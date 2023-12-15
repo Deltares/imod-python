@@ -1,0 +1,987 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imod.wq.slv &#8212; iMOD Python 0.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/wq/slv';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">imod.wq.slv</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for imod.wq.slv</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pathlib</span>
+
+<span class="kn">import</span> <span class="nn">jinja2</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">imod.wq.pkgbase</span> <span class="kn">import</span> <span class="n">Package</span>
+
+
+<div class="viewcode-block" id="PreconditionedConjugateGradientSolver"><a class="viewcode-back" href="../../../api/generated/wq/imod.wq.PreconditionedConjugateGradientSolver.html#imod.wq.PreconditionedConjugateGradientSolver">[docs]</a><span class="k">class</span> <span class="nc">PreconditionedConjugateGradientSolver</span><span class="p">(</span><span class="n">Package</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Preconditioned Conjugate Gradient Solver is used to solve the finite</span>
+<span class="sd">    difference equations in each step of a MODFLOW stress period.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    max_iter: int</span>
+<span class="sd">        is the maximum number of outer iterations - that is, calss to the</span>
+<span class="sd">        solutions routine (MXITER). For a linear problem max_iter should be 1, unless</span>
+<span class="sd">        more than 50 inner iterations are required, when max_iter could be as</span>
+<span class="sd">        large as 10. A larger number (generally less than 100) is required for a</span>
+<span class="sd">        nonlinear problem.</span>
+<span class="sd">    inner_iter: int</span>
+<span class="sd">        is the number of inner iterations (iter1). For nonlinear problems,</span>
+<span class="sd">        inner_iter usually ranges from 10 to 30; a value of 30 will be</span>
+<span class="sd">        sufficient for most linear problems.</span>
+<span class="sd">    rclose: float</span>
+<span class="sd">        is the residual criterion for convergence, in units of cubic length per</span>
+<span class="sd">        time. The units for length and time are the same as established for all</span>
+<span class="sd">        model data. When the maximum absolute value of the residual at all nodes</span>
+<span class="sd">        during an iteration is less than or equal to RCLOSE, and the criterion</span>
+<span class="sd">        for HCLOSE is also satisfied (see below), iteration stops.</span>
+
+<span class="sd">        Default value: 100.0. **Nota bene**: this is aimed at regional modelling.</span>
+<span class="sd">        For detailed studies (e.g. lab experiments) much smaller values can be</span>
+<span class="sd">        required.</span>
+<span class="sd">        Very general rule of thumb: should be less than 10% of smallest cell volume.</span>
+<span class="sd">    hclose: float</span>
+<span class="sd">        is the head change criterion for convergence, in units of length. When</span>
+<span class="sd">        the maximum absolute value of head change from all nodes during an</span>
+<span class="sd">        iteration is less than or equal to HCLOSE, and the criterion for RCLOSE</span>
+<span class="sd">        is also satisfied (see above), iteration stops.</span>
+<span class="sd">        Default value: 1.0e-4. **Nota bene**: This is aimed at regional modelling, `</span>
+<span class="sd">        for detailed studies (e.g. lab experiments) much smaller values can be</span>
+<span class="sd">        required.</span>
+<span class="sd">    relax: float, optional</span>
+<span class="sd">        is the relaxation parameter used. Usually, RELAX = 1.0, but for some</span>
+<span class="sd">        problems a value of 0.99, 0.98, or 0.97 will reduce the number of</span>
+<span class="sd">        iterations required for convergence.</span>
+<span class="sd">        Default value: 0.98.</span>
+<span class="sd">    damp: float, optional</span>
+<span class="sd">        is the damping factor. It is typically set equal to one, which indicates</span>
+<span class="sd">        no damping. A value less than 1 and greater than 0 causes damping. DAMP</span>
+<span class="sd">        does not affect inner iterations; instead, it affects outer iterations.</span>
+<span class="sd">        Default value: 1.0.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">&quot;pcg&quot;</span>
+    <span class="n">_template</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;[pcg]</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    mxiter = </span><span class="si">{max_iter}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    iter1 = </span><span class="si">{inner_iter}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    npcond = 1</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    hclose = </span><span class="si">{hclose}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    rclose = </span><span class="si">{rclose}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    relax = </span><span class="si">{relax}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    iprpcg = 1</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    mutpcg = 0</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    damp = </span><span class="si">{damp}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="PreconditionedConjugateGradientSolver.__init__"><a class="viewcode-back" href="../../../api/generated/wq/imod.wq.PreconditionedConjugateGradientSolver.html#imod.wq.PreconditionedConjugateGradientSolver.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">max_iter</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span>
+        <span class="n">inner_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">rclose</span><span class="o">=</span><span class="mf">1000.0</span><span class="p">,</span>
+        <span class="n">hclose</span><span class="o">=</span><span class="mf">1.0e-4</span><span class="p">,</span>
+        <span class="n">relax</span><span class="o">=</span><span class="mf">0.98</span><span class="p">,</span>
+        <span class="n">damp</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;max_iter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">max_iter</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;inner_iter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">inner_iter</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;rclose&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rclose</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;hclose&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hclose</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;relax&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">relax</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;damp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">damp</span></div>
+
+    <span class="k">def</span> <span class="nf">_pkgcheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ibound</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">to_check</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;max_iter&quot;</span><span class="p">,</span> <span class="s2">&quot;inner_iter&quot;</span><span class="p">,</span> <span class="s2">&quot;rclose&quot;</span><span class="p">,</span> <span class="s2">&quot;hclose&quot;</span><span class="p">,</span> <span class="s2">&quot;damp&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_positive</span><span class="p">(</span><span class="n">to_check</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GeneralizedConjugateGradientSolver"><a class="viewcode-back" href="../../../api/generated/wq/imod.wq.GeneralizedConjugateGradientSolver.html#imod.wq.GeneralizedConjugateGradientSolver">[docs]</a><span class="k">class</span> <span class="nc">GeneralizedConjugateGradientSolver</span><span class="p">(</span><span class="n">Package</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Generalized Conjugate Gradient Solver solves the matrix equations</span>
+<span class="sd">    resulting from the implicit solution of the transport equation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    max_iter: int</span>
+<span class="sd">        is the maximum number of outer iterations (MXITER); it should be set to an</span>
+<span class="sd">        integer greater than one (1) only when a nonlinear sorption isotherm is</span>
+<span class="sd">        included in simulation.</span>
+<span class="sd">    iter1: int</span>
+<span class="sd">        is the maximum number of inner iterations (iter1); a value of 30-50</span>
+<span class="sd">        should be adequate for most problems.</span>
+<span class="sd">    isolve: int</span>
+<span class="sd">        is the type of preconditioners to be used with the Lanczos/ORTHOMIN</span>
+<span class="sd">        acceleration scheme:</span>
+<span class="sd">        isolve = 1: Jacobi</span>
+<span class="sd">        isolve = 2: SSOR</span>
+<span class="sd">        isolve = 3: Modified Incomplete Cholesky (MIC)</span>
+<span class="sd">        (MIC usually converges faster, but it needs significantly more memory)</span>
+<span class="sd">    lump_dispersion: bool</span>
+<span class="sd">        is an integer flag for treatment of dispersion tensor cross terms:</span>
+<span class="sd">        ncrs = 0: lump all dispersion cross terms to the right-hand-side</span>
+<span class="sd">        (approximate but highly efficient).</span>
+<span class="sd">        ncrs = 1: include full dispersion tensor (memory intensive).</span>
+<span class="sd">    cclose: float</span>
+<span class="sd">        is the convergence criterion in terms of relative concentration; a real</span>
+<span class="sd">        value between 10-4 and 10-6 is generally adequate.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">&quot;gcg&quot;</span>
+    <span class="n">_template</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;[gcg]</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    mxiter = </span><span class="si">{max_iter}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    iter1 = </span><span class="si">{inner_iter}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    isolve = </span><span class="si">{preconditioner}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    ncrs = </span><span class="si">{lump_dispersion}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    cclose = </span><span class="si">{cclose}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    iprgcg = 0&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">_keywords</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;preconditioner&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;jacobi&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;ssor&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;mic&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span>
+        <span class="s2">&quot;lump_dispersion&quot;</span><span class="p">:</span> <span class="p">{</span><span class="kc">True</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+    <span class="p">}</span>
+
+<div class="viewcode-block" id="GeneralizedConjugateGradientSolver.__init__"><a class="viewcode-back" href="../../../api/generated/wq/imod.wq.GeneralizedConjugateGradientSolver.html#imod.wq.GeneralizedConjugateGradientSolver.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">max_iter</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">inner_iter</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+        <span class="n">cclose</span><span class="o">=</span><span class="mf">1.0e-6</span><span class="p">,</span>
+        <span class="n">preconditioner</span><span class="o">=</span><span class="s2">&quot;mic&quot;</span><span class="p">,</span>
+        <span class="n">lump_dispersion</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;max_iter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">max_iter</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;inner_iter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">inner_iter</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;cclose&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cclose</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;preconditioner&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">preconditioner</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;lump_dispersion&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lump_dispersion</span></div>
+
+    <span class="k">def</span> <span class="nf">_pkgcheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ibound</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">to_check</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;max_iter&quot;</span><span class="p">,</span> <span class="s2">&quot;inner_iter&quot;</span><span class="p">,</span> <span class="s2">&quot;cclose&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_positive</span><span class="p">(</span><span class="n">to_check</span><span class="p">)</span></div>
+
+
+<span class="k">class</span> <span class="nc">ParallelSolver</span><span class="p">(</span><span class="n">Package</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base package for the parallel solvers.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_compute_load_balance_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ibound</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;partition&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;rcb&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;load_balance_weight&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[()]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;load_balance_weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">ibound</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">values</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_vars</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_keywords&quot;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keywords</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_replace_keyword</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;partition&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;rcb&quot;</span><span class="p">:</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;load_balance_weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_path</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;directory&quot;</span><span class="p">:</span> <span class="n">directory</span><span class="p">,</span>
+                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;load_balance_weight&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;extension&quot;</span><span class="p">:</span> <span class="s2">&quot;.asc&quot;</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">d</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Overloaded method to write .asc instead of .idf.</span>
+<span class="sd">        (This is an idiosyncracy of the parallel iMODwq code.)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: remove this when iMOD_wq accepts idfs for the load grid.</span>
+        <span class="n">da</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;load_balance_weight&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span> <span class="o">==</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;load_balance_weight dimensions must be exactly (&#39;y&#39;, &#39;x&#39;).&quot;</span>
+            <span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;load_balance_weight.asc&quot;</span><span class="p">)</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
+            <span class="n">path</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">float_format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%8.2f</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+
+<div class="viewcode-block" id="ParallelKrylovFlowSolver"><a class="viewcode-back" href="../../../api/generated/wq/imod.wq.ParallelKrylovFlowSolver.html#imod.wq.ParallelKrylovFlowSolver">[docs]</a><span class="k">class</span> <span class="nc">ParallelKrylovFlowSolver</span><span class="p">(</span><span class="n">ParallelSolver</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Parallel Krylov Flow Solver is used for parallel solving of the flow</span>
+<span class="sd">    model.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    max_iter: int</span>
+<span class="sd">        is the maximum number of outer iterations (MXITER); it should be set to</span>
+<span class="sd">        an integer greater than one (1) only when a nonlinear sorption isotherm</span>
+<span class="sd">        is included in simulation.</span>
+<span class="sd">    inner_iter: int</span>
+<span class="sd">        is the maximum number of inner iterations (INNERIT); a value of 30-50</span>
+<span class="sd">        should be adequate for most problems.</span>
+<span class="sd">    hclose: float</span>
+<span class="sd">        is the head change criterion for convergence (HCLOSEPKS), in units of</span>
+<span class="sd">        length. When the maximum absolute value of head change from all nodes</span>
+<span class="sd">        during an iteration is less than or equal to HCLOSE, and the criterion</span>
+<span class="sd">        for RCLOSE is also satisfied (see below), iteration stops.</span>
+<span class="sd">    rclose: float</span>
+<span class="sd">        is the residual criterion for convergence (RCLOSEPKS), in units of cubic</span>
+<span class="sd">        length per time. The units for length and time are the same as</span>
+<span class="sd">        established for all model data. When the maximum absolute value of the</span>
+<span class="sd">        residual at all nodes during an iteration is less than or equal to</span>
+<span class="sd">        RCLOSE, and the criterion for HCLOSE is also satisfied (see above),</span>
+<span class="sd">        iteration stops.</span>
+<span class="sd">    relax: float</span>
+<span class="sd">        is the relaxation parameter used. Usually, RELAX = 1.0, but for some</span>
+<span class="sd">        problems a value of 0.99, 0.98, or 0.97 will reduce the number of</span>
+<span class="sd">        iterations required for convergence.</span>
+<span class="sd">    h_fstrict: float, optional</span>
+<span class="sd">        is a factor to apply to HCLOSE to set a stricter hclose for the linear</span>
+<span class="sd">        inner iterations (H_FSTRICTPKS). HCLOSE_inner is calculated as follows:</span>
+<span class="sd">        HCLOSEPKS * H_FSTRICTPKS.</span>
+<span class="sd">    r_fstrict: float, optional</span>
+<span class="sd">        is a factor to apply to RCLOSE to set a stricter rclose for the linear</span>
+<span class="sd">        inner iterations (R_FSTRICTPKS). RCLOSE_inner is calculated as follows:</span>
+<span class="sd">        RCLOSEPKS * R_FSTRICTPKS.</span>
+<span class="sd">    partition: {&quot;uniform&quot;, &quot;rcb&quot;}, optional</span>
+<span class="sd">        Partitioning option (PARTOPT). &quot;uniform&quot; partitions the model domain</span>
+<span class="sd">        into equally sized subdomains. &quot;rcb&quot; (Recursive Coordinate Bisection)</span>
+<span class="sd">        uses a 2D pointer grid with weights to partition the model domain.</span>
+<span class="sd">        Default value: &quot;uniform&quot;</span>
+<span class="sd">    solver: {&quot;pcg&quot;}, optional</span>
+<span class="sd">        Flag indicating the linear solver to be used (ISOLVER).</span>
+<span class="sd">        Default value: &quot;pcg&quot;</span>
+<span class="sd">    preconditioner: {&quot;ilu&quot;}, optional</span>
+<span class="sd">        Flag inicating the preconditioner to be used (NPC).</span>
+<span class="sd">        Devault value: &quot;ilu&quot;</span>
+<span class="sd">    deflate: {True, False}, optional</span>
+<span class="sd">        Flag for deflation preconditioner.</span>
+<span class="sd">        Default value: False</span>
+<span class="sd">    debug: {True, False}, optional</span>
+<span class="sd">        Debug option.</span>
+<span class="sd">        Default value: False</span>
+<span class="sd">    load_balance_weight: xarray.DataArray, optional</span>
+<span class="sd">        2D grid with load balance weights, used when partition = &quot;rcb&quot;</span>
+<span class="sd">        (Recursive Coordinate Bisection). If None (default), then the module</span>
+<span class="sd">        will create a load balance grid by summing active cells over layers:</span>
+<span class="sd">        `(ibound != 0).sum(&quot;layer&quot;)`</span>
+
+<span class="sd">        Note that even though the iMOD-SEAWAT helpfile states .idf is</span>
+<span class="sd">        accepted, it is not. This load balance grid should be a .asc file</span>
+<span class="sd">        (without a header). Formatting is done as follows:</span>
+<span class="sd">        `pd.DataFrame(load_balance_weight.values).to_csv(path, sep=&#39;\\t&#39;,</span>
+<span class="sd">        header=False, index=False, float_format = &quot;%8.2f&quot;)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">&quot;pksf&quot;</span>
+    <span class="n">_template</span> <span class="o">=</span> <span class="n">jinja2</span><span class="o">.</span><span class="n">Template</span><span class="p">(</span>
+        <span class="s2">&quot;[pksf]</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    mxiter = {{max_iter}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    innerit = {{inner_iter}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    hclosepks = {{hclose}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    rclosepks = {{rclose}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    relax = {{relax}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    h_fstrictpks = {{h_fstrict}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    r_fstrictpks = {{r_fstrict}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    partopt = {{partition}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    isolver = {{solver}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    npc = {{preconditioner}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    npcdef = {{deflate}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;{</span><span class="si">% i</span><span class="s2">f load_balance_weight %}    loadptr = {{load_balance_weight}}</span><span class="se">\n</span><span class="s2">{</span><span class="si">% e</span><span class="s2">ndif %}&quot;</span>
+        <span class="s2">&quot;    pressakey = {{debug}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+    <span class="n">_keywords</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;partition&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;uniform&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;rcb&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span>
+        <span class="s2">&quot;solver&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;pcg&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="s2">&quot;preconditioner&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;ilu&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+        <span class="s2">&quot;deflate&quot;</span><span class="p">:</span> <span class="p">{</span><span class="kc">False</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">True</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+    <span class="p">}</span>
+
+<div class="viewcode-block" id="ParallelKrylovFlowSolver.__init__"><a class="viewcode-back" href="../../../api/generated/wq/imod.wq.ParallelKrylovFlowSolver.html#imod.wq.ParallelKrylovFlowSolver.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">max_iter</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span>
+        <span class="n">inner_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">hclose</span><span class="o">=</span><span class="mf">1.0e-4</span><span class="p">,</span>
+        <span class="n">rclose</span><span class="o">=</span><span class="mf">1000.0</span><span class="p">,</span>
+        <span class="n">relax</span><span class="o">=</span><span class="mf">0.98</span><span class="p">,</span>
+        <span class="n">h_fstrict</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">r_fstrict</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">partition</span><span class="o">=</span><span class="s2">&quot;uniform&quot;</span><span class="p">,</span>
+        <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;pcg&quot;</span><span class="p">,</span>
+        <span class="n">preconditioner</span><span class="o">=</span><span class="s2">&quot;ilu&quot;</span><span class="p">,</span>
+        <span class="n">deflate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">load_balance_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;max_iter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">max_iter</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;inner_iter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">inner_iter</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;hclose&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hclose</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;rclose&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rclose</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;relax&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">relax</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;h_fstrict&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">h_fstrict</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;r_fstrict&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">r_fstrict</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;partition&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">partition</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;solver&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">solver</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;preconditioner&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">preconditioner</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;deflate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">deflate</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;debug&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">debug</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;load_balance_weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_balance_weight</span></div>
+
+    <span class="k">def</span> <span class="nf">_pkgcheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ibound</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">to_check</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;hclose&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;rclose&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;h_fstrict&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;r_fstrict&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;max_iter&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;inner_iter&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;relax&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_positive</span><span class="p">(</span><span class="n">to_check</span><span class="p">)</span></div>
+        <span class="c1"># TODO: fix</span>
+        <span class="c1"># Check whether option is actually an available option</span>
+        <span class="c1"># for opt_arg in self._keywords.keys():</span>
+        <span class="c1">#    if self[opt_arg] not in self._keywords[opt_arg].keys():</span>
+        <span class="c1">#        raise ValueError(</span>
+        <span class="c1">#            &quot;Argument for {} not in {}, instead got {}&quot;.format(</span>
+        <span class="c1">#                opt_arg, self._keywords[opt_arg].keys(), self[opt_arg]</span>
+        <span class="c1">#            )</span>
+        <span class="c1">#        )</span>
+        <span class="c1">#</span>
+
+
+<div class="viewcode-block" id="ParallelKrylovTransportSolver"><a class="viewcode-back" href="../../../api/generated/wq/imod.wq.ParallelKrylovTransportSolver.html#imod.wq.ParallelKrylovTransportSolver">[docs]</a><span class="k">class</span> <span class="nc">ParallelKrylovTransportSolver</span><span class="p">(</span><span class="n">ParallelSolver</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Parallel Krylov Transport Solver is used for parallel solving of the</span>
+<span class="sd">    transport model.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    max_iter: int</span>
+<span class="sd">        is the maximum number of outer iterations (MXITER); it should be set to</span>
+<span class="sd">        an integer greater than one (1) only when a nonlinear sorption isotherm</span>
+<span class="sd">        is included in simulation.</span>
+<span class="sd">    inner_iter: int</span>
+<span class="sd">        is the maximum number of inner iterations (INNERIT); a value of 30-50</span>
+<span class="sd">        should be adequate for most problems.</span>
+<span class="sd">    cclose: float, optional</span>
+<span class="sd">        is the convergence criterion in terms of relative concentration; a real</span>
+<span class="sd">        value between 10-4 and 10-6 is generally adequate.</span>
+<span class="sd">        Default value: 1.0e-6.</span>
+<span class="sd">    relax: float, optional</span>
+<span class="sd">        is the relaxation parameter used. Usually, RELAX = 1.0, but for some</span>
+<span class="sd">        problems a value of 0.99, 0.98, or 0.97 will reduce the number of</span>
+<span class="sd">        iterations required for convergence.</span>
+<span class="sd">        Default value: 0.98.</span>
+<span class="sd">    partition: {&quot;uniform&quot;, &quot;rcb&quot;}, optional</span>
+<span class="sd">        Partitioning option (PARTOPT). &quot;uniform&quot; partitions the model domain</span>
+<span class="sd">        into equally sized subdomains. &quot;rcb&quot; (Recursive Coordinate Bisection)</span>
+<span class="sd">        uses a 2D pointer grid with weights to partition the model domain.</span>
+<span class="sd">        Default value: &quot;uniform&quot;.</span>
+<span class="sd">    solver: {&quot;bicgstab&quot;, &quot;gmres&quot;, &quot;gcr&quot;}, optional</span>
+<span class="sd">        Flag indicating the linear solver to be used (ISOLVER).</span>
+<span class="sd">        Default value: &quot;bicgstab&quot;</span>
+<span class="sd">    preconditioner: {&quot;ilu&quot;}, optional</span>
+<span class="sd">        Flag inicating the preconditioner to be used (NPC).</span>
+<span class="sd">        Devault value: &quot;ilu&quot;.</span>
+<span class="sd">    debug: {True, False}, optional</span>
+<span class="sd">        Debug option.</span>
+<span class="sd">        Default value: False</span>
+<span class="sd">    load_balance_weight: xarray.DataArray, optional</span>
+<span class="sd">        2D grid with load balance weights, used when partition = &quot;rcb&quot;</span>
+<span class="sd">        (Recursive Coordinate Bisection). If None (default), then the module</span>
+<span class="sd">        will create a load balance grid by summing active cells over layers:</span>
+<span class="sd">        `(ibound != 0).sum(&quot;layer&quot;)`</span>
+
+<span class="sd">        Note that even though the iMOD-SEAWAT helpfile states .idf is</span>
+<span class="sd">        accepted, it is not. This load balance grid should be a .asc file</span>
+<span class="sd">        (without a header). Formatting is done as follows:</span>
+<span class="sd">        `pd.DataFrame(load_balance_weight.values).to_csv(path, sep=&#39;\\t&#39;,</span>
+<span class="sd">        header=False, index=False, float_format = &quot;%8.2f&quot;)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">&quot;pkst&quot;</span>
+    <span class="n">_template</span> <span class="o">=</span> <span class="n">jinja2</span><span class="o">.</span><span class="n">Template</span><span class="p">(</span>
+        <span class="s2">&quot;[pkst]</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    mxiter = {{max_iter}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    innerit = {{inner_iter}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    cclosepks = {{cclose}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    relax = {{relax}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    partopt = {{partition}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    isolver = {{solver}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    npc = {{preconditioner}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;{</span><span class="si">% i</span><span class="s2">f load_balance_weight %}    loadptr = {{load_balance_weight}}</span><span class="se">\n</span><span class="s2">{</span><span class="si">% e</span><span class="s2">ndif %}&quot;</span>
+        <span class="s2">&quot;    pressakey = {{debug}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">_keywords</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;partition&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;uniform&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;rcb&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span>
+        <span class="s2">&quot;solver&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bicgstab&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;gmres&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;gcr&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">},</span>
+        <span class="s2">&quot;preconditioner&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;ilu&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+    <span class="p">}</span>
+
+<div class="viewcode-block" id="ParallelKrylovTransportSolver.__init__"><a class="viewcode-back" href="../../../api/generated/wq/imod.wq.ParallelKrylovTransportSolver.html#imod.wq.ParallelKrylovTransportSolver.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">max_iter</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">inner_iter</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+        <span class="n">cclose</span><span class="o">=</span><span class="mf">1.0e-6</span><span class="p">,</span>
+        <span class="n">relax</span><span class="o">=</span><span class="mf">0.98</span><span class="p">,</span>
+        <span class="n">partition</span><span class="o">=</span><span class="s2">&quot;uniform&quot;</span><span class="p">,</span>
+        <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;bicgstab&quot;</span><span class="p">,</span>
+        <span class="n">preconditioner</span><span class="o">=</span><span class="s2">&quot;ilu&quot;</span><span class="p">,</span>
+        <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">load_balance_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;max_iter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">max_iter</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;inner_iter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">inner_iter</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;cclose&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cclose</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;relax&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">relax</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;partition&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">partition</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;solver&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">solver</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;preconditioner&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">preconditioner</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;debug&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">debug</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;load_balance_weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_balance_weight</span></div>
+
+    <span class="k">def</span> <span class="nf">_pkgcheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ibound</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">to_check</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;cclose&quot;</span><span class="p">,</span> <span class="s2">&quot;max_iter&quot;</span><span class="p">,</span> <span class="s2">&quot;inner_iter&quot;</span><span class="p">,</span> <span class="s2">&quot;relax&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_positive</span><span class="p">(</span><span class="n">to_check</span><span class="p">)</span></div>
+        <span class="c1"># TODO: fix</span>
+        <span class="c1"># Check whether option is actually an available option</span>
+        <span class="c1"># for opt_arg in self._keywords.keys():</span>
+        <span class="c1">#    if self[opt_arg] not in self._keywords[opt_arg].keys():</span>
+        <span class="c1">#        raise ValueError(</span>
+        <span class="c1">#            &quot;Argument for {} not in {}, instead got {}&quot;.format(</span>
+        <span class="c1">#                opt_arg, self._keywords[opt_arg].keys(), self[opt_arg]</span>
+        <span class="c1">#            )</span>
+        <span class="c1">#        )</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

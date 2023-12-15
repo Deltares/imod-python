@@ -1,0 +1,29 @@
+﻿imod.flow.GeneralHeadBoundary
+=============================
+
+.. currentmodule:: imod.flow
+
+.. autoclass:: GeneralHeadBoundary
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~GeneralHeadBoundary.__init__
+      ~GeneralHeadBoundary.compose
+      ~GeneralHeadBoundary.from_file
+      ~GeneralHeadBoundary.isel
+      ~GeneralHeadBoundary.periodic_stress
+      ~GeneralHeadBoundary.repeat_stress
+      ~GeneralHeadBoundary.save
+      ~GeneralHeadBoundary.sel
+   
+   
+
+   
+   
+   

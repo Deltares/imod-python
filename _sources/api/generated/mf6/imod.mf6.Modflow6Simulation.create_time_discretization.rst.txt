@@ -1,0 +1,6 @@
+﻿imod.mf6.Modflow6Simulation.create\_time\_discretization
+========================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: Modflow6Simulation.create_time_discretization

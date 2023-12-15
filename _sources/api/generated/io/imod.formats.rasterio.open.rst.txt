@@ -1,0 +1,6 @@
+﻿imod.formats.rasterio.open
+==========================
+
+.. currentmodule:: imod.formats.rasterio
+
+.. autofunction:: open

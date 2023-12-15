@@ -1,0 +1,45 @@
+﻿imod.mf6.AdvectionTVD
+=====================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: AdvectionTVD
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~AdvectionTVD.__init__
+      ~AdvectionTVD.clip_box
+      ~AdvectionTVD.copy
+      ~AdvectionTVD.from_file
+      ~AdvectionTVD.get_regrid_methods
+      ~AdvectionTVD.is_grid_agnostic_package
+      ~AdvectionTVD.is_regridding_supported
+      ~AdvectionTVD.isel
+      ~AdvectionTVD.mask
+      ~AdvectionTVD.regrid_like
+      ~AdvectionTVD.render
+      ~AdvectionTVD.sel
+      ~AdvectionTVD.skip_masking_dataarray
+      ~AdvectionTVD.to_netcdf
+      ~AdvectionTVD.write
+      ~AdvectionTVD.write_binary_griddata
+      ~AdvectionTVD.write_blockfile
+      ~AdvectionTVD.write_text_griddata
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~AdvectionTVD.dataset
+   
+   

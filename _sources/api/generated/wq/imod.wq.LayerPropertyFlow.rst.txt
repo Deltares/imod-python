@@ -1,0 +1,26 @@
+﻿imod.wq.LayerPropertyFlow
+=========================
+
+.. currentmodule:: imod.wq
+
+.. autoclass:: LayerPropertyFlow
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~LayerPropertyFlow.__init__
+      ~LayerPropertyFlow.from_file
+      ~LayerPropertyFlow.isel
+      ~LayerPropertyFlow.save
+      ~LayerPropertyFlow.sel
+   
+   
+
+   
+   
+   

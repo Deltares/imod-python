@@ -1,0 +1,28 @@
+﻿imod.wq.RechargeTopLayer
+========================
+
+.. currentmodule:: imod.wq
+
+.. autoclass:: RechargeTopLayer
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~RechargeTopLayer.__init__
+      ~RechargeTopLayer.add_timemap
+      ~RechargeTopLayer.from_file
+      ~RechargeTopLayer.isel
+      ~RechargeTopLayer.repeat_stress
+      ~RechargeTopLayer.save
+      ~RechargeTopLayer.sel
+   
+   
+
+   
+   
+   

@@ -1,0 +1,6 @@
+﻿imod.util.ignore\_warnings
+==========================
+
+.. currentmodule:: imod.util
+
+.. autofunction:: ignore_warnings

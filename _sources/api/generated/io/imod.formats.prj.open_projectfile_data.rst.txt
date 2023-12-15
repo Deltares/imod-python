@@ -1,0 +1,6 @@
+﻿imod.formats.prj.open\_projectfile\_data
+========================================
+
+.. currentmodule:: imod.formats.prj
+
+.. autofunction:: open_projectfile_data

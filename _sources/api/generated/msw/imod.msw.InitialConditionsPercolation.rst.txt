@@ -1,0 +1,26 @@
+﻿imod.msw.InitialConditionsPercolation
+=====================================
+
+.. currentmodule:: imod.msw
+
+.. autoclass:: InitialConditionsPercolation
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~InitialConditionsPercolation.__init__
+      ~InitialConditionsPercolation.isel
+      ~InitialConditionsPercolation.sel
+      ~InitialConditionsPercolation.write
+      ~InitialConditionsPercolation.write_dataframe_fixed_width
+   
+   
+
+   
+   
+   

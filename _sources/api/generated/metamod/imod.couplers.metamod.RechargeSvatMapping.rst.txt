@@ -1,0 +1,26 @@
+﻿imod.couplers.metamod.RechargeSvatMapping
+=========================================
+
+.. currentmodule:: imod.couplers.metamod
+
+.. autoclass:: RechargeSvatMapping
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~RechargeSvatMapping.__init__
+      ~RechargeSvatMapping.isel
+      ~RechargeSvatMapping.sel
+      ~RechargeSvatMapping.write
+      ~RechargeSvatMapping.write_dataframe_fixed_width
+   
+   
+
+   
+   
+   

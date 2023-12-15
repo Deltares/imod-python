@@ -1,0 +1,6 @@
+﻿imod.formats.rasterio.header
+============================
+
+.. currentmodule:: imod.formats.rasterio
+
+.. autofunction:: header

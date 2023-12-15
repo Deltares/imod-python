@@ -1,0 +1,27 @@
+﻿imod.flow.Boundary
+==================
+
+.. currentmodule:: imod.flow
+
+.. autoclass:: Boundary
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Boundary.__init__
+      ~Boundary.compose
+      ~Boundary.from_file
+      ~Boundary.isel
+      ~Boundary.save
+      ~Boundary.sel
+   
+   
+
+   
+   
+   

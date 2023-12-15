@@ -1,0 +1,26 @@
+﻿imod.couplers.metamod.NodeSvatMapping
+=====================================
+
+.. currentmodule:: imod.couplers.metamod
+
+.. autoclass:: NodeSvatMapping
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~NodeSvatMapping.__init__
+      ~NodeSvatMapping.isel
+      ~NodeSvatMapping.sel
+      ~NodeSvatMapping.write
+      ~NodeSvatMapping.write_dataframe_fixed_width
+   
+   
+
+   
+   
+   

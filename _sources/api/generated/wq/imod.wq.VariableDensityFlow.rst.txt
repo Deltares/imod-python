@@ -1,0 +1,26 @@
+﻿imod.wq.VariableDensityFlow
+===========================
+
+.. currentmodule:: imod.wq
+
+.. autoclass:: VariableDensityFlow
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~VariableDensityFlow.__init__
+      ~VariableDensityFlow.from_file
+      ~VariableDensityFlow.isel
+      ~VariableDensityFlow.save
+      ~VariableDensityFlow.sel
+   
+   
+
+   
+   
+   

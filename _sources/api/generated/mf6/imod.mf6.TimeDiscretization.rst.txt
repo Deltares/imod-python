@@ -1,0 +1,45 @@
+﻿imod.mf6.TimeDiscretization
+===========================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: TimeDiscretization
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TimeDiscretization.__init__
+      ~TimeDiscretization.clip_box
+      ~TimeDiscretization.copy
+      ~TimeDiscretization.from_file
+      ~TimeDiscretization.get_regrid_methods
+      ~TimeDiscretization.is_grid_agnostic_package
+      ~TimeDiscretization.is_regridding_supported
+      ~TimeDiscretization.isel
+      ~TimeDiscretization.mask
+      ~TimeDiscretization.regrid_like
+      ~TimeDiscretization.render
+      ~TimeDiscretization.sel
+      ~TimeDiscretization.skip_masking_dataarray
+      ~TimeDiscretization.to_netcdf
+      ~TimeDiscretization.write
+      ~TimeDiscretization.write_binary_griddata
+      ~TimeDiscretization.write_blockfile
+      ~TimeDiscretization.write_text_griddata
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~TimeDiscretization.dataset
+   
+   

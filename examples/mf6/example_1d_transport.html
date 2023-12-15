@@ -1,0 +1,873 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>1D Solute Transport Benchmarks &#8212; iMOD Python 0.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/mf6/example_1d_transport';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Example models" href="example_models.html" />
+    <link rel="prev" title="TWRI" href="ex01_twri.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">MODFLOW6</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Henry.html">Henry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="circle.html">Circle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="circle_transport.html">Freshwater lens (circle)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ex01_twri.html">TWRI</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">1D Solute Transport Benchmarks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_models.html">Example models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hondsrug.html">Regional model</a></li>
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="hondsrug_partitioning.html">Partitioning a regional model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hondsrug_regridding.html">Regridding a regional model</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="lake.html">Lake package example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="twri_regridding.html">TWRI regridding</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../imodflow/index.html">iMODFLOW</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../imodflow/ImodflowProjectfile.html">Model Creation</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../imod-wq/index.html">iMOD-WQ</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../imod-wq/Elder.html">Elder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../imod-wq/FreshwaterLens.html">Freshwater Lens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../imod-wq/Henry.html">Henry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../imod-wq/Hydrocoin.html">Hydrocoin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../imod-wq/SaltwaterPocket.html">Saltwater Pocket</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../imod-wq/VerticalInterface.html">Vertical Interface</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../metaswap/index.html">MetaSWAP</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../metaswap/metaswap_example.html">Coupled MetaSWAP - Modflow6 model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../metaswap/read_metaswap_file.html">Reading existing MetaSWAP input</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../prepare/index.html">Prepare</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/point_interpolation.html">Head point interpolation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/polygonize_raster.html">Polygonize raster</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/rasterize_shp.html">Rasterize shapefiles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/reproject.html">Reproject data</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../visualize/index.html">Visualization</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../visualize/flowvel_streamlines.html">Flow velocities and streamlines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../visualize/plot_map.html">Plot maps</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Examples</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">MODFLOW6</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">1D Solute...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-examples-mf6-example-1d-transport-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="d-solute-transport-benchmarks">
+<span id="sphx-glr-examples-mf6-example-1d-transport-py"></span><h1>1D Solute Transport Benchmarks<a class="headerlink" href="#d-solute-transport-benchmarks" title="Permalink to this heading">#</a></h1>
+<p>This example is taken from the MODFLOW6 Examples, number 35.</p>
+<p>As explained there, the setup is a simple 1d homogeneous aquifer with a steady
+state flow field of constant velocity. The benchmark consists of four transport
+problems that are modeled using this flow field. Here we have modeled these
+four transport problems as a single simulation with multiple species. In all
+cases the initial concentration in the domain is zero, but water entering the
+domain has a concentration of one:</p>
+<ul class="simple">
+<li><p>species a is transported with zero diffusion or dispersion and the
+concentration distribution should show a sharp front, but due to the
+numerical method we see some smearing, which is expected.</p></li>
+<li><p>species b has a sizeable dispersivity and hence shows more smearing than
+species a but the same centre of mass.</p></li>
+<li><p>Species c has linear sorption and therefore the concentration doesn’t enter
+the domain as far as species a or species b, but the front of the solute
+plume has the same overall shape as for species a or species b.</p></li>
+<li><p>Species d has linear sorption and first order decay, and this changes the
+shape of the front of the solute plume.</p></li>
+</ul>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+<span class="kn">import</span> <span class="nn">imod</span>
+
+
+<span class="k">def</span> <span class="nf">create_transport_model</span><span class="p">(</span><span class="n">flowmodel</span><span class="p">,</span> <span class="n">speciesname</span><span class="p">,</span> <span class="n">dispersivity</span><span class="p">,</span> <span class="n">retardation</span><span class="p">,</span> <span class="n">decay</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to create a transport model, as we intend to create four similar</span>
+<span class="sd">    transport models.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flowmodel: GroundwaterFlowModel</span>
+<span class="sd">    speciesname: str</span>
+<span class="sd">    dispersivity: float</span>
+<span class="sd">    retardation: float</span>
+<span class="sd">    decay: float</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    transportmodel: GroundwaterTransportModel</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">rhobulk</span> <span class="o">=</span> <span class="mf">1150.0</span>
+    <span class="n">porosity</span> <span class="o">=</span> <span class="mf">0.25</span>
+
+    <span class="n">tpt_model</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">GroundwaterTransportModel</span><span class="p">()</span>
+    <span class="n">tpt_model</span><span class="p">[</span><span class="s2">&quot;ssm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">SourceSinkMixing</span><span class="o">.</span><span class="n">from_flow_model</span><span class="p">(</span>
+        <span class="n">flowmodel</span><span class="p">,</span> <span class="n">speciesname</span><span class="p">,</span> <span class="n">save_flows</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="n">tpt_model</span><span class="p">[</span><span class="s2">&quot;adv&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">AdvectionUpstream</span><span class="p">()</span>
+    <span class="n">tpt_model</span><span class="p">[</span><span class="s2">&quot;dsp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Dispersion</span><span class="p">(</span>
+        <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">longitudinal_horizontal</span><span class="o">=</span><span class="n">dispersivity</span><span class="p">,</span>
+        <span class="n">transversal_horizontal1</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">xt3d_off</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">xt3d_rhs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Compute the sorption coefficient based on the desired retardation factor</span>
+    <span class="c1"># and the bulk density. Because of this, the exact value of bulk density</span>
+    <span class="c1"># does not matter for the solution.</span>
+    <span class="k">if</span> <span class="n">retardation</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="n">sorption</span> <span class="o">=</span> <span class="s2">&quot;linear&quot;</span>
+        <span class="n">kd</span> <span class="o">=</span> <span class="p">(</span><span class="n">retardation</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">porosity</span> <span class="o">/</span> <span class="n">rhobulk</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sorption</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">kd</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+    <span class="n">tpt_model</span><span class="p">[</span><span class="s2">&quot;mst&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">MobileStorageTransfer</span><span class="p">(</span>
+        <span class="n">porosity</span><span class="o">=</span><span class="n">porosity</span><span class="p">,</span>
+        <span class="n">decay</span><span class="o">=</span><span class="n">decay</span><span class="p">,</span>
+        <span class="n">decay_sorbed</span><span class="o">=</span><span class="n">decay</span><span class="p">,</span>
+        <span class="n">bulk_density</span><span class="o">=</span><span class="n">rhobulk</span><span class="p">,</span>
+        <span class="n">distcoef</span><span class="o">=</span><span class="n">kd</span><span class="p">,</span>
+        <span class="n">first_order_decay</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">sorption</span><span class="o">=</span><span class="n">sorption</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">tpt_model</span><span class="p">[</span><span class="s2">&quot;ic&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">InitialConditions</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">tpt_model</span><span class="p">[</span><span class="s2">&quot;oc&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">OutputControl</span><span class="p">(</span>
+        <span class="n">save_concentration</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">save_budget</span><span class="o">=</span><span class="s2">&quot;last&quot;</span>
+    <span class="p">)</span>
+    <span class="n">tpt_model</span><span class="p">[</span><span class="s2">&quot;dis&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flowmodel</span><span class="p">[</span><span class="s2">&quot;dis&quot;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">tpt_model</span>
+</pre></div>
+</div>
+<p>Create the spatial discretization.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">nlay</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">nrow</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">ncol</span> <span class="o">=</span> <span class="mi">101</span>
+<span class="n">dx</span> <span class="o">=</span> <span class="mf">10.0</span>
+<span class="n">xmin</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">xmax</span> <span class="o">=</span> <span class="n">dx</span> <span class="o">*</span> <span class="n">ncol</span>
+<span class="n">layer</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">dx</span>
+
+<span class="n">grid_dims</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
+<span class="n">grid_coords</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">layer</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">}</span>
+<span class="n">grid_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">nlay</span><span class="p">,</span> <span class="n">nrow</span><span class="p">,</span> <span class="n">ncol</span><span class="p">)</span>
+<span class="n">grid</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">grid_shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span> <span class="n">coords</span><span class="o">=</span><span class="n">grid_coords</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">grid_dims</span><span class="p">)</span>
+<span class="n">bottom</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+<span class="n">gwf_model</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">GroundwaterFlowModel</span><span class="p">()</span>
+<span class="n">gwf_model</span><span class="p">[</span><span class="s2">&quot;ic&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">InitialConditions</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Create the input for a constant head boundary and its associated concentration.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">constant_head</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">constant_head</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">60.0</span>
+<span class="n">constant_head</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+<span class="n">constant_conc</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">constant_conc</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">constant_conc</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">constant_conc</span> <span class="o">=</span> <span class="n">constant_conc</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span>
+    <span class="n">species</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;species_a&quot;</span><span class="p">,</span> <span class="s2">&quot;species_b&quot;</span><span class="p">,</span> <span class="s2">&quot;species_c&quot;</span><span class="p">,</span> <span class="s2">&quot;species_d&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">gwf_model</span><span class="p">[</span><span class="s2">&quot;chd&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">ConstantHead</span><span class="p">(</span><span class="n">constant_head</span><span class="p">,</span> <span class="n">constant_conc</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Add other flow packages.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">gwf_model</span><span class="p">[</span><span class="s2">&quot;npf&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">NodePropertyFlow</span><span class="p">(</span>
+    <span class="n">icelltype</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">k</span><span class="o">=</span><span class="n">xr</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
+    <span class="n">variable_vertical_conductance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">dewatered</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">perched</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">gwf_model</span><span class="p">[</span><span class="s2">&quot;dis&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">StructuredDiscretization</span><span class="p">(</span>
+    <span class="n">top</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">bottom</span><span class="o">=</span><span class="n">bottom</span><span class="p">,</span>
+    <span class="n">idomain</span><span class="o">=</span><span class="n">grid</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">gwf_model</span><span class="p">[</span><span class="s2">&quot;oc&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">OutputControl</span><span class="p">(</span><span class="n">save_head</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">save_budget</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+<span class="n">gwf_model</span><span class="p">[</span><span class="s2">&quot;sto&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">SpecificStorage</span><span class="p">(</span>
+    <span class="n">specific_storage</span><span class="o">=</span><span class="mf">1.0e-5</span><span class="p">,</span>
+    <span class="n">specific_yield</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span>
+    <span class="n">transient</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">convertible</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Create the simulation.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">simulation</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Modflow6Simulation</span><span class="p">(</span><span class="s2">&quot;1d_tpt_benchmark&quot;</span><span class="p">)</span>
+<span class="n">simulation</span><span class="p">[</span><span class="s2">&quot;flow&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gwf_model</span>
+</pre></div>
+</div>
+<p>Add four transport simulations, and setup the solver flow and transport.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">simulation</span><span class="p">[</span><span class="s2">&quot;tpt_a&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">create_transport_model</span><span class="p">(</span><span class="n">gwf_model</span><span class="p">,</span> <span class="s2">&quot;species_a&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+<span class="n">simulation</span><span class="p">[</span><span class="s2">&quot;tpt_b&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">create_transport_model</span><span class="p">(</span><span class="n">gwf_model</span><span class="p">,</span> <span class="s2">&quot;species_b&quot;</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+<span class="n">simulation</span><span class="p">[</span><span class="s2">&quot;tpt_c&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">create_transport_model</span><span class="p">(</span><span class="n">gwf_model</span><span class="p">,</span> <span class="s2">&quot;species_c&quot;</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+<span class="n">simulation</span><span class="p">[</span><span class="s2">&quot;tpt_d&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">create_transport_model</span><span class="p">(</span><span class="n">gwf_model</span><span class="p">,</span> <span class="s2">&quot;species_d&quot;</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">0.002</span><span class="p">)</span>
+
+<span class="n">simulation</span><span class="p">[</span><span class="s2">&quot;flow_solver&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Solution</span><span class="p">(</span>
+    <span class="n">modelnames</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;flow&quot;</span><span class="p">],</span>
+    <span class="n">print_option</span><span class="o">=</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span>
+    <span class="n">csv_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">no_ptc</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">outer_dvclose</span><span class="o">=</span><span class="mf">1.0e-4</span><span class="p">,</span>
+    <span class="n">outer_maximum</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+    <span class="n">under_relaxation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">inner_dvclose</span><span class="o">=</span><span class="mf">1.0e-4</span><span class="p">,</span>
+    <span class="n">inner_rclose</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+    <span class="n">inner_maximum</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">linear_acceleration</span><span class="o">=</span><span class="s2">&quot;bicgstab&quot;</span><span class="p">,</span>
+    <span class="n">scaling_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">reordering_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">relaxation_factor</span><span class="o">=</span><span class="mf">0.97</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">simulation</span><span class="p">[</span><span class="s2">&quot;transport_solver&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Solution</span><span class="p">(</span>
+    <span class="n">modelnames</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;tpt_a&quot;</span><span class="p">,</span> <span class="s2">&quot;tpt_b&quot;</span><span class="p">,</span> <span class="s2">&quot;tpt_c&quot;</span><span class="p">,</span> <span class="s2">&quot;tpt_d&quot;</span><span class="p">],</span>
+    <span class="n">print_option</span><span class="o">=</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span>
+    <span class="n">csv_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">no_ptc</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">outer_dvclose</span><span class="o">=</span><span class="mf">1.0e-4</span><span class="p">,</span>
+    <span class="n">outer_maximum</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+    <span class="n">under_relaxation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">inner_dvclose</span><span class="o">=</span><span class="mf">1.0e-4</span><span class="p">,</span>
+    <span class="n">inner_rclose</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+    <span class="n">inner_maximum</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">linear_acceleration</span><span class="o">=</span><span class="s2">&quot;bicgstab&quot;</span><span class="p">,</span>
+    <span class="n">scaling_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">reordering_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">relaxation_factor</span><span class="o">=</span><span class="mf">0.97</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">duration</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_timedelta</span><span class="p">(</span><span class="s2">&quot;2000d&quot;</span><span class="p">)</span>
+<span class="n">start</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="s2">&quot;2000-01-01&quot;</span><span class="p">)</span>
+<span class="n">simulation</span><span class="o">.</span><span class="n">create_time_discretization</span><span class="p">(</span><span class="n">additional_times</span><span class="o">=</span><span class="p">[</span><span class="n">start</span><span class="p">,</span> <span class="n">start</span> <span class="o">+</span> <span class="n">duration</span><span class="p">])</span>
+<span class="n">simulation</span><span class="p">[</span><span class="s2">&quot;time_discretization&quot;</span><span class="p">][</span><span class="s2">&quot;n_timesteps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span>
+</pre></div>
+</div>
+<p>Run the simulation.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">modeldir</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">temporary_directory</span><span class="p">()</span>
+<span class="n">simulation</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">modeldir</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">simulation</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Open the concentration results and store them in a single DataArray.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">concentration</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">open_concentration</span><span class="p">(</span><span class="n">species_ls</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">])</span>
+<span class="n">mass_budgets</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">open_transport_budget</span><span class="p">(</span><span class="n">species_ls</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Visualize the last concentration profiles of the model run for the different
+species.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">concentration</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">time</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;species&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_example_1d_transport_001.png" srcset="../../_images/sphx_glr_example_1d_transport_001.png" alt="y = 1.5, dx = 10.0, dy = -1.0, layer = 1, time ..." class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D object at 0x0000014B2E177E80&gt;, &lt;matplotlib.lines.Line2D object at 0x0000014B2E177C70&gt;, &lt;matplotlib.lines.Line2D object at 0x0000014B2E176E00&gt;, &lt;matplotlib.lines.Line2D object at 0x0000014B2E1747F0&gt;]
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 3.918 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-example-1d-transport-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/5153289a2b35429bbbceb8b8ae4a7e08/example_1d_transport.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">example_1d_transport.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/bc2e640a6414463ff245f683ede2497b/example_1d_transport.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">example_1d_transport.py</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="ex01_twri.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">TWRI</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="example_models.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Example models</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/examples/mf6/example_1d_transport.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

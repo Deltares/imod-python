@@ -1,0 +1,45 @@
+﻿imod.mf6.MobileStorageTransfer
+==============================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: MobileStorageTransfer
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MobileStorageTransfer.__init__
+      ~MobileStorageTransfer.clip_box
+      ~MobileStorageTransfer.copy
+      ~MobileStorageTransfer.from_file
+      ~MobileStorageTransfer.get_regrid_methods
+      ~MobileStorageTransfer.is_grid_agnostic_package
+      ~MobileStorageTransfer.is_regridding_supported
+      ~MobileStorageTransfer.isel
+      ~MobileStorageTransfer.mask
+      ~MobileStorageTransfer.regrid_like
+      ~MobileStorageTransfer.render
+      ~MobileStorageTransfer.sel
+      ~MobileStorageTransfer.skip_masking_dataarray
+      ~MobileStorageTransfer.to_netcdf
+      ~MobileStorageTransfer.write
+      ~MobileStorageTransfer.write_binary_griddata
+      ~MobileStorageTransfer.write_blockfile
+      ~MobileStorageTransfer.write_text_griddata
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~MobileStorageTransfer.dataset
+   
+   

@@ -1,0 +1,6 @@
+﻿imod.visualize.imshow\_topview
+==============================
+
+.. currentmodule:: imod.visualize
+
+.. autofunction:: imshow_topview

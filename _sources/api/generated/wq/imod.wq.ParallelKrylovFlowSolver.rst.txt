@@ -1,0 +1,26 @@
+﻿imod.wq.ParallelKrylovFlowSolver
+================================
+
+.. currentmodule:: imod.wq
+
+.. autoclass:: ParallelKrylovFlowSolver
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ParallelKrylovFlowSolver.__init__
+      ~ParallelKrylovFlowSolver.from_file
+      ~ParallelKrylovFlowSolver.isel
+      ~ParallelKrylovFlowSolver.save
+      ~ParallelKrylovFlowSolver.sel
+   
+   
+
+   
+   
+   

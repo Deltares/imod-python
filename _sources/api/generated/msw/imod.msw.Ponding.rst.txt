@@ -1,0 +1,26 @@
+﻿imod.msw.Ponding
+================
+
+.. currentmodule:: imod.msw
+
+.. autoclass:: Ponding
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Ponding.__init__
+      ~Ponding.isel
+      ~Ponding.sel
+      ~Ponding.write
+      ~Ponding.write_dataframe_fixed_width
+   
+   
+
+   
+   
+   

@@ -1,0 +1,29 @@
+﻿imod.flow.Drain
+===============
+
+.. currentmodule:: imod.flow
+
+.. autoclass:: Drain
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Drain.__init__
+      ~Drain.compose
+      ~Drain.from_file
+      ~Drain.isel
+      ~Drain.periodic_stress
+      ~Drain.repeat_stress
+      ~Drain.save
+      ~Drain.sel
+   
+   
+
+   
+   
+   

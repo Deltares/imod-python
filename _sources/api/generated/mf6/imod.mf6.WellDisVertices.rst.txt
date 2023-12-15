@@ -1,0 +1,46 @@
+﻿imod.mf6.WellDisVertices
+========================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: WellDisVertices
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~WellDisVertices.__init__
+      ~WellDisVertices.clip_box
+      ~WellDisVertices.copy
+      ~WellDisVertices.from_file
+      ~WellDisVertices.get_period_varnames
+      ~WellDisVertices.get_regrid_methods
+      ~WellDisVertices.is_grid_agnostic_package
+      ~WellDisVertices.is_regridding_supported
+      ~WellDisVertices.isel
+      ~WellDisVertices.mask
+      ~WellDisVertices.regrid_like
+      ~WellDisVertices.render
+      ~WellDisVertices.sel
+      ~WellDisVertices.skip_masking_dataarray
+      ~WellDisVertices.to_netcdf
+      ~WellDisVertices.write
+      ~WellDisVertices.write_binary_griddata
+      ~WellDisVertices.write_blockfile
+      ~WellDisVertices.write_text_griddata
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~WellDisVertices.dataset
+   
+   

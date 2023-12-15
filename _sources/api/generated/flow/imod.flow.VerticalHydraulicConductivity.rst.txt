@@ -1,0 +1,27 @@
+﻿imod.flow.VerticalHydraulicConductivity
+=======================================
+
+.. currentmodule:: imod.flow
+
+.. autoclass:: VerticalHydraulicConductivity
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~VerticalHydraulicConductivity.__init__
+      ~VerticalHydraulicConductivity.compose
+      ~VerticalHydraulicConductivity.from_file
+      ~VerticalHydraulicConductivity.isel
+      ~VerticalHydraulicConductivity.save
+      ~VerticalHydraulicConductivity.sel
+   
+   
+
+   
+   
+   

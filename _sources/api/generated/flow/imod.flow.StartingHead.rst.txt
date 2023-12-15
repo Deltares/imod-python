@@ -1,0 +1,27 @@
+﻿imod.flow.StartingHead
+======================
+
+.. currentmodule:: imod.flow
+
+.. autoclass:: StartingHead
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~StartingHead.__init__
+      ~StartingHead.compose
+      ~StartingHead.from_file
+      ~StartingHead.isel
+      ~StartingHead.save
+      ~StartingHead.sel
+   
+   
+
+   
+   
+   

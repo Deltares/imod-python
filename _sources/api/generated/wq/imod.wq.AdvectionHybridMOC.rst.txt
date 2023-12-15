@@ -1,0 +1,26 @@
+﻿imod.wq.AdvectionHybridMOC
+==========================
+
+.. currentmodule:: imod.wq
+
+.. autoclass:: AdvectionHybridMOC
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~AdvectionHybridMOC.__init__
+      ~AdvectionHybridMOC.from_file
+      ~AdvectionHybridMOC.isel
+      ~AdvectionHybridMOC.save
+      ~AdvectionHybridMOC.sel
+   
+   
+
+   
+   
+   

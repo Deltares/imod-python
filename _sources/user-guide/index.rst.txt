@@ -1,0 +1,187 @@
+:orphan:
+
+User Guide
+==========
+
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+
+The imod Python package builds on top of popular Python packages like
+`xarray`_, `pandas`_, and `geopandas`_ to prepare and analyze MODFLOW models.
+This user guide will introduce these packages and their data structures, and
+explains how they relate to the many forms of data we come across while
+modeling groundwater flow.
+
+This user guide is not an exhaustive explanation of these packages and their
+data structures. Rather this guide intends to introduce the packages, explain
+their roles, and how they fit together to help with groundwater modeling.
+
+The imod package provides a link between these packages and groundwater
+modeling.Pandas, geopandas, and xarray already provide a great deal of
+capabilities and features; imod expands these capabilities when they are
+(i)MODFLOW specific or when existing capabilities are too limited or too slow.
+
+Specifically:
+
+* input and output to (i)MODFLOW specific file formats.
+* data preparation, mostly "GIS-like" routines: raster to vector and vice versa,
+  changing cell sizes, data selection, gapfilling, etc.
+* overview statistics, water balance, etc,
+* visualization of groundwater heads, cross sections, 3D animations, etc.
+
+Nearly every function in imod consumes and produces xarray, pandas, or
+geopandas data structures. Therefore, this guide first introduces these data
+structures. Secondly, it will demonstrate how a modeling workflow is set up. 
+
+.. toctree::
+   :titlesonly:
+   :hidden:
+   
+.. _xarray: http://xarray.pydata.org
+.. _pandas: http://pandas.pydata.org
+.. _geopandas: http://geopandas.org
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Geospatial data primarily comes in two forms: raster data and vector data. This guide focuses o...">
+
+.. only:: html
+
+  .. image:: /user-guide/images/thumb/sphx_glr_01-raster-data_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_user-guide_01-raster-data.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Raster data and xarray</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Geospatial data primarily comes in two forms: raster data and vector data. This guide focuses o...">
+
+.. only:: html
+
+  .. image:: /user-guide/images/thumb/sphx_glr_02-vector-data_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_user-guide_02-vector-data.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Vector data and Geopandas</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Handling time series is major part of geohydrology and groundwater modeling. Time series data c...">
+
+.. only:: html
+
+  .. image:: /user-guide/images/thumb/sphx_glr_03-timeseries-data_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_user-guide_03-timeseries-data.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Time series data and Pandas</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="MODFLOW6 supports unstructured grids. Unlike raster data, the connectivity of unstructured grid...">
+
+.. only:: html
+
+  .. image:: /user-guide/images/thumb/sphx_glr_05-unstructured-grids_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_user-guide_05-unstructured-grids.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Unstructured Grids</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="A powerful feature of xarray is `lazy evaluation`_. Lazy evaluation means that expressions are ...">
+
+.. only:: html
+
+  .. image:: /user-guide/images/thumb/sphx_glr_06-lazy-evaluation_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_user-guide_06-lazy-evaluation.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Lazy evaluation</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="iMOD Python provides nice functionality to discretize your models into stress periods, dependin...">
+
+.. only:: html
+
+  .. image:: /user-guide/images/thumb/sphx_glr_07-time-discretization_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_user-guide_07-time-discretization.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Model time discretization</div>
+    </div>
+
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /user-guide/01-raster-data
+   /user-guide/02-vector-data
+   /user-guide/03-timeseries-data
+   /user-guide/05-unstructured-grids
+   /user-guide/06-lazy-evaluation
+   /user-guide/07-time-discretization
+
+
+.. only:: html
+
+  .. container:: sphx-glr-footer sphx-glr-footer-gallery
+
+    .. container:: sphx-glr-download sphx-glr-download-python
+
+      :download:`Download all examples in Python source code: user-guide_python.zip </user-guide/user-guide_python.zip>`
+
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
+
+      :download:`Download all examples in Jupyter notebooks: user-guide_jupyter.zip </user-guide/user-guide_jupyter.zip>`
+
+
+.. only:: html
+
+ .. rst-class:: sphx-glr-signature
+
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_

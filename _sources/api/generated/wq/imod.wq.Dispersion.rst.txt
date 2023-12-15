@@ -1,0 +1,26 @@
+﻿imod.wq.Dispersion
+==================
+
+.. currentmodule:: imod.wq
+
+.. autoclass:: Dispersion
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Dispersion.__init__
+      ~Dispersion.from_file
+      ~Dispersion.isel
+      ~Dispersion.save
+      ~Dispersion.sel
+   
+   
+
+   
+   
+   

@@ -1,0 +1,6 @@
+﻿imod.util.spatial\_reference
+============================
+
+.. currentmodule:: imod.util
+
+.. autofunction:: spatial_reference

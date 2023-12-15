@@ -1,0 +1,6 @@
+﻿imod.select.cross\_section\_line
+================================
+
+.. currentmodule:: imod.select
+
+.. autofunction:: cross_section_line

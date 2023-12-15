@@ -1,0 +1,6 @@
+﻿imod.formats.prj.read\_projectfile
+==================================
+
+.. currentmodule:: imod.formats.prj
+
+.. autofunction:: read_projectfile

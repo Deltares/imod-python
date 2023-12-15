@@ -1,0 +1,26 @@
+﻿imod.msw.InitialConditionsRootzonePressureHead
+==============================================
+
+.. currentmodule:: imod.msw
+
+.. autoclass:: InitialConditionsRootzonePressureHead
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~InitialConditionsRootzonePressureHead.__init__
+      ~InitialConditionsRootzonePressureHead.isel
+      ~InitialConditionsRootzonePressureHead.sel
+      ~InitialConditionsRootzonePressureHead.write
+      ~InitialConditionsRootzonePressureHead.write_dataframe_fixed_width
+   
+   
+
+   
+   
+   

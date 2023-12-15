@@ -1,0 +1,26 @@
+﻿imod.msw.AnnualCropFactors
+==========================
+
+.. currentmodule:: imod.msw
+
+.. autoclass:: AnnualCropFactors
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~AnnualCropFactors.__init__
+      ~AnnualCropFactors.isel
+      ~AnnualCropFactors.sel
+      ~AnnualCropFactors.write
+      ~AnnualCropFactors.write_dataframe_fixed_width
+   
+   
+
+   
+   
+   

@@ -1,0 +1,6 @@
+﻿imod.evaluate.stability\_constraint\_wel
+========================================
+
+.. currentmodule:: imod.evaluate
+
+.. autofunction:: stability_constraint_wel

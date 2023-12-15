@@ -1,0 +1,27 @@
+﻿imod.msw.GridData
+=================
+
+.. currentmodule:: imod.msw
+
+.. autoclass:: GridData
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~GridData.__init__
+      ~GridData.generate_index_array
+      ~GridData.isel
+      ~GridData.sel
+      ~GridData.write
+      ~GridData.write_dataframe_fixed_width
+   
+   
+
+   
+   
+   

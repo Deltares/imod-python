@@ -1,0 +1,26 @@
+﻿imod.wq.GeneralizedConjugateGradientSolver
+==========================================
+
+.. currentmodule:: imod.wq
+
+.. autoclass:: GeneralizedConjugateGradientSolver
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~GeneralizedConjugateGradientSolver.__init__
+      ~GeneralizedConjugateGradientSolver.from_file
+      ~GeneralizedConjugateGradientSolver.isel
+      ~GeneralizedConjugateGradientSolver.save
+      ~GeneralizedConjugateGradientSolver.sel
+   
+   
+
+   
+   
+   

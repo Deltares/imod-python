@@ -1,0 +1,6 @@
+﻿imod.select.points\_in\_bounds
+==============================
+
+.. currentmodule:: imod.select
+
+.. autofunction:: points_in_bounds

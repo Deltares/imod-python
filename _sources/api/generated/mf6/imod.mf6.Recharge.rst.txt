@@ -1,0 +1,46 @@
+﻿imod.mf6.Recharge
+=================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: Recharge
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Recharge.__init__
+      ~Recharge.clip_box
+      ~Recharge.copy
+      ~Recharge.from_file
+      ~Recharge.get_period_varnames
+      ~Recharge.get_regrid_methods
+      ~Recharge.is_grid_agnostic_package
+      ~Recharge.is_regridding_supported
+      ~Recharge.isel
+      ~Recharge.mask
+      ~Recharge.regrid_like
+      ~Recharge.render
+      ~Recharge.sel
+      ~Recharge.skip_masking_dataarray
+      ~Recharge.to_netcdf
+      ~Recharge.write
+      ~Recharge.write_binary_griddata
+      ~Recharge.write_blockfile
+      ~Recharge.write_text_griddata
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Recharge.dataset
+   
+   

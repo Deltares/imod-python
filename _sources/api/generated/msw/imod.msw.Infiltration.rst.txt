@@ -1,0 +1,26 @@
+﻿imod.msw.Infiltration
+=====================
+
+.. currentmodule:: imod.msw
+
+.. autoclass:: Infiltration
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Infiltration.__init__
+      ~Infiltration.isel
+      ~Infiltration.sel
+      ~Infiltration.write
+      ~Infiltration.write_dataframe_fixed_width
+   
+   
+
+   
+   
+   

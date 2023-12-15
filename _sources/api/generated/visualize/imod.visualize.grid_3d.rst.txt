@@ -1,0 +1,6 @@
+﻿imod.visualize.grid\_3d
+=======================
+
+.. currentmodule:: imod.visualize
+
+.. autofunction:: grid_3d

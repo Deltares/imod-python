@@ -1,0 +1,46 @@
+﻿imod.mf6.SpecificStorage
+========================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: SpecificStorage
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SpecificStorage.__init__
+      ~SpecificStorage.clip_box
+      ~SpecificStorage.copy
+      ~SpecificStorage.from_file
+      ~SpecificStorage.get_options
+      ~SpecificStorage.get_regrid_methods
+      ~SpecificStorage.is_grid_agnostic_package
+      ~SpecificStorage.is_regridding_supported
+      ~SpecificStorage.isel
+      ~SpecificStorage.mask
+      ~SpecificStorage.regrid_like
+      ~SpecificStorage.render
+      ~SpecificStorage.sel
+      ~SpecificStorage.skip_masking_dataarray
+      ~SpecificStorage.to_netcdf
+      ~SpecificStorage.write
+      ~SpecificStorage.write_binary_griddata
+      ~SpecificStorage.write_blockfile
+      ~SpecificStorage.write_text_griddata
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~SpecificStorage.dataset
+   
+   

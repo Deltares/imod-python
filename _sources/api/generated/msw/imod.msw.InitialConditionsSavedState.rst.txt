@@ -1,0 +1,26 @@
+﻿imod.msw.InitialConditionsSavedState
+====================================
+
+.. currentmodule:: imod.msw
+
+.. autoclass:: InitialConditionsSavedState
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~InitialConditionsSavedState.__init__
+      ~InitialConditionsSavedState.isel
+      ~InitialConditionsSavedState.sel
+      ~InitialConditionsSavedState.write
+      ~InitialConditionsSavedState.write_dataframe_fixed_width
+   
+   
+
+   
+   
+   

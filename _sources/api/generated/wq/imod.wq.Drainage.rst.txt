@@ -1,0 +1,28 @@
+﻿imod.wq.Drainage
+================
+
+.. currentmodule:: imod.wq
+
+.. autoclass:: Drainage
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Drainage.__init__
+      ~Drainage.add_timemap
+      ~Drainage.from_file
+      ~Drainage.isel
+      ~Drainage.repeat_stress
+      ~Drainage.save
+      ~Drainage.sel
+   
+   
+
+   
+   
+   

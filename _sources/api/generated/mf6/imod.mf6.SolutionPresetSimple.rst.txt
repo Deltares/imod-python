@@ -1,0 +1,6 @@
+﻿imod.mf6.SolutionPresetSimple
+=============================
+
+.. currentmodule:: imod.mf6
+
+.. autofunction:: SolutionPresetSimple

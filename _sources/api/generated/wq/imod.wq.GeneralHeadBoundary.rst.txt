@@ -1,0 +1,28 @@
+﻿imod.wq.GeneralHeadBoundary
+===========================
+
+.. currentmodule:: imod.wq
+
+.. autoclass:: GeneralHeadBoundary
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~GeneralHeadBoundary.__init__
+      ~GeneralHeadBoundary.add_timemap
+      ~GeneralHeadBoundary.from_file
+      ~GeneralHeadBoundary.isel
+      ~GeneralHeadBoundary.repeat_stress
+      ~GeneralHeadBoundary.save
+      ~GeneralHeadBoundary.sel
+   
+   
+
+   
+   
+   

@@ -1,0 +1,6 @@
+﻿imod.util.to\_ugrid2d
+=====================
+
+.. currentmodule:: imod.util
+
+.. autofunction:: to_ugrid2d

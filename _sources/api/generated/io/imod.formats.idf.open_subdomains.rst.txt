@@ -1,0 +1,6 @@
+﻿imod.formats.idf.open\_subdomains
+=================================
+
+.. currentmodule:: imod.formats.idf
+
+.. autofunction:: open_subdomains

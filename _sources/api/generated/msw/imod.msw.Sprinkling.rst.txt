@@ -1,0 +1,26 @@
+﻿imod.msw.Sprinkling
+===================
+
+.. currentmodule:: imod.msw
+
+.. autoclass:: Sprinkling
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Sprinkling.__init__
+      ~Sprinkling.isel
+      ~Sprinkling.sel
+      ~Sprinkling.write
+      ~Sprinkling.write_dataframe_fixed_width
+   
+   
+
+   
+   
+   

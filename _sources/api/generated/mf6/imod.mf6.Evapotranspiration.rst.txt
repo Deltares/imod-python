@@ -1,0 +1,46 @@
+﻿imod.mf6.Evapotranspiration
+===========================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: Evapotranspiration
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Evapotranspiration.__init__
+      ~Evapotranspiration.clip_box
+      ~Evapotranspiration.copy
+      ~Evapotranspiration.from_file
+      ~Evapotranspiration.get_period_varnames
+      ~Evapotranspiration.get_regrid_methods
+      ~Evapotranspiration.is_grid_agnostic_package
+      ~Evapotranspiration.is_regridding_supported
+      ~Evapotranspiration.isel
+      ~Evapotranspiration.mask
+      ~Evapotranspiration.regrid_like
+      ~Evapotranspiration.render
+      ~Evapotranspiration.sel
+      ~Evapotranspiration.skip_masking_dataarray
+      ~Evapotranspiration.to_netcdf
+      ~Evapotranspiration.write
+      ~Evapotranspiration.write_binary_griddata
+      ~Evapotranspiration.write_blockfile
+      ~Evapotranspiration.write_text_griddata
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Evapotranspiration.dataset
+   
+   

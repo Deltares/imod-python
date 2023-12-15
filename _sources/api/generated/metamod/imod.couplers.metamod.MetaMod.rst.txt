@@ -1,0 +1,25 @@
+﻿imod.couplers.metamod.MetaMod
+=============================
+
+.. currentmodule:: imod.couplers.metamod
+
+.. autoclass:: MetaMod
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MetaMod.__init__
+      ~MetaMod.write
+      ~MetaMod.write_exchanges
+      ~MetaMod.write_toml
+   
+   
+
+   
+   
+   

@@ -1,0 +1,47 @@
+﻿imod.mf6.GroundwaterTransportModel
+==================================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: GroundwaterTransportModel
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~GroundwaterTransportModel.__init__
+      ~GroundwaterTransportModel.clear
+      ~GroundwaterTransportModel.clip_box
+      ~GroundwaterTransportModel.copy
+      ~GroundwaterTransportModel.dump
+      ~GroundwaterTransportModel.from_file
+      ~GroundwaterTransportModel.fromkeys
+      ~GroundwaterTransportModel.get
+      ~GroundwaterTransportModel.items
+      ~GroundwaterTransportModel.keys
+      ~GroundwaterTransportModel.model_id
+      ~GroundwaterTransportModel.pop
+      ~GroundwaterTransportModel.popitem
+      ~GroundwaterTransportModel.regrid_like
+      ~GroundwaterTransportModel.render
+      ~GroundwaterTransportModel.setdefault
+      ~GroundwaterTransportModel.update
+      ~GroundwaterTransportModel.values
+      ~GroundwaterTransportModel.write
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~GroundwaterTransportModel.bottom
+      ~GroundwaterTransportModel.domain
+   
+   

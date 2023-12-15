@@ -1,0 +1,26 @@
+﻿imod.msw.TimeOutputControl
+==========================
+
+.. currentmodule:: imod.msw
+
+.. autoclass:: TimeOutputControl
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TimeOutputControl.__init__
+      ~TimeOutputControl.isel
+      ~TimeOutputControl.sel
+      ~TimeOutputControl.write
+      ~TimeOutputControl.write_dataframe_fixed_width
+   
+   
+
+   
+   
+   

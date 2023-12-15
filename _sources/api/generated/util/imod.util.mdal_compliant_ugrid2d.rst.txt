@@ -1,0 +1,6 @@
+﻿imod.util.mdal\_compliant\_ugrid2d
+==================================
+
+.. currentmodule:: imod.util
+
+.. autofunction:: mdal_compliant_ugrid2d

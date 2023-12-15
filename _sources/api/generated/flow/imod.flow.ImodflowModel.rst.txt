@@ -1,0 +1,38 @@
+﻿imod.flow.ImodflowModel
+=======================
+
+.. currentmodule:: imod.flow
+
+.. autoclass:: ImodflowModel
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ImodflowModel.__init__
+      ~ImodflowModel.clear
+      ~ImodflowModel.copy
+      ~ImodflowModel.create_time_discretization
+      ~ImodflowModel.fromkeys
+      ~ImodflowModel.get
+      ~ImodflowModel.items
+      ~ImodflowModel.keys
+      ~ImodflowModel.package_check
+      ~ImodflowModel.pop
+      ~ImodflowModel.popitem
+      ~ImodflowModel.render
+      ~ImodflowModel.setdefault
+      ~ImodflowModel.time_discretization
+      ~ImodflowModel.update
+      ~ImodflowModel.values
+      ~ImodflowModel.write
+   
+   
+
+   
+   
+   

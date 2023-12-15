@@ -1,0 +1,26 @@
+﻿imod.msw.InitialConditionsEquilibrium
+=====================================
+
+.. currentmodule:: imod.msw
+
+.. autoclass:: InitialConditionsEquilibrium
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~InitialConditionsEquilibrium.__init__
+      ~InitialConditionsEquilibrium.isel
+      ~InitialConditionsEquilibrium.sel
+      ~InitialConditionsEquilibrium.write
+      ~InitialConditionsEquilibrium.write_dataframe_fixed_width
+   
+   
+
+   
+   
+   

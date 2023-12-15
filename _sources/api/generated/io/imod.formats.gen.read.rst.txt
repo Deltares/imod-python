@@ -1,0 +1,6 @@
+﻿imod.formats.gen.read
+=====================
+
+.. currentmodule:: imod.formats.gen
+
+.. autofunction:: read

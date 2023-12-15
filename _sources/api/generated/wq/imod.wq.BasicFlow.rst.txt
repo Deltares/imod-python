@@ -1,0 +1,27 @@
+﻿imod.wq.BasicFlow
+=================
+
+.. currentmodule:: imod.wq
+
+.. autoclass:: BasicFlow
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~BasicFlow.__init__
+      ~BasicFlow.from_file
+      ~BasicFlow.isel
+      ~BasicFlow.save
+      ~BasicFlow.sel
+      ~BasicFlow.thickness
+   
+   
+
+   
+   
+   

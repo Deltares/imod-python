@@ -1,0 +1,6 @@
+﻿imod.prepare.celltable
+======================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: celltable

@@ -1,0 +1,25 @@
+﻿imod.visualize.GridAnimation3D
+==============================
+
+.. currentmodule:: imod.visualize
+
+.. autoclass:: GridAnimation3D
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~GridAnimation3D.__init__
+      ~GridAnimation3D.peek
+      ~GridAnimation3D.reset
+      ~GridAnimation3D.write
+   
+   
+
+   
+   
+   

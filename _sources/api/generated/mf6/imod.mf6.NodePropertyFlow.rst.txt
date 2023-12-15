@@ -1,0 +1,46 @@
+﻿imod.mf6.NodePropertyFlow
+=========================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: NodePropertyFlow
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~NodePropertyFlow.__init__
+      ~NodePropertyFlow.clip_box
+      ~NodePropertyFlow.copy
+      ~NodePropertyFlow.from_file
+      ~NodePropertyFlow.get_pkg_id
+      ~NodePropertyFlow.get_regrid_methods
+      ~NodePropertyFlow.is_grid_agnostic_package
+      ~NodePropertyFlow.is_regridding_supported
+      ~NodePropertyFlow.isel
+      ~NodePropertyFlow.mask
+      ~NodePropertyFlow.regrid_like
+      ~NodePropertyFlow.render
+      ~NodePropertyFlow.sel
+      ~NodePropertyFlow.skip_masking_dataarray
+      ~NodePropertyFlow.to_netcdf
+      ~NodePropertyFlow.write
+      ~NodePropertyFlow.write_binary_griddata
+      ~NodePropertyFlow.write_blockfile
+      ~NodePropertyFlow.write_text_griddata
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~NodePropertyFlow.dataset
+   
+   

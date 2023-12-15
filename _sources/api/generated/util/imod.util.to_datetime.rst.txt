@@ -1,0 +1,6 @@
+﻿imod.util.to\_datetime
+======================
+
+.. currentmodule:: imod.util
+
+.. autofunction:: to_datetime

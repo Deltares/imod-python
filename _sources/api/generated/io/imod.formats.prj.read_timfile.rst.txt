@@ -1,0 +1,6 @@
+﻿imod.formats.prj.read\_timfile
+==============================
+
+.. currentmodule:: imod.formats.prj
+
+.. autofunction:: read_timfile

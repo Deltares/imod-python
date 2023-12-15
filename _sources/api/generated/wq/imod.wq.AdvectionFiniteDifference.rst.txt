@@ -1,0 +1,26 @@
+﻿imod.wq.AdvectionFiniteDifference
+=================================
+
+.. currentmodule:: imod.wq
+
+.. autoclass:: AdvectionFiniteDifference
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~AdvectionFiniteDifference.__init__
+      ~AdvectionFiniteDifference.from_file
+      ~AdvectionFiniteDifference.isel
+      ~AdvectionFiniteDifference.save
+      ~AdvectionFiniteDifference.sel
+   
+   
+
+   
+   
+   

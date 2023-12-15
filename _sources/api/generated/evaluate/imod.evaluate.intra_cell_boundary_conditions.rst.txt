@@ -1,0 +1,6 @@
+﻿imod.evaluate.intra\_cell\_boundary\_conditions
+===============================================
+
+.. currentmodule:: imod.evaluate
+
+.. autofunction:: intra_cell_boundary_conditions

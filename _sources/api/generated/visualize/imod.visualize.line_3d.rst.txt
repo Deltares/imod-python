@@ -1,0 +1,6 @@
+﻿imod.visualize.line\_3d
+=======================
+
+.. currentmodule:: imod.visualize
+
+.. autofunction:: line_3d

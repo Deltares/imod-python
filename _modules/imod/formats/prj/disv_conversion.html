@@ -1,0 +1,1380 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imod.formats.prj.disv_conversion &#8212; iMOD Python 0.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/sphinx_highlight.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/formats/prj/disv_conversion';</script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">imod.formats...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for imod.formats.prj.disv_conversion</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Most of the functionality here attempts to replicate what iMOD does with</span>
+<span class="sd">project files.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">cast</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="kn">import</span> <span class="nn">xugrid</span> <span class="k">as</span> <span class="nn">xu</span>
+
+<span class="kn">import</span> <span class="nn">imod</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.model</span> <span class="kn">import</span> <span class="n">Modflow6Model</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.utilities.package_utils</span> <span class="kn">import</span> <span class="n">get_repeat_stress</span>
+<span class="kn">from</span> <span class="nn">imod.prepare.layer</span> <span class="kn">import</span> <span class="n">get_upper_active_grid_cells</span>
+<span class="kn">from</span> <span class="nn">imod.typing</span> <span class="kn">import</span> <span class="n">GridDataArray</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">gpd</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;geopandas&quot;</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">shapely</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">shapely</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;shapely&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">hash_xy</span><span class="p">(</span><span class="n">da</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a unique identifier based on the x and y coordinates of a DataArray.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="nb">hash</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="nb">hash</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+
+
+<span class="k">class</span> <span class="nc">SingularTargetRegridderWeightsCache</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a mapping of (source_coords, regridder_cls) =&gt; regridding weights.</span>
+
+<span class="sd">    Allows re-use of the regridding weights, as computing the weights is the</span>
+<span class="sd">    most costly step.</span>
+
+<span class="sd">    The regridder only processes x and y coordinates: we can hash these,</span>
+<span class="sd">    and get a unique identifier. The target is assumed to be constant.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projectfile_data</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">cache_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="c1"># Collect the x-y coordinates of all x-y dimensioned DataArrays.</span>
+        <span class="c1"># Determine which regridding method to use.</span>
+        <span class="c1"># Count occurrences of both.</span>
+        <span class="c1"># Create and cache weights of the most common ones.</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">sources</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">methods</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">pkgdict</span> <span class="ow">in</span> <span class="n">projectfile_data</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">variable</span><span class="p">,</span> <span class="n">da</span> <span class="ow">in</span> <span class="n">pkgdict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">xydims</span> <span class="o">=</span> <span class="nb">set</span><span class="p">((</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">xydims</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">):</span>
+                    <span class="c1"># for initial condition, constant head, general head boundary</span>
+                    <span class="k">if</span> <span class="n">variable</span> <span class="o">==</span> <span class="s2">&quot;head&quot;</span><span class="p">:</span>
+                        <span class="bp">cls</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">BarycentricInterpolator</span>
+                        <span class="n">method</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">elif</span> <span class="n">variable</span> <span class="o">==</span> <span class="s2">&quot;conductance&quot;</span><span class="p">:</span>
+                        <span class="bp">cls</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">RelativeOverlapRegridder</span>
+                        <span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;conductance&quot;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">cls</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">OverlapRegridder</span>
+                        <span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span>
+
+                    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">hash_xy</span><span class="p">(</span><span class="n">da</span><span class="p">)</span>
+                    <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span>
+                    <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                    <span class="n">sources</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">da</span>
+                    <span class="n">methods</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">method</span>
+
+        <span class="n">counter</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">counter</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="n">cache_size</span><span class="p">):</span>
+            <span class="bp">cls</span> <span class="o">=</span> <span class="n">key</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">ugrid_source</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="o">.</span><span class="n">from_structured</span><span class="p">(</span><span class="n">sources</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">ugrid_source</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="n">target</span><span class="p">}</span>
+            <span class="n">method</span> <span class="o">=</span> <span class="n">methods</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">method</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;method&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">method</span>
+            <span class="n">regridder</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">regridder</span><span class="o">.</span><span class="n">weights</span>
+
+    <span class="k">def</span> <span class="nf">regrid</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+        <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
+        <span class="n">original2d</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span> <span class="o">!=</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">):</span>  <span class="c1"># So it&#39;s a constant</span>
+            <span class="k">if</span> <span class="n">original2d</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;original2d must be provided for constant values&quot;</span><span class="p">)</span>
+            <span class="n">source</span> <span class="o">=</span> <span class="n">source</span> <span class="o">*</span> <span class="n">xr</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">original2d</span><span class="p">)</span>
+
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;barycentric&quot;</span><span class="p">:</span>
+            <span class="bp">cls</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">BarycentricInterpolator</span>
+        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;conductance&quot;</span><span class="p">:</span>
+            <span class="bp">cls</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">RelativeOverlapRegridder</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;method&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">method</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">cls</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">OverlapRegridder</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;method&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">method</span>
+
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">hash_xy</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;weights&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="n">regridder</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_weights</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="c1"># Avoid creation of a UgridDataArray here</span>
+            <span class="n">dims</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">dims</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">source</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">}</span>
+            <span class="n">facedim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">face_dimension</span>
+            <span class="n">face_source</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+                <span class="n">source</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">*</span><span class="n">source</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+                <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span>
+                <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="o">*</span><span class="n">dims</span><span class="p">,</span> <span class="n">facedim</span><span class="p">],</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">source</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">(</span>
+                <span class="n">regridder</span><span class="o">.</span><span class="n">regrid_dataarray</span><span class="p">(</span><span class="n">face_source</span><span class="p">,</span> <span class="p">(</span><span class="n">facedim</span><span class="p">,)),</span>
+                <span class="n">regridder</span><span class="o">.</span><span class="n">_target</span><span class="o">.</span><span class="n">ugrid_topology</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ugrid_source</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="o">.</span><span class="n">from_structured</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ugrid_source</span>
+            <span class="n">regridder</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">regridder</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span><span class="n">ugrid_source</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">raise_on_layer</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">variable</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="n">da</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s2">&quot;layer&quot;</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">variable</span><span class="si">}</span><span class="s2"> should not be assigned a layer&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">da</span>
+
+
+<span class="k">def</span> <span class="nf">finish</span><span class="p">(</span><span class="n">uda</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set dimension order, and drop empty layers.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">facedim</span> <span class="o">=</span> <span class="n">uda</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span>
+    <span class="n">dims</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="n">facedim</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">uda</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">*</span><span class="n">dims</span><span class="p">,</span> <span class="n">missing_dims</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">create_idomain</span><span class="p">(</span><span class="n">thickness</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find cells that should get a passthrough value: IDOMAIN = -1.</span>
+
+<span class="sd">    We may find them by forward and back-filling: if they are filled in both, they</span>
+<span class="sd">    contain active cells in both directions, and the value should be set to -1.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">active</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">thickness</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>  <span class="c1"># TODO larger than a specific value for round off?</span>
+    <span class="n">ones</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">active</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">active</span><span class="p">)</span>
+    <span class="n">passthrough</span> <span class="o">=</span> <span class="n">ones</span><span class="o">.</span><span class="n">ffill</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">ones</span><span class="o">.</span><span class="n">bfill</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span>
+    <span class="n">idomain</span> <span class="o">=</span> <span class="n">ones</span><span class="o">.</span><span class="n">combine_first</span><span class="p">(</span>
+        <span class="n">xu</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">active</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">passthrough</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">idomain</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">create_disv</span><span class="p">(</span>
+    <span class="n">cache</span><span class="p">,</span>
+    <span class="n">top</span><span class="p">,</span>
+    <span class="n">bottom</span><span class="p">,</span>
+    <span class="n">ibound</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="k">if</span> <span class="n">top</span><span class="o">.</span><span class="n">dims</span> <span class="o">==</span> <span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,):</span>
+        <span class="k">if</span> <span class="n">ibound</span><span class="o">.</span><span class="n">dims</span> <span class="o">!=</span> <span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Either ibound or top must have dimensions (layer, y, x) to &quot;</span>
+                <span class="s2">&quot;derive model extent. Both may not be provided as constants.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">top</span> <span class="o">=</span> <span class="n">top</span> <span class="o">*</span> <span class="n">xr</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">ibound</span><span class="p">)</span>
+        <span class="n">original2d</span> <span class="o">=</span> <span class="n">ibound</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">original2d</span> <span class="o">=</span> <span class="n">top</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">bottom</span><span class="o">.</span><span class="n">dims</span> <span class="o">==</span> <span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,):</span>
+        <span class="n">bottom</span> <span class="o">=</span> <span class="n">bottom</span> <span class="o">*</span> <span class="n">xr</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">ibound</span><span class="p">)</span>
+
+    <span class="n">top</span> <span class="o">=</span> <span class="n">top</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+    <span class="n">bottom</span> <span class="o">=</span> <span class="n">bottom</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+    <span class="n">disv_top</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span><span class="n">top</span><span class="p">)</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+    <span class="n">disv_bottom</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span><span class="n">bottom</span><span class="p">)</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+    <span class="n">thickness</span> <span class="o">=</span> <span class="n">disv_top</span> <span class="o">-</span> <span class="n">disv_bottom</span>
+    <span class="n">idomain</span> <span class="o">=</span> <span class="n">create_idomain</span><span class="p">(</span><span class="n">thickness</span><span class="p">)</span>
+    <span class="n">disv</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">VerticesDiscretization</span><span class="p">(</span>
+        <span class="n">top</span><span class="o">=</span><span class="n">disv_top</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+        <span class="n">bottom</span><span class="o">=</span><span class="n">disv_bottom</span><span class="p">,</span>
+        <span class="n">idomain</span><span class="o">=</span><span class="n">idomain</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">active</span> <span class="o">=</span> <span class="n">idomain</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">disv</span><span class="p">,</span> <span class="n">disv_top</span><span class="p">,</span> <span class="n">disv_bottom</span><span class="p">,</span> <span class="n">active</span><span class="p">,</span> <span class="n">original2d</span>
+
+
+<span class="k">def</span> <span class="nf">create_npf</span><span class="p">(</span>
+    <span class="n">cache</span><span class="p">,</span>
+    <span class="n">k</span><span class="p">,</span>
+    <span class="n">vertical_anisotropy</span><span class="p">,</span>
+    <span class="n">active</span><span class="p">,</span>
+    <span class="n">original2d</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">disv_k</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;geometric_mean&quot;</span><span class="p">,</span> <span class="n">original2d</span><span class="o">=</span><span class="n">original2d</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="n">active</span>
+    <span class="p">)</span>
+    <span class="n">k33</span> <span class="o">=</span> <span class="n">k</span> <span class="o">*</span> <span class="n">vertical_anisotropy</span>
+    <span class="n">disv_k33</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span><span class="n">k33</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;harmonic_mean&quot;</span><span class="p">,</span> <span class="n">original2d</span><span class="o">=</span><span class="n">original2d</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="n">active</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">NodePropertyFlow</span><span class="p">(</span>
+        <span class="n">icelltype</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">k</span><span class="o">=</span><span class="n">disv_k</span><span class="p">,</span>
+        <span class="n">k33</span><span class="o">=</span><span class="n">disv_k33</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">create_chd</span><span class="p">(</span>
+    <span class="n">cache</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">key</span><span class="p">,</span>
+    <span class="n">value</span><span class="p">,</span>
+    <span class="n">ibound</span><span class="p">,</span>
+    <span class="n">active</span><span class="p">,</span>
+    <span class="n">original2d</span><span class="p">,</span>
+    <span class="n">repeat</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">head</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="s2">&quot;head&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="s2">&quot;layer&quot;</span> <span class="ow">in</span> <span class="n">head</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
+        <span class="n">layer</span> <span class="o">=</span> <span class="n">head</span><span class="o">.</span><span class="n">layer</span>
+        <span class="n">ibound</span> <span class="o">=</span> <span class="n">ibound</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="n">layer</span><span class="p">)</span>
+        <span class="n">active</span> <span class="o">=</span> <span class="n">active</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="n">layer</span><span class="p">)</span>
+
+    <span class="n">disv_head</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span>
+        <span class="n">head</span><span class="p">,</span>
+        <span class="n">method</span><span class="o">=</span><span class="s2">&quot;barycentric&quot;</span><span class="p">,</span>
+        <span class="n">original2d</span><span class="o">=</span><span class="n">original2d</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">valid</span> <span class="o">=</span> <span class="p">(</span><span class="n">ibound</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">active</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">valid</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="k">return</span>
+
+    <span class="n">chd</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">ConstantHead</span><span class="p">(</span><span class="n">head</span><span class="o">=</span><span class="n">disv_head</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">valid</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">repeat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">chd</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;repeat_stress&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_repeat_stress</span><span class="p">(</span><span class="n">repeat</span><span class="p">)</span>
+    <span class="n">model</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">chd</span>
+    <span class="k">return</span>
+
+
+<span class="k">def</span> <span class="nf">create_drn</span><span class="p">(</span>
+    <span class="n">cache</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">key</span><span class="p">,</span>
+    <span class="n">value</span><span class="p">,</span>
+    <span class="n">active</span><span class="p">,</span>
+    <span class="n">top</span><span class="p">,</span>
+    <span class="n">bottom</span><span class="p">,</span>
+    <span class="n">original2d</span><span class="p">,</span>
+    <span class="n">repeat</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">conductance</span> <span class="o">=</span> <span class="n">raise_on_layer</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;conductance&quot;</span><span class="p">)</span>
+    <span class="n">elevation</span> <span class="o">=</span> <span class="n">raise_on_layer</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;elevation&quot;</span><span class="p">)</span>
+
+    <span class="n">disv_cond</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span>
+        <span class="n">conductance</span><span class="p">,</span>
+        <span class="n">method</span><span class="o">=</span><span class="s2">&quot;conductance&quot;</span><span class="p">,</span>
+        <span class="n">original2d</span><span class="o">=</span><span class="n">original2d</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">disv_elev</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span><span class="n">elevation</span><span class="p">,</span> <span class="n">original2d</span><span class="o">=</span><span class="n">original2d</span><span class="p">)</span>
+    <span class="n">valid</span> <span class="o">=</span> <span class="p">(</span><span class="n">disv_cond</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">disv_elev</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">active</span>
+    <span class="n">location</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">active</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">location</span> <span class="o">=</span> <span class="n">location</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">disv_elev</span> <span class="o">&gt;</span> <span class="n">bottom</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">disv_elev</span> <span class="o">&lt;=</span> <span class="n">top</span><span class="p">))</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">valid</span><span class="p">)</span>
+    <span class="n">disv_cond</span> <span class="o">=</span> <span class="n">finish</span><span class="p">(</span><span class="n">location</span> <span class="o">*</span> <span class="n">disv_cond</span><span class="p">)</span>
+    <span class="n">disv_elev</span> <span class="o">=</span> <span class="n">finish</span><span class="p">(</span><span class="n">location</span> <span class="o">*</span> <span class="n">disv_elev</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">disv_cond</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+        <span class="k">return</span>
+
+    <span class="n">drn</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Drainage</span><span class="p">(</span>
+        <span class="n">elevation</span><span class="o">=</span><span class="n">disv_elev</span><span class="p">,</span>
+        <span class="n">conductance</span><span class="o">=</span><span class="n">disv_cond</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">repeat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">drn</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;repeat_stress&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_repeat_stress</span><span class="p">(</span><span class="n">repeat</span><span class="p">)</span>
+    <span class="n">model</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">drn</span>
+    <span class="k">return</span>
+
+
+<span class="k">def</span> <span class="nf">create_ghb</span><span class="p">(</span>
+    <span class="n">cache</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">key</span><span class="p">,</span>
+    <span class="n">value</span><span class="p">,</span>
+    <span class="n">active</span><span class="p">,</span>
+    <span class="n">original2d</span><span class="p">,</span>
+    <span class="n">repeat</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">conductance</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="s2">&quot;conductance&quot;</span><span class="p">]</span>
+    <span class="n">head</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="s2">&quot;head&quot;</span><span class="p">]</span>
+
+    <span class="n">disv_cond</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span>
+        <span class="n">conductance</span><span class="p">,</span>
+        <span class="n">method</span><span class="o">=</span><span class="s2">&quot;conductance&quot;</span><span class="p">,</span>
+        <span class="n">original2d</span><span class="o">=</span><span class="n">original2d</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">disv_head</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span>
+        <span class="n">head</span><span class="p">,</span>
+        <span class="n">method</span><span class="o">=</span><span class="s2">&quot;barycentric&quot;</span><span class="p">,</span>
+        <span class="n">original2d</span><span class="o">=</span><span class="n">original2d</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">valid</span> <span class="o">=</span> <span class="p">(</span><span class="n">disv_cond</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">disv_head</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">active</span>
+
+    <span class="n">ghb</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">GeneralHeadBoundary</span><span class="p">(</span>
+        <span class="n">conductance</span><span class="o">=</span><span class="n">disv_cond</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">valid</span><span class="p">),</span>
+        <span class="n">head</span><span class="o">=</span><span class="n">disv_head</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">valid</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">repeat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ghb</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;repeat_stress&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_repeat_stress</span><span class="p">(</span><span class="n">repeat</span><span class="p">)</span>
+    <span class="n">model</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ghb</span>
+    <span class="k">return</span>
+
+
+<span class="k">def</span> <span class="nf">create_riv</span><span class="p">(</span>
+    <span class="n">cache</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">key</span><span class="p">,</span>
+    <span class="n">value</span><span class="p">,</span>
+    <span class="n">active</span><span class="p">,</span>
+    <span class="n">original2d</span><span class="p">,</span>
+    <span class="n">top</span><span class="p">,</span>
+    <span class="n">bottom</span><span class="p">,</span>
+    <span class="n">repeat</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="k">def</span> <span class="nf">assign_to_layer</span><span class="p">(</span>
+        <span class="n">conductance</span><span class="p">,</span> <span class="n">stage</span><span class="p">,</span> <span class="n">elevation</span><span class="p">,</span> <span class="n">infiltration_factor</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">active</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Assign river boundary to multiple layers. Distribute the conductance based</span>
+<span class="sd">        on the vertical degree of overlap.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        conductance</span>
+<span class="sd">        stage:</span>
+<span class="sd">            water stage</span>
+<span class="sd">        elevation:</span>
+<span class="sd">            bottom elevation of the river</span>
+<span class="sd">        infiltration_factor</span>
+<span class="sd">            factor (generally &lt;1) to reduce infiltration conductance compared</span>
+<span class="sd">            to drainage conductance.</span>
+<span class="sd">        top:</span>
+<span class="sd">            layer model top elevation</span>
+<span class="sd">        bottom:</span>
+<span class="sd">            layer model bottom elevation</span>
+<span class="sd">        active:</span>
+<span class="sd">            active or inactive cells (idomain &gt; 0)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">valid</span> <span class="o">=</span> <span class="n">conductance</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
+        <span class="n">conductance</span> <span class="o">=</span> <span class="n">conductance</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">valid</span><span class="p">)</span>
+        <span class="n">stage</span> <span class="o">=</span> <span class="n">stage</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">valid</span><span class="p">)</span>
+        <span class="n">elevation</span> <span class="o">=</span> <span class="n">elevation</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">valid</span><span class="p">)</span>
+        <span class="n">elevation</span> <span class="o">=</span> <span class="n">elevation</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">elevation</span> <span class="o">&lt;=</span> <span class="n">stage</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="n">stage</span><span class="p">)</span>
+
+        <span class="c1"># TODO: this removes too much when the stage is higher than the top...</span>
+        <span class="c1"># Instead: just cut through all layers until the bottom elevation.</span>
+        <span class="c1"># Then, assign a transmissivity weighted conductance.</span>
+        <span class="n">water_top</span> <span class="o">=</span> <span class="n">stage</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">stage</span> <span class="o">&lt;=</span> <span class="n">top</span><span class="p">)</span>
+        <span class="n">water_bottom</span> <span class="o">=</span> <span class="n">elevation</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">elevation</span> <span class="o">&gt;</span> <span class="n">bottom</span><span class="p">)</span>
+        <span class="n">layer_height</span> <span class="o">=</span> <span class="n">top</span> <span class="o">-</span> <span class="n">bottom</span>
+        <span class="n">layer_height</span> <span class="o">=</span> <span class="n">layer_height</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">active</span><span class="p">)</span>  <span class="c1"># avoid 0 thickness layers</span>
+        <span class="n">fraction</span> <span class="o">=</span> <span class="p">(</span><span class="n">water_top</span> <span class="o">-</span> <span class="n">water_bottom</span><span class="p">)</span> <span class="o">/</span> <span class="n">layer_height</span>
+        <span class="c1"># Set values of 0.0 to 1.0, but do not change NaN values:</span>
+        <span class="n">fraction</span> <span class="o">=</span> <span class="n">fraction</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="p">(</span><span class="n">fraction</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">),</span> <span class="n">other</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">location</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">fraction</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">fraction</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">active</span><span class="p">)</span>
+
+        <span class="n">layered_conductance</span> <span class="o">=</span> <span class="n">finish</span><span class="p">(</span><span class="n">conductance</span> <span class="o">*</span> <span class="n">fraction</span><span class="p">)</span>
+        <span class="n">layered_stage</span> <span class="o">=</span> <span class="n">finish</span><span class="p">(</span><span class="n">stage</span> <span class="o">*</span> <span class="n">location</span><span class="p">)</span>
+        <span class="n">layered_elevation</span> <span class="o">=</span> <span class="n">finish</span><span class="p">(</span><span class="n">elevation</span> <span class="o">*</span> <span class="n">location</span><span class="p">)</span>
+        <span class="n">infiltration_factor</span> <span class="o">=</span> <span class="n">finish</span><span class="p">(</span><span class="n">infiltration_factor</span> <span class="o">*</span> <span class="n">location</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">layered_conductance</span><span class="p">,</span>
+            <span class="n">layered_stage</span><span class="p">,</span>
+            <span class="n">layered_elevation</span><span class="p">,</span>
+            <span class="n">infiltration_factor</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">conductance</span> <span class="o">=</span> <span class="n">raise_on_layer</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;conductance&quot;</span><span class="p">)</span>
+    <span class="n">stage</span> <span class="o">=</span> <span class="n">raise_on_layer</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;stage&quot;</span><span class="p">)</span>
+    <span class="n">bottom_elevation</span> <span class="o">=</span> <span class="n">raise_on_layer</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;bottom_elevation&quot;</span><span class="p">)</span>
+    <span class="n">infiltration_factor</span> <span class="o">=</span> <span class="n">raise_on_layer</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;infiltration_factor&quot;</span><span class="p">)</span>
+
+    <span class="n">disv_cond_2d</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span>
+        <span class="n">conductance</span><span class="p">,</span>
+        <span class="n">method</span><span class="o">=</span><span class="s2">&quot;conductance&quot;</span><span class="p">,</span>
+        <span class="n">original2d</span><span class="o">=</span><span class="n">original2d</span><span class="p">,</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+    <span class="n">disv_elev_2d</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span><span class="n">bottom_elevation</span><span class="p">,</span> <span class="n">original2d</span><span class="o">=</span><span class="n">original2d</span><span class="p">)</span>
+    <span class="n">disv_stage_2d</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span><span class="n">stage</span><span class="p">,</span> <span class="n">original2d</span><span class="o">=</span><span class="n">original2d</span><span class="p">)</span>
+    <span class="n">disv_inff_2d</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span><span class="n">infiltration_factor</span><span class="p">,</span> <span class="n">original2d</span><span class="o">=</span><span class="n">original2d</span><span class="p">)</span>
+
+    <span class="n">disv_cond</span><span class="p">,</span> <span class="n">disv_stage</span><span class="p">,</span> <span class="n">disv_elev</span><span class="p">,</span> <span class="n">disv_inff</span> <span class="o">=</span> <span class="n">assign_to_layer</span><span class="p">(</span>
+        <span class="n">conductance</span><span class="o">=</span><span class="n">disv_cond_2d</span><span class="p">,</span>
+        <span class="n">stage</span><span class="o">=</span><span class="n">disv_stage_2d</span><span class="p">,</span>
+        <span class="n">elevation</span><span class="o">=</span><span class="n">disv_elev_2d</span><span class="p">,</span>
+        <span class="n">infiltration_factor</span><span class="o">=</span><span class="n">disv_inff_2d</span><span class="p">,</span>
+        <span class="n">top</span><span class="o">=</span><span class="n">top</span><span class="p">,</span>
+        <span class="n">bottom</span><span class="o">=</span><span class="n">bottom</span><span class="p">,</span>
+        <span class="n">active</span><span class="o">=</span><span class="n">active</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">disv_cond</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+        <span class="k">return</span>
+
+    <span class="c1"># The infiltration factor may be 0. In that case, we need only create a DRN</span>
+    <span class="c1"># package.</span>
+    <span class="n">drn</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Drainage</span><span class="p">(</span>
+        <span class="n">conductance</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">disv_inff</span><span class="p">)</span> <span class="o">*</span> <span class="n">disv_cond</span><span class="p">,</span>
+        <span class="n">elevation</span><span class="o">=</span><span class="n">disv_stage</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">repeat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">drn</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;repeat_stress&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_repeat_stress</span><span class="p">(</span><span class="n">repeat</span><span class="p">)</span>
+    <span class="n">model</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">-drn&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">drn</span>
+
+    <span class="n">riv_cond</span> <span class="o">=</span> <span class="n">disv_cond</span> <span class="o">*</span> <span class="n">disv_inff</span>
+    <span class="n">riv_valid</span> <span class="o">=</span> <span class="n">riv_cond</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">riv_valid</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="k">return</span>
+
+    <span class="n">riv</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">River</span><span class="p">(</span>
+        <span class="n">stage</span><span class="o">=</span><span class="n">disv_stage</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">riv_valid</span><span class="p">),</span>
+        <span class="n">conductance</span><span class="o">=</span><span class="n">riv_cond</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">riv_valid</span><span class="p">),</span>
+        <span class="n">bottom_elevation</span><span class="o">=</span><span class="n">disv_elev</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">riv_valid</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">repeat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">riv</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;repeat_stress&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_repeat_stress</span><span class="p">(</span><span class="n">repeat</span><span class="p">)</span>
+    <span class="n">model</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">riv</span>
+
+    <span class="k">return</span>
+
+
+<span class="k">def</span> <span class="nf">create_rch</span><span class="p">(</span>
+    <span class="n">cache</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">key</span><span class="p">,</span>
+    <span class="n">value</span><span class="p">,</span>
+    <span class="n">active</span><span class="p">,</span>
+    <span class="n">original2d</span><span class="p">,</span>
+    <span class="n">repeat</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">rate</span> <span class="o">=</span> <span class="n">raise_on_layer</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;rate&quot;</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.001</span>
+    <span class="n">disv_rate</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span><span class="n">rate</span><span class="p">,</span> <span class="n">original2d</span><span class="o">=</span><span class="n">original2d</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">active</span><span class="p">)</span>
+    <span class="c1"># Find highest active layer</span>
+    <span class="n">location</span> <span class="o">=</span> <span class="n">get_upper_active_grid_cells</span><span class="p">(</span><span class="n">active</span><span class="p">)</span>
+    <span class="n">disv_rate</span> <span class="o">=</span> <span class="n">finish</span><span class="p">(</span><span class="n">disv_rate</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">location</span><span class="p">))</span>
+
+    <span class="c1"># Skip if there&#39;s no data</span>
+    <span class="k">if</span> <span class="n">disv_rate</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+        <span class="k">return</span>
+
+    <span class="n">rch</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Recharge</span><span class="p">(</span><span class="n">rate</span><span class="o">=</span><span class="n">disv_rate</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">repeat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">rch</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;repeat_stress&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_repeat_stress</span><span class="p">(</span><span class="n">repeat</span><span class="p">)</span>
+    <span class="n">model</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">rch</span>
+    <span class="k">return</span>
+
+
+<span class="k">def</span> <span class="nf">create_evt</span><span class="p">(</span>
+    <span class="n">cache</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">key</span><span class="p">,</span>
+    <span class="n">value</span><span class="p">,</span>
+    <span class="n">active</span><span class="p">,</span>
+    <span class="n">original2d</span><span class="p">,</span>
+    <span class="n">repeat</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">surface</span> <span class="o">=</span> <span class="n">raise_on_layer</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;surface&quot;</span><span class="p">)</span>
+    <span class="n">rate</span> <span class="o">=</span> <span class="n">raise_on_layer</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;rate&quot;</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.001</span>
+    <span class="n">depth</span> <span class="o">=</span> <span class="n">raise_on_layer</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;depth&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Find highest active layer</span>
+    <span class="n">highest</span> <span class="o">=</span> <span class="n">active</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">active</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">active</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+    <span class="n">location</span> <span class="o">=</span> <span class="n">highest</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">highest</span><span class="p">)</span>
+
+    <span class="n">disv_surface</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span><span class="n">surface</span><span class="p">,</span> <span class="n">original2d</span><span class="o">=</span><span class="n">original2d</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">active</span><span class="p">)</span>
+    <span class="n">disv_surface</span> <span class="o">=</span> <span class="n">finish</span><span class="p">(</span><span class="n">disv_surface</span> <span class="o">*</span> <span class="n">location</span><span class="p">)</span>
+
+    <span class="n">disv_rate</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span><span class="n">rate</span><span class="p">,</span> <span class="n">original2d</span><span class="o">=</span><span class="n">original2d</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">active</span><span class="p">)</span>
+    <span class="n">disv_rate</span> <span class="o">=</span> <span class="n">finish</span><span class="p">(</span><span class="n">disv_rate</span> <span class="o">*</span> <span class="n">location</span><span class="p">)</span>
+
+    <span class="n">disv_depth</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="n">original2d</span><span class="o">=</span><span class="n">original2d</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">active</span><span class="p">)</span>
+    <span class="n">disv_depth</span> <span class="o">=</span> <span class="n">finish</span><span class="p">(</span><span class="n">disv_depth</span> <span class="o">*</span> <span class="n">location</span><span class="p">)</span>
+
+    <span class="c1"># At depth 1.0, the rate is 0.0.</span>
+    <span class="n">proportion_depth</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">disv_surface</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">disv_surface</span><span class="o">.</span><span class="n">notnull</span><span class="p">())</span>
+    <span class="n">proportion_rate</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">disv_surface</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">disv_surface</span><span class="o">.</span><span class="n">notnull</span><span class="p">())</span>
+
+    <span class="n">evt</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Evapotranspiration</span><span class="p">(</span>
+        <span class="n">surface</span><span class="o">=</span><span class="n">disv_surface</span><span class="p">,</span>
+        <span class="n">rate</span><span class="o">=</span><span class="n">disv_rate</span><span class="p">,</span>
+        <span class="n">depth</span><span class="o">=</span><span class="n">disv_depth</span><span class="p">,</span>
+        <span class="n">proportion_rate</span><span class="o">=</span><span class="n">proportion_rate</span><span class="p">,</span>
+        <span class="n">proportion_depth</span><span class="o">=</span><span class="n">proportion_depth</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">repeat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">evt</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;repeat_stress&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_repeat_stress</span><span class="p">(</span><span class="n">repeat</span><span class="p">)</span>
+    <span class="n">model</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">evt</span>
+    <span class="k">return</span>
+
+
+<span class="k">def</span> <span class="nf">create_sto</span><span class="p">(</span>
+    <span class="n">cache</span><span class="p">,</span>
+    <span class="n">storage_coefficient</span><span class="p">,</span>
+    <span class="n">active</span><span class="p">,</span>
+    <span class="n">original2d</span><span class="p">,</span>
+    <span class="n">transient</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="k">if</span> <span class="n">storage_coefficient</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">disv_coef</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">disv_coef</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span><span class="n">storage_coefficient</span><span class="p">,</span> <span class="n">original2d</span><span class="o">=</span><span class="n">original2d</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+            <span class="n">active</span>
+        <span class="p">)</span>
+
+    <span class="n">sto</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">StorageCoefficient</span><span class="p">(</span>
+        <span class="n">storage_coefficient</span><span class="o">=</span><span class="n">disv_coef</span><span class="p">,</span>
+        <span class="n">specific_yield</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">transient</span><span class="o">=</span><span class="n">transient</span><span class="p">,</span>
+        <span class="n">convertible</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">sto</span>
+
+
+<span class="k">def</span> <span class="nf">create_wel</span><span class="p">(</span>
+    <span class="n">cache</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">key</span><span class="p">,</span>
+    <span class="n">value</span><span class="p">,</span>
+    <span class="n">active</span><span class="p">,</span>
+    <span class="n">top</span><span class="p">,</span>
+    <span class="n">bottom</span><span class="p">,</span>
+    <span class="n">k</span><span class="p">,</span>
+    <span class="n">repeat</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">target</span>
+    <span class="n">dataframe</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="s2">&quot;dataframe&quot;</span><span class="p">]</span>
+    <span class="n">layer</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">layer</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">dataframe</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">prepare</span><span class="o">.</span><span class="n">assign_wells</span><span class="p">(</span>
+            <span class="n">wells</span><span class="o">=</span><span class="n">dataframe</span><span class="p">,</span>
+            <span class="n">top</span><span class="o">=</span><span class="n">top</span><span class="p">,</span>
+            <span class="n">bottom</span><span class="o">=</span><span class="n">bottom</span><span class="p">,</span>
+            <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span>
+            <span class="n">minimum_thickness</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+            <span class="n">minimum_k</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dataframe</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dataframe</span><span class="p">))</span>
+        <span class="n">dataframe</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">layer</span>
+
+    <span class="n">first</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="n">well_layer</span> <span class="o">=</span> <span class="n">first</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">xy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">first</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">first</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]])</span>
+    <span class="n">cell2d</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">locate_points</span><span class="p">(</span><span class="n">xy</span><span class="p">)</span>
+    <span class="n">valid</span> <span class="o">=</span> <span class="p">(</span><span class="n">cell2d</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">active</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">well_layer</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">cell2d</span><span class="p">]</span>
+
+    <span class="n">cell2d</span> <span class="o">=</span> <span class="n">cell2d</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="c1"># Skip if no wells are located inside cells</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">valid</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="s2">&quot;time&quot;</span> <span class="ow">in</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="c1"># Ensure the well data is rectangular.</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">dataframe</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span>
+        <span class="c1"># First ffill, then bfill!</span>
+        <span class="n">dfs</span> <span class="o">=</span> <span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">time</span><span class="p">)</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">bfill</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">)]</span>
+        <span class="n">rate</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">])[</span><span class="s2">&quot;rate&quot;</span><span class="p">]</span>
+            <span class="o">.</span><span class="n">to_xarray</span><span class="p">()</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rate</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">dataframe</span><span class="p">[</span><span class="s2">&quot;rate&quot;</span><span class="p">],</span> <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="n">dataframe</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">]},</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Don&#39;t forget to remove the out-of-bounds points.</span>
+    <span class="n">rate</span> <span class="o">=</span> <span class="n">rate</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">valid</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">]),</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">wel</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">WellDisVertices</span><span class="p">(</span>
+        <span class="n">layer</span><span class="o">=</span><span class="n">well_layer</span><span class="p">,</span>
+        <span class="n">cell2d</span><span class="o">=</span><span class="n">cell2d</span><span class="p">,</span>
+        <span class="n">rate</span><span class="o">=</span><span class="n">rate</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">repeat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">wel</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;repeat_stress&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_repeat_stress</span><span class="p">(</span><span class="n">repeat</span><span class="p">)</span>
+
+    <span class="n">model</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">wel</span>
+    <span class="k">return</span>
+
+
+<span class="k">def</span> <span class="nf">create_ic</span><span class="p">(</span><span class="n">cache</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">active</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="s2">&quot;head&quot;</span><span class="p">]</span>
+    <span class="n">disv_start</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;barycentric&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">active</span><span class="p">)</span>
+    <span class="n">model</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">InitialConditions</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">disv_start</span><span class="p">)</span>
+    <span class="k">return</span>
+
+
+<span class="k">def</span> <span class="nf">create_hfb</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Modflow6Model</span><span class="p">,</span>
+    <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
+    <span class="n">top</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">dataframe</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="s2">&quot;geodataframe&quot;</span><span class="p">]</span>
+
+    <span class="n">barrier_gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+        <span class="n">geometry</span><span class="o">=</span><span class="n">dataframe</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;resistance&quot;</span><span class="p">:</span> <span class="n">dataframe</span><span class="p">[</span><span class="s2">&quot;resistance&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+            <span class="s2">&quot;ztop&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">dataframe</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">*</span> <span class="n">top</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+            <span class="s2">&quot;zbottom&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">dataframe</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">*</span> <span class="n">bottom</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="n">model</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">HorizontalFlowBarrierResistance</span><span class="p">(</span><span class="n">barrier_gdf</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">merge_hfbs</span><span class="p">(</span>
+    <span class="n">horizontal_flow_barriers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">HorizontalFlowBarrierResistance</span><span class="p">],</span>
+<span class="p">):</span>
+    <span class="n">datasets</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">horizontal_flow_barrier</span> <span class="ow">in</span> <span class="n">horizontal_flow_barriers</span><span class="p">:</span>
+        <span class="n">datasets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">horizontal_flow_barrier</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
+
+    <span class="n">combined_dataset</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">datasets</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">)</span>
+    <span class="n">combined_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">combined_dataset</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">])</span>
+
+    <span class="n">combined_dataframe</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span> <span class="n">combined_dataset</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">())</span>
+    <span class="n">combined_dataframe</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;print_input&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">HorizontalFlowBarrierResistance</span><span class="p">(</span><span class="n">combined_dataframe</span><span class="p">)</span>
+
+
+<span class="n">PKG_CONVERSION</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;chd&quot;</span><span class="p">:</span> <span class="n">create_chd</span><span class="p">,</span>
+    <span class="s2">&quot;drn&quot;</span><span class="p">:</span> <span class="n">create_drn</span><span class="p">,</span>
+    <span class="s2">&quot;evt&quot;</span><span class="p">:</span> <span class="n">create_evt</span><span class="p">,</span>
+    <span class="s2">&quot;ghb&quot;</span><span class="p">:</span> <span class="n">create_ghb</span><span class="p">,</span>
+    <span class="s2">&quot;hfb&quot;</span><span class="p">:</span> <span class="n">create_hfb</span><span class="p">,</span>
+    <span class="s2">&quot;shd&quot;</span><span class="p">:</span> <span class="n">create_ic</span><span class="p">,</span>
+    <span class="s2">&quot;rch&quot;</span><span class="p">:</span> <span class="n">create_rch</span><span class="p">,</span>
+    <span class="s2">&quot;riv&quot;</span><span class="p">:</span> <span class="n">create_riv</span><span class="p">,</span>
+    <span class="s2">&quot;wel&quot;</span><span class="p">:</span> <span class="n">create_wel</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="k">def</span> <span class="nf">expand_repetitions</span><span class="p">(</span>
+    <span class="n">repeat_stress</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">datetime</span><span class="p">],</span> <span class="n">time_min</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">time_max</span><span class="p">:</span> <span class="n">datetime</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">datetime</span><span class="p">,</span> <span class="n">datetime</span><span class="p">]:</span>
+    <span class="n">expanded</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">year</span><span class="p">,</span> <span class="n">date</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span>
+        <span class="nb">range</span><span class="p">(</span><span class="n">time_min</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">time_max</span><span class="o">.</span><span class="n">year</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="n">repeat_stress</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">newdate</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">year</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">newdate</span> <span class="o">&lt;</span> <span class="n">time_max</span><span class="p">:</span>
+            <span class="n">expanded</span><span class="p">[</span><span class="n">newdate</span><span class="p">]</span> <span class="o">=</span> <span class="n">date</span>
+    <span class="k">return</span> <span class="n">expanded</span>
+
+
+<div class="viewcode-block" id="convert_to_disv"><a class="viewcode-back" href="../../../../api/generated/io/imod.formats.prj.convert_to_disv.html#imod.formats.prj.convert_to_disv">[docs]</a><span class="k">def</span> <span class="nf">convert_to_disv</span><span class="p">(</span>
+    <span class="n">projectfile_data</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">time_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">repeat_stress</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert the contents of a project file to a MODFLOW6 DISV model.</span>
+
+<span class="sd">    The ``time_min`` and ``time_max`` are **both** required when</span>
+<span class="sd">    ``repeat_stress`` is given. The entries in the Periods section of the</span>
+<span class="sd">    project file will be expanded to yearly repeats between ``time_min`` and</span>
+<span class="sd">    ``time_max``.</span>
+
+<span class="sd">    Additionally, ``time_min`` and ``time_max`` may be used to slice the input</span>
+<span class="sd">    to a specific time domain.</span>
+
+<span class="sd">    The returned model is steady-state if none of the packages contain a time</span>
+<span class="sd">    dimension. The model is transient if any of the packages contain a time</span>
+<span class="sd">    dimension. This can be changed by setting the &quot;transient&quot; value in the</span>
+<span class="sd">    storage package of the returned model. Storage coefficient input is</span>
+<span class="sd">    required for a transient model.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    projectfile_data: dict</span>
+<span class="sd">        Dictionary with the projectfile topics as keys, and the data</span>
+<span class="sd">        as xarray.DataArray, pandas.DataFrame, or geopandas.GeoDataFrame.</span>
+<span class="sd">    target: xu.Ugrid2d</span>
+<span class="sd">        The unstructured target topology. All data is transformed to match this</span>
+<span class="sd">        topology.</span>
+<span class="sd">    time_min: datetime, optional</span>
+<span class="sd">        Minimum starting time of a stress.</span>
+<span class="sd">        Required when ``repeat_stress`` is provided.</span>
+<span class="sd">    time_max: datetime, optional</span>
+<span class="sd">        Maximum starting time of a stress.</span>
+<span class="sd">        Required when ``repeat_stress`` is provided.</span>
+<span class="sd">    repeat_stress: dict of dict of string to datetime, optional</span>
+<span class="sd">        This dict contains contains, per topic, the period alias (a string) to</span>
+<span class="sd">        its datetime.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    disv_model: imod.mf6.GroundwaterFlowModel</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">repeat_stress</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">time_min</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">time_max</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;time_min and time_max are required when repeat_stress is given&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="p">(</span><span class="n">time_min</span><span class="p">,</span> <span class="n">time_max</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">arg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">datetime</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;time_min and time_max must be datetime.datetime. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">projectfile_data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">GroundwaterFlowModel</span><span class="p">()</span>
+
+    <span class="c1"># Setup the regridding weights cache.</span>
+    <span class="n">weights_cache</span> <span class="o">=</span> <span class="n">SingularTargetRegridderWeightsCache</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">cache_size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+    <span class="c1"># Mandatory packages first.</span>
+    <span class="n">ibound</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;bnd&quot;</span><span class="p">][</span><span class="s2">&quot;ibound&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+    <span class="n">disv</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">active</span><span class="p">,</span> <span class="n">original2d</span> <span class="o">=</span> <span class="n">create_disv</span><span class="p">(</span>
+        <span class="n">cache</span><span class="o">=</span><span class="n">weights_cache</span><span class="p">,</span>
+        <span class="n">top</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">][</span><span class="s2">&quot;top&quot;</span><span class="p">],</span>
+        <span class="n">bottom</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;bot&quot;</span><span class="p">][</span><span class="s2">&quot;bottom&quot;</span><span class="p">],</span>
+        <span class="n">ibound</span><span class="o">=</span><span class="n">ibound</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">npf</span> <span class="o">=</span> <span class="n">create_npf</span><span class="p">(</span>
+        <span class="n">cache</span><span class="o">=</span><span class="n">weights_cache</span><span class="p">,</span>
+        <span class="n">k</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;khv&quot;</span><span class="p">][</span><span class="s2">&quot;kh&quot;</span><span class="p">],</span>
+        <span class="n">vertical_anisotropy</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;kva&quot;</span><span class="p">][</span><span class="s2">&quot;vertical_anisotropy&quot;</span><span class="p">],</span>
+        <span class="n">active</span><span class="o">=</span><span class="n">active</span><span class="p">,</span>
+        <span class="n">original2d</span><span class="o">=</span><span class="n">original2d</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">model</span><span class="p">[</span><span class="s2">&quot;npf&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">npf</span>
+    <span class="n">model</span><span class="p">[</span><span class="s2">&quot;disv&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">disv</span>
+    <span class="n">model</span><span class="p">[</span><span class="s2">&quot;oc&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">OutputControl</span><span class="p">(</span><span class="n">save_head</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Used in other package construction:</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">npf</span><span class="p">[</span><span class="s2">&quot;k&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+    <span class="n">new_ibound</span> <span class="o">=</span> <span class="n">weights_cache</span><span class="o">.</span><span class="n">regrid</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">ibound</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;minimum&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+
+    <span class="c1"># Boundary conditions, one by one.</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">pkg</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">convert</span> <span class="o">=</span> <span class="n">PKG_CONVERSION</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pkg</span><span class="p">)</span>
+        <span class="c1"># Skip unsupported packages</span>
+        <span class="k">if</span> <span class="n">convert</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="n">repeat_stress</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">repeat</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">repeat</span> <span class="o">=</span> <span class="n">repeat_stress</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">repeat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">repeat</span> <span class="o">=</span> <span class="n">expand_repetitions</span><span class="p">(</span><span class="n">repeat</span><span class="p">,</span> <span class="n">time_min</span><span class="p">,</span> <span class="n">time_max</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># conversion will update model instance</span>
+            <span class="n">convert</span><span class="p">(</span>
+                <span class="n">cache</span><span class="o">=</span><span class="n">weights_cache</span><span class="p">,</span>
+                <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+                <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+                <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span>
+                <span class="n">ibound</span><span class="o">=</span><span class="n">new_ibound</span><span class="p">,</span>
+                <span class="n">active</span><span class="o">=</span><span class="n">active</span><span class="p">,</span>
+                <span class="n">original2d</span><span class="o">=</span><span class="n">original2d</span><span class="p">,</span>
+                <span class="n">top</span><span class="o">=</span><span class="n">top</span><span class="p">,</span>
+                <span class="n">bottom</span><span class="o">=</span><span class="n">bottom</span><span class="p">,</span>
+                <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span>
+                <span class="n">repeat</span><span class="o">=</span><span class="n">repeat</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="se">\n</span><span class="s2">during conversion of </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Treat hfb&#39;s separately: they must be merged into one,</span>
+    <span class="c1"># as MODFLOW6 only supports a single HFB.</span>
+    <span class="n">hfb_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;hfb&quot;</span><span class="p">]</span>
+    <span class="n">hfbs</span> <span class="o">=</span> <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">hfb_keys</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">hfbs</span><span class="p">:</span>
+        <span class="n">model</span><span class="p">[</span><span class="s2">&quot;hfb&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">merge_hfbs</span><span class="p">(</span><span class="n">hfbs</span><span class="p">)</span>
+
+    <span class="n">transient</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="s2">&quot;time&quot;</span> <span class="ow">in</span> <span class="n">pkg</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">dims</span> <span class="k">for</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">transient</span> <span class="ow">and</span> <span class="p">(</span><span class="n">time_min</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">time_max</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">clip_box</span><span class="p">(</span><span class="n">time_min</span><span class="o">=</span><span class="n">time_min</span><span class="p">,</span> <span class="n">time_max</span><span class="o">=</span><span class="n">time_max</span><span class="p">)</span>
+
+    <span class="n">sto_entry</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sto&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">sto_entry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">transient</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;storage input is required for a transient run&quot;</span><span class="p">)</span>
+        <span class="n">storage_coefficient</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">storage_coefficient</span> <span class="o">=</span> <span class="n">sto_entry</span><span class="p">[</span><span class="s2">&quot;storage_coefficient&quot;</span><span class="p">]</span>
+
+    <span class="n">model</span><span class="p">[</span><span class="s2">&quot;sto&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">create_sto</span><span class="p">(</span>
+        <span class="n">cache</span><span class="o">=</span><span class="n">weights_cache</span><span class="p">,</span>
+        <span class="n">storage_coefficient</span><span class="o">=</span><span class="n">storage_coefficient</span><span class="p">,</span>
+        <span class="n">active</span><span class="o">=</span><span class="n">active</span><span class="p">,</span>
+        <span class="n">original2d</span><span class="o">=</span><span class="n">original2d</span><span class="p">,</span>
+        <span class="n">transient</span><span class="o">=</span><span class="n">transient</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">model</span></div>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

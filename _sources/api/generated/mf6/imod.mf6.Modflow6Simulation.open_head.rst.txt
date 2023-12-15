@@ -1,0 +1,6 @@
+﻿imod.mf6.Modflow6Simulation.open\_head
+======================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: Modflow6Simulation.open_head

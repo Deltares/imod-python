@@ -1,0 +1,45 @@
+﻿imod.mf6.InitialConditions
+==========================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: InitialConditions
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~InitialConditions.__init__
+      ~InitialConditions.clip_box
+      ~InitialConditions.copy
+      ~InitialConditions.from_file
+      ~InitialConditions.get_regrid_methods
+      ~InitialConditions.is_grid_agnostic_package
+      ~InitialConditions.is_regridding_supported
+      ~InitialConditions.isel
+      ~InitialConditions.mask
+      ~InitialConditions.regrid_like
+      ~InitialConditions.render
+      ~InitialConditions.sel
+      ~InitialConditions.skip_masking_dataarray
+      ~InitialConditions.to_netcdf
+      ~InitialConditions.write
+      ~InitialConditions.write_binary_griddata
+      ~InitialConditions.write_blockfile
+      ~InitialConditions.write_text_griddata
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~InitialConditions.dataset
+   
+   

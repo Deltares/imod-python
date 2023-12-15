@@ -1,0 +1,26 @@
+﻿imod.couplers.metamod.WellSvatMapping
+=====================================
+
+.. currentmodule:: imod.couplers.metamod
+
+.. autoclass:: WellSvatMapping
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~WellSvatMapping.__init__
+      ~WellSvatMapping.isel
+      ~WellSvatMapping.sel
+      ~WellSvatMapping.write
+      ~WellSvatMapping.write_dataframe_fixed_width
+   
+   
+
+   
+   
+   

@@ -1,0 +1,29 @@
+﻿imod.flow.River
+===============
+
+.. currentmodule:: imod.flow
+
+.. autoclass:: River
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~River.__init__
+      ~River.compose
+      ~River.from_file
+      ~River.isel
+      ~River.periodic_stress
+      ~River.repeat_stress
+      ~River.save
+      ~River.sel
+   
+   
+
+   
+   
+   

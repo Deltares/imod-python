@@ -1,0 +1,46 @@
+﻿imod.mf6.Drainage
+=================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: Drainage
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Drainage.__init__
+      ~Drainage.clip_box
+      ~Drainage.copy
+      ~Drainage.from_file
+      ~Drainage.get_period_varnames
+      ~Drainage.get_regrid_methods
+      ~Drainage.is_grid_agnostic_package
+      ~Drainage.is_regridding_supported
+      ~Drainage.isel
+      ~Drainage.mask
+      ~Drainage.regrid_like
+      ~Drainage.render
+      ~Drainage.sel
+      ~Drainage.skip_masking_dataarray
+      ~Drainage.to_netcdf
+      ~Drainage.write
+      ~Drainage.write_binary_griddata
+      ~Drainage.write_blockfile
+      ~Drainage.write_text_griddata
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Drainage.dataset
+   
+   

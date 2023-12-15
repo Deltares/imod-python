@@ -1,0 +1,27 @@
+﻿imod.flow.HorizontalAnisotropy
+==============================
+
+.. currentmodule:: imod.flow
+
+.. autoclass:: HorizontalAnisotropy
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~HorizontalAnisotropy.__init__
+      ~HorizontalAnisotropy.compose
+      ~HorizontalAnisotropy.from_file
+      ~HorizontalAnisotropy.isel
+      ~HorizontalAnisotropy.save
+      ~HorizontalAnisotropy.sel
+   
+   
+
+   
+   
+   

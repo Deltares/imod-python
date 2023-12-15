@@ -1,0 +1,26 @@
+﻿imod.wq.PreconditionedConjugateGradientSolver
+=============================================
+
+.. currentmodule:: imod.wq
+
+.. autoclass:: PreconditionedConjugateGradientSolver
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~PreconditionedConjugateGradientSolver.__init__
+      ~PreconditionedConjugateGradientSolver.from_file
+      ~PreconditionedConjugateGradientSolver.isel
+      ~PreconditionedConjugateGradientSolver.save
+      ~PreconditionedConjugateGradientSolver.sel
+   
+   
+
+   
+   
+   

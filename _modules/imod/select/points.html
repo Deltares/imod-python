@@ -1,0 +1,892 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imod.select.points &#8212; iMOD Python 0.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/select/points';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">imod.select.points</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for imod.select.points</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="kn">import</span> <span class="nn">xugrid</span> <span class="k">as</span> <span class="nn">xu</span>
+
+<span class="kn">import</span> <span class="nn">imod</span>
+
+
+<span class="k">def</span> <span class="nf">get_unstructured_cell2d_from_xy</span><span class="p">(</span><span class="n">uda</span><span class="p">,</span> <span class="o">**</span><span class="n">points</span><span class="p">):</span>
+    <span class="c1"># Unstructured grids always require to be tested both on x and y coordinates</span>
+    <span class="c1"># to see if points are within bounds.</span>
+    <span class="k">for</span> <span class="n">coord</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">coord</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">points</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Missing </span><span class="si">{</span><span class="n">coord</span><span class="si">}</span><span class="s2"> in point coordinates.&quot;</span>
+                <span class="s2">&quot;Unstructured grids require both an x and y coordinate&quot;</span>
+                <span class="s2">&quot;to get cell indices.&quot;</span>
+            <span class="p">)</span>
+    <span class="n">xy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">points</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">points</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]])</span>
+    <span class="k">return</span> <span class="n">uda</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">locate_points</span><span class="p">(</span><span class="n">xy</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">__check_and_get_points_shape</span><span class="p">(</span><span class="n">points</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check whether points have the right shape&quot;&quot;&quot;</span>
+    <span class="n">shapes</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">coord</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">points</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">points</span><span class="p">[</span><span class="n">coord</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Coordinate </span><span class="si">{</span><span class="n">coord</span><span class="si">}</span><span class="s2"> is not one-dimensional, but has shape: </span><span class="si">{</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="n">shapes</span><span class="p">[</span><span class="n">coord</span><span class="p">]</span> <span class="o">=</span> <span class="n">shape</span>
+    <span class="k">return</span> <span class="n">shapes</span>
+
+
+<span class="k">def</span> <span class="nf">__check_point_shapes_consistency</span><span class="p">(</span><span class="n">shapes</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">shapes</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">coord</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">coord</span><span class="p">,</span> <span class="n">shape</span> <span class="ow">in</span> <span class="n">shapes</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shapes of coordinates do match each other:</span><span class="se">\n</span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_check_points</span><span class="p">(</span><span class="n">points</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check whether the array with points has the right and consistent shape.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">shapes</span> <span class="o">=</span> <span class="n">__check_and_get_points_shape</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+    <span class="n">__check_point_shapes_consistency</span><span class="p">(</span><span class="n">shapes</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">__arr_like_points</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return array with the same shape as the first array provided in points.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">first_value</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">points</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">first_value</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="points_in_bounds"><a class="viewcode-back" href="../../../api/generated/select/imod.select.points_in_bounds.html#imod.select.points_in_bounds">[docs]</a><span class="k">def</span> <span class="nf">points_in_bounds</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="o">**</span><span class="n">points</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns whether points specified by keyword arguments fall within the bounds</span>
+<span class="sd">    of ``da``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    da : xr.DataArray</span>
+<span class="sd">    points : keyword arguments of coordinate=values</span>
+<span class="sd">        keyword arguments specifying coordinate and values. Please refer to the</span>
+<span class="sd">        examples.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    in_bounds : np.array of bools</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Create the DataArray, then use the keyword arguments to define along which</span>
+<span class="sd">    coordinate to check whether the points are within bounds.</span>
+
+<span class="sd">    &gt;&gt;&gt; nrow, ncol = 3, 4</span>
+<span class="sd">    &gt;&gt;&gt; data = np.arange(12.0).reshape(nrow, ncol)</span>
+<span class="sd">    &gt;&gt;&gt; coords = {&quot;x&quot;: [0.5, 1.5, 2.5, 3.5], &quot;y&quot;: [2.5, 1.5, 0.5]}</span>
+<span class="sd">    &gt;&gt;&gt; dims = (&quot;y&quot;, &quot;x&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; da = xr.DataArray(data, coords, dims)</span>
+<span class="sd">    &gt;&gt;&gt; x = [0.4, 2.6]</span>
+<span class="sd">    &gt;&gt;&gt; points_in_bounds(da, x=x)</span>
+
+<span class="sd">    This works for an arbitrary number of coordinates:</span>
+
+<span class="sd">    &gt;&gt;&gt; y = [1.3, 2.7]</span>
+<span class="sd">    &gt;&gt;&gt; points_in_bounds(da, x=x, y=y)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_check_points</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+
+    <span class="n">in_bounds</span> <span class="o">=</span> <span class="n">__arr_like_points</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">):</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">get_unstructured_cell2d_from_xy</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="o">**</span><span class="n">points</span><span class="p">)</span>
+        <span class="c1"># xu.Ugrid2d.locate_points makes cells outside grid -1</span>
+        <span class="n">in_bounds</span> <span class="o">=</span> <span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="n">points</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+        <span class="n">points</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">points</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">da_x</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">coord_reference</span><span class="p">(</span><span class="n">da_x</span><span class="p">)</span>
+        <span class="c1"># Inplace bitwise operator</span>
+        <span class="n">in_bounds</span> <span class="o">&amp;=</span> <span class="p">(</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="n">xmin</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">xmax</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">in_bounds</span></div>
+
+
+<span class="k">def</span> <span class="nf">check_points_in_bounds</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">points</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="p">):</span>
+    <span class="n">inside</span> <span class="o">=</span> <span class="n">points_in_bounds</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="o">**</span><span class="n">points</span><span class="p">)</span>
+    <span class="c1"># Error handling</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Not all points are located within the bounds of the DataArray&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">inside</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">out_of_bounds</span> <span class="o">==</span> <span class="s2">&quot;raise&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">out_of_bounds</span> <span class="o">==</span> <span class="s2">&quot;warn&quot;</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">out_of_bounds</span> <span class="o">==</span> <span class="s2">&quot;ignore&quot;</span><span class="p">:</span>
+            <span class="n">points</span> <span class="o">=</span> <span class="p">{</span><span class="n">dim</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="n">inside</span><span class="p">]</span> <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">points</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unrecognized option </span><span class="si">{</span><span class="n">out_of_bounds</span><span class="si">}</span><span class="s2"> for out_of_bounds, &quot;</span>
+                <span class="s2">&quot;should be one of: error, warn, ignore.&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">points</span><span class="p">,</span> <span class="n">inside</span>
+
+
+<span class="k">def</span> <span class="nf">_get_indices_1d</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">coordname</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">x_decreasing</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">indexes</span><span class="p">[</span><span class="n">coordname</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_decreasing</span>
+    <span class="n">dx</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">coord_reference</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">coordname</span><span class="p">])</span>
+
+    <span class="n">ncell</span> <span class="o">=</span> <span class="n">da</span><span class="p">[</span><span class="n">coordname</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
+    <span class="c1"># Compute edges</span>
+    <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">ncell</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">xmin</span><span class="p">)</span>
+    <span class="c1"># Turn dx into array</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">ncell</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="c1"># Always increasing</span>
+    <span class="k">if</span> <span class="n">x_decreasing</span><span class="p">:</span>
+        <span class="n">xs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dx</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">xs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dx</span><span class="p">)</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
+
+    <span class="c1"># From np.searchsorted docstring:</span>
+    <span class="c1"># Find the indices into a sorted array a such that, if the corresponding</span>
+    <span class="c1"># elements in v were inserted before the indices, the order of a would</span>
+    <span class="c1"># be preserved.</span>
+    <span class="n">ixs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Take care of decreasing coordinates</span>
+    <span class="k">if</span> <span class="n">x_decreasing</span><span class="p">:</span>
+        <span class="n">ixs</span> <span class="o">=</span> <span class="n">ncell</span> <span class="o">-</span> <span class="n">ixs</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ixs</span> <span class="o">=</span> <span class="n">ixs</span> <span class="o">-</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">ixs</span>
+
+
+<div class="viewcode-block" id="points_indices"><a class="viewcode-back" href="../../../api/generated/select/imod.select.points_indices.html#imod.select.points_indices">[docs]</a><span class="k">def</span> <span class="nf">points_indices</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">points</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the indices for points as defined by the arrays x and y.</span>
+
+<span class="sd">    Not all points may be located in the bounds of the DataArray. By default,</span>
+<span class="sd">    this function raises an error. This behavior can be controlled with the</span>
+<span class="sd">    ``out_of_bounds`` argument. If ``out_of_bounds`` is set to &quot;warn&quot; or</span>
+<span class="sd">    &quot;ignore&quot;, out of bounds point are removed. Which points have been removed</span>
+<span class="sd">    is visible in the ``index`` coordinate of the resulting selection.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    da : xr.DataArray</span>
+<span class="sd">    out_of_bounds : {&quot;raise&quot;, &quot;warn&quot;, &quot;ignore&quot;}, default: &quot;raise&quot;</span>
+<span class="sd">        What to do if the points are not located in the bounds of the</span>
+<span class="sd">        DataArray:</span>
+<span class="sd">        - &quot;raise&quot;: raise an exception</span>
+<span class="sd">        - &quot;warn&quot;: raise a warning, and ignore the missing points</span>
+<span class="sd">        - &quot;ignore&quot;: ignore the missing points</span>
+<span class="sd">    points : keyword arguments of coordinates and values</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    indices : dict of {coordinate: xr.DataArray with indices}</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    To extract values:</span>
+
+<span class="sd">    &gt;&gt;&gt; x = [1.0, 2.2, 3.0]</span>
+<span class="sd">    &gt;&gt;&gt; y = [4.0, 5.6, 7.0]</span>
+<span class="sd">    &gt;&gt;&gt; indices = imod.select.points_indices(da, x=x, y=y)</span>
+<span class="sd">    &gt;&gt;&gt; ind_y = indices[&quot;y&quot;]</span>
+<span class="sd">    &gt;&gt;&gt; ind_x = indices[&quot;x&quot;]</span>
+<span class="sd">    &gt;&gt;&gt; selection = da.isel(x=ind_x, y=ind_y)</span>
+
+<span class="sd">    Or shorter, using dictionary unpacking:</span>
+
+<span class="sd">    &gt;&gt;&gt; indices = imod.select.points_indices(da, x=x, y=y)</span>
+<span class="sd">    &gt;&gt;&gt; selection = da.isel(**indices)</span>
+
+<span class="sd">    To set values (in a new array), the following will do the trick:</span>
+
+<span class="sd">    &gt;&gt;&gt; empty = xr.full_like(da, np.nan)</span>
+<span class="sd">    &gt;&gt;&gt; empty.data[indices[&quot;y&quot;].values, indices[&quot;x&quot;].values] = values_to_set</span>
+
+<span class="sd">    Unfortunately, at the time of writing, xarray&#39;s .sel method does not</span>
+<span class="sd">    support setting values yet. The method here works for both numpy and dask</span>
+<span class="sd">    arrays, but you&#39;ll have to manage dimensions yourself!</span>
+
+<span class="sd">    The ``imod.select.points_set_values()`` function will take care of the</span>
+<span class="sd">    dimensions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">points</span><span class="p">,</span> <span class="n">inside</span> <span class="o">=</span> <span class="n">check_points_in_bounds</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">points</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="p">)</span>
+
+    <span class="n">indices</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">inside</span><span class="p">))[</span><span class="n">inside</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">):</span>
+        <span class="n">ind_arr</span> <span class="o">=</span> <span class="n">get_unstructured_cell2d_from_xy</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="o">**</span><span class="n">points</span><span class="p">)</span>
+        <span class="n">ind_da</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">ind_arr</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="n">index</span><span class="p">},</span> <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">,))</span>
+        <span class="n">face_dim</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span>
+        <span class="n">indices</span><span class="p">[</span><span class="n">face_dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">ind_da</span>
+        <span class="n">points</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+        <span class="n">points</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">coordname</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">points</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">ind_arr</span> <span class="o">=</span> <span class="n">_get_indices_1d</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">coordname</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="n">ind_da</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">ind_arr</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="n">index</span><span class="p">},</span> <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">,))</span>
+        <span class="n">indices</span><span class="p">[</span><span class="n">coordname</span><span class="p">]</span> <span class="o">=</span> <span class="n">ind_da</span>
+
+    <span class="k">return</span> <span class="n">indices</span></div>
+
+
+<div class="viewcode-block" id="points_values"><a class="viewcode-back" href="../../../api/generated/select/imod.select.points_values.html#imod.select.points_values">[docs]</a><span class="k">def</span> <span class="nf">points_values</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">points</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get values from specified points.</span>
+
+<span class="sd">    This function will raise a ValueError if the points fall outside of the</span>
+<span class="sd">    bounds of the DataArray to avoid ambiguous behavior. Use the</span>
+<span class="sd">    ``imod.select.points_in_bounds`` function to detect these points.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    da : xr.DataArray</span>
+<span class="sd">    out_of_bounds : {&quot;raise&quot;, &quot;warn&quot;, &quot;ignore&quot;}, default: &quot;raise&quot;</span>
+<span class="sd">        What to do if the points are not located in the bounds of the</span>
+<span class="sd">        DataArray:</span>
+<span class="sd">        - &quot;raise&quot;: raise an exception</span>
+<span class="sd">        - &quot;warn&quot;: raise a warning, and ignore the missing points</span>
+<span class="sd">        - &quot;ignore&quot;: ignore the missing points</span>
+<span class="sd">    points : keyword arguments of coordinate=values</span>
+<span class="sd">        keyword arguments specifying coordinate and values.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    selection : xr.DataArray</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    &gt;&gt;&gt; x = [1.0, 2.2, 3.0]</span>
+<span class="sd">    &gt;&gt;&gt; y = [4.0, 5.6, 7.0]</span>
+<span class="sd">    &gt;&gt;&gt; selection = imod.select.points_values(da, x=x, y=y)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">iterable_points</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">coordname</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">points</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">coordname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;DataArray has no coordinate &quot;</span><span class="si">{</span><span class="n">coordname</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+        <span class="c1"># contents must be iterable</span>
+        <span class="n">iterable_points</span><span class="p">[</span><span class="n">coordname</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">select</span><span class="o">.</span><span class="n">points</span><span class="o">.</span><span class="n">points_indices</span><span class="p">(</span>
+        <span class="n">da</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="o">=</span><span class="n">out_of_bounds</span><span class="p">,</span> <span class="o">**</span><span class="n">iterable_points</span>
+    <span class="p">)</span>
+    <span class="n">selection</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="o">**</span><span class="n">indices</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">selection</span></div>
+
+
+<div class="viewcode-block" id="points_set_values"><a class="viewcode-back" href="../../../api/generated/select/imod.select.points_set_values.html#imod.select.points_set_values">[docs]</a><span class="k">def</span> <span class="nf">points_set_values</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">points</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set values at specified points.</span>
+
+<span class="sd">    This function will raise a ValueError if the points fall outside of the</span>
+<span class="sd">    bounds of the DataArray to avoid ambiguous behavior. Use the</span>
+<span class="sd">    ``imod.select.points_in_bounds`` function to detect these points.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    da : xr.DataArray</span>
+<span class="sd">    values : (int, float) or array of (int, float)</span>
+<span class="sd">    out_of_bounds : {&quot;raise&quot;, &quot;warn&quot;, &quot;ignore&quot;}, default: &quot;raise&quot;</span>
+<span class="sd">        What to do if the points are not located in the bounds of the</span>
+<span class="sd">        DataArray:</span>
+<span class="sd">        - &quot;raise&quot;: raise an exception</span>
+<span class="sd">        - &quot;warn&quot;: raise a warning, and ignore the missing points</span>
+<span class="sd">        - &quot;ignore&quot;: ignore the missing points</span>
+<span class="sd">    points : keyword arguments of coordinate=values</span>
+<span class="sd">        keyword arguments specifying coordinate and values.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    da : xr.DataArray</span>
+<span class="sd">        DataArray with values set at the point locations.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    &gt;&gt;&gt; x = [1.0, 2.2, 3.0]</span>
+<span class="sd">    &gt;&gt;&gt; y = [4.0, 5.6, 7.0]</span>
+<span class="sd">    &gt;&gt;&gt; values = [10.0, 11.0, 12.0]</span>
+<span class="sd">    &gt;&gt;&gt; out = imod.select.points_set_values(da, values, x=x, y=y)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">points</span><span class="p">,</span> <span class="n">inside</span> <span class="o">=</span> <span class="n">check_points_in_bounds</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">points</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>  <span class="c1"># then it might be an array</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">inside</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Shape of ``values`` does not match shape of coordinates.&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Shape of values: </span><span class="si">{</span><span class="n">values</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">; shape of coordinates: </span><span class="si">{</span><span class="n">inside</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="c1"># Make sure a list or tuple is indexable by inside.</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">values</span><span class="p">)[</span><span class="n">inside</span><span class="p">]</span>
+
+    <span class="c1"># Avoid side-effects just in case</span>
+    <span class="c1"># Load into memory, so values can be set efficiently via numpy indexing.</span>
+    <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+
+    <span class="n">sel_indices</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">coordname</span> <span class="ow">in</span> <span class="n">points</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">coordname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;DataArray has no coordinate &quot;</span><span class="si">{</span><span class="n">coordname</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+        <span class="n">underlying_dims</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">coordname</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">underlying_dims</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Coordinate </span><span class="si">{</span><span class="n">coordname</span><span class="si">}</span><span class="s2"> is not one-dimensional&quot;</span><span class="p">)</span>
+        <span class="c1"># Use the first and only element of underlying_dims</span>
+        <span class="n">sel_indices</span><span class="p">[</span><span class="n">underlying_dims</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">_get_indices_1d</span><span class="p">(</span>
+            <span class="n">da</span><span class="p">,</span> <span class="n">coordname</span><span class="p">,</span> <span class="n">points</span><span class="p">[</span><span class="n">coordname</span><span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Collect indices in the right order</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+        <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sel_indices</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)))</span>
+
+    <span class="c1"># Set values in dask or numpy array</span>
+    <span class="n">da</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">indices</span><span class="p">)]</span> <span class="o">=</span> <span class="n">values</span>
+    <span class="k">return</span> <span class="n">da</span></div>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

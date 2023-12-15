@@ -1,0 +1,27 @@
+﻿imod.msw.PrecipitationMapping
+=============================
+
+.. currentmodule:: imod.msw
+
+.. autoclass:: PrecipitationMapping
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~PrecipitationMapping.__init__
+      ~PrecipitationMapping.grid_mapping
+      ~PrecipitationMapping.isel
+      ~PrecipitationMapping.sel
+      ~PrecipitationMapping.write
+      ~PrecipitationMapping.write_dataframe_fixed_width
+   
+   
+
+   
+   
+   

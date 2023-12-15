@@ -1,0 +1,1831 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Changelog &#8212; iMOD Python 0.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/changelog';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="FAQ" href="../faq/index.html" />
+    <link rel="prev" title="imod.couplers.metamod.WellSvatMapping" href="generated/metamod/imod.couplers.metamod.WellSvatMapping.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="io.html">Input/output</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/io/imod.formats.idf.open.html">imod.formats.idf.open</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/io/imod.formats.idf.open_dataset.html">imod.formats.idf.open_dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/io/imod.formats.idf.open_subdomains.html">imod.formats.idf.open_subdomains</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/io/imod.formats.idf.save.html">imod.formats.idf.save</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/io/imod.formats.idf.header.html">imod.formats.idf.header</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/io/imod.formats.ipf.read.html">imod.formats.ipf.read</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/io/imod.formats.ipf.read_associated.html">imod.formats.ipf.read_associated</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/io/imod.formats.ipf.save.html">imod.formats.ipf.save</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/io/imod.formats.ipf.write.html">imod.formats.ipf.write</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/io/imod.formats.ipf.write_assoc.html">imod.formats.ipf.write_assoc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/io/imod.formats.rasterio.header.html">imod.formats.rasterio.header</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/io/imod.formats.rasterio.open.html">imod.formats.rasterio.open</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/io/imod.formats.rasterio.save.html">imod.formats.rasterio.save</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/io/imod.formats.gen.read.html">imod.formats.gen.read</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/io/imod.formats.gen.write.html">imod.formats.gen.write</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/io/imod.formats.gen.read_ascii.html">imod.formats.gen.read_ascii</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/io/imod.formats.prj.read_projectfile.html">imod.formats.prj.read_projectfile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html">imod.formats.prj.open_projectfile_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/io/imod.formats.prj.read_timfile.html">imod.formats.prj.read_timfile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/io/imod.formats.prj.convert_to_disv.html">imod.formats.prj.convert_to_disv</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="prepare.html">Prepare model input</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.Regridder.html">imod.prepare.Regridder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.LayerRegridder.html">imod.prepare.LayerRegridder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.Voxelizer.html">imod.prepare.Voxelizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.fill.html">imod.prepare.fill</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.laplace_interpolate.html">imod.prepare.laplace_interpolate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.polygonize.html">imod.prepare.polygonize</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.reproject.html">imod.prepare.reproject</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.rasterize.html">imod.prepare.rasterize</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.gdal_rasterize.html">imod.prepare.gdal_rasterize</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.celltable.html">imod.prepare.celltable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.rasterize_celltable.html">imod.prepare.rasterize_celltable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.zonal_aggregate_polygons.html">imod.prepare.zonal_aggregate_polygons</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.zonal_aggregate_raster.html">imod.prepare.zonal_aggregate_raster</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.assign_wells.html">imod.prepare.assign_wells</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="select.html">Select points and cross sections</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/select/imod.select.cross_section_line.html">imod.select.cross_section_line</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/select/imod.select.cross_section_linestring.html">imod.select.cross_section_linestring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/select/imod.select.points_in_bounds.html">imod.select.points_in_bounds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/select/imod.select.points_values.html">imod.select.points_values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/select/imod.select.points_set_values.html">imod.select.points_set_values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/select/imod.select.points_indices.html">imod.select.points_indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/select/imod.select.upper_active_layer.html">imod.select.upper_active_layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/select/imod.select.grid_boundary_xy.html">imod.select.grid_boundary_xy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/select/imod.select.active_grid_boundary_xy.html">imod.select.active_grid_boundary_xy</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="evaluate.html">Evaluate model output</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/evaluate/imod.evaluate.calculate_gxg.html">imod.evaluate.calculate_gxg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/evaluate/imod.evaluate.convert_pointwaterhead_freshwaterhead.html">imod.evaluate.convert_pointwaterhead_freshwaterhead</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/evaluate/imod.evaluate.facebudget.html">imod.evaluate.facebudget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/evaluate/imod.evaluate.flow_velocity.html">imod.evaluate.flow_velocity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/evaluate/imod.evaluate.interpolate_value_boundaries.html">imod.evaluate.interpolate_value_boundaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/evaluate/imod.evaluate.quiver_line.html">imod.evaluate.quiver_line</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/evaluate/imod.evaluate.quiver_linestring.html">imod.evaluate.quiver_linestring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/evaluate/imod.evaluate.streamfunction_line.html">imod.evaluate.streamfunction_line</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/evaluate/imod.evaluate.streamfunction_linestring.html">imod.evaluate.streamfunction_linestring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/evaluate/imod.evaluate.intra_cell_boundary_conditions.html">imod.evaluate.intra_cell_boundary_conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/evaluate/imod.evaluate.stability_constraint_advection.html">imod.evaluate.stability_constraint_advection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/evaluate/imod.evaluate.stability_constraint_wel.html">imod.evaluate.stability_constraint_wel</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="visualize.html">Visualize</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/visualize/imod.visualize.cross_section.html">imod.visualize.cross_section</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/visualize/imod.visualize.plot_map.html">imod.visualize.plot_map</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/visualize/imod.visualize.imshow_topview.html">imod.visualize.imshow_topview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/visualize/imod.visualize.read_imod_legend.html">imod.visualize.read_imod_legend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/visualize/imod.visualize.quiver.html">imod.visualize.quiver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/visualize/imod.visualize.streamfunction.html">imod.visualize.streamfunction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/visualize/imod.visualize.waterbalance_barchart.html">imod.visualize.waterbalance_barchart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/visualize/imod.visualize.grid_3d.html">imod.visualize.grid_3d</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/visualize/imod.visualize.line_3d.html">imod.visualize.line_3d</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/visualize/imod.visualize.GridAnimation3D.html">imod.visualize.GridAnimation3D</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/visualize/imod.visualize.StaticGridAnimation3D.html">imod.visualize.StaticGridAnimation3D</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="util.html">Utilities</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.empty_2d.html">imod.util.empty_2d</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.empty_2d_transient.html">imod.util.empty_2d_transient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.empty_3d.html">imod.util.empty_3d</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.empty_3d_transient.html">imod.util.empty_3d_transient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.where.html">imod.util.where</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.cd.html">imod.util.cd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.ignore_warnings.html">imod.util.ignore_warnings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.to_datetime.html">imod.util.to_datetime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.coord_reference.html">imod.util.coord_reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.spatial_reference.html">imod.util.spatial_reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.transform.html">imod.util.transform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.to_ugrid2d.html">imod.util.to_ugrid2d</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.mdal_compliant_ugrid2d.html">imod.util.mdal_compliant_ugrid2d</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="mf6.html">MODFLOW6</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.open_hds.html">imod.mf6.open_hds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.open_cbc.html">imod.mf6.open_cbc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.read_cbc_headers.html">imod.mf6.read_cbc_headers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.html">imod.mf6.Modflow6Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.create_time_discretization.html">imod.mf6.Modflow6Simulation.create_time_discretization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.write.html">imod.mf6.Modflow6Simulation.write</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.run.html">imod.mf6.Modflow6Simulation.run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.open_flow_budget.html">imod.mf6.Modflow6Simulation.open_flow_budget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.open_transport_budget.html">imod.mf6.Modflow6Simulation.open_transport_budget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.open_head.html">imod.mf6.Modflow6Simulation.open_head</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.open_concentration.html">imod.mf6.Modflow6Simulation.open_concentration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.clip_box.html">imod.mf6.Modflow6Simulation.clip_box</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.split.html">imod.mf6.Modflow6Simulation.split</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.regrid_like.html">imod.mf6.Modflow6Simulation.regrid_like</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.html">imod.mf6.GroundwaterFlowModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterTransportModel.html">imod.mf6.GroundwaterTransportModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.StructuredDiscretization.html">imod.mf6.StructuredDiscretization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.VerticesDiscretization.html">imod.mf6.VerticesDiscretization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.TimeDiscretization.html">imod.mf6.TimeDiscretization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.OutputControl.html">imod.mf6.OutputControl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Solution.html">imod.mf6.Solution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SolutionPresetSimple.html">imod.mf6.SolutionPresetSimple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SolutionPresetModerate.html">imod.mf6.SolutionPresetModerate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SolutionPresetComplex.html">imod.mf6.SolutionPresetComplex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Buoyancy.html">imod.mf6.Buoyancy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.ConstantHead.html">imod.mf6.ConstantHead</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Drainage.html">imod.mf6.Drainage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Evapotranspiration.html">imod.mf6.Evapotranspiration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GeneralHeadBoundary.html">imod.mf6.GeneralHeadBoundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic.html">imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierMultiplier.html">imod.mf6.HorizontalFlowBarrierMultiplier</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierResistance.html">imod.mf6.HorizontalFlowBarrierResistance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.InitialConditions.html">imod.mf6.InitialConditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.NodePropertyFlow.html">imod.mf6.NodePropertyFlow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.html">imod.mf6.Recharge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.River.html">imod.mf6.River</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SpecificStorage.html">imod.mf6.SpecificStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.html">imod.mf6.StorageCoefficient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.UnsaturatedZoneFlow.html">imod.mf6.UnsaturatedZoneFlow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.WellDisStructured.html">imod.mf6.WellDisStructured</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.WellDisVertices.html">imod.mf6.WellDisVertices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.AdvectionCentral.html">imod.mf6.AdvectionCentral</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.AdvectionTVD.html">imod.mf6.AdvectionTVD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.AdvectionUpstream.html">imod.mf6.AdvectionUpstream</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.ConstantConcentration.html">imod.mf6.ConstantConcentration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Dispersion.html">imod.mf6.Dispersion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.ImmobileStorageTransfer.html">imod.mf6.ImmobileStorageTransfer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.MobileStorageTransfer.html">imod.mf6.MobileStorageTransfer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.MassSourceLoading.html">imod.mf6.MassSourceLoading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SourceSinkMixing.html">imod.mf6.SourceSinkMixing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SourceSinkMixing.from_flow_model.html">imod.mf6.SourceSinkMixing.from_flow_model</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="wq.html">iMOD-WQ</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.SeawatModel.html">imod.wq.SeawatModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.SeawatModel.create_time_discretization.html">imod.wq.SeawatModel.create_time_discretization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.TimeDiscretization.html">imod.wq.TimeDiscretization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.OutputControl.html">imod.wq.OutputControl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.PreconditionedConjugateGradientSolver.html">imod.wq.PreconditionedConjugateGradientSolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.GeneralizedConjugateGradientSolver.html">imod.wq.GeneralizedConjugateGradientSolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.ParallelKrylovFlowSolver.html">imod.wq.ParallelKrylovFlowSolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.ParallelKrylovTransportSolver.html">imod.wq.ParallelKrylovTransportSolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.BasicFlow.html">imod.wq.BasicFlow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.ConstantHead.html">imod.wq.ConstantHead</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.Drainage.html">imod.wq.Drainage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.EvapotranspirationTopLayer.html">imod.wq.EvapotranspirationTopLayer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.EvapotranspirationLayers.html">imod.wq.EvapotranspirationLayers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.EvapotranspirationHighestActive.html">imod.wq.EvapotranspirationHighestActive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.GeneralHeadBoundary.html">imod.wq.GeneralHeadBoundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.LayerPropertyFlow.html">imod.wq.LayerPropertyFlow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.RechargeTopLayer.html">imod.wq.RechargeTopLayer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.RechargeLayers.html">imod.wq.RechargeLayers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.RechargeHighestActive.html">imod.wq.RechargeHighestActive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.River.html">imod.wq.River</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.Well.html">imod.wq.Well</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.VariableDensityFlow.html">imod.wq.VariableDensityFlow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.AdvectionTVD.html">imod.wq.AdvectionTVD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.AdvectionMOC.html">imod.wq.AdvectionMOC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.AdvectionModifiedMOC.html">imod.wq.AdvectionModifiedMOC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.AdvectionHybridMOC.html">imod.wq.AdvectionHybridMOC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.AdvectionFiniteDifference.html">imod.wq.AdvectionFiniteDifference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.BasicTransport.html">imod.wq.BasicTransport</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.Dispersion.html">imod.wq.Dispersion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.MassLoading.html">imod.wq.MassLoading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.TimeVaryingConstantConcentration.html">imod.wq.TimeVaryingConstantConcentration</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="flow.html">iMODFLOW</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/flow/imod.flow.ImodflowModel.html">imod.flow.ImodflowModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/flow/imod.flow.ImodflowModel.create_time_discretization.html">imod.flow.ImodflowModel.create_time_discretization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/flow/imod.flow.Boundary.html">imod.flow.Boundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/flow/imod.flow.Top.html">imod.flow.Top</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/flow/imod.flow.Bottom.html">imod.flow.Bottom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/flow/imod.flow.PreconditionedConjugateGradientSolver.html">imod.flow.PreconditionedConjugateGradientSolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/flow/imod.flow.ConstantHead.html">imod.flow.ConstantHead</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/flow/imod.flow.Drain.html">imod.flow.Drain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/flow/imod.flow.EvapoTranspiration.html">imod.flow.EvapoTranspiration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/flow/imod.flow.GeneralHeadBoundary.html">imod.flow.GeneralHeadBoundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/flow/imod.flow.HorizontalHydraulicConductivity.html">imod.flow.HorizontalHydraulicConductivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/flow/imod.flow.HorizontalAnisotropy.html">imod.flow.HorizontalAnisotropy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/flow/imod.flow.HorizontalFlowBarrier.html">imod.flow.HorizontalFlowBarrier</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/flow/imod.flow.MetaSwap.html">imod.flow.MetaSwap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/flow/imod.flow.Recharge.html">imod.flow.Recharge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/flow/imod.flow.River.html">imod.flow.River</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/flow/imod.flow.StartingHead.html">imod.flow.StartingHead</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/flow/imod.flow.VerticalHydraulicConductivity.html">imod.flow.VerticalHydraulicConductivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/flow/imod.flow.VerticalAnisotropy.html">imod.flow.VerticalAnisotropy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/flow/imod.flow.StorageCoefficient.html">imod.flow.StorageCoefficient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/flow/imod.flow.SpecificStorage.html">imod.flow.SpecificStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/flow/imod.flow.Well.html">imod.flow.Well</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="msw.html">MetaSWAP</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.GridData.html">imod.msw.GridData</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.Infiltration.html">imod.msw.Infiltration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.Ponding.html">imod.msw.Ponding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.ScalingFactors.html">imod.msw.ScalingFactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.Sprinkling.html">imod.msw.Sprinkling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.IdfMapping.html">imod.msw.IdfMapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.TimeOutputControl.html">imod.msw.TimeOutputControl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.VariableOutputControl.html">imod.msw.VariableOutputControl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsEquilibrium.html">imod.msw.InitialConditionsEquilibrium</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsPercolation.html">imod.msw.InitialConditionsPercolation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsRootzonePressureHead.html">imod.msw.InitialConditionsRootzonePressureHead</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.InitialConditionsSavedState.html">imod.msw.InitialConditionsSavedState</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.LanduseOptions.html">imod.msw.LanduseOptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.AnnualCropFactors.html">imod.msw.AnnualCropFactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.MeteoGrid.html">imod.msw.MeteoGrid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.EvapotranspirationMapping.html">imod.msw.EvapotranspirationMapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.PrecipitationMapping.html">imod.msw.PrecipitationMapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.CouplerMapping.html">imod.msw.CouplerMapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.MetaSwapModel.html">imod.msw.MetaSwapModel</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="metamod.html">MetaMod</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/metamod/imod.couplers.metamod.MetaMod.html">imod.couplers.metamod.MetaMod</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/metamod/imod.couplers.metamod.NodeSvatMapping.html">imod.couplers.metamod.NodeSvatMapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/metamod/imod.couplers.metamod.RechargeSvatMapping.html">imod.couplers.metamod.RechargeSvatMapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/metamod/imod.couplers.metamod.WellSvatMapping.html">imod.couplers.metamod.WellSvatMapping</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Changelog</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">API Reference</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Changelog</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="changelog">
+<h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this heading">#</a></h1>
+<p>All notable changes to this project will be documented in this file.</p>
+<p>The format is based on <a class="reference external" href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>, and this project adheres to
+<a class="reference external" href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
+<section id="unreleased">
+<h2>[Unreleased]<a class="headerlink" href="#unreleased" title="Permalink to this heading">#</a></h2>
+</section>
+<section id="id1">
+<h2>[0.15.0] - 2023-11-25<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h2>
+<section id="fixed">
+<h3>Fixed<a class="headerlink" href="#fixed" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>The Newton option for a <a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.html#imod.mf6.GroundwaterFlowModel" title="imod.mf6.GroundwaterFlowModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.GroundwaterFlowModel</span></code></a> was being ignored. This has been
+corrected.</p></li>
+<li><p>The Contextily packages started throwing errors. This was caused because the
+default tile provider being used was Stamen. However Stamen is no longer free
+which caused Contextily to fail. The default tile provider has been changed to
+OpenStreetMap to resolve this issue.</p></li>
+<li><p><a href="#id2"><span class="problematic" id="id3">:function:`imod.mf6.open_cbc`</span></a> now reads saved cell saturations and specific discharges.</p></li>
+<li><p><a href="#id4"><span class="problematic" id="id5">:function:`imod.mf6.open_cbc`</span></a> failed to read unstructured budgets stored
+following IMETH1, most importantly the storage fluxes.</p></li>
+<li><p>Fixed support of Python 3.11 by dropping the obsolete <code class="docutils literal notranslate"><span class="pre">qgs</span></code> module.</p></li>
+<li><p>Bug in <a class="reference internal" href="generated/mf6/imod.mf6.SourceSinkMixing.html#imod.mf6.SourceSinkMixing" title="imod.mf6.SourceSinkMixing"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.SourceSinkMixing</span></code></a> where, in case of multiple active
+boundary conditions with assigned concentrations, it would write a <code class="docutils literal notranslate"><span class="pre">.ssm</span></code>
+file with all sources/sinks on one single row.</p></li>
+<li><p>Fixed bug where TypeError was thrown upond calling
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.HorizontalFlowBarrier.regrid_like()</span></code> and
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.HorizontalFlowBarrier.mask()</span></code>.</p></li>
+<li><p>Fixed bug where calling <code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Well.clip_box()</span></code> over only the time
+dimension would remove the index coordinate.</p></li>
+<li><p>Validation errors are rendered properly when writing a simulation object or
+regridding a model object.</p></li>
+</ul>
+</section>
+<section id="changed">
+<h3>Changed<a class="headerlink" href="#changed" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>The imod-environment.yml file has been split in an imod-environment.yml
+(containing all packages required to run imod-python) and a
+imod-environment-dev.yml file (containing additional packages for developers).</p></li>
+<li><p>Changed the way <a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.html#imod.mf6.Modflow6Simulation" title="imod.mf6.Modflow6Simulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation</span></code></a>,
+<a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.html#imod.mf6.GroundwaterFlowModel" title="imod.mf6.GroundwaterFlowModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.GroundwaterFlowModel</span></code></a>,
+<a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterTransportModel.html#imod.mf6.GroundwaterTransportModel" title="imod.mf6.GroundwaterTransportModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.GroundwaterTransportModel</span></code></a>, and Modflow 6 packages are
+represented while printing.</p></li>
+<li><p>The grid-agnostic packages <code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Well.regrid_like()</span></code> and
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.HorizontalFlowBarrier.regrid_like()</span></code> now return a clip with the
+grid exterior of the target grid</p></li>
+</ul>
+</section>
+<section id="added">
+<h3>Added<a class="headerlink" href="#added" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>The unit tests results are now published on GitLab</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">save_saturation</span></code> option to <a class="reference internal" href="generated/mf6/imod.mf6.NodePropertyFlow.html#imod.mf6.NodePropertyFlow" title="imod.mf6.NodePropertyFlow"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.NodePropertyFlow</span></code></a> which saves
+cell saturations for unconfined flow.</p></li>
+<li><p>Functions <a href="#id6"><span class="problematic" id="id7">:function:`imod.prepare.layer.get_upper_active_layer_number`</span></a> and
+<a href="#id8"><span class="problematic" id="id9">:function:`imod.prepare.layer.get_lower_active_layer_number`</span></a> to return planar
+grids with numbers of the highest and lowest active cells respectively.</p></li>
+<li><p>Functions <a href="#id10"><span class="problematic" id="id11">:function:`imod.prepare.layer.get_upper_active_grid_cells`</span></a> and
+<a href="#id12"><span class="problematic" id="id13">:function:`imod.prepare.layer.get_lower_active_grid_cells`</span></a> to return boolean
+grids designating respectively the highest and lowest active cells in a grid.</p></li>
+<li><p>validation of <code class="docutils literal notranslate"><span class="pre">transient</span></code> argument in <a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.html#imod.mf6.StorageCoefficient" title="imod.mf6.StorageCoefficient"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.StorageCoefficient</span></code></a>
+and <a class="reference internal" href="generated/mf6/imod.mf6.SpecificStorage.html#imod.mf6.SpecificStorage" title="imod.mf6.SpecificStorage"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.SpecificStorage</span></code></a>.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Simulation.open_concentration()</span></code>,
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Simulation.open_head()</span></code>,
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Simulation.open_transport_budget()</span></code>, and
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Simulation.open_flow_budget()</span></code>, were added as convenience
+methods to open simulation output easier (without having to specify paths).</p></li>
+<li><p>The <code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Simulation.split()</span></code> method has been added. This method makes
+it possible for a user to create a Multi-Model simulation. A user needs to
+provide a submodel label array in which they specify to which submodel a cell
+belongs. The method will then create the submodels and split the nested
+packages. The split method will create the gwfgwf exchanges required to
+connect the submodels. At the moment auxiliary variables <code class="docutils literal notranslate"><span class="pre">cdist</span></code> and
+<code class="docutils literal notranslate"><span class="pre">angldegx</span></code> are only computed for structured grids.</p></li>
+<li><p>The label array can be generated through a convenience function
+<a href="#id14"><span class="problematic" id="id15">:function:`imod.mf6.partition_generator.get_label_array`</span></a></p></li>
+<li><p>Once a split simulation has been executed by MF6, we find head and balance
+results in each of the partition models. These can now be merged into head and
+balance datasets for the original domain using
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Simulation.open_concentration()</span></code>,
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Simulation.open_head()</span></code>,
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Simulation.open_transport_budget()</span></code>,
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Simulation.open_flow_budget()</span></code>.
+In the case of balances, the exchanges through the partition boundary are not
+yet added to this merged balance.</p></li>
+<li><p>Settings such as <code class="docutils literal notranslate"><span class="pre">save_flows</span></code> can be passed through
+<a class="reference internal" href="generated/mf6/imod.mf6.SourceSinkMixing.from_flow_model.html#imod.mf6.SourceSinkMixing.from_flow_model" title="imod.mf6.SourceSinkMixing.from_flow_model"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.SourceSinkMixing.from_flow_model()</span></code></a></p></li>
+<li><p>Added <code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.LayeredHorizontalFlowBarrierHydraulicCharacteristic</span></code>,
+<code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.LayeredHorizontalFlowBarrierMultiplier</span></code>,
+<code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.LayeredHorizontalFlowBarrierResistance</span></code>, for horizontal flow
+barriers with a specified layer number.</p></li>
+</ul>
+</section>
+<section id="removed">
+<h3>Removed<a class="headerlink" href="#removed" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Tox has been removed from the project.</p></li>
+<li><p>Dropped support for writing .qgs files directly for QGIS, as this was hard to
+maintain and rarely used. To export your model to QGIS readable files, call
+the <code class="docutils literal notranslate"><span class="pre">dump</span></code> method <code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.Simulation</span></code> with <code class="docutils literal notranslate"><span class="pre">mdal_compliant=True</span></code>.
+This writes UGRID NetCDFs which can read as meshes in QGIS.</p></li>
+<li><p>Removed <code class="docutils literal notranslate"><span class="pre">declxml</span></code> from repository.</p></li>
+</ul>
+</section>
+</section>
+<section id="id16">
+<h2>[0.14.1] - 2023-09-07<a class="headerlink" href="#id16" title="Permalink to this heading">#</a></h2>
+<section id="id17">
+<h3>Changed<a class="headerlink" href="#id17" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>TWRI Modflow 6 example uses the grid-agnostic <code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.Well</span></code>
+package instead of the <a class="reference internal" href="generated/mf6/imod.mf6.WellDisStructured.html#imod.mf6.WellDisStructured" title="imod.mf6.WellDisStructured"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.WellDisStructured</span></code></a> package.</p></li>
+</ul>
+</section>
+<section id="id18">
+<h3>Fixed<a class="headerlink" href="#id18" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.HorizontalFlowBarrier</span></code> would write to a binary file by
+default. However, the current version of Modflow 6 does not support this.
+Therefore, this class now always writes to text file.</p></li>
+</ul>
+</section>
+</section>
+<section id="id19">
+<h2>[0.14.0] - 2023-09-06<a class="headerlink" href="#id19" title="Permalink to this heading">#</a></h2>
+<section id="id20">
+<h3>Changed<a class="headerlink" href="#id20" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.HorizontalFlowBarrier</span></code> is specified by providing a geopandas
+<a class="reference external" href="https://geopandas.org/en/stable/docs/reference/geodataframe.html">GeoDataFrame</a></p></li>
+</ul>
+</section>
+<section id="id21">
+<h3>Added<a class="headerlink" href="#id21" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Simulation.regrid_like()</span></code> to regrid a Modflow6 simulation to a
+new grid (structured or unstructured), using <a class="reference external" href="https://deltares.github.io/xugrid/examples/regridder_overview.html">xugrid’s regridding
+functionality.</a>
+Variables are regridded with pre-selected methods. The regridding
+functionality is useful for a variety of applications, for example to test the
+effect of different grid sizes, to add detail to a simulation (by refining the
+grid) or to speed up a simulation (by coarsening the grid) to name a few</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Package.regrid_like()</span></code> to regrid packages. The user can
+specify their own custom regridder types and methods for variables.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Simulation.clip_box()</span></code> got an extra argument
+<code class="docutils literal notranslate"><span class="pre">states_for_boundary</span></code>, which takes a dictionary with modelname as key and
+griddata as value. This data is specified as fixed state on the model
+boundary. At present only <cite>imod.mf6.GroundwaterFlowModel</cite> is supported, grid
+data is specified as a <a class="reference internal" href="generated/mf6/imod.mf6.ConstantHead.html#imod.mf6.ConstantHead" title="imod.mf6.ConstantHead"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.ConstantHead</span></code></a> at the model boundary.</p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.Well</span></code>, a grid-agnostic well package, where wells can be
+specified based on their x,y coordinates and filter top and bottom.</p></li>
+</ul>
+</section>
+</section>
+<section id="id22">
+<h2>[0.13.2] - 2023-07-26<a class="headerlink" href="#id22" title="Permalink to this heading">#</a></h2>
+<section id="id23">
+<h3>Changed<a class="headerlink" href="#id23" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.rasterio.save()</span></code> will now write ESRII ASCII rasters, even if
+rasterio is not installed. A fallback function has been added specifically
+for ASCII rasters.</p></li>
+</ul>
+</section>
+<section id="id24">
+<h3>Fixed<a class="headerlink" href="#id24" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Geopandas and rasterio were imported at the top of a module in some places.
+This has been fixed so that both are not optional dependencies when
+installing via pip (installing via conda or mamba will always pull all
+dependencies and supports full functionality).</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Simulation._validate()</span></code> now print all validation errors for all
+models and packages in one message.</p></li>
+<li><p>The gen file reader can now handle feature id’s that contain commas and spaces</p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.EvapoTranspiration</span></code> now supports segments, by adding a
+<code class="docutils literal notranslate"><span class="pre">segment</span></code> dimension to the <code class="docutils literal notranslate"><span class="pre">proportion_depth</span></code> and <code class="docutils literal notranslate"><span class="pre">proportion_rate</span></code>
+variables.</p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.EvapoTranspiration</span></code> template for <code class="docutils literal notranslate"><span class="pre">.evt</span></code> file now properly
+formats <code class="docutils literal notranslate"><span class="pre">nseg</span></code> option.</p></li>
+<li><p>Fixed bug in <a class="reference internal" href="generated/wq/imod.wq.Well.html#imod.wq.Well" title="imod.wq.Well"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.wq.Well</span></code></a> preventing saving wells without a time
+dimension, but with a layer dimension.</p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.DiscretizationVertices._validate</span></code> threw <code class="docutils literal notranslate"><span class="pre">KeyError</span></code> for
+<code class="docutils literal notranslate"><span class="pre">&quot;bottom&quot;</span></code> when validating the package separately.</p></li>
+</ul>
+</section>
+<section id="id25">
+<h3>Added<a class="headerlink" href="#id25" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.select.grid.active_grid_boundary_xy()</span></code> &amp;
+<code class="xref py py-func docutils literal notranslate"><span class="pre">imod.select.grid.grid_boundary_xy()</span></code> are added to find grid boundaries.</p></li>
+</ul>
+</section>
+</section>
+<section id="id26">
+<h2>[0.13.1] - 2023-05-05<a class="headerlink" href="#id26" title="Permalink to this heading">#</a></h2>
+<section id="id27">
+<h3>Added<a class="headerlink" href="#id27" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><a class="reference internal" href="generated/mf6/imod.mf6.SpecificStorage.html#imod.mf6.SpecificStorage" title="imod.mf6.SpecificStorage"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.SpecificStorage</span></code></a> and <a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.html#imod.mf6.StorageCoefficient" title="imod.mf6.StorageCoefficient"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.StorageCoefficient</span></code></a>
+now have a <code class="docutils literal notranslate"><span class="pre">save_flow</span></code> argument.</p></li>
+</ul>
+</section>
+<section id="id28">
+<h3>Fixed<a class="headerlink" href="#id28" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><a class="reference internal" href="generated/mf6/imod.mf6.open_cbc.html#imod.mf6.open_cbc" title="imod.mf6.open_cbc"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.open_cbc()</span></code></a> can now read storage fluxes without error.</p></li>
+</ul>
+</section>
+</section>
+<section id="id29">
+<h2>[0.13.0] - 2023-05-02<a class="headerlink" href="#id29" title="Permalink to this heading">#</a></h2>
+<section id="id30">
+<h3>Added<a class="headerlink" href="#id30" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><a class="reference internal" href="generated/mf6/imod.mf6.OutputControl.html#imod.mf6.OutputControl" title="imod.mf6.OutputControl"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.OutputControl</span></code></a> now takes parameters <code class="docutils literal notranslate"><span class="pre">head_file</span></code>,
+<code class="docutils literal notranslate"><span class="pre">concentration_file</span></code>, and <code class="docutils literal notranslate"><span class="pre">budget_file</span></code> to specify where to store
+MODFLOW6 output files.</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.util.from_mdal_compliant_ugrid2d()</span></code> to “restack” the variables that
+have have been “unstacked” in <a class="reference internal" href="generated/util/imod.util.mdal_compliant_ugrid2d.html#imod.util.mdal_compliant_ugrid2d" title="imod.util.mdal_compliant_ugrid2d"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.util.mdal_compliant_ugrid2d()</span></code></a>.</p></li>
+<li><p>Added support for the Modflow6 Lake package</p></li>
+<li><p><a class="reference internal" href="generated/select/imod.select.points_in_bounds.html#imod.select.points_in_bounds" title="imod.select.points_in_bounds"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.select.points_in_bounds()</span></code></a>, <a class="reference internal" href="generated/select/imod.select.points_indices.html#imod.select.points_indices" title="imod.select.points_indices"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.select.points_indices()</span></code></a>,
+<a class="reference internal" href="generated/select/imod.select.points_values.html#imod.select.points_values" title="imod.select.points_values"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.select.points_values()</span></code></a> now support unstructured grids.</p></li>
+<li><p>Added support for the Modflow 6 Lake package: <code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.Lake</span></code>,
+<code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.LakeData</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.OutletManning</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">OutletSpecified</span></code>,
+<code class="xref py py-class docutils literal notranslate"><span class="pre">OutletWeir</span></code>. See the examples for an application of the Lake package.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.simulation.Modflow6Simulation.dump()</span></code> now supports dumping to MDAL compliant
+ugrids. These can be used to view and explore Modlfow 6 simulations in QGIS.</p></li>
+</ul>
+</section>
+<section id="id31">
+<h3>Fixed<a class="headerlink" href="#id31" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.wq.bas.BasicFlow.thickness()</span></code> returns a DataArray with the correct
+dimension order again. This confusingly resulted in an error when writing the
+<a class="reference internal" href="generated/wq/imod.wq.BasicTransport.html#imod.wq.BasicTransport" title="imod.wq.btn.BasicTransport"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.wq.btn.BasicTransport</span></code></a> package.</p></li>
+<li><p>Fixed bug in <a class="reference internal" href="generated/mf6/imod.mf6.StructuredDiscretization.html#imod.mf6.StructuredDiscretization" title="imod.mf6.dis.StructuredDiscretization"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.dis.StructuredDiscretization</span></code></a> and
+<code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.dis.VerticesDiscretization</span></code> where
+<code class="docutils literal notranslate"><span class="pre">inactive</span> <span class="pre">bottom</span> <span class="pre">above</span> <span class="pre">active</span> <span class="pre">cell</span></code> was incorrectly raised.</p></li>
+</ul>
+</section>
+</section>
+<section id="id32">
+<h2>[0.12.0] - 2023-03-17<a class="headerlink" href="#id32" title="Permalink to this heading">#</a></h2>
+<section id="id33">
+<h3>Added<a class="headerlink" href="#id33" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.prj.read_projectfile()</span></code> to read the contents of a project file into
+a Python dictionary.</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.prj.open_projectfile_data()</span></code> to read/open the data that is pointed
+to in a project file.</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.gen.read_ascii()</span></code> to read the geometry stored in ASCII text .gen files.</p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.hfb.HorizontalFlowBarrier</span></code> to support Modflow6’s HFB
+package, works well with <cite>xugrid.snap_to_grid</cite> function.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.simulation.Modflow6Simulation.dump()</span></code> to dump a simulation to a toml file
+which acts as a definition file, pointing to packages written as netcdf files. This
+can be used to intermediately store Modflow6 simulations.</p></li>
+</ul>
+</section>
+<section id="id34">
+<h3>Fixed<a class="headerlink" href="#id34" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.evaluate.budget.flow_velocity()</span></code> now properly computes velocity by
+dividing by the porosity. Before, this function computed the Darcian velocity.</p></li>
+</ul>
+</section>
+<section id="id35">
+<h3>Changed<a class="headerlink" href="#id35" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.ipf.save()</span></code> will error on duplicate IDs for associated files if a
+<code class="docutils literal notranslate"><span class="pre">&quot;layer&quot;</span></code> column is present. As a dataframe is automatically broken down
+into a single IPF per layer, associated files for the first layer would be
+overwritten by the second, and so forth.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.wq.Well.save()</span></code> will now write time varying data to associated
+files for extration rate and concentration.</p></li>
+<li><p>Choosing <code class="docutils literal notranslate"><span class="pre">method=&quot;geometric_mean&quot;</span></code> in the Regridder will now result in NaN
+values in the regridded result if a geometric mean is computed over negative
+values; in general, a geometric mean should only be computed over physical
+quantities with a “true zero” (e.g. conductivity, but not elevation).</p></li>
+</ul>
+</section>
+</section>
+<section id="id36">
+<h2>[0.11.6] - 2023-02-01<a class="headerlink" href="#id36" title="Permalink to this heading">#</a></h2>
+<section id="id37">
+<h3>Added<a class="headerlink" href="#id37" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Added an extra optional argument in
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.couplers.metamod.MetaMod.write()</span></code> named <code class="docutils literal notranslate"><span class="pre">modflow6_write_kwargs</span></code>,
+which can be used to provide keyword arguments to the writing of the Modflow 6
+Simulation.</p></li>
+</ul>
+</section>
+<section id="id38">
+<h3>Fixed<a class="headerlink" href="#id38" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.out.disv.read_grb()</span></code> Remove repeated construction of
+<code class="docutils literal notranslate"><span class="pre">UgridDataArray</span></code> for <code class="docutils literal notranslate"><span class="pre">top</span></code></p></li>
+</ul>
+</section>
+</section>
+<section id="id39">
+<h2>[0.11.5] - 2022-12-15<a class="headerlink" href="#id39" title="Permalink to this heading">#</a></h2>
+<section id="id40">
+<h3>Fixed<a class="headerlink" href="#id40" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.write.html#imod.mf6.Modflow6Simulation.write" title="imod.mf6.Modflow6Simulation.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.write()</span></code></a> with <code class="docutils literal notranslate"><span class="pre">binary=False</span></code> no longer
+results in invalid MODFLOW6 input for 2D grid data, such as DIS top.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.flow.ImodflowModel.write()</span></code> no longer writes incorrect project
+files for non-grid values with a time and layer dimension.</p></li>
+<li><p><a class="reference internal" href="generated/evaluate/imod.evaluate.interpolate_value_boundaries.html#imod.evaluate.interpolate_value_boundaries" title="imod.evaluate.interpolate_value_boundaries"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.evaluate.interpolate_value_boundaries()</span></code></a>: Fix edge case when
+successive values in z direction are exactly equal to the boundary value.</p></li>
+</ul>
+</section>
+<section id="id41">
+<h3>Changed<a class="headerlink" href="#id41" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Removed <code class="docutils literal notranslate"><span class="pre">meshzoo</span></code> dependency.</p></li>
+<li><p>Minor changes to <code class="xref py py-mod docutils literal notranslate"><span class="pre">imod.gen.gen</span></code> backend, to support <a class="reference external" href="https://shapely.readthedocs.io/en/latest/release/2.x.html">Shapely 2.0</a> , Shapely
+version above equal v1.8 is now required.</p></li>
+</ul>
+</section>
+<section id="id42">
+<h3>Added<a class="headerlink" href="#id42" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.flow.ImodflowModel.write()</span></code> now supports writing a
+<code class="docutils literal notranslate"><span class="pre">config_run.ini</span></code> to convert the projectfile to a runfile or modflow 6
+namfile with iMOD5.</p></li>
+<li><p>Added validation of Modflow6 Flow and Transport models. Incorrect model input
+will now throw a <code class="docutils literal notranslate"><span class="pre">ValidationError</span></code>. To turn off the validation, set
+<code class="docutils literal notranslate"><span class="pre">validate=False</span></code> upon package initialization and/or when calling
+<a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.write.html#imod.mf6.Modflow6Simulation.write" title="imod.mf6.Modflow6Simulation.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.write()</span></code></a>.</p></li>
+</ul>
+</section>
+</section>
+<section id="id43">
+<h2>[0.11.4] - 2022-09-05<a class="headerlink" href="#id43" title="Permalink to this heading">#</a></h2>
+<section id="id44">
+<h3>Fixed<a class="headerlink" href="#id44" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.GroundwaterFlowModel.write()</span></code> will no longer error when a 3D
+DataArray with a single layer is written. It will now accept both 2D and 3D
+arrays with a single layer coordinate.</p></li>
+<li><p>Hotfixes for <code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.wq.model.SeawatModel.clip()</span></code>, until <a class="reference external" href="https://gitlab.com/deltares/imod/imod-python/-/merge_requests/111">this merge request</a> is
+fulfilled.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.flow.ImodflowModel.write()</span></code> will set the timestring in the
+projectfile to <code class="docutils literal notranslate"><span class="pre">steady-state</span></code> for <code class="docutils literal notranslate"><span class="pre">BoundaryConditions</span></code> without a time
+dimension.</p></li>
+<li><p>Added <code class="xref py py-class docutils literal notranslate"><span class="pre">imod.flow.OutputControl</span></code> as this was still missing.</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.ipf.read()</span></code> will no longer error when an associated files with 0
+rows is read.</p></li>
+<li><p><a class="reference internal" href="generated/evaluate/imod.evaluate.calculate_gxg.html#imod.evaluate.calculate_gxg" title="imod.evaluate.calculate_gxg"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.evaluate.calculate_gxg()</span></code></a> now correctly uses (March 14, March
+28, April 14) to calculate GVG rather than (March 28, April 14, April 28).</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.out.open_cbc()</span></code> now correctly loads boundary fluxes.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.prepare.LayerRegridder.regrid()</span></code> will now correctly skip values
+if <code class="docutils literal notranslate"><span class="pre">top_source</span></code> or <code class="docutils literal notranslate"><span class="pre">bottom_source</span></code> are NaN.</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.gen.write()</span></code> no longer errors on dataframes with empty columns.</p></li>
+</ul>
+</section>
+<section id="id45">
+<h3>Changed<a class="headerlink" href="#id45" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Deprecate the current documentation URL: <a class="reference external" href="https://imod.xyz">https://imod.xyz</a>. For the coming
+months, redirection is automatic to:
+<a class="reference external" href="https://deltares.gitlab.io/imod/imod-python/">https://deltares.gitlab.io/imod/imod-python/</a>.</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.ipf.save()</span></code> will now store associated files in separate directories
+named <code class="docutils literal notranslate"><span class="pre">layer1</span></code>, <code class="docutils literal notranslate"><span class="pre">layer2</span></code>, etc. The ID in the main IPF file is updated
+accordingly. Previously, if IDs were shared between different layers, the
+associated files would be overwritten as the IDs would result in the same
+file name being used over and over.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.flow.ImodflowModel.time_discretization()</span></code>,
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.wq.SeawatModel.time_discretization()</span></code>,
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Simulation.time_discretization()</span></code>,
+are renamed to:
+<a class="reference internal" href="generated/flow/imod.flow.ImodflowModel.create_time_discretization.html#imod.flow.ImodflowModel.create_time_discretization" title="imod.flow.ImodflowModel.create_time_discretization"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.flow.ImodflowModel.create_time_discretization()</span></code></a>,
+<a class="reference internal" href="generated/wq/imod.wq.SeawatModel.create_time_discretization.html#imod.wq.SeawatModel.create_time_discretization" title="imod.wq.SeawatModel.create_time_discretization"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.wq.SeawatModel.create_time_discretization()</span></code></a>,
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Simulation.create_time_discretization()</span></code>,</p></li>
+<li><p>Moved tests inside <cite>imod</cite> directory, added an entry point for pytest fixtures.
+Running the tests now requires an editable install, and also existing
+installations have to be reinstalled to run the tests.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">imod.mf6</span></code> model packages now all run type checks on input. This is a
+breaking change for scripts which provide input with an incorrect dtype.</p></li>
+<li><p><a class="reference internal" href="generated/mf6/imod.mf6.Solution.html#imod.mf6.Solution" title="imod.mf6.Solution"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.Solution</span></code></a> now requires a <cite>model_names</cite> argument to specify
+which models should be solved in a single numerical solution. This is
+required to simulate groundwater flow and transport as they should be
+in separate solutions.</p></li>
+<li><p>When writing MODFLOW6 input option blocks, a NaN value is now recognized as
+an alternative to None (and the entry will not be included in the options
+block).</p></li>
+</ul>
+</section>
+<section id="id46">
+<h3>Added<a class="headerlink" href="#id46" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Added support to write MetaSWAP models, <a class="reference internal" href="generated/msw/imod.msw.MetaSwapModel.html#imod.msw.MetaSwapModel" title="imod.msw.MetaSwapModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.msw.MetaSwapModel</span></code></a>.</p></li>
+<li><p>Addes support to write coupled MetaSWAP and Modflow6 simulations,
+<code class="xref py py-class docutils literal notranslate"><span class="pre">imod.couplers.MetaMod</span></code></p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.util.replace()</span></code> has been added to find and replace different values
+in a DataArray.</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.evaluate.calculate_gxg_points()</span></code> has been added to compute GXG
+values for time varying point data (i.e. loaded from IPF and presented as a
+Pandas dataframe).</p></li>
+<li><p><a class="reference internal" href="generated/evaluate/imod.evaluate.calculate_gxg.html#imod.evaluate.calculate_gxg" title="imod.evaluate.calculate_gxg"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.evaluate.calculate_gxg()</span></code></a> will return the number of years used
+in the GxG calculation as separate variables in the output dataset.</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.visualize.spatial.plot_map()</span></code> now accepts a <cite>fix</cite> and <cite>ax</cite> argument,
+to enable adding maps to existing axes.</p></li>
+<li><p><a class="reference internal" href="generated/flow/imod.flow.ImodflowModel.create_time_discretization.html#imod.flow.ImodflowModel.create_time_discretization" title="imod.flow.ImodflowModel.create_time_discretization"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.flow.ImodflowModel.create_time_discretization()</span></code></a>,
+<a class="reference internal" href="generated/wq/imod.wq.SeawatModel.create_time_discretization.html#imod.wq.SeawatModel.create_time_discretization" title="imod.wq.SeawatModel.create_time_discretization"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.wq.SeawatModel.create_time_discretization()</span></code></a>,
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Simulation.create_time_discretization()</span></code>, now have a
+documentation section.</p></li>
+<li><p><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterTransportModel.html#imod.mf6.GroundwaterTransportModel" title="imod.mf6.GroundwaterTransportModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.GroundwaterTransportModel</span></code></a> has been added with associated
+simple classes to allow creation of solute transport models. Advanced
+boundary conditions such as LAK or UZF are not yet supported.</p></li>
+<li><p><a class="reference internal" href="generated/mf6/imod.mf6.Buoyancy.html#imod.mf6.Buoyancy" title="imod.mf6.Buoyancy"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.Buoyancy</span></code></a> has been added to simulate density dependent
+groundwater flow.</p></li>
+</ul>
+</section>
+</section>
+<section id="id47">
+<h2>[0.11.1] - 2021-12-23<a class="headerlink" href="#id47" title="Permalink to this heading">#</a></h2>
+<section id="id48">
+<h3>Fixed<a class="headerlink" href="#id48" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">contextily</span></code>, <code class="docutils literal notranslate"><span class="pre">geopandas</span></code>, <code class="docutils literal notranslate"><span class="pre">pyvista</span></code>, <code class="docutils literal notranslate"><span class="pre">rasterio</span></code>, and <code class="docutils literal notranslate"><span class="pre">shapely</span></code>
+are now fully optional dependencies. Import errors are only raised when
+accessing functionality that requires their use.</p></li>
+<li><p>Include declxml as <code class="docutils literal notranslate"><span class="pre">imod.declxml</span></code> (should be internal use only!): declxml
+is no longer maintained on the official repository:
+<a class="github reference external" href="https://github.com/gatkin/declxml">gatkin/declxml</a>. Furthermore, it has no conda feedstock,
+which makes distribution via conda difficult.</p></li>
+</ul>
+</section>
+</section>
+<section id="id49">
+<h2>[0.11.0] - 2021-12-21<a class="headerlink" href="#id49" title="Permalink to this heading">#</a></h2>
+<section id="id50">
+<h3>Fixed<a class="headerlink" href="#id50" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.ipf.read()</span></code> accepts list of file names.</p></li>
+<li><p><a class="reference internal" href="generated/mf6/imod.mf6.open_hds.html#imod.mf6.open_hds" title="imod.mf6.open_hds"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.open_hds()</span></code></a> did not read the appropriate bytes from the
+heads file, apart for the first timestep. It will now read the right records.</p></li>
+<li><p>Use the appropriate array for modflow6 timestep duration: the
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.GroundwaterFlowModel.write()</span></code> would write the timesteps
+multiplier in place of the duration array.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.GroundwaterFlowModel.write()</span></code> will now respect the layer
+coordinate of DataArrays that had multiple coordinates, but were
+discontinuous from 1; e.g. layers [1, 3, 5] would’ve been transformed to [1,
+2, 3] incorrectly.</p></li>
+<li><p><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.write.html#imod.mf6.Modflow6Simulation.write" title="imod.mf6.Modflow6Simulation.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.write()</span></code></a> will no longer change working directory
+while writing model input – this could lead to errors when multiple
+processes are writing models in parallel.</p></li>
+<li><p><a class="reference internal" href="generated/prepare/imod.prepare.laplace_interpolate.html#imod.prepare.laplace_interpolate" title="imod.prepare.laplace_interpolate"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.prepare.laplace_interpolate()</span></code></a> will no longer ZeroDivisionError
+when given a value for <code class="docutils literal notranslate"><span class="pre">ibound</span></code>.</p></li>
+</ul>
+</section>
+<section id="id51">
+<h3>Added<a class="headerlink" href="#id51" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.idf.open_subdomains()</span></code> will now also accept iMOD-WQ output of
+multiple species runs.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.wq.SeawatModel.to_netcdf()</span></code> has been added to write all model
+packages to netCDF files.</p></li>
+<li><p><a class="reference internal" href="generated/mf6/imod.mf6.open_cbc.html#imod.mf6.open_cbc" title="imod.mf6.open_cbc"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.open_cbc()</span></code></a> has been added to read the budget data of
+structured (DIS) MODFLOW6 models. The data is read lazily into xarray
+DataArrays per timestep.</p></li>
+<li><p><a class="reference internal" href="generated/visualize/imod.visualize.streamfunction.html#imod.visualize.streamfunction" title="imod.visualize.streamfunction"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.visualize.streamfunction()</span></code></a> and <a class="reference internal" href="generated/visualize/imod.visualize.quiver.html#imod.visualize.quiver" title="imod.visualize.quiver"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.visualize.quiver()</span></code></a>
+were added to plot a 2D representation of the groundwater flow field using
+either streamlines or quivers over a cross section plot
+(<a class="reference internal" href="generated/visualize/imod.visualize.cross_section.html#imod.visualize.cross_section" title="imod.visualize.cross_section"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.visualize.cross_section()</span></code></a>).</p></li>
+<li><p><a class="reference internal" href="generated/evaluate/imod.evaluate.streamfunction_line.html#imod.evaluate.streamfunction_line" title="imod.evaluate.streamfunction_line"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.evaluate.streamfunction_line()</span></code></a> and
+<a class="reference internal" href="generated/evaluate/imod.evaluate.streamfunction_linestring.html#imod.evaluate.streamfunction_linestring" title="imod.evaluate.streamfunction_linestring"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.evaluate.streamfunction_linestring()</span></code></a> were added to extract the
+2D projected streamfunction of the 3D flow field for a given cross section.</p></li>
+<li><p><a class="reference internal" href="generated/evaluate/imod.evaluate.quiver_line.html#imod.evaluate.quiver_line" title="imod.evaluate.quiver_line"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.evaluate.quiver_line()</span></code></a> and <a class="reference internal" href="generated/evaluate/imod.evaluate.quiver_linestring.html#imod.evaluate.quiver_linestring" title="imod.evaluate.quiver_linestring"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.evaluate.quiver_linestring()</span></code></a>
+were added to extract the u and v components of the 3D flow field for a given
+cross section.</p></li>
+<li><p>Added <code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.GroundwaterFlowModel.write_qgis_project()</span></code> to write a
+QGIS project for easier inspection of model input in QGIS.</p></li>
+<li><p>Added <code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.wq.SeawatModel.clip()</span></code> to clip a model to a provided extent.
+Boundary conditions of clipped model can be automatically derived from parent
+model calculation results and are applied along the edges of the extent.</p></li>
+<li><p>Added <code class="xref py py-func docutils literal notranslate"><span class="pre">imod.gen.read()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">imod.gen.write()</span></code> for reading
+and writing binary iMOD GEN files to and from geopandas GeoDataFrames.</p></li>
+<li><p>Added <a class="reference internal" href="generated/prepare/imod.prepare.zonal_aggregate_raster.html#imod.prepare.zonal_aggregate_raster" title="imod.prepare.zonal_aggregate_raster"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.prepare.zonal_aggregate_raster()</span></code></a> and
+<a class="reference internal" href="generated/prepare/imod.prepare.zonal_aggregate_polygons.html#imod.prepare.zonal_aggregate_polygons" title="imod.prepare.zonal_aggregate_polygons"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.prepare.zonal_aggregate_polygons()</span></code></a> to efficiently compute zonal
+aggregates for many polygons (e.g. the properties every individual ditch in
+the Netherlands).</p></li>
+<li><p>Added <a class="reference internal" href="generated/flow/imod.flow.ImodflowModel.html#imod.flow.ImodflowModel" title="imod.flow.ImodflowModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.flow.ImodflowModel</span></code></a> to write to model iMODFLOW project
+file.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Simulation.write()</span></code> now has a <code class="docutils literal notranslate"><span class="pre">binary</span></code> keyword. When set
+to <code class="docutils literal notranslate"><span class="pre">False</span></code>, all MODFLOW6 input is written to text rather than binary files.</p></li>
+<li><p>Added <code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.DiscretizationVertices</span></code> to write MODFLOW6 DISV model
+input.</p></li>
+<li><p>Packages for <a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.html#imod.mf6.GroundwaterFlowModel" title="imod.mf6.GroundwaterFlowModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.GroundwaterFlowModel</span></code></a> will now accept
+<code class="xref py py-class docutils literal notranslate"><span class="pre">xugrid.UgridDataArray</span></code> objects for (DISV) unstructured grids, next to
+<code class="xref py py-class docutils literal notranslate"><span class="pre">xarray.DataArray</span></code> objects for structured (DIS) grids.</p></li>
+<li><p>Transient wells are now supported in <a class="reference internal" href="generated/mf6/imod.mf6.WellDisStructured.html#imod.mf6.WellDisStructured" title="imod.mf6.WellDisStructured"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.WellDisStructured</span></code></a> and
+<a class="reference internal" href="generated/mf6/imod.mf6.WellDisVertices.html#imod.mf6.WellDisVertices" title="imod.mf6.WellDisVertices"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.WellDisVertices</span></code></a>.</p></li>
+<li><p><a class="reference internal" href="generated/util/imod.util.to_ugrid2d.html#imod.util.to_ugrid2d" title="imod.util.to_ugrid2d"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.util.to_ugrid2d()</span></code></a> has been added to convert a (structured) xarray
+DataArray or Dataset to a quadrilateral UGRID dataset.</p></li>
+<li><p>Functions created to create empty DataArrays with greater ease:
+<a class="reference internal" href="generated/util/imod.util.empty_2d.html#imod.util.empty_2d" title="imod.util.empty_2d"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.util.empty_2d()</span></code></a>, <a class="reference internal" href="generated/util/imod.util.empty_2d_transient.html#imod.util.empty_2d_transient" title="imod.util.empty_2d_transient"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.util.empty_2d_transient()</span></code></a>,
+<a class="reference internal" href="generated/util/imod.util.empty_3d.html#imod.util.empty_3d" title="imod.util.empty_3d"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.util.empty_3d()</span></code></a>, and <a class="reference internal" href="generated/util/imod.util.empty_3d_transient.html#imod.util.empty_3d_transient" title="imod.util.empty_3d_transient"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.util.empty_3d_transient()</span></code></a>.</p></li>
+<li><p><a class="reference internal" href="generated/util/imod.util.where.html#imod.util.where" title="imod.util.where"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.util.where()</span></code></a> has been added for easier if-then-else operations,
+especially for preserving NaN nodata values.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Simulation.run()</span></code> has been added to more easily run a model,
+especially in examples and tests.</p></li>
+<li><p><a class="reference internal" href="generated/mf6/imod.mf6.open_cbc.html#imod.mf6.open_cbc" title="imod.mf6.open_cbc"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.open_cbc()</span></code></a> and <a class="reference internal" href="generated/mf6/imod.mf6.open_hds.html#imod.mf6.open_hds" title="imod.mf6.open_hds"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.open_hds()</span></code></a> will automatically
+return a <code class="docutils literal notranslate"><span class="pre">xugrid.UgridDataArray</span></code> for MODFLOW6 DISV model output.</p></li>
+</ul>
+</section>
+<section id="id52">
+<h3>Changed<a class="headerlink" href="#id52" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Documentation overhaul: different theme, add sample data for examples, add
+Frequently Asked Questions (FAQ) section, restructure API Reference. Examples
+now ru</p></li>
+<li><p>Datetime columns in IPF associated files (via
+<code class="xref py py-func docutils literal notranslate"><span class="pre">imod.ipf.write_assoc()</span></code>) will not be placed within quotes, as this can
+break certain iMOD batch functions.</p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.Well</span></code> has been renamed into <a class="reference internal" href="generated/mf6/imod.mf6.WellDisStructured.html#imod.mf6.WellDisStructured" title="imod.mf6.WellDisStructured"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.WellDisStructured</span></code></a>.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.GroundwaterFlowModel.write()</span></code> will now write package names
+into the simulation namefile.</p></li>
+<li><p><a class="reference internal" href="generated/mf6/imod.mf6.open_cbc.html#imod.mf6.open_cbc" title="imod.mf6.open_cbc"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.open_cbc()</span></code></a> will now return a dictionary with keys
+<code class="docutils literal notranslate"><span class="pre">flow-front-face,</span> <span class="pre">flow-lower-face,</span> <span class="pre">flow-right-face</span></code> for the face flows,
+rather than <code class="docutils literal notranslate"><span class="pre">front-face-flow</span></code> for better consistency.</p></li>
+<li><p>Switched to composition from inheritance for all model packages: all model
+packages now contain an internal (xarray) Dataset, rather than inheriting
+from the xarray Dataset.</p></li>
+<li><p><a class="reference internal" href="generated/mf6/imod.mf6.SpecificStorage.html#imod.mf6.SpecificStorage" title="imod.mf6.SpecificStorage"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.SpecificStorage</span></code></a> or <a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.html#imod.mf6.StorageCoefficient" title="imod.mf6.StorageCoefficient"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.StorageCoefficient</span></code></a> is
+now mandatory for every MODFLOW6 model to avoid accidental steady-state
+configuration.</p></li>
+</ul>
+</section>
+<section id="id53">
+<h3>Removed<a class="headerlink" href="#id53" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Module <code class="docutils literal notranslate"><span class="pre">imod.tec</span></code> for reading Tecplot files has been removed.</p></li>
+</ul>
+</section>
+</section>
+<section id="id54">
+<h2>[0.10.1] - 2020-10-19<a class="headerlink" href="#id54" title="Permalink to this heading">#</a></h2>
+<section id="id55">
+<h3>Changed<a class="headerlink" href="#id55" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.wq.SeawatModel.write()</span></code> now generates iMOD-WQ runfiles with
+more intelligent use of the “macro tokens”. <code class="docutils literal notranslate"><span class="pre">:</span></code> is used exclusively for
+ranges; <code class="docutils literal notranslate"><span class="pre">$</span></code> is used to signify all layers. (This makes runfiles shorter,
+speeding up parsing, which takes a significant amount of time in the runfile
+to namefile conversion of iMOD-WQ.)</p></li>
+<li><p>Datetime formats are inferred based on length of the time string according to
+<code class="docutils literal notranslate"><span class="pre">%Y%m%d%H%M%S</span></code>; supported lengths 4 (year only) to 14 (full format string).</p></li>
+</ul>
+</section>
+<section id="id56">
+<h3>Added<a class="headerlink" href="#id56" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><a class="reference internal" href="generated/wq/imod.wq.MassLoading.html#imod.wq.MassLoading" title="imod.wq.MassLoading"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.wq.MassLoading</span></code></a> and
+<a class="reference internal" href="generated/wq/imod.wq.TimeVaryingConstantConcentration.html#imod.wq.TimeVaryingConstantConcentration" title="imod.wq.TimeVaryingConstantConcentration"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.wq.TimeVaryingConstantConcentration</span></code></a> have been added to allow
+additional concentration boundary conditions.</p></li>
+<li><p>IPF writing methods support an <code class="docutils literal notranslate"><span class="pre">assoc_columns</span></code> keyword to allow greater
+flexibility in including and renaming columns of the associated files.</p></li>
+<li><p>Optional basemap plotting has been added to <a class="reference internal" href="generated/visualize/imod.visualize.plot_map.html#imod.visualize.plot_map" title="imod.visualize.plot_map"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.visualize.plot_map()</span></code></a>.</p></li>
+</ul>
+</section>
+<section id="id57">
+<h3>Fixed<a class="headerlink" href="#id57" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>IO methods for IDF files will now correctly identify double precision IDFs.
+The correct record length identifier is 2295 rather than 2296 (2296 was a
+typo in the iMOD manual).</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.wq.SeawatModel.write()</span></code> will now write the correct path for
+recharge package concentration given in IDF files. It did not prepend the
+name of the package correctly (resulting in paths like
+<code class="docutils literal notranslate"><span class="pre">concentration_l1.idf</span></code> instead of <code class="docutils literal notranslate"><span class="pre">rch/concentration_l1.idf</span></code>).</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.idf.save()</span></code> will simplify constant cellsize arrays to a scalar
+value – this greatly speeds up drawing in the iMOD-GUI.</p></li>
+</ul>
+</section>
+</section>
+<section id="id58">
+<h2>[0.10.0] - 2020-05-23<a class="headerlink" href="#id58" title="Permalink to this heading">#</a></h2>
+<section id="id59">
+<h3>Changed<a class="headerlink" href="#id59" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.wq.SeawatModel.write()</span></code> no longer automatically appends the model
+name to the directory where the input is written. Instead, it simply writes
+to the directory as specified.</p></li>
+<li><p><a class="reference internal" href="generated/select/imod.select.points_set_values.html#imod.select.points_set_values" title="imod.select.points_set_values"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.select.points_set_values()</span></code></a> returns a new DataArray rather than
+mutating the input <code class="docutils literal notranslate"><span class="pre">da</span></code>.</p></li>
+<li><p><a class="reference internal" href="generated/select/imod.select.points_values.html#imod.select.points_values" title="imod.select.points_values"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.select.points_values()</span></code></a> returns a DataArray with an index taken
+from the data of the first provided dimensions if it is a <code class="docutils literal notranslate"><span class="pre">pandas.Series</span></code>.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.wq.SeawatModel.write()</span></code> now writes a runfile with <code class="docutils literal notranslate"><span class="pre">start_hour</span></code>
+and <code class="docutils literal notranslate"><span class="pre">start_minute</span></code> (this results in output IDFs with datetime format
+<code class="docutils literal notranslate"><span class="pre">&quot;%Y%m%d%H%M&quot;</span></code>).</p></li>
+</ul>
+</section>
+<section id="id60">
+<h3>Added<a class="headerlink" href="#id60" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_file()</span></code> constructors have been added to all <cite>imod.wq.Package</cite>.
+This allows loading directly package from a netCDF file (or any file supported by
+<code class="docutils literal notranslate"><span class="pre">xarray.open_dataset</span></code>), or a path to a Zarr directory with suffix “.zarr” or “.zip”.</p></li>
+<li><p>This can be combined with the <cite>cache</cite> argument in <code class="xref py py-meth docutils literal notranslate"><span class="pre">from_file()</span></code> to
+enable caching of answers to avoid repeated computation during
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.wq.SeawatModel.write()</span></code>; it works by checking whether input and
+output files have changed.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">resultdir_is_workspace</span></code> argument has been added to <code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.wq.SeawatModel.write()</span></code>.
+iMOD-wq writes a number of files (e.g. list file) in the directory where the
+runfile is located. This results in mixing of input and output. By setting it
+<code class="docutils literal notranslate"><span class="pre">True</span></code>, <strong>all</strong> model output is written in the results directory.</p></li>
+<li><p><a class="reference internal" href="generated/visualize/imod.visualize.imshow_topview.html#imod.visualize.imshow_topview" title="imod.visualize.imshow_topview"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.visualize.imshow_topview()</span></code></a> has been added to visualize a complete
+DataArray with atleast dimensions <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code>; it dumps PNGs into a
+specified directory.</p></li>
+<li><p>Some support for 3D visualization has been added.
+<a class="reference internal" href="generated/visualize/imod.visualize.grid_3d.html#imod.visualize.grid_3d" title="imod.visualize.grid_3d"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.visualize.grid_3d()</span></code></a> and <a class="reference internal" href="generated/visualize/imod.visualize.line_3d.html#imod.visualize.line_3d" title="imod.visualize.line_3d"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.visualize.line_3d()</span></code></a> have been
+added to produce <code class="docutils literal notranslate"><span class="pre">pyvista</span></code> meshes from <code class="docutils literal notranslate"><span class="pre">xarray.DataArray</span></code>’s and
+<code class="docutils literal notranslate"><span class="pre">shapely</span></code> polygons, respectively.
+<a class="reference internal" href="generated/visualize/imod.visualize.GridAnimation3D.html#imod.visualize.GridAnimation3D" title="imod.visualize.GridAnimation3D"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.visualize.GridAnimation3D</span></code></a> and <a class="reference internal" href="generated/visualize/imod.visualize.StaticGridAnimation3D.html#imod.visualize.StaticGridAnimation3D" title="imod.visualize.StaticGridAnimation3D"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.visualize.StaticGridAnimation3D</span></code></a>
+have been added to setup 3D animations of DataArrays with transient data.</p></li>
+<li><p>Support for out of core computation by <code class="docutils literal notranslate"><span class="pre">imod.prepare.Regridder</span></code> if <code class="docutils literal notranslate"><span class="pre">source</span></code>
+is chunked.</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.ipf.read()</span></code> now reports the problematic file if reading errors occur.</p></li>
+<li><p><a class="reference internal" href="generated/prepare/imod.prepare.polygonize.html#imod.prepare.polygonize" title="imod.prepare.polygonize"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.prepare.polygonize()</span></code></a> added to polygonize DataArrays to GeoDataFrames.</p></li>
+<li><p>Added more support for multiple species imod-wq models, specifically: scalar concentration
+for boundary condition packages and well IPFs.</p></li>
+</ul>
+</section>
+<section id="id61">
+<h3>Fixed<a class="headerlink" href="#id61" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><a class="reference internal" href="generated/prepare/imod.prepare.Regridder.html#imod.prepare.Regridder" title="imod.prepare.Regridder"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.prepare.Regridder()</span></code></a> detects if the <code class="docutils literal notranslate"><span class="pre">like</span></code> DataArray is a subset
+along a dimension, in which case the dimension is not regridded.</p></li>
+<li><p><a class="reference internal" href="generated/prepare/imod.prepare.Regridder.html#imod.prepare.Regridder" title="imod.prepare.Regridder"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.prepare.Regridder()</span></code></a> now slices the <code class="docutils literal notranslate"><span class="pre">source</span></code> array accurately
+before regridding, taking cell boundaries into account rather than only
+cell midpoints.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">density</span></code> is no longer an optional argument in <code class="xref py py-class docutils literal notranslate"><span class="pre">imod.wq.GeneralHeadboundary</span></code> and
+<a class="reference internal" href="generated/wq/imod.wq.River.html#imod.wq.River" title="imod.wq.River"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.wq.River</span></code></a>. The reason is that iMOD-WQ fully removes (!) these packages if density
+is not present.</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.idf.save()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">imod.rasterio.save()</span></code> will now also save DataArrays in
+which a coordinate other than <code class="docutils literal notranslate"><span class="pre">x</span></code> or <code class="docutils literal notranslate"><span class="pre">y</span></code> is descending.</p></li>
+<li><p><a class="reference internal" href="generated/visualize/imod.visualize.plot_map.html#imod.visualize.plot_map" title="imod.visualize.plot_map"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.visualize.plot_map()</span></code></a> enforces decreasing <code class="docutils literal notranslate"><span class="pre">y</span></code>, which ensures maps are not plotted
+upside down.</p></li>
+<li><p><a class="reference internal" href="generated/util/imod.util.coord_reference.html#imod.util.coord_reference" title="imod.util.coord_reference"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.util.coord_reference()</span></code></a> now returns a scalar cellsize if coordinate is equidistant.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.prepare.Regridder.regrid()</span></code> returns cellsizes as scalar when coordinates are
+equidistant.</p></li>
+<li><p>Raise proper ValueError in <code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.prepare.Regridder.regrid()</span></code> consistenly when the number
+of dimensions to regrid does not match the regridder dimensions.</p></li>
+<li><p>When writing DataArrays that have size 1 in dimension <code class="docutils literal notranslate"><span class="pre">x</span></code> or <code class="docutils literal notranslate"><span class="pre">y</span></code>: raise error if cellsize
+(<code class="docutils literal notranslate"><span class="pre">dx</span></code> or <code class="docutils literal notranslate"><span class="pre">dy</span></code>) is not specified; and actually use <code class="docutils literal notranslate"><span class="pre">dy</span></code> or <code class="docutils literal notranslate"><span class="pre">dx</span></code> when size is 1.</p></li>
+</ul>
+</section>
+</section>
+<section id="id62">
+<h2>[0.9.0] - 2020-01-19<a class="headerlink" href="#id62" title="Permalink to this heading">#</a></h2>
+<section id="id63">
+<h3>Added<a class="headerlink" href="#id63" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>IDF files representing data of arbitrary dimensionality can be opened and
+saved. This enables reading and writing files with more dimensions than just x,
+y, layer, and time.</p></li>
+<li><p>Added multi-species support for (<code class="xref py py-mod docutils literal notranslate"><span class="pre">imod.wq</span></code>)</p></li>
+<li><p>GDAL rasters representing N-dimensional data can be opened and saved similar to (<code class="xref py py-mod docutils literal notranslate"><span class="pre">imod.idf</span></code>) in (<code class="xref py py-mod docutils literal notranslate"><span class="pre">imod.rasterio</span></code>)</p></li>
+<li><p>Writing GDAL rasters using <code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.rasterio.save()</span></code> and (<code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.rasterio.write()</span></code>) auto-detects GDAL driver based on file extension</p></li>
+<li><p>64-bit IDF files can be opened <code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.idf.open()</span></code></p></li>
+<li><p>64-bit IDF files can be written using <code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.idf.save()</span></code> and (<code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.idf.write()</span></code>) using keyword <code class="docutils literal notranslate"><span class="pre">dtype=np.float64</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sel</span></code> and <code class="docutils literal notranslate"><span class="pre">isel</span></code> methods to <code class="docutils literal notranslate"><span class="pre">SeawatModel</span></code> to support taking out a subdomain</p></li>
+<li><p>Docstrings for the Modflow 6 classes in <code class="xref py py-mod docutils literal notranslate"><span class="pre">imod.mf6</span></code></p></li>
+<li><p><a class="reference internal" href="generated/select/imod.select.upper_active_layer.html#imod.select.upper_active_layer" title="imod.select.upper_active_layer"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.select.upper_active_layer()</span></code></a> function to get the upper active layer from ibound <code class="docutils literal notranslate"><span class="pre">xr.DataArray</span></code></p></li>
+</ul>
+</section>
+<section id="id64">
+<h3>Changed<a class="headerlink" href="#id64" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.idf.read()</span></code> is deprecated, use <code class="xref py py-mod docutils literal notranslate"><span class="pre">imod.idf.open</span></code> instead</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.rasterio.read()</span></code> is deprecated, use <code class="xref py py-mod docutils literal notranslate"><span class="pre">imod.rasterio.open</span></code> instead</p></li>
+</ul>
+</section>
+<section id="id65">
+<h3>Fixed<a class="headerlink" href="#id65" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><a class="reference internal" href="generated/prepare/imod.prepare.reproject.html#imod.prepare.reproject" title="imod.prepare.reproject"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.prepare.reproject()</span></code></a> working instead of silently failing when given a <code class="docutils literal notranslate"><span class="pre">&quot;+init=ESPG:XXXX</span></code> CRS string</p></li>
+</ul>
+</section>
+</section>
+<section id="id66">
+<h2>[0.8.0] - 2019-10-14<a class="headerlink" href="#id66" title="Permalink to this heading">#</a></h2>
+<section id="id67">
+<h3>Added<a class="headerlink" href="#id67" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Laplace grid interpolation <a class="reference internal" href="generated/prepare/imod.prepare.laplace_interpolate.html#imod.prepare.laplace_interpolate" title="imod.prepare.laplace_interpolate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.prepare.laplace_interpolate()</span></code></a></p></li>
+<li><p>Experimental Modflow 6 structured model write support <code class="xref py py-mod docutils literal notranslate"><span class="pre">imod.mf6</span></code></p></li>
+<li><p>More supported visualizations <code class="xref py py-mod docutils literal notranslate"><span class="pre">imod.visualize</span></code></p></li>
+<li><p>More extensive reading and writing of GDAL raster in <code class="xref py py-mod docutils literal notranslate"><span class="pre">imod.rasterio</span></code></p></li>
+</ul>
+</section>
+<section id="id68">
+<h3>Changed<a class="headerlink" href="#id68" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>The documentation moved to a custom domain name: <a class="reference external" href="https://imod.xyz/">https://imod.xyz/</a></p></li>
+</ul>
+</section>
+</section>
+<section id="id69">
+<h2>[0.7.1] - 2019-08-07<a class="headerlink" href="#id69" title="Permalink to this heading">#</a></h2>
+<section id="id70">
+<h3>Added<a class="headerlink" href="#id70" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;multilinear&quot;</span></code> has been added as a regridding option to <code class="docutils literal notranslate"><span class="pre">imod.prepare.Regridder</span></code> to do linear interpolation up to three dimensions.</p></li>
+<li><p>Boundary condition packages in <code class="docutils literal notranslate"><span class="pre">imod.wq</span></code> support a method called <code class="docutils literal notranslate"><span class="pre">add_timemap</span></code> to do cyclical boundary conditions, such as summer and winter stages.</p></li>
+</ul>
+</section>
+<section id="id71">
+<h3>Fixed<a class="headerlink" href="#id71" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">imod.idf.save</span></code> no longer fails on a single IDF when it is a voxel IDF (when it has top and bottom data).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">imod.prepare.celltable</span></code> now succesfully does parallel chunkwise operations, rather than raising an error.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">imod.Regridder</span></code>’s <code class="docutils literal notranslate"><span class="pre">regrid</span></code> method now succesfully returns <code class="docutils literal notranslate"><span class="pre">source</span></code> if all dimensions already have the right cell sizes, rather than raising an error.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">imod.idf.open_subdomains</span></code> is much faster now at merging different subdomain IDFs of a parallel modflow simulation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">imod.idf.save</span></code> no longer suffers from extremely slow execution when the DataArray to save is chunked (it got extremely slow in some cases).</p></li>
+<li><p>Package checks in <code class="docutils literal notranslate"><span class="pre">imod.wq.SeawatModel</span></code> succesfully reduces over dimensions.</p></li>
+<li><p>Fix last case in <code class="docutils literal notranslate"><span class="pre">imod.prepare.reproject</span></code> where it did not allocate a new array yet, but returned <code class="docutils literal notranslate"><span class="pre">like</span></code> instead of the reprojected result.</p></li>
+</ul>
+</section>
+</section>
+<section id="id72">
+<h2>[0.7.0] - 2019-07-23<a class="headerlink" href="#id72" title="Permalink to this heading">#</a></h2>
+<section id="id73">
+<h3>Added<a class="headerlink" href="#id73" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">imod.wq</span></code> module to create iMODFLOW Water Quality models</p></li>
+<li><p>conda-forge recipe to install imod (<a class="github reference external" href="https://github.com/conda-forge/imod-feedstock/">conda-forge/imod-feedstock</a>)</p></li>
+<li><p>significantly extended documentation and examples</p></li>
+<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">imod.prepare</span></code> module with many data mangling functions</p></li>
+<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">imod.select</span></code> module for extracting data along cross sections or at points</p></li>
+<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">imod.visualize</span></code> module added to visualize results</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.idf.open_subdomains()</span></code> function to open and merge the IDF results of a parallelized run</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.ipf.read()</span></code> now infers delimeters for the headers and the body</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.ipf.read()</span></code> can now deal with heterogeneous delimiters between multiple IPF files, and between the headers and body in a single file</p></li>
+</ul>
+</section>
+<section id="id74">
+<h3>Changed<a class="headerlink" href="#id74" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Namespaces: lift many functions one level, such that you can use e.g. the function <code class="docutils literal notranslate"><span class="pre">imod.prepare.reproject</span></code> instead of <code class="docutils literal notranslate"><span class="pre">imod.prepare.reproject.reproject</span></code></p></li>
+</ul>
+</section>
+<section id="id75">
+<h3>Removed<a class="headerlink" href="#id75" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>All that was deprecated in v0.6.0</p></li>
+</ul>
+</section>
+<section id="deprecated">
+<h3>Deprecated<a class="headerlink" href="#deprecated" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.seawat_write()</span></code> is deprecated, use the write method of <a class="reference internal" href="generated/wq/imod.wq.SeawatModel.html#imod.wq.SeawatModel" title="imod.wq.SeawatModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.wq.SeawatModel</span></code></a> instead</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.run.seawat_get_runfile()</span></code> is deprecated, use <code class="xref py py-mod docutils literal notranslate"><span class="pre">imod.wq</span></code> instead</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.run.seawat_write_runfile()</span></code> is deprecated, use <code class="xref py py-mod docutils literal notranslate"><span class="pre">imod.wq</span></code> instead</p></li>
+</ul>
+</section>
+</section>
+<section id="id76">
+<h2>[0.6.1] - 2019-04-17<a class="headerlink" href="#id76" title="Permalink to this heading">#</a></h2>
+<section id="id77">
+<h3>Added<a class="headerlink" href="#id77" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Support nonequidistant models in runfile</p></li>
+</ul>
+</section>
+<section id="id78">
+<h3>Fixed<a class="headerlink" href="#id78" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Time conversion in runfile now also accepts cftime objects</p></li>
+</ul>
+</section>
+</section>
+<section id="id79">
+<h2>[0.6.0] - 2019-03-15<a class="headerlink" href="#id79" title="Permalink to this heading">#</a></h2>
+<p>The primary change is that a number of functions have been renamed to
+better communicate what they do.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">load</span></code> function name was not appropriate for IDFs, since the IDFs
+are not loaded into memory. Rather, they are opened and the headers are
+read; the data is only loaded when needed, in accordance with
+<code class="docutils literal notranslate"><span class="pre">xarray</span></code>’s design; compare for example <code class="docutils literal notranslate"><span class="pre">xarray.open_dataset</span></code>. The
+function has been renamed to <code class="docutils literal notranslate"><span class="pre">open</span></code>.</p>
+<p>Similarly, <code class="docutils literal notranslate"><span class="pre">load</span></code> for IPFs has been deprecated. <code class="docutils literal notranslate"><span class="pre">imod.ipf.read</span></code> now
+reads both single and multiple IPF files into a single
+<code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code>.</p>
+<section id="id80">
+<h3>Removed<a class="headerlink" href="#id80" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">imod.idf.setnodataheader</span></code></p></li>
+</ul>
+</section>
+<section id="id81">
+<h3>Deprecated<a class="headerlink" href="#id81" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Opening IDFs with <code class="docutils literal notranslate"><span class="pre">imod.idf.load</span></code>, use <code class="docutils literal notranslate"><span class="pre">imod.idf.open</span></code> instead</p></li>
+<li><p>Opening a set of IDFs with <code class="docutils literal notranslate"><span class="pre">imod.idf.loadset</span></code>, use
+<code class="docutils literal notranslate"><span class="pre">imod.idf.open_dataset</span></code> instead</p></li>
+<li><p>Reading IPFs with <code class="docutils literal notranslate"><span class="pre">imod.ipf.load</span></code>, use <code class="docutils literal notranslate"><span class="pre">imod.ipf.read</span></code></p></li>
+<li><p>Reading IDF data into a dask array with <code class="docutils literal notranslate"><span class="pre">imod.idf.dask</span></code>, use
+<code class="docutils literal notranslate"><span class="pre">imod.idf._dask</span></code> instead</p></li>
+<li><p>Reading an iMOD-seawat .tec file, use <code class="docutils literal notranslate"><span class="pre">imod.tec.read</span></code> instead.</p></li>
+</ul>
+</section>
+<section id="id82">
+<h3>Changed<a class="headerlink" href="#id82" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">np.datetime64</span></code> when dates are within time bounds, use
+<code class="docutils literal notranslate"><span class="pre">cftime.DatetimeProlepticGregorian</span></code> when they are not (matches
+<code class="docutils literal notranslate"><span class="pre">xarray</span></code> defaults)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">assert</span></code> is no longer used to catch faulty input arguments,
+appropriate exceptions are raised instead</p></li>
+</ul>
+</section>
+<section id="id83">
+<h3>Fixed<a class="headerlink" href="#id83" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">idf.open</span></code>: sorts both paths and headers consistently so data does
+not end up mixed up in the DataArray</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">idf.open</span></code>: Return an <code class="docutils literal notranslate"><span class="pre">xarray.CFTimeIndex</span></code> rather than an array
+of <code class="docutils literal notranslate"><span class="pre">cftime.DatimeProlepticGregorian</span></code> objects</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">idf.save</span></code> properly forwards <code class="docutils literal notranslate"><span class="pre">nodata</span></code> argument to <code class="docutils literal notranslate"><span class="pre">write</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">idf.write</span></code> coerces coordinates to floats before writing</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ipf.read</span></code>: Significant performance increase for reading IPF
+timeseries by specifying the datetime format</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ipf.write</span></code> no longer writes <code class="docutils literal notranslate"><span class="pre">,,</span></code> for missing data (which iMOD
+does not accept)</p></li>
+</ul>
+</section>
+</section>
+<section id="id84">
+<h2>[0.5.0] - 2019-02-26<a class="headerlink" href="#id84" title="Permalink to this heading">#</a></h2>
+<section id="id85">
+<h3>Removed<a class="headerlink" href="#id85" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Reading IDFs with the <code class="docutils literal notranslate"><span class="pre">chunks</span></code> option</p></li>
+</ul>
+</section>
+<section id="id86">
+<h3>Deprecated<a class="headerlink" href="#id86" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Reading IDFs with the <code class="docutils literal notranslate"><span class="pre">memmap</span></code> option</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">imod.idf.dataarray</span></code>, use <code class="docutils literal notranslate"><span class="pre">imod.idf.load</span></code> instead</p></li>
+</ul>
+</section>
+<section id="id87">
+<h3>Changed<a class="headerlink" href="#id87" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Reading IDFs gives delayed objects, which are only read on demand by
+dask</p></li>
+<li><p>IDF: instead of <code class="docutils literal notranslate"><span class="pre">res</span></code> and <code class="docutils literal notranslate"><span class="pre">transform</span></code> attributes, use <code class="docutils literal notranslate"><span class="pre">dx</span></code> and
+<code class="docutils literal notranslate"><span class="pre">dy</span></code> coordinates (0D or 1D)</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">cftime.DatetimeProlepticGregorian</span></code> to support time instead of
+<code class="docutils literal notranslate"><span class="pre">np.datetime64</span></code>, allowing longer timespans</p></li>
+<li><p>Repository moved from <code class="docutils literal notranslate"><span class="pre">https://gitlab.com/deltares/</span></code> to
+<code class="docutils literal notranslate"><span class="pre">https://gitlab.com/deltares/imod/</span></code></p></li>
+</ul>
+</section>
+<section id="id88">
+<h3>Added<a class="headerlink" href="#id88" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Notebook in <code class="docutils literal notranslate"><span class="pre">examples</span></code> folder for synthetic model example</p></li>
+<li><p>Support for nonequidistant IDF files, by adding <code class="docutils literal notranslate"><span class="pre">dx</span></code> and <code class="docutils literal notranslate"><span class="pre">dy</span></code>
+coordinates</p></li>
+</ul>
+</section>
+<section id="id89">
+<h3>Fixed<a class="headerlink" href="#id89" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>IPF support implicit <code class="docutils literal notranslate"><span class="pre">itype</span></code></p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="generated/metamod/imod.couplers.metamod.WellSvatMapping.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">imod.couplers.metamod.WellSvatMapping</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../faq/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">FAQ</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#unreleased">[Unreleased]</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">[0.15.0] - 2023-11-25</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed">Fixed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#changed">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#added">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#removed">Removed</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">[0.14.1] - 2023-09-07</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">Fixed</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id19">[0.14.0] - 2023-09-06</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id20">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id21">Added</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id22">[0.13.2] - 2023-07-26</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id23">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id24">Fixed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id25">Added</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id26">[0.13.1] - 2023-05-05</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id27">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id28">Fixed</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id29">[0.13.0] - 2023-05-02</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id30">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id31">Fixed</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id32">[0.12.0] - 2023-03-17</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id33">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id34">Fixed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id35">Changed</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id36">[0.11.6] - 2023-02-01</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id37">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id38">Fixed</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id39">[0.11.5] - 2022-12-15</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id40">Fixed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id41">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id42">Added</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id43">[0.11.4] - 2022-09-05</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id44">Fixed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id45">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id46">Added</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id47">[0.11.1] - 2021-12-23</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id48">Fixed</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id49">[0.11.0] - 2021-12-21</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id50">Fixed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id51">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id52">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id53">Removed</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id54">[0.10.1] - 2020-10-19</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id55">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id56">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id57">Fixed</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id58">[0.10.0] - 2020-05-23</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id59">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id60">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id61">Fixed</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id62">[0.9.0] - 2020-01-19</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id63">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id64">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id65">Fixed</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id66">[0.8.0] - 2019-10-14</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id67">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id68">Changed</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id69">[0.7.1] - 2019-08-07</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id70">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id71">Fixed</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id72">[0.7.0] - 2019-07-23</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id73">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id74">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id75">Removed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#deprecated">Deprecated</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id76">[0.6.1] - 2019-04-17</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id77">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id78">Fixed</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id79">[0.6.0] - 2019-03-15</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id80">Removed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id81">Deprecated</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id82">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id83">Fixed</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id84">[0.5.0] - 2019-02-26</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id85">Removed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id86">Deprecated</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id87">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id88">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id89">Fixed</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/api/changelog.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

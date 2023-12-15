@@ -1,0 +1,27 @@
+﻿imod.flow.StorageCoefficient
+============================
+
+.. currentmodule:: imod.flow
+
+.. autoclass:: StorageCoefficient
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~StorageCoefficient.__init__
+      ~StorageCoefficient.compose
+      ~StorageCoefficient.from_file
+      ~StorageCoefficient.isel
+      ~StorageCoefficient.save
+      ~StorageCoefficient.sel
+   
+   
+
+   
+   
+   

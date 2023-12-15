@@ -1,0 +1,6 @@
+﻿imod.wq.SeawatModel.create\_time\_discretization
+================================================
+
+.. currentmodule:: imod.wq
+
+.. automethod:: SeawatModel.create_time_discretization

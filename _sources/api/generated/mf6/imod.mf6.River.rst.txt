@@ -1,0 +1,46 @@
+﻿imod.mf6.River
+==============
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: River
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~River.__init__
+      ~River.clip_box
+      ~River.copy
+      ~River.from_file
+      ~River.get_period_varnames
+      ~River.get_regrid_methods
+      ~River.is_grid_agnostic_package
+      ~River.is_regridding_supported
+      ~River.isel
+      ~River.mask
+      ~River.regrid_like
+      ~River.render
+      ~River.sel
+      ~River.skip_masking_dataarray
+      ~River.to_netcdf
+      ~River.write
+      ~River.write_binary_griddata
+      ~River.write_blockfile
+      ~River.write_text_griddata
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~River.dataset
+   
+   

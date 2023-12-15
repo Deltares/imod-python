@@ -1,0 +1,6 @@
+﻿imod.formats.ipf.read\_associated
+=================================
+
+.. currentmodule:: imod.formats.ipf
+
+.. autofunction:: read_associated

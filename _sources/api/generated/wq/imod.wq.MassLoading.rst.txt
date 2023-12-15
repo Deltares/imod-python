@@ -1,0 +1,28 @@
+﻿imod.wq.MassLoading
+===================
+
+.. currentmodule:: imod.wq
+
+.. autoclass:: MassLoading
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MassLoading.__init__
+      ~MassLoading.add_timemap
+      ~MassLoading.from_file
+      ~MassLoading.isel
+      ~MassLoading.repeat_stress
+      ~MassLoading.save
+      ~MassLoading.sel
+   
+   
+
+   
+   
+   

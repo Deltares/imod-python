@@ -1,0 +1,23 @@
+﻿imod.prepare.Regridder
+======================
+
+.. currentmodule:: imod.prepare
+
+.. autoclass:: Regridder
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Regridder.__init__
+      ~Regridder.regrid
+   
+   
+
+   
+   
+   

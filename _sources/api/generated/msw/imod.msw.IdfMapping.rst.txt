@@ -1,0 +1,27 @@
+﻿imod.msw.IdfMapping
+===================
+
+.. currentmodule:: imod.msw
+
+.. autoclass:: IdfMapping
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~IdfMapping.__init__
+      ~IdfMapping.get_output_settings
+      ~IdfMapping.isel
+      ~IdfMapping.sel
+      ~IdfMapping.write
+      ~IdfMapping.write_dataframe_fixed_width
+   
+   
+
+   
+   
+   

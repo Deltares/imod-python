@@ -1,0 +1,6 @@
+﻿imod.formats.gen.write
+======================
+
+.. currentmodule:: imod.formats.gen
+
+.. autofunction:: write

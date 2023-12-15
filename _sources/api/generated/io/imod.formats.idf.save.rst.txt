@@ -1,0 +1,6 @@
+﻿imod.formats.idf.save
+=====================
+
+.. currentmodule:: imod.formats.idf
+
+.. autofunction:: save

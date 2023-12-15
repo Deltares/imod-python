@@ -1,0 +1,28 @@
+﻿imod.wq.EvapotranspirationTopLayer
+==================================
+
+.. currentmodule:: imod.wq
+
+.. autoclass:: EvapotranspirationTopLayer
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~EvapotranspirationTopLayer.__init__
+      ~EvapotranspirationTopLayer.add_timemap
+      ~EvapotranspirationTopLayer.from_file
+      ~EvapotranspirationTopLayer.isel
+      ~EvapotranspirationTopLayer.repeat_stress
+      ~EvapotranspirationTopLayer.save
+      ~EvapotranspirationTopLayer.sel
+   
+   
+
+   
+   
+   

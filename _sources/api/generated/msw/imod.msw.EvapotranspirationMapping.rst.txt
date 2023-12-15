@@ -1,0 +1,27 @@
+﻿imod.msw.EvapotranspirationMapping
+==================================
+
+.. currentmodule:: imod.msw
+
+.. autoclass:: EvapotranspirationMapping
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~EvapotranspirationMapping.__init__
+      ~EvapotranspirationMapping.grid_mapping
+      ~EvapotranspirationMapping.isel
+      ~EvapotranspirationMapping.sel
+      ~EvapotranspirationMapping.write
+      ~EvapotranspirationMapping.write_dataframe_fixed_width
+   
+   
+
+   
+   
+   

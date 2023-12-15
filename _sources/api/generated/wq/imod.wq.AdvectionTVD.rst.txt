@@ -1,0 +1,26 @@
+﻿imod.wq.AdvectionTVD
+====================
+
+.. currentmodule:: imod.wq
+
+.. autoclass:: AdvectionTVD
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~AdvectionTVD.__init__
+      ~AdvectionTVD.from_file
+      ~AdvectionTVD.isel
+      ~AdvectionTVD.save
+      ~AdvectionTVD.sel
+   
+   
+
+   
+   
+   

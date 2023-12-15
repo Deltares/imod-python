@@ -1,0 +1,6 @@
+﻿imod.evaluate.streamfunction\_linestring
+========================================
+
+.. currentmodule:: imod.evaluate
+
+.. autofunction:: streamfunction_linestring

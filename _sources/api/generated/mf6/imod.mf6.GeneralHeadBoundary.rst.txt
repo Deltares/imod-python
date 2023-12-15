@@ -1,0 +1,46 @@
+﻿imod.mf6.GeneralHeadBoundary
+============================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: GeneralHeadBoundary
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~GeneralHeadBoundary.__init__
+      ~GeneralHeadBoundary.clip_box
+      ~GeneralHeadBoundary.copy
+      ~GeneralHeadBoundary.from_file
+      ~GeneralHeadBoundary.get_period_varnames
+      ~GeneralHeadBoundary.get_regrid_methods
+      ~GeneralHeadBoundary.is_grid_agnostic_package
+      ~GeneralHeadBoundary.is_regridding_supported
+      ~GeneralHeadBoundary.isel
+      ~GeneralHeadBoundary.mask
+      ~GeneralHeadBoundary.regrid_like
+      ~GeneralHeadBoundary.render
+      ~GeneralHeadBoundary.sel
+      ~GeneralHeadBoundary.skip_masking_dataarray
+      ~GeneralHeadBoundary.to_netcdf
+      ~GeneralHeadBoundary.write
+      ~GeneralHeadBoundary.write_binary_griddata
+      ~GeneralHeadBoundary.write_blockfile
+      ~GeneralHeadBoundary.write_text_griddata
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~GeneralHeadBoundary.dataset
+   
+   

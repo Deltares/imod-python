@@ -1,0 +1,48 @@
+﻿imod.mf6.HorizontalFlowBarrierMultiplier
+========================================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: HorizontalFlowBarrierMultiplier
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~HorizontalFlowBarrierMultiplier.__init__
+      ~HorizontalFlowBarrierMultiplier.clip_box
+      ~HorizontalFlowBarrierMultiplier.copy
+      ~HorizontalFlowBarrierMultiplier.from_file
+      ~HorizontalFlowBarrierMultiplier.get_period_varnames
+      ~HorizontalFlowBarrierMultiplier.get_regrid_methods
+      ~HorizontalFlowBarrierMultiplier.is_grid_agnostic_package
+      ~HorizontalFlowBarrierMultiplier.is_regridding_supported
+      ~HorizontalFlowBarrierMultiplier.isel
+      ~HorizontalFlowBarrierMultiplier.mask
+      ~HorizontalFlowBarrierMultiplier.regrid_like
+      ~HorizontalFlowBarrierMultiplier.render
+      ~HorizontalFlowBarrierMultiplier.sel
+      ~HorizontalFlowBarrierMultiplier.skip_masking_dataarray
+      ~HorizontalFlowBarrierMultiplier.to_mf6_pkg
+      ~HorizontalFlowBarrierMultiplier.to_netcdf
+      ~HorizontalFlowBarrierMultiplier.write
+      ~HorizontalFlowBarrierMultiplier.write_binary_griddata
+      ~HorizontalFlowBarrierMultiplier.write_blockfile
+      ~HorizontalFlowBarrierMultiplier.write_text_griddata
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~HorizontalFlowBarrierMultiplier.dataset
+      ~HorizontalFlowBarrierMultiplier.geometry
+   
+   

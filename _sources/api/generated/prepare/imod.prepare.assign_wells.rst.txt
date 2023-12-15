@@ -1,0 +1,6 @@
+﻿imod.prepare.assign\_wells
+==========================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: assign_wells

@@ -1,0 +1,45 @@
+﻿imod.mf6.AdvectionCentral
+=========================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: AdvectionCentral
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~AdvectionCentral.__init__
+      ~AdvectionCentral.clip_box
+      ~AdvectionCentral.copy
+      ~AdvectionCentral.from_file
+      ~AdvectionCentral.get_regrid_methods
+      ~AdvectionCentral.is_grid_agnostic_package
+      ~AdvectionCentral.is_regridding_supported
+      ~AdvectionCentral.isel
+      ~AdvectionCentral.mask
+      ~AdvectionCentral.regrid_like
+      ~AdvectionCentral.render
+      ~AdvectionCentral.sel
+      ~AdvectionCentral.skip_masking_dataarray
+      ~AdvectionCentral.to_netcdf
+      ~AdvectionCentral.write
+      ~AdvectionCentral.write_binary_griddata
+      ~AdvectionCentral.write_blockfile
+      ~AdvectionCentral.write_text_griddata
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~AdvectionCentral.dataset
+   
+   

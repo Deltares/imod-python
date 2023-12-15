@@ -1,0 +1,669 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imod.wq.vdf &#8212; iMOD Python 0.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/wq/vdf';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">imod.wq.vdf</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for imod.wq.vdf</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">imod.wq.pkgbase</span> <span class="kn">import</span> <span class="n">Package</span>
+
+
+<div class="viewcode-block" id="VariableDensityFlow"><a class="viewcode-back" href="../../../api/generated/wq/imod.wq.VariableDensityFlow.html#imod.wq.VariableDensityFlow">[docs]</a><span class="k">class</span> <span class="nc">VariableDensityFlow</span><span class="p">(</span><span class="n">Package</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Variable Density Flow package.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    density_species: int</span>
+<span class="sd">        is the MT3DMS species number that will be used in the equation of state</span>
+<span class="sd">        to compute fluid density (mtdnconc).</span>
+<span class="sd">        If density_species = 0, fluid density is specified using items 6 and 7,</span>
+<span class="sd">        and flow will be uncoupled with transport if the IMT Process is active.</span>
+<span class="sd">        If density_species &gt; 0, fluid density is calculated using the MT3DMS</span>
+<span class="sd">        species number that corresponds with density_species. A value for</span>
+<span class="sd">        density_species greater than zero indicates that flow will be coupled</span>
+<span class="sd">        with transport.</span>
+<span class="sd">        If density_species = -1, fluid density is calculated using one or more</span>
+<span class="sd">        MT3DMS species. Items 4a, 4b, and 4c will be read instead of item 4.</span>
+<span class="sd">    density_min: float</span>
+<span class="sd">        is the minimum fluid density (DENSEMIN). If the resulting density value</span>
+<span class="sd">        calculated with the equation of state is less than density_min, the</span>
+<span class="sd">        density value is set to density_min.</span>
+<span class="sd">        If density_min = 0, the computed fluid density is not limited by</span>
+<span class="sd">        density_min (this is the option to use for most simulations).</span>
+<span class="sd">        If density_min &gt; 0, a computed fluid density less than density_min is</span>
+<span class="sd">        automatically reset to density_min.</span>
+<span class="sd">    density_max: float</span>
+<span class="sd">        is the maximum fluid density (DENSEMAX). If the resulting density value</span>
+<span class="sd">        calculated with the equation of state is greater than density_max, the</span>
+<span class="sd">        density value is set to density_max.</span>
+<span class="sd">        If density_max = 0, the computed fluid density is not limited by</span>
+<span class="sd">        density_max (this is the option to use for most simulations).</span>
+<span class="sd">        If density_max &gt; 0, a computed fluid density larger than density_max is</span>
+<span class="sd">        automatically reset to density_max.</span>
+<span class="sd">    density_ref: float</span>
+<span class="sd">        is the fluid density at the reference concentration, temperature, and</span>
+<span class="sd">        pressure (DENSEREF). For most simulations, density_ref is specified as</span>
+<span class="sd">        the density of freshwater at 25 °C and at a reference pressure of zero.</span>
+<span class="sd">        Value of 1000 is often used.</span>
+<span class="sd">    density_concentration_slope: float</span>
+<span class="sd">        is the slope d(rho)/d(C) of the linear equation of state that relates</span>
+<span class="sd">        fluid density to solute concentration (denseslp). Value of 0.7143 is</span>
+<span class="sd">        often used.</span>
+<span class="sd">    density_criterion: float</span>
+<span class="sd">        is the convergence parameter for the coupling between flow and transport</span>
+<span class="sd">        and has units of fluid density (DNSCRIT). If the maximum density</span>
+<span class="sd">        difference between two consecutive coupling iterations is not less than</span>
+<span class="sd">        density_criterion, the program will continue to iterate on the flow and</span>
+<span class="sd">        transport equations or will terminate if &#39;coupling&#39; is exceeded.</span>
+<span class="sd">    coupling: int</span>
+<span class="sd">        is a flag used to determine the flow and transport coupling procedure</span>
+<span class="sd">        (nswtcpl).</span>
+<span class="sd">        If coupling = 0 or 1, flow and transport will be explicitly coupled</span>
+<span class="sd">        using a one-timestep lag. The explicit coupling option is normally much</span>
+<span class="sd">        faster than the iterative option and is recommended for most</span>
+<span class="sd">        applications.</span>
+<span class="sd">        If coupling &gt; 1, coupling is the maximum number of non-linear coupling</span>
+<span class="sd">        iterations for the flow and transport solutions. SEAWAT-2000 will stop</span>
+<span class="sd">        execution after coupling iterations if convergence between flow and</span>
+<span class="sd">        transport has not occurred.</span>
+<span class="sd">        If coupling = -1, the flow solution will be recalculated only for: The</span>
+<span class="sd">        first transport step of the simulation, or The last transport step of</span>
+<span class="sd">        the MODFLOW timestep, or The maximum density change at a cell is greater</span>
+<span class="sd">        than density_criterion.</span>
+<span class="sd">    correct_water_table: bool</span>
+<span class="sd">        is a flag used to activate the variable-density water-table corrections</span>
+<span class="sd">        (IWTABLE).</span>
+<span class="sd">        If correct_water_table = False, the water-table correction will not be</span>
+<span class="sd">        applied.</span>
+<span class="sd">        If correct_water_table = True, the water-table correction will be</span>
+<span class="sd">        applied.</span>
+<span class="sd">    internodal: str, {&quot;upstream&quot;, &quot;central&quot;}</span>
+<span class="sd">        is a flag that determines the method for calculating the internodal</span>
+<span class="sd">        density values used to conserve fluid mass (MFNADVFD).</span>
+<span class="sd">        If internodal = &quot;central&quot;, internodal conductance values used to</span>
+<span class="sd">        conserve fluid mass are calculated using a central-in-space algorithm.</span>
+<span class="sd">        If internodal = &quot;upstream&quot;, internodal conductance values used to</span>
+<span class="sd">        conserve fluid mass are calculated using an upstream-weighted algorithm.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">&quot;vdf&quot;</span>
+
+    <span class="n">_template</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;[vdf]</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    mtdnconc = </span><span class="si">{density_species}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    densemin = </span><span class="si">{density_min}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    densemax = </span><span class="si">{density_max}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    denseref = </span><span class="si">{density_ref}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    denseslp = </span><span class="si">{density_concentration_slope}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    dnscrit = </span><span class="si">{density_criterion}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    nswtcpl = </span><span class="si">{coupling}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    iwtable = </span><span class="si">{correct_water_table}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    mfnadvfd = </span><span class="si">{internodal}</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">_keywords</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;internodal&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;central&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;upstream&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="s2">&quot;correct_water_table&quot;</span><span class="p">:</span> <span class="p">{</span><span class="kc">False</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">True</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+    <span class="p">}</span>
+
+<div class="viewcode-block" id="VariableDensityFlow.__init__"><a class="viewcode-back" href="../../../api/generated/wq/imod.wq.VariableDensityFlow.html#imod.wq.VariableDensityFlow.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">density_concentration_slope</span><span class="p">,</span>
+        <span class="n">density_species</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">density_min</span><span class="o">=</span><span class="mf">1000.0</span><span class="p">,</span>
+        <span class="n">density_max</span><span class="o">=</span><span class="mf">1025.0</span><span class="p">,</span>
+        <span class="n">density_ref</span><span class="o">=</span><span class="mf">1000.0</span><span class="p">,</span>
+        <span class="n">density_criterion</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+        <span class="n">read_density</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">internodal</span><span class="o">=</span><span class="s2">&quot;central&quot;</span><span class="p">,</span>
+        <span class="n">coupling</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">correct_water_table</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;density_species&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">density_species</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;density_min&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">density_min</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;density_max&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">density_max</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;density_ref&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">density_ref</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;density_concentration_slope&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">density_concentration_slope</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;density_criterion&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">density_criterion</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;read_density&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">read_density</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;internodal&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">internodal</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;coupling&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">coupling</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;correct_water_table&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">correct_water_table</span></div>
+
+    <span class="k">def</span> <span class="nf">_pkgcheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ibound</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">to_check</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;density_species&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;density_min&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;density_max&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;density_ref&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;density_concentration_slope&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;density_criterion&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_positive</span><span class="p">(</span><span class="n">to_check</span><span class="p">)</span></div>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

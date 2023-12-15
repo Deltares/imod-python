@@ -1,0 +1,6 @@
+﻿imod.visualize.cross\_section
+=============================
+
+.. currentmodule:: imod.visualize
+
+.. autofunction:: cross_section

@@ -1,0 +1,43 @@
+﻿imod.wq.SeawatModel
+===================
+
+.. currentmodule:: imod.wq
+
+.. autoclass:: SeawatModel
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SeawatModel.__init__
+      ~SeawatModel.clear
+      ~SeawatModel.clip
+      ~SeawatModel.copy
+      ~SeawatModel.create_time_discretization
+      ~SeawatModel.fromkeys
+      ~SeawatModel.get
+      ~SeawatModel.isel
+      ~SeawatModel.items
+      ~SeawatModel.keys
+      ~SeawatModel.package_check
+      ~SeawatModel.pop
+      ~SeawatModel.popitem
+      ~SeawatModel.render
+      ~SeawatModel.sel
+      ~SeawatModel.setdefault
+      ~SeawatModel.time_discretization
+      ~SeawatModel.to_netcdf
+      ~SeawatModel.update
+      ~SeawatModel.values
+      ~SeawatModel.visualize
+      ~SeawatModel.write
+   
+   
+
+   
+   
+   

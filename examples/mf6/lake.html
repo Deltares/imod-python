@@ -1,0 +1,896 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Lake package example &#8212; iMOD Python 0.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/mf6/lake';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="TWRI regridding" href="twri_regridding.html" />
+    <link rel="prev" title="Regridding a regional model" href="hondsrug_regridding.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">MODFLOW6</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Henry.html">Henry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="circle.html">Circle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="circle_transport.html">Freshwater lens (circle)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ex01_twri.html">TWRI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_1d_transport.html">1D Solute Transport Benchmarks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_models.html">Example models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hondsrug.html">Regional model</a></li>
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="hondsrug_partitioning.html">Partitioning a regional model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hondsrug_regridding.html">Regridding a regional model</a></li>
+
+
+
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Lake package example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="twri_regridding.html">TWRI regridding</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../imodflow/index.html">iMODFLOW</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../imodflow/ImodflowProjectfile.html">Model Creation</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../imod-wq/index.html">iMOD-WQ</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../imod-wq/Elder.html">Elder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../imod-wq/FreshwaterLens.html">Freshwater Lens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../imod-wq/Henry.html">Henry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../imod-wq/Hydrocoin.html">Hydrocoin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../imod-wq/SaltwaterPocket.html">Saltwater Pocket</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../imod-wq/VerticalInterface.html">Vertical Interface</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../metaswap/index.html">MetaSWAP</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../metaswap/metaswap_example.html">Coupled MetaSWAP - Modflow6 model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../metaswap/read_metaswap_file.html">Reading existing MetaSWAP input</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../prepare/index.html">Prepare</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/point_interpolation.html">Head point interpolation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/polygonize_raster.html">Polygonize raster</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/rasterize_shp.html">Rasterize shapefiles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/reproject.html">Reproject data</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../visualize/index.html">Visualization</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../visualize/flowvel_streamlines.html">Flow velocities and streamlines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../visualize/plot_map.html">Plot maps</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Examples</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">MODFLOW6</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Lake package example</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-examples-mf6-lake-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="lake-package-example">
+<span id="sphx-glr-examples-mf6-lake-py"></span><h1>Lake package example<a class="headerlink" href="#lake-package-example" title="Permalink to this heading">#</a></h1>
+<p>This is a synthetic example (using invented, not necesarily physical data) of how to use the
+lake package api to generate models with lakes.</p>
+<p>In overview, we’ll set the following steps:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Create a structured grid for a rectangular geometry.</p></li>
+<li><p>Create a constant head boundary</p></li>
+<li><p>Create packages for  initial conditions, output control, storage, and node property flow</p></li>
+<li><p>Create a lake package with a time-dependent rainfall</p></li>
+<li><p>Write to modflow6 files.</p></li>
+<li><p>Run the model.</p></li>
+<li><p>Open the results back into DataArrays.</p></li>
+<li><p>Visualize the results.</p></li>
+</ul>
+</div></blockquote>
+<p>We’ll start with the usual imports. As this is an simple (synthetic)
+structured model, we can make due with few packages.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+<span class="kn">import</span> <span class="nn">imod</span>
+<span class="kn">import</span> <span class="nn">imod.mf6.lak</span> <span class="k">as</span> <span class="nn">lak</span>
+
+<span class="n">nlay</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">nrow</span> <span class="o">=</span> <span class="mi">15</span>
+<span class="n">ncol</span> <span class="o">=</span> <span class="mi">15</span>
+<span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">nlay</span><span class="p">,</span> <span class="n">nrow</span><span class="p">,</span> <span class="n">ncol</span><span class="p">)</span>
+
+<span class="n">dx</span> <span class="o">=</span> <span class="mf">5000.0</span>
+<span class="n">dy</span> <span class="o">=</span> <span class="o">-</span><span class="mf">5000.0</span>
+<span class="n">xmin</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">xmax</span> <span class="o">=</span> <span class="n">dx</span> <span class="o">*</span> <span class="n">ncol</span>
+<span class="n">ymin</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">ymax</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dy</span><span class="p">)</span> <span class="o">*</span> <span class="n">nrow</span>
+<span class="n">dims</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
+
+<span class="n">layer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ymax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">dy</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">dx</span>
+<span class="n">coords</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">layer</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">}</span>
+
+<span class="n">idomain</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">dims</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">lake_layer</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">lake_x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span>
+<span class="n">lake_y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span>
+<span class="n">is_lake</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">idomain</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+<span class="n">is_lake</span><span class="o">.</span><span class="n">loc</span><span class="p">[{</span><span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">lake_layer</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">lake_x</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">lake_y</span><span class="p">}]</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">is_lake</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">imshow</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_lake_001.png" srcset="../../_images/sphx_glr_lake_001.png" alt="layer = 1" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x0000014B27A47040&gt;
+</pre></div>
+</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">VERTICAL</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">connectionType</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">is_lake</span><span class="p">,</span> <span class="n">VERTICAL</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+<span class="n">bed_leak</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">is_lake</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+<span class="n">top_elevation</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">is_lake</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+<span class="n">bot_elevation</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">is_lake</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+<span class="n">connection_length</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">is_lake</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+<span class="n">connection_width</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">is_lake</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+
+<span class="n">times_rainfall</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="s2">&quot;2000-01-01&quot;</span><span class="p">),</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="s2">&quot;2000-03-01&quot;</span><span class="p">),</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="s2">&quot;2000-05-01&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="n">rainfall</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">times_rainfall</span><span class="p">)),</span> <span class="mf">0.001</span><span class="p">),</span>
+    <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">times_rainfall</span><span class="p">},</span>
+    <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+
+
+<span class="n">lake</span> <span class="o">=</span> <span class="n">lak</span><span class="o">.</span><span class="n">LakeData</span><span class="p">(</span>
+    <span class="mf">10.0</span><span class="p">,</span>
+    <span class="s2">&quot;Nieuwkoopse_plas&quot;</span><span class="p">,</span>
+    <span class="n">connectionType</span><span class="p">,</span>
+    <span class="n">bed_leak</span><span class="p">,</span>
+    <span class="n">top_elevation</span><span class="p">,</span>
+    <span class="n">bot_elevation</span><span class="p">,</span>
+    <span class="n">connection_length</span><span class="p">,</span>
+    <span class="n">connection_width</span><span class="p">,</span>
+    <span class="kc">None</span><span class="p">,</span>
+    <span class="kc">None</span><span class="p">,</span>
+    <span class="n">rainfall</span><span class="p">,</span>
+    <span class="kc">None</span><span class="p">,</span>
+    <span class="kc">None</span><span class="p">,</span>
+    <span class="kc">None</span><span class="p">,</span>
+    <span class="kc">None</span><span class="p">,</span>
+    <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<section id="create-grid-coordinates">
+<h2>Create grid coordinates<a class="headerlink" href="#create-grid-coordinates" title="Permalink to this heading">#</a></h2>
+<p>The first steps consist of setting up the grid – first the number of layer,
+rows, and columns. Cell sizes are constant throughout the model.</p>
+<p>We’ll create a new directory in which we will write and run the model.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">modeldir</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">temporary_directory</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="create-dataarrays">
+<h2>Create DataArrays<a class="headerlink" href="#create-dataarrays" title="Permalink to this heading">#</a></h2>
+<p>Now that we have the grid coordinates setup, we can start defining model
+parameters. The model is characterized by:</p>
+<ul class="simple">
+<li><p>a constant head boundary on the left</p></li>
+<li><p>a single drain in the center left of the model</p></li>
+<li><p>uniform recharge on the top layer</p></li>
+</ul>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">bottom</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">([</span><span class="o">-</span><span class="mf">200.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">300.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">450.0</span><span class="p">],</span> <span class="p">{</span><span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">layer</span><span class="p">},</span> <span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,))</span>
+
+<span class="c1"># Constant head</span>
+<span class="n">constant_head</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">idomain</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="n">constant_head</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+<span class="c1"># Node properties</span>
+<span class="n">icelltype</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">{</span><span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">layer</span><span class="p">},</span> <span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,))</span>
+<span class="n">k</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">([</span><span class="mf">1.0e-3</span><span class="p">,</span> <span class="mf">1.0e-4</span><span class="p">,</span> <span class="mf">2.0e-4</span><span class="p">],</span> <span class="p">{</span><span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">layer</span><span class="p">},</span> <span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,))</span>
+<span class="n">k33</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">([</span><span class="mf">2.0e-8</span><span class="p">,</span> <span class="mf">2.0e-8</span><span class="p">,</span> <span class="mf">2.0e-8</span><span class="p">],</span> <span class="p">{</span><span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">layer</span><span class="p">},</span> <span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,))</span>
+
+<span class="n">gwf_model</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">GroundwaterFlowModel</span><span class="p">()</span>
+<span class="n">gwf_model</span><span class="p">[</span><span class="s2">&quot;dis&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">StructuredDiscretization</span><span class="p">(</span>
+    <span class="n">top</span><span class="o">=</span><span class="mf">200.0</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="n">bottom</span><span class="p">,</span> <span class="n">idomain</span><span class="o">=</span><span class="n">idomain</span>
+<span class="p">)</span>
+<span class="n">gwf_model</span><span class="p">[</span><span class="s2">&quot;chd&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">ConstantHead</span><span class="p">(</span>
+    <span class="n">constant_head</span><span class="p">,</span> <span class="n">print_input</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_flows</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_flows</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="n">gwf_model</span><span class="p">[</span><span class="s2">&quot;ic&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">InitialConditions</span><span class="p">(</span><span class="n">head</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="n">gwf_model</span><span class="p">[</span><span class="s2">&quot;npf&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">NodePropertyFlow</span><span class="p">(</span>
+    <span class="n">icelltype</span><span class="o">=</span><span class="n">icelltype</span><span class="p">,</span>
+    <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span>
+    <span class="n">k33</span><span class="o">=</span><span class="n">k33</span><span class="p">,</span>
+    <span class="n">variable_vertical_conductance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">dewatered</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">perched</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">save_flows</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">gwf_model</span><span class="p">[</span><span class="s2">&quot;sto&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">SpecificStorage</span><span class="p">(</span>
+    <span class="n">specific_storage</span><span class="o">=</span><span class="mf">1.0e-5</span><span class="p">,</span>
+    <span class="n">specific_yield</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span>
+    <span class="n">transient</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">convertible</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">gwf_model</span><span class="p">[</span><span class="s2">&quot;oc&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">OutputControl</span><span class="p">(</span><span class="n">save_head</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">save_budget</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+
+<span class="c1"># Attach it to a simulation</span>
+<span class="n">simulation</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Modflow6Simulation</span><span class="p">(</span><span class="s2">&quot;ex01-twri&quot;</span><span class="p">)</span>
+<span class="n">simulation</span><span class="p">[</span><span class="s2">&quot;GWF_1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gwf_model</span>
+<span class="c1"># Define solver settings</span>
+<span class="n">simulation</span><span class="p">[</span><span class="s2">&quot;solver&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Solution</span><span class="p">(</span>
+    <span class="n">modelnames</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GWF_1&quot;</span><span class="p">],</span>
+    <span class="n">print_option</span><span class="o">=</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span>
+    <span class="n">csv_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">no_ptc</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">outer_dvclose</span><span class="o">=</span><span class="mf">1.0e-4</span><span class="p">,</span>
+    <span class="n">outer_maximum</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+    <span class="n">under_relaxation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">inner_dvclose</span><span class="o">=</span><span class="mf">1.0e-4</span><span class="p">,</span>
+    <span class="n">inner_rclose</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+    <span class="n">inner_maximum</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">linear_acceleration</span><span class="o">=</span><span class="s2">&quot;cg&quot;</span><span class="p">,</span>
+    <span class="n">scaling_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">reordering_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">relaxation_factor</span><span class="o">=</span><span class="mf">0.97</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">gwf_model</span><span class="p">[</span><span class="s2">&quot;lake&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lak</span><span class="o">.</span><span class="n">Lake</span><span class="o">.</span><span class="n">from_lakes_and_outlets</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">lake</span><span class="p">],</span>
+    <span class="n">print_input</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">print_stage</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">print_flows</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">save_flows</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">stagefile</span><span class="o">=</span><span class="n">modeldir</span> <span class="o">/</span> <span class="s2">&quot;GWF_1/stagefile.lak&quot;</span><span class="p">,</span>
+    <span class="n">budgetcsvfile</span><span class="o">=</span><span class="n">modeldir</span> <span class="o">/</span> <span class="s2">&quot;GWF_1/budgetcsvfile.lak&quot;</span><span class="p">,</span>
+    <span class="n">package_convergence_filename</span><span class="o">=</span><span class="n">modeldir</span> <span class="o">/</span> <span class="s2">&quot;GWF_1/convergence.lak&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Collect time discretization</span>
+<span class="n">simulation</span><span class="o">.</span><span class="n">create_time_discretization</span><span class="p">(</span>
+    <span class="n">additional_times</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;2000-01-01&quot;</span><span class="p">,</span> <span class="s2">&quot;2000-01-02&quot;</span><span class="p">,</span> <span class="s2">&quot;2000-01-03&quot;</span><span class="p">,</span> <span class="s2">&quot;2013-06-04&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+
+
+<span class="n">simulation</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">modeldir</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="run-the-model">
+<h2>Run the model<a class="headerlink" href="#run-the-model" title="Permalink to this heading">#</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The following lines assume the <code class="docutils literal notranslate"><span class="pre">mf6</span></code> executable is available on your PATH.
+<a class="reference internal" href="index.html#mf6-introduction"><span class="std std-ref">The Modflow 6 examples introduction</span></a> shortly
+describes how to add it to yours.</p>
+</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">simulation</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="open-the-results">
+<h2>Open the results<a class="headerlink" href="#open-the-results" title="Permalink to this heading">#</a></h2>
+<p>We’ll open the heads (.hds) file.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">head</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">open_hds</span><span class="p">(</span>
+    <span class="n">modeldir</span> <span class="o">/</span> <span class="s2">&quot;GWF_1/GWF_1.hds&quot;</span><span class="p">,</span>
+    <span class="n">modeldir</span> <span class="o">/</span> <span class="s2">&quot;GWF_1/dis.dis.grb&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="visualize-the-results">
+<h2>Visualize the results<a class="headerlink" href="#visualize-the-results" title="Permalink to this heading">#</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">head</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contourf</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_lake_002.png" srcset="../../_images/sphx_glr_lake_002.png" alt="dx = 5e+03, dy = -5e+03, layer = 1, time = 4.90..." class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x0000014B2EE995D0&gt;
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.122 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-lake-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/3e561bea3b8b74fe958e91a442daed49/lake.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">lake.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/e5c921f8c85dd71a72437c3f00a89bc3/lake.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">lake.py</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="hondsrug_regridding.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Regridding a regional model</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="twri_regridding.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">TWRI regridding</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#create-grid-coordinates">Create grid coordinates</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#create-dataarrays">Create DataArrays</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-model">Run the model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#open-the-results">Open the results</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualize-the-results">Visualize the results</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/examples/mf6/lake.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

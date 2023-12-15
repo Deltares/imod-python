@@ -1,0 +1,6 @@
+﻿imod.formats.idf.open\_dataset
+==============================
+
+.. currentmodule:: imod.formats.idf
+
+.. autofunction:: open_dataset

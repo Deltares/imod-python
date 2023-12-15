@@ -1,0 +1,6 @@
+﻿imod.util.cd
+============
+
+.. currentmodule:: imod.util
+
+.. autofunction:: cd

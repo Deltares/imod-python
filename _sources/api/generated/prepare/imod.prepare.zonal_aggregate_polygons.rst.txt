@@ -1,0 +1,6 @@
+﻿imod.prepare.zonal\_aggregate\_polygons
+=======================================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: zonal_aggregate_polygons

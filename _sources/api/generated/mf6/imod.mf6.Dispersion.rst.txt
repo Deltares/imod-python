@@ -1,0 +1,45 @@
+﻿imod.mf6.Dispersion
+===================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: Dispersion
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Dispersion.__init__
+      ~Dispersion.clip_box
+      ~Dispersion.copy
+      ~Dispersion.from_file
+      ~Dispersion.get_regrid_methods
+      ~Dispersion.is_grid_agnostic_package
+      ~Dispersion.is_regridding_supported
+      ~Dispersion.isel
+      ~Dispersion.mask
+      ~Dispersion.regrid_like
+      ~Dispersion.render
+      ~Dispersion.sel
+      ~Dispersion.skip_masking_dataarray
+      ~Dispersion.to_netcdf
+      ~Dispersion.write
+      ~Dispersion.write_binary_griddata
+      ~Dispersion.write_blockfile
+      ~Dispersion.write_text_griddata
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Dispersion.dataset
+   
+   

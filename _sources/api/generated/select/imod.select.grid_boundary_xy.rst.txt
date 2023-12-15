@@ -1,0 +1,6 @@
+﻿imod.select.grid\_boundary\_xy
+==============================
+
+.. currentmodule:: imod.select
+
+.. autofunction:: grid_boundary_xy

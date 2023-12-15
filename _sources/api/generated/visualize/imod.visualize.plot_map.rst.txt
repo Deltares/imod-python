@@ -1,0 +1,6 @@
+﻿imod.visualize.plot\_map
+========================
+
+.. currentmodule:: imod.visualize
+
+.. autofunction:: plot_map

@@ -1,0 +1,909 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imod.evaluate.budget &#8212; iMOD Python 0.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/evaluate/budget';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">imod.evaluate.budget</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for imod.evaluate.budget</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span> <span class="nn">dask</span>
+<span class="kn">import</span> <span class="nn">dask.array</span>
+<span class="kn">import</span> <span class="nn">numba</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.ndimage</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+<span class="n">DIM_Z</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">DIM_Y</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">DIM_X</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">LOWER</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">UPPER</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">FRONT</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">BACK</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">RIGHT</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">LEFT</span> <span class="o">=</span> <span class="mi">8</span>
+
+
+<span class="k">def</span> <span class="nf">_outer_edge</span><span class="p">(</span><span class="n">da</span><span class="p">):</span>
+    <span class="n">faces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+    <span class="n">unique_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">unique_ids</span> <span class="o">=</span> <span class="n">unique_ids</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">unique_ids</span><span class="p">)]</span>
+    <span class="c1"># Number the faces by their id</span>
+    <span class="k">for</span> <span class="n">unique_id</span> <span class="ow">in</span> <span class="n">unique_ids</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">(</span><span class="n">da</span> <span class="o">==</span> <span class="n">unique_id</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">from_edge</span> <span class="o">=</span> <span class="o">~</span><span class="n">scipy</span><span class="o">.</span><span class="n">ndimage</span><span class="o">.</span><span class="n">binary_dilation</span><span class="p">(</span><span class="o">~</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">is_edge</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">from_edge</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">faces</span><span class="p">[</span><span class="n">is_edge</span><span class="p">]</span> <span class="o">=</span> <span class="n">unique_id</span>
+    <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">faces</span><span class="p">,</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span>
+<span class="k">def</span> <span class="nf">_face_indices</span><span class="p">(</span><span class="n">face</span><span class="p">,</span> <span class="n">budgetzone</span><span class="p">):</span>
+    <span class="n">nface</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">face</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">nface</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">nface</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">indices</span>
+    <span class="c1"># Loop over cells</span>
+    <span class="n">nlay</span><span class="p">,</span> <span class="n">nrow</span><span class="p">,</span> <span class="n">ncol</span> <span class="o">=</span> <span class="n">budgetzone</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nlay</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nrow</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ncol</span><span class="p">):</span>
+                <span class="n">face_value</span> <span class="o">=</span> <span class="n">face</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+                <span class="k">if</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">face_value</span><span class="p">):</span>
+                    <span class="c1"># Store indices</span>
+                    <span class="n">indices</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="n">DIM_Z</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span>
+                    <span class="n">indices</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="n">DIM_Y</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+                    <span class="n">indices</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="n">DIM_X</span><span class="p">]</span> <span class="o">=</span> <span class="n">j</span>
+                    <span class="c1"># Default value: part of domain for edges</span>
+                    <span class="n">lower</span> <span class="o">=</span> <span class="n">front</span> <span class="o">=</span> <span class="n">right</span> <span class="o">=</span> <span class="n">upper</span> <span class="o">=</span> <span class="n">back</span> <span class="o">=</span> <span class="n">left</span> <span class="o">=</span> <span class="n">face_value</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">upper</span> <span class="o">=</span> <span class="n">budgetzone</span><span class="p">[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">nlay</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                        <span class="n">lower</span> <span class="o">=</span> <span class="n">budgetzone</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">back</span> <span class="o">=</span> <span class="n">budgetzone</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">nrow</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                        <span class="n">front</span> <span class="o">=</span> <span class="n">budgetzone</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">j</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">left</span> <span class="o">=</span> <span class="n">budgetzone</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">ncol</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                        <span class="n">right</span> <span class="o">=</span> <span class="n">budgetzone</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+                    <span class="c1"># Test if cell is a control surface cell for the direction</span>
+                    <span class="k">if</span> <span class="n">lower</span> <span class="o">!=</span> <span class="n">face_value</span><span class="p">:</span>
+                        <span class="n">indices</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="n">LOWER</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">upper</span> <span class="o">!=</span> <span class="n">face_value</span><span class="p">:</span>
+                        <span class="n">indices</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="n">UPPER</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">front</span> <span class="o">!=</span> <span class="n">face_value</span><span class="p">:</span>
+                        <span class="n">indices</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="n">FRONT</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">back</span> <span class="o">!=</span> <span class="n">face_value</span><span class="p">:</span>
+                        <span class="n">indices</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="n">BACK</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">right</span> <span class="o">!=</span> <span class="n">face_value</span><span class="p">:</span>
+                        <span class="n">indices</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="n">RIGHT</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">left</span> <span class="o">!=</span> <span class="n">face_value</span><span class="p">:</span>
+                        <span class="n">indices</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="n">LEFT</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+                    <span class="c1"># Incrementer counter</span>
+                    <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">indices</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span>
+<span class="k">def</span> <span class="nf">_collect_flowfront</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">flow</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">flow</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">nface</span> <span class="o">=</span> <span class="n">indices</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nface</span><span class="p">):</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="n">DIM_Z</span><span class="p">]</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="n">DIM_Y</span><span class="p">]</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="n">DIM_X</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">indices</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="n">FRONT</span><span class="p">]:</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="n">flow</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">indices</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="n">BACK</span><span class="p">]:</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">-=</span> <span class="n">flow</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span>
+<span class="k">def</span> <span class="nf">_collect_flowlower</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">flow</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">flow</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">nface</span> <span class="o">=</span> <span class="n">indices</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nface</span><span class="p">):</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="n">DIM_Z</span><span class="p">]</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="n">DIM_Y</span><span class="p">]</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="n">DIM_X</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">indices</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="n">LOWER</span><span class="p">]:</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="n">flow</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">indices</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="n">UPPER</span><span class="p">]:</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">-=</span> <span class="n">flow</span><span class="p">[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span>
+<span class="k">def</span> <span class="nf">_collect_flowright</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">flow</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">flow</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">nface</span> <span class="o">=</span> <span class="n">indices</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nface</span><span class="p">):</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="n">DIM_Z</span><span class="p">]</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="n">DIM_Y</span><span class="p">]</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="n">DIM_X</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">indices</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="n">RIGHT</span><span class="p">]:</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="n">flow</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">indices</span><span class="p">[</span><span class="n">count</span><span class="p">,</span> <span class="n">LEFT</span><span class="p">]:</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">-=</span> <span class="n">flow</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="k">def</span> <span class="nf">delayed_collect</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">front</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">right</span><span class="p">):</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">indices</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+    <span class="n">result_front</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">_collect_flowfront</span><span class="p">,</span> <span class="n">nout</span><span class="o">=</span><span class="mi">1</span><span class="p">)(</span><span class="n">indices</span><span class="p">,</span> <span class="n">front</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">result_lower</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">_collect_flowlower</span><span class="p">,</span> <span class="n">nout</span><span class="o">=</span><span class="mi">1</span><span class="p">)(</span><span class="n">indices</span><span class="p">,</span> <span class="n">lower</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">result_right</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">_collect_flowright</span><span class="p">,</span> <span class="n">nout</span><span class="o">=</span><span class="mi">1</span><span class="p">)(</span><span class="n">indices</span><span class="p">,</span> <span class="n">right</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">dask_front</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">from_delayed</span><span class="p">(</span><span class="n">result_front</span><span class="p">,</span> <span class="n">front</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">dask_lower</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">from_delayed</span><span class="p">(</span><span class="n">result_lower</span><span class="p">,</span> <span class="n">lower</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">dask_right</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">from_delayed</span><span class="p">(</span><span class="n">result_right</span><span class="p">,</span> <span class="n">right</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dask_front</span><span class="p">,</span> <span class="n">dask_lower</span><span class="p">,</span> <span class="n">dask_right</span>
+
+
+<div class="viewcode-block" id="facebudget"><a class="viewcode-back" href="../../../api/generated/evaluate/imod.evaluate.facebudget.html#imod.evaluate.facebudget">[docs]</a><span class="k">def</span> <span class="nf">facebudget</span><span class="p">(</span><span class="n">budgetzone</span><span class="p">,</span> <span class="n">front</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">netflow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes net face flow into a control volume, as defined by ``budgetzone``.</span>
+
+<span class="sd">    Returns a three dimensional DataArray with in- and outgoing flows for every</span>
+<span class="sd">    cell that is located on the edge of the control volume, thereby calculating</span>
+<span class="sd">    the flow through the control surface of the control volume.</span>
+
+<span class="sd">    Front, lower, and right arguments refer to iMOD face flow budgets, in cubic</span>
+<span class="sd">    meters per day. In terms of flow direction these are defined as:</span>
+
+<span class="sd">    * ``front``: positive with ``y`` (negative with row index)</span>
+<span class="sd">    * ``lower``: positive with ``layer`` (positive with layer index)</span>
+<span class="sd">    * ``right``: negative with ``x`` (negative with column index)</span>
+
+<span class="sd">    Only a single face flow has to be defined, for example, if only vertical</span>
+<span class="sd">    fluxes (``lower``) are to be considered.</span>
+
+<span class="sd">    Note that you generally should not define a budgetzone that is only one cell</span>
+<span class="sd">    wide. In that case, flow will both enter and leave the cell, resulting in a</span>
+<span class="sd">    net flow of zero (given there are no boundary conditions present).</span>
+
+<span class="sd">    The output of this function defines ingoing flow as positive, and outgoing</span>
+<span class="sd">    flow as negative. The output is a 3D array with net flows for every control</span>
+<span class="sd">    surface cell. You can select specific parts of the control surface, for</span>
+<span class="sd">    example only the east-facing side of the control volume. Please refer to the</span>
+<span class="sd">    examples.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    budgetzone: xr.DataAray of floats</span>
+<span class="sd">        Array defining zones. Non-zones should be with a ``np.nan`` value.</span>
+<span class="sd">        Dimensions must be exactly ``(&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;)``.</span>
+<span class="sd">    front: xr.DataArray of floats, optional</span>
+<span class="sd">        Dimensions must be exactly ``(&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;)`` or</span>
+<span class="sd">        ``(&quot;time&quot;, &quot;layer&quot;, &quot;y&quot;, &quot;x&quot;)``.</span>
+<span class="sd">    lower: xr.DataArray of floats, optional</span>
+<span class="sd">        Dimensions must be exactly ``(&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;)`` or</span>
+<span class="sd">        ``(&quot;time&quot;, &quot;layer&quot;, &quot;y&quot;, &quot;x&quot;)``.</span>
+<span class="sd">    right: xr.DataArray of floats, optional</span>
+<span class="sd">        Dimensions must be exactly ``(&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;)`` or</span>
+<span class="sd">        ``(&quot;time&quot;, &quot;layer&quot;, &quot;y&quot;, &quot;x&quot;)``.</span>
+<span class="sd">    netflow : bool, optional</span>
+<span class="sd">        Whether to split flows by direction (front, lower, right).</span>
+<span class="sd">        True: sum all flows. False: return individual directions.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    facebudget_front, facebudget_lower, face_budget_right : xr.DataArray of floats</span>
+<span class="sd">        Only returned if `netflow` is False.</span>
+<span class="sd">    facebudget_net : xr.DataArray of floats</span>
+<span class="sd">        Only returned if `netflow` is True.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Load the face flows, and select the last time using index selection:</span>
+
+<span class="sd">    &gt;&gt;&gt; import imod</span>
+<span class="sd">    &gt;&gt;&gt; lower = imod.idf.open(&quot;bdgflf*.idf&quot;).isel(time=-1)</span>
+<span class="sd">    &gt;&gt;&gt; right = imod.idf.open(&quot;bdgfrf*.idf&quot;).isel(time=-1)</span>
+<span class="sd">    &gt;&gt;&gt; front = imod.idf.open(&quot;bdgfff*.idf&quot;).isel(time=-1)</span>
+
+<span class="sd">    Define the zone of interest, e.g. via rasterizing a shapefile:</span>
+
+<span class="sd">    &gt;&gt;&gt; import geopandas as gpd</span>
+<span class="sd">    &gt;&gt;&gt; gdf = gpd.read_file(&quot;zone_of_interest.shp&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; zone2D = imod.prepare.rasterize(gdf, like=lower.isel(layer=0))</span>
+
+<span class="sd">    Broadcast it to three dimensions:</span>
+
+<span class="sd">    &gt;&gt;&gt; zone = xr.ones_like(flow) * zone2D</span>
+
+<span class="sd">    Compute net flow through the (control) surface of the budget zone:</span>
+
+<span class="sd">    &gt;&gt;&gt; flow = imod.evaluate.facebudget(</span>
+<span class="sd">    &gt;&gt;&gt;     budgetzone=zone, front=front, lower=lower, right=right</span>
+<span class="sd">    &gt;&gt;&gt; )</span>
+
+<span class="sd">    Or evaluate only horizontal fluxes:</span>
+
+<span class="sd">    &gt;&gt;&gt; flow = imod.evaluate.facebudget(</span>
+<span class="sd">    &gt;&gt;&gt;     budgetzone=zone, front=front, right=right</span>
+<span class="sd">    &gt;&gt;&gt; )</span>
+
+<span class="sd">    Extract the net flow, only on the right side of the zone, for example as</span>
+<span class="sd">    defined by x &gt; 10000:</span>
+
+<span class="sd">    &gt;&gt;&gt; netflow_right = flow.where(flow[&quot;x&quot;] &gt; 10_000.0).sum()</span>
+
+<span class="sd">    Extract the net flow for only the first four layers:</span>
+
+<span class="sd">    &gt;&gt;&gt; netflow_layers = netflow_right.sel(layer=slice(1, 4)).sum()</span>
+
+<span class="sd">    Extract the net flow to the right of an arbitrary diagonal in ``x`` and</span>
+<span class="sd">    ``y`` is simple using the equation for a straight line:</span>
+
+<span class="sd">    &gt;&gt;&gt; netflow_right_of_diagonal = flow.where(</span>
+<span class="sd">    &gt;&gt;&gt;    flow[&quot;y&quot;] &lt; (line_slope * flow[&quot;x&quot;] + line_intercept)</span>
+<span class="sd">    &gt;&gt;&gt; )</span>
+
+<span class="sd">    There are many ways to extract flows for a certain part of the zone of</span>
+<span class="sd">    interest. The most flexible one with regards to the ``x`` and ``y``</span>
+<span class="sd">    dimensions is by drawing a vector file, rasterizing it, and using it to</span>
+<span class="sd">    select with ``xarray.where()``.</span>
+
+<span class="sd">    To get the flows per direction, pass ``netflow=False``.</span>
+
+<span class="sd">    &gt;&gt;&gt; flowfront, flowlower, flowright = imod.evaluate.facebudget(</span>
+<span class="sd">    &gt;&gt;&gt;    budgetzone=zone, front=front, lower=lower, right=right, netflow=False</span>
+<span class="sd">    &gt;&gt;&gt; )</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Error handling</span>
+    <span class="k">if</span> <span class="n">front</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">lower</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">right</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Atleast a single flow budget DataArray must be given&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">budgetzone</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Dimensions of budgetzone must be exactly (&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;)&#39;</span><span class="p">)</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="n">budgetzone</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">for</span> <span class="n">da</span><span class="p">,</span> <span class="n">daname</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">((</span><span class="n">front</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">right</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;front&quot;</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">da</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dims</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span>
+            <span class="k">if</span> <span class="s2">&quot;time&quot;</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">:</span>
+                <span class="n">da_shape</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">da_shape</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">shape</span>
+            <span class="k">if</span> <span class="n">da_shape</span> <span class="o">!=</span> <span class="n">shape</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Shape of </span><span class="si">{</span><span class="n">daname</span><span class="si">}</span><span class="s2"> does not match budgetzone&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Determine control surface</span>
+    <span class="n">face</span> <span class="o">=</span> <span class="n">_outer_edge</span><span class="p">(</span><span class="n">budgetzone</span><span class="p">)</span>
+    <span class="c1"># Convert indices array to dask array, otherwise garbage collection gets</span>
+    <span class="c1"># rid of the array and we get a segfault.</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">_face_indices</span><span class="p">(</span><span class="n">face</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">budgetzone</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+    <span class="c1"># Make sure it returns NaNs if no zones are defined.</span>
+    <span class="k">if</span> <span class="n">indices</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># Create dummy arrays for skipped values, allocate just once</span>
+        <span class="k">if</span> <span class="n">front</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">F</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">budgetzone</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">lower</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">L</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">budgetzone</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">right</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">R</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">budgetzone</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+        <span class="n">results_front</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">results_lower</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">results_right</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="s2">&quot;time&quot;</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">itime</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">front</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">front</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">F</span> <span class="o">=</span> <span class="n">front</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">itime</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">lower</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">L</span> <span class="o">=</span> <span class="n">lower</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">itime</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">right</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">R</span> <span class="o">=</span> <span class="n">right</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">itime</span><span class="p">)</span>
+                <span class="c1"># collect dask arrays</span>
+                <span class="n">dF</span><span class="p">,</span> <span class="n">dL</span><span class="p">,</span> <span class="n">dR</span> <span class="o">=</span> <span class="n">delayed_collect</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
+                <span class="c1"># append</span>
+                <span class="n">results_front</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dF</span><span class="p">)</span>
+                <span class="n">results_lower</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dL</span><span class="p">)</span>
+                <span class="n">results_right</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dR</span><span class="p">)</span>
+
+            <span class="c1"># Concatenate over time dimension</span>
+            <span class="n">dask_front</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">results_front</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">dask_lower</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">results_lower</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">dask_right</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">results_right</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">front</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">F</span> <span class="o">=</span> <span class="n">front</span>
+            <span class="k">if</span> <span class="n">lower</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">L</span> <span class="o">=</span> <span class="n">lower</span>
+            <span class="k">if</span> <span class="n">right</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">R</span> <span class="o">=</span> <span class="n">right</span>
+            <span class="n">dask_front</span><span class="p">,</span> <span class="n">dask_lower</span><span class="p">,</span> <span class="n">dask_right</span> <span class="o">=</span> <span class="n">delayed_collect</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">chunks</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="n">da_shape</span><span class="p">)</span>
+        <span class="n">dask_front</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">front</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="n">chunks</span><span class="p">)</span>
+        <span class="n">dask_lower</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">lower</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="n">chunks</span><span class="p">)</span>
+        <span class="n">dask_right</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">right</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="n">chunks</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">netflow</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">dask_front</span> <span class="o">+</span> <span class="n">dask_lower</span> <span class="o">+</span> <span class="n">dask_right</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">dask_front</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">),</span>
+            <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">dask_lower</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">),</span>
+            <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">dask_right</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="p">),</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="flow_velocity"><a class="viewcode-back" href="../../../api/generated/evaluate/imod.evaluate.flow_velocity.html#imod.evaluate.flow_velocity">[docs]</a><span class="k">def</span> <span class="nf">flow_velocity</span><span class="p">(</span>
+    <span class="n">front</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">lower</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">right</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">top_bot</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">porosity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute flow velocities (m/d) from budgets (m3/d).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    front: xr.DataArray of floats, optional</span>
+<span class="sd">        Dimensions must be exactly ``(&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;)``.</span>
+<span class="sd">    lower: xr.DataArray of floats, optional</span>
+<span class="sd">        Dimensions must be exactly ``(&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;)``.</span>
+<span class="sd">    right: xr.DataArray of floats, optional</span>
+<span class="sd">        Dimensions must be exactly ``(&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;)``.</span>
+<span class="sd">    top_bot: xr.Dataset of floats, containing &#39;top&#39;, &#39;bot&#39; and optionally</span>
+<span class="sd">        &#39;dz&#39; of layers.</span>
+<span class="sd">        Dimensions must be exactly ``(&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;)``.</span>
+<span class="sd">    porosity: float or xr.DataArray of floats, optional (default 0.3)</span>
+<span class="sd">        If xr.DataArray, dimensions must be exactly ``(&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;)``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    vx, vy, vz: xr.DataArray of floats</span>
+<span class="sd">        Velocity components in x, y, z direction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s2">&quot;dz&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">top_bot</span><span class="p">:</span>
+        <span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;dz&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">top_bot</span><span class="p">[</span><span class="s2">&quot;bot&quot;</span><span class="p">]</span>
+
+    <span class="c1"># cell side area (m2)</span>
+    <span class="n">A_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">top_bot</span><span class="o">.</span><span class="n">dz</span> <span class="o">*</span> <span class="n">right</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span>
+    <span class="n">A_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">top_bot</span><span class="o">.</span><span class="n">dz</span> <span class="o">*</span> <span class="n">front</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span>
+    <span class="n">A_z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">lower</span><span class="o">.</span><span class="n">dx</span> <span class="o">*</span> <span class="n">lower</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span>
+
+    <span class="c1"># Divide flux (m3/d) by area (m2) -&gt; (m/d)</span>
+    <span class="c1"># Flip direction around for x (right)</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="o">-</span><span class="n">right</span> <span class="o">/</span> <span class="p">(</span><span class="n">A_x</span> <span class="o">*</span> <span class="n">porosity</span><span class="p">),</span>
+        <span class="n">front</span> <span class="o">/</span> <span class="p">(</span><span class="n">A_y</span> <span class="o">*</span> <span class="n">porosity</span><span class="p">),</span>
+        <span class="n">lower</span> <span class="o">/</span> <span class="p">(</span><span class="n">A_z</span> <span class="o">*</span> <span class="n">porosity</span><span class="p">),</span>
+    <span class="p">)</span></div>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

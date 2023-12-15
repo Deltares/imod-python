@@ -1,0 +1,6 @@
+﻿imod.formats.ipf.write
+======================
+
+.. currentmodule:: imod.formats.ipf
+
+.. autofunction:: write

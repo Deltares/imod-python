@@ -1,0 +1,27 @@
+﻿imod.flow.HorizontalFlowBarrier
+===============================
+
+.. currentmodule:: imod.flow
+
+.. autoclass:: HorizontalFlowBarrier
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~HorizontalFlowBarrier.__init__
+      ~HorizontalFlowBarrier.compose
+      ~HorizontalFlowBarrier.from_file
+      ~HorizontalFlowBarrier.isel
+      ~HorizontalFlowBarrier.save
+      ~HorizontalFlowBarrier.sel
+   
+   
+
+   
+   
+   

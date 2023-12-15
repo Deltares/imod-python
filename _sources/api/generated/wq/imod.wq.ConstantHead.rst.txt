@@ -1,0 +1,28 @@
+﻿imod.wq.ConstantHead
+====================
+
+.. currentmodule:: imod.wq
+
+.. autoclass:: ConstantHead
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ConstantHead.__init__
+      ~ConstantHead.add_timemap
+      ~ConstantHead.from_file
+      ~ConstantHead.isel
+      ~ConstantHead.repeat_stress
+      ~ConstantHead.save
+      ~ConstantHead.sel
+   
+   
+
+   
+   
+   

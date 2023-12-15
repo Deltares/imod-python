@@ -1,0 +1,1236 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imod.formats.ipf &#8212; iMOD Python 0.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/formats/ipf';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">imod.formats.ipf</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for imod.formats.ipf</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Functions for reading and writing iMOD Point Files (IDFs) to ``pandas.DataFrame``.</span>
+
+<span class="sd">The primary functions to use are :func:`imod.ipf.read` and</span>
+<span class="sd">:func:`imod.ipf.save`, though lower level functions are also available.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">pathlib</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">imod</span> <span class="kn">import</span> <span class="n">util</span>
+
+
+<span class="k">def</span> <span class="nf">_infer_delimwhitespace</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">ncol</span><span class="p">):</span>
+    <span class="n">n_elem</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">([</span><span class="n">line</span><span class="p">])))</span>
+    <span class="k">if</span> <span class="n">n_elem</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">elif</span> <span class="n">n_elem</span> <span class="o">==</span> <span class="n">ncol</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Inconsistent IPF: header states </span><span class="si">{</span><span class="n">ncol</span><span class="si">}</span><span class="s2"> columns, first line contains </span><span class="si">{</span><span class="n">n_elem</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span> <span class="nf">_read_ipf</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">nrow</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="n">ncol</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="n">colnames</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ncol</span><span class="p">)]</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># csv.reader parse one line</span>
+            <span class="c1"># this catches commas in quotes</span>
+            <span class="n">indexcol</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">strip</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">([</span><span class="n">line</span><span class="p">])))</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>  <span class="c1"># then try whitespace delimited</span>
+            <span class="n">indexcol</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">strip</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">([</span><span class="n">line</span><span class="p">],</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">)))</span>
+
+        <span class="n">position</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">delim_whitespace</span> <span class="o">=</span> <span class="n">_infer_delimwhitespace</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">ncol</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+
+        <span class="n">ipf_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;delim_whitespace&quot;</span><span class="p">:</span> <span class="n">delim_whitespace</span><span class="p">,</span>
+            <span class="s2">&quot;header&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;names&quot;</span><span class="p">:</span> <span class="n">colnames</span><span class="p">,</span>
+            <span class="s2">&quot;nrows&quot;</span><span class="p">:</span> <span class="n">nrow</span><span class="p">,</span>
+            <span class="s2">&quot;skipinitialspace&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">ipf_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="o">**</span><span class="n">ipf_kwargs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">indexcol</span><span class="p">),</span> <span class="n">ext</span>
+
+
+<span class="k">def</span> <span class="nf">_read</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">assoc_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read one IPF file to a single pandas.DataFrame, including associated (TXT) files.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path: pathlib.Path or str</span>
+<span class="sd">        globpath for IPF files to read.</span>
+<span class="sd">    kwargs : dict</span>
+<span class="sd">        Dictionary containing the ``pandas.read_csv()`` keyword arguments for the</span>
+<span class="sd">        IPF files (e.g. `{&quot;delim_whitespace&quot;: True}`)</span>
+<span class="sd">    assoc_kwargs: dict</span>
+<span class="sd">        Dictionary containing the ``pandas.read_csv()`` keyword arguments for the</span>
+<span class="sd">        associated (TXT) files (e.g. `{&quot;delim_whitespace&quot;: True}`)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pandas.DataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span><span class="p">,</span> <span class="n">indexcol</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_read_ipf</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">assoc_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">assoc_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># See if reading associated files is necessary</span>
+    <span class="k">if</span> <span class="n">indexcol</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">colnames</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+        <span class="c1"># df = pd.read_csv(f, header=None, names=colnames, nrows=nrow, **kwargs)</span>
+        <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">itertuples</span><span class="p">():</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">indexcol</span><span class="p">]</span>
+            <span class="c1"># associate paths are relative to the ipf</span>
+            <span class="n">path_assoc</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># Note that these kwargs handle all associated files, which might differ</span>
+            <span class="c1"># within an IPF. If this happens we could consider supporting a dict</span>
+            <span class="c1"># or function that maps assoc filenames to different kwargs.</span>
+            <span class="k">try</span><span class="p">:</span>  <span class="c1"># Capture the error and print the offending path</span>
+                <span class="n">df_assoc</span> <span class="o">=</span> <span class="n">read_associated</span><span class="p">(</span><span class="n">path_assoc</span><span class="p">,</span> <span class="n">assoc_kwargs</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span>
+                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="se">\n</span><span class="s1">While reading associated file &quot;</span><span class="si">{</span><span class="n">path_assoc</span><span class="si">}</span><span class="s1">&quot; of IPF file &quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
+                <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+
+            <span class="c1"># Include records of the &quot;mother&quot; ipf file.</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">colnames</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>  <span class="c1"># ignores df.index in row</span>
+                <span class="n">df_assoc</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="c1"># Append to list</span>
+            <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_assoc</span><span class="p">)</span>
+        <span class="c1"># Merge into a single whole</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span>
+
+
+<div class="viewcode-block" id="read_associated"><a class="viewcode-back" href="../../../api/generated/io/imod.formats.ipf.read_associated.html#imod.formats.ipf.read_associated">[docs]</a><span class="k">def</span> <span class="nf">read_associated</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{}):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read an IPF associated file (TXT).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : pathlib.Path or str</span>
+<span class="sd">        Path to associated file.</span>
+<span class="sd">    kwargs : dict</span>
+<span class="sd">        Dictionary containing the ``pandas.read_csv()`` keyword arguments for the</span>
+<span class="sd">        associated (TXT) file (e.g. `{&quot;delim_whitespace&quot;: True}`).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pandas.DataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># deal with e.g. incorrect capitalization</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">nrow</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># csv.reader parse one line</span>
+            <span class="c1"># this catches commas in quotes</span>
+            <span class="n">ncol</span><span class="p">,</span> <span class="n">itype</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">strip</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">([</span><span class="n">line</span><span class="p">]))))</span>
+        <span class="c1"># itype can be implicit, in which case it&#39;s a timeseries</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">ncol</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                <span class="n">itype</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>  <span class="c1"># then try whitespace delimited</span>
+                <span class="n">ncol</span><span class="p">,</span> <span class="n">itype</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span>
+                    <span class="nb">int</span><span class="p">,</span> <span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">strip</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">([</span><span class="n">line</span><span class="p">],</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">)))</span>
+                <span class="p">)</span>
+
+        <span class="c1"># use pandas for csv parsing: stuff like commas within quotes</span>
+        <span class="c1"># this is a workaround for a pandas bug, probable related issue:</span>
+        <span class="c1"># https://github.com/pandas-dev/pandas/issues/19827#issuecomment-398649163</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ncol</span><span class="p">)]</span>
+        <span class="n">delim_whitespace</span> <span class="o">=</span> <span class="n">_infer_delimwhitespace</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># Normally, this ought to work:</span>
+        <span class="c1"># metadata = pd.read_csv(f, header=None, nrows=ncol).values</span>
+        <span class="c1"># TODO: replace when bugfix is released</span>
+        <span class="c1"># try both comma and whitespace delimited, everything can be be mixed</span>
+        <span class="c1"># in a single file...</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+        <span class="c1"># TODO: find out whether this can be replace by csv.reader</span>
+        <span class="c1"># the challenge lies in replacing the pd.notnull for nodata values.</span>
+        <span class="c1"># is otherwise quite a bit faster for such a header block.</span>
+        <span class="n">metadata_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;delim_whitespace&quot;</span><span class="p">:</span> <span class="n">delim_whitespace</span><span class="p">,</span>
+            <span class="s2">&quot;header&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;nrows&quot;</span><span class="p">:</span> <span class="n">ncol</span><span class="p">,</span>
+            <span class="s2">&quot;skipinitialspace&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">metadata_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">lines</span><span class="p">),</span> <span class="o">**</span><span class="n">metadata_kwargs</span><span class="p">)</span>
+        <span class="c1"># header description possibly includes nodata</span>
+        <span class="n">usecols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ncol</span><span class="p">)[</span><span class="n">pd</span><span class="o">.</span><span class="n">notnull</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">usecols</span><span class="p">,</span> <span class="p">:]</span>
+
+        <span class="c1"># Collect column names and nodata values</span>
+        <span class="n">colnames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">na_values</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">colname</span><span class="p">,</span> <span class="n">nodata</span> <span class="ow">in</span> <span class="n">metadata</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+            <span class="n">na_values</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">nodata</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">]</span>  <span class="c1"># &quot;-&quot; seems common enough to ignore</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">colname</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">colnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">colname</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">colnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">colname</span><span class="p">)</span>
+
+        <span class="c1"># Sniff the first line of the data block</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+        <span class="n">delim_whitespace</span> <span class="o">=</span> <span class="n">_infer_delimwhitespace</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">ncol</span><span class="p">)</span>
+
+        <span class="n">itype_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;delim_whitespace&quot;</span><span class="p">:</span> <span class="n">delim_whitespace</span><span class="p">,</span>
+            <span class="s2">&quot;header&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;names&quot;</span><span class="p">:</span> <span class="n">colnames</span><span class="p">,</span>
+            <span class="s2">&quot;usecols&quot;</span><span class="p">:</span> <span class="n">usecols</span><span class="p">,</span>
+            <span class="s2">&quot;nrows&quot;</span><span class="p">:</span> <span class="n">nrow</span><span class="p">,</span>
+            <span class="s2">&quot;na_values&quot;</span><span class="p">:</span> <span class="n">na_values</span><span class="p">,</span>
+            <span class="s2">&quot;skipinitialspace&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">itype</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># Timevariant information: timeseries</span>
+            <span class="c1"># check if first column is time in [yyyymmdd] or [yyyymmddhhmmss]</span>
+            <span class="n">itype_kwargs</span><span class="p">[</span><span class="s2">&quot;dtype&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">colnames</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="nb">str</span><span class="p">}</span>
+        <span class="k">elif</span> <span class="n">itype</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># 1D borehole</span>
+            <span class="c1"># enforce first column is a float</span>
+            <span class="n">itype_kwargs</span><span class="p">[</span><span class="s2">&quot;dtype&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">colnames</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">}</span>
+        <span class="k">elif</span> <span class="n">itype</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>  <span class="c1"># cpt</span>
+            <span class="c1"># all columns must be numeric</span>
+            <span class="n">itype_kwargs</span><span class="p">[</span><span class="s2">&quot;dtype&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">colname</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span> <span class="k">for</span> <span class="n">colname</span> <span class="ow">in</span> <span class="n">colnames</span><span class="p">}</span>
+        <span class="k">elif</span> <span class="n">itype</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>  <span class="c1"># 3D borehole</span>
+            <span class="c1"># enforce first 3 columns are float</span>
+            <span class="n">itype_kwargs</span><span class="p">[</span><span class="s2">&quot;dtype&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">colnames</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+                <span class="n">colnames</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+                <span class="n">colnames</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="n">itype_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="o">**</span><span class="n">itype_kwargs</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">nrow</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">itype</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">time_column</span> <span class="o">=</span> <span class="n">colnames</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">len_date</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">time_column</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">len_date</span> <span class="o">==</span> <span class="mi">14</span><span class="p">:</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">time_column</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">time_column</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">%H%M%S&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">len_date</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">time_column</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">time_column</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: datetime format must be yyyymmddhhmmss or yyyymmdd&quot;</span>
+            <span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="read"><a class="viewcode-back" href="../../../api/generated/io/imod.formats.ipf.read.html#imod.formats.ipf.read">[docs]</a><span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{},</span> <span class="n">assoc_kwargs</span><span class="o">=</span><span class="p">{}):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read one or more IPF files to a single pandas.DataFrame, including associated</span>
+<span class="sd">    (TXT) files.</span>
+
+<span class="sd">    The different IPF files can be from different model layers,</span>
+<span class="sd">    and column names may differ between them.</span>
+
+<span class="sd">    Note that this function always returns a ``pandas.DataFrame``. IPF files</span>
+<span class="sd">    always contain spatial information, for which ``geopandas.GeoDataFrame``</span>
+<span class="sd">    is a better fit, in principle. However, GeoDataFrames are not the best fit</span>
+<span class="sd">    for the associated data.</span>
+
+<span class="sd">    To perform spatial operations on the points, you&#39;re likely best served by</span>
+<span class="sd">    (temporarily) creating a GeoDataFrame, doing the spatial operation, and</span>
+<span class="sd">    then using the output to select values in the original DataFrame. Please</span>
+<span class="sd">    refer to the examples.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path: str, Path or list</span>
+<span class="sd">        This can be a single file, &#39;wells_l1.ipf&#39;, a glob pattern expansion,</span>
+<span class="sd">        &#39;wells_l*.ipf&#39;, or a list of files, [&#39;wells_l1.ipf&#39;, &#39;wells_l2.ipf&#39;].</span>
+<span class="sd">        Note that each file needs to have the same columns, such that they can</span>
+<span class="sd">        be combined in a single pd.DataFrame.</span>
+<span class="sd">    kwargs : dict</span>
+<span class="sd">        Dictionary containing the ``pandas.read_csv()`` keyword arguments for the</span>
+<span class="sd">        IPF files (e.g. `{&quot;delim_whitespace&quot;: True}`)</span>
+<span class="sd">    assoc_kwargs: dict</span>
+<span class="sd">        Dictionary containing the ``pandas.read_csv()`` keyword arguments for the</span>
+<span class="sd">        associated (TXT) files (e.g. `{&quot;delim_whitespace&quot;: True}`)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pandas.DataFrame</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Read an IPF file into a dataframe:</span>
+
+<span class="sd">    &gt;&gt;&gt; import imod</span>
+<span class="sd">    &gt;&gt;&gt; df = imod.ipf.read(&quot;example.ipf&quot;)</span>
+
+<span class="sd">    Convert the x and y data into a GeoDataFrame, do a spatial operation, and</span>
+<span class="sd">    use it to select points within a polygon.</span>
+<span class="sd">    Note: ``gpd.points_from_xy()`` requires a geopandas version &gt;= 0.5.</span>
+
+<span class="sd">    &gt;&gt;&gt; import geopandas as gpd</span>
+<span class="sd">    &gt;&gt;&gt; polygon = gpd.read_file(&quot;polygon.shp&quot;).geometry[0]</span>
+<span class="sd">    &gt;&gt;&gt; ipf_points = gpd.GeoDataFrame(geometry=gpd.points_from_xy(df[&quot;x&quot;], df[&quot;y&quot;]))</span>
+<span class="sd">    &gt;&gt;&gt; within_polygon = ipf_points.within(polygon)</span>
+<span class="sd">    &gt;&gt;&gt; selection = df[within_polygon]</span>
+
+<span class="sd">    The same exercise is a little more complicated when associated files (like</span>
+<span class="sd">    timeseries) are involved, since many duplicate values of x and y will exist.</span>
+<span class="sd">    The easiest way to isolate these is by applying a groupby, and then taking</span>
+<span class="sd">    first of x and y of every group:</span>
+
+<span class="sd">    &gt;&gt;&gt; df = imod.ipf.read(&quot;example_with_time.ipf&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; first = df.groupby(&quot;id&quot;).first()  # replace &quot;id&quot; by what your ID column is called</span>
+<span class="sd">    &gt;&gt;&gt; x = first[&quot;x&quot;]</span>
+<span class="sd">    &gt;&gt;&gt; y = first[&quot;y&quot;]</span>
+<span class="sd">    &gt;&gt;&gt; id_code = first.index  # id is a reserved keyword in python</span>
+<span class="sd">    &gt;&gt;&gt; ipf_points = gpd.GeoDataFrame(geometry=gpd.points_from_xy(x, y))</span>
+<span class="sd">    &gt;&gt;&gt; within_polygon = ipf_points.within(polygon)</span>
+
+<span class="sd">    Using the result is a little more complicated as well, since it has to be</span>
+<span class="sd">    mapped back to many duplicate values of the original dataframe.</span>
+<span class="sd">    There are two options. First, by using the index:</span>
+
+<span class="sd">    &gt;&gt;&gt; within_polygon.index = id_code</span>
+<span class="sd">    &gt;&gt;&gt; df = df.set_index(&quot;id&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; selection = df[within_polygon]</span>
+
+<span class="sd">    If you do not wish to change index on the original dataframe, use</span>
+<span class="sd">    ``pandas.DataFrame.merge()`` instead.</span>
+
+<span class="sd">    &gt;&gt;&gt; import pandas as pd</span>
+<span class="sd">    &gt;&gt;&gt; within_polygon = pd.DataFrame({&quot;within&quot;: within_polygon})</span>
+<span class="sd">    &gt;&gt;&gt; within_polygon[&quot;id&quot;] = id_code</span>
+<span class="sd">    &gt;&gt;&gt; df = df.merge(within_polygon, on=&quot;id&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; df = df[df[&quot;within&quot;]]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">paths</span> <span class="o">=</span> <span class="n">path</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">)):</span>
+        <span class="c1"># convert since for Path.glob non-relative patterns are unsupported</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">path</span><span class="p">)]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Path should be either a list, str or pathlib.Path&quot;</span><span class="p">)</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not find any files matching </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">bigdf</span> <span class="o">=</span> <span class="n">_read</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">assoc_kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
+            <span class="n">layer</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">decompose</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">_read</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">assoc_kwargs</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="se">\n</span><span class="s1">While reading IPF file &quot;</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="k">if</span> <span class="n">layer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">df</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">layer</span>
+            <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+        <span class="n">bigdf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+            <span class="n">dfs</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>  <span class="c1"># this sorts in pandas &lt; 0.23</span>
+
+    <span class="k">return</span> <span class="n">bigdf</span></div>
+
+
+<span class="k">def</span> <span class="nf">_coerce_itype</span><span class="p">(</span><span class="n">itype</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Changes string itype to int&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">itype</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]:</span>
+        <span class="k">pass</span>
+    <span class="k">elif</span> <span class="n">itype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;timeseries&quot;</span><span class="p">:</span>
+        <span class="n">itype</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">elif</span> <span class="n">itype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;borehole1d&quot;</span><span class="p">:</span>
+        <span class="n">itype</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">elif</span> <span class="n">itype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;cpt&quot;</span><span class="p">:</span>
+        <span class="n">itype</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="k">elif</span> <span class="n">itype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;borehole3d&quot;</span><span class="p">:</span>
+        <span class="n">itype</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid IPF itype&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">itype</span>
+
+
+<span class="k">def</span> <span class="nf">_lower</span><span class="p">(</span><span class="n">colnames</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Lowers colnames, checking for uniqueness&quot;&quot;&quot;</span>
+    <span class="n">lowered_colnames</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">colnames</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">lowered_colnames</span><span class="p">))</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">colnames</span><span class="p">):</span>
+        <span class="n">seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">lowered_colnames</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Column name &quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&quot; is not unique, after lowering.&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">lowered_colnames</span>
+
+
+<div class="viewcode-block" id="write_assoc"><a class="viewcode-back" href="../../../api/generated/io/imod.formats.ipf.write_assoc.html#imod.formats.ipf.write_assoc">[docs]</a><span class="k">def</span> <span class="nf">write_assoc</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">itype</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nodata</span><span class="o">=</span><span class="mf">1.0e20</span><span class="p">,</span> <span class="n">assoc_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Writes a single IPF associated (TXT) file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : pathlib.Path or str</span>
+<span class="sd">        Path for the written associated file.</span>
+<span class="sd">    df : pandas.DataFrame</span>
+<span class="sd">        DataFrame containing the data to write.</span>
+<span class="sd">    itype : int or str</span>
+<span class="sd">        IPF type.</span>
+<span class="sd">        Possible values, either integer or string:</span>
+
+<span class="sd">        1 : &quot;timeseries&quot;</span>
+<span class="sd">        2 : &quot;borehole1d&quot;</span>
+<span class="sd">        3 : &quot;cpt&quot;</span>
+<span class="sd">        4 : &quot;borehole3d&quot;</span>
+<span class="sd">    nodata : float</span>
+<span class="sd">        The value given to nodata values. These are generally NaN (Not-a-Number)</span>
+<span class="sd">        in pandas, but this leads to errors in iMOD(FLOW) for IDFs.</span>
+<span class="sd">        Defaults to value of 1.0e20 instead.</span>
+<span class="sd">    assoc_columns : optional, list or dict</span>
+<span class="sd">        Columns to store in the associated file. In case of a dictionary, the</span>
+<span class="sd">        columns will be renamed according to the mapping in the dictionary.</span>
+<span class="sd">        Defaults to None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">        Writes a file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">itype</span> <span class="o">=</span> <span class="n">_coerce_itype</span><span class="p">(</span><span class="n">itype</span><span class="p">)</span>
+    <span class="n">required_columns</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="mi">1</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">],</span>
+        <span class="mi">2</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">],</span>
+        <span class="mi">3</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">],</span>
+        <span class="mi">4</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;x_offset&quot;</span><span class="p">,</span> <span class="s2">&quot;y_offset&quot;</span><span class="p">,</span> <span class="s2">&quot;top&quot;</span><span class="p">],</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Ensure columns are in the right order for the itype</span>
+    <span class="n">colnames</span> <span class="o">=</span> <span class="n">_lower</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">colnames</span>
+    <span class="n">columnorder</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">colname</span> <span class="ow">in</span> <span class="n">required_columns</span><span class="p">[</span><span class="n">itype</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">colname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">colnames</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;given itype requires column &quot;</span><span class="si">{</span><span class="n">colname</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+        <span class="n">colnames</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">colname</span><span class="p">)</span>
+        <span class="n">columnorder</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">colname</span><span class="p">)</span>
+    <span class="n">columnorder</span> <span class="o">+=</span> <span class="n">colnames</span>
+
+    <span class="c1"># Check if columns have to be renamed</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">assoc_columns</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">columnorder</span> <span class="o">=</span> <span class="p">[</span><span class="n">assoc_columns</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columnorder</span><span class="p">]</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">assoc_columns</span><span class="p">)</span>
+
+    <span class="n">nrecords</span><span class="p">,</span> <span class="n">nfields</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">nrecords</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">nfields</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">itype</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">colname</span> <span class="ow">in</span> <span class="n">columnorder</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;,&quot;</span> <span class="ow">in</span> <span class="n">colname</span> <span class="ow">or</span> <span class="s2">&quot; &quot;</span> <span class="ow">in</span> <span class="n">colname</span><span class="p">:</span>
+                <span class="n">colname</span> <span class="o">=</span> <span class="s1">&#39;&quot;&#39;</span> <span class="o">+</span> <span class="n">colname</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">colname</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">nodata</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1"># workaround pandas issue by closing the file first, see</span>
+    <span class="c1"># https://github.com/pandas-dev/pandas/issues/19827#issuecomment-398649163</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">nodata</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">columnorder</span><span class="p">]</span>
+
+    <span class="c1"># We cannot rely on the quoting=QUOTE_NONNUMERIC policy</span>
+    <span class="c1"># The reason is that datetime columns are converted to string as well</span>
+    <span class="c1"># and then quoted. This causes trouble with some iMOD(batch) functions.</span>
+    <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">):</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&quot;&#39;</span> <span class="o">+</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">column</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span>
+
+    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
+        <span class="n">path</span><span class="p">,</span>
+        <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">,</span>
+        <span class="n">date_format</span><span class="o">=</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">%H%M%S&quot;</span><span class="p">,</span>
+        <span class="n">quoting</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">QUOTE_NONE</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="write"><a class="viewcode-back" href="../../../api/generated/io/imod.formats.ipf.write.html#imod.formats.ipf.write">[docs]</a><span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">indexcolumn</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">assoc_ext</span><span class="o">=</span><span class="s2">&quot;txt&quot;</span><span class="p">,</span> <span class="n">nodata</span><span class="o">=</span><span class="mf">1.0e20</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Writes a single IPF file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : pathlib.Path or str</span>
+<span class="sd">        path of the written IPF file.</span>
+<span class="sd">        Any associated files are written relative to this path, based on the ID</span>
+<span class="sd">        column.</span>
+<span class="sd">    df : pandas.DataFrame</span>
+<span class="sd">        DataFrame containing the data to write.</span>
+<span class="sd">    indexcolumn : integer</span>
+<span class="sd">        number of the column containg the paths to the associated (TXT) files.</span>
+<span class="sd">        Defaults to a value of 0 (no associated files).</span>
+<span class="sd">    assoc_ext : str</span>
+<span class="sd">        Extension of the associated files. Defaults to &quot;txt&quot;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">        Writes a file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">nodata</span><span class="p">)</span>
+    <span class="n">nrecords</span><span class="p">,</span> <span class="n">nfields</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">nrecords</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">nfields</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">colname</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;,&quot;</span> <span class="ow">in</span> <span class="n">colname</span> <span class="ow">or</span> <span class="s2">&quot; &quot;</span> <span class="ow">in</span> <span class="n">colname</span><span class="p">:</span>
+                <span class="n">colname</span> <span class="o">=</span> <span class="s1">&#39;&quot;&#39;</span> <span class="o">+</span> <span class="n">colname</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">colname</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">indexcolumn</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">assoc_ext</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># We cannot rely on the quoting=QUOTE_NONNUMERIC policy</span>
+    <span class="c1"># The reason is that datetime columns are converted to string as well</span>
+    <span class="c1"># and then quoted. This causes trouble with some iMOD(batch) functions.</span>
+    <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">):</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&quot;&#39;</span> <span class="o">+</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">column</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span>
+
+    <span class="c1"># workaround pandas issue by closing the file first, see</span>
+    <span class="c1"># https://github.com/pandas-dev/pandas/issues/19827#issuecomment-398649163</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">quoting</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">QUOTE_NONE</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_is_single_value</span><span class="p">(</span><span class="n">group</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">group</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span>
+
+
+<span class="k">def</span> <span class="nf">_compose_ipf</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">itype</span><span class="p">,</span> <span class="n">assoc_ext</span><span class="p">,</span> <span class="n">nodata</span><span class="o">=</span><span class="mf">1.0e20</span><span class="p">,</span> <span class="n">assoc_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    When itype is not None, breaks down the pandas DataFrame into its IPF part</span>
+<span class="sd">    and its associated TXT files, creating the IPF data structure.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : pathlib.Path or str</span>
+<span class="sd">        path of the written IPF file.</span>
+<span class="sd">        Any associated files are written relative to this path, based on the ID</span>
+<span class="sd">        column.</span>
+<span class="sd">    df : pandas.DataFrame</span>
+<span class="sd">        DataFrame containing the data to write.</span>
+<span class="sd">    itype : int or str or None</span>
+<span class="sd">        If ``None`` no associated files are written.</span>
+<span class="sd">        Other possible values, either integer or string:</span>
+
+<span class="sd">        * ``1`` or ``&quot;timeseries&quot;``</span>
+<span class="sd">        * ``2`` or ``&quot;borehole1d&quot;``</span>
+<span class="sd">        * ``3`` or ``&quot;cpt&quot;``</span>
+<span class="sd">        * ``4`` or ``&quot;borehole3d&quot;``</span>
+<span class="sd">    assoc_ext : str</span>
+<span class="sd">        Extension of the associated files. Normally &quot;.txt&quot;.</span>
+<span class="sd">    nodata : float</span>
+<span class="sd">        The value given to nodata values. These are generally NaN (Not-a-Number)</span>
+<span class="sd">        in pandas, but this leads to errors in iMOD(FLOW) for IDFs.</span>
+<span class="sd">        Defaults to value of 1.0e20 instead.</span>
+<span class="sd">    assoc_columns : optional, list or dict</span>
+<span class="sd">        Columns to store in the associated file. In case of a dictionary, the</span>
+<span class="sd">        columns will be renamed according to the mapping in the dictionary.</span>
+<span class="sd">        Defaults to None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">        Writes files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">itype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">write</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">nodata</span><span class="o">=</span><span class="n">nodata</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">itype</span> <span class="o">=</span> <span class="n">_coerce_itype</span><span class="p">(</span><span class="n">itype</span><span class="p">)</span>
+        <span class="n">colnames</span> <span class="o">=</span> <span class="n">_lower</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">colnames</span>
+        <span class="k">for</span> <span class="n">refname</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">refname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">colnames</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;given itype requires column &quot;</span><span class="si">{</span><span class="n">refname</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+            <span class="n">colnames</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">refname</span><span class="p">)</span>
+
+        <span class="n">grouped</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">grouped</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">_is_single_value</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;column x contains more than one value per id&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">grouped</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">_is_single_value</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;column y contains more than one value per id&quot;</span><span class="p">)</span>
+        <span class="c1"># get columns that have only one value within a group, to save them in ipf</span>
+        <span class="n">ipf_columns</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">colname</span><span class="p">,</span> <span class="s2">&quot;first&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">colname</span> <span class="ow">in</span> <span class="n">colnames</span>
+            <span class="k">if</span> <span class="n">grouped</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">_is_single_value</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">idcode</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">grouped</span><span class="p">:</span>
+            <span class="n">assoc_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">idcode</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">assoc_ext</span><span class="p">))</span>
+            <span class="n">assoc_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">assoc_columns</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">selection</span> <span class="o">=</span> <span class="n">assoc_columns</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">assoc_columns</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">selection</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">assoc_columns</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">selection</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">colname</span> <span class="k">for</span> <span class="n">colname</span> <span class="ow">in</span> <span class="n">colnames</span> <span class="k">if</span> <span class="n">colname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ipf_columns</span>
+                <span class="p">]</span>
+            <span class="n">out_df</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="n">selection</span><span class="p">]</span>
+            <span class="n">write_assoc</span><span class="p">(</span><span class="n">assoc_path</span><span class="p">,</span> <span class="n">out_df</span><span class="p">,</span> <span class="n">itype</span><span class="p">,</span> <span class="n">nodata</span><span class="p">,</span> <span class="n">assoc_columns</span><span class="p">)</span>
+
+        <span class="c1"># ensures right order for x, y, id; so that also indexcolumn == 3</span>
+        <span class="n">agg_kwargs</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">(</span>
+            <span class="p">[(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;first&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;first&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;first&quot;</span><span class="p">)]</span>
+        <span class="p">)</span>
+        <span class="n">agg_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ipf_columns</span><span class="p">)</span>
+        <span class="n">agg_df</span> <span class="o">=</span> <span class="n">grouped</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">agg_kwargs</span><span class="p">)</span>
+        <span class="n">write</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">agg_df</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">assoc_ext</span><span class="p">,</span> <span class="n">nodata</span><span class="o">=</span><span class="n">nodata</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="save"><a class="viewcode-back" href="../../../api/generated/io/imod.formats.ipf.save.html#imod.formats.ipf.save">[docs]</a><span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">itype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">assoc_ext</span><span class="o">=</span><span class="s2">&quot;txt&quot;</span><span class="p">,</span> <span class="n">nodata</span><span class="o">=</span><span class="mf">1.0e20</span><span class="p">,</span> <span class="n">assoc_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Saves the contents of a pandas DataFrame to one or more IPF files, and</span>
+<span class="sd">    associated (TXT) files.</span>
+
+<span class="sd">    Can write multiple IPF files if one of the columns is named &quot;layer&quot;. In</span>
+<span class="sd">    turn, multiple associated (TXT) files may written for each of these IPF</span>
+<span class="sd">    files. Note that the ID must be unique for each layer. See the examples.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : pathlib.Path or str</span>
+<span class="sd">        path of the written IPF file.</span>
+<span class="sd">        Any associated files are written relative to this path, based on the ID</span>
+<span class="sd">        column.</span>
+<span class="sd">    df : pandas.DataFrame</span>
+<span class="sd">        DataFrame containing the data to write.</span>
+<span class="sd">    itype : int or str or None</span>
+<span class="sd">        IPF type. Defaults to ``None``, in which case no associated files are</span>
+<span class="sd">        created. Possible other values, either integer or string:</span>
+
+<span class="sd">        * ``1`` or ``&quot;timeseries&quot;``</span>
+<span class="sd">        * ``2`` or ``&quot;borehole1d&quot;``</span>
+<span class="sd">        * ``3`` or ``&quot;cpt&quot;``</span>
+<span class="sd">        * ``4`` or ``&quot;borehole3d&quot;``</span>
+<span class="sd">    assoc_ext : str</span>
+<span class="sd">        Extension of the associated files. Defaults to &quot;txt&quot;.</span>
+<span class="sd">    nodata : float</span>
+<span class="sd">        The value given to nodata values. These are generally NaN (Not-a-Number)</span>
+<span class="sd">        in pandas, but this leads to errors in iMOD(FLOW) for IDFs.</span>
+<span class="sd">        Defaults to value of 1.0e20 instead.</span>
+<span class="sd">    assoc_columns : optional, list or dict</span>
+<span class="sd">        Columns to store in the associated file. In case of a dictionary, the</span>
+<span class="sd">        columns will be renamed according to the mapping in the dictionary.</span>
+<span class="sd">        Defaults to None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">        Writes files.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    To write a single IPF without associated timeseries or boreholes:</span>
+
+<span class="sd">    &gt;&gt;&gt; imod.ipf.save(&quot;static-data.ipf&quot;, df)</span>
+
+<span class="sd">    To write timeseries data:</span>
+
+<span class="sd">    &gt;&gt;&gt; imod.ipf.save(&quot;transient-data.ipf&quot;, df, itype=&quot;timeseries&quot;)</span>
+
+<span class="sd">    If a ``&quot;layer&quot;`` column is present, make sure the ID is unique per layer:</span>
+
+<span class="sd">    &gt;&gt;&gt; df[&quot;id&quot;] = df[&quot;id&quot;].str.cat(df[&quot;layer&quot;], sep=&quot;_&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; imod.ipf.save(&quot;layered.ipf&quot;, df, itype=&quot;timeseries&quot;)</span>
+
+<span class="sd">    An error will be raised otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;extension&quot;</span><span class="p">:</span> <span class="s2">&quot;.ipf&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">path</span><span class="o">.</span><span class="n">stem</span><span class="p">,</span> <span class="s2">&quot;directory&quot;</span><span class="p">:</span> <span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="p">}</span>
+    <span class="n">d</span><span class="p">[</span><span class="s2">&quot;directory&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">colnames</span> <span class="o">=</span> <span class="n">_lower</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+    <span class="c1"># Lower assoc_columns as well if available</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">assoc_columns</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">assoc_columns</span> <span class="o">=</span> <span class="n">_lower</span><span class="p">(</span><span class="n">assoc_columns</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">assoc_columns</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="n">_lower</span><span class="p">(</span><span class="n">assoc_columns</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">_lower</span><span class="p">(</span><span class="n">assoc_columns</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="n">assoc_columns</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">values</span><span class="p">)}</span>
+
+    <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">colnames</span>
+    <span class="k">if</span> <span class="s2">&quot;layer&quot;</span> <span class="ow">in</span> <span class="n">colnames</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;time&quot;</span> <span class="ow">in</span> <span class="n">colnames</span><span class="p">:</span>
+            <span class="n">groupcols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">groupcols</span> <span class="o">=</span> <span class="s2">&quot;id&quot;</span>
+
+        <span class="n">n_layer_per_id</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">groupcols</span><span class="p">)[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">n_layer_per_id</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Multiple layer values for a single ID detected. &quot;</span>
+                <span class="s2">&quot;Unique IDs are required for each layer.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">layer</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">):</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">layer</span>
+            <span class="n">fn</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+            <span class="n">_compose_ipf</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">itype</span><span class="p">,</span> <span class="n">assoc_ext</span><span class="p">,</span> <span class="n">nodata</span><span class="p">,</span> <span class="n">assoc_columns</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="n">_compose_ipf</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">itype</span><span class="p">,</span> <span class="n">assoc_ext</span><span class="p">,</span> <span class="n">nodata</span><span class="p">,</span> <span class="n">assoc_columns</span><span class="p">)</span></div>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

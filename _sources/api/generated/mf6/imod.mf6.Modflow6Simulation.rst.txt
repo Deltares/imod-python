@@ -1,0 +1,49 @@
+﻿imod.mf6.Modflow6Simulation
+===========================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: Modflow6Simulation
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Modflow6Simulation.__init__
+      ~Modflow6Simulation.clear
+      ~Modflow6Simulation.clip_box
+      ~Modflow6Simulation.copy
+      ~Modflow6Simulation.create_time_discretization
+      ~Modflow6Simulation.dump
+      ~Modflow6Simulation.from_file
+      ~Modflow6Simulation.fromkeys
+      ~Modflow6Simulation.get
+      ~Modflow6Simulation.get_exchange_relationships
+      ~Modflow6Simulation.get_models_of_type
+      ~Modflow6Simulation.items
+      ~Modflow6Simulation.keys
+      ~Modflow6Simulation.open_concentration
+      ~Modflow6Simulation.open_flow_budget
+      ~Modflow6Simulation.open_head
+      ~Modflow6Simulation.open_transport_budget
+      ~Modflow6Simulation.pop
+      ~Modflow6Simulation.popitem
+      ~Modflow6Simulation.regrid_like
+      ~Modflow6Simulation.render
+      ~Modflow6Simulation.run
+      ~Modflow6Simulation.setdefault
+      ~Modflow6Simulation.split
+      ~Modflow6Simulation.time_discretization
+      ~Modflow6Simulation.update
+      ~Modflow6Simulation.values
+      ~Modflow6Simulation.write
+   
+   
+
+   
+   
+   

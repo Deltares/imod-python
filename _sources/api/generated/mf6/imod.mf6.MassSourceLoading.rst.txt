@@ -1,0 +1,46 @@
+﻿imod.mf6.MassSourceLoading
+==========================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: MassSourceLoading
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MassSourceLoading.__init__
+      ~MassSourceLoading.clip_box
+      ~MassSourceLoading.copy
+      ~MassSourceLoading.from_file
+      ~MassSourceLoading.get_period_varnames
+      ~MassSourceLoading.get_regrid_methods
+      ~MassSourceLoading.is_grid_agnostic_package
+      ~MassSourceLoading.is_regridding_supported
+      ~MassSourceLoading.isel
+      ~MassSourceLoading.mask
+      ~MassSourceLoading.regrid_like
+      ~MassSourceLoading.render
+      ~MassSourceLoading.sel
+      ~MassSourceLoading.skip_masking_dataarray
+      ~MassSourceLoading.to_netcdf
+      ~MassSourceLoading.write
+      ~MassSourceLoading.write_binary_griddata
+      ~MassSourceLoading.write_blockfile
+      ~MassSourceLoading.write_text_griddata
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~MassSourceLoading.dataset
+   
+   

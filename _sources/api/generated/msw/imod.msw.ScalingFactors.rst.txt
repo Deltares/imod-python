@@ -1,0 +1,26 @@
+﻿imod.msw.ScalingFactors
+=======================
+
+.. currentmodule:: imod.msw
+
+.. autoclass:: ScalingFactors
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ScalingFactors.__init__
+      ~ScalingFactors.isel
+      ~ScalingFactors.sel
+      ~ScalingFactors.write
+      ~ScalingFactors.write_dataframe_fixed_width
+   
+   
+
+   
+   
+   

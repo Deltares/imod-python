@@ -1,0 +1,1272 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imod.visualize.pyvista &#8212; iMOD Python 0.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/visualize/pyvista';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">imod.visuali...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for imod.visualize.pyvista</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module creates unstructured grids from DataArrays.</span>
+<span class="sd">Directly creating pyvista.UnstructuredGrids is advantageous for several reasons.</span>
+
+<span class="sd">1. Structured (modflow) grids are rectilinear, so the pyvista.RectilinearGrid might</span>
+<span class="sd">seem obvious. However, nodata values are also present, and have to be removed using</span>
+<span class="sd">a .treshold(). This means constructing every cell, followed by throwing most away.</span>
+<span class="sd">This also returns an unstructured grid, and is slower.</span>
+
+<span class="sd">2. Cells are rectangular, and they jump in the z dimension from one cell to the</span>
+<span class="sd">other:</span>
+<span class="sd">      __</span>
+<span class="sd">  __ |2 |</span>
+<span class="sd"> |1 ||__|</span>
+<span class="sd"> |__|</span>
+
+<span class="sd">In case of a rectilinear grid, the z value on the edge between cell 1 and 2 is</span>
+<span class="sd">linearly interpolated, rather than making a jump. To create jumps, double the number</span>
+<span class="sd">of cells is required, with dummy cells in between with width 0. This is clearly</span>
+<span class="sd">wasteful.</span>
+
+<span class="sd">The grid is constructed with:</span>
+<span class="sd">offset, cells, cell_type, points, values</span>
+
+<span class="sd">As presented here:</span>
+<span class="sd">https://github.com/pyvista/pyvista/blob/0.23.0/examples/00-load/create-unstructured-surface.py</span>
+
+<span class="sd">* offset: start of each cell in the cells array.</span>
+<span class="sd">* cells: number of points in the cell, then point number; for every cell.</span>
+<span class="sd">* cell_type: integers, informing vtk of the geometry type.</span>
+<span class="sd">* points are the coordinates (x, y, z) for every cell corner.</span>
+<span class="sd">* values: are the values from the data array. Can generally by used for coloring.</span>
+
+<span class="sd">The methods below construct pyvista.UnstructuredGrids for voxel models (z1d),</span>
+<span class="sd">&quot;layer models&quot; (z3d), and two dimensional data (e.g. a DEM).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span> <span class="nn">numba</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">scipy.ndimage</span>
+<span class="kn">import</span> <span class="nn">tqdm</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+<span class="kn">from</span> <span class="nn">imod</span> <span class="kn">import</span> <span class="n">util</span>
+<span class="kn">from</span> <span class="nn">imod.select</span> <span class="kn">import</span> <span class="n">points_values</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">pyvista</span> <span class="k">as</span> <span class="nn">pv</span>
+    <span class="kn">import</span> <span class="nn">vtk</span>
+
+    <span class="k">if</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkVersion</span><span class="p">()</span><span class="o">.</span><span class="n">GetVTKMajorVersion</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">9</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;VTK version of 9.0 or higher required&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">pv</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;pyvista&quot;</span><span class="p">)</span>
+    <span class="n">vtk</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;vtk&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">exterior</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="n">has_data</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span>
+    <span class="n">eroded</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">scipy</span><span class="o">.</span><span class="n">ndimage</span><span class="o">.</span><span class="n">binary_erosion</span><span class="p">(</span><span class="n">has_data</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">iterations</span><span class="o">=</span><span class="n">n</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">has_data</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">eroded</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span>
+<span class="k">def</span> <span class="nf">_create_hexahedra_z1d</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function creates the necessary arrays to create hexahedra, based on a</span>
+<span class="sd">    one-dimensional z array: i.e. one that does not depend on x and y.</span>
+<span class="sd">    These arrays are used to create a pyvista.UnstructuredGrid.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : np.array of size (nz, ny, nx)</span>
+<span class="sd">    x : np.array of size nx + 1</span>
+<span class="sd">    y: np.array of size ny + 1</span>
+<span class="sd">    z : np.array of size (nz + 1)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    offset : np.array of int</span>
+<span class="sd">    cells : np.array of int</span>
+<span class="sd">    cell_type : np.array of vkt enum</span>
+<span class="sd">    points : np.array of float</span>
+<span class="sd">    values : np.array of float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nz</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nx</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+    <span class="c1"># First pass: count valid values</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nz</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ny</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nx</span><span class="p">):</span>
+                <span class="k">if</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]):</span>
+                    <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># Allocate</span>
+    <span class="c1"># VTK_HEXAHEDRON is just an enum</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">9</span><span class="p">)</span>
+    <span class="n">cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="mi">9</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="n">cell_type</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">vtk</span><span class="o">.</span><span class="n">VTK_HEXAHEDRON</span><span class="p">)</span>
+    <span class="c1"># A hexahedron has 8 corners</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="n">ii</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">jj</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">kk</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">linear_index</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nz</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ny</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nx</span><span class="p">):</span>
+                <span class="k">if</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]):</span>
+                    <span class="c1"># Set coordinates of points</span>
+                    <span class="n">points</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">z</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">points</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">z</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">points</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">z</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">points</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">z</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">points</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">z</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+                    <span class="n">points</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">z</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+                    <span class="n">points</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">z</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+                    <span class="n">points</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">z</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+                    <span class="c1"># Set number of cells, and point number</span>
+                    <span class="n">cells</span><span class="p">[</span><span class="n">jj</span><span class="p">]</span> <span class="o">=</span> <span class="mi">8</span>
+                    <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span>
+                    <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span>
+                    <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span> <span class="o">+</span> <span class="mi">2</span>
+                    <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span> <span class="o">+</span> <span class="mi">3</span>
+                    <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span> <span class="o">+</span> <span class="mi">4</span>
+                    <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span> <span class="o">+</span> <span class="mi">5</span>
+                    <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span> <span class="o">+</span> <span class="mi">6</span>
+                    <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">8</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span> <span class="o">+</span> <span class="mi">7</span>
+                    <span class="n">ii</span> <span class="o">+=</span> <span class="mi">8</span>
+                    <span class="n">jj</span> <span class="o">+=</span> <span class="mi">9</span>
+                    <span class="c1"># Set values</span>
+                    <span class="n">values</span><span class="p">[</span><span class="n">kk</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span>
+                    <span class="c1"># Set indices</span>
+                    <span class="n">indices</span><span class="p">[</span><span class="n">kk</span><span class="p">]</span> <span class="o">=</span> <span class="n">linear_index</span>
+                    <span class="n">kk</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">linear_index</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">indices</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">cells</span><span class="p">,</span> <span class="n">cell_type</span><span class="p">,</span> <span class="n">points</span><span class="p">,</span> <span class="n">values</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span>
+<span class="k">def</span> <span class="nf">_create_hexahedra_z3d</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z3d</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function creates the necessary arrays to create hexahedra, based on a</span>
+<span class="sd">    three-dimensional z array: i.e. one that depends on x and y.</span>
+<span class="sd">    These arrays are used to create a pyvista.UnstructuredGrid.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : np.array of size (nz, ny, nx)</span>
+<span class="sd">    x : np.array of size nx + 1</span>
+<span class="sd">    y: np.array of size ny + 1</span>
+<span class="sd">    z : np.array of size (nz + 1, ny, nx)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    offset : np.array of int</span>
+<span class="sd">    cells : np.array of int</span>
+<span class="sd">    cell_type : np.array of vkt enum</span>
+<span class="sd">    points : np.array of float</span>
+<span class="sd">    values : np.array of float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nz</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nx</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+    <span class="c1"># First pass: count valid values</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nz</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ny</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nx</span><span class="p">):</span>
+                <span class="k">if</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]):</span>
+                    <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># Allocate</span>
+    <span class="c1"># VTK_HEXAHEDRON is just an enum</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">9</span><span class="p">)</span>
+    <span class="n">cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="mi">9</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="n">cell_type</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">vtk</span><span class="o">.</span><span class="n">VTK_HEXAHEDRON</span><span class="p">)</span>
+    <span class="c1"># A hexahedron has 8 corners</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="n">ii</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">jj</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">kk</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">linear_index</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nz</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ny</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nx</span><span class="p">):</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span>
+                <span class="k">if</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+                    <span class="c1"># Set coordinates of points</span>
+                    <span class="n">points</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">z3d</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span>
+                    <span class="n">points</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">z3d</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span>
+                    <span class="n">points</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">z3d</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span>
+                    <span class="n">points</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">z3d</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span>
+                    <span class="n">points</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">z3d</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span>
+                    <span class="n">points</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">z3d</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span>
+                    <span class="n">points</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">z3d</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span>
+                    <span class="n">points</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">z3d</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span>
+                    <span class="c1"># Set number of cells, and point number</span>
+                    <span class="n">cells</span><span class="p">[</span><span class="n">jj</span><span class="p">]</span> <span class="o">=</span> <span class="mi">8</span>
+                    <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span>
+                    <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span>
+                    <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span> <span class="o">+</span> <span class="mi">2</span>
+                    <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span> <span class="o">+</span> <span class="mi">3</span>
+                    <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span> <span class="o">+</span> <span class="mi">4</span>
+                    <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span> <span class="o">+</span> <span class="mi">5</span>
+                    <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span> <span class="o">+</span> <span class="mi">6</span>
+                    <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">8</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span> <span class="o">+</span> <span class="mi">7</span>
+                    <span class="n">ii</span> <span class="o">+=</span> <span class="mi">8</span>
+                    <span class="n">jj</span> <span class="o">+=</span> <span class="mi">9</span>
+                    <span class="c1"># Set values</span>
+                    <span class="n">values</span><span class="p">[</span><span class="n">kk</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+                    <span class="c1"># Set index</span>
+                    <span class="n">indices</span><span class="p">[</span><span class="n">kk</span><span class="p">]</span> <span class="o">=</span> <span class="n">linear_index</span>
+                    <span class="n">kk</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">linear_index</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">indices</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">cells</span><span class="p">,</span> <span class="n">cell_type</span><span class="p">,</span> <span class="n">points</span><span class="p">,</span> <span class="n">values</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span>
+<span class="k">def</span> <span class="nf">_create_plane_surface</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function creates the necessary arrays to create quads, based on a</span>
+<span class="sd">    two-dimensional data array. The data array is used for the z dimension.</span>
+<span class="sd">    All the horizontal surfaces are connected by vertical faces, exactly</span>
+<span class="sd">    representing the cell geometry, with a constant value per cell.</span>
+<span class="sd">    The alternative is linear interpolation, which does not represent</span>
+<span class="sd">    geometry exactly, or holes in the surface, with isolated quads floating</span>
+<span class="sd">    in space.</span>
+
+<span class="sd">    These arrays are used to create a pyvista.UnstructuredGrid.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : np.array of size (ny, nx)</span>
+<span class="sd">    x : np.array of size nx + 1</span>
+<span class="sd">    y: np.array of size ny + 1</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    offset : np.array of int</span>
+<span class="sd">    cells : np.array of int</span>
+<span class="sd">    cell_type : np.array of vkt enum</span>
+<span class="sd">    points : np.array of float</span>
+<span class="sd">    values : np.array of float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ny</span><span class="p">,</span> <span class="n">nx</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+    <span class="c1"># First pass: count valid values</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ny</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nx</span><span class="p">):</span>
+            <span class="k">if</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]):</span>
+                <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">nx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]):</span>
+                        <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">ny</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]):</span>
+                        <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># Allocate</span>
+    <span class="c1"># VTK_QUAD is just an enum</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="n">cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="n">cell_type</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">vtk</span><span class="o">.</span><span class="n">VTK_QUAD</span><span class="p">)</span>
+    <span class="c1"># A hexahedron has r corners</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="n">ii</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">jj</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">kk</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ny</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nx</span><span class="p">):</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+            <span class="c1"># Create horizontal quad</span>
+            <span class="k">if</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+                <span class="c1"># Set coordinates of points</span>
+                <span class="n">points</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">v</span><span class="p">)</span>
+                <span class="n">points</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">v</span><span class="p">)</span>
+                <span class="n">points</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">v</span><span class="p">)</span>
+                <span class="n">points</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">v</span><span class="p">)</span>
+                <span class="c1"># Set number of cells, and point number</span>
+                <span class="n">cells</span><span class="p">[</span><span class="n">jj</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>
+                <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span>
+                <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span> <span class="o">+</span> <span class="mi">2</span>
+                <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span> <span class="o">+</span> <span class="mi">3</span>
+                <span class="n">ii</span> <span class="o">+=</span> <span class="mi">4</span>
+                <span class="n">jj</span> <span class="o">+=</span> <span class="mi">5</span>
+                <span class="c1"># Set values</span>
+                <span class="n">values</span><span class="p">[</span><span class="n">kk</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+                <span class="c1"># Set index</span>
+                <span class="n">kk</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="k">if</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">nx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">v01</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                    <span class="c1"># Create vertical quads</span>
+                    <span class="k">if</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">v01</span><span class="p">):</span>
+                        <span class="c1"># Set coordinates of points</span>
+                        <span class="n">points</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">v</span><span class="p">)</span>
+                        <span class="n">points</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">v</span><span class="p">)</span>
+                        <span class="n">points</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">v01</span><span class="p">)</span>
+                        <span class="n">points</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">v01</span><span class="p">)</span>
+                        <span class="c1"># Set number of cells, and point number</span>
+                        <span class="n">cells</span><span class="p">[</span><span class="n">jj</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>
+                        <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span>
+                        <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span>
+                        <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span> <span class="o">+</span> <span class="mi">2</span>
+                        <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span> <span class="o">+</span> <span class="mi">3</span>
+                        <span class="n">ii</span> <span class="o">+=</span> <span class="mi">4</span>
+                        <span class="n">jj</span> <span class="o">+=</span> <span class="mi">5</span>
+                        <span class="c1"># Set values</span>
+                        <span class="n">values</span><span class="p">[</span><span class="n">kk</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span> <span class="k">if</span> <span class="n">v</span> <span class="o">&gt;</span> <span class="n">v01</span> <span class="k">else</span> <span class="n">v01</span>
+                        <span class="c1"># Set index</span>
+                        <span class="n">kk</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">ny</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">v10</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">v10</span><span class="p">):</span>
+                        <span class="c1"># Set coordinates of points</span>
+                        <span class="n">points</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">v</span><span class="p">)</span>
+                        <span class="n">points</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">v</span><span class="p">)</span>
+                        <span class="n">points</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">v10</span><span class="p">)</span>
+                        <span class="n">points</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">v10</span><span class="p">)</span>
+                        <span class="c1"># Set number of cells, and point number</span>
+                        <span class="n">cells</span><span class="p">[</span><span class="n">jj</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>
+                        <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span>
+                        <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span>
+                        <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span> <span class="o">+</span> <span class="mi">2</span>
+                        <span class="n">cells</span><span class="p">[</span><span class="n">jj</span> <span class="o">+</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span> <span class="o">+</span> <span class="mi">3</span>
+                        <span class="n">ii</span> <span class="o">+=</span> <span class="mi">4</span>
+                        <span class="n">jj</span> <span class="o">+=</span> <span class="mi">5</span>
+                        <span class="c1"># Set values</span>
+                        <span class="n">values</span><span class="p">[</span><span class="n">kk</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span> <span class="k">if</span> <span class="n">v</span> <span class="o">&gt;</span> <span class="n">v10</span> <span class="k">else</span> <span class="n">v10</span>
+                        <span class="c1"># Set index</span>
+                        <span class="n">kk</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">offset</span><span class="p">,</span> <span class="n">cells</span><span class="p">,</span> <span class="n">cell_type</span><span class="p">,</span> <span class="n">points</span><span class="p">,</span> <span class="n">values</span>
+
+
+<span class="k">def</span> <span class="nf">vertices_coords</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">nx</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the coordinates of the vertices.</span>
+<span class="sd">    (xarray stores midpoints)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">xmin</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">xmax</span><span class="p">)</span>
+    <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">+=</span> <span class="n">dx</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">x</span>
+
+
+<div class="viewcode-block" id="grid_3d"><a class="viewcode-back" href="../../../api/generated/visualize/imod.visualize.grid_3d.html#imod.visualize.grid_3d">[docs]</a><span class="k">def</span> <span class="nf">grid_3d</span><span class="p">(</span>
+    <span class="n">da</span><span class="p">,</span>
+    <span class="n">vertical_exaggeration</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
+    <span class="n">exterior_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">exterior_depth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">return_index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Constructs a 3D PyVista representation of a DataArray.</span>
+<span class="sd">    DataArrays should be two-dimensional or three-dimensional:</span>
+
+<span class="sd">    * 2D: dimensions should be ``{&quot;y&quot;, &quot;x&quot;}``. E.g. a DEM.</span>
+<span class="sd">    * 3D: dimensions should be ``{&quot;z&quot;, &quot;y&quot;, &quot;x&quot;}``, for a voxel model.</span>
+<span class="sd">    * 3D: dimensions should be ``{&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;}``, with coordinates</span>
+<span class="sd">        ``&quot;top&quot;({&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;})`` and ``&quot;bottom&quot;({&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;})``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    da : xr.DataArray</span>
+<span class="sd">    vertical_exaggeration : float, default 30.0</span>
+<span class="sd">    exterior_only : bool, default True</span>
+<span class="sd">        Whether or not to only draw the exterior. Greatly speeds up rendering,</span>
+<span class="sd">        but it means that pyvista slices and filters produce &quot;hollowed out&quot;</span>
+<span class="sd">        results.</span>
+<span class="sd">    exterior_depth : int, default 1</span>
+<span class="sd">        How many cells to consider as exterior. In case of large jumps, holes</span>
+<span class="sd">        can occur. By settings this argument to a higher value, more of the</span>
+<span class="sd">        inner cells will be rendered, reducing the chances of gaps occurring.</span>
+<span class="sd">    return_index : bool, default False</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pyvista.UnstructuredGrid</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    &gt;&gt;&gt; grid = imod.visualize.grid_3d(da)</span>
+
+<span class="sd">    To plot the grid, call the ``.plot()`` method.</span>
+
+<span class="sd">    &gt;&gt;&gt; grid.plot()</span>
+
+<span class="sd">    Use ``.assign_coords`` to assign tops and bottoms to layer models:</span>
+
+<span class="sd">    &gt;&gt;&gt; top = imod.idf.open(&quot;top*.idf&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; bottom = imod.idf.open(&quot;bot*.idf&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; kd = imod.idf.open(&quot;kd*.idf&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; kd = kd.assign_coords(top=((&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;), top))</span>
+<span class="sd">    &gt;&gt;&gt; kd = kd.assign_coords(bottom=((&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;), bottom))</span>
+<span class="sd">    &gt;&gt;&gt; grid = imod.visualize.grid_3d(kd)</span>
+<span class="sd">    &gt;&gt;&gt; grid.plot()</span>
+
+<span class="sd">    Refer to the PyVista documentation on how to customize plots:</span>
+<span class="sd">    https://docs.pyvista.org/index.html</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># x and y dimension</span>
+    <span class="n">dx</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">spatial_reference</span><span class="p">(</span><span class="n">da</span><span class="p">)</span>
+    <span class="n">nx</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">ny</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">vertices_coords</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">nx</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">vertices_coords</span><span class="p">(</span><span class="n">dy</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="n">ny</span><span class="p">)</span>
+    <span class="c1"># Coordinates should always have dtype == np.float64 by now</span>
+
+    <span class="c1"># z dimension</span>
+    <span class="k">if</span> <span class="s2">&quot;top&quot;</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span> <span class="ow">and</span> <span class="s2">&quot;bottom&quot;</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Coordinates &quot;top&quot; and &quot;bottom&quot; are present, but data is not 3D.&#39;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">}:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Coordinates &quot;top&quot; and &quot;bottom&quot; are present, only dimensions allowed are: &#39;</span>
+                <span class="s1">&#39;{&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;}&#39;</span>
+            <span class="p">)</span>
+        <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">transpose_coords</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">ztop</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span>
+        <span class="n">zbot</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]</span>
+        <span class="n">z3d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">ztop</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">zbot</span><span class="o">.</span><span class="n">values</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">exterior_only</span><span class="p">:</span>
+            <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">exterior</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">exterior_depth</span><span class="p">))</span>
+
+        <span class="n">indices</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">cells</span><span class="p">,</span> <span class="n">cell_type</span><span class="p">,</span> <span class="n">points</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="n">_create_hexahedra_z3d</span><span class="p">(</span>
+            <span class="n">da</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z3d</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="s2">&quot;z&quot;</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Coordinate &quot;z&quot; is present, but data is not 3D.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">}</span> <span class="ow">or</span> <span class="nb">set</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">}):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Coordinate &quot;z&quot; is present, only dimensions allowed are: &#39;</span>
+                <span class="s1">&#39;{&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;} or {&quot;z&quot;, &quot;y&quot;, &quot;x&quot;}&#39;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;z&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+            <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">transpose_coords</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">transpose_coords</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">dz</span><span class="p">,</span> <span class="n">zmin</span><span class="p">,</span> <span class="n">zmax</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">coord_reference</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">])</span>
+        <span class="n">nz</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">vertices_coords</span><span class="p">(</span><span class="n">dz</span><span class="p">,</span> <span class="n">zmin</span><span class="p">,</span> <span class="n">zmax</span><span class="p">,</span> <span class="n">nz</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">exterior_only</span><span class="p">:</span>
+            <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">exterior</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">exterior_depth</span><span class="p">))</span>
+
+        <span class="n">indices</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">cells</span><span class="p">,</span> <span class="n">cell_type</span><span class="p">,</span> <span class="n">points</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="n">_create_hexahedra_z1d</span><span class="p">(</span>
+            <span class="n">da</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">set</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">}:</span>
+        <span class="k">if</span> <span class="n">return_index</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot return indices for a 2D dataarray.&quot;</span><span class="p">)</span>
+        <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">transpose_coords</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">offset</span><span class="p">,</span> <span class="n">cells</span><span class="p">,</span> <span class="n">cell_type</span><span class="p">,</span> <span class="n">points</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="n">_create_plane_surface</span><span class="p">(</span>
+            <span class="n">da</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s1">&#39;Incorrect coordinates and/or dimensions: Neither &quot;z&quot; nor &quot;top&quot; and &#39;</span>
+            <span class="s1">&#39;&quot;bottom&quot; is present in the DataArray, but dimension are not {&quot;y&quot;, &quot;x&quot;} &#39;</span>
+            <span class="s2">&quot; either.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">UnstructuredGrid</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="n">cell_type</span><span class="p">,</span> <span class="n">points</span><span class="p">)</span>
+    <span class="n">grid</span><span class="o">.</span><span class="n">points</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*=</span> <span class="n">vertical_exaggeration</span>
+    <span class="n">grid</span><span class="o">.</span><span class="n">cell_data</span><span class="p">[</span><span class="s2">&quot;values&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span>
+
+    <span class="k">if</span> <span class="n">return_index</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">grid</span><span class="p">,</span> <span class="n">indices</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">grid</span></div>
+
+
+<span class="c1"># For arrow plots: compute magnitude of vector</span>
+<span class="c1"># Downsample, using max rule.</span>
+<span class="c1"># Upsample again</span>
+<span class="c1"># Select with .where?</span>
+<span class="c1"># Create an array of (n, 3) shape</span>
+<span class="c1"># Vectors are located somewhere</span>
+
+
+<div class="viewcode-block" id="line_3d"><a class="viewcode-back" href="../../../api/generated/visualize/imod.visualize.line_3d.html#imod.visualize.line_3d">[docs]</a><span class="k">def</span> <span class="nf">line_3d</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the exterior line of a shapely polygon.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    polygon : shapely.geometry.Polygon</span>
+<span class="sd">    z : float or xr.DataArray</span>
+<span class="sd">        z-coordinate to assign to line. If DataArray, assigns z-coordinate</span>
+<span class="sd">        based on xy locations in DataArray.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pyvista.PolyData</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">polygon</span><span class="o">.</span><span class="n">exterior</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">xy</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">points_values</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">])</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">pv</span><span class="o">.</span><span class="n">lines_from_points</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GridAnimation3D"><a class="viewcode-back" href="../../../api/generated/visualize/imod.visualize.GridAnimation3D.html#imod.visualize.GridAnimation3D">[docs]</a><span class="k">class</span> <span class="nc">GridAnimation3D</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class to easily setup 3D animations for transient data. Use the</span>
+<span class="sd">    ``imod.visualize.StaticGridAnimation3D`` when the location of the displayed</span>
+<span class="sd">    cells is constant over time: it will render much faster.</span>
+
+<span class="sd">    You can iteratively add or change settings to the plotter, until you&#39;re</span>
+<span class="sd">    satisfied. Call the ``.peek()`` method to take a look. When satisfied, call</span>
+<span class="sd">    ``.output()`` to write to a file.</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    da : xr.DataArray</span>
+<span class="sd">        The dataarray with transient data. Must contain a &quot;time&quot; dimension.</span>
+<span class="sd">    vertical_exaggeration : float, defaults to 30.0 mesh_kwargs : dict</span>
+<span class="sd">        keyword arguments that are forwarded to the pyvista mesh representing</span>
+<span class="sd">        &quot;da&quot;. If &quot;stitle&quot; is given as one of the arguments, the special keyword</span>
+<span class="sd">        &quot;timestamp&quot; can be used to render the plotted time as part of the title.</span>
+<span class="sd">        See example. For a full list of kwargs supported, see the</span>
+<span class="sd">        `plotter.add_mesh</span>
+<span class="sd">        &lt;https://docs.pyvista.org/api/plotting/_autosummary/pyvista.Plotter.add_mesh.html#pyvista.Plotter.add_mesh&gt;`_</span>
+<span class="sd">        method documentation.</span>
+<span class="sd">    plotter_kwargs : dict</span>
+<span class="sd">        keyword arguments that are forwarded to the pyvista plotter. For a full</span>
+<span class="sd">        list of of kwargs supported, see the `Plotter constructor</span>
+<span class="sd">        &lt;https://docs.pyvista.org/api/plotting/_autosummary/pyvista.Plotter.html&gt;`_</span>
+<span class="sd">        documention.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    Initialize the animation:</span>
+
+<span class="sd">    &gt;&gt;&gt; animation = imod.visualize.GridAnimation3D(concentration, mesh_kwargs=dict(cmap=&quot;jet&quot;))</span>
+
+<span class="sd">    Check what it looks like (if a window pops up: press &quot;q&quot; instead of the X to</span>
+<span class="sd">    return):</span>
+
+<span class="sd">    &gt;&gt;&gt; animation.peek()</span>
+
+<span class="sd">    Change the camera position, add bounding box, and check the result:</span>
+
+<span class="sd">    &gt;&gt;&gt; animation.plotter.camera_position = (2, 1, 0.5)</span>
+<span class="sd">    &gt;&gt;&gt; animation.plotter.add_bounding_box()</span>
+<span class="sd">    &gt;&gt;&gt; animation.peek()</span>
+
+<span class="sd">    When it looks good, write to a file:</span>
+
+<span class="sd">    &gt;&gt;&gt; animation.write(&quot;example.mp4&quot;)</span>
+
+<span class="sd">    If you&#39;ve made some changes that don&#39;t look good, call ``.reset()`` to start</span>
+<span class="sd">    over:</span>
+
+<span class="sd">    &gt;&gt;&gt; animation.reset()</span>
+
+<span class="sd">    Note that ``.reset()`` is automatically called when the animation has</span>
+<span class="sd">    finished writing.</span>
+
+<span class="sd">    You can use &quot;stitle&quot; in mesh_kwargs in conjunction with the &quot;timestamp&quot;</span>
+<span class="sd">    keyword to print a formatted timestamp in the animation:</span>
+
+<span class="sd">    &gt;&gt;&gt; animation = imod.visualize.GridAnimation3D(concentration, mesh_kwargs=dict(stitle=&quot;Concentration on {timestamp:%Y-%m-%d}&quot;))</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">da</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span> <span class="o">=</span> <span class="n">grid_3d</span><span class="p">(</span>
+            <span class="n">da</span><span class="p">,</span> <span class="n">vertical_exaggeration</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">vertical_exaggeration</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
+        <span class="n">mesh_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh_kwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s2">&quot;stitle&quot;</span> <span class="ow">in</span> <span class="n">mesh_kwargs</span> <span class="ow">and</span> <span class="s2">&quot;{timestamp&quot;</span> <span class="ow">in</span> <span class="n">mesh_kwargs</span><span class="p">[</span><span class="s2">&quot;stitle&quot;</span><span class="p">]:</span>
+            <span class="n">mesh_kwargs</span><span class="p">[</span><span class="s2">&quot;stitle&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_kwargs</span><span class="p">[</span><span class="s2">&quot;stitle&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">timestamp</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mesh_actor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">add_mesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="o">**</span><span class="n">mesh_kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">da</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">remove_actor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh_actor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initialize</span><span class="p">(</span><span class="n">da</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GridAnimation3D.__init__"><a class="viewcode-back" href="../../../api/generated/visualize/imod.visualize.GridAnimation3D.html#imod.visualize.GridAnimation3D.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">da</span><span class="p">,</span> <span class="n">vertical_exaggeration</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span> <span class="n">mesh_kwargs</span><span class="o">=</span><span class="p">{},</span> <span class="n">plotter_kwargs</span><span class="o">=</span><span class="p">{}</span>
+    <span class="p">):</span>
+        <span class="c1"># Store data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">da</span> <span class="o">=</span> <span class="n">da</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertical_exaggeration</span> <span class="o">=</span> <span class="n">vertical_exaggeration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mesh_kwargs</span> <span class="o">=</span> <span class="n">mesh_kwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotter_kwargs</span> <span class="o">=</span> <span class="n">plotter_kwargs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">Plotter</span><span class="p">(</span><span class="o">**</span><span class="n">plotter_kwargs</span><span class="p">)</span>
+        <span class="c1"># Initialize pyvista objects</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initialize</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="nf">peek</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Display the current state of the animation plotter.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">auto_close</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reset the plotter to its base state.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">Plotter</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">plotter_kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">framerate</span><span class="o">=</span><span class="mi">24</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write the animation to a video or gif.</span>
+
+<span class="sd">        Resets the plotter when finished animating.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : str, pathlib.Path</span>
+<span class="sd">            Filename to write the video to. Should be an .mp4 or .gif.</span>
+<span class="sd">        framerate : int, optional</span>
+<span class="sd">            Frames per second. Not honoured for gif.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">Path</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;.gif&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">open_gif</span><span class="p">(</span>
+                <span class="n">Path</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.gif&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+            <span class="p">)</span>  <span class="c1"># only lowercase gif and no Path allowed</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">open_movie</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">framerate</span><span class="o">=</span><span class="n">framerate</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">auto_close</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">write_frame</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">itime</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">itime</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">write_frame</span><span class="p">()</span>
+
+        <span class="c1"># Close and reinitialize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotter</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="StaticGridAnimation3D"><a class="viewcode-back" href="../../../api/generated/visualize/imod.visualize.StaticGridAnimation3D.html#imod.visualize.StaticGridAnimation3D">[docs]</a><span class="k">class</span> <span class="nc">StaticGridAnimation3D</span><span class="p">(</span><span class="n">GridAnimation3D</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class to easily setup 3D animations for transient data;</span>
+<span class="sd">    Should only be used when the location of the displayed cells is constant</span>
+<span class="sd">    over time. It will render much faster than ``imod.visualize.GridAnimation3D``.</span>
+
+<span class="sd">    Refer to examples of ``imod.visualize.GridAnimation3D``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">da</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span> <span class="o">=</span> <span class="n">grid_3d</span><span class="p">(</span>
+            <span class="n">da</span><span class="p">,</span> <span class="n">vertical_exaggeration</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">vertical_exaggeration</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">da</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">cell_data</span><span class="p">[</span><span class="s2">&quot;values&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">]</span></div>
+
+
+<span class="k">def</span> <span class="nf">velocity_field</span><span class="p">(</span>
+    <span class="n">vx</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">vy</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">vz</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">z</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">vertical_exaggeration</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">30.0</span><span class="p">,</span>
+    <span class="n">scale_by_magnitude</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">factor</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">tolerance</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">absolute</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">clamping</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">rng</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="k">if</span> <span class="n">z</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">vx</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">vx</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">vy</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">vz</span><span class="o">.</span><span class="n">shape</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Shapes of velocity components vx, vy, vz do not match&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">vx</span><span class="o">.</span><span class="n">dims</span> <span class="o">==</span> <span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">vx</span><span class="o">.</span><span class="n">dims</span> <span class="o">==</span> <span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s1">&#39;Velocity components must have dimensions (&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;) &#39;</span>
+            <span class="s1">&#39;or (&quot;z&quot;, &quot;y&quot;, &quot;x&quot;) exactly.</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">f</span><span class="s2">&quot;Received </span><span class="si">{</span><span class="n">vx</span><span class="o">.</span><span class="n">dims</span><span class="si">}</span><span class="s2"> instead.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Start by generating the location of the velocity arrows</span>
+    <span class="c1"># Ensure the points follow the memory layout of the v DataArrays (z, y, x)</span>
+    <span class="c1"># otherwise, the result of np.ravel() doesn&#39;t match up</span>
+    <span class="k">if</span> <span class="n">z</span><span class="o">.</span><span class="n">dim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">zz</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">vx</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">vx</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s2">&quot;ij&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">z</span><span class="o">.</span><span class="n">dim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">z</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">vx</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Shape of `z` does not match velocity components.&quot;</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">vx</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">vy</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">avlues</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s2">&quot;ij&quot;</span>
+        <span class="p">)</span>
+        <span class="n">zz</span> <span class="o">=</span> <span class="n">z</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;z should be one or three dimensional.&quot;</span><span class="p">)</span>
+
+    <span class="n">zz</span> <span class="o">*=</span> <span class="n">vertical_exaggeration</span>
+    <span class="n">cellcenters</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">PolyData</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">zz</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+    <span class="c1"># Add the velocity components in x, y, z order</span>
+    <span class="n">cellcenters</span><span class="p">[</span><span class="s2">&quot;velocity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="n">vx</span><span class="p">,</span> <span class="n">vy</span><span class="p">,</span> <span class="n">vz</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="s2">&quot;velocity&quot;</span> <span class="k">if</span> <span class="n">scale_by_magnitude</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="n">cellcenters</span><span class="o">.</span><span class="n">glyph</span><span class="p">(</span>
+        <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span>
+        <span class="n">orient</span><span class="o">=</span><span class="s2">&quot;velocity&quot;</span><span class="p">,</span>
+        <span class="n">factor</span><span class="o">=</span><span class="n">factor</span><span class="p">,</span>
+        <span class="n">tolerance</span><span class="o">=</span><span class="n">tolerance</span><span class="p">,</span>
+        <span class="n">absolute</span><span class="o">=</span><span class="n">absolute</span><span class="p">,</span>
+        <span class="n">clamping</span><span class="o">=</span><span class="n">clamping</span><span class="p">,</span>
+        <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,26 @@
+﻿imod.msw.CouplerMapping
+=======================
+
+.. currentmodule:: imod.msw
+
+.. autoclass:: CouplerMapping
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CouplerMapping.__init__
+      ~CouplerMapping.isel
+      ~CouplerMapping.sel
+      ~CouplerMapping.write
+      ~CouplerMapping.write_dataframe_fixed_width
+   
+   
+
+   
+   
+   

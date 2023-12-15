@@ -1,0 +1,3232 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Model Creation &#8212; iMOD Python 0.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/imodflow/ImodflowProjectfile';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="iMOD-WQ" href="../imod-wq/index.html" />
+    <link rel="prev" title="iMODFLOW" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../mf6/index.html">MODFLOW6</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/Henry.html">Henry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/circle.html">Circle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/circle_transport.html">Freshwater lens (circle)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/ex01_twri.html">TWRI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/example_1d_transport.html">1D Solute Transport Benchmarks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/example_models.html">Example models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/hondsrug.html">Regional model</a></li>
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../mf6/hondsrug_partitioning.html">Partitioning a regional model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/hondsrug_regridding.html">Regridding a regional model</a></li>
+
+
+
+<li class="toctree-l2"><a class="reference internal" href="../mf6/lake.html">Lake package example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/twri_regridding.html">TWRI regridding</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">iMODFLOW</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Model Creation</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../imod-wq/index.html">iMOD-WQ</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../imod-wq/Elder.html">Elder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../imod-wq/FreshwaterLens.html">Freshwater Lens</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../imod-wq/Henry.html">Henry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../imod-wq/Hydrocoin.html">Hydrocoin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../imod-wq/SaltwaterPocket.html">Saltwater Pocket</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../imod-wq/VerticalInterface.html">Vertical Interface</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../metaswap/index.html">MetaSWAP</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../metaswap/metaswap_example.html">Coupled MetaSWAP - Modflow6 model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../metaswap/read_metaswap_file.html">Reading existing MetaSWAP input</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../prepare/index.html">Prepare</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/point_interpolation.html">Head point interpolation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/polygonize_raster.html">Polygonize raster</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/rasterize_shp.html">Rasterize shapefiles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/reproject.html">Reproject data</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../visualize/index.html">Visualization</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../visualize/flowvel_streamlines.html">Flow velocities and streamlines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../visualize/plot_map.html">Plot maps</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Examples</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">iMODFLOW</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Model Creation</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-examples-imodflow-imodflowprojectfile-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="model-creation">
+<span id="sphx-glr-examples-imodflow-imodflowprojectfile-py"></span><h1>Model Creation<a class="headerlink" href="#model-creation" title="Permalink to this heading">#</a></h1>
+<p>In this example, we’ll create an iMODFLOW model
+from scratch with complex boundary conditions
+and horizontal barriers.</p>
+<p>There are two surface water systems:
+the outer two edges of the grid feature ditches
+with a rising stage, whereas the central ditch
+has a periodic boundary conditions with a
+summer and winter stage.</p>
+<p>The model will be written as a projectfile
+with a set of IDFs containing all the grid information
+and a .tim file containing the time discretization.</p>
+<p>We’ll start with the usual imports, supplied
+with geopandas and shapely to specify vector data
+for the <cite>hfb</cite> package.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">LineString</span>
+
+<span class="kn">import</span> <span class="nn">imod</span>
+<span class="kn">import</span> <span class="nn">imod.flow</span> <span class="k">as</span> <span class="nn">flow</span>
+</pre></div>
+</div>
+<section id="discretization">
+<h2>Discretization<a class="headerlink" href="#discretization" title="Permalink to this heading">#</a></h2>
+<p>We’ll start off by creating a model discretization.
+The model consists of a 3 by 9 by 9 three-dimensional grid.</p>
+<p>We’ll specify the grid first.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">shape</span> <span class="o">=</span> <span class="n">nlay</span><span class="p">,</span> <span class="n">nrow</span><span class="p">,</span> <span class="n">ncol</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">9</span>
+
+<span class="n">dx</span> <span class="o">=</span> <span class="mf">100.0</span>
+<span class="n">dy</span> <span class="o">=</span> <span class="o">-</span><span class="mf">100.0</span>
+<span class="n">dz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">100</span><span class="p">])</span>
+<span class="n">xmin</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">xmax</span> <span class="o">=</span> <span class="n">dx</span> <span class="o">*</span> <span class="n">ncol</span>
+<span class="n">ymin</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">ymax</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dy</span><span class="p">)</span> <span class="o">*</span> <span class="n">nrow</span>
+<span class="n">dims</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Next, we’ll create the coordinates
+which set the grid dimensions.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">layer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nlay</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ymax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">dy</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">dx</span>
+<span class="n">coords</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">layer</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>The vertical grid discretization (tops and bottoms) are set with a 1D DataArray.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">surface</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">interfaces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">((</span><span class="n">surface</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">dz</span><span class="p">)),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">surface</span><span class="p">)</span>
+
+<span class="n">bottom</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">interfaces</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">layer</span><span class="p">},</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span>
+<span class="n">top</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">interfaces</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">layer</span><span class="p">},</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We’ll have to create a time discretization as well.
+Create 1 year of monthly timesteps</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">times</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s2">&quot;1/1/2018&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;12/1/2018&quot;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s2">&quot;MS&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We’ll create our first 3 dimensional grid here,
+the <cite>ibound</cite> grid, which sets where active cells are <cite>(ibound = 1.0)</cite></p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">ibound</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">shape</span><span class="p">),</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">dims</span><span class="p">)</span>
+<span class="n">ibound</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewBox="0 0 32 32">
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewBox="0 0 32 32">
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+ *
+ */
+
+:root {
+  --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
+  --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
+  --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
+  --xr-border-color: var(--jp-border-color2, #e0e0e0);
+  --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
+  --xr-background-color: var(--jp-layout-color0, white);
+  --xr-background-color-row-even: var(--jp-layout-color1, white);
+  --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+}
+
+html[theme=dark],
+body[data-theme=dark],
+body.vscode-dark {
+  --xr-font-color0: rgba(255, 255, 255, 1);
+  --xr-font-color2: rgba(255, 255, 255, 0.54);
+  --xr-font-color3: rgba(255, 255, 255, 0.38);
+  --xr-border-color: #1F1F1F;
+  --xr-disabled-color: #515151;
+  --xr-background-color: #111111;
+  --xr-background-color-row-even: #111111;
+  --xr-background-color-row-odd: #313131;
+}
+
+.xr-wrap {
+  display: block !important;
+  min-width: 300px;
+  max-width: 700px;
+}
+
+.xr-text-repr-fallback {
+  /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+  display: none;
+}
+
+.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}
+
+.xr-header > div,
+.xr-header > ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.xr-obj-type,
+.xr-array-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.xr-obj-type {
+  color: var(--xr-font-color2);
+}
+
+.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 20px 20px;
+}
+
+.xr-section-item {
+  display: contents;
+}
+
+.xr-section-item input {
+  display: none;
+}
+
+.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}
+
+.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}
+
+.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}
+
+.xr-section-summary > span {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+
+.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}
+
+.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: '►';
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}
+
+.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-summary-in:checked + label:before {
+  content: '▼';
+}
+
+.xr-section-summary-in:checked + label > span {
+  display: none;
+}
+
+.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.xr-section-inline-details {
+  grid-column: 2 / -1;
+}
+
+.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+}
+
+.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}
+
+.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+
+.xr-array-wrap > label {
+  grid-column: 1;
+  vertical-align: top;
+}
+
+.xr-preview {
+  color: var(--xr-font-color3);
+}
+
+.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}
+
+.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}
+
+.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}
+
+.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+
+.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.xr-dim-list:before {
+  content: '(';
+}
+
+.xr-dim-list:after {
+  content: ')';
+}
+
+.xr-dim-list li:not(:last-child):after {
+  content: ',';
+  padding-right: 5px;
+}
+
+.xr-has-index {
+  font-weight: bold;
+}
+
+.xr-var-list,
+.xr-var-item {
+  display: contents;
+}
+
+.xr-var-item > div,
+.xr-var-item label,
+.xr-var-item > .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  margin-bottom: 0;
+}
+
+.xr-var-item > .xr-var-name:hover span {
+  padding-right: 5px;
+}
+
+.xr-var-list > li:nth-child(odd) > div,
+.xr-var-list > li:nth-child(odd) > label,
+.xr-var-list > li:nth-child(odd) > .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+}
+
+.xr-var-name {
+  grid-column: 1;
+}
+
+.xr-var-dims {
+  grid-column: 2;
+}
+
+.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-preview {
+  grid-column: 4;
+}
+
+.xr-index-preview {
+  grid-column: 2 / 5;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}
+
+.xr-var-attrs,
+.xr-var-data,
+.xr-index-data {
+  display: none;
+  background-color: var(--xr-background-color) !important;
+  padding-bottom: 5px !important;
+}
+
+.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data,
+.xr-index-data-in:checked ~ .xr-index-data {
+  display: block;
+}
+
+.xr-var-data > table {
+  float: right;
+}
+
+.xr-var-name span,
+.xr-var-data,
+.xr-index-name div,
+.xr-index-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}
+
+.xr-attrs,
+.xr-var-attrs,
+.xr-var-data,
+.xr-index-data {
+  grid-column: 1 / -1;
+}
+
+dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}
+
+.xr-attrs dt,
+.xr-attrs dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}
+
+.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}
+
+.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}
+
+.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.xr-icon-database,
+.xr-icon-file-text2,
+.xr-no-icon {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray (layer: 3, y: 9, x: 9)&gt;
+array([[[1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.]],
+
+       [[1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.]],
+
+       [[1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.]]])
+Coordinates:
+  * layer    (layer) int32 1 2 3
+  * y        (y) float64 850.0 750.0 650.0 550.0 450.0 350.0 250.0 150.0 50.0
+  * x        (x) float64 50.0 150.0 250.0 350.0 450.0 550.0 650.0 750.0 850.0</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>layer</span>: 3</li><li><span class='xr-has-index'>y</span>: 9</li><li><span class='xr-has-index'>x</span>: 9</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-6dc5899b-c4df-4a70-8b23-99f6206cf3c7' class='xr-array-in' type='checkbox' checked><label for='section-6dc5899b-c4df-4a70-8b23-99f6206cf3c7' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 ... 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0</span></div><div class='xr-array-data'><pre>array([[[1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.]],
+
+       [[1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.]],
+
+       [[1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.]]])</pre></div></div></li><li class='xr-section-item'><input id='section-daed3f0e-10a1-4418-b29c-384f731d2784' class='xr-section-summary-in' type='checkbox'  checked><label for='section-daed3f0e-10a1-4418-b29c-384f731d2784' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int32</div><div class='xr-var-preview xr-preview'>1 2 3</div><input id='attrs-c6d4b135-07b4-4d75-9173-70d1283e1a5f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c6d4b135-07b4-4d75-9173-70d1283e1a5f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-3b14e63d-474f-44be-889e-5ce06cb42ba6' class='xr-var-data-in' type='checkbox'><label for='data-3b14e63d-474f-44be-889e-5ce06cb42ba6' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 2, 3])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>y</span></div><div class='xr-var-dims'>(y)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>850.0 750.0 650.0 ... 150.0 50.0</div><input id='attrs-95b5d21d-ffb3-4a5b-8042-220897d8ab66' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-95b5d21d-ffb3-4a5b-8042-220897d8ab66' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-afd2fb11-3e22-40dd-88b4-9c08e4758733' class='xr-var-data-in' type='checkbox'><label for='data-afd2fb11-3e22-40dd-88b4-9c08e4758733' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([850., 750., 650., 550., 450., 350., 250., 150.,  50.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>x</span></div><div class='xr-var-dims'>(x)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>50.0 150.0 250.0 ... 750.0 850.0</div><input id='attrs-53f7e9d3-13a9-4098-a5c9-752b85c1b736' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-53f7e9d3-13a9-4098-a5c9-752b85c1b736' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-5bfc979c-c9a0-4fd2-9992-8c6d277a320b' class='xr-var-data-in' type='checkbox'><label for='data-5bfc979c-c9a0-4fd2-9992-8c6d277a320b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 50., 150., 250., 350., 450., 550., 650., 750., 850.])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-8e19f7c4-7964-4e1a-a6be-bc203225d6e0' class='xr-section-summary-in' type='checkbox'  ><label for='section-8e19f7c4-7964-4e1a-a6be-bc203225d6e0' class='xr-section-summary' >Indexes: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>layer</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-0ee77b80-d590-4043-a021-92fecabefbff' class='xr-index-data-in' type='checkbox'/><label for='index-0ee77b80-d590-4043-a021-92fecabefbff' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Int64Index([1, 2, 3], dtype=&#x27;int64&#x27;, name=&#x27;layer&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>y</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-ef2b8fb0-b48e-4f8d-a51a-6a393d0be85d' class='xr-index-data-in' type='checkbox'/><label for='index-ef2b8fb0-b48e-4f8d-a51a-6a393d0be85d' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Float64Index([850.0, 750.0, 650.0, 550.0, 450.0, 350.0, 250.0, 150.0, 50.0], dtype=&#x27;float64&#x27;, name=&#x27;y&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>x</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-fa10153d-55bf-4130-8758-7e5290da4f84' class='xr-index-data-in' type='checkbox'/><label for='index-fa10153d-55bf-4130-8758-7e5290da4f84' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Float64Index([50.0, 150.0, 250.0, 350.0, 450.0, 550.0, 650.0, 750.0, 850.0], dtype=&#x27;float64&#x27;, name=&#x27;x&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-37b7d595-c732-4bda-85e9-88451c203244' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-37b7d595-c732-4bda-85e9-88451c203244' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+</div>
+<br />
+<br /></section>
+<section id="hydrogeology">
+<h2>Hydrogeology<a class="headerlink" href="#hydrogeology" title="Permalink to this heading">#</a></h2>
+<p>We’ll create a very simple hydrogeology,
+by specifying kh, kva, and sto as constants</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">kh</span> <span class="o">=</span> <span class="mf">10.0</span>
+<span class="n">kva</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">sto</span> <span class="o">=</span> <span class="mf">0.001</span>
+</pre></div>
+</div>
+</section>
+<section id="initial-conditions">
+<h2>Initial conditions<a class="headerlink" href="#initial-conditions" title="Permalink to this heading">#</a></h2>
+<p>We do not put much effort in the creation of the initial conditions
+in this example, instead we copy the ibounds.
+This is a 3D grid filled with the value 1, and we can use it as a
+inital condition as well.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">starting_head</span> <span class="o">=</span> <span class="n">ibound</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="boundary-conditions">
+<h2>Boundary conditions<a class="headerlink" href="#boundary-conditions" title="Permalink to this heading">#</a></h2>
+<p>We will put some more effort in creating some complex
+boundary conditions. We’ll create both two outer ditches
+with a rising stage, as well as a central ditch with periodic
+(summer-winter) stage.</p>
+<section id="rising-outer-ditches">
+<h3>Rising outer ditches<a class="headerlink" href="#rising-outer-ditches" title="Permalink to this heading">#</a></h3>
+<p>First, we’ll create rising trend,
+by creating a 1D array ones with the same size as the time dimension,
+and computing the cumulative sum over it.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">trend</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">times</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">trend</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">trend</span><span class="p">)</span>
+<span class="n">trend_da</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">trend</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">times</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]},</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">])</span>
+
+<span class="n">trend_da</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewBox="0 0 32 32">
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewBox="0 0 32 32">
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+ *
+ */
+
+:root {
+  --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
+  --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
+  --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
+  --xr-border-color: var(--jp-border-color2, #e0e0e0);
+  --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
+  --xr-background-color: var(--jp-layout-color0, white);
+  --xr-background-color-row-even: var(--jp-layout-color1, white);
+  --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+}
+
+html[theme=dark],
+body[data-theme=dark],
+body.vscode-dark {
+  --xr-font-color0: rgba(255, 255, 255, 1);
+  --xr-font-color2: rgba(255, 255, 255, 0.54);
+  --xr-font-color3: rgba(255, 255, 255, 0.38);
+  --xr-border-color: #1F1F1F;
+  --xr-disabled-color: #515151;
+  --xr-background-color: #111111;
+  --xr-background-color-row-even: #111111;
+  --xr-background-color-row-odd: #313131;
+}
+
+.xr-wrap {
+  display: block !important;
+  min-width: 300px;
+  max-width: 700px;
+}
+
+.xr-text-repr-fallback {
+  /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+  display: none;
+}
+
+.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}
+
+.xr-header > div,
+.xr-header > ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.xr-obj-type,
+.xr-array-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.xr-obj-type {
+  color: var(--xr-font-color2);
+}
+
+.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 20px 20px;
+}
+
+.xr-section-item {
+  display: contents;
+}
+
+.xr-section-item input {
+  display: none;
+}
+
+.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}
+
+.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}
+
+.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}
+
+.xr-section-summary > span {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+
+.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}
+
+.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: '►';
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}
+
+.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-summary-in:checked + label:before {
+  content: '▼';
+}
+
+.xr-section-summary-in:checked + label > span {
+  display: none;
+}
+
+.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.xr-section-inline-details {
+  grid-column: 2 / -1;
+}
+
+.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+}
+
+.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}
+
+.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+
+.xr-array-wrap > label {
+  grid-column: 1;
+  vertical-align: top;
+}
+
+.xr-preview {
+  color: var(--xr-font-color3);
+}
+
+.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}
+
+.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}
+
+.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}
+
+.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+
+.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.xr-dim-list:before {
+  content: '(';
+}
+
+.xr-dim-list:after {
+  content: ')';
+}
+
+.xr-dim-list li:not(:last-child):after {
+  content: ',';
+  padding-right: 5px;
+}
+
+.xr-has-index {
+  font-weight: bold;
+}
+
+.xr-var-list,
+.xr-var-item {
+  display: contents;
+}
+
+.xr-var-item > div,
+.xr-var-item label,
+.xr-var-item > .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  margin-bottom: 0;
+}
+
+.xr-var-item > .xr-var-name:hover span {
+  padding-right: 5px;
+}
+
+.xr-var-list > li:nth-child(odd) > div,
+.xr-var-list > li:nth-child(odd) > label,
+.xr-var-list > li:nth-child(odd) > .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+}
+
+.xr-var-name {
+  grid-column: 1;
+}
+
+.xr-var-dims {
+  grid-column: 2;
+}
+
+.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-preview {
+  grid-column: 4;
+}
+
+.xr-index-preview {
+  grid-column: 2 / 5;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}
+
+.xr-var-attrs,
+.xr-var-data,
+.xr-index-data {
+  display: none;
+  background-color: var(--xr-background-color) !important;
+  padding-bottom: 5px !important;
+}
+
+.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data,
+.xr-index-data-in:checked ~ .xr-index-data {
+  display: block;
+}
+
+.xr-var-data > table {
+  float: right;
+}
+
+.xr-var-name span,
+.xr-var-data,
+.xr-index-name div,
+.xr-index-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}
+
+.xr-attrs,
+.xr-var-attrs,
+.xr-var-data,
+.xr-index-data {
+  grid-column: 1 / -1;
+}
+
+dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}
+
+.xr-attrs dt,
+.xr-attrs dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}
+
+.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}
+
+.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}
+
+.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.xr-icon-database,
+.xr-icon-file-text2,
+.xr-no-icon {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray (time: 11)&gt;
+array([ 1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10., 11.])
+Coordinates:
+  * time     (time) datetime64[ns] 2018-01-01 2018-02-01 ... 2018-11-01</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>time</span>: 11</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-87812bfb-8bda-4543-b283-35b49621c31e' class='xr-array-in' type='checkbox' checked><label for='section-87812bfb-8bda-4543-b283-35b49621c31e' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 11.0</span></div><div class='xr-array-data'><pre>array([ 1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10., 11.])</pre></div></div></li><li class='xr-section-item'><input id='section-9186cc7f-2973-4560-bfac-318ecb86d38f' class='xr-section-summary-in' type='checkbox'  checked><label for='section-9186cc7f-2973-4560-bfac-318ecb86d38f' class='xr-section-summary' >Coordinates: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>time</span></div><div class='xr-var-dims'>(time)</div><div class='xr-var-dtype'>datetime64[ns]</div><div class='xr-var-preview xr-preview'>2018-01-01 ... 2018-11-01</div><input id='attrs-feafa891-5bd6-4ef9-85e5-b040e8adc17c' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-feafa891-5bd6-4ef9-85e5-b040e8adc17c' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-bc54344c-f915-4494-b960-b1fddc196432' class='xr-var-data-in' type='checkbox'><label for='data-bc54344c-f915-4494-b960-b1fddc196432' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;2018-01-01T00:00:00.000000000&#x27;, &#x27;2018-02-01T00:00:00.000000000&#x27;,
+       &#x27;2018-03-01T00:00:00.000000000&#x27;, &#x27;2018-04-01T00:00:00.000000000&#x27;,
+       &#x27;2018-05-01T00:00:00.000000000&#x27;, &#x27;2018-06-01T00:00:00.000000000&#x27;,
+       &#x27;2018-07-01T00:00:00.000000000&#x27;, &#x27;2018-08-01T00:00:00.000000000&#x27;,
+       &#x27;2018-09-01T00:00:00.000000000&#x27;, &#x27;2018-10-01T00:00:00.000000000&#x27;,
+       &#x27;2018-11-01T00:00:00.000000000&#x27;], dtype=&#x27;datetime64[ns]&#x27;)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-c55fb2c2-5e98-4d76-9647-9a334f264b7d' class='xr-section-summary-in' type='checkbox'  ><label for='section-c55fb2c2-5e98-4d76-9647-9a334f264b7d' class='xr-section-summary' >Indexes: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>time</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-892fe1a6-8c66-4b63-89c2-92dd673933bc' class='xr-index-data-in' type='checkbox'/><label for='index-892fe1a6-8c66-4b63-89c2-92dd673933bc' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(DatetimeIndex([&#x27;2018-01-01&#x27;, &#x27;2018-02-01&#x27;, &#x27;2018-03-01&#x27;, &#x27;2018-04-01&#x27;,
+               &#x27;2018-05-01&#x27;, &#x27;2018-06-01&#x27;, &#x27;2018-07-01&#x27;, &#x27;2018-08-01&#x27;,
+               &#x27;2018-09-01&#x27;, &#x27;2018-10-01&#x27;, &#x27;2018-11-01&#x27;],
+              dtype=&#x27;datetime64[ns]&#x27;, name=&#x27;time&#x27;, freq=&#x27;MS&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-305d3177-f18c-4ba1-a6f8-484d4bd1a309' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-305d3177-f18c-4ba1-a6f8-484d4bd1a309' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+</div>
+<br />
+<br /><p>Next, we assign values only to edges of model x domain.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">is_x_edge</span> <span class="o">=</span> <span class="n">starting_head</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">head_edge</span> <span class="o">=</span> <span class="n">starting_head</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">is_x_edge</span><span class="p">)</span>
+<span class="n">head_edge</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewBox="0 0 32 32">
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewBox="0 0 32 32">
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+ *
+ */
+
+:root {
+  --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
+  --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
+  --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
+  --xr-border-color: var(--jp-border-color2, #e0e0e0);
+  --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
+  --xr-background-color: var(--jp-layout-color0, white);
+  --xr-background-color-row-even: var(--jp-layout-color1, white);
+  --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+}
+
+html[theme=dark],
+body[data-theme=dark],
+body.vscode-dark {
+  --xr-font-color0: rgba(255, 255, 255, 1);
+  --xr-font-color2: rgba(255, 255, 255, 0.54);
+  --xr-font-color3: rgba(255, 255, 255, 0.38);
+  --xr-border-color: #1F1F1F;
+  --xr-disabled-color: #515151;
+  --xr-background-color: #111111;
+  --xr-background-color-row-even: #111111;
+  --xr-background-color-row-odd: #313131;
+}
+
+.xr-wrap {
+  display: block !important;
+  min-width: 300px;
+  max-width: 700px;
+}
+
+.xr-text-repr-fallback {
+  /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+  display: none;
+}
+
+.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}
+
+.xr-header > div,
+.xr-header > ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.xr-obj-type,
+.xr-array-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.xr-obj-type {
+  color: var(--xr-font-color2);
+}
+
+.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 20px 20px;
+}
+
+.xr-section-item {
+  display: contents;
+}
+
+.xr-section-item input {
+  display: none;
+}
+
+.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}
+
+.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}
+
+.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}
+
+.xr-section-summary > span {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+
+.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}
+
+.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: '►';
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}
+
+.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-summary-in:checked + label:before {
+  content: '▼';
+}
+
+.xr-section-summary-in:checked + label > span {
+  display: none;
+}
+
+.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.xr-section-inline-details {
+  grid-column: 2 / -1;
+}
+
+.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+}
+
+.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}
+
+.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+
+.xr-array-wrap > label {
+  grid-column: 1;
+  vertical-align: top;
+}
+
+.xr-preview {
+  color: var(--xr-font-color3);
+}
+
+.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}
+
+.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}
+
+.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}
+
+.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+
+.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.xr-dim-list:before {
+  content: '(';
+}
+
+.xr-dim-list:after {
+  content: ')';
+}
+
+.xr-dim-list li:not(:last-child):after {
+  content: ',';
+  padding-right: 5px;
+}
+
+.xr-has-index {
+  font-weight: bold;
+}
+
+.xr-var-list,
+.xr-var-item {
+  display: contents;
+}
+
+.xr-var-item > div,
+.xr-var-item label,
+.xr-var-item > .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  margin-bottom: 0;
+}
+
+.xr-var-item > .xr-var-name:hover span {
+  padding-right: 5px;
+}
+
+.xr-var-list > li:nth-child(odd) > div,
+.xr-var-list > li:nth-child(odd) > label,
+.xr-var-list > li:nth-child(odd) > .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+}
+
+.xr-var-name {
+  grid-column: 1;
+}
+
+.xr-var-dims {
+  grid-column: 2;
+}
+
+.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-preview {
+  grid-column: 4;
+}
+
+.xr-index-preview {
+  grid-column: 2 / 5;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}
+
+.xr-var-attrs,
+.xr-var-data,
+.xr-index-data {
+  display: none;
+  background-color: var(--xr-background-color) !important;
+  padding-bottom: 5px !important;
+}
+
+.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data,
+.xr-index-data-in:checked ~ .xr-index-data {
+  display: block;
+}
+
+.xr-var-data > table {
+  float: right;
+}
+
+.xr-var-name span,
+.xr-var-data,
+.xr-index-name div,
+.xr-index-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}
+
+.xr-attrs,
+.xr-var-attrs,
+.xr-var-data,
+.xr-index-data {
+  grid-column: 1 / -1;
+}
+
+dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}
+
+.xr-attrs dt,
+.xr-attrs dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}
+
+.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}
+
+.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}
+
+.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.xr-icon-database,
+.xr-icon-file-text2,
+.xr-no-icon {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray (layer: 3, y: 9, x: 9)&gt;
+array([[[ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.]],
+
+       [[ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.]],
+
+       [[ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.]]])
+Coordinates:
+  * layer    (layer) int32 1 2 3
+  * y        (y) float64 850.0 750.0 650.0 550.0 450.0 350.0 250.0 150.0 50.0
+  * x        (x) float64 50.0 150.0 250.0 350.0 450.0 550.0 650.0 750.0 850.0</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>layer</span>: 3</li><li><span class='xr-has-index'>y</span>: 9</li><li><span class='xr-has-index'>x</span>: 9</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-d1a0cc65-a9da-45fb-91f7-fe08821369c3' class='xr-array-in' type='checkbox' checked><label for='section-d1a0cc65-a9da-45fb-91f7-fe08821369c3' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1.0 nan nan nan nan nan nan nan ... nan nan nan nan nan nan nan 1.0</span></div><div class='xr-array-data'><pre>array([[[ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.]],
+
+       [[ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.]],
+
+       [[ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.],
+        [ 1., nan, nan, nan, nan, nan, nan, nan,  1.]]])</pre></div></div></li><li class='xr-section-item'><input id='section-80734775-5ca5-4973-b3b1-9a4650f40cad' class='xr-section-summary-in' type='checkbox'  checked><label for='section-80734775-5ca5-4973-b3b1-9a4650f40cad' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int32</div><div class='xr-var-preview xr-preview'>1 2 3</div><input id='attrs-c78d457c-652c-4b98-ba54-8202296ff81e' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c78d457c-652c-4b98-ba54-8202296ff81e' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d7b2d3c8-bd46-4962-b8ed-81dec4d0c3d5' class='xr-var-data-in' type='checkbox'><label for='data-d7b2d3c8-bd46-4962-b8ed-81dec4d0c3d5' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 2, 3])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>y</span></div><div class='xr-var-dims'>(y)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>850.0 750.0 650.0 ... 150.0 50.0</div><input id='attrs-29be3559-6e7f-4665-bb5d-ad1ec7091204' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-29be3559-6e7f-4665-bb5d-ad1ec7091204' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-17b5265a-6bb8-4086-ab10-5692be2b0cf4' class='xr-var-data-in' type='checkbox'><label for='data-17b5265a-6bb8-4086-ab10-5692be2b0cf4' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([850., 750., 650., 550., 450., 350., 250., 150.,  50.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>x</span></div><div class='xr-var-dims'>(x)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>50.0 150.0 250.0 ... 750.0 850.0</div><input id='attrs-588004bf-c09a-4870-9fcc-09a573607d14' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-588004bf-c09a-4870-9fcc-09a573607d14' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-20d482b2-445e-454a-a2c6-9e68690faf23' class='xr-var-data-in' type='checkbox'><label for='data-20d482b2-445e-454a-a2c6-9e68690faf23' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 50., 150., 250., 350., 450., 550., 650., 750., 850.])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-9a7afc66-f053-4a79-b3d9-53b26060215c' class='xr-section-summary-in' type='checkbox'  ><label for='section-9a7afc66-f053-4a79-b3d9-53b26060215c' class='xr-section-summary' >Indexes: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>layer</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-a4d77817-7c45-463a-910a-c31c6ef990a0' class='xr-index-data-in' type='checkbox'/><label for='index-a4d77817-7c45-463a-910a-c31c6ef990a0' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Int64Index([1, 2, 3], dtype=&#x27;int64&#x27;, name=&#x27;layer&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>y</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-d9a89f63-6cf5-4e96-81a0-098aea08f65b' class='xr-index-data-in' type='checkbox'/><label for='index-d9a89f63-6cf5-4e96-81a0-098aea08f65b' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Float64Index([850.0, 750.0, 650.0, 550.0, 450.0, 350.0, 250.0, 150.0, 50.0], dtype=&#x27;float64&#x27;, name=&#x27;y&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>x</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-c0ddb832-83db-4ee5-ac5b-8fd967d304df' class='xr-index-data-in' type='checkbox'/><label for='index-c0ddb832-83db-4ee5-ac5b-8fd967d304df' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Float64Index([50.0, 150.0, 250.0, 350.0, 450.0, 550.0, 650.0, 750.0, 850.0], dtype=&#x27;float64&#x27;, name=&#x27;x&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-cee888df-cfda-474d-b291-4dec8b4ef22f' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-cee888df-cfda-474d-b291-4dec8b4ef22f' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+</div>
+<br />
+<br /><p>Now let’s multiply our
+1D DataArray with dimension <code class="docutils literal notranslate"><span class="pre">time</span></code>, with the static 3D grid
+with dimension <code class="docutils literal notranslate"><span class="pre">layer,</span> <span class="pre">y,</span> <span class="pre">x</span></code>,
+which xarray automatically broadcasts to a 4D array,
+with dimensions <code class="docutils literal notranslate"><span class="pre">time,</span> <span class="pre">layer,</span> <span class="pre">y,</span> <span class="pre">x</span></code>
+This finishes our</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">head_edge_rising</span> <span class="o">=</span> <span class="n">trend_da</span> <span class="o">*</span> <span class="n">head_edge</span>
+<span class="n">head_edge_rising</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewBox="0 0 32 32">
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewBox="0 0 32 32">
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+ *
+ */
+
+:root {
+  --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
+  --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
+  --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
+  --xr-border-color: var(--jp-border-color2, #e0e0e0);
+  --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
+  --xr-background-color: var(--jp-layout-color0, white);
+  --xr-background-color-row-even: var(--jp-layout-color1, white);
+  --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+}
+
+html[theme=dark],
+body[data-theme=dark],
+body.vscode-dark {
+  --xr-font-color0: rgba(255, 255, 255, 1);
+  --xr-font-color2: rgba(255, 255, 255, 0.54);
+  --xr-font-color3: rgba(255, 255, 255, 0.38);
+  --xr-border-color: #1F1F1F;
+  --xr-disabled-color: #515151;
+  --xr-background-color: #111111;
+  --xr-background-color-row-even: #111111;
+  --xr-background-color-row-odd: #313131;
+}
+
+.xr-wrap {
+  display: block !important;
+  min-width: 300px;
+  max-width: 700px;
+}
+
+.xr-text-repr-fallback {
+  /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+  display: none;
+}
+
+.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}
+
+.xr-header > div,
+.xr-header > ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.xr-obj-type,
+.xr-array-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.xr-obj-type {
+  color: var(--xr-font-color2);
+}
+
+.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 20px 20px;
+}
+
+.xr-section-item {
+  display: contents;
+}
+
+.xr-section-item input {
+  display: none;
+}
+
+.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}
+
+.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}
+
+.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}
+
+.xr-section-summary > span {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+
+.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}
+
+.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: '►';
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}
+
+.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-summary-in:checked + label:before {
+  content: '▼';
+}
+
+.xr-section-summary-in:checked + label > span {
+  display: none;
+}
+
+.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.xr-section-inline-details {
+  grid-column: 2 / -1;
+}
+
+.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+}
+
+.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}
+
+.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+
+.xr-array-wrap > label {
+  grid-column: 1;
+  vertical-align: top;
+}
+
+.xr-preview {
+  color: var(--xr-font-color3);
+}
+
+.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}
+
+.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}
+
+.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}
+
+.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+
+.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.xr-dim-list:before {
+  content: '(';
+}
+
+.xr-dim-list:after {
+  content: ')';
+}
+
+.xr-dim-list li:not(:last-child):after {
+  content: ',';
+  padding-right: 5px;
+}
+
+.xr-has-index {
+  font-weight: bold;
+}
+
+.xr-var-list,
+.xr-var-item {
+  display: contents;
+}
+
+.xr-var-item > div,
+.xr-var-item label,
+.xr-var-item > .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  margin-bottom: 0;
+}
+
+.xr-var-item > .xr-var-name:hover span {
+  padding-right: 5px;
+}
+
+.xr-var-list > li:nth-child(odd) > div,
+.xr-var-list > li:nth-child(odd) > label,
+.xr-var-list > li:nth-child(odd) > .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+}
+
+.xr-var-name {
+  grid-column: 1;
+}
+
+.xr-var-dims {
+  grid-column: 2;
+}
+
+.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-preview {
+  grid-column: 4;
+}
+
+.xr-index-preview {
+  grid-column: 2 / 5;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}
+
+.xr-var-attrs,
+.xr-var-data,
+.xr-index-data {
+  display: none;
+  background-color: var(--xr-background-color) !important;
+  padding-bottom: 5px !important;
+}
+
+.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data,
+.xr-index-data-in:checked ~ .xr-index-data {
+  display: block;
+}
+
+.xr-var-data > table {
+  float: right;
+}
+
+.xr-var-name span,
+.xr-var-data,
+.xr-index-name div,
+.xr-index-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}
+
+.xr-attrs,
+.xr-var-attrs,
+.xr-var-data,
+.xr-index-data {
+  grid-column: 1 / -1;
+}
+
+dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}
+
+.xr-attrs dt,
+.xr-attrs dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}
+
+.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}
+
+.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}
+
+.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.xr-icon-database,
+.xr-icon-file-text2,
+.xr-no-icon {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray (time: 11, layer: 3, y: 9, x: 9)&gt;
+array([[[[ 1., nan, nan, ..., nan, nan,  1.],
+         [ 1., nan, nan, ..., nan, nan,  1.],
+         [ 1., nan, nan, ..., nan, nan,  1.],
+         ...,
+         [ 1., nan, nan, ..., nan, nan,  1.],
+         [ 1., nan, nan, ..., nan, nan,  1.],
+         [ 1., nan, nan, ..., nan, nan,  1.]],
+
+        [[ 1., nan, nan, ..., nan, nan,  1.],
+         [ 1., nan, nan, ..., nan, nan,  1.],
+         [ 1., nan, nan, ..., nan, nan,  1.],
+         ...,
+         [ 1., nan, nan, ..., nan, nan,  1.],
+         [ 1., nan, nan, ..., nan, nan,  1.],
+         [ 1., nan, nan, ..., nan, nan,  1.]],
+
+        [[ 1., nan, nan, ..., nan, nan,  1.],
+         [ 1., nan, nan, ..., nan, nan,  1.],
+         [ 1., nan, nan, ..., nan, nan,  1.],
+         ...,
+...
+         ...,
+         [11., nan, nan, ..., nan, nan, 11.],
+         [11., nan, nan, ..., nan, nan, 11.],
+         [11., nan, nan, ..., nan, nan, 11.]],
+
+        [[11., nan, nan, ..., nan, nan, 11.],
+         [11., nan, nan, ..., nan, nan, 11.],
+         [11., nan, nan, ..., nan, nan, 11.],
+         ...,
+         [11., nan, nan, ..., nan, nan, 11.],
+         [11., nan, nan, ..., nan, nan, 11.],
+         [11., nan, nan, ..., nan, nan, 11.]],
+
+        [[11., nan, nan, ..., nan, nan, 11.],
+         [11., nan, nan, ..., nan, nan, 11.],
+         [11., nan, nan, ..., nan, nan, 11.],
+         ...,
+         [11., nan, nan, ..., nan, nan, 11.],
+         [11., nan, nan, ..., nan, nan, 11.],
+         [11., nan, nan, ..., nan, nan, 11.]]]])
+Coordinates:
+  * time     (time) datetime64[ns] 2018-01-01 2018-02-01 ... 2018-11-01
+  * layer    (layer) int32 1 2 3
+  * y        (y) float64 850.0 750.0 650.0 550.0 450.0 350.0 250.0 150.0 50.0
+  * x        (x) float64 50.0 150.0 250.0 350.0 450.0 550.0 650.0 750.0 850.0</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>time</span>: 11</li><li><span class='xr-has-index'>layer</span>: 3</li><li><span class='xr-has-index'>y</span>: 9</li><li><span class='xr-has-index'>x</span>: 9</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-e3ee9597-abd4-417d-b7a8-d795028bdbb9' class='xr-array-in' type='checkbox' checked><label for='section-e3ee9597-abd4-417d-b7a8-d795028bdbb9' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>1.0 nan nan nan nan nan nan nan ... nan nan nan nan nan nan nan 11.0</span></div><div class='xr-array-data'><pre>array([[[[ 1., nan, nan, ..., nan, nan,  1.],
+         [ 1., nan, nan, ..., nan, nan,  1.],
+         [ 1., nan, nan, ..., nan, nan,  1.],
+         ...,
+         [ 1., nan, nan, ..., nan, nan,  1.],
+         [ 1., nan, nan, ..., nan, nan,  1.],
+         [ 1., nan, nan, ..., nan, nan,  1.]],
+
+        [[ 1., nan, nan, ..., nan, nan,  1.],
+         [ 1., nan, nan, ..., nan, nan,  1.],
+         [ 1., nan, nan, ..., nan, nan,  1.],
+         ...,
+         [ 1., nan, nan, ..., nan, nan,  1.],
+         [ 1., nan, nan, ..., nan, nan,  1.],
+         [ 1., nan, nan, ..., nan, nan,  1.]],
+
+        [[ 1., nan, nan, ..., nan, nan,  1.],
+         [ 1., nan, nan, ..., nan, nan,  1.],
+         [ 1., nan, nan, ..., nan, nan,  1.],
+         ...,
+...
+         ...,
+         [11., nan, nan, ..., nan, nan, 11.],
+         [11., nan, nan, ..., nan, nan, 11.],
+         [11., nan, nan, ..., nan, nan, 11.]],
+
+        [[11., nan, nan, ..., nan, nan, 11.],
+         [11., nan, nan, ..., nan, nan, 11.],
+         [11., nan, nan, ..., nan, nan, 11.],
+         ...,
+         [11., nan, nan, ..., nan, nan, 11.],
+         [11., nan, nan, ..., nan, nan, 11.],
+         [11., nan, nan, ..., nan, nan, 11.]],
+
+        [[11., nan, nan, ..., nan, nan, 11.],
+         [11., nan, nan, ..., nan, nan, 11.],
+         [11., nan, nan, ..., nan, nan, 11.],
+         ...,
+         [11., nan, nan, ..., nan, nan, 11.],
+         [11., nan, nan, ..., nan, nan, 11.],
+         [11., nan, nan, ..., nan, nan, 11.]]]])</pre></div></div></li><li class='xr-section-item'><input id='section-0f7453da-b44b-4f74-a776-b0e0fd05804d' class='xr-section-summary-in' type='checkbox'  checked><label for='section-0f7453da-b44b-4f74-a776-b0e0fd05804d' class='xr-section-summary' >Coordinates: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>time</span></div><div class='xr-var-dims'>(time)</div><div class='xr-var-dtype'>datetime64[ns]</div><div class='xr-var-preview xr-preview'>2018-01-01 ... 2018-11-01</div><input id='attrs-6a3e71b7-4e81-4574-90f4-f9654286c91a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-6a3e71b7-4e81-4574-90f4-f9654286c91a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d0836f7b-7210-48ba-81d4-34b6f9f55cef' class='xr-var-data-in' type='checkbox'><label for='data-d0836f7b-7210-48ba-81d4-34b6f9f55cef' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;2018-01-01T00:00:00.000000000&#x27;, &#x27;2018-02-01T00:00:00.000000000&#x27;,
+       &#x27;2018-03-01T00:00:00.000000000&#x27;, &#x27;2018-04-01T00:00:00.000000000&#x27;,
+       &#x27;2018-05-01T00:00:00.000000000&#x27;, &#x27;2018-06-01T00:00:00.000000000&#x27;,
+       &#x27;2018-07-01T00:00:00.000000000&#x27;, &#x27;2018-08-01T00:00:00.000000000&#x27;,
+       &#x27;2018-09-01T00:00:00.000000000&#x27;, &#x27;2018-10-01T00:00:00.000000000&#x27;,
+       &#x27;2018-11-01T00:00:00.000000000&#x27;], dtype=&#x27;datetime64[ns]&#x27;)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int32</div><div class='xr-var-preview xr-preview'>1 2 3</div><input id='attrs-2bce97ad-8a5f-47bb-bb97-5b7725241b5a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2bce97ad-8a5f-47bb-bb97-5b7725241b5a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-adbf0a0a-67e2-45a6-9184-76d3a17fe29d' class='xr-var-data-in' type='checkbox'><label for='data-adbf0a0a-67e2-45a6-9184-76d3a17fe29d' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 2, 3])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>y</span></div><div class='xr-var-dims'>(y)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>850.0 750.0 650.0 ... 150.0 50.0</div><input id='attrs-e48cbd11-356f-4cbe-830a-390e6fbca3eb' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e48cbd11-356f-4cbe-830a-390e6fbca3eb' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-6fb48a84-c1ba-4a5e-ae91-3bb69558d2a3' class='xr-var-data-in' type='checkbox'><label for='data-6fb48a84-c1ba-4a5e-ae91-3bb69558d2a3' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([850., 750., 650., 550., 450., 350., 250., 150.,  50.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>x</span></div><div class='xr-var-dims'>(x)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>50.0 150.0 250.0 ... 750.0 850.0</div><input id='attrs-cafca6e4-b421-4410-a146-b25d26b82bcc' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-cafca6e4-b421-4410-a146-b25d26b82bcc' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-eae0897d-a9c9-4a45-8d85-d698b88aa34f' class='xr-var-data-in' type='checkbox'><label for='data-eae0897d-a9c9-4a45-8d85-d698b88aa34f' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 50., 150., 250., 350., 450., 550., 650., 750., 850.])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-dde265dc-3f45-4f1b-8ad9-84f1449dc2a4' class='xr-section-summary-in' type='checkbox'  ><label for='section-dde265dc-3f45-4f1b-8ad9-84f1449dc2a4' class='xr-section-summary' >Indexes: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>time</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-2f824f00-751a-4c86-aa46-5185df609add' class='xr-index-data-in' type='checkbox'/><label for='index-2f824f00-751a-4c86-aa46-5185df609add' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(DatetimeIndex([&#x27;2018-01-01&#x27;, &#x27;2018-02-01&#x27;, &#x27;2018-03-01&#x27;, &#x27;2018-04-01&#x27;,
+               &#x27;2018-05-01&#x27;, &#x27;2018-06-01&#x27;, &#x27;2018-07-01&#x27;, &#x27;2018-08-01&#x27;,
+               &#x27;2018-09-01&#x27;, &#x27;2018-10-01&#x27;, &#x27;2018-11-01&#x27;],
+              dtype=&#x27;datetime64[ns]&#x27;, name=&#x27;time&#x27;, freq=&#x27;MS&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>layer</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-3a2f25b8-2d1c-4c3f-9383-6c754317e60b' class='xr-index-data-in' type='checkbox'/><label for='index-3a2f25b8-2d1c-4c3f-9383-6c754317e60b' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Int64Index([1, 2, 3], dtype=&#x27;int64&#x27;, name=&#x27;layer&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>y</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-410182f0-bd7e-4bfc-b9ef-ff0438e63fa8' class='xr-index-data-in' type='checkbox'/><label for='index-410182f0-bd7e-4bfc-b9ef-ff0438e63fa8' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Float64Index([850.0, 750.0, 650.0, 550.0, 450.0, 350.0, 250.0, 150.0, 50.0], dtype=&#x27;float64&#x27;, name=&#x27;y&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>x</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-adbc9950-0564-4650-b044-1f6fb4a2132f' class='xr-index-data-in' type='checkbox'/><label for='index-adbc9950-0564-4650-b044-1f6fb4a2132f' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Float64Index([50.0, 150.0, 250.0, 350.0, 450.0, 550.0, 650.0, 750.0, 850.0], dtype=&#x27;float64&#x27;, name=&#x27;x&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-74231ccd-d744-4f80-818c-218e0bca6181' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-74231ccd-d744-4f80-818c-218e0bca6181' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+</div>
+<br />
+<br /></section>
+<section id="periodic-central-ditch">
+<h3>Periodic central ditch<a class="headerlink" href="#periodic-central-ditch" title="Permalink to this heading">#</a></h3>
+<p>We’ll take only the central column of the grid with
+(<code class="docutils literal notranslate"><span class="pre">where</span></code>), the rest will be set to <code class="docutils literal notranslate"><span class="pre">np.nan</span></code>,
+and from this we’ll select only the upper layer,
+as the ditch will be located only in the upper layer.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">is_x_central</span> <span class="o">=</span> <span class="n">starting_head</span><span class="o">.</span><span class="n">x</span> <span class="o">==</span> <span class="n">x</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+<span class="n">head_central</span> <span class="o">=</span> <span class="n">starting_head</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">is_x_central</span><span class="p">)</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Create period times, we let these times start before
+the model starts.
+This is necessary because <cite>iMODFLOW</cite> only forward fills periods.
+Otherwise, in this case there wouldn’t be a
+periodic boundary condition until april.</p>
+<p>We will do this by selecting the months april and october,
+and then subtracting a year</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">period_times</span> <span class="o">=</span> <span class="n">times</span><span class="p">[[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">]]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="mi">365</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We are creating a summer and winter level.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">periods_da</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">period_times</span><span class="p">},</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">])</span>
+<span class="n">head_periodic</span> <span class="o">=</span> <span class="n">periods_da</span> <span class="o">*</span> <span class="n">head_central</span>
+
+<span class="n">head_periodic</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewBox="0 0 32 32">
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewBox="0 0 32 32">
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+ *
+ */
+
+:root {
+  --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
+  --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
+  --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
+  --xr-border-color: var(--jp-border-color2, #e0e0e0);
+  --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
+  --xr-background-color: var(--jp-layout-color0, white);
+  --xr-background-color-row-even: var(--jp-layout-color1, white);
+  --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+}
+
+html[theme=dark],
+body[data-theme=dark],
+body.vscode-dark {
+  --xr-font-color0: rgba(255, 255, 255, 1);
+  --xr-font-color2: rgba(255, 255, 255, 0.54);
+  --xr-font-color3: rgba(255, 255, 255, 0.38);
+  --xr-border-color: #1F1F1F;
+  --xr-disabled-color: #515151;
+  --xr-background-color: #111111;
+  --xr-background-color-row-even: #111111;
+  --xr-background-color-row-odd: #313131;
+}
+
+.xr-wrap {
+  display: block !important;
+  min-width: 300px;
+  max-width: 700px;
+}
+
+.xr-text-repr-fallback {
+  /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+  display: none;
+}
+
+.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}
+
+.xr-header > div,
+.xr-header > ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.xr-obj-type,
+.xr-array-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.xr-obj-type {
+  color: var(--xr-font-color2);
+}
+
+.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 20px 20px;
+}
+
+.xr-section-item {
+  display: contents;
+}
+
+.xr-section-item input {
+  display: none;
+}
+
+.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}
+
+.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}
+
+.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}
+
+.xr-section-summary > span {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+
+.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}
+
+.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: '►';
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}
+
+.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-summary-in:checked + label:before {
+  content: '▼';
+}
+
+.xr-section-summary-in:checked + label > span {
+  display: none;
+}
+
+.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.xr-section-inline-details {
+  grid-column: 2 / -1;
+}
+
+.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+}
+
+.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}
+
+.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+
+.xr-array-wrap > label {
+  grid-column: 1;
+  vertical-align: top;
+}
+
+.xr-preview {
+  color: var(--xr-font-color3);
+}
+
+.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}
+
+.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}
+
+.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}
+
+.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+
+.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.xr-dim-list:before {
+  content: '(';
+}
+
+.xr-dim-list:after {
+  content: ')';
+}
+
+.xr-dim-list li:not(:last-child):after {
+  content: ',';
+  padding-right: 5px;
+}
+
+.xr-has-index {
+  font-weight: bold;
+}
+
+.xr-var-list,
+.xr-var-item {
+  display: contents;
+}
+
+.xr-var-item > div,
+.xr-var-item label,
+.xr-var-item > .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  margin-bottom: 0;
+}
+
+.xr-var-item > .xr-var-name:hover span {
+  padding-right: 5px;
+}
+
+.xr-var-list > li:nth-child(odd) > div,
+.xr-var-list > li:nth-child(odd) > label,
+.xr-var-list > li:nth-child(odd) > .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+}
+
+.xr-var-name {
+  grid-column: 1;
+}
+
+.xr-var-dims {
+  grid-column: 2;
+}
+
+.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-preview {
+  grid-column: 4;
+}
+
+.xr-index-preview {
+  grid-column: 2 / 5;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}
+
+.xr-var-attrs,
+.xr-var-data,
+.xr-index-data {
+  display: none;
+  background-color: var(--xr-background-color) !important;
+  padding-bottom: 5px !important;
+}
+
+.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data,
+.xr-index-data-in:checked ~ .xr-index-data {
+  display: block;
+}
+
+.xr-var-data > table {
+  float: right;
+}
+
+.xr-var-name span,
+.xr-var-data,
+.xr-index-name div,
+.xr-index-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}
+
+.xr-attrs,
+.xr-var-attrs,
+.xr-var-data,
+.xr-index-data {
+  grid-column: 1 / -1;
+}
+
+dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}
+
+.xr-attrs dt,
+.xr-attrs dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}
+
+.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}
+
+.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}
+
+.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.xr-icon-database,
+.xr-icon-file-text2,
+.xr-no-icon {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray (time: 2, y: 9, x: 9)&gt;
+array([[[nan, nan, nan, nan,  4., nan, nan, nan, nan],
+        [nan, nan, nan, nan,  4., nan, nan, nan, nan],
+        [nan, nan, nan, nan,  4., nan, nan, nan, nan],
+        [nan, nan, nan, nan,  4., nan, nan, nan, nan],
+        [nan, nan, nan, nan,  4., nan, nan, nan, nan],
+        [nan, nan, nan, nan,  4., nan, nan, nan, nan],
+        [nan, nan, nan, nan,  4., nan, nan, nan, nan],
+        [nan, nan, nan, nan,  4., nan, nan, nan, nan],
+        [nan, nan, nan, nan,  4., nan, nan, nan, nan]],
+
+       [[nan, nan, nan, nan, 10., nan, nan, nan, nan],
+        [nan, nan, nan, nan, 10., nan, nan, nan, nan],
+        [nan, nan, nan, nan, 10., nan, nan, nan, nan],
+        [nan, nan, nan, nan, 10., nan, nan, nan, nan],
+        [nan, nan, nan, nan, 10., nan, nan, nan, nan],
+        [nan, nan, nan, nan, 10., nan, nan, nan, nan],
+        [nan, nan, nan, nan, 10., nan, nan, nan, nan],
+        [nan, nan, nan, nan, 10., nan, nan, nan, nan],
+        [nan, nan, nan, nan, 10., nan, nan, nan, nan]]])
+Coordinates:
+  * time     (time) datetime64[ns] 2017-04-01 2017-10-01
+    layer    int32 1
+  * y        (y) float64 850.0 750.0 650.0 550.0 450.0 350.0 250.0 150.0 50.0
+  * x        (x) float64 50.0 150.0 250.0 350.0 450.0 550.0 650.0 750.0 850.0</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>time</span>: 2</li><li><span class='xr-has-index'>y</span>: 9</li><li><span class='xr-has-index'>x</span>: 9</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-e3e1d3f6-5134-422b-8f2c-ea0564deeb17' class='xr-array-in' type='checkbox' checked><label for='section-e3e1d3f6-5134-422b-8f2c-ea0564deeb17' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>nan nan nan nan 4.0 nan nan nan ... nan nan nan 10.0 nan nan nan nan</span></div><div class='xr-array-data'><pre>array([[[nan, nan, nan, nan,  4., nan, nan, nan, nan],
+        [nan, nan, nan, nan,  4., nan, nan, nan, nan],
+        [nan, nan, nan, nan,  4., nan, nan, nan, nan],
+        [nan, nan, nan, nan,  4., nan, nan, nan, nan],
+        [nan, nan, nan, nan,  4., nan, nan, nan, nan],
+        [nan, nan, nan, nan,  4., nan, nan, nan, nan],
+        [nan, nan, nan, nan,  4., nan, nan, nan, nan],
+        [nan, nan, nan, nan,  4., nan, nan, nan, nan],
+        [nan, nan, nan, nan,  4., nan, nan, nan, nan]],
+
+       [[nan, nan, nan, nan, 10., nan, nan, nan, nan],
+        [nan, nan, nan, nan, 10., nan, nan, nan, nan],
+        [nan, nan, nan, nan, 10., nan, nan, nan, nan],
+        [nan, nan, nan, nan, 10., nan, nan, nan, nan],
+        [nan, nan, nan, nan, 10., nan, nan, nan, nan],
+        [nan, nan, nan, nan, 10., nan, nan, nan, nan],
+        [nan, nan, nan, nan, 10., nan, nan, nan, nan],
+        [nan, nan, nan, nan, 10., nan, nan, nan, nan],
+        [nan, nan, nan, nan, 10., nan, nan, nan, nan]]])</pre></div></div></li><li class='xr-section-item'><input id='section-6650bba0-e7fd-43fd-a343-fdb5cb8af61d' class='xr-section-summary-in' type='checkbox'  checked><label for='section-6650bba0-e7fd-43fd-a343-fdb5cb8af61d' class='xr-section-summary' >Coordinates: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>time</span></div><div class='xr-var-dims'>(time)</div><div class='xr-var-dtype'>datetime64[ns]</div><div class='xr-var-preview xr-preview'>2017-04-01 2017-10-01</div><input id='attrs-eb6cecdd-eb84-41c9-9e43-432823664af0' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-eb6cecdd-eb84-41c9-9e43-432823664af0' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-06e9a3e8-29bd-4e02-a9a6-8135bcec38d7' class='xr-var-data-in' type='checkbox'><label for='data-06e9a3e8-29bd-4e02-a9a6-8135bcec38d7' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([&#x27;2017-04-01T00:00:00.000000000&#x27;, &#x27;2017-10-01T00:00:00.000000000&#x27;],
+      dtype=&#x27;datetime64[ns]&#x27;)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>layer</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>int32</div><div class='xr-var-preview xr-preview'>1</div><input id='attrs-0d6276ab-930a-482c-a39c-7e0b2ea7136c' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-0d6276ab-930a-482c-a39c-7e0b2ea7136c' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-414e6e34-9b75-4322-b9b2-fd5100b216ca' class='xr-var-data-in' type='checkbox'><label for='data-414e6e34-9b75-4322-b9b2-fd5100b216ca' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(1)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>y</span></div><div class='xr-var-dims'>(y)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>850.0 750.0 650.0 ... 150.0 50.0</div><input id='attrs-ad6699c9-d532-43fc-aae8-5f2e96e7f9cc' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-ad6699c9-d532-43fc-aae8-5f2e96e7f9cc' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-86ed5f53-64ce-4803-ab23-4d7d189c05e9' class='xr-var-data-in' type='checkbox'><label for='data-86ed5f53-64ce-4803-ab23-4d7d189c05e9' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([850., 750., 650., 550., 450., 350., 250., 150.,  50.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>x</span></div><div class='xr-var-dims'>(x)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>50.0 150.0 250.0 ... 750.0 850.0</div><input id='attrs-16dd18bc-e4e0-4078-b9b3-89319a030fd4' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-16dd18bc-e4e0-4078-b9b3-89319a030fd4' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b0d89707-8ad2-4c4a-bb9a-247ad263482f' class='xr-var-data-in' type='checkbox'><label for='data-b0d89707-8ad2-4c4a-bb9a-247ad263482f' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([ 50., 150., 250., 350., 450., 550., 650., 750., 850.])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-094f471a-cf37-47af-879c-a3e7dcc1426c' class='xr-section-summary-in' type='checkbox'  ><label for='section-094f471a-cf37-47af-879c-a3e7dcc1426c' class='xr-section-summary' >Indexes: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>time</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-23c5f8c7-1eeb-453e-ab36-ce596b9a0955' class='xr-index-data-in' type='checkbox'/><label for='index-23c5f8c7-1eeb-453e-ab36-ce596b9a0955' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(DatetimeIndex([&#x27;2017-04-01&#x27;, &#x27;2017-10-01&#x27;], dtype=&#x27;datetime64[ns]&#x27;, name=&#x27;time&#x27;, freq=None))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>y</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-e7566f65-eb40-4b57-b571-b60fe9374532' class='xr-index-data-in' type='checkbox'/><label for='index-e7566f65-eb40-4b57-b571-b60fe9374532' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Float64Index([850.0, 750.0, 650.0, 550.0, 450.0, 350.0, 250.0, 150.0, 50.0], dtype=&#x27;float64&#x27;, name=&#x27;y&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>x</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-58d092c1-93e7-4604-ba2a-829bf2da7c30' class='xr-index-data-in' type='checkbox'/><label for='index-58d092c1-93e7-4604-ba2a-829bf2da7c30' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Float64Index([50.0, 150.0, 250.0, 350.0, 450.0, 550.0, 650.0, 750.0, 850.0], dtype=&#x27;float64&#x27;, name=&#x27;x&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-7fff891b-8699-490e-9deb-dcfb4363e98c' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-7fff891b-8699-490e-9deb-dcfb4363e98c' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+</div>
+<br />
+<br /><p>Create dictionary to tell <cite>iMOD</cite>
+which period name corresponds to which date.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">timemap</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">period_times</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="s2">&quot;summer&quot;</span><span class="p">,</span>
+    <span class="n">period_times</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="s2">&quot;winter&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="wells">
+<h3>Wells<a class="headerlink" href="#wells" title="Permalink to this heading">#</a></h3>
+<p>Wells are specified as a pandas dataframe.
+We create a diagonal line of wells through the domain.</p>
+<p>Because we can.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">wel_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="n">wel_df</span><span class="p">[</span><span class="s2">&quot;id_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+<span class="n">wel_df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+<span class="n">wel_df</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span>
+<span class="n">wel_df</span><span class="p">[</span><span class="s2">&quot;rate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dx</span> <span class="o">*</span> <span class="n">dy</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="mf">0.5</span>
+<span class="n">wel_df</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">times</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">2</span><span class="p">)[:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)]</span>
+<span class="n">wel_df</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="n">wel_df</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id_name</th>
+      <th>x</th>
+      <th>y</th>
+      <th>rate</th>
+      <th>time</th>
+      <th>layer</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>50.0</td>
+      <td>850.0</td>
+      <td>5000.0</td>
+      <td>2018-01-01</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>150.0</td>
+      <td>750.0</td>
+      <td>5000.0</td>
+      <td>2018-02-01</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2</td>
+      <td>250.0</td>
+      <td>650.0</td>
+      <td>5000.0</td>
+      <td>2018-03-01</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>3</td>
+      <td>350.0</td>
+      <td>550.0</td>
+      <td>5000.0</td>
+      <td>2018-04-01</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>4</td>
+      <td>450.0</td>
+      <td>450.0</td>
+      <td>5000.0</td>
+      <td>2018-05-01</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>5</td>
+      <td>550.0</td>
+      <td>350.0</td>
+      <td>5000.0</td>
+      <td>2018-06-01</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>6</td>
+      <td>650.0</td>
+      <td>250.0</td>
+      <td>5000.0</td>
+      <td>2018-07-01</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>7</td>
+      <td>750.0</td>
+      <td>150.0</td>
+      <td>5000.0</td>
+      <td>2018-08-01</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>8</td>
+      <td>850.0</td>
+      <td>50.0</td>
+      <td>5000.0</td>
+      <td>2018-09-01</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+<br />
+<br /></section>
+</section>
+<section id="horizontal-flow-barrier">
+<h2>Horizontal Flow Barrier<a class="headerlink" href="#horizontal-flow-barrier" title="Permalink to this heading">#</a></h2>
+<p>Create barriers between ditches in layer 1 and 2 (but not 3).</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">line1</span> <span class="o">=</span> <span class="n">LineString</span><span class="p">([(</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">ymin</span><span class="p">),</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">ymax</span><span class="p">)])</span>
+<span class="n">line2</span> <span class="o">=</span> <span class="n">LineString</span><span class="p">([(</span><span class="n">x</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="n">ymin</span><span class="p">),</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="n">ymax</span><span class="p">)])</span>
+</pre></div>
+</div>
+<p>We’ll have to repeat each line for each layer</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">lines</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">line1</span><span class="p">,</span> <span class="n">line2</span><span class="p">,</span> <span class="n">line1</span><span class="p">,</span> <span class="n">line2</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">)</span>
+<span class="n">hfb_layers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>We can specify names for our own bookkeeping</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">id_name</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;left_upper&quot;</span><span class="p">,</span> <span class="s2">&quot;right_upper&quot;</span><span class="p">,</span> <span class="s2">&quot;left_lower&quot;</span><span class="p">,</span> <span class="s2">&quot;right_lower&quot;</span><span class="p">]</span>
+
+<span class="c1"># The hfb has to specified as a geopandas `GeoDataFrame</span>
+<span class="c1"># &lt;https://geopandas.org/en/stable/docs/reference/api/geopandas.GeoDataFrame.html&gt;`_</span>
+
+<span class="n">hfb_gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+    <span class="n">geometry</span><span class="o">=</span><span class="n">lines</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">id_name</span><span class="o">=</span><span class="n">id_name</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="n">hfb_layers</span><span class="p">,</span> <span class="n">resistance</span><span class="o">=</span><span class="mf">100.0</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">hfb_gdf</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id_name</th>
+      <th>layer</th>
+      <th>resistance</th>
+      <th>geometry</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>left_upper</td>
+      <td>1</td>
+      <td>100.0</td>
+      <td>LINESTRING (250.000 0.000, 250.000 900.000)</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>right_upper</td>
+      <td>1</td>
+      <td>100.0</td>
+      <td>LINESTRING (750.000 0.000, 750.000 900.000)</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>left_lower</td>
+      <td>2</td>
+      <td>100.0</td>
+      <td>LINESTRING (250.000 0.000, 250.000 900.000)</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>right_lower</td>
+      <td>2</td>
+      <td>100.0</td>
+      <td>LINESTRING (750.000 0.000, 750.000 900.000)</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+<br />
+<br /></section>
+<section id="build">
+<h2>Build<a class="headerlink" href="#build" title="Permalink to this heading">#</a></h2>
+<p>Finally, we build the model.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">ImodflowModel</span><span class="p">(</span><span class="s2">&quot;my_first_imodflow_model&quot;</span><span class="p">)</span>
+<span class="n">m</span><span class="p">[</span><span class="s2">&quot;pcg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">PreconditionedConjugateGradientSolver</span><span class="p">()</span>
+
+<span class="n">m</span><span class="p">[</span><span class="s2">&quot;bnd&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">Boundary</span><span class="p">(</span><span class="n">ibound</span><span class="p">)</span>
+<span class="n">m</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">Top</span><span class="p">(</span><span class="n">top</span><span class="p">)</span>
+<span class="n">m</span><span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">Bottom</span><span class="p">(</span><span class="n">bottom</span><span class="p">)</span>
+
+<span class="n">m</span><span class="p">[</span><span class="s2">&quot;khv&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">HorizontalHydraulicConductivity</span><span class="p">(</span><span class="n">kh</span><span class="p">)</span>
+<span class="n">m</span><span class="p">[</span><span class="s2">&quot;kva&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">VerticalAnisotropy</span><span class="p">(</span><span class="n">kva</span><span class="p">)</span>
+<span class="n">m</span><span class="p">[</span><span class="s2">&quot;sto&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">StorageCoefficient</span><span class="p">(</span><span class="n">sto</span><span class="p">)</span>
+
+<span class="n">m</span><span class="p">[</span><span class="s2">&quot;shd&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">StartingHead</span><span class="p">(</span><span class="n">starting_head</span><span class="p">)</span>
+
+<span class="n">m</span><span class="p">[</span><span class="s2">&quot;chd&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">ConstantHead</span><span class="p">(</span><span class="n">head</span><span class="o">=</span><span class="n">head_edge_rising</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Create periodic boundary condition
+and specify it as a periodic stress package.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;ghb&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">GeneralHeadBoundary</span><span class="p">(</span><span class="n">head</span><span class="o">=</span><span class="n">head_periodic</span><span class="p">,</span> <span class="n">conductance</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+<span class="n">m</span><span class="p">[</span><span class="s2">&quot;ghb&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">periodic_stress</span><span class="p">(</span><span class="n">timemap</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We can specify a second stress package as follows:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;ghb2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">GeneralHeadBoundary</span><span class="p">(</span><span class="n">head</span><span class="o">=</span><span class="n">head_periodic</span> <span class="o">+</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">conductance</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="c1"># You also need to specify periodic stresses for second system.</span>
+<span class="n">m</span><span class="p">[</span><span class="s2">&quot;ghb2&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">periodic_stress</span><span class="p">(</span><span class="n">timemap</span><span class="p">)</span>
+
+<span class="n">m</span><span class="p">[</span><span class="s2">&quot;wel&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">Well</span><span class="p">(</span><span class="o">**</span><span class="n">wel_df</span><span class="p">)</span>
+
+<span class="n">m</span><span class="p">[</span><span class="s2">&quot;hfb&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">HorizontalFlowBarrier</span><span class="p">(</span><span class="o">**</span><span class="n">hfb_gdf</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Specify output control; -1 specifies to save the output of interest for all layers.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;oc&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">OutputControl</span><span class="p">(</span><span class="n">save_head</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">save_flux</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>imod-python wants you to provide the model endtime to your time_discretization!</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">create_time_discretization</span><span class="p">(</span><span class="n">additional_times</span><span class="o">=</span><span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Now we write the model
+Writes both .IDFs as well as projectfile, an inifile,
+and a .tim file that contains the time discretization.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">modeldir</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">temporary_directory</span><span class="p">()</span>
+<span class="n">m</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">directory</span><span class="o">=</span><span class="n">modeldir</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="run">
+<h2>Run<a class="headerlink" href="#run" title="Permalink to this heading">#</a></h2>
+<p>You can run the model using the comand prompt and the iMOD executables.
+This is part of the iMOD v5 release, which can be downloaded here:
+<a class="reference external" href="https://oss.deltares.nl/web/imod/download-imod5">https://oss.deltares.nl/web/imod/download-imod5</a> .
+iMOD only works on Windows.</p>
+<p>To run your model, open up a command prompt
+and run the following commands:</p>
+<div class="highlight-batch notranslate"><div class="highlight"><pre><span></span><span class="k">cd</span> c:\path\to\modeldir
+c<span class="p">:</span><span class="nl">\path\to\imod\folder\iMOD_v5_3_X64R.EXE</span><span class="c1"> config_run.ini</span>
+c<span class="p">:</span><span class="nl">\path\to\imod\folder\iMODFLOW_V5_3_METASWAP_SVN1977_X64R.EXE</span><span class="c1"> my_first_imodflow_model.nam</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>iMODFLOW requires you to change directory into the model directory
+before calling its executable. Otherwise the program will throw an error.</p>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.545 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-imodflow-imodflowprojectfile-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/2a3cb6737968011b4c9c70b7491f1ea0/ImodflowProjectfile.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">ImodflowProjectfile.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/70c8fb46fd5ac67d2ba0690c15ea8709/ImodflowProjectfile.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">ImodflowProjectfile.py</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">iMODFLOW</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../imod-wq/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">iMOD-WQ</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discretization">Discretization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hydrogeology">Hydrogeology</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#initial-conditions">Initial conditions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#boundary-conditions">Boundary conditions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rising-outer-ditches">Rising outer ditches</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#periodic-central-ditch">Periodic central ditch</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#wells">Wells</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#horizontal-flow-barrier">Horizontal Flow Barrier</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#build">Build</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#run">Run</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/examples/imodflow/ImodflowProjectfile.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

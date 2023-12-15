@@ -1,0 +1,45 @@
+﻿imod.mf6.OutputControl
+======================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: OutputControl
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~OutputControl.__init__
+      ~OutputControl.clip_box
+      ~OutputControl.copy
+      ~OutputControl.from_file
+      ~OutputControl.get_regrid_methods
+      ~OutputControl.is_grid_agnostic_package
+      ~OutputControl.is_regridding_supported
+      ~OutputControl.isel
+      ~OutputControl.mask
+      ~OutputControl.regrid_like
+      ~OutputControl.render
+      ~OutputControl.sel
+      ~OutputControl.skip_masking_dataarray
+      ~OutputControl.to_netcdf
+      ~OutputControl.write
+      ~OutputControl.write_binary_griddata
+      ~OutputControl.write_blockfile
+      ~OutputControl.write_text_griddata
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~OutputControl.dataset
+   
+   

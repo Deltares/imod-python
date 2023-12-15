@@ -1,0 +1,6 @@
+﻿imod.prepare.rasterize\_celltable
+=================================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: rasterize_celltable

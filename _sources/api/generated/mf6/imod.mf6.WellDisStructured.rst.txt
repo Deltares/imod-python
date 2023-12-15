@@ -1,0 +1,46 @@
+﻿imod.mf6.WellDisStructured
+==========================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: WellDisStructured
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~WellDisStructured.__init__
+      ~WellDisStructured.clip_box
+      ~WellDisStructured.copy
+      ~WellDisStructured.from_file
+      ~WellDisStructured.get_period_varnames
+      ~WellDisStructured.get_regrid_methods
+      ~WellDisStructured.is_grid_agnostic_package
+      ~WellDisStructured.is_regridding_supported
+      ~WellDisStructured.isel
+      ~WellDisStructured.mask
+      ~WellDisStructured.regrid_like
+      ~WellDisStructured.render
+      ~WellDisStructured.sel
+      ~WellDisStructured.skip_masking_dataarray
+      ~WellDisStructured.to_netcdf
+      ~WellDisStructured.write
+      ~WellDisStructured.write_binary_griddata
+      ~WellDisStructured.write_blockfile
+      ~WellDisStructured.write_text_griddata
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~WellDisStructured.dataset
+   
+   

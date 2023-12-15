@@ -1,0 +1,6 @@
+﻿imod.visualize.waterbalance\_barchart
+=====================================
+
+.. currentmodule:: imod.visualize
+
+.. autofunction:: waterbalance_barchart

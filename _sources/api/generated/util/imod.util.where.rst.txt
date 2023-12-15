@@ -1,0 +1,6 @@
+﻿imod.util.where
+===============
+
+.. currentmodule:: imod.util
+
+.. autofunction:: where

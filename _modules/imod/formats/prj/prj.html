@@ -1,0 +1,1504 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imod.formats.prj.prj &#8212; iMOD Python 0.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/sphinx_highlight.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/formats/prj/prj';</script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">imod.formats.prj.prj</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for imod.formats.prj.prj</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Utilities for parsing a project file.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">shlex</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">PathLike</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+<span class="kn">import</span> <span class="nn">imod</span>
+
+<span class="n">FilePath</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;PathLike[str]&quot;</span><span class="p">]</span>
+
+
+<span class="n">KEYS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;(bnd)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;ibound&quot;</span><span class="p">,),</span>
+    <span class="s2">&quot;(top)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;top&quot;</span><span class="p">,),</span>
+    <span class="s2">&quot;(bot)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;bottom&quot;</span><span class="p">,),</span>
+    <span class="s2">&quot;(thk)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;thickness&quot;</span><span class="p">,),</span>
+    <span class="s2">&quot;(khv)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;kh&quot;</span><span class="p">,),</span>
+    <span class="s2">&quot;(kva)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;vertical_anisotropy&quot;</span><span class="p">,),</span>
+    <span class="s2">&quot;(kdw)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;transmissivity&quot;</span><span class="p">,),</span>
+    <span class="s2">&quot;(kvv)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;kv&quot;</span><span class="p">,),</span>
+    <span class="s2">&quot;(vcw)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;resistance&quot;</span><span class="p">,),</span>
+    <span class="s2">&quot;(shd)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;head&quot;</span><span class="p">,),</span>
+    <span class="s2">&quot;(sto)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;storage_coefficient&quot;</span><span class="p">,),</span>
+    <span class="s2">&quot;(spy)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;specific_yield&quot;</span><span class="p">,),</span>
+    <span class="s2">&quot;(por)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;porosity&quot;</span><span class="p">,),</span>
+    <span class="s2">&quot;(ani)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;factor&quot;</span><span class="p">,</span> <span class="s2">&quot;angle&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;(hfb)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;gen&quot;</span><span class="p">,),</span>
+    <span class="s2">&quot;(ibs)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+    <span class="s2">&quot;(pwt)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+    <span class="s2">&quot;(sft)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+    <span class="s2">&quot;(obs)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+    <span class="s2">&quot;(cbi)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+    <span class="s2">&quot;(sco)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+    <span class="s2">&quot;(dsp)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+    <span class="s2">&quot;(ics)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+    <span class="s2">&quot;(fcs)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+    <span class="s2">&quot;(ssc)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+    <span class="s2">&quot;(fod)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+    <span class="s2">&quot;(fos)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+    <span class="s2">&quot;(rct)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+    <span class="s2">&quot;(con)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+    <span class="s2">&quot;(pst)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+<span class="p">}</span>
+
+<span class="n">DATE_KEYS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;(uzf)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">,),</span>
+    <span class="s2">&quot;(rch)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;rate&quot;</span><span class="p">,),</span>
+    <span class="s2">&quot;(evt)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;rate&quot;</span><span class="p">,</span> <span class="s2">&quot;surface&quot;</span><span class="p">,</span> <span class="s2">&quot;depth&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;(drn)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;conductance&quot;</span><span class="p">,</span> <span class="s2">&quot;elevation&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;(olf)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;elevation&quot;</span><span class="p">,),</span>
+    <span class="s2">&quot;(riv)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;conductance&quot;</span><span class="p">,</span> <span class="s2">&quot;stage&quot;</span><span class="p">,</span> <span class="s2">&quot;bottom_elevation&quot;</span><span class="p">,</span> <span class="s2">&quot;infiltration_factor&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;(isg)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;isg&quot;</span><span class="p">,),</span>
+    <span class="s2">&quot;(sfr)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;isg&quot;</span><span class="p">,),</span>
+    <span class="s2">&quot;(lak)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">,),</span>
+    <span class="s2">&quot;(wel)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;ipf&quot;</span><span class="p">,),</span>
+    <span class="s2">&quot;(mnw)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">,),</span>
+    <span class="s2">&quot;(ghb)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;conductance&quot;</span><span class="p">,</span> <span class="s2">&quot;head&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;(chd)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;head&quot;</span><span class="p">,),</span>
+    <span class="s2">&quot;(fhb)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">,),</span>
+    <span class="s2">&quot;(fde)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">,),</span>
+    <span class="s2">&quot;(tvc)&quot;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">,),</span>
+<span class="p">}</span>
+
+<span class="n">METASWAP_VARS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;boundary&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;landuse&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;rootzone_thickness&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;soil_physical_unit&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;meteo_station_number&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;surface_elevation&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;artificial_recharge&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;artifical_recharge_layer&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;artificial_recharge_capacity&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;wetted_area&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;urban_area&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;urban_ponding_depth&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;rural_ponding_depth&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;urban_runoff_resistance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;rural_runoff_resistance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;urban_runon_resistance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;rural_runon_resistance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;urban_infiltration_capacity&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;rural_infiltration_capacity&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;perched_water_table_level&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;soil_moisture_fraction&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;conductivitiy_factor&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;plot_number&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;steering_location&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;plot_drainage_level&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;plot_drainage_resistance&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">_LineIterator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Like iter(lines), but we can go back and we check if we&#39;re finished.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lines</span> <span class="o">=</span> <span class="n">lines</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">finished</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">back</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">finished</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span>
+
+
+<span class="k">def</span> <span class="nf">_tokenize</span><span class="p">(</span><span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A value separator in Fortran list-directed input is:</span>
+
+<span class="sd">    * A comma if period decimal edit mode is POINT.</span>
+<span class="sd">    * One or more contiguous spaces (blanks); no tabs.</span>
+
+<span class="sd">    Other remarks:</span>
+
+<span class="sd">    * Values, except for character strings, cannot contain blanks.</span>
+<span class="sd">    * Strings may be unquoted if they do not start with a digit and no value</span>
+<span class="sd">      separators.</span>
+<span class="sd">    * Character strings can be quoted strings, using pairs of quotes (&quot;), pairs</span>
+<span class="sd">      of apostrophes (&#39;).</span>
+<span class="sd">    * A quote or apostrophe must be preceded by a value separator to initite a</span>
+<span class="sd">      quoted string.</span>
+<span class="sd">    * An empty entry consists of two consecutive commas (or semicolons).</span>
+
+<span class="sd">    For the use here (parsing IMOD&#39;s project files), we ignore:</span>
+
+<span class="sd">    * A semicolon value separator if period decimal edit mode is COMMA.</span>
+<span class="sd">    * Complex constants given as two real constants separated by a comma and</span>
+<span class="sd">      enclosed in parentheses.</span>
+<span class="sd">    * Repetition counts: 4*(3.,2.) 2*, 4*&#39;hello&#39;</span>
+
+<span class="sd">    Furthermore, we do not expect commas inside of the project file entries,</span>
+<span class="sd">    since we expect:</span>
+
+<span class="sd">    * Package names: unquoted character strings.</span>
+<span class="sd">    * File paths: will not contain commas, no single apostrophe, nor a single</span>
+<span class="sd">      quote symbol, may contain whitespace if quoted. * Integers for counts and</span>
+<span class="sd">      settings.</span>
+<span class="sd">    * Floats for addition and multiplication values.</span>
+<span class="sd">    * Simple character strings for period names (summer, winter). These</span>
+<span class="sd">      technically could contain commas if quoted, which is very unlikely.</span>
+<span class="sd">    * No quotes or apostrophes are escaped.</span>
+
+<span class="sd">    With these assumptions, we can limit complexity considerably (see the</span>
+<span class="sd">    PyLiDiRe link for a complete implementation):</span>
+
+<span class="sd">    * First we split by comma (we don&#39;t expected commas in quote strings).</span>
+<span class="sd">    * Next we split by whitespace, unless quoted.</span>
+
+<span class="sd">    We can expect both single and double quotes, even within a single line:</span>
+<span class="sd">    shlex.split() handles this. Note that additional entries are likely</span>
+<span class="sd">    allowed, as the Fortran implementation only reads what is necessary,</span>
+<span class="sd">    then stops parsing.</span>
+
+<span class="sd">    See also:</span>
+<span class="sd">        * https://stackoverflow.com/questions/36165050/python-equivalent-of-fortran-list-directed-input</span>
+<span class="sd">        * https://gitlab.com/everythingfunctional/PyLiDiRe</span>
+<span class="sd">        * https://docs.oracle.com/cd/E19957-01/805-4939/6j4m0vnc5/index.html</span>
+<span class="sd">        * The Fortran 2003 Handbook</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    Raise ValueError, due to missing closing quotation. (Can be enabled</span>
+<span class="sd">    shlex.split(s, posix=False)):</span>
+
+<span class="sd">    &gt;&gt; _tokenize(&quot;That&#39;s life&quot;)</span>
+
+<span class="sd">    &gt;&gt; _tokenize(&quot;That &#39;s life&#39;&quot;)</span>
+<span class="sd">    &gt;&gt; [&quot;That&quot;, &quot;s life&quot;]</span>
+
+<span class="sd">    &gt;&gt; _tokenize(&quot;That,&#39;s life&#39;&quot;)</span>
+<span class="sd">    &gt;&gt; [&quot;That&quot;, &quot;s life&quot;]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]</span>
+    <span class="n">tokens</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">tokens</span>
+
+
+<span class="k">def</span> <span class="nf">_wrap_error_message</span><span class="p">(</span>
+    <span class="n">exception</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">lines</span><span class="p">:</span> <span class="n">_LineIterator</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">back</span><span class="p">()</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+    <span class="n">number</span> <span class="o">=</span> <span class="n">lines</span><span class="o">.</span><span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">exception</span><span class="p">)(</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">exception</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;Failed to parse </span><span class="si">{</span><span class="n">description</span><span class="si">}</span><span class="s2"> for line </span><span class="si">{</span><span class="n">number</span><span class="si">}</span><span class="s2"> with content:</span><span class="se">\n</span><span class="si">{</span><span class="n">content</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_parse_blockheader</span><span class="p">(</span><span class="n">lines</span><span class="p">:</span> <span class="n">_LineIterator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">no_result</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+        <span class="c1"># Skip if it&#39;s an empty line.</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">no_result</span>
+
+        <span class="n">first</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">first</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;periods&quot;</span><span class="p">,</span> <span class="s2">&quot;species&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="mi">1</span><span class="p">,</span> <span class="n">first</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="c1"># The line must contain atleast nper, key, active.</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">first</span><span class="p">)</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">active</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">n</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">active</span>
+        <span class="c1"># It&#39;s a comment or something.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">no_result</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">_wrap_error_message</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s2">&quot;block header&quot;</span><span class="p">,</span> <span class="n">lines</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_parse_time</span><span class="p">(</span><span class="n">lines</span><span class="p">:</span> <span class="n">_LineIterator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+        <span class="n">date</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">time</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">time</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">date</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">_wrap_error_message</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s2">&quot;date time&quot;</span><span class="p">,</span> <span class="n">lines</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_parse_blockline</span><span class="p">(</span><span class="n">lines</span><span class="p">:</span> <span class="n">_LineIterator</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;active&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">])),</span>
+            <span class="s2">&quot;is_constant&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+            <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
+            <span class="s2">&quot;factor&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span>
+            <span class="s2">&quot;addition&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">4</span><span class="p">]),</span>
+            <span class="s2">&quot;constant&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">5</span><span class="p">]),</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">content</span><span class="p">[</span><span class="s2">&quot;is_constant&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">content</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span>
+        <span class="k">return</span> <span class="n">content</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">_wrap_error_message</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s2">&quot;entries&quot;</span><span class="p">,</span> <span class="n">lines</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_parse_nsub_nsystem</span><span class="p">(</span><span class="n">lines</span><span class="p">:</span> <span class="n">_LineIterator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+        <span class="n">n_entry</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">n_system</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">n_entry</span><span class="p">,</span> <span class="n">n_system</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">_wrap_error_message</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s2">&quot;number of sub-entries and number of systems&quot;</span><span class="p">,</span> <span class="n">lines</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_parse_notimeblock</span><span class="p">(</span>
+    <span class="n">lines</span><span class="p">:</span> <span class="n">_LineIterator</span><span class="p">,</span>
+    <span class="n">fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="n">n_entry</span><span class="p">,</span> <span class="n">n_system</span> <span class="o">=</span> <span class="n">_parse_nsub_nsystem</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_entry</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Expected NSUB entry of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">fields</span><span class="si">}</span><span class="s2">, read: </span><span class="si">{</span><span class="n">n_entry</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">field</span><span class="p">:</span> <span class="p">[</span><span class="n">_parse_blockline</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_system</span><span class="p">)]</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span>
+    <span class="p">}</span>
+    <span class="n">content</span><span class="p">[</span><span class="s2">&quot;n_system&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_system</span>
+    <span class="k">return</span> <span class="n">content</span>
+
+
+<span class="k">def</span> <span class="nf">_parse_capblock</span><span class="p">(</span>
+    <span class="n">lines</span><span class="p">:</span> <span class="n">_LineIterator</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="n">METASWAP_VARS</span>
+    <span class="n">n_entry</span><span class="p">,</span> <span class="n">n_system</span> <span class="o">=</span> <span class="n">_parse_nsub_nsystem</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">n_entry</span> <span class="o">==</span> <span class="mi">21</span><span class="p">:</span>
+        <span class="c1"># Remove layer entry.</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">fields</span><span class="p">[:</span><span class="mi">22</span><span class="p">])</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">n_entry</span> <span class="o">==</span> <span class="mi">22</span><span class="p">:</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[:</span><span class="mi">22</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">n_entry</span> <span class="o">==</span> <span class="mi">26</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Expected NSUB entry of 21, 22, or 26 for </span><span class="si">{</span><span class="n">fields</span><span class="si">}</span><span class="s2">, read: </span><span class="si">{</span><span class="n">n_entry</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">content</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">field</span><span class="p">:</span> <span class="p">[</span><span class="n">_parse_blockline</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_system</span><span class="p">)]</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span>
+    <span class="p">}</span>
+    <span class="n">content</span><span class="p">[</span><span class="s2">&quot;n_system&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_system</span>
+    <span class="k">return</span> <span class="n">content</span>
+
+
+<span class="k">def</span> <span class="nf">_parse_extrablock</span><span class="p">(</span><span class="n">lines</span><span class="p">:</span> <span class="n">_LineIterator</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse the MetaSWAP &quot;extra files&quot; block&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;paths&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">next</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]}</span>
+
+
+<span class="k">def</span> <span class="nf">_parse_timeblock</span><span class="p">(</span>
+    <span class="n">lines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="n">n_fields</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="n">_parse_time</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+        <span class="n">content</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+        <span class="n">n_entry</span><span class="p">,</span> <span class="n">n_system</span> <span class="o">=</span> <span class="n">_parse_nsub_nsystem</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">n_fields</span> <span class="o">!=</span> <span class="n">n_entry</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected NSUB entry of </span><span class="si">{</span><span class="n">n_fields</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">fields</span><span class="si">}</span><span class="s2">, read: </span><span class="si">{</span><span class="n">n_entry</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+            <span class="n">content</span><span class="p">[</span><span class="n">field</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">_parse_blockline</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">time</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_system</span><span class="p">)]</span>
+            <span class="p">)</span>
+
+    <span class="n">content</span><span class="p">[</span><span class="s2">&quot;n_system&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_system</span>
+    <span class="k">return</span> <span class="n">content</span>
+
+
+<span class="k">def</span> <span class="nf">_parse_pcgblock</span><span class="p">(</span><span class="n">lines</span><span class="p">:</span> <span class="n">_LineIterator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+        <span class="c1"># TODO: which are optional? How many to expect?</span>
+        <span class="c1"># Check for an empty line to terminate the block?</span>
+        <span class="n">types</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;mxiter&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="s2">&quot;iter1&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="s2">&quot;hclose&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+            <span class="s2">&quot;rclose&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+            <span class="s2">&quot;relax&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+            <span class="s2">&quot;npcond&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="s2">&quot;iprpcg&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="s2">&quot;mutpcg&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="s2">&quot;damppcg&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+            <span class="s2">&quot;damppcgt&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+            <span class="s2">&quot;iqerror&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="s2">&quot;qerror&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">12</span><span class="p">:</span>
+            <span class="n">line_iterator</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">k</span><span class="p">:</span> <span class="n">valuetype</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">line_iterator</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">valuetype</span> <span class="ow">in</span> <span class="n">types</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">}</span>
+        <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="ow">in</span> <span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">line</span><span class="p">):</span>
+            <span class="n">pcglines</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="nb">next</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">11</span><span class="p">)]</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">pcglines</span><span class="p">:</span>
+                <span class="c1"># undo separation, partition on equality sign instead.</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="n">key</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">types</span><span class="p">[</span><span class="n">key</span><span class="p">](</span><span class="n">value</span><span class="p">)</span>
+                <span class="n">content</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected 12 KEY = VALUE pairs, or 12 values. Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">content</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">_wrap_error_message</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s2">&quot;PCG entry&quot;</span><span class="p">,</span> <span class="n">lines</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_parse_periodsblock</span><span class="p">(</span><span class="n">lines</span><span class="p">:</span> <span class="n">_LineIterator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">periods</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">lines</span><span class="o">.</span><span class="n">finished</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+            <span class="c1"># Stop if we encounter an empty line.</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="c1"># Read the alias</span>
+            <span class="n">alias</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># Now read the time associated with it.</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">_parse_time</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+            <span class="n">periods</span><span class="p">[</span><span class="n">alias</span><span class="p">]</span> <span class="o">=</span> <span class="n">start</span>
+        <span class="k">return</span> <span class="n">periods</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">_wrap_error_message</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s2">&quot;periods data block&quot;</span><span class="p">,</span> <span class="n">lines</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_parse_speciesblock</span><span class="p">(</span><span class="n">lines</span><span class="p">:</span> <span class="n">_LineIterator</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">species</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">lines</span><span class="o">.</span><span class="n">finished</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+            <span class="c1"># Stop if we encounter an empty line.</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">name</span><span class="p">,</span> <span class="n">nr</span> <span class="o">=</span> <span class="n">line</span>
+            <span class="n">nr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">nr</span><span class="p">)</span>
+            <span class="n">species</span><span class="p">[</span><span class="n">nr</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="k">return</span> <span class="n">species</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">_wrap_error_message</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s2">&quot;species entry&quot;</span><span class="p">,</span> <span class="n">lines</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_parse_block</span><span class="p">(</span><span class="n">lines</span><span class="p">:</span> <span class="n">_LineIterator</span><span class="p">,</span> <span class="n">content</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mutates content dict.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">key</span> <span class="o">=</span> <span class="n">active</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># A project file may contain any number of lines outside of a &quot;topic&quot;</span>
+    <span class="c1"># block. _parse_blockheader will return triple None in that case.</span>
+    <span class="k">while</span> <span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">lines</span><span class="o">.</span><span class="n">finished</span><span class="p">:</span>
+        <span class="n">n</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">active</span> <span class="o">=</span> <span class="n">_parse_blockheader</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">KEYS</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected N=1 for </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">, read: </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">fields</span> <span class="o">=</span> <span class="n">KEYS</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="n">blockcontent</span> <span class="o">=</span> <span class="n">_parse_notimeblock</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">DATE_KEYS</span><span class="p">:</span>
+            <span class="n">fields</span> <span class="o">=</span> <span class="n">DATE_KEYS</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="n">blockcontent</span> <span class="o">=</span> <span class="n">_parse_timeblock</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;(cap)&quot;</span><span class="p">:</span>
+            <span class="n">blockcontent</span> <span class="o">=</span> <span class="n">_parse_capblock</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;(pcg)&quot;</span><span class="p">:</span>
+            <span class="n">blockcontent</span> <span class="o">=</span> <span class="n">_parse_pcgblock</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;periods&quot;</span><span class="p">:</span>
+            <span class="n">blockcontent</span> <span class="o">=</span> <span class="n">_parse_periodsblock</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;species&quot;</span><span class="p">:</span>
+            <span class="n">blockcontent</span> <span class="o">=</span> <span class="n">_parse_speciesblock</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;extra&quot;</span><span class="p">:</span>
+            <span class="n">blockcontent</span> <span class="o">=</span> <span class="n">_parse_extrablock</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;(pcg)&quot;</span><span class="p">,</span> <span class="s2">&quot;(gcg)&quot;</span><span class="p">,</span> <span class="s2">&quot;(vdf)&quot;</span><span class="p">)</span>
+            <span class="n">options</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">KEYS</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">+</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">DATE_KEYS</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">+</span> <span class="n">other</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">back</span><span class="p">()</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+            <span class="n">number</span> <span class="o">=</span> <span class="n">lines</span><span class="o">.</span><span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to recognize header keyword: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">. Expected one of keywords </span><span class="si">{</span><span class="n">options</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Errored in line </span><span class="si">{</span><span class="n">number</span><span class="si">}</span><span class="s2"> with entries:</span><span class="se">\n</span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="se">\n</span><span class="s2">Error occurred for keyword: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">blockcontent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">active</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">blockcontent</span><span class="p">[</span><span class="s2">&quot;active&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">active</span>
+
+    <span class="n">content</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">blockcontent</span>
+    <span class="k">return</span>
+
+
+<span class="k">def</span> <span class="nf">_process_package_entry</span><span class="p">(</span><span class="n">entry</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The iMOD project file supports constants in lieu of IDFs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]}</span>
+    <span class="n">dims</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,)</span>
+
+    <span class="k">if</span> <span class="s2">&quot;path&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">entry</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;coords&quot;</span><span class="p">:</span> <span class="n">coords</span><span class="p">}</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;constant&quot;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">]</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">idf</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{name}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">header</span><span class="p">[</span><span class="s2">&quot;dims&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dims</span>
+    <span class="k">return</span> <span class="n">path</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="n">value</span>
+
+
+<span class="k">def</span> <span class="nf">_merge_coords</span><span class="p">(</span><span class="n">headers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">header</span> <span class="ow">in</span> <span class="n">headers</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;coords&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">coords</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">coords</span><span class="p">}</span>
+
+
+<span class="k">def</span> <span class="nf">_create_datarray_from_paths</span><span class="p">(</span><span class="n">paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">headers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]):</span>
+    <span class="n">da</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">formats</span><span class="o">.</span><span class="n">array_io</span><span class="o">.</span><span class="n">reading</span><span class="o">.</span><span class="n">_load</span><span class="p">(</span>
+        <span class="n">paths</span><span class="p">,</span> <span class="n">use_cftime</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">_read</span><span class="o">=</span><span class="n">imod</span><span class="o">.</span><span class="n">idf</span><span class="o">.</span><span class="n">_read</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">da</span>
+
+
+<span class="k">def</span> <span class="nf">_create_dataarray_from_values</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">headers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]):</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">_merge_coords</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
+    <span class="n">firstdims</span> <span class="o">=</span> <span class="n">headers</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;dims&quot;</span><span class="p">]</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">coord</span><span class="p">)</span> <span class="k">for</span> <span class="n">coord</span> <span class="ow">in</span> <span class="n">coords</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+    <span class="n">da</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">shape</span><span class="p">),</span> <span class="n">dims</span><span class="o">=</span><span class="n">firstdims</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">da</span>
+
+
+<span class="k">def</span> <span class="nf">_create_dataarray</span><span class="p">(</span>
+    <span class="n">paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">headers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a DataArray from a list of IDF paths, or from constant values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">values_valid</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">paths_valid</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">headers_paths</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">headers_values</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">headers_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+            <span class="n">values_valid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">headers_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+            <span class="n">paths_valid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">paths_valid</span> <span class="ow">and</span> <span class="n">values_valid</span><span class="p">:</span>
+        <span class="n">dap</span> <span class="o">=</span> <span class="n">_create_datarray_from_paths</span><span class="p">(</span><span class="n">paths_valid</span><span class="p">,</span> <span class="n">headers_paths</span><span class="p">)</span>
+        <span class="n">dav</span> <span class="o">=</span> <span class="n">_create_dataarray_from_values</span><span class="p">(</span><span class="n">values_valid</span><span class="p">,</span> <span class="n">headers_values</span><span class="p">)</span>
+        <span class="n">dap</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;tmp&quot;</span>
+        <span class="n">dav</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;tmp&quot;</span>
+        <span class="n">da</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">((</span><span class="n">dap</span><span class="p">,</span> <span class="n">dav</span><span class="p">),</span> <span class="n">join</span><span class="o">=</span><span class="s2">&quot;outer&quot;</span><span class="p">)[</span><span class="s2">&quot;tmp&quot;</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">paths_valid</span><span class="p">:</span>
+        <span class="n">da</span> <span class="o">=</span> <span class="n">_create_datarray_from_paths</span><span class="p">(</span><span class="n">paths_valid</span><span class="p">,</span> <span class="n">headers_paths</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">values_valid</span><span class="p">:</span>
+        <span class="n">da</span> <span class="o">=</span> <span class="n">_create_dataarray_from_values</span><span class="p">(</span><span class="n">values_valid</span><span class="p">,</span> <span class="n">headers_values</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">da</span>
+
+
+<span class="k">def</span> <span class="nf">_open_package_idf</span><span class="p">(</span>
+    <span class="n">block_content</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">variables</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">]:</span>
+    <span class="n">das</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
+        <span class="n">variable_content</span> <span class="o">=</span> <span class="n">block_content</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
+        <span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">variable_content</span><span class="p">:</span>
+            <span class="n">path</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">_process_package_entry</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+            <span class="n">header</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">variable</span>
+            <span class="n">header</span><span class="p">[</span><span class="s2">&quot;dims&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span>
+            <span class="n">header</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span>
+            <span class="n">paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">headers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+            <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="n">das</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span> <span class="o">=</span> <span class="n">_create_dataarray</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">das</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_process_time</span><span class="p">(</span><span class="n">time</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">yearfirst</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">time</span> <span class="o">==</span> <span class="s2">&quot;steady-state&quot;</span><span class="p">:</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">yearfirst</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="o">==</span> <span class="mi">19</span><span class="p">:</span>
+                <span class="n">time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="o">==</span> <span class="mi">10</span><span class="p">:</span>
+                <span class="n">time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;time data </span><span class="si">{</span><span class="n">time</span><span class="si">}</span><span class="s2"> does not match format &quot;</span>
+                    <span class="s1">&#39;&quot;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S&quot; or &quot;%Y-%m-</span><span class="si">%d</span><span class="s1">&quot;&#39;</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="o">==</span> <span class="mi">19</span><span class="p">:</span>
+                <span class="n">time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">-%m-%Y %H:%M:%S&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="o">==</span> <span class="mi">10</span><span class="p">:</span>
+                <span class="n">time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">-%m-%Y&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;time data </span><span class="si">{</span><span class="n">time</span><span class="si">}</span><span class="s2"> does not match format &quot;</span>
+                    <span class="s1">&#39;&quot;</span><span class="si">%d</span><span class="s1">-%m-%Y %H:%M:%S&quot; or &quot;</span><span class="si">%d</span><span class="s1">-%m-%Y&quot;&#39;</span>
+                <span class="p">)</span>
+    <span class="k">return</span> <span class="n">time</span>
+
+
+<span class="k">def</span> <span class="nf">_process_boundary_condition_entry</span><span class="p">(</span><span class="n">entry</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">periods</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">datetime</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The iMOD project file supports constants in lieu of IDFs.</span>
+
+<span class="sd">    Also process repeated stress periods (on a yearly basis): substitute the</span>
+<span class="sd">    original date here.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">timestring</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span>
+
+    <span class="c1"># Resolve repeating periods first:</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">periods</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timestring</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">repeat</span> <span class="o">=</span> <span class="n">time</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># this resolves e.g. &quot;steady-state&quot;</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="n">_process_time</span><span class="p">(</span><span class="n">timestring</span><span class="p">)</span>
+        <span class="n">repeat</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dims</span> <span class="o">=</span> <span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dims</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">,)</span>
+        <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span>
+
+    <span class="c1"># 0 signifies that the layer must be determined on the basis of</span>
+    <span class="c1"># bottom elevation and stage.</span>
+    <span class="n">layer</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">layer</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">layer</span> <span class="ow">is</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">layer</span>
+        <span class="n">dims</span> <span class="o">=</span> <span class="n">dims</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,)</span>
+
+    <span class="k">if</span> <span class="s2">&quot;path&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">entry</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;coords&quot;</span><span class="p">:</span> <span class="n">coords</span><span class="p">}</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;constant&quot;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">]</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">idf</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{name}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">header</span><span class="p">[</span><span class="s2">&quot;dims&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dims</span>
+    <span class="k">if</span> <span class="n">layer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">header</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">layer</span>
+    <span class="k">if</span> <span class="n">time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">header</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span>
+
+    <span class="k">return</span> <span class="n">path</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">repeat</span>
+
+
+<span class="k">def</span> <span class="nf">_open_boundary_condition_idf</span><span class="p">(</span>
+    <span class="n">block_content</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">periods</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">datetime</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">]],</span> <span class="n">List</span><span class="p">[</span><span class="n">datetime</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read the variables specified from block_content.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_system</span> <span class="o">=</span> <span class="n">block_content</span><span class="p">[</span><span class="s2">&quot;n_system&quot;</span><span class="p">]</span>
+    <span class="n">n_time</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">block_content</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">])</span>
+    <span class="n">n_total</span> <span class="o">=</span> <span class="n">n_system</span> <span class="o">*</span> <span class="n">n_time</span>
+
+    <span class="n">das</span> <span class="o">=</span> <span class="p">[{}</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_system</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
+        <span class="n">variable_content</span> <span class="o">=</span> <span class="n">block_content</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">variable_content</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">!=</span> <span class="n">n_total</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected n_time * n_system = </span><span class="si">{</span><span class="n">n_time</span><span class="si">}</span><span class="s2"> * </span><span class="si">{</span><span class="n">n_system</span><span class="si">}</span><span class="s2"> = &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n_total</span><span class="si">}</span><span class="s2"> entries for variable </span><span class="si">{</span><span class="n">variable</span><span class="si">}</span><span class="s2">. Received: </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Group the paths and headers by system.</span>
+        <span class="n">system_paths</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="n">system_headers</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="n">system_values</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="n">all_repeats</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">entry</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">variable_content</span><span class="p">):</span>
+            <span class="n">path</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">repeat</span> <span class="o">=</span> <span class="n">_process_boundary_condition_entry</span><span class="p">(</span>
+                <span class="n">entry</span><span class="p">,</span> <span class="n">periods</span>
+            <span class="p">)</span>
+            <span class="n">header</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">variable</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">i</span> <span class="o">%</span> <span class="n">n_system</span>
+            <span class="n">system_paths</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">system_headers</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+            <span class="n">system_values</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">repeat</span><span class="p">:</span>
+                <span class="n">all_repeats</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">repeat</span><span class="p">)</span>
+
+        <span class="c1"># Concat one system at a time.</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+            <span class="nb">zip</span><span class="p">(</span><span class="n">system_paths</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">system_headers</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">system_values</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="p">):</span>
+            <span class="n">das</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">variable</span><span class="p">]</span> <span class="o">=</span> <span class="n">_create_dataarray</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+
+    <span class="n">repeats</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">all_repeats</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">das</span><span class="p">,</span> <span class="n">repeats</span>
+
+
+<span class="k">def</span> <span class="nf">_read_package_gen</span><span class="p">(</span>
+    <span class="n">block_content</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">has_topbot</span><span class="p">:</span> <span class="nb">bool</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">block_content</span><span class="p">[</span><span class="s2">&quot;gen&quot;</span><span class="p">]:</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">gen</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">has_topbot</span><span class="p">:</span>
+            <span class="n">gdf</span><span class="p">[</span><span class="s2">&quot;resistance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;factor&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;addition&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">gdf</span><span class="p">[</span><span class="s2">&quot;multiplier&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;factor&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;addition&quot;</span><span class="p">]</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;geodataframe&quot;</span><span class="p">:</span> <span class="n">gdf</span><span class="p">,</span>
+            <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">],</span>
+        <span class="p">}</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span>
+
+
+<span class="k">def</span> <span class="nf">_read_package_ipf</span><span class="p">(</span>
+    <span class="n">block_content</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">periods</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">datetime</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">List</span><span class="p">[</span><span class="n">datetime</span><span class="p">]]:</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">repeats</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">block_content</span><span class="p">[</span><span class="s2">&quot;ipf&quot;</span><span class="p">]:</span>
+        <span class="n">timestring</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span>
+        <span class="n">layer</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="n">periods</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timestring</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">time</span> <span class="o">=</span> <span class="n">_process_time</span><span class="p">(</span><span class="n">timestring</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">repeats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+
+        <span class="c1"># Ensure the columns are identifiable.</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">])</span>
+        <span class="n">ipf_df</span><span class="p">,</span> <span class="n">indexcol</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">ipf</span><span class="o">.</span><span class="n">_read_ipf</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">indexcol</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># No associated files</span>
+            <span class="n">columns</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;rate&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">layer</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">ipf_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">5</span><span class="p">]</span>
+                <span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;top&quot;</span><span class="p">,</span> <span class="s2">&quot;bottom&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">ipf_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">ipf_df</span><span class="o">.</span><span class="n">itertuples</span><span class="p">():</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">indexcol</span><span class="p">]</span>
+                <span class="n">path_assoc</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">df_assoc</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">ipf</span><span class="o">.</span><span class="n">read_associated</span><span class="p">(</span><span class="n">path_assoc</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+                <span class="n">df_assoc</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;rate&quot;</span><span class="p">]</span>
+                <span class="n">df_assoc</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">df_assoc</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                <span class="n">df_assoc</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_assoc</span><span class="o">.</span><span class="n">stem</span>
+                <span class="k">if</span> <span class="n">layer</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">df_assoc</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+                    <span class="n">df_assoc</span><span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+                <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_assoc</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;dataframe&quot;</span><span class="p">:</span> <span class="n">df</span><span class="p">,</span>
+            <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">layer</span><span class="p">,</span>
+            <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">time</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+    <span class="n">repeats</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">repeats</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span><span class="p">,</span> <span class="n">repeats</span>
+
+
+<div class="viewcode-block" id="read_projectfile"><a class="viewcode-back" href="../../../../api/generated/io/imod.formats.prj.read_projectfile.html#imod.formats.prj.read_projectfile">[docs]</a><span class="k">def</span> <span class="nf">read_projectfile</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read an iMOD project file into a collection of nested dictionaries.</span>
+
+<span class="sd">    The top-level keys are the &quot;topic&quot; entries such &quot;bnd&quot; or &quot;riv&quot; in the</span>
+<span class="sd">    project file. An example structure of the dictionaries is visualized below:</span>
+
+<span class="sd">    .. code-block::</span>
+
+<span class="sd">        content</span>
+<span class="sd">        ├── bnd</span>
+<span class="sd">        │   ├── active: bool</span>
+<span class="sd">        │   └── ibound: list of dictionaries for each layer</span>
+<span class="sd">        ├── riv</span>
+<span class="sd">        │   ├── active: bool</span>
+<span class="sd">        │   ├── conductance: list of dictionaries for each time and layer.</span>
+<span class="sd">        │   ├── stage: idem.</span>
+<span class="sd">        │   ├── bottom_elevation: idem.</span>
+<span class="sd">        │   └── infiltration_factor: idem.</span>
+<span class="sd">        etc.</span>
+
+<span class="sd">    Time and layer are flattened into a single list and time is included in</span>
+<span class="sd">    every dictionary:</span>
+
+<span class="sd">    .. code-block::</span>
+
+<span class="sd">        stage</span>
+<span class="sd">        ├── 0  # First entry in list</span>
+<span class="sd">        │   ├── active: bool</span>
+<span class="sd">        │   ├── is_constant: bool</span>
+<span class="sd">        │   ├── layer: int</span>
+<span class="sd">        │   ├── factor: float</span>
+<span class="sd">        │   ├── addition: float</span>
+<span class="sd">        │   ├── constant: float</span>
+<span class="sd">        │   ├── path: str</span>
+<span class="sd">        │   └── time: str</span>
+<span class="sd">        │</span>
+<span class="sd">        ├── 1  # Second entry in list</span>
+<span class="sd">        │   ├── etc.</span>
+<span class="sd">        etc.</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path: str or Path</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    content: Dict[str, Any]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Force to Path</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+
+    <span class="n">tokenized</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">tokenized</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_tokenize</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="se">\n</span><span class="s2">Error occurred in line </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">_LineIterator</span><span class="p">(</span><span class="n">tokenized</span><span class="p">)</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">wdir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">parent</span>
+    <span class="c1"># Change dir temporarely to projectfile dir to resolve relative paths</span>
+    <span class="k">with</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">cd</span><span class="p">(</span><span class="n">wdir</span><span class="p">):</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">lines</span><span class="o">.</span><span class="n">finished</span><span class="p">:</span>
+            <span class="n">_parse_block</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">content</span></div>
+
+
+<div class="viewcode-block" id="open_projectfile_data"><a class="viewcode-back" href="../../../../api/generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data">[docs]</a><span class="k">def</span> <span class="nf">open_projectfile_data</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read the contents of an iMOD project file and read/open the data present in</span>
+<span class="sd">    it:</span>
+
+<span class="sd">    * IDF data is lazily loaded into xarray.DataArrays.</span>
+<span class="sd">    * GEN data is eagerly loaded into geopandas.GeoDataFrames</span>
+<span class="sd">    * IPF data is eagerly loaded into pandas.DataFrames</span>
+<span class="sd">    * Non-file based entries (such as the PCG settings) are kept as a dictionary.</span>
+
+<span class="sd">    When multiple systems are present, they are numbered starting from one, e.g.:</span>
+
+<span class="sd">    * drn-1</span>
+<span class="sd">    * drn-2</span>
+
+<span class="sd">    Xarray requires valid dates for the time coordinate. Aliases such as</span>
+<span class="sd">    &quot;summer&quot; and &quot;winter&quot; that are associated with dates in the project file</span>
+<span class="sd">    Periods block cannot be used in the time coordinate. Hence, this function</span>
+<span class="sd">    will instead insert the dates associated with the aliases, with the year</span>
+<span class="sd">    replaced by 1899; as the iMOD calendar starts at 1900, this ensures that</span>
+<span class="sd">    the repeats are always first and that no date collisions will occur.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path: pathlib.Path or str.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    data: Dict[str, Any]</span>
+<span class="sd">    Keys are the iMOD project file &quot;topics&quot;, without parentheses.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">read_projectfile</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">periods_block</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;periods&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">periods_block</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">periods</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Set the year of a repeat date to 1899: this ensures it falls outside</span>
+        <span class="c1"># of the iMOD calendar. Collisions are then always avoided.</span>
+        <span class="n">periods</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">key</span><span class="p">:</span> <span class="n">_process_time</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">yearfirst</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mi">1899</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">time</span> <span class="ow">in</span> <span class="n">periods_block</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+
+    <span class="c1"># Pop species block, at the moment we do not do much with,</span>
+    <span class="c1"># since most regional models are without solute transport</span>
+    <span class="n">content</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;species&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="n">has_topbot</span> <span class="o">=</span> <span class="s2">&quot;(top)&quot;</span> <span class="ow">in</span> <span class="n">content</span> <span class="ow">and</span> <span class="s2">&quot;(bot)&quot;</span> <span class="ow">in</span> <span class="n">content</span>
+    <span class="n">prj_data</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">repeat_stress</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">block_content</span> <span class="ow">in</span> <span class="n">content</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">repeats</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;(hfb)&quot;</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">_read_package_gen</span><span class="p">(</span><span class="n">block_content</span><span class="p">,</span> <span class="n">has_topbot</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;(wel)&quot;</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">,</span> <span class="n">repeats</span> <span class="o">=</span> <span class="n">_read_package_ipf</span><span class="p">(</span><span class="n">block_content</span><span class="p">,</span> <span class="n">periods</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;(cap)&quot;</span><span class="p">:</span>
+                <span class="n">variables</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">METASWAP_VARS</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">block_content</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">_open_package_idf</span><span class="p">(</span><span class="n">block_content</span><span class="p">,</span> <span class="n">variables</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;(pcg)&quot;</span><span class="p">):</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">block_content</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">KEYS</span><span class="p">:</span>
+                <span class="n">variables</span> <span class="o">=</span> <span class="n">KEYS</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">_open_package_idf</span><span class="p">(</span><span class="n">block_content</span><span class="p">,</span> <span class="n">variables</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">DATE_KEYS</span><span class="p">:</span>
+                <span class="n">variables</span> <span class="o">=</span> <span class="n">DATE_KEYS</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="n">data</span><span class="p">,</span> <span class="n">repeats</span> <span class="o">=</span> <span class="n">_open_boundary_condition_idf</span><span class="p">(</span>
+                    <span class="n">block_content</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">periods</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported key: &#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">. Errored while opening/reading data entries for: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">strippedkey</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;(&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;)&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">da</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+                <span class="n">numbered_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">strippedkey</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">prj_data</span><span class="p">[</span><span class="n">numbered_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">da</span>
+                <span class="n">repeat_stress</span><span class="p">[</span><span class="n">numbered_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeats</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">prj_data</span><span class="p">[</span><span class="n">strippedkey</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">repeat_stress</span><span class="p">[</span><span class="n">strippedkey</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeats</span>
+
+    <span class="n">repeat_stress</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">repeat_stress</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">prj_data</span><span class="p">,</span> <span class="n">repeat_stress</span></div>
+
+
+<div class="viewcode-block" id="read_timfile"><a class="viewcode-back" href="../../../../api/generated/io/imod.formats.prj.read_timfile.html#imod.formats.prj.read_timfile">[docs]</a><span class="k">def</span> <span class="nf">read_timfile</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">parsetime</span><span class="p">(</span><span class="n">time</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
+        <span class="c1"># Check for steady-state:</span>
+        <span class="k">if</span> <span class="n">time</span> <span class="o">==</span> <span class="s2">&quot;00000000000000&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">%H%M%S&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+
+    <span class="c1"># A line contains 2, 3, or 4 values:</span>
+    <span class="c1"># time, isave, nstp, tmult</span>
+    <span class="n">casters</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">parsetime</span><span class="p">,</span>
+        <span class="s2">&quot;save&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span>
+        <span class="s2">&quot;n_timestep&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="s2">&quot;timestep_multiplier&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+        <span class="n">stripped</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">stripped</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">stripped</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">cast</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">cast</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">parts</span><span class="p">,</span> <span class="n">casters</span><span class="o">.</span><span class="n">items</span><span class="p">())}</span>
+        <span class="n">content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">content</span></div>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,26 @@
+﻿imod.wq.ParallelKrylovTransportSolver
+=====================================
+
+.. currentmodule:: imod.wq
+
+.. autoclass:: ParallelKrylovTransportSolver
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ParallelKrylovTransportSolver.__init__
+      ~ParallelKrylovTransportSolver.from_file
+      ~ParallelKrylovTransportSolver.isel
+      ~ParallelKrylovTransportSolver.save
+      ~ParallelKrylovTransportSolver.sel
+   
+   
+
+   
+   
+   

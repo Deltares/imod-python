@@ -1,0 +1,28 @@
+﻿imod.wq.Well
+============
+
+.. currentmodule:: imod.wq
+
+.. autoclass:: Well
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Well.__init__
+      ~Well.add_timemap
+      ~Well.from_file
+      ~Well.isel
+      ~Well.repeat_stress
+      ~Well.save
+      ~Well.sel
+   
+   
+
+   
+   
+   

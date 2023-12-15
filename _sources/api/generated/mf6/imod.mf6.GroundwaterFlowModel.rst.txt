@@ -1,0 +1,47 @@
+﻿imod.mf6.GroundwaterFlowModel
+=============================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: GroundwaterFlowModel
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~GroundwaterFlowModel.__init__
+      ~GroundwaterFlowModel.clear
+      ~GroundwaterFlowModel.clip_box
+      ~GroundwaterFlowModel.copy
+      ~GroundwaterFlowModel.dump
+      ~GroundwaterFlowModel.from_file
+      ~GroundwaterFlowModel.fromkeys
+      ~GroundwaterFlowModel.get
+      ~GroundwaterFlowModel.items
+      ~GroundwaterFlowModel.keys
+      ~GroundwaterFlowModel.model_id
+      ~GroundwaterFlowModel.pop
+      ~GroundwaterFlowModel.popitem
+      ~GroundwaterFlowModel.regrid_like
+      ~GroundwaterFlowModel.render
+      ~GroundwaterFlowModel.setdefault
+      ~GroundwaterFlowModel.update
+      ~GroundwaterFlowModel.values
+      ~GroundwaterFlowModel.write
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~GroundwaterFlowModel.bottom
+      ~GroundwaterFlowModel.domain
+   
+   

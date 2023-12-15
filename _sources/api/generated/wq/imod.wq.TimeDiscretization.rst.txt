@@ -1,0 +1,26 @@
+﻿imod.wq.TimeDiscretization
+==========================
+
+.. currentmodule:: imod.wq
+
+.. autoclass:: TimeDiscretization
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TimeDiscretization.__init__
+      ~TimeDiscretization.from_file
+      ~TimeDiscretization.isel
+      ~TimeDiscretization.save
+      ~TimeDiscretization.sel
+   
+   
+
+   
+   
+   

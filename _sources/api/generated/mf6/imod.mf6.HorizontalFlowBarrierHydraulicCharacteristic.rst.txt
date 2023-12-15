@@ -1,0 +1,48 @@
+﻿imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic
+=====================================================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: HorizontalFlowBarrierHydraulicCharacteristic
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~HorizontalFlowBarrierHydraulicCharacteristic.__init__
+      ~HorizontalFlowBarrierHydraulicCharacteristic.clip_box
+      ~HorizontalFlowBarrierHydraulicCharacteristic.copy
+      ~HorizontalFlowBarrierHydraulicCharacteristic.from_file
+      ~HorizontalFlowBarrierHydraulicCharacteristic.get_period_varnames
+      ~HorizontalFlowBarrierHydraulicCharacteristic.get_regrid_methods
+      ~HorizontalFlowBarrierHydraulicCharacteristic.is_grid_agnostic_package
+      ~HorizontalFlowBarrierHydraulicCharacteristic.is_regridding_supported
+      ~HorizontalFlowBarrierHydraulicCharacteristic.isel
+      ~HorizontalFlowBarrierHydraulicCharacteristic.mask
+      ~HorizontalFlowBarrierHydraulicCharacteristic.regrid_like
+      ~HorizontalFlowBarrierHydraulicCharacteristic.render
+      ~HorizontalFlowBarrierHydraulicCharacteristic.sel
+      ~HorizontalFlowBarrierHydraulicCharacteristic.skip_masking_dataarray
+      ~HorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg
+      ~HorizontalFlowBarrierHydraulicCharacteristic.to_netcdf
+      ~HorizontalFlowBarrierHydraulicCharacteristic.write
+      ~HorizontalFlowBarrierHydraulicCharacteristic.write_binary_griddata
+      ~HorizontalFlowBarrierHydraulicCharacteristic.write_blockfile
+      ~HorizontalFlowBarrierHydraulicCharacteristic.write_text_griddata
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~HorizontalFlowBarrierHydraulicCharacteristic.dataset
+      ~HorizontalFlowBarrierHydraulicCharacteristic.geometry
+   
+   

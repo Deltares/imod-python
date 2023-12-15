@@ -1,0 +1,750 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imod.wq.bas &#8212; iMOD Python 0.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/wq/bas';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">imod.wq.bas</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for imod.wq.bas</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">jinja2</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.ndimage</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+<span class="kn">from</span> <span class="nn">imod</span> <span class="kn">import</span> <span class="n">util</span>
+<span class="kn">from</span> <span class="nn">imod.wq.pkgbase</span> <span class="kn">import</span> <span class="n">Package</span>
+
+
+<div class="viewcode-block" id="BasicFlow"><a class="viewcode-back" href="../../../api/generated/wq/imod.wq.BasicFlow.html#imod.wq.BasicFlow">[docs]</a><span class="k">class</span> <span class="nc">BasicFlow</span><span class="p">(</span><span class="n">Package</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Basic package is used to specify certain data used in all models.</span>
+<span class="sd">    These include:</span>
+
+<span class="sd">    1. the locations of acitve, inactive, and specified head in cells,</span>
+<span class="sd">    2. the head stored in inactive cells,</span>
+<span class="sd">    3. the initial head in all cells, and</span>
+<span class="sd">    4. the top and bottom of the aquifer</span>
+
+<span class="sd">    The number of layers (NLAY) is automatically calculated using the IBOUND.</span>
+<span class="sd">    Thickness is calculated using the specified tops en bottoms.</span>
+<span class="sd">    The Basic package input file is required in all models.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ibound: xr.DataArray of integers</span>
+<span class="sd">        is the boundary variable.</span>
+<span class="sd">        If IBOUND(J,I,K) &lt; 0, cell J,I,K has a constant head.</span>
+<span class="sd">        If IBOUND(J,I,K) = 0, cell J,I,K is inactive.</span>
+<span class="sd">        If IBOUND(J,I,K) &gt; 0, cell J,I,K is active.</span>
+<span class="sd">    top: float or xr.DataArray of floats</span>
+<span class="sd">        is the top elevation of layer 1. For the common situation in which the</span>
+<span class="sd">        top layer represents a water-table aquifer, it may be reasonable to set</span>
+<span class="sd">        `top` equal to land-surface elevation.</span>
+<span class="sd">    bottom: xr.DataArray of floats</span>
+<span class="sd">        is the bottom elevation of model layers or Quasi-3d confining beds. The</span>
+<span class="sd">        DataArray should at least include the `layer` dimension.</span>
+<span class="sd">    starting_head: float or xr.DataArray of floats</span>
+<span class="sd">        is initial (starting) head—that is, head at the beginning of the</span>
+<span class="sd">        simulation (STRT). starting_head must be specified for all simulations,</span>
+<span class="sd">        including steady-state simulations. One value is read for every model</span>
+<span class="sd">        cell. Usually, these values are read a layer at a time.</span>
+<span class="sd">    inactive_head: float, optional</span>
+<span class="sd">        is the value of head to be assigned to all inactive (no flow) cells</span>
+<span class="sd">        (IBOUND = 0) throughout the simulation (HNOFLO). Because head at</span>
+<span class="sd">        inactive cells is unused in model calculations, this does not affect</span>
+<span class="sd">        model results but serves to identify inactive cells when head is</span>
+<span class="sd">        printed. This value is also used as drawdown at inactive cells if the</span>
+<span class="sd">        drawdown option is used. Even if the user does not anticipate having</span>
+<span class="sd">        inactive cells, a value for inactive_head must be entered. Default</span>
+<span class="sd">        value is 1.0e30.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">&quot;bas6&quot;</span>
+    <span class="n">_template</span> <span class="o">=</span> <span class="n">jinja2</span><span class="o">.</span><span class="n">Template</span><span class="p">(</span>
+        <span class="s2">&quot;[bas6]</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    {</span><span class="si">%- f</span><span class="s2">or layer, value in ibound.items() %}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    ibound_l{{layer}} = {{value}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    {</span><span class="si">%- e</span><span class="s2">ndfor %}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    hnoflo = {{inactive_head}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    {</span><span class="si">%- f</span><span class="s2">or layer, value in starting_head.items() %}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    strt_l{{layer}} = {{value}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;    {</span><span class="si">%- e</span><span class="s2">ndfor -%}&quot;</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="BasicFlow.__init__"><a class="viewcode-back" href="../../../api/generated/wq/imod.wq.BasicFlow.html#imod.wq.BasicFlow.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ibound</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">starting_head</span><span class="p">,</span> <span class="n">inactive_head</span><span class="o">=</span><span class="mf">1.0e30</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_ibound</span><span class="p">(</span><span class="n">ibound</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;ibound&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ibound</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">top</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bottom</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;starting_head&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">starting_head</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;inactive_head&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">inactive_head</span></div>
+
+    <span class="k">def</span> <span class="nf">_check_ibound</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ibound</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ibound</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;ibound must be xarray.DataArray&quot;</span><span class="p">)</span>
+        <span class="n">dims</span> <span class="o">=</span> <span class="n">ibound</span><span class="o">.</span><span class="n">dims</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">dims</span> <span class="o">==</span> <span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">dims</span> <span class="o">==</span> <span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;ibound dimensions must be (&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;) or (&quot;z&quot;, &quot;y&quot;, &quot;x&quot;),&#39;</span>
+                <span class="sa">f</span><span class="s2">&quot; got instead </span><span class="si">{</span><span class="n">dims</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">nlayer</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Renders part of runfile that ends up under [bas] section.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">varname</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;ibound&quot;</span><span class="p">,</span> <span class="s2">&quot;starting_head&quot;</span><span class="p">):</span>
+            <span class="n">d</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_values_layer</span><span class="p">(</span><span class="n">varname</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">nlayer</span><span class="p">)</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;inactive_head&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;inactive_head&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_compose_top</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Composes paths to file, or gets the appropriate scalar value for</span>
+<span class="sd">        a top of model domain.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        directory : str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">da</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;x&quot;</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span> <span class="ow">and</span> <span class="s2">&quot;y&quot;</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Top should either be 2d or a scalar value&quot;</span><span class="p">)</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;top&quot;</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;directory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">directory</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;extension&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;.idf&quot;</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_path</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">da</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Top should either be 2d or a scalar value&quot;</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">da</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_cellsizes</span><span class="p">(</span><span class="n">dx</span><span class="p">):</span>
+        <span class="n">ncell</span> <span class="o">=</span> <span class="n">dx</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">index_ends</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">dx</span><span class="p">)</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">index_ends</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index_ends</span><span class="p">,</span> <span class="n">ncell</span><span class="p">)</span>
+        <span class="n">index_starts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">index_ends</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">index_starts</span><span class="p">,</span> <span class="n">index_ends</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">dx</span><span class="p">[</span><span class="n">s</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">d</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">d</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="n">d</span>
+
+    <span class="k">def</span> <span class="nf">_render_dis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">nlayer</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Renders part of runfile that ends up under [dis] section.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_top</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compose_values_layer</span><span class="p">(</span><span class="s2">&quot;bottom&quot;</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">nlayer</span><span class="p">)</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;nlay&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;nrow&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;ncol&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;ibound&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+        <span class="c1"># TODO: check dx &gt; 0, dy &lt; 0?</span>
+        <span class="k">if</span> <span class="s2">&quot;dx&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="ow">or</span> <span class="s2">&quot;dy&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">:</span>  <span class="c1"># assume equidistant</span>
+            <span class="n">dx</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">coord_reference</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">])</span>
+            <span class="n">dy</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">coord_reference</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;dx&quot;</span><span class="p">]</span>
+            <span class="n">dy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;dy&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dy</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">))</span> <span class="ow">or</span> <span class="n">dy</span><span class="o">.</span><span class="n">shape</span> <span class="ow">in</span> <span class="p">((),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)):</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;dy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;?&quot;</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">dy</span><span class="p">))}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;dy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cellsizes</span><span class="p">(</span><span class="n">dy</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">))</span> <span class="ow">or</span> <span class="n">dx</span><span class="o">.</span><span class="n">shape</span> <span class="ow">in</span> <span class="p">((),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)):</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;dx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;?&quot;</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">dx</span><span class="p">))}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">d</span><span class="p">[</span><span class="s2">&quot;dx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cellsizes</span><span class="p">(</span><span class="n">dx</span><span class="p">)</span>
+
+        <span class="c1"># Non-time dependent part of dis</span>
+        <span class="c1"># Can be inferred from ibound</span>
+        <span class="n">_dis_template</span> <span class="o">=</span> <span class="n">jinja2</span><span class="o">.</span><span class="n">Template</span><span class="p">(</span>
+            <span class="s2">&quot;[dis]</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;    nlay = {{nlay}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;    nrow = {{nrow}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;    ncol = {{ncol}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;    {</span><span class="si">%- f</span><span class="s2">or row, value in dy.items() %}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;    delc_r{{row}} = {{value}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;    {</span><span class="si">%- e</span><span class="s2">ndfor %}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;    {</span><span class="si">%- f</span><span class="s2">or col, value in dx.items() %}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;    delr_c{{col}} = {{value}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;    {</span><span class="si">%- e</span><span class="s2">ndfor %}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;    top = {{top}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;    {</span><span class="si">%- f</span><span class="s2">or layer, value in bottom.items() %}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;    botm_l{{layer}} = {{value}}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;    {</span><span class="si">%- e</span><span class="s2">ndfor %}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;    laycbd_l? = 0&quot;</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">_dis_template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">thickness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes layer thickness from top and bottom data.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        thickness : xr.DataArray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">th</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                <span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">),</span>
+            <span class="p">],</span>
+            <span class="n">dim</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Concat results in wrong dimension order (y, x, layer), transpose to</span>
+        <span class="c1"># fix dimension order.</span>
+        <span class="k">return</span> <span class="n">th</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">missing_dims</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_pkgcheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ibound</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;top should be larger than bottom in </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">active_cells</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;ibound&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">active_cells</span> <span class="o">&amp;</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;starting_head&quot;</span><span class="p">]))</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Active cells in ibound may not have a nan value in starting_head in </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">nlabels</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">ndimage</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="n">active_cells</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nlabels</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">nlabels</span><span class="si">}</span><span class="s2"> disconnected model domain detected in the ibound in </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span></div>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

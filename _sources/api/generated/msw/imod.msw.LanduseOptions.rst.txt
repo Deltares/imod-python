@@ -1,0 +1,26 @@
+﻿imod.msw.LanduseOptions
+=======================
+
+.. currentmodule:: imod.msw
+
+.. autoclass:: LanduseOptions
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~LanduseOptions.__init__
+      ~LanduseOptions.isel
+      ~LanduseOptions.sel
+      ~LanduseOptions.write
+      ~LanduseOptions.write_dataframe_fixed_width
+   
+   
+
+   
+   
+   

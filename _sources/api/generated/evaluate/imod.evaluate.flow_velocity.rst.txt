@@ -1,0 +1,6 @@
+﻿imod.evaluate.flow\_velocity
+============================
+
+.. currentmodule:: imod.evaluate
+
+.. autofunction:: flow_velocity

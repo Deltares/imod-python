@@ -1,0 +1,6 @@
+﻿imod.prepare.gdal\_rasterize
+============================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: gdal_rasterize

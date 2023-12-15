@@ -1,0 +1,1570 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imod.mf6.hfb &#8212; iMOD Python 0.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/mf6/hfb';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">imod.mf6.hfb</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for imod.mf6.hfb</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">abc</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">shapely.wkt</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="kn">import</span> <span class="nn">xugrid</span> <span class="k">as</span> <span class="nn">xu</span>
+<span class="kn">from</span> <span class="nn">fastcore.dispatch</span> <span class="kn">import</span> <span class="n">typedispatch</span>
+
+<span class="kn">from</span> <span class="nn">imod.mf6.boundary_condition</span> <span class="kn">import</span> <span class="n">BoundaryCondition</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.interfaces.ilinedatapackage</span> <span class="kn">import</span> <span class="n">ILineDataPackage</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.mf6_hfb_adapter</span> <span class="kn">import</span> <span class="n">Mf6HorizontalFlowBarrier</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.package</span> <span class="kn">import</span> <span class="n">Package</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.utilities.clip</span> <span class="kn">import</span> <span class="n">clip_by_grid</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.utilities.grid</span> <span class="kn">import</span> <span class="n">broadcast_to_full_domain</span>
+<span class="kn">from</span> <span class="nn">imod.typing</span> <span class="kn">import</span> <span class="n">GridDataArray</span>
+
+
+<span class="nd">@typedispatch</span>
+<span class="k">def</span> <span class="nf">_derive_connected_cell_ids</span><span class="p">(</span>
+    <span class="n">idomain</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">grid</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">Ugrid2d</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Derive the cell ids of the connected cells of an edge on a structured grid.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    idomain: xr.DataArray</span>
+<span class="sd">        The active domain</span>
+<span class="sd">    grid :</span>
+<span class="sd">        The unstructured grid of the domain</span>
+<span class="sd">    edge_index :</span>
+<span class="sd">        The indices of the edges from which the connected cell ids are computed</span>
+
+<span class="sd">    Returns A dataset containing the cell_id1 and cell_id2 data variables. The  cell dimensions are stored in the</span>
+<span class="sd">    cell_dims coordinates.</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">edge_faces</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">edge_face_connectivity</span>
+    <span class="n">cell2d</span> <span class="o">=</span> <span class="n">edge_faces</span><span class="p">[</span><span class="n">edge_index</span><span class="p">]</span>
+
+    <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">idomain</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">idomain</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+    <span class="n">row_1</span><span class="p">,</span> <span class="n">column_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">cell2d</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">shape</span><span class="p">)</span>
+    <span class="n">row_2</span><span class="p">,</span> <span class="n">column_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">cell2d</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">shape</span><span class="p">)</span>
+
+    <span class="n">cell_ids</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">()</span>
+
+    <span class="n">cell_ids</span><span class="p">[</span><span class="s2">&quot;cell_id1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">row_1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">column_1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
+        <span class="n">coords</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;edge_index&quot;</span><span class="p">:</span> <span class="n">edge_index</span><span class="p">,</span>
+            <span class="s2">&quot;cell_dims1&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;row_1&quot;</span><span class="p">,</span> <span class="s2">&quot;column_1&quot;</span><span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="n">cell_ids</span><span class="p">[</span><span class="s2">&quot;cell_id2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">row_2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">column_2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
+        <span class="n">coords</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;edge_index&quot;</span><span class="p">:</span> <span class="n">edge_index</span><span class="p">,</span>
+            <span class="s2">&quot;cell_dims2&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;row_2&quot;</span><span class="p">,</span> <span class="s2">&quot;column_2&quot;</span><span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cell_ids</span>
+
+
+<span class="nd">@typedispatch</span>
+<span class="k">def</span> <span class="nf">_derive_connected_cell_ids</span><span class="p">(</span>
+    <span class="n">_</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">grid</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">Ugrid2d</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Derive the cell ids of the connected cells of an edge on an unstructured grid.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    grid :</span>
+<span class="sd">        The unstructured grid of the domain</span>
+<span class="sd">    edge_index :</span>
+<span class="sd">        The indices of the edges from which the connected cell ids are computed</span>
+
+<span class="sd">    Returns A dataset containing the cell_id1 and cell_id2 data variables. The  cell dimensions are stored in the</span>
+<span class="sd">    cell_dims coordinates.</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">edge_faces</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">edge_face_connectivity</span>
+    <span class="n">cell2d</span> <span class="o">=</span> <span class="n">edge_faces</span><span class="p">[</span><span class="n">edge_index</span><span class="p">]</span>
+
+    <span class="n">cell2d_1</span> <span class="o">=</span> <span class="n">cell2d</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">cell2d_2</span> <span class="o">=</span> <span class="n">cell2d</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">cell_ids</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">()</span>
+
+    <span class="n">cell_ids</span><span class="p">[</span><span class="s2">&quot;cell_id1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">cell2d_1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
+        <span class="n">coords</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;edge_index&quot;</span><span class="p">:</span> <span class="n">edge_index</span><span class="p">,</span>
+            <span class="s2">&quot;cell_dims1&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;cell2d_1&quot;</span><span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="n">cell_ids</span><span class="p">[</span><span class="s2">&quot;cell_id2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">cell2d_2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
+        <span class="n">coords</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;edge_index&quot;</span><span class="p">:</span> <span class="n">edge_index</span><span class="p">,</span>
+            <span class="s2">&quot;cell_dims2&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;cell2d_2&quot;</span><span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cell_ids</span>
+
+
+<span class="k">def</span> <span class="nf">to_connected_cells_dataset</span><span class="p">(</span>
+    <span class="n">idomain</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">grid</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">Ugrid2d</span><span class="p">,</span>
+    <span class="n">edge_index</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">edge_values</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts a cell edge grid with values defined on the edges to a dataset with the cell ids of the connected cells,</span>
+<span class="sd">    the layer of the cells and the value of the edge. The connected cells are returned in cellid notation e.g.(row,</span>
+<span class="sd">    column) for structured grid, (mesh2d_nFaces) for unstructured grids.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    idomain: GridDataArray</span>
+<span class="sd">        active domain</span>
+<span class="sd">    grid: xu.Ugrid2d,</span>
+<span class="sd">        unstructured grid containing the edge to cell array</span>
+<span class="sd">    edge_index: np.ndarray</span>
+<span class="sd">        indices of the edges for which the edge values will be converted to values in the connected cells</span>
+<span class="sd">    edge_values: typing.Dict</span>
+<span class="sd">        dictionary containing the value name and the edge values that are applied on the edges identified by the</span>
+<span class="sd">        edge_index</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    ----------</span>
+<span class="sd">        a dataset containing:</span>
+<span class="sd">            - cell_id1</span>
+<span class="sd">            - cell_id2</span>
+<span class="sd">            - layer</span>
+<span class="sd">            - value name</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">barrier_dataset</span> <span class="o">=</span> <span class="n">_derive_connected_cell_ids</span><span class="p">(</span><span class="n">idomain</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">edge_values</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">barrier_dataset</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">values</span><span class="p">,</span>
+            <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;edge_index&quot;</span><span class="p">],</span>
+            <span class="n">coords</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;edge_index&quot;</span><span class="p">:</span> <span class="n">edge_index</span><span class="p">,</span>
+                <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">values</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">],</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+    <span class="n">barrier_dataset</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">barrier_dataset</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">cell_id</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;edge_index&quot;</span><span class="p">),</span> <span class="n">create_index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="s2">&quot;edge_index&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">reset_coords</span><span class="p">()</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">barrier_dataset</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="s2">&quot;cell_id&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_fraction_layer_overlap</span><span class="p">(</span>
+    <span class="n">snapped_dataset</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">,</span>
+    <span class="n">edge_index</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">top</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">,</span>
+    <span class="n">bottom</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the fraction a barrier occupies inside a layer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">snapped_dataset</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">edge_face_connectivity</span><span class="p">[</span><span class="n">edge_index</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">top_mean</span> <span class="o">=</span> <span class="n">_mean_left_and_right</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span>
+    <span class="n">bottom_mean</span> <span class="o">=</span> <span class="n">_mean_left_and_right</span><span class="p">(</span><span class="n">bottom</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span>
+
+    <span class="n">n_layer</span><span class="p">,</span> <span class="n">n_edge</span> <span class="o">=</span> <span class="n">top_mean</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">layer_bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n_edge</span><span class="p">,</span> <span class="n">n_layer</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">layer_bounds</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">typing</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">bottom_mean</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">layer_bounds</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">typing</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">top_mean</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="n">hfb_bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n_edge</span><span class="p">,</span> <span class="n">n_layer</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">hfb_bounds</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">snapped_dataset</span><span class="p">[</span><span class="s2">&quot;zbottom&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">edge_index</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_edge</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">hfb_bounds</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">snapped_dataset</span><span class="p">[</span><span class="s2">&quot;ztop&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">edge_index</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_edge</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">overlap</span> <span class="o">=</span> <span class="n">_vectorized_overlap</span><span class="p">(</span><span class="n">hfb_bounds</span><span class="p">,</span> <span class="n">layer_bounds</span><span class="p">)</span>
+    <span class="n">height</span> <span class="o">=</span> <span class="n">layer_bounds</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">layer_bounds</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># Avoid runtime warnings when diving by 0:</span>
+    <span class="n">height</span><span class="p">[</span><span class="n">height</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="n">fraction</span> <span class="o">=</span> <span class="p">(</span><span class="n">overlap</span> <span class="o">/</span> <span class="n">height</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">top_mean</span><span class="p">)</span> <span class="o">*</span> <span class="n">fraction</span>
+
+
+<span class="k">def</span> <span class="nf">_mean_left_and_right</span><span class="p">(</span>
+    <span class="n">cell_values</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This method computes the mean value of cell pairs. The left array specifies the first cell, the right array</span>
+<span class="sd">    the second cells. The mean is computed by (first_cell+second_cell/2.0)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cell_values: xu.UgridDataArray</span>
+<span class="sd">        The array containing the data values of all the cells</span>
+<span class="sd">    left :</span>
+<span class="sd">        The array containing indices to the first cells</span>
+<span class="sd">    right :</span>
+<span class="sd">        The array containing indices to the second cells</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        The means of the cells</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">facedim</span> <span class="o">=</span> <span class="n">cell_values</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span>
+    <span class="n">uda_left</span> <span class="o">=</span> <span class="n">cell_values</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="n">facedim</span><span class="p">:</span> <span class="n">left</span><span class="p">})</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="n">facedim</span><span class="p">)</span>
+    <span class="n">uda_right</span> <span class="o">=</span> <span class="n">cell_values</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="n">facedim</span><span class="p">:</span> <span class="n">right</span><span class="p">})</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="n">facedim</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">((</span><span class="n">uda_left</span><span class="p">,</span> <span class="n">uda_right</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="s2">&quot;two&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="s2">&quot;two&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_vectorized_overlap</span><span class="p">(</span><span class="n">bounds_a</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">bounds_b</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Vectorized overlap computation. Returns the overlap of 2 vectors along the same axis.</span>
+<span class="sd">    If there is no overlap zero will be returned.</span>
+
+<span class="sd">            b1</span>
+<span class="sd">            ▲</span>
+<span class="sd">      a1    |</span>
+<span class="sd">      ▲     |</span>
+<span class="sd">      |     |</span>
+<span class="sd">      |     ▼</span>
+<span class="sd">      ▼     b0</span>
+<span class="sd">      a0</span>
+
+<span class="sd">    To compute the overlap of the 2 vectors the maximum of a0,b0, is subtracted from the minimum of a1,b1.</span>
+
+<span class="sd">    Compare with:</span>
+
+<span class="sd">    overlap = max(0, min(a[1], b[1]) - max(a[0], b[0]))</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span>
+        <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">bounds_a</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">bounds_b</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">bounds_a</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">bounds_b</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
+    <span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">BarrierType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">HydraulicCharacteristic</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">Multiplier</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">Resistance</span> <span class="o">=</span> <span class="mi">2</span>
+
+
+<span class="k">class</span> <span class="nc">HorizontalFlowBarrierBase</span><span class="p">(</span><span class="n">BoundaryCondition</span><span class="p">,</span> <span class="n">ILineDataPackage</span><span class="p">):</span>
+    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">&quot;hfb&quot;</span>
+
+    <span class="n">_period_data</span> <span class="o">=</span> <span class="p">()</span>
+    <span class="n">_init_schemata</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_write_schemata</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">_regrid_method</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">geometry</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">print_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;print_input&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">print_input</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">geometry</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">())</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="nb">object</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">pkgname</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">binary</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> is a grid-agnostic package and does not have a render method. To render the</span>
+<span class="s2">            package, first convert to a Modflow6 package by calling pkg.to_mf6_pkg()&quot;&quot;&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_netcdf_encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;dtype&quot;</span><span class="p">:</span> <span class="s2">&quot;str&quot;</span><span class="p">}}</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">wkt</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">instance</span>
+
+    <span class="k">def</span> <span class="nf">_compute_barrier_values</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">snapped_dataset</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">idomain</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">to_mf6_pkg</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">idomain</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+        <span class="n">top</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+        <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+        <span class="n">k</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mf6HorizontalFlowBarrier</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write package to Modflow 6 package.</span>
+
+<span class="sd">        Based on the model grid, top and bottoms, the layers in which the barrier belong are computed. If the</span>
+<span class="sd">        barrier only partially occupies a layer an effective resistance or hydraulic conductivity for that layer is</span>
+<span class="sd">        calculated. This calculation is skipped for the Multiplier type.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        idomain: GridDataArray</span>
+<span class="sd">             Grid with active cells.</span>
+<span class="sd">        top: GridDataArray</span>
+<span class="sd">            Grid with top of model layers.</span>
+<span class="sd">        bottom: GridDataArray</span>
+<span class="sd">            Grid with bottom of model layers.</span>
+<span class="sd">        k: GridDataArray</span>
+<span class="sd">            Grid with hydraulic conductivities.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span> <span class="o">=</span> <span class="n">broadcast_to_full_domain</span><span class="p">(</span><span class="n">idomain</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">)</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">idomain</span> <span class="o">*</span> <span class="n">k</span>
+        <span class="n">unstructured_grid</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__to_unstructured</span><span class="p">(</span><span class="n">idomain</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">idomain</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span>
+            <span class="k">else</span> <span class="p">[</span><span class="n">idomain</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">snapped_dataset</span><span class="p">,</span> <span class="n">edge_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__snap_to_grid</span><span class="p">(</span><span class="n">idomain</span><span class="p">)</span>
+        <span class="n">edge_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__remove_invalid_edges</span><span class="p">(</span><span class="n">unstructured_grid</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">)</span>
+
+        <span class="n">barrier_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_barrier_values</span><span class="p">(</span>
+            <span class="n">snapped_dataset</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">idomain</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span>
+        <span class="p">)</span>
+        <span class="n">barrier_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__remove_edge_values_connected_to_inactive_cells</span><span class="p">(</span>
+            <span class="n">barrier_values</span><span class="p">,</span> <span class="n">unstructured_grid</span><span class="p">,</span> <span class="n">edge_index</span>
+        <span class="p">)</span>
+
+        <span class="n">barrier_dataset</span> <span class="o">=</span> <span class="n">typing</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span>
+            <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
+            <span class="n">to_connected_cells_dataset</span><span class="p">(</span>
+                <span class="n">idomain</span><span class="p">,</span>
+                <span class="n">unstructured_grid</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span>
+                <span class="n">edge_index</span><span class="p">,</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;hydraulic_characteristic&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__to_hydraulic_characteristic</span><span class="p">(</span>
+                        <span class="n">barrier_values</span>
+                    <span class="p">)</span>
+                <span class="p">},</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="n">barrier_dataset</span><span class="p">[</span><span class="s2">&quot;print_input&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;print_input&quot;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">Mf6HorizontalFlowBarrier</span><span class="p">(</span><span class="o">**</span><span class="n">barrier_dataset</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_resistance_layer</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">snapped_dataset</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">,</span>
+        <span class="n">edge_index</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">idomain</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns layered xarray with barrier resistance distributed over layers</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">hfb_resistance</span> <span class="o">=</span> <span class="n">snapped_dataset</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_variable_name</span><span class="p">()]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">edge_index</span><span class="p">]</span>
+        <span class="n">hfb_layer</span> <span class="o">=</span> <span class="n">snapped_dataset</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">edge_index</span><span class="p">]</span>
+        <span class="n">nlay</span> <span class="o">=</span> <span class="n">idomain</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">model_layer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">idomain</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">hfb_resistance</span><span class="o">.</span><span class="n">size</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">nlay</span><span class="p">,</span> <span class="n">hfb_resistance</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">model_layer</span> <span class="o">==</span> <span class="n">hfb_layer</span><span class="p">,</span> <span class="n">hfb_resistance</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">coords</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nlay</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;mesh2d_nFaces&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_resistance_layer_overlap</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">snapped_dataset</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">,</span>
+        <span class="n">edge_index</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">top</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">,</span>
+        <span class="n">bottom</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">,</span>
+        <span class="n">k</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes the effective value of a barrier that partially overlaps a cell in the z direction.</span>
+<span class="sd">        A barrier always lies on an edge in the xy-plane, however in doesn&#39;t have to fully extend in the z-direction to</span>
+<span class="sd">        cover the entire layer. This method computes the effective resistance in that case.</span>
+
+<span class="sd">                        Barrier</span>
+<span class="sd">        ......................................  ▲     ▲</span>
+<span class="sd">        .                @@@@                .  |     |</span>
+<span class="sd">        .                @Rb@                .  | Lb  |</span>
+<span class="sd">        .    Cell1       @@@@     Cell2      .  ▼     | H</span>
+<span class="sd">        .                :  :                .        |</span>
+<span class="sd">        .                :  :                .        |</span>
+<span class="sd">        .................:..:.................        ▼</span>
+<span class="sd">                k1                    k2</span>
+
+<span class="sd">        The effective value of a partially emerged barrier in a layer is computed by:</span>
+<span class="sd">        c_total = 1.0 / (fraction / Rb + (1.0 - fraction) / c_aquifer)</span>
+<span class="sd">        c_aquifer = 1.0 / k_mean = 1.0 / ((k1 + k2) / 2.0)</span>
+<span class="sd">        fraction = Lb / H</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">snapped_dataset</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">edge_face_connectivity</span><span class="p">[</span><span class="n">edge_index</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">k_mean</span> <span class="o">=</span> <span class="n">_mean_left_and_right</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span>
+
+        <span class="n">resistance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__to_resistance</span><span class="p">(</span>
+            <span class="n">snapped_dataset</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_variable_name</span><span class="p">()]</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">edge_index</span><span class="p">]</span>
+
+        <span class="n">fraction</span> <span class="o">=</span> <span class="n">_fraction_layer_overlap</span><span class="p">(</span><span class="n">snapped_dataset</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">)</span>
+
+        <span class="n">c_aquifer</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">k_mean</span>
+        <span class="n">inverse_c</span> <span class="o">=</span> <span class="p">(</span><span class="n">fraction</span> <span class="o">/</span> <span class="n">resistance</span><span class="p">)</span> <span class="o">+</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">fraction</span><span class="p">)</span> <span class="o">/</span> <span class="n">c_aquifer</span><span class="p">)</span>
+        <span class="n">c_total</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">inverse_c</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__from_resistance</span><span class="p">(</span><span class="n">c_total</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__to_resistance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">:</span>
+        <span class="k">match</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_barrier_type</span><span class="p">():</span>
+            <span class="k">case</span> <span class="n">BarrierType</span><span class="o">.</span><span class="n">HydraulicCharacteristic</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">value</span>  <span class="c1"># type: ignore</span>
+            <span class="k">case</span> <span class="n">BarrierType</span><span class="o">.</span><span class="n">Multiplier</span><span class="p">:</span>
+                <span class="k">return</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">value</span>  <span class="c1"># type: ignore</span>
+            <span class="k">case</span> <span class="n">BarrierType</span><span class="o">.</span><span class="n">Resistance</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">value</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Unknown barrier type </span><span class="si">{barrier_type}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__from_resistance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resistance</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+        <span class="k">match</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_barrier_type</span><span class="p">():</span>
+            <span class="k">case</span> <span class="n">BarrierType</span><span class="o">.</span><span class="n">HydraulicCharacteristic</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">resistance</span>
+            <span class="k">case</span> <span class="n">BarrierType</span><span class="o">.</span><span class="n">Multiplier</span><span class="p">:</span>
+                <span class="k">return</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">resistance</span>
+            <span class="k">case</span> <span class="n">BarrierType</span><span class="o">.</span><span class="n">Resistance</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">resistance</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Unknown barrier type </span><span class="si">{barrier_type}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__to_hydraulic_characteristic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+        <span class="k">match</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_barrier_type</span><span class="p">():</span>
+            <span class="k">case</span> <span class="n">BarrierType</span><span class="o">.</span><span class="n">HydraulicCharacteristic</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">value</span>
+            <span class="k">case</span> <span class="n">BarrierType</span><span class="o">.</span><span class="n">Multiplier</span><span class="p">:</span>
+                <span class="k">return</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">value</span>
+            <span class="k">case</span> <span class="n">BarrierType</span><span class="o">.</span><span class="n">Resistance</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">value</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Unknown barrier type </span><span class="si">{barrier_type}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_get_barrier_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BarrierType</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_get_variable_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_get_vertical_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="k">def</span> <span class="nf">clip_box</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">time_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">time_max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">layer_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">layer_max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">x_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">x_max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">y_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">y_max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;HorizontalFlowBarrierBase&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clip a package by a bounding box (time, layer, y, x).</span>
+
+<span class="sd">        Slicing intervals may be half-bounded, by providing None:</span>
+
+<span class="sd">        * To select 500.0 &lt;= x &lt;= 1000.0:</span>
+<span class="sd">          ``clip_box(x_min=500.0, x_max=1000.0)``.</span>
+<span class="sd">        * To select x &lt;= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``</span>
+<span class="sd">          or ``clip_box(x_max=1000.0)``.</span>
+<span class="sd">        * To select x &gt;= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``</span>
+<span class="sd">          or ``clip_box(x_min=1000.0)``.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        time_min: optional</span>
+<span class="sd">        time_max: optional</span>
+<span class="sd">        layer_min: optional, int</span>
+<span class="sd">        layer_max: optional, int</span>
+<span class="sd">        x_min: optional, float</span>
+<span class="sd">        x_max: optional, float</span>
+<span class="sd">        y_min: optional, float</span>
+<span class="sd">        y_max: optional, float</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        sliced : Package</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new</span>
+
+    <span class="k">def</span> <span class="nf">regrid_like</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">target_grid</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;HorizontalFlowBarrierBase&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The regrid_like method is irrelevant for this package as it is</span>
+<span class="sd">        grid-agnostic, instead this method clips the package based on the grid</span>
+<span class="sd">        exterior.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">clip_by_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_grid</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Package</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The mask method is irrelevant for this package as it is</span>
+<span class="sd">        grid-agnostic, instead this method retuns a copy of itself.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">__to_unstructured</span><span class="p">(</span>
+        <span class="n">idomain</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">top</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">bottom</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
+        <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span>
+    <span class="p">]:</span>
+        <span class="n">unstruct</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="o">.</span><span class="n">from_structured</span><span class="p">(</span><span class="n">idomain</span><span class="p">)</span>
+        <span class="n">top</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="o">.</span><span class="n">from_structured</span><span class="p">(</span><span class="n">top</span><span class="p">)</span>
+        <span class="n">bottom</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="o">.</span><span class="n">from_structured</span><span class="p">(</span><span class="n">bottom</span><span class="p">)</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="o">.</span><span class="n">from_structured</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">unstruct</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span>
+
+    <span class="k">def</span> <span class="nf">__snap_to_grid</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">idomain</span><span class="p">:</span> <span class="n">GridDataArray</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="s2">&quot;layer&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">:</span>
+            <span class="n">variable_names</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_variable_name</span><span class="p">(),</span> <span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="s2">&quot;layer&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">variable_names</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_variable_name</span><span class="p">(),</span> <span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="s2">&quot;ztop&quot;</span><span class="p">,</span> <span class="s2">&quot;zbottom&quot;</span><span class="p">]</span>
+        <span class="n">barrier_dataframe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
+
+        <span class="n">snapped_dataset</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">typing</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span>
+            <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">,</span>
+            <span class="n">xu</span><span class="o">.</span><span class="n">snap_to_grid</span><span class="p">(</span><span class="n">barrier_dataframe</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="n">idomain</span><span class="p">,</span> <span class="n">max_snap_distance</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">edge_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span>
+            <span class="n">snapped_dataset</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_variable_name</span><span class="p">()]</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span><span class="o">.</span><span class="n">values</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">snapped_dataset</span><span class="p">,</span> <span class="n">edge_index</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">__remove_invalid_edges</span><span class="p">(</span>
+        <span class="n">unstructured_grid</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove invalid edges indices. An edge is considered invalid when:</span>
+<span class="sd">        - it lies on an exterior boundary (face_connectivity equals the grid fill value)</span>
+<span class="sd">        - The corresponding connected cells are inactive</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="n">unstructured_grid</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span>
+        <span class="n">face_dimension</span> <span class="o">=</span> <span class="n">unstructured_grid</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span>
+        <span class="n">face_connectivity</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">edge_face_connectivity</span><span class="p">[</span><span class="n">edge_index</span><span class="p">]</span>
+
+        <span class="n">valid_edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">face_connectivity</span> <span class="o">!=</span> <span class="n">grid</span><span class="o">.</span><span class="n">fill_value</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">connected_cells</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">edge_index</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">connected_cells</span><span class="p">[</span><span class="n">valid_edges</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">unstructured_grid</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">loc</span><span class="p">[{</span><span class="n">face_dimension</span><span class="p">:</span> <span class="n">face_connectivity</span><span class="p">[</span><span class="n">valid_edges</span><span class="p">,</span> <span class="mi">0</span><span class="p">]}]</span>
+            <span class="o">.</span><span class="n">values</span>
+        <span class="p">)</span>
+        <span class="n">connected_cells</span><span class="p">[</span><span class="n">valid_edges</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">unstructured_grid</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">loc</span><span class="p">[{</span><span class="n">face_dimension</span><span class="p">:</span> <span class="n">face_connectivity</span><span class="p">[</span><span class="n">valid_edges</span><span class="p">,</span> <span class="mi">1</span><span class="p">]}]</span>
+            <span class="o">.</span><span class="n">values</span>
+        <span class="p">)</span>
+
+        <span class="n">valid</span> <span class="o">=</span> <span class="p">(</span><span class="n">connected_cells</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">edge_index</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">__remove_edge_values_connected_to_inactive_cells</span><span class="p">(</span>
+        <span class="n">values</span><span class="p">,</span> <span class="n">unstructured_grid</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="p">):</span>
+        <span class="n">face_dimension</span> <span class="o">=</span> <span class="n">unstructured_grid</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span>
+
+        <span class="n">face_connectivity</span> <span class="o">=</span> <span class="n">unstructured_grid</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">edge_face_connectivity</span><span class="p">[</span>
+            <span class="n">edge_index</span>
+        <span class="p">]</span>
+        <span class="n">connected_cells_left</span> <span class="o">=</span> <span class="n">unstructured_grid</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+            <span class="p">{</span><span class="n">face_dimension</span><span class="p">:</span> <span class="n">face_connectivity</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]}</span>
+        <span class="p">]</span>
+        <span class="n">connected_cells_right</span> <span class="o">=</span> <span class="n">unstructured_grid</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+            <span class="p">{</span><span class="n">face_dimension</span><span class="p">:</span> <span class="n">face_connectivity</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]}</span>
+        <span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">values</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">connected_cells_left</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">face_dimension</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="o">&amp;</span> <span class="p">(</span><span class="n">connected_cells_right</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">face_dimension</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="p">)</span>
+
+
+<div class="viewcode-block" id="HorizontalFlowBarrierHydraulicCharacteristic"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic.html#imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic">[docs]</a><span class="k">class</span> <span class="nc">HorizontalFlowBarrierHydraulicCharacteristic</span><span class="p">(</span><span class="n">HorizontalFlowBarrierBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Horizontal Flow Barrier (HFB) package</span>
+
+<span class="sd">    Input to the Horizontal Flow Barrier (HFB) Package is read from the file</span>
+<span class="sd">    that has type &quot;HFB6&quot; in the Name File. Only one HFB Package can be</span>
+<span class="sd">    specified for a GWF model.</span>
+<span class="sd">    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.2.2.pdf</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    geometry: gpd.GeoDataFrame</span>
+<span class="sd">        Dataframe that describes:</span>
+<span class="sd">         - geometry: the geometries of the barriers,</span>
+<span class="sd">         - hydraulic_characteristic: the hydraulic characteristic of the barriers</span>
+<span class="sd">         - ztop: the top z-value of the barriers</span>
+<span class="sd">         - zbottom: the bottom z-value of the barriers</span>
+<span class="sd">    print_input: bool</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    &gt;&gt; barrier_x = [-1000.0, 0.0, 1000.0]</span>
+<span class="sd">    &gt;&gt; barrier_y = [500.0, 250.0, 500.0]</span>
+<span class="sd">    &gt;&gt; barrier_gdf = gpd.GeoDataFrame(</span>
+<span class="sd">    &gt;&gt;     geometry=[shapely.linestrings(barrier_x, barrier_y),],</span>
+<span class="sd">    &gt;&gt;     data={</span>
+<span class="sd">    &gt;&gt;         &quot;hydraulic_characteristic&quot;: [1e-3,],</span>
+<span class="sd">    &gt;&gt;         &quot;ztop&quot;: [10.0,],</span>
+<span class="sd">    &gt;&gt;         &quot;zbottom&quot;: [0.0,],</span>
+<span class="sd">    &gt;&gt;     },</span>
+<span class="sd">    &gt;&gt; )</span>
+<span class="sd">    &gt;&gt;</span>
+<span class="sd">    &gt;&gt; hfb = imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic(barrier_gdf)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="HorizontalFlowBarrierHydraulicCharacteristic.__init__"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic.html#imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">geometry</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">print_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">print_input</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_barrier_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">BarrierType</span><span class="o">.</span><span class="n">HydraulicCharacteristic</span>
+
+    <span class="k">def</span> <span class="nf">_get_variable_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;hydraulic_characteristic&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_get_vertical_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;ztop&quot;</span><span class="p">,</span> <span class="s2">&quot;zbottom&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_compute_barrier_values</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">snapped_dataset</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">idomain</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span>
+    <span class="p">):</span>
+        <span class="n">barrier_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resistance_layer_overlap</span><span class="p">(</span>
+            <span class="n">snapped_dataset</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">barrier_values</span></div>
+
+
+<span class="k">class</span> <span class="nc">LayeredHorizontalFlowBarrierHydraulicCharacteristic</span><span class="p">(</span><span class="n">HorizontalFlowBarrierBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Horizontal Flow Barrier (HFB) package</span>
+
+<span class="sd">    Input to the Horizontal Flow Barrier (HFB) Package is read from the file</span>
+<span class="sd">    that has type &quot;HFB6&quot; in the Name File. Only one HFB Package can be</span>
+<span class="sd">    specified for a GWF model.</span>
+<span class="sd">    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.2.2.pdf</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    geometry: gpd.GeoDataFrame</span>
+<span class="sd">        Dataframe that describes:</span>
+<span class="sd">         - geometry: the geometries of the barriers,</span>
+<span class="sd">         - hydraulic_characteristic: the hydraulic characteristic of the barriers</span>
+<span class="sd">         - layer: model layer for the barrier</span>
+<span class="sd">    print_input: bool</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    &gt;&gt; barrier_x = [-1000.0, 0.0, 1000.0]</span>
+<span class="sd">    &gt;&gt; barrier_y = [500.0, 250.0, 500.0]</span>
+<span class="sd">    &gt;&gt; barrier_gdf = gpd.GeoDataFrame(</span>
+<span class="sd">    &gt;&gt;     geometry=[shapely.linestrings(barrier_x, barrier_y),],</span>
+<span class="sd">    &gt;&gt;     data={</span>
+<span class="sd">    &gt;&gt;         &quot;hydraulic_characteristic&quot;: [1e-3,],</span>
+<span class="sd">    &gt;&gt;         &quot;layer&quot;: [1,]</span>
+<span class="sd">    &gt;&gt;     },</span>
+<span class="sd">    &gt;&gt; )</span>
+<span class="sd">    &gt;&gt;</span>
+<span class="sd">    &gt;&gt; hfb = imod.mf6.LayeredHorizontalFlowBarrierHydraulicCharacteristic(barrier_gdf)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">geometry</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">print_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">print_input</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_barrier_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">BarrierType</span><span class="o">.</span><span class="n">HydraulicCharacteristic</span>
+
+    <span class="k">def</span> <span class="nf">_get_variable_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;hydraulic_characteristic&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_get_vertical_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_compute_barrier_values</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">snapped_dataset</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">idomain</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span>
+    <span class="p">):</span>
+        <span class="n">barrier_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resistance_layer</span><span class="p">(</span>
+            <span class="n">snapped_dataset</span><span class="p">,</span>
+            <span class="n">edge_index</span><span class="p">,</span>
+            <span class="n">idomain</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">barrier_values</span>
+
+
+<div class="viewcode-block" id="HorizontalFlowBarrierMultiplier"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.HorizontalFlowBarrierMultiplier.html#imod.mf6.HorizontalFlowBarrierMultiplier">[docs]</a><span class="k">class</span> <span class="nc">HorizontalFlowBarrierMultiplier</span><span class="p">(</span><span class="n">HorizontalFlowBarrierBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Horizontal Flow Barrier (HFB) package</span>
+
+<span class="sd">    Input to the Horizontal Flow Barrier (HFB) Package is read from the file</span>
+<span class="sd">    that has type &quot;HFB6&quot; in the Name File. Only one HFB Package can be</span>
+<span class="sd">    specified for a GWF model.</span>
+<span class="sd">    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.2.2.pdf</span>
+
+<span class="sd">    If parts of the barrier overlap a layer the multiplier is applied to the entire layer.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    geometry: gpd.GeoDataFrame</span>
+<span class="sd">        Dataframe that describes:</span>
+<span class="sd">         - geometry: the geometries of the barriers,</span>
+<span class="sd">         - multiplier: the multiplier of the barriers</span>
+<span class="sd">         - ztop: the top z-value of the barriers</span>
+<span class="sd">         - zbottom: the bottom z-value of the barriers</span>
+<span class="sd">    print_input: bool</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    &gt;&gt; barrier_x = [-1000.0, 0.0, 1000.0]</span>
+<span class="sd">    &gt;&gt; barrier_y = [500.0, 250.0, 500.0]</span>
+<span class="sd">    &gt;&gt; barrier_gdf = gpd.GeoDataFrame(</span>
+<span class="sd">    &gt;&gt;     geometry=[shapely.linestrings(barrier_x, barrier_y),],</span>
+<span class="sd">    &gt;&gt;     data={</span>
+<span class="sd">    &gt;&gt;         &quot;multiplier&quot;: [1.5,],</span>
+<span class="sd">    &gt;&gt;         &quot;ztop&quot;: [10.0,],</span>
+<span class="sd">    &gt;&gt;         &quot;zbottom&quot;: [0.0,],</span>
+<span class="sd">    &gt;&gt;     },</span>
+<span class="sd">    &gt;&gt; )</span>
+<span class="sd">    &gt;&gt;</span>
+<span class="sd">    &gt;&gt; hfb = imod.mf6.HorizontalFlowBarrierMultiplier(barrier_gdf)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="HorizontalFlowBarrierMultiplier.__init__"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.HorizontalFlowBarrierMultiplier.html#imod.mf6.HorizontalFlowBarrierMultiplier.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">geometry</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">print_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">print_input</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_barrier_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">BarrierType</span><span class="o">.</span><span class="n">Multiplier</span>
+
+    <span class="k">def</span> <span class="nf">_get_variable_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;multiplier&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_get_vertical_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;ztop&quot;</span><span class="p">,</span> <span class="s2">&quot;zbottom&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_compute_barrier_values</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">snapped_dataset</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">idomain</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span>
+    <span class="p">):</span>
+        <span class="n">fraction</span> <span class="o">=</span> <span class="n">_fraction_layer_overlap</span><span class="p">(</span><span class="n">snapped_dataset</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">)</span>
+
+        <span class="n">barrier_values</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">fraction</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">fraction</span><span class="p">)</span>
+            <span class="o">*</span> <span class="n">snapped_dataset</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_variable_name</span><span class="p">()]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">edge_index</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">barrier_values</span></div>
+
+
+<span class="k">class</span> <span class="nc">LayeredHorizontalFlowBarrierMultiplier</span><span class="p">(</span><span class="n">HorizontalFlowBarrierBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Horizontal Flow Barrier (HFB) package</span>
+
+<span class="sd">    Input to the Horizontal Flow Barrier (HFB) Package is read from the file</span>
+<span class="sd">    that has type &quot;HFB6&quot; in the Name File. Only one HFB Package can be</span>
+<span class="sd">    specified for a GWF model.</span>
+<span class="sd">    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.2.2.pdf</span>
+
+<span class="sd">    If parts of the barrier overlap a layer the multiplier is applied to the entire layer.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    geometry: gpd.GeoDataFrame</span>
+<span class="sd">        Dataframe that describes:</span>
+<span class="sd">         - geometry: the geometries of the barriers,</span>
+<span class="sd">         - multiplier: the multiplier of the barriers</span>
+<span class="sd">         - layer: model layer for the barrier</span>
+<span class="sd">    print_input: bool</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    &gt;&gt; barrier_x = [-1000.0, 0.0, 1000.0]</span>
+<span class="sd">    &gt;&gt; barrier_y = [500.0, 250.0, 500.0]</span>
+<span class="sd">    &gt;&gt; barrier_gdf = gpd.GeoDataFrame(</span>
+<span class="sd">    &gt;&gt;     geometry=[shapely.linestrings(barrier_x, barrier_y),],</span>
+<span class="sd">    &gt;&gt;     data={</span>
+<span class="sd">    &gt;&gt;         &quot;multiplier&quot;: [1.5,],</span>
+<span class="sd">    &gt;&gt;         &quot;layer&quot;: [1,],</span>
+
+<span class="sd">    &gt;&gt;     },</span>
+<span class="sd">    &gt;&gt; )</span>
+<span class="sd">    &gt;&gt;</span>
+<span class="sd">    &gt;&gt; hfb = imod.mf6.LayeredHorizontalFlowBarrierMultiplier(barrier_gdf)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">geometry</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">print_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">print_input</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_barrier_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">BarrierType</span><span class="o">.</span><span class="n">Multiplier</span>
+
+    <span class="k">def</span> <span class="nf">_get_variable_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;multiplier&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_get_vertical_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_compute_barrier_values</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">snapped_dataset</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">idomain</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span>
+    <span class="p">):</span>
+        <span class="n">barrier_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__multiplier_layer</span><span class="p">(</span><span class="n">snapped_dataset</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">idomain</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">barrier_values</span>
+
+    <span class="k">def</span> <span class="nf">__multiplier_layer</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">snapped_dataset</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">,</span>
+        <span class="n">edge_index</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">idomain</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns layered xarray with barrier multiplier distrubuted over layers</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">hfb_multiplier</span> <span class="o">=</span> <span class="n">snapped_dataset</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_variable_name</span><span class="p">()]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">edge_index</span><span class="p">]</span>
+        <span class="n">hfb_layer</span> <span class="o">=</span> <span class="n">snapped_dataset</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">edge_index</span><span class="p">]</span>
+        <span class="n">nlay</span> <span class="o">=</span> <span class="n">idomain</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">model_layer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">idomain</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">hfb_multiplier</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">nlay</span><span class="p">,</span> <span class="n">hfb_multiplier</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">model_layer</span> <span class="o">==</span> <span class="n">hfb_layer</span><span class="p">,</span> <span class="n">hfb_multiplier</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">coords</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nlay</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="s2">&quot;mesh2d_nFaces&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+
+
+<div class="viewcode-block" id="HorizontalFlowBarrierResistance"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.HorizontalFlowBarrierResistance.html#imod.mf6.HorizontalFlowBarrierResistance">[docs]</a><span class="k">class</span> <span class="nc">HorizontalFlowBarrierResistance</span><span class="p">(</span><span class="n">HorizontalFlowBarrierBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Horizontal Flow Barrier (HFB) package</span>
+
+<span class="sd">    Input to the Horizontal Flow Barrier (HFB) Package is read from the file</span>
+<span class="sd">    that has type &quot;HFB6&quot; in the Name File. Only one HFB Package can be</span>
+<span class="sd">    specified for a GWF model.</span>
+<span class="sd">    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.2.2.pdf</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    geometry: gpd.GeoDataFrame</span>
+<span class="sd">        Dataframe that describes:</span>
+<span class="sd">         - geometry: the geometries of the barriers,</span>
+<span class="sd">         - resistance: the resistance of the barriers</span>
+<span class="sd">         - ztop: the top z-value of the barriers</span>
+<span class="sd">         - zbottom: the bottom z-value of the barriers</span>
+<span class="sd">    print_input: bool</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    &gt;&gt; barrier_x = [-1000.0, 0.0, 1000.0]</span>
+<span class="sd">    &gt;&gt; barrier_y = [500.0, 250.0, 500.0]</span>
+<span class="sd">    &gt;&gt; barrier_gdf = gpd.GeoDataFrame(</span>
+<span class="sd">    &gt;&gt;     geometry=[shapely.linestrings(barrier_x, barrier_y),],</span>
+<span class="sd">    &gt;&gt;     data={</span>
+<span class="sd">    &gt;&gt;         &quot;resistance&quot;: [1e3,],</span>
+<span class="sd">    &gt;&gt;         &quot;ztop&quot;: [10.0,],</span>
+<span class="sd">    &gt;&gt;         &quot;zbottom&quot;: [0.0,],</span>
+<span class="sd">    &gt;&gt;     },</span>
+<span class="sd">    &gt;&gt; )</span>
+<span class="sd">    &gt;&gt;</span>
+<span class="sd">    &gt;&gt; hfb = imod.mf6.HorizontalFlowBarrierResistance(barrier_gdf)</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="HorizontalFlowBarrierResistance.__init__"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.HorizontalFlowBarrierResistance.html#imod.mf6.HorizontalFlowBarrierResistance.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">geometry</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">print_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">print_input</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_barrier_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">BarrierType</span><span class="o">.</span><span class="n">Resistance</span>
+
+    <span class="k">def</span> <span class="nf">_get_variable_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;resistance&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_get_vertical_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;ztop&quot;</span><span class="p">,</span> <span class="s2">&quot;zbottom&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_compute_barrier_values</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">snapped_dataset</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">idomain</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span>
+    <span class="p">):</span>
+        <span class="n">barrier_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resistance_layer_overlap</span><span class="p">(</span>
+            <span class="n">snapped_dataset</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">barrier_values</span></div>
+
+
+<span class="k">class</span> <span class="nc">LayeredHorizontalFlowBarrierResistance</span><span class="p">(</span><span class="n">HorizontalFlowBarrierBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Horizontal Flow Barrier (HFB) package</span>
+
+<span class="sd">    Input to the Horizontal Flow Barrier (HFB) Package is read from the file</span>
+<span class="sd">    that has type &quot;HFB6&quot; in the Name File. Only one HFB Package can be</span>
+<span class="sd">    specified for a GWF model.</span>
+<span class="sd">    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.2.2.pdf</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    geometry: gpd.GeoDataFrame</span>
+<span class="sd">        Dataframe that describes:</span>
+<span class="sd">         - geometry: the geometries of the barriers,</span>
+<span class="sd">         - resistance: the resistance of the barriers</span>
+<span class="sd">         - layer: model layer for the barrier</span>
+<span class="sd">    print_input: bool</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    &gt;&gt; barrier_x = [-1000.0, 0.0, 1000.0]</span>
+<span class="sd">    &gt;&gt; barrier_y = [500.0, 250.0, 500.0]</span>
+<span class="sd">    &gt;&gt; barrier_gdf = gpd.GeoDataFrame(</span>
+<span class="sd">    &gt;&gt;     geometry=[shapely.linestrings(barrier_x, barrier_y),],</span>
+<span class="sd">    &gt;&gt;     data={</span>
+<span class="sd">    &gt;&gt;         &quot;resistance&quot;: [1e3,],</span>
+<span class="sd">    &gt;&gt;         &quot;layer&quot;: [2,],</span>
+<span class="sd">    &gt;&gt;     },</span>
+<span class="sd">    &gt;&gt; )</span>
+<span class="sd">    &gt;&gt;</span>
+<span class="sd">    &gt;&gt; hfb = imod.mf6.LayeredHorizontalFlowBarrierResistance(barrier_gdf)</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">geometry</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">print_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">print_input</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_barrier_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">BarrierType</span><span class="o">.</span><span class="n">Resistance</span>
+
+    <span class="k">def</span> <span class="nf">_get_variable_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;resistance&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_get_vertical_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_compute_barrier_values</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">snapped_dataset</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">idomain</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span>
+    <span class="p">):</span>
+        <span class="n">barrier_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resistance_layer</span><span class="p">(</span>
+            <span class="n">snapped_dataset</span><span class="p">,</span>
+            <span class="n">edge_index</span><span class="p">,</span>
+            <span class="n">idomain</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">barrier_values</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

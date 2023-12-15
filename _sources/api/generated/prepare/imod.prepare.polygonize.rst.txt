@@ -1,0 +1,6 @@
+﻿imod.prepare.polygonize
+=======================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: polygonize

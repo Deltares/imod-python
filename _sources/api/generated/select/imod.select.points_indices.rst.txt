@@ -1,0 +1,6 @@
+﻿imod.select.points\_indices
+===========================
+
+.. currentmodule:: imod.select
+
+.. autofunction:: points_indices

@@ -1,0 +1,28 @@
+﻿imod.wq.TimeVaryingConstantConcentration
+========================================
+
+.. currentmodule:: imod.wq
+
+.. autoclass:: TimeVaryingConstantConcentration
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TimeVaryingConstantConcentration.__init__
+      ~TimeVaryingConstantConcentration.add_timemap
+      ~TimeVaryingConstantConcentration.from_file
+      ~TimeVaryingConstantConcentration.isel
+      ~TimeVaryingConstantConcentration.repeat_stress
+      ~TimeVaryingConstantConcentration.save
+      ~TimeVaryingConstantConcentration.sel
+   
+   
+
+   
+   
+   

@@ -1,0 +1,27 @@
+﻿imod.flow.VerticalAnisotropy
+============================
+
+.. currentmodule:: imod.flow
+
+.. autoclass:: VerticalAnisotropy
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~VerticalAnisotropy.__init__
+      ~VerticalAnisotropy.compose
+      ~VerticalAnisotropy.from_file
+      ~VerticalAnisotropy.isel
+      ~VerticalAnisotropy.save
+      ~VerticalAnisotropy.sel
+   
+   
+
+   
+   
+   

@@ -1,0 +1,70 @@
+
+:orphan:
+
+.. _sphx_glr_examples_mf6_sg_execution_times:
+
+
+Computation times
+=================
+**14:07.787** total execution time for 12 files **from examples\mf6**:
+
+.. container::
+
+  .. raw:: html
+
+    <style scoped>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    </style>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script type="text/javascript" class="init">
+    $(document).ready( function () {
+        $('table.sg-datatable').DataTable({order: [[1, 'desc']]});
+    } );
+    </script>
+
+  .. list-table::
+   :header-rows: 1
+   :class: table table-striped sg-datatable
+
+   * - Example
+     - Time
+     - Mem (MB)
+   * - :ref:`sphx_glr_examples_mf6_hondsrug_partitioning.py` (``hondsrug_partitioning.py``)
+     - 05:27.643
+     - 0.0
+   * - :ref:`sphx_glr_examples_mf6_hondsrug_regridding.py` (``hondsrug_regridding.py``)
+     - 02:55.522
+     - 0.0
+   * - :ref:`sphx_glr_examples_mf6_hondsrug.py` (``hondsrug.py``)
+     - 02:34.860
+     - 0.0
+   * - :ref:`sphx_glr_examples_mf6_circle_transport.py` (``circle_transport.py``)
+     - 01:39.350
+     - 0.0
+   * - :ref:`sphx_glr_examples_mf6_Henry.py` (``Henry.py``)
+     - 01:08.013
+     - 0.0
+   * - :ref:`sphx_glr_examples_mf6_twri_regridding.py` (``twri_regridding.py``)
+     - 00:07.413
+     - 0.0
+   * - :ref:`sphx_glr_examples_mf6_circle_partitioned.py` (``circle_partitioned.py``)
+     - 00:04.783
+     - 0.0
+   * - :ref:`sphx_glr_examples_mf6_circle.py` (``circle.py``)
+     - 00:04.303
+     - 0.0
+   * - :ref:`sphx_glr_examples_mf6_example_1d_transport.py` (``example_1d_transport.py``)
+     - 00:03.918
+     - 0.0
+   * - :ref:`sphx_glr_examples_mf6_lake.py` (``lake.py``)
+     - 00:01.122
+     - 0.0
+   * - :ref:`sphx_glr_examples_mf6_ex01_twri.py` (``ex01_twri.py``)
+     - 00:00.845
+     - 0.0
+   * - :ref:`sphx_glr_examples_mf6_example_models.py` (``example_models.py``)
+     - 00:00.014
+     - 0.0

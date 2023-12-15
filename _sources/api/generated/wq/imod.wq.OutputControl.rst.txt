@@ -1,0 +1,26 @@
+﻿imod.wq.OutputControl
+=====================
+
+.. currentmodule:: imod.wq
+
+.. autoclass:: OutputControl
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~OutputControl.__init__
+      ~OutputControl.from_file
+      ~OutputControl.isel
+      ~OutputControl.save
+      ~OutputControl.sel
+   
+   
+
+   
+   
+   

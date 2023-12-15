@@ -1,0 +1,740 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Installing &#8212; iMOD Python 0.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'installation';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="User Guide" href="user-guide/index.html" />
+    <link rel="prev" title="iMOD Python: make massive MODFLOW models" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.0 documentation - Home"/>
+    <script>document.write(`<img src="_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Installing</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="installing">
+<h1>Installing<a class="headerlink" href="#installing" title="Permalink to this heading">#</a></h1>
+<section id="which-python">
+<h2>Which Python?<a class="headerlink" href="#which-python" title="Permalink to this heading">#</a></h2>
+<p>You’ll need <strong>Python 3.7 or greater</strong>.</p>
+<p>The recommended way to install Python depends on your experience: Are you new to
+the Python packaging ecosystem or already got experience with it? If you already
+know what <code class="docutils literal notranslate"><span class="pre">conda</span></code> and <code class="docutils literal notranslate"><span class="pre">pip</span></code> are, and are able to install tedious packages
+GIS packages yourself without issue, you are <em>experienced</em>. If you have no idea
+what the previous sentence was about, you are <em>new</em>.</p>
+<section id="new">
+<h3>New<a class="headerlink" href="#new" title="Permalink to this heading">#</a></h3>
+<p>We recommend new users to install iMOD Python using the <a class="reference external" href="https://deltares.github.io/deltaforge/">Deltaforge</a> Python
+distribution. See <a class="reference internal" href="#install-deltaforge"><span class="std std-ref">Installing with Deltaforge</span></a>.</p>
+</section>
+<section id="experienced">
+<h3>Experienced<a class="headerlink" href="#experienced" title="Permalink to this heading">#</a></h3>
+<p>For experienced users, who want to be in control of packages installed, we
+recommend using the <a class="reference external" href="https://github.com/conda-forge/miniforge#mambaforge">Mambaforge</a> Python distribution. This installs Python and
+the <code class="docutils literal notranslate"><span class="pre">mamba</span></code> package manager. <a class="reference external" href="https://github.com/conda-forge/miniforge">Miniforge</a> and <a class="reference external" href="https://docs.conda.io/en/latest/miniconda.html">Miniconda</a> will only install Python
+and the <code class="docutils literal notranslate"><span class="pre">conda</span></code> package manager. Differences to note, in a nutshell:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">mamba</span></code> is much faster than <code class="docutils literal notranslate"><span class="pre">conda</span></code>, but has identical commands.</p></li>
+<li><p>Mambaforge and miniforge are community driven installers, installing by
+default from the <code class="docutils literal notranslate"><span class="pre">conda-forge</span></code> channel.</p></li>
+<li><p>Miniconda is a company driven (Anaconda) installer, installing by default
+from the <code class="docutils literal notranslate"><span class="pre">anaconda</span></code> channel.</p></li>
+<li><p>Installing from the <code class="docutils literal notranslate"><span class="pre">anaconda</span></code> channel has certain (legal) <a class="reference external" href="https://www.anaconda.com/blog/anaconda-commercial-edition-faq">limitations</a>
+for “commercial use”.</p></li>
+</ul>
+<p>Installing Mambaforge/Miniforge/Miniconda does not require administrative
+rights to your computer and doesn’t interfere with any other Python
+installations in your system.</p>
+</section>
+</section>
+<section id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">imod</span></code> Python package makes extensive use of the modern scientific Python
+ecosystem. The most important dependencies are listed here.</p>
+<p>Data structures:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://pandas.pydata.org/">pandas</a></p></li>
+<li><p><a class="reference external" href="https://www.numpy.org/">numpy</a></p></li>
+<li><p><a class="reference external" href="https://xarray.pydata.org/">xarray</a></p></li>
+<li><p><a class="reference external" href="https://deltares.github.io/xugrid/">xugrid</a></p></li>
+</ul>
+<p>Delayed/out-of-core computation, parallellization:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://dask.org/">dask</a></p></li>
+</ul>
+<p>Spatial operations:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://deltares.github.io/numba_celltree/">numba_celltree</a></p></li>
+<li><p><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/">scipy</a></p></li>
+</ul>
+<p>Geospatial libaries (optional):</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://geopandas.org/en/stable/">geopandas</a></p></li>
+<li><p><a class="reference external" href="https://shapely.readthedocs.io/en/stable/manual.html">shapely</a></p></li>
+<li><p><a class="reference external" href="https://pyproj4.github.io/pyproj/stable/">pyproj</a></p></li>
+<li><p><a class="reference external" href="https://rasterio.readthedocs.io/en/latest/">rasterio</a></p></li>
+</ul>
+<p>Data provisioning for examples:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.fatiando.org/pooch/">pooch</a></p></li>
+</ul>
+<p>Visualization:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://matplotlib.org/">matplotlib</a></p></li>
+<li><p><a class="reference external" href="https://docs.pyvista.org/">pyvista</a> (Optional)</p></li>
+</ul>
+<p>Installing all these dependencies requires around 2.5 gigabyte of space;
+Installing only the required dependencies (via pip) requires around 0.5
+gigabyte.</p>
+</section>
+<section id="ways-to-install-imod-python">
+<h2>Ways to install iMOD Python<a class="headerlink" href="#ways-to-install-imod-python" title="Permalink to this heading">#</a></h2>
+<section id="installing-with-deltaforge">
+<span id="install-deltaforge"></span><h3>Installing with Deltaforge<a class="headerlink" href="#installing-with-deltaforge" title="Permalink to this heading">#</a></h3>
+<p>Deltaforge is an installer of Deltares python packages, including iMOD Python,
+and their dependencies. This makes it possible to install iMOD Python without
+much knowledge about the Python package management system. The download links
+are listed <a class="reference external" href="https://deltares.github.io/deltaforge/index.html#where">here.</a>
+Users new to the python package ecosystem are recommended to install iMOD Python
+using Deltaforge.</p>
+</section>
+<section id="installing-with-mamba">
+<h3>Installing with mamba<a class="headerlink" href="#installing-with-mamba" title="Permalink to this heading">#</a></h3>
+<p>You can install <code class="docutils literal notranslate"><span class="pre">imod</span></code> using the <a class="reference external" href="https://github.com/mamba-org/mamba">mamba package manager</a> that comes with the
+Mambaforge distribution. We advice to install <code class="docutils literal notranslate"><span class="pre">imod</span></code> in a seperate <code class="docutils literal notranslate"><span class="pre">conda</span></code>
+environment, as you can simply delete these in case they break. Not doing so
+will install imod and its dependencies in your base environment, which requires
+a reinstall of Mambaforge in case this environment breaks:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mamba</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">imodenv</span>
+<span class="n">mamba</span> <span class="n">install</span> <span class="o">-</span><span class="n">n</span> <span class="n">imodenv</span> <span class="n">imod</span> <span class="o">--</span><span class="n">channel</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">mamba</span></code> will automatically find the appropriate versions of the dependencies
+and in this case install them in the <code class="docutils literal notranslate"><span class="pre">imodenv</span></code> environment. Installing with
+mamba or conda will automatically download <em>all</em> optional dependencies, and
+enable all functionality.</p>
+<p>To run scripts using <code class="docutils literal notranslate"><span class="pre">imod</span></code>, you first have to activate the <code class="docutils literal notranslate"><span class="pre">imodenv</span></code>
+environment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">activate</span> <span class="n">imodenv</span>
+</pre></div>
+</div>
+</section>
+<section id="installing-with-conda">
+<h3>Installing with conda<a class="headerlink" href="#installing-with-conda" title="Permalink to this heading">#</a></h3>
+<p>Alternatively, you can also use the <a class="reference external" href="https://docs.conda.io/en/latest/">conda package manager</a>. Like mamba, conda
+will also infer the appropriate versions of the dependencies and install them.
+However, it generally takes around a factor 5 longer to do so, but may be
+worthwhile if mamba is unstable or buggy:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">imodenv</span>
+<span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">n</span> <span class="n">imodenv</span> <span class="n">imod</span> <span class="o">--</span><span class="n">channel</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
+</pre></div>
+</div>
+<p>To run scripts using <code class="docutils literal notranslate"><span class="pre">imod</span></code>, you first have to activate the <code class="docutils literal notranslate"><span class="pre">imodenv</span></code>
+environment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">activate</span> <span class="n">imodenv</span>
+</pre></div>
+</div>
+</section>
+<section id="installing-with-pip">
+<h3>Installing with pip<a class="headerlink" href="#installing-with-pip" title="Permalink to this heading">#</a></h3>
+<p>Finally, you can also use the <a class="reference external" href="https://pypi.org/project/pip/">pip package manager</a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">imod</span>
+</pre></div>
+</div>
+<p>Unlike installing with conda or mamba, installing with pip will not install
+all optional dependencies. This results in a far smaller installation, but
+it means that not all functionality is directly available.</p>
+<p>Refer to <a class="reference internal" href="faq/python.html"><span class="doc">Installing Python and packages</span></a> in the FAQ section for background
+information on <code class="docutils literal notranslate"><span class="pre">mamba</span></code>, <code class="docutils literal notranslate"><span class="pre">conda</span></code>, and <code class="docutils literal notranslate"><span class="pre">pip</span></code>.</p>
+</section>
+<section id="installing-the-latest-development-version">
+<h3>Installing the latest development version<a class="headerlink" href="#installing-the-latest-development-version" title="Permalink to this heading">#</a></h3>
+<p>You can use <code class="docutils literal notranslate"><span class="pre">pip</span></code> to install the latest source from Gitlab:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">git</span><span class="o">+</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">gitlab</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">deltares</span><span class="o">/</span><span class="n">imod</span><span class="o">/</span><span class="n">imod</span><span class="o">-</span><span class="n">python</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+<p>Alternatively, you can clone the git repository locally and install from there:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">gitlab</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">deltares</span><span class="o">/</span><span class="n">imod</span><span class="o">/</span><span class="n">imod</span><span class="o">-</span><span class="n">python</span><span class="o">.</span><span class="n">git</span>
+<span class="n">cd</span> <span class="n">imod</span><span class="o">-</span><span class="n">python</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="o">.</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">iMOD Python: make massive MODFLOW models</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="user-guide/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">User Guide</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#which-python">Which Python?</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#new">New</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#experienced">Experienced</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencies">Dependencies</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ways-to-install-imod-python">Ways to install iMOD Python</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-with-deltaforge">Installing with Deltaforge</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-with-mamba">Installing with mamba</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-with-conda">Installing with conda</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-with-pip">Installing with pip</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-the-latest-development-version">Installing the latest development version</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="_sources/installation.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

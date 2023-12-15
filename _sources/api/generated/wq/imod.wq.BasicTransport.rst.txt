@@ -1,0 +1,26 @@
+﻿imod.wq.BasicTransport
+======================
+
+.. currentmodule:: imod.wq
+
+.. autoclass:: BasicTransport
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~BasicTransport.__init__
+      ~BasicTransport.from_file
+      ~BasicTransport.isel
+      ~BasicTransport.save
+      ~BasicTransport.sel
+   
+   
+
+   
+   
+   

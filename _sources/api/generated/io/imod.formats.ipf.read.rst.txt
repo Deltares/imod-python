@@ -1,0 +1,6 @@
+﻿imod.formats.ipf.read
+=====================
+
+.. currentmodule:: imod.formats.ipf
+
+.. autofunction:: read

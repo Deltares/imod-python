@@ -1,0 +1,45 @@
+﻿imod.mf6.Buoyancy
+=================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: Buoyancy
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Buoyancy.__init__
+      ~Buoyancy.clip_box
+      ~Buoyancy.copy
+      ~Buoyancy.from_file
+      ~Buoyancy.get_regrid_methods
+      ~Buoyancy.is_grid_agnostic_package
+      ~Buoyancy.is_regridding_supported
+      ~Buoyancy.isel
+      ~Buoyancy.mask
+      ~Buoyancy.regrid_like
+      ~Buoyancy.render
+      ~Buoyancy.sel
+      ~Buoyancy.skip_masking_dataarray
+      ~Buoyancy.to_netcdf
+      ~Buoyancy.write
+      ~Buoyancy.write_binary_griddata
+      ~Buoyancy.write_blockfile
+      ~Buoyancy.write_text_griddata
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Buoyancy.dataset
+   
+   

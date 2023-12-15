@@ -1,0 +1,986 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imod.visualize.cross_sections &#8212; iMOD Python 0.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/visualize/cross_sections';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">imod.visuali...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for imod.visualize.cross_sections</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1</span> <span class="kn">import</span> <span class="n">make_axes_locatable</span>
+
+<span class="kn">import</span> <span class="nn">imod</span>
+<span class="kn">from</span> <span class="nn">imod.visualize</span> <span class="kn">import</span> <span class="n">common</span>
+
+
+<span class="k">def</span> <span class="nf">_meshcoords</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">continuous</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate coordinates for pcolormesh, or fill_between</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    da : xr.DataArray</span>
+<span class="sd">        The array to plot</span>
+<span class="sd">    continuous : bool, optional</span>
+<span class="sd">        Whether the layers are connected, such that the bottom of layer N is</span>
+<span class="sd">        the top of layer N + 1.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    X : np.array</span>
+<span class="sd">        x coordinates of mesh</span>
+<span class="sd">    Y : np.array</span>
+<span class="sd">        y coordinates of mesh</span>
+<span class="sd">    C : np.array</span>
+<span class="sd">        values of the mesh</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dims</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;layer&quot;</span><span class="p">:</span>
+        <span class="c1"># Switch &#39;m around</span>
+        <span class="n">dims</span> <span class="o">=</span> <span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="c1"># Ensure dimensions are in the right order</span>
+    <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">*</span><span class="n">dims</span><span class="p">,</span> <span class="n">transpose_coords</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">xcoord</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">dx</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">coord_reference</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="n">xcoord</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">dx</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="n">dx</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dx</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">xmin</span> <span class="o">+</span> <span class="n">dx</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># assuming dx is an array, non-equidistant dx</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">dx</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="n">dx</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dx</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">dx</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">xcoord</span><span class="si">}</span><span class="s2"> is not monotonic&quot;</span><span class="p">)</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="p">(</span><span class="n">xmin</span> <span class="o">+</span> <span class="n">dx</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="n">dx</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
+
+    <span class="c1"># if dimensions of top and bottom are 1D (voxels), promote to 2D</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">top</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">top</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="n">xcoord</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">top</span><span class="o">=</span><span class="p">((</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="n">xcoord</span><span class="p">),</span> <span class="n">top</span><span class="p">))</span>
+        <span class="n">bot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">bottom</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="n">xcoord</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">bottom</span><span class="o">=</span><span class="p">((</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="n">xcoord</span><span class="p">),</span> <span class="n">bot</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">continuous</span><span class="p">:</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">da</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">da</span><span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">nrow</span><span class="p">,</span> <span class="n">ncol</span> <span class="o">=</span> <span class="n">da</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">nrow</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">ncol</span><span class="p">))</span>
+        <span class="n">Y</span><span class="p">[</span><span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">da</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">Y</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">da</span><span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">nodata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
+    <span class="n">Y</span><span class="p">[</span><span class="n">nodata</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">xmin</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">xmax</span><span class="p">])</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">continuous</span><span class="p">:</span>
+        <span class="n">nrow</span><span class="p">,</span> <span class="n">ncol</span> <span class="o">=</span> <span class="n">Y</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">nrow</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ncol</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="n">C</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ncol</span> <span class="o">=</span> <span class="n">Y</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">nrow</span><span class="p">,</span> <span class="n">ncol</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="n">C</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+
+    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">nodata</span>
+
+
+<span class="k">def</span> <span class="nf">_plot_aquitards</span><span class="p">(</span><span class="n">aquitards</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">kwargs_aquitards</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Overlay aquitards on ax</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    aquitards : xr.DataArray</span>
+<span class="sd">        DataArray containing location of aquitards</span>
+<span class="sd">        NaN&#39;s and zeros are treated as locations without aquitard</span>
+<span class="sd">    ax : matplotlib.Axes object</span>
+<span class="sd">    kwargs_aquitards : dict</span>
+<span class="sd">        keyword arguments for ax.fill_between()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">kwargs_aquitards</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">kwargs_aquitards</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s2">&quot;facecolor&quot;</span><span class="p">:</span> <span class="s2">&quot;grey&quot;</span><span class="p">}</span>
+    <span class="n">X_aq</span><span class="p">,</span> <span class="n">Y_aq</span><span class="p">,</span> <span class="n">C_aq</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_meshcoords</span><span class="p">(</span><span class="n">aquitards</span><span class="p">,</span> <span class="n">continuous</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">C_aq</span> <span class="o">=</span> <span class="n">C_aq</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">X_aq</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)):</span>
+        <span class="n">Y_i</span> <span class="o">=</span> <span class="n">Y_aq</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="n">C_i</span> <span class="o">=</span> <span class="n">C_aq</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+        <span class="n">C_i</span><span class="p">[</span><span class="n">C_i</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="n">nodata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">C_i</span><span class="p">[</span><span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">]),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">Y_i</span><span class="p">[:,</span> <span class="n">nodata</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">X_aq</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Y_i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Y_i</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs_aquitards</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="cross_section"><a class="viewcode-back" href="../../../api/generated/visualize/imod.visualize.cross_section.html#imod.visualize.cross_section">[docs]</a><span class="k">def</span> <span class="nf">cross_section</span><span class="p">(</span>
+    <span class="n">da</span><span class="p">,</span>
+    <span class="n">colors</span><span class="p">,</span>
+    <span class="n">levels</span><span class="p">,</span>
+    <span class="n">layers</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">aquitards</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">kwargs_pcolormesh</span><span class="o">=</span><span class="p">{},</span>
+    <span class="n">kwargs_colorbar</span><span class="o">=</span><span class="p">{},</span>
+    <span class="n">kwargs_aquitards</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">return_cmap_norm</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">fig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wraps matplotlib.pcolormesh to draw cross-sections, drawing cell boundaries</span>
+<span class="sd">    accurately. Aquitards can be plotted on top of the cross-section, by providing</span>
+<span class="sd">    a DataArray with the aquitard location for `aquitards`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    da : xr.DataArray</span>
+<span class="sd">        Two dimensional DataArray containing data of the cross section. One</span>
+<span class="sd">        dimension must be &quot;layer&quot;, and the second dimension will be used as the</span>
+<span class="sd">        x-axis for the cross-section.</span>
+
+<span class="sd">        Coordinates &quot;top&quot; and &quot;bottom&quot; must be present, and must have at least the</span>
+<span class="sd">        &quot;layer&quot; dimension (voxels) or both the &quot;layer&quot; and x-coordinate dimension.</span>
+
+<span class="sd">        *Use imod.select.cross_section_line() or cross_section_linestring() to obtain</span>
+<span class="sd">        the required DataArray.*</span>
+<span class="sd">    colors : list of str, or list of RGB tuples</span>
+<span class="sd">        Matplotlib acceptable list of colors. Length N.</span>
+<span class="sd">        Accepts both tuples of (R, G, B) and hexidecimal (e.g. &quot;#7ec0ee&quot;).</span>
+
+<span class="sd">        Looking for good colormaps? Try: http://colorbrewer2.org/</span>
+<span class="sd">        Choose a colormap, and use the HEX JS array.</span>
+<span class="sd">    levels : listlike of floats or integers</span>
+<span class="sd">        Boundaries between the legend colors/classes. Length: N - 1.</span>
+<span class="sd">    layers : boolean, optional</span>
+<span class="sd">        Whether to draw lines separating the layers.</span>
+<span class="sd">    aquitards : xr.DataArray, optional</span>
+<span class="sd">        Datarray containing data on location of aquitard layers.</span>
+<span class="sd">    kwargs_pcolormesh : dict</span>
+<span class="sd">        Other optional keyword arguments for matplotlib.pcolormesh.</span>
+<span class="sd">    kwargs_colorbar : dict</span>
+<span class="sd">        If optional key ``plot_colorbar`` is set to False, no colorbar is drawn. Defaults to True.</span>
+<span class="sd">        Optional keyword argument ``whiten_triangles`` whitens respective colorbar triangle if</span>
+<span class="sd">        data is not larger/smaller than legend_levels-range. Defaults to True.</span>
+<span class="sd">        Other arguments are forwarded to fig.colorbar()</span>
+<span class="sd">    kwargs_aquitards: dict</span>
+<span class="sd">        These arguments are forwarded to matplotlib.fill_between to draw the</span>
+<span class="sd">        aquitards.</span>
+<span class="sd">    return_cmap_norm : boolean, optional</span>
+<span class="sd">        Return the cmap and norm of the plot, default False</span>
+<span class="sd">    fig : matplotlib Figure instance, optional</span>
+<span class="sd">        Figure to write plot to. If not supplied, a Figure instance is created</span>
+<span class="sd">    ax : matplotlib Axes instance, optional</span>
+<span class="sd">        Axes to write plot to. If not supplied, an Axes instance is created</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fig : matplotlib.figure</span>
+<span class="sd">    ax : matplotlig.ax</span>
+<span class="sd">    if return_cmap_norm == True:</span>
+<span class="sd">    cmap : matplotlib.colors.ListedColormap</span>
+<span class="sd">    norm : matplotlib.colors.BoundaryNorm</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    Basic cross section:</span>
+
+<span class="sd">    &gt;&gt;&gt; imod.visualize.cross_section(da, colors, levels)</span>
+
+<span class="sd">    Aquitards can be styled in multiple ways. For a transparent grey overlay</span>
+<span class="sd">    (the default):</span>
+
+<span class="sd">    &gt;&gt;&gt; kwargs_aquitards = {&quot;alpha&quot;: 0.5, &quot;facecolor&quot;: &quot;grey&quot;}</span>
+<span class="sd">    &gt;&gt;&gt; imod.visualize.cross_section(da, colors, levels, aquitards=aquitards, kwargs_aquitards)</span>
+
+<span class="sd">    For a hatched overlay:</span>
+
+<span class="sd">    &gt;&gt;&gt; kwargs_aquitards = {&quot;hatch&quot;: &quot;/&quot;, &quot;edgecolor&quot;: &quot;k&quot;}</span>
+<span class="sd">    &gt;&gt;&gt; imod.visualize.cross_section(da, colors, levels, aquitards=aquitards, kwargs_aquitards)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">aquitards</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">aquitards</span> <span class="o">=</span> <span class="n">aquitards</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;DataArray must be 2D&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;layer&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;DataArray must contain dimension &quot;layer&quot;&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;top&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;DataArray must contain coordinate &quot;top&quot;&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;bottom&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;DataArray must contain coordinate &quot;bottom&quot;&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;&quot;top&quot; coordinate be 1D or 2D&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;&quot;bottom&quot; coordinate be 1D or 2D&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Read legend settings</span>
+    <span class="n">cmap</span><span class="p">,</span> <span class="n">norm</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">_cmapnorm_from_colorslevels</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="n">levels</span><span class="p">)</span>
+
+    <span class="c1"># cbar kwargs</span>
+    <span class="n">settings_cbar</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ticks&quot;</span><span class="p">:</span> <span class="n">levels</span><span class="p">,</span> <span class="s2">&quot;extend&quot;</span><span class="p">:</span> <span class="s2">&quot;both&quot;</span><span class="p">}</span>
+
+    <span class="c1"># Find a unit in the raster to use in the colorbar label</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">settings_cbar</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;units&quot;</span><span class="p">]</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">settings_cbar</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;unit&quot;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+            <span class="k">pass</span>
+
+    <span class="n">whiten_triangles</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">plot_colorbar</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">kwargs_colorbar</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">whiten_triangles</span> <span class="o">=</span> <span class="n">kwargs_colorbar</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;whiten_triangles&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">plot_colorbar</span> <span class="o">=</span> <span class="n">kwargs_colorbar</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;plot_colorbar&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">settings_cbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs_colorbar</span><span class="p">)</span>
+
+    <span class="c1"># pcmesh kwargs</span>
+    <span class="n">settings_pcmesh</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;cmap&quot;</span><span class="p">:</span> <span class="n">cmap</span><span class="p">,</span> <span class="s2">&quot;norm&quot;</span><span class="p">:</span> <span class="n">norm</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">kwargs_pcolormesh</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">settings_pcmesh</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs_pcolormesh</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">fig</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+    <span class="c1"># Plot raster</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">nodata</span> <span class="o">=</span> <span class="n">_meshcoords</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">continuous</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">ax1</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="o">**</span><span class="n">settings_pcmesh</span><span class="p">)</span>
+    <span class="c1"># Plot aquitards if applicable</span>
+    <span class="k">if</span> <span class="n">aquitards</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_plot_aquitards</span><span class="p">(</span><span class="n">aquitards</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">kwargs_aquitards</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">layers</span><span class="p">:</span>
+        <span class="n">Y</span><span class="p">[</span><span class="n">nodata</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">Y</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+
+    <span class="c1"># Make triangles white if data is not larger/smaller than legend_levels-range</span>
+    <span class="k">if</span> <span class="n">whiten_triangles</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">())</span> <span class="o">&lt;</span> <span class="n">levels</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">cmap</span><span class="o">.</span><span class="n">set_over</span><span class="p">(</span><span class="s2">&quot;#FFFFFF&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">())</span> <span class="o">&gt;</span> <span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">cmap</span><span class="o">.</span><span class="n">set_under</span><span class="p">(</span><span class="s2">&quot;#FFFFFF&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Add colorbar</span>
+    <span class="k">if</span> <span class="n">plot_colorbar</span><span class="p">:</span>
+        <span class="n">divider</span> <span class="o">=</span> <span class="n">make_axes_locatable</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+        <span class="n">cbar_ax</span> <span class="o">=</span> <span class="n">divider</span><span class="o">.</span><span class="n">append_axes</span><span class="p">(</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s2">&quot;5%&quot;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="s2">&quot;5%&quot;</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">cax</span><span class="o">=</span><span class="n">cbar_ax</span><span class="p">,</span> <span class="o">**</span><span class="n">settings_cbar</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">return_cmap_norm</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">cmap</span><span class="p">,</span> <span class="n">norm</span></div>
+
+
+<div class="viewcode-block" id="streamfunction"><a class="viewcode-back" href="../../../api/generated/visualize/imod.visualize.streamfunction.html#imod.visualize.streamfunction">[docs]</a><span class="k">def</span> <span class="nf">streamfunction</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">n_streamlines</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">kwargs_contour</span><span class="o">=</span><span class="p">{}):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wraps matplotlib.contour to draw stream lines. Function can be used to draw</span>
+<span class="sd">    stream lines on top of a cross-section.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    da : xr.DataArray</span>
+<span class="sd">        Two dimensional DataArray containing data of the cross section. One</span>
+<span class="sd">        dimension must be &quot;layer&quot;, and the second dimension will be used as the</span>
+<span class="sd">        x-axis for the cross-section.</span>
+
+<span class="sd">        Coordinates &quot;top&quot; and &quot;bottom&quot; must be present, and must have at least the</span>
+<span class="sd">        &quot;layer&quot; dimension (voxels) or both the &quot;layer&quot; and x-coordinate dimension.</span>
+
+<span class="sd">        *Use imod.evaluate.streamfunction_line() or streamfunction_linestring() to obtain</span>
+<span class="sd">        the required DataArray.*</span>
+<span class="sd">    ax : matplotlib Axes instance</span>
+<span class="sd">        Axes to write plot to.</span>
+<span class="sd">    n_streamlines : int or array_like</span>
+<span class="sd">        Determines the number and positions of the contour lines / regions.</span>
+
+<span class="sd">        If an int n, use n data intervals; i.e. draw n+1 contour lines. The level heights are automatically chosen.</span>
+
+<span class="sd">        If array-like, draw contour lines at the specified levels. The values must be in increasing order.</span>
+<span class="sd">    kwargs_contour : dict</span>
+<span class="sd">        Other optional keyword arguments for matplotlib.contour.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    matplotlib.contour.QuadContourSet</span>
+<span class="sd">        The drawn contour lines.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;DataArray must be 2D&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;layer&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;DataArray must contain dimension &quot;layer&quot;&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;top&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;DataArray must contain coordinate &quot;top&quot;&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;bottom&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;DataArray must contain coordinate &quot;bottom&quot;&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;&quot;top&quot; coordinate be 1D or 2D&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;&quot;bottom&quot; coordinate be 1D or 2D&#39;</span><span class="p">)</span>
+
+    <span class="c1"># add a row of zeros at the bottom, with thickness zero</span>
+    <span class="c1"># moved here i/o imod.evaluate to not bother user with</span>
+    <span class="c1"># additional layer hampering coord assignment</span>
+    <span class="n">zeros</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">zeros</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">zeros</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">zeros</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]</span>  <span class="c1"># layer of zero thickness</span>
+    <span class="n">zeros</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">zeros</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.1</span>
+    <span class="n">da</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">((</span><span class="n">da</span><span class="p">,</span> <span class="n">zeros</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span>
+
+    <span class="c1"># _meshcoords returns mesh edges, but useful here to allow 1D/2D</span>
+    <span class="c1"># dimensions in da</span>
+    <span class="c1"># go back to cell centers in 2D</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="s2">&quot;s&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">da</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">da</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">da</span><span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">values</span>
+    <span class="k">if</span> <span class="n">Y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="n">Y</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="n">da</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="n">settings_contour</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;colors&quot;</span><span class="p">:</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;linestyles&quot;</span><span class="p">:</span> <span class="s2">&quot;solid&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;linewidths&quot;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span>
+        <span class="s2">&quot;zorder&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">settings_contour</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs_contour</span><span class="p">)</span>
+
+    <span class="n">CS</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">da</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">n_streamlines</span><span class="p">,</span> <span class="o">**</span><span class="n">settings_contour</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">CS</span></div>
+
+
+<div class="viewcode-block" id="quiver"><a class="viewcode-back" href="../../../api/generated/visualize/imod.visualize.quiver.html#imod.visualize.quiver">[docs]</a><span class="k">def</span> <span class="nf">quiver</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">kwargs_quiver</span><span class="o">=</span><span class="p">{}):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wraps matplotlib.quiver to draw quiver plots. Function can be used to draw</span>
+<span class="sd">    flow quivers on top of a cross-section.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    u : xr.DataArray</span>
+<span class="sd">        Two dimensional DataArray containing u component of quivers. One</span>
+<span class="sd">        dimension must be &quot;layer&quot;, and the second dimension will be used as the</span>
+<span class="sd">        x-axis for the cross-section.</span>
+
+<span class="sd">        Coordinates &quot;top&quot; and &quot;bottom&quot; must be present, and must have at least the</span>
+<span class="sd">        &quot;layer&quot; dimension (voxels) or both the &quot;layer&quot; and x-coordinate dimension.</span>
+
+<span class="sd">        *Use imod.evaluate.quiver_line() or quiver_linestring() to obtain</span>
+<span class="sd">        the required DataArray.*</span>
+<span class="sd">    v : xr.DataArray</span>
+<span class="sd">        Two dimensional DataArray containing v component of quivers. One</span>
+<span class="sd">        dimension must be &quot;layer&quot;, and the second dimension will be used as the</span>
+<span class="sd">        x-axis for the cross-section.</span>
+
+<span class="sd">        Coordinates &quot;top&quot; and &quot;bottom&quot; must be present, and must have at least the</span>
+<span class="sd">        &quot;layer&quot; dimension (voxels) or both the &quot;layer&quot; and x-coordinate dimension.</span>
+
+<span class="sd">        *Use imod.evaluate.quiver_line() or quiver_linestring() to obtain</span>
+<span class="sd">        the required DataArray.*</span>
+<span class="sd">    ax : matplotlib Axes instance</span>
+<span class="sd">        Axes to write plot to.</span>
+<span class="sd">    kwargs_quiver : dict</span>
+<span class="sd">        Other optional keyword arguments for matplotlib.quiver.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    matplotlib.quiver.Quiver</span>
+<span class="sd">        The drawn quivers.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    First: apply evaluate.quiver_line to get the u and v components of the quivers</span>
+<span class="sd">    from a three dimensional flow field. Assign top and bottom coordinates if these are</span>
+<span class="sd">    not already present in the flow field data arrays.</span>
+
+<span class="sd">    &gt;&gt;&gt; u, v = imod.evaluate.quiver_line(right, front, lower, start, end)</span>
+<span class="sd">    &gt;&gt;&gt; u.assign_coords(top=top, bottom=bottom)</span>
+<span class="sd">    &gt;&gt;&gt; v.assign_coords(top=top, bottom=bottom)</span>
+
+<span class="sd">    The quivers can then be plotted over a cross section created by imod.visualize.cross_section():</span>
+
+<span class="sd">    &gt;&gt;&gt; imod.visualize.quiver(u, v, ax)</span>
+
+<span class="sd">    Quivers can easily overwhelm your plot, so it is a good idea to &#39;thin out&#39; some of the quivers:</span>
+
+<span class="sd">    &gt;&gt;&gt; # Only plot quivers at every 5th cell and every 3rd layer</span>
+<span class="sd">    &gt;&gt;&gt; thin = {&quot;s&quot;: slice(0, None, 5), &quot;layer&quot;: slice(0, None, 3)}</span>
+<span class="sd">    &gt;&gt;&gt; imod.visualize.quiver(u.isel(**thin), v.isel(**thin), ax)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">da</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DataArray </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be 2D&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;layer&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;DataArray </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> must contain dimension &quot;layer&quot;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;top&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;DataArray </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> must contain coordinate &quot;top&quot;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;bottom&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;DataArray </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> must contain coordinate &quot;bottom&quot;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;&quot;top&quot; coordinate in dataarray </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> must be 1D or 2D&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;&quot;bottom&quot; coordinate in dataarray </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> must be 1D or 2D&#39;</span>
+            <span class="p">)</span>
+
+    <span class="c1"># do not draw quivers for cells that are only thinly sliced (ds &gt; 25% of cellsize)</span>
+    <span class="n">dsmin</span> <span class="o">=</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">dx</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">ds</span> <span class="o">&gt;</span> <span class="n">dsmin</span><span class="p">)</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">ds</span> <span class="o">&gt;</span> <span class="n">dsmin</span><span class="p">)</span>
+
+    <span class="c1"># _meshcoords returns mesh edges, but useful here to allow 1D/2D</span>
+    <span class="c1"># dimensions in da</span>
+    <span class="c1"># go back to cell centers in 2D</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">top</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">bottom</span>
+    <span class="k">if</span> <span class="n">Y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># promote to 2D</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">[</span><span class="n">Y</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="p">)</span>
+
+    <span class="n">settings_quiver</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;scale&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># autoscaling</span>
+        <span class="s2">&quot;linestyle&quot;</span><span class="p">:</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;zorder&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">settings_quiver</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs_quiver</span><span class="p">)</span>
+
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">quiver</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="o">**</span><span class="n">settings_quiver</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Q</span></div>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,28 @@
+﻿imod.msw.MeteoGrid
+==================
+
+.. currentmodule:: imod.msw
+
+.. autoclass:: MeteoGrid
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MeteoGrid.__init__
+      ~MeteoGrid.check_string_lengths
+      ~MeteoGrid.isel
+      ~MeteoGrid.sel
+      ~MeteoGrid.write
+      ~MeteoGrid.write_dataframe_fixed_width
+      ~MeteoGrid.write_free_format_file
+   
+   
+
+   
+   
+   

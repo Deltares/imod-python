@@ -1,0 +1,6 @@
+﻿imod.evaluate.stability\_constraint\_advection
+==============================================
+
+.. currentmodule:: imod.evaluate
+
+.. autofunction:: stability_constraint_advection

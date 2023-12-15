@@ -1,0 +1,29 @@
+﻿imod.flow.Recharge
+==================
+
+.. currentmodule:: imod.flow
+
+.. autoclass:: Recharge
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Recharge.__init__
+      ~Recharge.compose
+      ~Recharge.from_file
+      ~Recharge.isel
+      ~Recharge.periodic_stress
+      ~Recharge.repeat_stress
+      ~Recharge.save
+      ~Recharge.sel
+   
+   
+
+   
+   
+   

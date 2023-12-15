@@ -1,0 +1,6 @@
+﻿imod.select.points\_values
+==========================
+
+.. currentmodule:: imod.select
+
+.. autofunction:: points_values

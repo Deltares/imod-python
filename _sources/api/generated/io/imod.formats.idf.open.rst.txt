@@ -1,0 +1,6 @@
+﻿imod.formats.idf.open
+=====================
+
+.. currentmodule:: imod.formats.idf
+
+.. autofunction:: open

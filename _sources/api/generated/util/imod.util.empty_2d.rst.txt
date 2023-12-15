@@ -1,0 +1,6 @@
+﻿imod.util.empty\_2d
+===================
+
+.. currentmodule:: imod.util
+
+.. autofunction:: empty_2d

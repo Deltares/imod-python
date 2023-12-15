@@ -1,0 +1,23 @@
+﻿imod.prepare.LayerRegridder
+===========================
+
+.. currentmodule:: imod.prepare
+
+.. autoclass:: LayerRegridder
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~LayerRegridder.__init__
+      ~LayerRegridder.regrid
+   
+   
+
+   
+   
+   

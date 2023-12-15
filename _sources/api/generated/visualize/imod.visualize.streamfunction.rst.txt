@@ -1,0 +1,6 @@
+﻿imod.visualize.streamfunction
+=============================
+
+.. currentmodule:: imod.visualize
+
+.. autofunction:: streamfunction

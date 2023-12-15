@@ -1,0 +1,982 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Vector data and Geopandas &#8212; iMOD Python 0.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user-guide/02-vector-data';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Time series data and Pandas" href="03-timeseries-data.html" />
+    <link rel="prev" title="Raster data and xarray" href="01-raster-data.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01-raster-data.html">Raster data and xarray</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Vector data and Geopandas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03-timeseries-data.html">Time series data and Pandas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05-unstructured-grids.html">Unstructured Grids</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06-lazy-evaluation.html">Lazy evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07-time-discretization.html">Model time discretization</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">User Guide</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Vector data...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-user-guide-02-vector-data-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="vector-data-and-geopandas">
+<span id="sphx-glr-user-guide-02-vector-data-py"></span><h1>Vector data and Geopandas<a class="headerlink" href="#vector-data-and-geopandas" title="Permalink to this heading">#</a></h1>
+<p>Geospatial data primarily comes in two forms: raster data and vector data.
+This guide focuses on the latter.</p>
+<p>Typical examples of file formats containing vector data are:</p>
+<ul class="simple">
+<li><p>ESRI shapefile</p></li>
+<li><p>GeoJSON</p></li>
+<li><p>Geopackage</p></li>
+</ul>
+<p>Vector data consist of vertices (corner points), optionally connected by paths.
+The three primary categories of vector data are:</p>
+<ul class="simple">
+<li><p>Points</p></li>
+<li><p>Lines</p></li>
+<li><p>Polygons</p></li>
+</ul>
+<p>In groundwater modeling, typical examples of each are:</p>
+<ul class="simple">
+<li><p>Pumping wells, observation wells, boreholes</p></li>
+<li><p>Canals, ditches, waterways</p></li>
+<li><p>Lakes, administrative boundaries, land use</p></li>
+</ul>
+<p>These data consist of geospatial coordinates, indicating the location in space
+and a number of attributes: for a canal, this could be parameters like its
+width, depth, and water level. In GIS software like QGIS, the geometry is
+visible in the map view, and the attributes can inspected via e.g. the
+attribute table.</p>
+<p>In Python, such data can be represented by a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">geopandas.GeoDataFrame</span></code>. Essentially, geopandas is a pandas
+DataFrame to store tabular data (the attribute table), and adds a geometry
+column to store the geospatial coordinates.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">imod</span>
+
+<span class="n">tempdir</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">temporary_directory</span><span class="p">()</span>
+<span class="n">gdf</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">lakes_shp</span><span class="p">(</span><span class="n">tempdir</span> <span class="o">/</span> <span class="s2">&quot;lake&quot;</span><span class="p">)</span>
+<span class="n">gdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">:]</span>  <span class="c1"># first 5 rows, last 3 columns</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>SHAPE_Leng</th>
+      <th>SHAPE_Area</th>
+      <th>geometry</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>4689.155578</td>
+      <td>511471.386406</td>
+      <td>POLYGON ((108774.371 466627.430, 108774.375 46...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2050.843018</td>
+      <td>86091.854890</td>
+      <td>POLYGON ((115938.892 463013.165, 115926.865 46...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>5023.190894</td>
+      <td>625149.040467</td>
+      <td>POLYGON ((111380.977 448065.855, 111378.115 44...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>3724.550747</td>
+      <td>467233.192689</td>
+      <td>POLYGON ((117298.904 478782.595, 117297.744 47...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>6834.063594</td>
+      <td>809445.407846</td>
+      <td>POLYGON ((112096.692 450851.187, 112098.812 45...</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+<br />
+<br /><p>This geodataframe contains all the data from the shapefile. Note the geometry
+column. The geometry can be plotted:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">gdf</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_02-vector-data_001.png" srcset="../_images/sphx_glr_02-vector-data_001.png" alt="02 vector data" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Axes: &gt;
+</pre></div>
+</div>
+<p>A GeoDataFrame of points can also be easily generated from pairs of x and y
+coordinates.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">90_000.0</span><span class="p">,</span> <span class="mf">120_000.0</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">450_000.0</span><span class="p">,</span> <span class="mf">480_000.0</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">)</span>
+
+<span class="n">geometry</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">points_from_xy</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">points_gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span><span class="p">)</span>
+
+<span class="n">points_gdf</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_02-vector-data_002.png" srcset="../_images/sphx_glr_02-vector-data_002.png" alt="02 vector data" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Axes: &gt;
+</pre></div>
+</div>
+<p>An important feature of every geometry is its geometry type:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">gdf</span><span class="o">.</span><span class="n">geom_type</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0     Polygon
+1     Polygon
+2     Polygon
+3     Polygon
+4     Polygon
+       ...
+72    Polygon
+73    Polygon
+74    Polygon
+75    Polygon
+76    Polygon
+Length: 77, dtype: object
+</pre></div>
+</div>
+<p>As expected, the points are of the type … Point:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">points_gdf</span><span class="o">.</span><span class="n">geom_type</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0     Point
+1     Point
+2     Point
+3     Point
+4     Point
+5     Point
+6     Point
+7     Point
+8     Point
+9     Point
+10    Point
+11    Point
+12    Point
+13    Point
+14    Point
+15    Point
+16    Point
+17    Point
+18    Point
+19    Point
+20    Point
+21    Point
+22    Point
+23    Point
+24    Point
+25    Point
+26    Point
+27    Point
+28    Point
+29    Point
+dtype: object
+</pre></div>
+</div>
+<section id="input-and-output">
+<h2>Input and output<a class="headerlink" href="#input-and-output" title="Permalink to this heading">#</a></h2>
+<p>Geopandas supports many vector file formats. It wraps <a class="reference external" href="https://fiona.readthedocs.io/en/latest/manual.html">fiona</a>, which in turns
+wraps <a class="reference external" href="https://gdal.org/faq.html#what-is-this-ogr-stuff">OGR</a>, which is a part of <a class="reference external" href="https://gdal.org/">GDAL</a>. For example, the lake polygons above
+are loaded from an ESRI Shapefile:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">filenames</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="p">(</span><span class="n">tempdir</span> <span class="o">/</span> <span class="s2">&quot;lake&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filenames</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>lakes.cpg
+lakes.dbf
+lakes.prj
+lakes.shp
+lakes.shx
+</pre></div>
+</div>
+<p>They can be easily stored into more modern formats as well, such as
+<a class="reference external" href="https://www.geopackage.org/">GeoPackage</a>:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">points_gdf</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">tempdir</span> <span class="o">/</span> <span class="s2">&quot;points.gpkg&quot;</span><span class="p">)</span>
+<span class="n">filenames</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">tempdir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filenames</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>lake
+points.gpkg
+</pre></div>
+</div>
+<p>… and back:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">back</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">tempdir</span> <span class="o">/</span> <span class="s2">&quot;points.gpkg&quot;</span><span class="p">)</span>
+<span class="n">back</span>
+</pre></div>
+</div>
+<div class="output_subarea output_html rendered_html output_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>geometry</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>POINT (90000.00000 450000.00000)</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>POINT (91000.00000 451000.00000)</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>POINT (92000.00000 452000.00000)</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>POINT (93000.00000 453000.00000)</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>POINT (94000.00000 454000.00000)</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>POINT (95000.00000 455000.00000)</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>POINT (96000.00000 456000.00000)</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>POINT (97000.00000 457000.00000)</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>POINT (98000.00000 458000.00000)</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>POINT (99000.00000 459000.00000)</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>POINT (100000.00000 460000.00000)</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>POINT (101000.00000 461000.00000)</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>POINT (102000.00000 462000.00000)</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>POINT (103000.00000 463000.00000)</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>POINT (104000.00000 464000.00000)</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>POINT (105000.00000 465000.00000)</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>POINT (106000.00000 466000.00000)</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>POINT (107000.00000 467000.00000)</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>POINT (108000.00000 468000.00000)</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>POINT (109000.00000 469000.00000)</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>POINT (110000.00000 470000.00000)</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>POINT (111000.00000 471000.00000)</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>POINT (112000.00000 472000.00000)</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>POINT (113000.00000 473000.00000)</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>POINT (114000.00000 474000.00000)</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>POINT (115000.00000 475000.00000)</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>POINT (116000.00000 476000.00000)</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>POINT (117000.00000 477000.00000)</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>POINT (118000.00000 478000.00000)</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>POINT (119000.00000 479000.00000)</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+<br />
+<br /></section>
+<section id="conversion-to-raster">
+<h2>Conversion to raster<a class="headerlink" href="#conversion-to-raster" title="Permalink to this heading">#</a></h2>
+<p>From the perspective of MODFLOW groundwater modeling, we are often interested
+in the properties of cells in specific polygons or zones. Refer to the
+examples or the API reference for <code class="docutils literal notranslate"><span class="pre">imod.prepare</span></code>.</p>
+<p>GeoPandas provides a full suite of vector based GIS operations, such as
+intersections, spatial joins, or plotting.</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.259 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-user-guide-02-vector-data-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/c5285c4c8db8c3bfdc970b48d3f5250f/02-vector-data.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">02-vector-data.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/34eafadca791794148fd7c094e311389/02-vector-data.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">02-vector-data.py</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="01-raster-data.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Raster data and xarray</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="03-timeseries-data.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Time series data and Pandas</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#input-and-output">Input and output</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conversion-to-raster">Conversion to raster</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/user-guide/02-vector-data.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

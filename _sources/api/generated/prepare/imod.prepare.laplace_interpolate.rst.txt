@@ -1,0 +1,6 @@
+﻿imod.prepare.laplace\_interpolate
+=================================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: laplace_interpolate

@@ -1,0 +1,6 @@
+﻿imod.visualize.read\_imod\_legend
+=================================
+
+.. currentmodule:: imod.visualize
+
+.. autofunction:: read_imod_legend

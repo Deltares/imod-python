@@ -1,0 +1,1062 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imod.mf6.ims &#8212; iMOD Python 0.15.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/mf6/ims';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitLab</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">imod.mf6.ims</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for imod.mf6.ims</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+<span class="kn">from</span> <span class="nn">imod.mf6.package</span> <span class="kn">import</span> <span class="n">Package</span>
+<span class="kn">from</span> <span class="nn">imod.schemata</span> <span class="kn">import</span> <span class="n">DTypeSchema</span>
+
+
+<div class="viewcode-block" id="Solution"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Solution.html#imod.mf6.Solution">[docs]</a><span class="k">class</span> <span class="nc">Solution</span><span class="p">(</span><span class="n">Package</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Iterative Model Solution.</span>
+<span class="sd">    The model solution will solve all of the models that are added to it, as</span>
+<span class="sd">    specified in the simulation name file, and will include Numerical Exchanges,</span>
+<span class="sd">    if they are present. The iterative model solution requires specification of</span>
+<span class="sd">    both nonlinear and linear settings.</span>
+<span class="sd">    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=147</span>
+
+<span class="sd">    Three predifined solutions settings are available: SolutionPresetSimple,</span>
+<span class="sd">    SolutionPresetModerate and SolutionPresetComplex. When using one of the</span>
+<span class="sd">    predefined solutions only the print_option, csv_output, and no_ptc have to</span>
+<span class="sd">    be defined. The default values for each are described below.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    modelnames: list of str</span>
+<span class="sd">        Which models to solve in this solution. Only models of the same type</span>
+<span class="sd">        (GWF or GWT) should be added to the same solution.</span>
+<span class="sd">    outer_dvclose: float</span>
+<span class="sd">        real value defining the head change criterion for convergence of the</span>
+<span class="sd">        outer (nonlinear) iterations, in units of length. When the maximum</span>
+<span class="sd">        absolute value of the head change at all nodes during an iteration is</span>
+<span class="sd">        less than or equal to outer_dvclose, iteration stops. Commonly,</span>
+<span class="sd">        outer_dvclose equals 0.01.</span>
+<span class="sd">        SolutionPresetSimple: 0.001</span>
+<span class="sd">        SolutionPresetModerate: 0.01</span>
+<span class="sd">        SolutionPresetComplex: 0.1</span>
+<span class="sd">    outer_maximum: int</span>
+<span class="sd">        integer value defining the maximum number of outer (nonlinear)</span>
+<span class="sd">        iterations – that is, calls to the solution routine. For a linear</span>
+<span class="sd">        problem outer_maximum should be 1.</span>
+<span class="sd">        SolutionPresetSimple: 25</span>
+<span class="sd">        SolutionPresetModerate: 50</span>
+<span class="sd">        SolutionPresetComplex: 100</span>
+<span class="sd">    inner_maximum: int</span>
+<span class="sd">        integer value defining the maximum number of inner (linear) iterations.</span>
+<span class="sd">        The number typically depends on the characteristics of the matrix</span>
+<span class="sd">        solution scheme being used. For nonlinear problems, inner_maximum</span>
+<span class="sd">        usually ranges from 60 to 600; a value of 100 will be sufficient for</span>
+<span class="sd">        most linear problems.</span>
+<span class="sd">        SolutionPresetSimple: 50</span>
+<span class="sd">        SolutionPresetModerate: 100</span>
+<span class="sd">        SolutionPresetComplex: 500</span>
+<span class="sd">    inner_dvclose: float</span>
+<span class="sd">        real value defining the head change criterion for convergence of the</span>
+<span class="sd">        inner (linear) iterations, in units of length. When the maximum absolute</span>
+<span class="sd">        value of the head change at all nodes during an iteration is less than</span>
+<span class="sd">        or equal to inner_dvclose, the matrix solver assumes convergence.</span>
+<span class="sd">        Commonly, inner_dvclose is set an order of magnitude less than the</span>
+<span class="sd">        outer_dvclose value.</span>
+<span class="sd">        SolutionPresetSimple: 0.001</span>
+<span class="sd">        SolutionPresetModerate: 0.01</span>
+<span class="sd">        SolutionPresetComplex: 0.1</span>
+<span class="sd">    inner_rclose: float</span>
+<span class="sd">        real value that defines the flow residual tolerance for convergence of</span>
+<span class="sd">        the IMS linear solver and specific flow residual criteria used. This</span>
+<span class="sd">        value represents the maximum allowable residual at any single node.</span>
+<span class="sd">        Value is in units of length cubed per time, and must be consistent with</span>
+<span class="sd">        MODFLOW 6 length and time units. Usually a value of 1.0 × 10−1 is</span>
+<span class="sd">        sufficient for the flow-residual criteria when meters and seconds are</span>
+<span class="sd">        the defined MODFLOW 6 length and time.</span>
+<span class="sd">        SolutionPresetSimple: 0.1</span>
+<span class="sd">        SolutionPresetModerate: 0.1</span>
+<span class="sd">        SolutionPresetComplex: 0.1</span>
+<span class="sd">    linear_acceleration: str</span>
+<span class="sd">        options: {&quot;cg&quot;, &quot;bicgstab&quot;}</span>
+<span class="sd">        a keyword that defines the linear acceleration method used by the</span>
+<span class="sd">        default IMS linear solvers. CG - preconditioned conjugate gradient</span>
+<span class="sd">        method. BICGSTAB - preconditioned bi-conjugate gradient stabilized</span>
+<span class="sd">        method.</span>
+<span class="sd">        SolutionPresetSimple: &quot;cg&quot;</span>
+<span class="sd">        SolutionPresetModerate: &quot;bicgstab&quot;</span>
+<span class="sd">        SolutionPresetComplex: &quot;bicgstab&quot;</span>
+<span class="sd">    under_relaxation: str, optional</span>
+<span class="sd">        options: {&quot;None&quot;, &quot;simple&quot;, &quot;cooley&quot;, &quot;bdb&quot;}</span>
+<span class="sd">        is an optional keyword that defines the nonlinear relative_rclose</span>
+<span class="sd">        schemes used. By default under_relaxation is not used.</span>
+<span class="sd">        None - relative_rclose is not used.</span>
+<span class="sd">        simple - Simple relative_rclose scheme with a fixed relaxation factor is</span>
+<span class="sd">        used.</span>
+<span class="sd">        cooley - Cooley relative_rclose scheme is used.</span>
+<span class="sd">        dbd - delta-bar-delta relative_rclose is used.</span>
+<span class="sd">        Note that the relative_rclose schemes are used in conjunction with</span>
+<span class="sd">        problems that use the Newton-Raphson formulation, however, experience</span>
+<span class="sd">        has indicated that the Cooley relative_rclose and damping work well also</span>
+<span class="sd">        for the Picard scheme with the wet/dry options of MODFLOW 6.</span>
+<span class="sd">        Default value: None</span>
+<span class="sd">        SolutionPresetSimple: None</span>
+<span class="sd">        SolutionPresetModerate: &quot;dbd&quot;</span>
+<span class="sd">        SolutionPresetComplex: &quot;dbd&quot;</span>
+<span class="sd">    under_relaxation_theta: float, optional</span>
+<span class="sd">        real value defining the reduction factor for the learning rate</span>
+<span class="sd">        (underrelaxation term) of the delta-bar-delta algorithm. The value of</span>
+<span class="sd">        under relaxation theta is between zero and one. If the change in the</span>
+<span class="sd">        variable (head) is of opposite sign to that of the previous iteration,</span>
+<span class="sd">        the relative_rclose term is reduced by a factor of under relaxation</span>
+<span class="sd">        theta. The value usually ranges from 0.3 to 0.9; a value of 0.7 works</span>
+<span class="sd">        well for most problems. under relaxation theta only needs to be</span>
+<span class="sd">        specified if under relaxation is dbd.</span>
+<span class="sd">        Default value: None</span>
+<span class="sd">        SolutionPresetSimple: 0.0</span>
+<span class="sd">        SolutionPresetModerate: 0.9</span>
+<span class="sd">        SolutionPresetComplex: 0.8</span>
+<span class="sd">    under_relaxation_kappa: float, optional</span>
+<span class="sd">        real value defining the increment for the learning rate (relative_rclose</span>
+<span class="sd">        term) of the delta-bar-delta algorithm. The value of under relaxation</span>
+<span class="sd">        kappa is between zero and one. If the change in the variable (head) is</span>
+<span class="sd">        of the same sign to that of the previous iteration, the relative_rclose</span>
+<span class="sd">        term is increased by an increment of under_relaxation_kappa. The value</span>
+<span class="sd">        usually ranges from 0.03 to 0.3; a value of 0.1 works well for most</span>
+<span class="sd">        problems. under relaxation kappa only needs to be specified if under</span>
+<span class="sd">        relaxation is dbd.</span>
+<span class="sd">        Default value: None</span>
+<span class="sd">        SolutionPresetSimple: 0.0</span>
+<span class="sd">        SolutionPresetModerate: 0.0001</span>
+<span class="sd">        SolutionPresetComplex: 0.0001</span>
+<span class="sd">    under_relaxation_gamma: float, optional</span>
+<span class="sd">        real value defining the history or memory term factor of the</span>
+<span class="sd">        delta-bardelta algorithm. under relaxation gamma is between zero and 1</span>
+<span class="sd">        but cannot be equal to one. When under relaxation gamma is zero, only</span>
+<span class="sd">        the most recent history (previous iteration value) is maintained. As</span>
+<span class="sd">        under relaxation gamma is increased, past history of iteration changes</span>
+<span class="sd">        has greater influence on the memory term. The memory term is maintained</span>
+<span class="sd">        as an exponential average of past changes. Retaining some past history</span>
+<span class="sd">        can overcome granular behavior in the calculated function surface and</span>
+<span class="sd">        therefore helps to overcome cyclic patterns of nonconvergence. The value</span>
+<span class="sd">        usually ranges from 0.1 to 0.3; a value of 0.2 works well for most</span>
+<span class="sd">        problems. under relaxation gamma only needs to be specified if under</span>
+<span class="sd">        relaxation is not none.</span>
+<span class="sd">        Default value: None</span>
+<span class="sd">        SolutionPresetSimple: 0.0</span>
+<span class="sd">        SolutionPresetModerate: 0.0</span>
+<span class="sd">        SolutionPresetComplex: 0.0</span>
+<span class="sd">    under_relaxation_momentum: float, optional</span>
+<span class="sd">        real value defining the fraction of past history changes that is added</span>
+<span class="sd">        as a momentum term to the step change for a nonlinear iteration. The</span>
+<span class="sd">        value of under relaxation momentum is between zero and one. A large</span>
+<span class="sd">        momentum term should only be used when small learning rates are</span>
+<span class="sd">        expected. Small amounts of the momentum term help convergence. The value</span>
+<span class="sd">        usually ranges from 0.0001 to 0.1; a value of 0.001 works well for most</span>
+<span class="sd">        problems. under relaxation momentum only needs to be specified if under</span>
+<span class="sd">        relaxation is dbd.</span>
+<span class="sd">        Default value: None</span>
+<span class="sd">        SolutionPresetSimple: 0.0</span>
+<span class="sd">        SolutionPresetModerate: 0.0</span>
+<span class="sd">        SolutionPresetComplex: 0.0</span>
+<span class="sd">    backtracking_number: int, optional</span>
+<span class="sd">        integer value defining the maximum number of backtracking iterations</span>
+<span class="sd">        allowed for residual reduction computations. If backtracking number = 0</span>
+<span class="sd">        then the backtracking iterations are omitted. The value usually ranges</span>
+<span class="sd">        from 2 to 20; a value of 10 works well for most problems.</span>
+<span class="sd">        Default value: None</span>
+<span class="sd">        SolutionPresetSimple: 0</span>
+<span class="sd">        SolutionPresetModerate: 0</span>
+<span class="sd">        SolutionPresetComplex: 20</span>
+<span class="sd">    backtracking_tolerance: float, optional</span>
+<span class="sd">        real value defining the tolerance for residual change that is allowed</span>
+<span class="sd">        for residual reduction computations. backtracking tolerance should not</span>
+<span class="sd">        be less than one to avoid getting stuck in local minima. A large value</span>
+<span class="sd">        serves to check for extreme residual increases, while a low value serves</span>
+<span class="sd">        to control step size more severely. The value usually ranges from 1.0 to</span>
+<span class="sd">        106; a value of 104 works well for most problems but lower values like</span>
+<span class="sd">        1.1 may be required for harder problems. backtracking tolerance only</span>
+<span class="sd">        needs to be specified if backtracking_number is greater than zero.</span>
+<span class="sd">        Default value: None</span>
+<span class="sd">        SolutionPresetSimple: 0.0</span>
+<span class="sd">        SolutionPresetModerate: 0.0</span>
+<span class="sd">        SolutionPresetComplex: 1.05</span>
+<span class="sd">    backtracking_reduction_factor: float, optional</span>
+<span class="sd">        real value defining the reduction in step size used for residual</span>
+<span class="sd">        reduction computations. The value of backtracking reduction factor is</span>
+<span class="sd">        between 142 MODFLOW 6 – Description of Input and Output zero and one.</span>
+<span class="sd">        The value usually ranges from 0.1 to 0.3; a value of 0.2 works well for</span>
+<span class="sd">        most problems. backtracking_reduction_factor only needs to be specified</span>
+<span class="sd">        if backtracking number is greater than zero.</span>
+<span class="sd">        Default value: None</span>
+<span class="sd">        SolutionPresetSimple: 0.0</span>
+<span class="sd">        SolutionPresetModerate: 0.0</span>
+<span class="sd">        SolutionPresetComplex: 0.1</span>
+<span class="sd">    backtracking_residual_limit: float, optional</span>
+<span class="sd">        real value defining the limit to which the residual is reduced with</span>
+<span class="sd">        backtracking. If the residual is smaller than</span>
+<span class="sd">        backtracking_residual_limit, then further backtracking is not performed.</span>
+<span class="sd">        A value of 100 is suitable for large problems and residual reduction to</span>
+<span class="sd">        smaller values may only slow down computations. backtracking residual</span>
+<span class="sd">        limit only needs to be specified if backtracking_number is greater than</span>
+<span class="sd">        zero.</span>
+<span class="sd">        Default value: None</span>
+<span class="sd">        SolutionPresetSimple: 0.0</span>
+<span class="sd">        SolutionPresetModerate: 0.0</span>
+<span class="sd">        SolutionPresetComplex: 0.002</span>
+<span class="sd">    rclose_option: str, optional</span>
+<span class="sd">        options: {&quot;strict&quot;, &quot;l2norm_rclose&quot;, &quot;relative_rclose&quot;}</span>
+<span class="sd">        an optional keyword that defines the specific flow residual criterion</span>
+<span class="sd">        used.</span>
+<span class="sd">        strict– an optional keyword that is used to specify that inner rclose</span>
+<span class="sd">        represents a infinity-norm (absolute convergence criteria) and that the</span>
+<span class="sd">        head and flow convergence criteria must be met on the first inner</span>
+<span class="sd">        iteration (this criteria is equivalent to the criteria used by the</span>
+<span class="sd">        MODFLOW-2005 PCG package (Hill, 1990)).</span>
+<span class="sd">        l2norm_rclose – an optionalkeyword that is used to specify that inner</span>
+<span class="sd">        rclose represents a l-2 norm closure criteria instead of a infinity-norm</span>
+<span class="sd">        (absolute convergence criteria). When l2norm_rclose is specified, a</span>
+<span class="sd">        reasonable initial inner rclose value is 0.1 times the number of active</span>
+<span class="sd">        cells when meters and seconds are the defined MODFLOW 6 length and time.</span>
+<span class="sd">        relative_rclose – an optional keyword that is used to specify that</span>
+<span class="sd">        inner_rclose represents a relative L-2 Norm reduction closure criteria</span>
+<span class="sd">        instead of a infinity-Norm (absolute convergence criteria). When</span>
+<span class="sd">        relative_rclose is specified, a reasonable initial inner_rclose value is</span>
+<span class="sd">        1.0 × 10−4 and convergence is achieved for a given inner (linear)</span>
+<span class="sd">        iteration when ∆h ≤ inner_dvclose and the current L-2 Norm is ≤ the</span>
+<span class="sd">        product of the relativ_rclose and the initial L-2 Norm for the current</span>
+<span class="sd">        inner (linear) iteration. If rclose_option is not specified, an absolute</span>
+<span class="sd">        residual (infinity-norm) criterion is used.</span>
+<span class="sd">        Default value: None</span>
+<span class="sd">        SolutionPresetSimple: &quot;strict&quot;</span>
+<span class="sd">        SolutionPresetModerate: &quot;strict&quot;</span>
+<span class="sd">        SolutionPresetComplex: &quot;strict&quot;</span>
+<span class="sd">    relaxation_factor: float, optional</span>
+<span class="sd">        optional real value that defines the relaxation factor used by the</span>
+<span class="sd">        incomplete LU factorization preconditioners (MILU(0) and MILUT).</span>
+<span class="sd">        relaxation_factor is unitless and should be greater than or equal to 0.0</span>
+<span class="sd">        and less than or equal to 1.0. relaxation_factor Iterative Model</span>
+<span class="sd">        Solution 143 values of about 1.0 are commonly used, and experience</span>
+<span class="sd">        suggests that convergence can be optimized in some cases with relax</span>
+<span class="sd">        values of 0.97. A relaxation_factor value of 0.0 will result in either</span>
+<span class="sd">        ILU(0) or ILUT preconditioning (depending on the value specified for</span>
+<span class="sd">        preconditioner_levels and/or preconditioner_drop_tolerance). By default,</span>
+<span class="sd">        relaxation_factor is zero.</span>
+<span class="sd">        Default value: None</span>
+<span class="sd">        SolutionPresetSimple: 0.0</span>
+<span class="sd">        SolutionPresetModerate: 0</span>
+<span class="sd">        SolutionPresetComplex: 0.0</span>
+<span class="sd">    preconditioner_levels: int, optional</span>
+<span class="sd">        optional integer value defining the level of fill for ILU decomposition</span>
+<span class="sd">        used in the ILUT and MILUT preconditioners. Higher levels of fill</span>
+<span class="sd">        provide more robustness but also require more memory. For optimal</span>
+<span class="sd">        performance, it is suggested that a large level of fill be applied (7 or</span>
+<span class="sd">        8) with use of a drop tolerance. Specification of a</span>
+<span class="sd">        preconditioner_levels value greater than zero results in use of the ILUT</span>
+<span class="sd">        preconditioner. By default, preconditioner_levels is zero and the</span>
+<span class="sd">        zero-fill incomplete LU factorization preconditioners (ILU(0) and</span>
+<span class="sd">        MILU(0)) are used.</span>
+<span class="sd">        Default value: None</span>
+<span class="sd">        SolutionPresetSimple: 0</span>
+<span class="sd">        SolutionPresetModerate: 0</span>
+<span class="sd">        SolutionPresetComplex: 5</span>
+<span class="sd">    preconditioner_drop_tolerance: float, optional</span>
+<span class="sd">        optional real value that defines the drop tolerance used to drop</span>
+<span class="sd">        preconditioner terms based on the magnitude of matrix entries in the</span>
+<span class="sd">        ILUT and MILUT preconditioners. A value of 10−4 works well for most</span>
+<span class="sd">        problems. By default, preconditioner_drop_tolerance is zero and the</span>
+<span class="sd">        zero-fill incomplete LU factorization preconditioners (ILU(0) and</span>
+<span class="sd">        MILU(0)) are used.</span>
+<span class="sd">        Default value: None</span>
+<span class="sd">        SolutionPresetSimple: 0</span>
+<span class="sd">        SolutionPresetModerate: 0.0</span>
+<span class="sd">        SolutionPresetComplex: 0.0001</span>
+<span class="sd">    number_orthogonalizations: int, optional</span>
+<span class="sd">        optional integer value defining the interval used to explicitly</span>
+<span class="sd">        recalculate the residual of the flow equation using the solver</span>
+<span class="sd">        coefficient matrix, the latest head estimates, and the right hand side.</span>
+<span class="sd">        For problems that benefit from explicit recalculation of the residual, a</span>
+<span class="sd">        number between 4 and 10 is appropriate. By default,</span>
+<span class="sd">        number_orthogonalizations is zero.</span>
+<span class="sd">        Default value: None</span>
+<span class="sd">        SolutionPresetSimple: 0</span>
+<span class="sd">        SolutionPresetModerate: 0</span>
+<span class="sd">        SolutionPresetComplex: 2</span>
+<span class="sd">    scaling_method: str</span>
+<span class="sd">        options: {&quot;None&quot;, &quot;diagonal&quot;, &quot;l2norm&quot;}</span>
+<span class="sd">        an optional keyword that defines the matrix scaling approach used. By</span>
+<span class="sd">        default, matrix scaling is not applied.</span>
+<span class="sd">        None - no matrix scaling applied.</span>
+<span class="sd">        diagonal - symmetric matrix scaling using the POLCG preconditioner</span>
+<span class="sd">        scaling method in Hill (1992).</span>
+<span class="sd">        l2norm - symmetric matrix scaling using the L2 norm.</span>
+<span class="sd">        Default value: None</span>
+<span class="sd">        SolutionPresetSimple: None</span>
+<span class="sd">        SolutionPresetModerate: None</span>
+<span class="sd">        SolutionPresetComplex: None</span>
+<span class="sd">    reordering_method: str</span>
+<span class="sd">        options: {&quot;None&quot;, &quot;rcm&quot;, &quot;md&quot;}</span>
+<span class="sd">        an optional keyword that defines the matrix reordering approach used. By</span>
+<span class="sd">        default, matrix reordering is not applied.</span>
+<span class="sd">        None - original ordering.</span>
+<span class="sd">        rcm - reverse Cuthill McKee ordering.</span>
+<span class="sd">        md - minimum degree ordering</span>
+<span class="sd">        Default value: None</span>
+<span class="sd">        SolutionPresetSimple: None</span>
+<span class="sd">        SolutionPresetModerate: None</span>
+<span class="sd">        SolutionPresetComplex: None</span>
+<span class="sd">    print_option: str</span>
+<span class="sd">        options: {&quot;None&quot;, &quot;summary&quot;, &quot;all&quot;}</span>
+<span class="sd">        is a flag that controls printing of convergence information from the</span>
+<span class="sd">        solver.</span>
+<span class="sd">        None - means print nothing.</span>
+<span class="sd">        summary - means print only the total</span>
+<span class="sd">        number of iterations and nonlinear residual reduction summaries.</span>
+<span class="sd">        all - means print linear matrix solver convergence information to the</span>
+<span class="sd">        solution listing file and model specific linear matrix solver</span>
+<span class="sd">        convergence information to each model listing file in addition to</span>
+<span class="sd">        SUMMARY information.</span>
+<span class="sd">        Default value: &quot;summary&quot;</span>
+<span class="sd">        SolutionPresetSimple: No Default</span>
+<span class="sd">        SolutionPresetModerate: No Default</span>
+<span class="sd">        SolutionPresetComplex: No Default</span>
+<span class="sd">    csv_output: str, optional</span>
+<span class="sd">        False if no csv is to be written for the output, enter str of filename</span>
+<span class="sd">        if csv is to be written.</span>
+<span class="sd">        Default value: False</span>
+<span class="sd">        SolutionPresetSimple: No Default</span>
+<span class="sd">        SolutionPresetModerate: No Default</span>
+<span class="sd">        SolutionPresetComplex: No Default</span>
+<span class="sd">    no_ptc: ({True, False}, optional)</span>
+<span class="sd">        is a flag that is used to disable pseudo-transient continuation (PTC).</span>
+<span class="sd">        Option only applies to steady-state stress periods for models using the</span>
+<span class="sd">        Newton-Raphson formulation. For many problems, PTC can significantly</span>
+<span class="sd">        improve convergence behavior for steady-state simulations, and for this</span>
+<span class="sd">        reason it is active by default. In some cases, however, PTC can worsen</span>
+<span class="sd">        the convergence behavior, especially when the initial conditions are</span>
+<span class="sd">        similar to the solution. When the initial conditions are similar to, or</span>
+<span class="sd">        exactly the same as, the solution and convergence is slow, then this NO</span>
+<span class="sd">        PTC option should be used to deactivate PTC. This NO PTC option should</span>
+<span class="sd">        also be used in order to compare convergence behavior with other MODFLOW</span>
+<span class="sd">        versions, as PTC is only available in MODFLOW 6.</span>
+<span class="sd">        Default value: False</span>
+<span class="sd">        SolutionPresetSimple: No Default</span>
+<span class="sd">        SolutionPresetModerate: No Default</span>
+<span class="sd">        SolutionPresetComplex: No Default</span>
+<span class="sd">    validate: {True, False}</span>
+<span class="sd">        Flag to indicate whether the package should be validated upon</span>
+<span class="sd">        initialization. This raises a ValidationError if package input is</span>
+<span class="sd">        provided in the wrong manner. Defaults to True.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">&quot;ims&quot;</span>
+    <span class="n">_keyword_map</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">_init_schemata</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;outer_dvclose&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
+        <span class="s2">&quot;outer_maximum&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)],</span>
+        <span class="s2">&quot;inner_maximum&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)],</span>
+        <span class="s2">&quot;inner_dvclose&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
+        <span class="s2">&quot;inner_rclose&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
+        <span class="s2">&quot;under_relaxation_theta&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
+        <span class="s2">&quot;under_relaxation_kappa&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
+        <span class="s2">&quot;under_relaxation_gamma&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
+        <span class="s2">&quot;under_relaxation_momentum&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
+        <span class="s2">&quot;backtracking_number&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)],</span>
+        <span class="s2">&quot;backtracking_tolerance&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
+        <span class="s2">&quot;backtracking_reduction_factor&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
+        <span class="s2">&quot;backtracking_residual_limit&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
+        <span class="s2">&quot;number_orthogonalizations&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)],</span>
+    <span class="p">}</span>
+    <span class="n">_template</span> <span class="o">=</span> <span class="n">Package</span><span class="o">.</span><span class="n">_initialize_template</span><span class="p">(</span><span class="n">_pkg_id</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Solution.__init__"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Solution.html#imod.mf6.Solution.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">modelnames</span><span class="p">,</span>
+        <span class="n">outer_dvclose</span><span class="p">,</span>
+        <span class="n">outer_maximum</span><span class="p">,</span>
+        <span class="n">inner_maximum</span><span class="p">,</span>
+        <span class="n">inner_dvclose</span><span class="p">,</span>
+        <span class="n">inner_rclose</span><span class="p">,</span>
+        <span class="n">linear_acceleration</span><span class="p">,</span>
+        <span class="n">under_relaxation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">under_relaxation_theta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">under_relaxation_kappa</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">under_relaxation_gamma</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">under_relaxation_momentum</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">backtracking_number</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">backtracking_tolerance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">backtracking_reduction_factor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">backtracking_residual_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">rclose_option</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">relaxation_factor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">preconditioner_levels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">preconditioner_drop_tolerance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">number_orthogonalizations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">scaling_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">reordering_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">print_option</span><span class="o">=</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span>
+        <span class="n">csv_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">no_ptc</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">validate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">()</span>
+        <span class="c1"># Make sure the modelnames are set as a variable rather than dimension:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">modelnames</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;modelnames&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">modelnames</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;modelnames&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="n">modelnames</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;outer_dvclose&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">outer_dvclose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;outer_maximum&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">outer_maximum</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;under_relaxation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">under_relaxation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;under_relaxation_theta&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">under_relaxation_theta</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;under_relaxation_kappa&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">under_relaxation_kappa</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;under_relaxation_gamma&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">under_relaxation_gamma</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;under_relaxation_momentum&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">under_relaxation_momentum</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;backtracking_number&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">backtracking_number</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;backtracking_tolerance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">backtracking_tolerance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;backtracking_reduction_factor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">backtracking_reduction_factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;backtracking_residual_limit&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">backtracking_residual_limit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;inner_maximum&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">inner_maximum</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;inner_dvclose&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">inner_dvclose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;inner_rclose&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">inner_rclose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;rclose_option&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rclose_option</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;linear_acceleration&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">linear_acceleration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;relaxation_factor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">relaxation_factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;preconditioner_levels&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">preconditioner_levels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;preconditioner_drop_tolerance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">preconditioner_drop_tolerance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;number_orthogonalizations&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">number_orthogonalizations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;scaling_method&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scaling_method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;reordering_method&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">reordering_method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;print_option&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">print_option</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;csv_output&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">csv_output</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;no_ptc&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">no_ptc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SolutionPresetSimple"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.SolutionPresetSimple.html#imod.mf6.SolutionPresetSimple">[docs]</a><span class="k">def</span> <span class="nf">SolutionPresetSimple</span><span class="p">(</span>
+    <span class="n">modelnames</span><span class="p">,</span> <span class="n">print_option</span><span class="o">=</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span> <span class="n">csv_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_ptc</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">):</span>
+    <span class="n">solution</span> <span class="o">=</span> <span class="n">Solution</span><span class="p">(</span>
+        <span class="n">modelnames</span><span class="o">=</span><span class="n">modelnames</span><span class="p">,</span>
+        <span class="n">print_option</span><span class="o">=</span><span class="n">print_option</span><span class="p">,</span>
+        <span class="n">csv_output</span><span class="o">=</span><span class="n">csv_output</span><span class="p">,</span>
+        <span class="n">no_ptc</span><span class="o">=</span><span class="n">no_ptc</span><span class="p">,</span>
+        <span class="n">outer_dvclose</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+        <span class="n">outer_maximum</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+        <span class="n">under_relaxation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">under_relaxation_theta</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">under_relaxation_kappa</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">under_relaxation_gamma</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">under_relaxation_momentum</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">backtracking_number</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">backtracking_tolerance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">backtracking_reduction_factor</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">backtracking_residual_limit</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">inner_maximum</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+        <span class="n">inner_dvclose</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+        <span class="n">inner_rclose</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">rclose_option</span><span class="o">=</span><span class="s2">&quot;strict&quot;</span><span class="p">,</span>
+        <span class="n">linear_acceleration</span><span class="o">=</span><span class="s2">&quot;cg&quot;</span><span class="p">,</span>
+        <span class="n">relaxation_factor</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">preconditioner_levels</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">preconditioner_drop_tolerance</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">number_orthogonalizations</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">scaling_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">reordering_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">solution</span></div>
+
+
+<div class="viewcode-block" id="SolutionPresetModerate"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.SolutionPresetModerate.html#imod.mf6.SolutionPresetModerate">[docs]</a><span class="k">def</span> <span class="nf">SolutionPresetModerate</span><span class="p">(</span>
+    <span class="n">modelnames</span><span class="p">,</span> <span class="n">print_option</span><span class="o">=</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span> <span class="n">csv_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_ptc</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">):</span>
+    <span class="n">solution</span> <span class="o">=</span> <span class="n">Solution</span><span class="p">(</span>
+        <span class="n">modelnames</span><span class="o">=</span><span class="n">modelnames</span><span class="p">,</span>
+        <span class="n">print_option</span><span class="o">=</span><span class="n">print_option</span><span class="p">,</span>
+        <span class="n">csv_output</span><span class="o">=</span><span class="n">csv_output</span><span class="p">,</span>
+        <span class="n">no_ptc</span><span class="o">=</span><span class="n">no_ptc</span><span class="p">,</span>
+        <span class="n">outer_dvclose</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+        <span class="n">outer_maximum</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+        <span class="n">under_relaxation</span><span class="o">=</span><span class="s2">&quot;dbd&quot;</span><span class="p">,</span>
+        <span class="n">under_relaxation_theta</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+        <span class="n">under_relaxation_kappa</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span>
+        <span class="n">under_relaxation_gamma</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">under_relaxation_momentum</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">backtracking_number</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">backtracking_tolerance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">backtracking_reduction_factor</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">backtracking_residual_limit</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">inner_maximum</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">inner_dvclose</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+        <span class="n">inner_rclose</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">rclose_option</span><span class="o">=</span><span class="s2">&quot;strict&quot;</span><span class="p">,</span>
+        <span class="n">linear_acceleration</span><span class="o">=</span><span class="s2">&quot;bicgstab&quot;</span><span class="p">,</span>
+        <span class="n">relaxation_factor</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">preconditioner_levels</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">preconditioner_drop_tolerance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">number_orthogonalizations</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">scaling_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">reordering_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">solution</span></div>
+
+
+<div class="viewcode-block" id="SolutionPresetComplex"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.SolutionPresetComplex.html#imod.mf6.SolutionPresetComplex">[docs]</a><span class="k">def</span> <span class="nf">SolutionPresetComplex</span><span class="p">(</span>
+    <span class="n">modelnames</span><span class="p">,</span> <span class="n">print_option</span><span class="o">=</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span> <span class="n">csv_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_ptc</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">):</span>
+    <span class="n">solution</span> <span class="o">=</span> <span class="n">Solution</span><span class="p">(</span>
+        <span class="n">modelnames</span><span class="o">=</span><span class="n">modelnames</span><span class="p">,</span>
+        <span class="n">print_option</span><span class="o">=</span><span class="n">print_option</span><span class="p">,</span>
+        <span class="n">csv_output</span><span class="o">=</span><span class="n">csv_output</span><span class="p">,</span>
+        <span class="n">no_ptc</span><span class="o">=</span><span class="n">no_ptc</span><span class="p">,</span>
+        <span class="n">outer_dvclose</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">outer_maximum</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">under_relaxation</span><span class="o">=</span><span class="s2">&quot;dbd&quot;</span><span class="p">,</span>
+        <span class="n">under_relaxation_theta</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+        <span class="n">under_relaxation_kappa</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span>
+        <span class="n">under_relaxation_gamma</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">under_relaxation_momentum</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">backtracking_number</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+        <span class="n">backtracking_tolerance</span><span class="o">=</span><span class="mf">1.05</span><span class="p">,</span>
+        <span class="n">backtracking_reduction_factor</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">backtracking_residual_limit</span><span class="o">=</span><span class="mf">0.002</span><span class="p">,</span>
+        <span class="n">inner_maximum</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+        <span class="n">inner_dvclose</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">inner_rclose</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">rclose_option</span><span class="o">=</span><span class="s2">&quot;strict&quot;</span><span class="p">,</span>
+        <span class="n">linear_acceleration</span><span class="o">=</span><span class="s2">&quot;bicgstab&quot;</span><span class="p">,</span>
+        <span class="n">relaxation_factor</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">preconditioner_levels</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">preconditioner_drop_tolerance</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span>
+        <span class="n">number_orthogonalizations</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">scaling_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">reordering_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">solution</span></div>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

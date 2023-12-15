@@ -1,0 +1,26 @@
+﻿imod.msw.VariableOutputControl
+==============================
+
+.. currentmodule:: imod.msw
+
+.. autoclass:: VariableOutputControl
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~VariableOutputControl.__init__
+      ~VariableOutputControl.isel
+      ~VariableOutputControl.sel
+      ~VariableOutputControl.write
+      ~VariableOutputControl.write_dataframe_fixed_width
+   
+   
+
+   
+   
+   

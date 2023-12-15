@@ -1,0 +1,48 @@
+﻿imod.mf6.HorizontalFlowBarrierResistance
+========================================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: HorizontalFlowBarrierResistance
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~HorizontalFlowBarrierResistance.__init__
+      ~HorizontalFlowBarrierResistance.clip_box
+      ~HorizontalFlowBarrierResistance.copy
+      ~HorizontalFlowBarrierResistance.from_file
+      ~HorizontalFlowBarrierResistance.get_period_varnames
+      ~HorizontalFlowBarrierResistance.get_regrid_methods
+      ~HorizontalFlowBarrierResistance.is_grid_agnostic_package
+      ~HorizontalFlowBarrierResistance.is_regridding_supported
+      ~HorizontalFlowBarrierResistance.isel
+      ~HorizontalFlowBarrierResistance.mask
+      ~HorizontalFlowBarrierResistance.regrid_like
+      ~HorizontalFlowBarrierResistance.render
+      ~HorizontalFlowBarrierResistance.sel
+      ~HorizontalFlowBarrierResistance.skip_masking_dataarray
+      ~HorizontalFlowBarrierResistance.to_mf6_pkg
+      ~HorizontalFlowBarrierResistance.to_netcdf
+      ~HorizontalFlowBarrierResistance.write
+      ~HorizontalFlowBarrierResistance.write_binary_griddata
+      ~HorizontalFlowBarrierResistance.write_blockfile
+      ~HorizontalFlowBarrierResistance.write_text_griddata
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~HorizontalFlowBarrierResistance.dataset
+      ~HorizontalFlowBarrierResistance.geometry
+   
+   
