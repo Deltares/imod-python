@@ -1,11 +1,9 @@
 from pathlib import Path
-from typing import Dict
 
 import numpy as np
 import pytest
-import xarray as xr
 import xugrid as xu
-from pytest_cases import case, parametrize_with_cases
+from pytest_cases import parametrize_with_cases
 
 import imod
 from imod.mf6 import Modflow6Simulation
