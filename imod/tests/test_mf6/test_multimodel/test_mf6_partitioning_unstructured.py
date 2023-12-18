@@ -100,6 +100,20 @@ class HorizontalFlowBarrierCases:
             },
         )
 
+    def case_hfb_diagonal(self):
+        # diagonal line
+        barrier_y = [-480.0, 480.0]
+        barrier_x = [-480.0, 480.0]
+
+        return gpd.GeoDataFrame(
+            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            data={
+                "resistance": [10.0],
+                "ztop": [10.0],
+                "zbottom": [0.0],
+            },
+        )
+
 
 @pytest.mark.usefixtures("circle_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
