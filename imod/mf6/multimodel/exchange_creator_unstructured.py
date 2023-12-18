@@ -57,9 +57,22 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         grid = self._submodel_labels.ugrid.grid
         edge_face_connectivity = grid.edge_face_connectivity
 
-        face1, face2 = edge_face_connectivity[self._connected_cell_edge_indices].T
+        unordered_face1, unordered_face2 = edge_face_connectivity[
+            self._connected_cell_edge_indices
+        ].T
+        face_partition_1 = self._get_partition_numbers(unordered_face1)
+        face_partition_2 = self._get_partition_numbers(unordered_face2)
+        face1 = np.where(
+            face_partition_1 > face_partition_2, unordered_face2, unordered_face1
+        )
+        face2 = np.where(
+            face_partition_1 > face_partition_2, unordered_face1, unordered_face2
+        )
+
         centroid_1 = grid.centroids[face1]
         centroid_2 = grid.centroids[face2]
+
+        cdist =  np.linalg.norm(centroid_2-centroid_1, axis=1)
 
         edge_coordinates = grid.edge_node_coordinates[self._connected_cell_edge_indices]
 
@@ -69,6 +82,29 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         # Compute vector of second cell centroid to first edge vertex
         Vj = centroid_2 - edge_coordinates[:, 0]
         length = np.linalg.norm(U, axis=1)
+
+        # vertex index, coordinate index, point 1 or point 2
+        dx = edge_coordinates[:, 1, 0] - edge_coordinates[:, 0, 0]
+        dy = edge_coordinates[:, 1, 1] - edge_coordinates[:, 0, 1]
+
+        normal = np.array((dy[:], -dx[:]), dtype=np.float_).T
+        outward_vector = centroid_2 - centroid_1
+
+        inprod = (
+            normal[:, 0] * outward_vector[:, 0] + normal[:, 1] * outward_vector[:, 1]
+        )
+
+        normal = np.where(
+            np.transpose((inprod[:] > 0, inprod[:] > 0)), normal[:], -normal[:]
+        )
+        norm_normal = np.sqrt(normal[:, 0] * normal[:, 0] + normal[:, 1] * normal[:, 1])
+        cos = (normal[:, 0]) / norm_normal
+        back_cos = ( -normal[:,0]/ norm_normal)
+        backangle = 180+np.degrees(np.arccos(back_cos))
+        angle = np.degrees(np.arccos(cos))
+        real_angle = np.where(normal[:,1]>0, angle, backangle)
+
+        # now that we have an outward pointing normal, let's compute angldegx
 
         # The cross product of U and V equals the area of the parallellogram,
         # dividing by length (the base of the parallellogram) gives the orthogonal distances cl1 & cl2.
@@ -80,6 +116,8 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
                 "cl1": np.abs(np.cross(U, Vi)) / length,
                 "cl2": np.abs(np.cross(U, Vj)) / length,
                 "hwva": length,
+                "angldegx": real_angle,
+                "cdist": cdist,
             }
         )
         return df
@@ -134,3 +172,6 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         is_inter_domain_edge = ~is_internal_edge & ~is_external_boundary_edge
 
         return is_inter_domain_edge
+
+    def _get_partition_numbers(self, face: np.ndarray) -> np.ndarray:
+        return self._submodel_labels.data[face]

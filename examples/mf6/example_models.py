@@ -557,6 +557,7 @@ def create_circle_simulation():
         k=k,
         k33=k33,
         save_flows=True,
+        save_specific_discharge=True
     )
     gwf_model["sto"] = imod.mf6.SpecificStorage(
         specific_storage=1.0e-5,

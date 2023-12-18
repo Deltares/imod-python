@@ -123,9 +123,6 @@ class ExchangeCreator(abc.ABC):
          For each connection between submodels only a single exchange is created. So if an exchange of model1 to
          model2 is created then no exchange for model2 to model1 will be created.
 
-         Add the moment the geometric coefficients aren't computed.
-
-
         Returns
         -------
         a list of GWFGWF-exchanges

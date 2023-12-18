@@ -13,12 +13,17 @@ from imod.typing.grid import zeros_like
 
 def setup_partitioning_arrays(idomain_top: xr.DataArray) -> Dict[str, xr.DataArray]:
     result = {}
-    two_parts = zeros_like(idomain_top)
 
-    two_parts.values[:108] = 0
-    two_parts.values[108:] = 1
+    end_range = 75
+    two_parts = zeros_like(idomain_top)
+    two_parts.values[end_range:] = 1
 
     result["two_parts"] = two_parts
+
+    two_parts_inverse = zeros_like(idomain_top)
+    two_parts_inverse.values[:end_range] = 1
+
+    result["two_parts_inverse"] = two_parts_inverse
 
     three_parts = zeros_like(idomain_top)
 
@@ -27,6 +32,80 @@ def setup_partitioning_arrays(idomain_top: xr.DataArray) -> Dict[str, xr.DataArr
     three_parts.values[144:] = 2
     result["three_parts"] = three_parts
 
+    return result
+
+
+def setup_reference_results() -> Dict[str, np.ndarray]:
+    result = {}
+    result["two_parts"] = np.array(
+        [
+            0.0,
+            0.0,
+            120.0,
+            6.20602311,
+            0.0,
+            60.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            135.0,
+            10.36623418,
+            140.44669732,
+            60.0,
+            60.0,
+            0.0,
+            0.0,
+            120.0,
+            6.20602311,
+            0.0,
+            60.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            135.0,
+            10.36623418,
+            140.44669732,
+            60.0,
+            60.0,
+        ]
+    )
+
+    result["two_parts_inverse"] = np.array(
+        [
+            180.0,
+            180.0,
+            60.0,
+            180.0,
+            120.0,
+            180.0,
+            180.0,
+            180.0,
+            180.0,
+            173.79397689,
+            45.0,
+            169.63376582,
+            39.55330268,
+            120.0,
+            120.0,
+            180.0,
+            180.0,
+            60.0,
+            180.0,
+            120.0,
+            180.0,
+            180.0,
+            180.0,
+            180.0,
+            173.79397689,
+            45.0,
+            169.63376582,
+            39.55330268,
+            120.0,
+            120.0,
+        ]
+    )
     return result
 
 
@@ -205,4 +284,30 @@ def test_partitioning_unstructured_with_vpt_cells(
     # compare the head result of the original simulation with the result of the partitioned simulation
     np.testing.assert_allclose(
         head["head"].values, orig_head.values, rtol=1e-5, atol=1e-3
+    )
+
+
+@pytest.mark.usefixtures("circle_model")
+@pytest.mark.parametrize(
+    "partition_name",
+    ["two_parts", "two_parts_inverse"],
+)
+def test_partitioning_unstructured_geometric_constants(
+    tmp_path: Path, circle_model: Modflow6Simulation, partition_name: str
+):
+    simulation = circle_model
+    simulation.write(tmp_path/"orig", binary=False)
+    # increase the recharge to make the head gradient more pronounced
+    simulation["GWF_1"]["rch"]["rate"] *= 100
+    idomain = simulation["GWF_1"].domain
+    partitioning_arrays = setup_partitioning_arrays(idomain.isel(layer=0))
+
+    # partition the simulation, run it, and save the (merged) results
+    split_simulation = simulation.split(partitioning_arrays[partition_name])
+    split_simulation.write(tmp_path/partition_name, binary=False)
+    references = setup_reference_results()
+
+    assert np.allclose(
+        split_simulation["split_exchanges"][0]["angldegx"].values,
+        references[partition_name],
     )
