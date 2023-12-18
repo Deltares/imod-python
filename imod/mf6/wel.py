@@ -45,8 +45,8 @@ def _assign_dims(arg) -> Dict:
         return ("index", arg)
 
 
-def mask_2D(package: Well, grid_2d: GridDataArray) -> Well:
-    point_active = points_values(grid_2d, x=package.x, y=package.y)
+def mask_2D(package: Well, domain_2d: GridDataArray) -> Well:
+    point_active = points_values(domain_2d, x=package.x, y=package.y)
 
     is_inside_exterior = point_active == 1
     selection = package.dataset.loc[{"index": is_inside_exterior}]
