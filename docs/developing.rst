@@ -83,12 +83,12 @@ To follow these steps, you need to be one of the maintainers for imod on both
 
 1. Update the :doc:`../api/changelog`.
 
-2. Tag in Gitlab UI. `Old tags are here
-   <https://gitlab.com/deltares/imod/imod-python/-/tags>`_. `Old releases are
-   here <https://gitlab.com/deltares/imod/imod-python/-/releases>`_. To make a
+2. Tag in GitHub UI. `Old tags are here
+   <https://github.com/Deltares/imod-python/tags>`_. `Old releases are
+   here <https://github.com/Deltares/imod-python/releases>`_. To make a
    tag show up under releases, fill in the release notes in the UI. Since we
    keep changes in the :doc:`../api/changelog` only, just put ``See
-   https://deltares.gitlab.io/imod/imod-python/api/changelog.html`` in both the
+   https://deltares.github.io/imod-python/api/changelog.html`` in both the
    ``Message`` and ``Release notes`` box. The tag name should be ``vx.y.z``,
    where x, y and z are version numbers according to `Semantic Versioning
    <https://semver.org/>`_.
@@ -202,7 +202,7 @@ which happens automatically within CI.
   apt-get install -y build-essential
   mamba install git
   cd /usr/src
-  git clone https://gitlab.com/deltares/imod/imod-python.git
+  git clone https://github.com/Deltares/imod-python.git
   cd imod-python
   mamba env create -f imod-environment.yml --name imod
   mamba env update -f imod-environment-dev.yml --name imod
@@ -213,7 +213,7 @@ which happens automatically within CI.
 At this point, everything should be ready to run the tests on the Docker image.
 
 .. _Contributing to xarray guide: https://xarray.pydata.org/en/latest/contributing.html
-.. _pages: https://gitlab.com/deltares/imod/imod-python/-/issues/
+.. _pages: https://github.com/Deltares/imod-python/issues
 .. _this stackoverflow article: https://stackoverflow.com/help/mcve
 .. _the extensive manual online: https://git-scm.com/doc
 .. _handbook: https://guides.github.com/introduction/git-handbook/
