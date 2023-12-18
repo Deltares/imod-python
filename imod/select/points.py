@@ -104,7 +104,7 @@ def points_in_bounds(da, **points):
     if isinstance(da, xu.UgridDataArray):
         index = get_unstructured_cell2d_from_xy(da, **points)
         # xu.Ugrid2d.locate_points makes cells outside grid -1
-        in_bounds = index > 0
+        in_bounds = index > -1
         points.pop("x")
         points.pop("y")
 
@@ -243,7 +243,7 @@ def points_indices(da, out_of_bounds="raise", **points):
     return indices
 
 
-def points_values(da, out_of_bounds="error", **points):
+def points_values(da, out_of_bounds="raise", **points):
     """
     Get values from specified points.
 

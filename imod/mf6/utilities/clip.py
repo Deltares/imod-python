@@ -55,9 +55,13 @@ def clip_by_grid(
     package: IPointDataPackage, active: xu.UgridDataArray
 ) -> IPointDataPackage:
     """Clip PointDataPackage outside unstructured grid."""
+
+    domain_slice = get_active_domain_slice(active)
+    active_clipped = active.isel(domain_slice, missing_dims="ignore")
+
     points = np.column_stack((package.x, package.y))
 
-    is_inside_exterior = active.grid.locate_points(points) != -1
+    is_inside_exterior = active_clipped.grid.locate_points(points) != -1
     selection = package.dataset.loc[{"index": is_inside_exterior}]
 
     cls = type(package)
