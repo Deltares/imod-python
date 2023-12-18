@@ -190,7 +190,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         x_max=None,
         y_min=None,
         y_max=None,
-    ) -> "Well":
+    ) -> Well:
         """
         Clip a package by a bounding box (time, layer, y, x).
 
@@ -486,7 +486,7 @@ class Well(BoundaryCondition, IPointDataPackage):
 
         return Mf6Wel(**ds)
 
-    def regrid_like(self, target_grid: GridDataArray, *_) -> "Well":
+    def regrid_like(self, target_grid: GridDataArray, *_) -> Well:
         """
         The regrid_like method is irrelevant for this package as it is
         grid-agnostic, instead this method clips the package based on the grid
@@ -495,7 +495,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         target_grid_2d = target_grid.isel(layer=0, drop=True, missing_dims="ignore")
         return clip_by_grid(self, target_grid_2d)
 
-    def mask(self, domain: GridDataArray) -> "Well":
+    def mask(self, domain: GridDataArray) -> Well:
         """
         Mask wells based on two-dimensional domain. For three-dimensional
         masking: Wells falling in inactive cells are automatically removed in
