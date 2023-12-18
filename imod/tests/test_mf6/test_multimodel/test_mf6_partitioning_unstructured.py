@@ -58,7 +58,7 @@ class WellCases:
 
 class HorizontalFlowBarrierCases:
     def case_hfb_vertical(self):
-        # vertical line at -100
+        # vertical line at x = -100
         barrier_y = [-990.0, 990.0]
         barrier_x = [-100.0, -100.0]
 
@@ -72,8 +72,22 @@ class HorizontalFlowBarrierCases:
         )
 
     def case_hfb_horizontal(self):
-        # horizontal line through origin
+        # horizontal line at y = -100.0
         barrier_x = [-990.0, 990.0]
+        barrier_y = [-100.0, -100.0]
+
+        return gpd.GeoDataFrame(
+            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            data={
+                "resistance": [10.0],
+                "ztop": [10.0],
+                "zbottom": [0.0],
+            },
+        )
+
+    def case_hfb_horizontal_outside_domain(self):
+        # horizontal line at y = -100.0 running outside domain
+        barrier_x = [-990.0, 10_000.0]
         barrier_y = [-100.0, -100.0]
 
         return gpd.GeoDataFrame(
