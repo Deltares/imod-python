@@ -18,6 +18,8 @@ Fixed
   into multiple models.
 - Fixed erronous default value for the ``out_of_bounds`` in
   :function:`imod.select.points.point_values`
+- Fixed bug where :class:`imod.mf6.Well` could not be assigned to the first cell
+  of an unstructured grid.
 
 Added
 ~~~~~
