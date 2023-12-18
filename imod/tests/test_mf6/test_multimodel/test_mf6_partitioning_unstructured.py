@@ -57,6 +57,50 @@ class WellCases:
         )
 
 
+class HorizontalFlowBarrierCases:
+    def case_hfb_vertical(self):
+        # vertical line at -100
+        barrier_y = [-990.0, 990.0]
+        barrier_x = [-100.0, -100.0]
+
+        return gpd.GeoDataFrame(
+            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            data={
+                "resistance": [10.0],
+                "ztop": [10.0],
+                "zbottom": [0.0],
+            },
+        )
+
+    def case_hfb_horizontal(self):
+        # horizontal line through origin
+        barrier_x = [-990.0, 990.0]
+        barrier_y = [-100.0, -100.0]
+
+        return gpd.GeoDataFrame(
+            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            data={
+                "resistance": [10.0],
+                "ztop": [10.0],
+                "zbottom": [0.0],
+            },
+        )
+
+    def case_hfb_horizontal_origin(self):
+        # horizontal line through origin
+        barrier_x = [-990.0, 990.0]
+        barrier_y = [0.0, 0.0]
+
+        return gpd.GeoDataFrame(
+            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            data={
+                "resistance": [10.0],
+                "ztop": [10.0],
+                "zbottom": [0.0],
+            },
+        )
+
+
 @pytest.mark.usefixtures("circle_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partitioning_unstructured(
@@ -221,28 +265,18 @@ def test_partitioning_unstructured_with_vpt_cells(
 
 @pytest.mark.usefixtures("circle_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
+@parametrize_with_cases("hfb", cases=HorizontalFlowBarrierCases)
 def test_partitioning_unstructured_hfb(
-    tmp_path: Path, circle_model: Modflow6Simulation, partition_array: xu.UgridDataArray
+    tmp_path: Path,
+    circle_model: Modflow6Simulation,
+    partition_array: xu.UgridDataArray,
+    hfb: imod.mf6.HorizontalFlowBarrierBase,
 ):
     simulation = circle_model
     # increase the recharge to make the head gradient more pronounced
     simulation["GWF_1"]["rch"]["rate"] *= 100
 
-    # add horizontal flow barrier
-    barrier_y = [-990.0, 990.0]
-    barrier_x = [-100.0, -100.0]
-
-    geometry = gpd.GeoDataFrame(
-        geometry=[shapely.linestrings(barrier_x, barrier_y)],
-        data={
-            "resistance": [10.0],
-            "ztop": [10.0],
-            "zbottom": [0.0],
-        },
-    )
-    simulation["GWF_1"]["hfb"] = imod.mf6.HorizontalFlowBarrierResistance(
-        geometry=geometry
-    )
+    simulation["GWF_1"]["hfb"] = imod.mf6.HorizontalFlowBarrierResistance(geometry=hfb)
 
     # run the original example, so without partitioning, and save the simulation results
     orig_dir = tmp_path / "original"
@@ -269,13 +303,12 @@ def test_partitioning_unstructured_hfb(
 
     cbc = split_simulation.open_flow_budget()
 
-    # compare the head result of the original simulation with the result of the partitioned simulation
-    np.testing.assert_allclose(
-        head["head"].values, orig_head.values, rtol=1e-5, atol=1e-3
-    )
-    np.testing.assert_allclose(
-        cbc["chd"].values, orig_cbc["chd"].values, rtol=1e-5, atol=1e-3
-    )
+    # compare the head result of the original simulation with the result of the
+    # partitioned simulation Criteria are a bit looser than in other tests
+    # because we are dealing with a problem with heads ranging roughly from 2000
+    # m to 0 m, and the HFB adds extra complexity to this.
+    np.testing.assert_allclose(head["head"].values, orig_head.values, rtol=1e-4)
+    np.testing.assert_allclose(cbc["chd"].values, orig_cbc["chd"].values, rtol=1e-4)
 
 
 @pytest.mark.usefixtures("circle_model")
