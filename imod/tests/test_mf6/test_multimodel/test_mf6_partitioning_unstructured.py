@@ -4,6 +4,8 @@ from typing import Dict
 import numpy as np
 import pytest
 import xarray as xr
+import xugrid as xu
+from pytest_cases import case, parametrize_with_cases
 
 import imod
 from imod.mf6 import Modflow6Simulation
@@ -11,32 +13,53 @@ from imod.mf6.wel import Well
 from imod.typing.grid import zeros_like
 
 
-def setup_partitioning_arrays(idomain_top: xr.DataArray) -> Dict[str, xr.DataArray]:
-    result = {}
-    two_parts = zeros_like(idomain_top)
+@pytest.mark.usefixtures("circle_model")
+@pytest.fixture(scope="function")
+def idomain_top(circle_model):
+    idomain = circle_model["GWF_1"].domain
+    return idomain.isel(layer=0)
 
-    two_parts.values[:108] = 0
-    two_parts.values[108:] = 1
 
-    result["two_parts"] = two_parts
+class PartitionArrayCases:
+    def case_two_parts(self, idomain_top) -> xu.UgridDataArray:
+        two_parts = zeros_like(idomain_top)
+        two_parts.values[:108] = 0
+        two_parts.values[108:] = 1
+        return two_parts
 
-    three_parts = zeros_like(idomain_top)
+    def case_three_parts(self, idomain_top) -> xu.UgridDataArray:
+        three_parts = zeros_like(idomain_top)
+        three_parts.values[:72] = 0
+        three_parts.values[72:144] = 1
+        three_parts.values[144:] = 2
+        return three_parts
 
-    three_parts.values[:72] = 0
-    three_parts.values[72:144] = 1
-    three_parts.values[144:] = 2
-    result["three_parts"] = three_parts
 
-    return result
+class WellCases:
+    def case_one_well(self):
+        return imod.mf6.Well(
+            x=[500.0], y=[0.0], screen_top=[3.0], screen_bottom=[2.0], rate=[1.0]
+        )
+
+    def case_all_wells(self, idomain_top):
+        x = idomain_top.ugrid.grid.face_x
+        y = idomain_top.ugrid.grid.face_y
+        size = len(x)
+
+        return imod.mf6.Well(
+            x=x,
+            y=y,
+            screen_top=size * [3.0],
+            screen_bottom=size * [2.0],
+            rate=size * [1.0],
+            minimum_k=1e-19,
+        )
 
 
 @pytest.mark.usefixtures("circle_model")
-@pytest.mark.parametrize(
-    "partition_name",
-    ["two_parts", "three_parts"],
-)
+@parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partitioning_unstructured(
-    tmp_path: Path, circle_model: Modflow6Simulation, partition_name: str
+    tmp_path: Path, circle_model: Modflow6Simulation, partition_array: xu.UgridDataArray
 ):
     simulation = circle_model
     # increase the recharge to make the head gradient more pronounced
@@ -58,10 +81,7 @@ def test_partitioning_unstructured(
     )
 
     # partition the simulation, run it, and save the (merged) results
-    idomain = simulation["GWF_1"].domain
-    partitioning_arrays = setup_partitioning_arrays(idomain.isel(layer=0))
-
-    split_simulation = simulation.split(partitioning_arrays[partition_name])
+    split_simulation = simulation.split(partition_array)
 
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()
@@ -79,12 +99,9 @@ def test_partitioning_unstructured(
 
 
 @pytest.mark.usefixtures("circle_model")
-@pytest.mark.parametrize(
-    "partition_name",
-    ["two_parts", "three_parts"],
-)
+@parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partitioning_unstructured_with_inactive_cells(
-    tmp_path: Path, circle_model: Modflow6Simulation, partition_name: str
+    tmp_path: Path, circle_model: Modflow6Simulation, partition_array: xu.UgridDataArray
 ):
     simulation = circle_model
 
@@ -127,9 +144,7 @@ def test_partitioning_unstructured_with_inactive_cells(
     #    )
 
     # partition the simulation, run it, and save the (merged) results
-    partitioning_arrays = setup_partitioning_arrays(idomain.isel(layer=0))
-
-    split_simulation = simulation.split(partitioning_arrays[partition_name])
+    split_simulation = simulation.split(partition_array)
 
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()
@@ -144,12 +159,9 @@ def test_partitioning_unstructured_with_inactive_cells(
 
 
 @pytest.mark.usefixtures("circle_model")
-@pytest.mark.parametrize(
-    "partition_name",
-    ["two_parts", "three_parts"],
-)
+@parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partitioning_unstructured_with_vpt_cells(
-    tmp_path: Path, circle_model: Modflow6Simulation, partition_name: str
+    tmp_path: Path, circle_model: Modflow6Simulation, partition_array: xu.UgridDataArray
 ):
     simulation = circle_model
 
@@ -162,7 +174,7 @@ def test_partitioning_unstructured_with_vpt_cells(
     idomain.loc[{"mesh2d_nFaces": deactivated_cells}] = 0
 
     # The cells we just deactivated on idomain must be deactivated on package inputs too.
-    for name, package in simulation["GWF_1"].items():
+    for _, package in simulation["GWF_1"].items():
         if not isinstance(package, Well):
             for arrayname in package.dataset.keys():
                 if "mesh2d_nFaces" in package[arrayname].coords:
@@ -192,9 +204,7 @@ def test_partitioning_unstructured_with_vpt_cells(
     #    )
 
     # partition the simulation, run it, and save the (merged) results
-    partitioning_arrays = setup_partitioning_arrays(idomain.isel(layer=0))
-
-    split_simulation = simulation.split(partitioning_arrays[partition_name])
+    split_simulation = simulation.split(partition_array)
 
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()
@@ -209,21 +219,19 @@ def test_partitioning_unstructured_with_vpt_cells(
 
 
 @pytest.mark.usefixtures("circle_model")
-@pytest.mark.parametrize(
-    "partition_name",
-    ["two_parts", "three_parts"],
-)
+@parametrize_with_cases("partition_array", cases=PartitionArrayCases)
+@parametrize_with_cases("well", cases=WellCases)
 def test_partitioning_unstructured_with_well(
-    tmp_path: Path, circle_model: Modflow6Simulation, partition_name: str
+    tmp_path: Path,
+    circle_model: Modflow6Simulation,
+    partition_array: xu.UgridDataArray,
+    well: imod.mf6.Well,
 ):
     simulation = circle_model
     # increase the recharge to make the head gradient more pronounced
     simulation["GWF_1"]["rch"]["rate"] *= 100
 
     # Add well
-    well = imod.mf6.Well(
-        x=[500.0], y=[0.0], screen_top=[3.0], screen_bottom=[2.0], rate=[1.0]
-    )
     simulation["GWF_1"]["well"] = well
 
     # run the original example, so without partitioning, and save the simulation results
@@ -244,10 +252,7 @@ def test_partitioning_unstructured_with_well(
     # )
 
     # partition the simulation, run it, and save the (merged) results
-    idomain = simulation["GWF_1"].domain
-    partitioning_arrays = setup_partitioning_arrays(idomain.isel(layer=0))
-
-    split_simulation = simulation.split(partitioning_arrays[partition_name])
+    split_simulation = simulation.split(partition_array)
 
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()
