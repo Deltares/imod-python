@@ -194,7 +194,7 @@ To get the latest version, activate the environment, clone the reposistory to
 a repository of choice, and do a "development install"::
 
     activate imod
-    git clone https://gitlab.com/deltares/imod/imod-python.git
+    git clone https://github.com/Deltares/imod-python.git
     cd imod-python
     pip install -e .
 
@@ -220,4 +220,4 @@ Past versions can also be found on the iMOD Python `releases page`_.
 .. _conda-forge: https://conda-forge.org/
 .. _PATH variable: https://en.wikipedia.org/wiki/PATH_(variable)
 .. _conda docs: https://conda.io/projects/conda/en/latest
-.. _releases page: https://gitlab.com/deltares/imod/imod-python/-/releases
+.. _releases page: https://github.com/Deltares/imod-python/releases

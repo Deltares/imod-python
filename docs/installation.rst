@@ -150,13 +150,13 @@ information on ``mamba``, ``conda``, and ``pip``.
 Installing the latest development version
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-You can use ``pip`` to install the latest source from Gitlab::
+You can use ``pip`` to install the latest source from GitHub::
 
-  pip install git+https://gitlab.com/deltares/imod/imod-python.git
+  pip install git+https://github.com/Deltares/imod-python.git
 
 Alternatively, you can clone the git repository locally and install from there::
 
-  git clone https://gitlab.com/deltares/imod/imod-python.git
+  git clone https://github.com/Deltares/imod-python.git
   cd imod-python
   pip install -e .
 

@@ -133,9 +133,9 @@ html_theme_options = {
             "type": "local",
         },
         {
-            "name": "GitLab",
-            "url": "https://gitlab.com/deltares/imod/imod-python",
-            "icon": "fab fa-gitlab",
+            "name": "GitHub",
+            "url": "https://github.com/Deltares/imod-python",
+            "icon": "fab fa-github",
             "type": "fontawesome",
         },
     ],

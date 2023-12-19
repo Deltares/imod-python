@@ -28,6 +28,11 @@ Fixed
   :meth:`imod.mf6.Modflow6Simulation.split` methods.
 
 
+Changed
+~~~~~~~
+- All the references to GitLab have been replaced by GitHub references as
+  part of our migration to GitHub.
+
 Added
 ~~~~~
 - Added comment in Modflow6 exchanges file (GWFGWF) denoting column header.
