@@ -166,10 +166,11 @@ def test_clip_by_grid__structured_grid_full(
     """All wells are included within the structured grid bounds"""
     # Arrange
     idomain, _, _ = basic_dis
+    active = idomain.sel(layer=1, drop=True)
     wel = imod.mf6.Well(*well_high_lvl_test_data_stationary, print_flows=True)
 
     # Act
-    wel_clipped = clip_by_grid(wel, idomain)
+    wel_clipped = clip_by_grid(wel, active)
 
     # Assert
     assert isinstance(wel_clipped, imod.mf6.Well)
@@ -184,12 +185,13 @@ def test_clip_by_grid__structured_grid_clipped(
     """Half of the wells are included within the structured grid bounds"""
     # Arrange
     idomain, _, _ = basic_dis
+    active = idomain.sel(layer=1, drop=True)
     wel = imod.mf6.Well(*well_high_lvl_test_data_stationary, print_flows=True)
     # Clip grid so that xmax is set to 70.0 instead of 90.0
-    idomain_selected = idomain.where(idomain.x < 70.0, -1)
+    active_selected = active.where(idomain.x < 70.0, -1)
 
     # Act
-    wel_clipped = clip_by_grid(wel, idomain_selected)
+    wel_clipped = clip_by_grid(wel, active_selected)
 
     # Assert
     assert isinstance(wel_clipped, imod.mf6.Well)
@@ -204,11 +206,12 @@ def test_clip_by_grid__unstructured_grid_full(
     """All the wells are included within the unstructured grid bounds"""
     # Arrange
     idomain, _, _ = basic_dis
+    active = idomain.sel(layer=1, drop=True)
     wel = imod.mf6.Well(*well_high_lvl_test_data_stationary, print_flows=True)
-    idomain_ugrid = xu.UgridDataArray.from_structured(idomain)
+    active_ugrid = xu.UgridDataArray.from_structured(active)
 
     # Act
-    wel_clipped = clip_by_grid(wel, idomain_ugrid)
+    wel_clipped = clip_by_grid(wel, active_ugrid)
 
     # Assert
     assert isinstance(wel_clipped, imod.mf6.Well)
@@ -223,13 +226,14 @@ def test_clip_by_grid__unstructured_grid_clipped(
     """Half of the wells are included within the unstructured grid bounds"""
     # Arrange
     idomain, _, _ = basic_dis
+    active = idomain.sel(layer=1, drop=True)
     wel = imod.mf6.Well(*well_high_lvl_test_data_stationary, print_flows=True)
     # Clip grid so that xmax is set to 70.0 instead of 90.0
-    idomain_selected = idomain.sel(x=slice(None, 70.0))
-    idomain_ugrid = xu.UgridDataArray.from_structured(idomain_selected)
+    active_selected = active.sel(x=slice(None, 70.0))
+    active_ugrid = xu.UgridDataArray.from_structured(active_selected)
 
     # Act
-    wel_clipped = clip_by_grid(wel, idomain_ugrid)
+    wel_clipped = clip_by_grid(wel, active_ugrid)
 
     # Assert
     assert isinstance(wel_clipped, imod.mf6.Well)

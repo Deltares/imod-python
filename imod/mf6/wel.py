@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import warnings
-from copy import deepcopy
 from typing import Dict, List, Union
 
 import numpy as np
@@ -18,13 +17,12 @@ from imod.mf6.boundary_condition import (
 )
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.mf6_wel_adapter import Mf6Wel
-from imod.mf6.package import Package
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
 from imod.schemata import AllNoDataSchema, DTypeSchema
-from imod.select.points import points_indices
+from imod.select.points import points_indices, points_values
 from imod.typing import GridDataArray
 from imod.typing.grid import ones_like
 from imod.util import values_within_range
@@ -45,6 +43,18 @@ def _assign_dims(arg) -> Dict:
         return ("index", arg.values)
     else:
         return ("index", arg)
+
+
+def mask_2D(package: Well, domain_2d: GridDataArray) -> Well:
+    point_active = points_values(domain_2d, x=package.x, y=package.y)
+
+    is_inside_exterior = point_active == 1
+    selection = package.dataset.loc[{"index": is_inside_exterior}]
+
+    cls = type(package)
+    new = cls.__new__(cls)
+    new.dataset = selection
+    return new
 
 
 class Well(BoundaryCondition, IPointDataPackage):
@@ -192,7 +202,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         x_max=None,
         y_min=None,
         y_max=None,
-    ) -> "Well":
+    ) -> Well:
         """
         Clip a package by a bounding box (time, layer, y, x).
 
@@ -488,24 +498,30 @@ class Well(BoundaryCondition, IPointDataPackage):
 
         return Mf6Wel(**ds)
 
-    def regrid_like(self, target_grid: GridDataArray, *_) -> "Well":
+    def regrid_like(self, target_grid: GridDataArray, *_) -> Well:
         """
         The regrid_like method is irrelevant for this package as it is
         grid-agnostic, instead this method clips the package based on the grid
         exterior.
         """
-        return clip_by_grid(self, target_grid)
+        target_grid_2d = target_grid.isel(layer=0, drop=True, missing_dims="ignore")
+        return clip_by_grid(self, target_grid_2d)
 
-    def mask(self, _) -> Package:
+    def mask(self, domain: GridDataArray) -> Well:
         """
-        The Well package has no mask method implemented. Wells falling in
-        inactive cells are automatically removed in the call to write to
-        Modflow 6 package. You can verify this by calling the ``to_mf6_pkg``
-        method.
+        Mask wells based on two-dimensional domain. For three-dimensional
+        masking: Wells falling in inactive cells are automatically removed in
+        the call to write to Modflow 6 package. You can verify this by calling
+        the ``to_mf6_pkg`` method.
         """
-        # TODO: Add docsting message to logger
-        # message = textwrap.dedent(self.mask.__doc__)
-        return deepcopy(self)
+
+        # Drop layer coordinate if present, otherwise a layer coordinate is assigned
+        # which causes conflicts downstream when assigning wells and deriving
+        # cellids.
+        domain_2d = domain.isel(layer=0, drop=True, missing_dims="ignore").drop(
+            "layer", errors="ignore"
+        )
+        return mask_2D(self, domain_2d)
 
 
 class WellDisStructured(DisStructuredBoundaryCondition):
