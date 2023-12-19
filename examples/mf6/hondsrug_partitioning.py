@@ -22,7 +22,7 @@ from imod.mf6.multimodel.partition_generator import get_label_array
 # %%
 # Obtain the simulation, write it, run it, and plot some heads.
 # There is a separate example contained in
-# `hondsrug <https://deltares.gitlab.io/imod/imod-python/examples/mf6/hondsrug.html#sphx-glr-examples-mf6-hondsrug-py>`_
+# :doc:`hondsrug </examples/mf6/hondsrug>`
 # that you should look at if you are interested in the model building
 gwf_simulation = create_hondsrug_simulation()
 

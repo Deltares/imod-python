@@ -21,6 +21,11 @@ Fixed
 - Fixed bug where :class:`imod.mf6.Well` could not be assigned to the first cell
   of an unstructured grid.
 
+Changed
+~~~~~~~
+- All the references to GitLab have been replaced by GitHub references as
+  part of our migration to GitHub.
+
 Added
 ~~~~~
 - Added comment in Modflow6 exchanges file (GWFGWF) denoting column header.

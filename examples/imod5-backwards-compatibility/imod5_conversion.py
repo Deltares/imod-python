@@ -29,7 +29,7 @@ import imod
 #
 # For this example we'll get our data from the data shipped with iMOD Python.
 # To read your own iMOD5 model, you can call
-# `imod.formats.prj.open_projectfile_data <https://deltares.gitlab.io/imod/imod-python/api/generated/io/imod.formats.prj.open_projectfile_data.html>`_
+# :doc:`/api/generated/io/imod.formats.prj.open_projectfile_data`
 temp_dir = imod.util.temporary_directory()
 
 data_prj, repeat_stress = imod.data.imod5_projectfile_data(temp_dir)
