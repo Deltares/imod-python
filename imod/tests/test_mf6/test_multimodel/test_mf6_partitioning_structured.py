@@ -133,13 +133,13 @@ def test_partitioning_structured(
 
     # Run the original example, so without partitioning, and save the simulation
     # results.
-    orig_dir = tmp_path / "original"
-    simulation.write(orig_dir, binary=False)
+    original_dir = tmp_path / "original"
+    simulation.write(original_dir, binary=False)
     simulation.run()
 
-    orig_head = imod.mf6.open_hds(
-        orig_dir / "GWF_1/GWF_1.hds",
-        orig_dir / "GWF_1/dis.dis.grb",
+    original_head = imod.mf6.open_hds(
+        original_dir / "GWF_1/GWF_1.hds",
+        original_dir / "GWF_1/dis.dis.grb",
     )
 
     # Partition the simulation, run it, and save the (merged) results
@@ -154,7 +154,7 @@ def test_partitioning_structured(
     # Compare the head result of the original simulation with the result of the
     # partitioned simulation.
     np.testing.assert_allclose(
-        head["head"].values, orig_head.values, rtol=1e-4, atol=1e-4
+        head["head"].values, original_head.values, rtol=1e-4, atol=1e-4
     )
 
 
@@ -182,14 +182,14 @@ def test_partitioning_structured_with_inactive_cells(
                         ] = 0
     # Run the original example, so without partitioning, and save the simulation
     # results.
-    orig_dir = tmp_path / "original"
-    simulation.write(orig_dir, binary=False)
+    original_dir = tmp_path / "original"
+    simulation.write(original_dir, binary=False)
 
     simulation.run()
 
-    orig_head = imod.mf6.open_hds(
-        orig_dir / "GWF_1/GWF_1.hds",
-        orig_dir / "GWF_1/dis.dis.grb",
+    original_head = imod.mf6.open_hds(
+        original_dir / "GWF_1/GWF_1.hds",
+        original_dir / "GWF_1/dis.dis.grb",
     )
 
     # Partition the simulation, run it, and save the (merged) results.
@@ -204,7 +204,7 @@ def test_partitioning_structured_with_inactive_cells(
     # Compare the head result of the original simulation with the result of the
     # partitioned simulation.
     np.testing.assert_allclose(
-        head["head"].values, orig_head.values, rtol=1e-4, atol=1e-4
+        head["head"].values, original_head.values, rtol=1e-4, atol=1e-4
     )
 
 
@@ -234,14 +234,14 @@ def test_partitioning_structured_with_vpt_cells(
 
     # Run the original example, so without partitioning, and save the simulation
     # results.
-    orig_dir = tmp_path / "original"
-    simulation.write(orig_dir, binary=False)
+    original_dir = tmp_path / "original"
+    simulation.write(original_dir, binary=False)
 
     simulation.run()
 
-    orig_head = imod.mf6.open_hds(
-        orig_dir / "GWF_1/GWF_1.hds",
-        orig_dir / "GWF_1/dis.dis.grb",
+    original_head = imod.mf6.open_hds(
+        original_dir / "GWF_1/GWF_1.hds",
+        original_dir / "GWF_1/dis.dis.grb",
     )
 
     # Partition the simulation, run it, and save the (merged) results.
@@ -256,7 +256,7 @@ def test_partitioning_structured_with_vpt_cells(
     # Compare the head result of the original simulation with the result of the
     # partitioned simulation.
     np.testing.assert_allclose(
-        head["head"].values, orig_head.values, rtol=1e-4, atol=1e-4
+        head["head"].values, original_head.values, rtol=1e-4, atol=1e-4
     )
 
 
@@ -357,13 +357,13 @@ def test_partitioning_structured_one_high_level_well(
 
     # Run the original example, so without partitioning, and save the simulation
     # results.
-    orig_dir = tmp_path / "original"
-    simulation.write(orig_dir, binary=False)
+    original_dir = tmp_path / "original"
+    simulation.write(original_dir, binary=False)
     simulation.run()
 
-    orig_head = imod.mf6.open_hds(
-        orig_dir / "GWF_1/GWF_1.hds",
-        orig_dir / "GWF_1/dis.dis.grb",
+    original_head = imod.mf6.open_hds(
+        original_dir / "GWF_1/GWF_1.hds",
+        original_dir / "GWF_1/dis.dis.grb",
     )
 
     # Partition the simulation, run it, and save the (merged) results
@@ -378,5 +378,5 @@ def test_partitioning_structured_one_high_level_well(
     # Compare the head result of the original simulation with the result of the
     # partitioned simulation.
     np.testing.assert_allclose(
-        head["head"].values, orig_head.values, rtol=1e-4, atol=1e-4
+        head["head"].values, original_head.values, rtol=1e-4, atol=1e-4
     )
