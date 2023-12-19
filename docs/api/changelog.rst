@@ -15,6 +15,11 @@ Fixed
 - Made ``specific_yield`` optional argument in
   :class:`imod.mf6.SpecificStorage`, :class:`imod.mf6.StorageCoefficient`.
 
+Changed
+~~~~~~~
+- All the references to GitLab have been replaced by GitHub references as
+  part of our migration to GitHub.
+
 Added
 ~~~~~
 - Added comment in Modflow6 exchanges file (GWFGWF) denoting column header.
