@@ -58,7 +58,7 @@ class WellCases:
 
 class HorizontalFlowBarrierCases:
     def case_hfb_vertical(self):
-        # vertical line at x = -100
+        # Vertical line at x = -100
         barrier_y = [-990.0, 990.0]
         barrier_x = [-100.0, -100.0]
 
@@ -72,7 +72,7 @@ class HorizontalFlowBarrierCases:
         )
 
     def case_hfb_horizontal(self):
-        # horizontal line at y = -100.0
+        # Horizontal line at y = -100.0
         barrier_x = [-990.0, 990.0]
         barrier_y = [-100.0, -100.0]
 
@@ -86,7 +86,7 @@ class HorizontalFlowBarrierCases:
         )
 
     def case_hfb_horizontal_outside_domain(self):
-        # horizontal line at y = -100.0 running outside domain
+        # Horizontal line at y = -100.0 running outside domain
         barrier_x = [-990.0, 10_000.0]
         barrier_y = [-100.0, -100.0]
 
@@ -100,7 +100,7 @@ class HorizontalFlowBarrierCases:
         )
 
     def case_hfb_horizontal_origin(self):
-        # horizontal line through origin
+        # Horizontal line through origin
         barrier_x = [-990.0, 990.0]
         barrier_y = [0.0, 0.0]
 
@@ -114,7 +114,7 @@ class HorizontalFlowBarrierCases:
         )
 
     def case_hfb_diagonal(self):
-        # diagonal line
+        # Diagonal line
         barrier_y = [-480.0, 480.0]
         barrier_x = [-480.0, 480.0]
 
@@ -134,10 +134,11 @@ def test_partitioning_unstructured(
     tmp_path: Path, circle_model: Modflow6Simulation, partition_array: xu.UgridDataArray
 ):
     simulation = circle_model
-    # increase the recharge to make the head gradient more pronounced
+    # Increase the recharge to make the head gradient more pronounced.
     simulation["GWF_1"]["rch"]["rate"] *= 100
 
-    # run the original example, so without partitioning, and save the simulation results
+    # Run the original example, so without partitioning, and save the simulation
+    # results.
     orig_dir = tmp_path / "original"
     simulation.write(orig_dir, binary=False)
     simulation.run()
@@ -152,7 +153,7 @@ def test_partitioning_unstructured(
         orig_dir / "GWF_1/disv.disv.grb",
     )
 
-    # partition the simulation, run it, and save the (merged) results
+    # Partition the simulation, run it, and save the (merged) results.
     split_simulation = simulation.split(partition_array)
 
     split_simulation.write(tmp_path, binary=False)
@@ -161,7 +162,7 @@ def test_partitioning_unstructured(
     head = split_simulation.open_head()
     cbc = split_simulation.open_flow_budget()
 
-    # compare the head result of the original simulation with the result of the partitioned simulation
+    # Compare the head result of the original simulation with the result of the partitioned simulation.
     np.testing.assert_allclose(
         head["head"].values, orig_head.values, rtol=1e-5, atol=1e-3
     )
@@ -177,10 +178,10 @@ def test_partitioning_unstructured_with_inactive_cells(
 ):
     simulation = circle_model
 
-    # increase the recharge to make the head gradient more pronounced
+    # Increase the recharge to make the head gradient more pronounced
     simulation["GWF_1"]["rch"]["rate"] *= 100
 
-    # deactivate some cells on idomain
+    # Deactivate some cells on idomain
     idomain = simulation["GWF_1"].domain
     deactivated_cells = slice(93, 97)
     idomain.loc[{"mesh2d_nFaces": deactivated_cells}] = 0
@@ -198,7 +199,7 @@ def test_partitioning_unstructured_with_inactive_cells(
                         {"mesh2d_nFaces": deactivated_cells}
                     ] = mask_value
 
-    # run the original example, so without partitioning, and save the simulation results
+    # Run the original example, so without partitioning, and save the simulation results
     orig_dir = tmp_path / "original"
     simulation.write(orig_dir, binary=False)
 
@@ -215,7 +216,7 @@ def test_partitioning_unstructured_with_inactive_cells(
     #        orig_dir / "GWF_1/disv.disv.grb",
     #    )
 
-    # partition the simulation, run it, and save the (merged) results
+    # Partition the simulation, run it, and save the (merged) results
     split_simulation = simulation.split(partition_array)
 
     split_simulation.write(tmp_path, binary=False)
@@ -224,7 +225,7 @@ def test_partitioning_unstructured_with_inactive_cells(
     head = split_simulation.open_head()
     # _ = split_simulation.open_flow_budget()
 
-    # compare the head result of the original simulation with the result of the partitioned simulation
+    # Compare the head result of the original simulation with the result of the partitioned simulation
     np.testing.assert_allclose(
         head["head"].values, orig_head.values, rtol=1e-5, atol=1e-3
     )
@@ -237,10 +238,10 @@ def test_partitioning_unstructured_with_vpt_cells(
 ):
     simulation = circle_model
 
-    # increase the recharge to make the head gradient more pronounced
+    # Increase the recharge to make the head gradient more pronounced
     simulation["GWF_1"]["rch"]["rate"] *= 100
 
-    # deactivate some cells on idomain
+    # Deactivate some cells on idomain
     idomain = simulation["GWF_1"].domain
     deactivated_cells = slice(93, 101)
     idomain.loc[{"mesh2d_nFaces": deactivated_cells}] = 0
@@ -258,7 +259,8 @@ def test_partitioning_unstructured_with_vpt_cells(
                         {"mesh2d_nFaces": deactivated_cells}
                     ] = mask_value
 
-    # run the original example, so without partitioning, and save the simulation results
+    # Run the original example, so without partitioning, and save the simulation
+    # results
     orig_dir = tmp_path / "original"
     simulation.write(orig_dir, binary=False)
 
@@ -275,7 +277,7 @@ def test_partitioning_unstructured_with_vpt_cells(
     #        orig_dir / "GWF_1/disv.disv.grb",
     #    )
 
-    # partition the simulation, run it, and save the (merged) results
+    # Partition the simulation, run it, and save the (merged) results
     split_simulation = simulation.split(partition_array)
 
     split_simulation.write(tmp_path, binary=False)
@@ -284,7 +286,7 @@ def test_partitioning_unstructured_with_vpt_cells(
     head = split_simulation.open_head()
     # _ = split_simulation.open_flow_budget()
 
-    # compare the head result of the original simulation with the result of the partitioned simulation
+    # Compare the head result of the original simulation with the result of the partitioned simulation
     np.testing.assert_allclose(
         head["head"].values, orig_head.values, rtol=1e-5, atol=1e-3
     )
@@ -300,12 +302,13 @@ def test_partitioning_unstructured_hfb(
     hfb: imod.mf6.HorizontalFlowBarrierBase,
 ):
     simulation = circle_model
-    # increase the recharge to make the head gradient more pronounced
+    # Increase the recharge to make the head gradient more pronounced
     simulation["GWF_1"]["rch"]["rate"] *= 100
 
     simulation["GWF_1"]["hfb"] = imod.mf6.HorizontalFlowBarrierResistance(geometry=hfb)
 
-    # run the original example, so without partitioning, and save the simulation results
+    # Run the original example, so without partitioning, and save the simulation
+    # results
     orig_dir = tmp_path / "original"
     simulation.write(orig_dir, binary=False)
     simulation.run()
@@ -320,7 +323,7 @@ def test_partitioning_unstructured_hfb(
         orig_dir / "GWF_1/disv.disv.grb",
     )
 
-    # partition the simulation, run it, and save the (merged) results
+    # Partition the simulation, run it, and save the (merged) results
     split_simulation = simulation.split(partition_array)
 
     split_simulation.write(tmp_path, binary=False)
@@ -330,8 +333,8 @@ def test_partitioning_unstructured_hfb(
 
     cbc = split_simulation.open_flow_budget()
 
-    # compare the head result of the original simulation with the result of the
-    # partitioned simulation Criteria are a bit looser than in other tests
+    # Compare the head result of the original simulation with the result of the
+    # partitioned simulation. Criteria are a bit looser than in other tests
     # because we are dealing with a problem with heads ranging roughly from 2000
     # m to 0 m, and the HFB adds extra complexity to this.
     np.testing.assert_allclose(head["head"].values, orig_head.values, rtol=1e-4)
@@ -348,13 +351,14 @@ def test_partitioning_unstructured_with_well(
     well: imod.mf6.Well,
 ):
     simulation = circle_model
-    # increase the recharge to make the head gradient more pronounced
+    # Increase the recharge to make the head gradient more pronounced
     simulation["GWF_1"]["rch"]["rate"] *= 100
 
     # Add well
     simulation["GWF_1"]["well"] = well
 
-    # run the original example, so without partitioning, and save the simulation results
+    # Run the original example, so without partitioning, and save the simulation
+    # results.
     orig_dir = tmp_path / "original"
     simulation.write(orig_dir, binary=False)
     simulation.run()
@@ -371,7 +375,7 @@ def test_partitioning_unstructured_with_well(
     #     orig_dir / "GWF_1/disv.disv.grb",
     # )
 
-    # partition the simulation, run it, and save the (merged) results
+    # Partition the simulation, run it, and save the (merged) results
     split_simulation = simulation.split(partition_array)
 
     split_simulation.write(tmp_path, binary=False)
@@ -382,7 +386,8 @@ def test_partitioning_unstructured_with_well(
     # Uncomment when fixed: https://gitlab.com/deltares/imod/imod-python/-/issues/683
     # cbc = split_simulation.open_flow_budget()
 
-    # compare the head result of the original simulation with the result of the partitioned simulation
+    # Compare the head result of the original simulation with the result of the
+    # partitioned simulation.
     np.testing.assert_allclose(
         head["head"].values, orig_head.values, rtol=1e-5, atol=1e-3
     )
