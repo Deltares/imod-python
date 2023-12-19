@@ -140,7 +140,7 @@ def test_regrid_unstructured():
 
     new_idomain = new_packages[0].dataset["icelltype"]
     for new_package in new_packages:
-        # TODO gitlab-398: package write validation crashes for VerticesDiscretization so we skip that one
+        # TODO github-398: package write validation crashes for VerticesDiscretization so we skip that one
         if not isinstance(new_package, imod.mf6.VerticesDiscretization):
             errors = new_package._validate(
                 new_package._write_schemata,

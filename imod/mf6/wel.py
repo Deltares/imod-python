@@ -255,7 +255,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         mf6_package = self.to_mf6_pkg(
             idomain, top, bottom, k, write_context.is_partitioned
         )
-        # TODO: make options like "save_flows" configurable. Issue gitlab #623
+        # TODO: make options like "save_flows" configurable. Issue github #623
         mf6_package.dataset["save_flows"] = True
         mf6_package.write(pkgname, globaltimes, write_context)
 
@@ -472,7 +472,7 @@ class Well(BoundaryCondition, IPointDataPackage):
 
         if nwells_df == 0:
             raise ValueError("No wells were assigned in package. None were present.")
-        # @TODO: reinstate this check. issue gitlab #621.
+        # @TODO: reinstate this check. issue github #621.
         if not is_partitioned and nwells_df != nwells_assigned:
             raise ValueError(
                 "One or more well(s) are completely invalid due to minimum conductivity and thickness constraints."
