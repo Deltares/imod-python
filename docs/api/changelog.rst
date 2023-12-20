@@ -37,7 +37,7 @@ Added
 ~~~~~
 - Added comment in Modflow6 exchanges file (GWFGWF) denoting column header.
 - Added Python 3.11 support.
-- The GWF-GWF exchange options are derived the user created packages and
+- The GWF-GWF exchange options are derived from user created packages (NPF, OC) and
   set automatically.
 
 Changed
