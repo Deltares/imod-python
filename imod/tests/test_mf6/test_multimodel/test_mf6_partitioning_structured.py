@@ -67,7 +67,7 @@ class PartitionArrayCases:
     @case(tags="intrusion")
     def case_intrusion(self, idomain_top):
         """
-        contains a single cell with 3 neighbors in another partitions
+        Contains a single cell with 3 neighbors in another partitions.
         [0, 0, 1, 1],
         [0, 0, 1, 1],
         [0, 0, 0, 1],
@@ -82,7 +82,7 @@ class PartitionArrayCases:
 
     def case_island(self, idomain_top):
         """
-        partition forms an island in another partition
+        Partition forms an island in another partition
         [0, 0, 0, 0],
         [0, 1, 1, 0],
         [0, 1, 1, 0],
@@ -131,17 +131,18 @@ def test_partitioning_structured(
 ):
     simulation = transient_twri_model
 
-    # run the original example, so without partitioning, and save the simulation results
-    orig_dir = tmp_path / "original"
-    simulation.write(orig_dir, binary=False)
+    # Run the original example, so without partitioning, and save the simulation
+    # results.
+    original_dir = tmp_path / "original"
+    simulation.write(original_dir, binary=False)
     simulation.run()
 
-    orig_head = imod.mf6.open_hds(
-        orig_dir / "GWF_1/GWF_1.hds",
-        orig_dir / "GWF_1/dis.dis.grb",
+    original_head = imod.mf6.open_hds(
+        original_dir / "GWF_1/GWF_1.hds",
+        original_dir / "GWF_1/dis.dis.grb",
     )
 
-    # partition the simulation, run it, and save the (merged) results
+    # Partition the simulation, run it, and save the (merged) results
     split_simulation = simulation.split(partition_array)
 
     split_simulation.write(tmp_path, binary=False)
@@ -150,9 +151,10 @@ def test_partitioning_structured(
     head = split_simulation.open_head()
     _ = split_simulation.open_flow_budget()
 
-    # compare the head result of the original simulation with the result of the partitioned simulation
+    # Compare the head result of the original simulation with the result of the
+    # partitioned simulation.
     np.testing.assert_allclose(
-        head["head"].values, orig_head.values, rtol=1e-4, atol=1e-4
+        head["head"].values, original_head.values, rtol=1e-4, atol=1e-4
     )
 
 
@@ -178,18 +180,19 @@ def test_partitioning_structured_with_inactive_cells(
                         package[arrayname].loc[
                             {"x": 32500, "y": slice(67500, 7500)}
                         ] = 0
-    # run the original example, so without partitioning, and save the simulation results
-    orig_dir = tmp_path / "original"
-    simulation.write(orig_dir, binary=False)
+    # Run the original example, so without partitioning, and save the simulation
+    # results.
+    original_dir = tmp_path / "original"
+    simulation.write(original_dir, binary=False)
 
     simulation.run()
 
-    orig_head = imod.mf6.open_hds(
-        orig_dir / "GWF_1/GWF_1.hds",
-        orig_dir / "GWF_1/dis.dis.grb",
+    original_head = imod.mf6.open_hds(
+        original_dir / "GWF_1/GWF_1.hds",
+        original_dir / "GWF_1/dis.dis.grb",
     )
 
-    # partition the simulation, run it, and save the (merged) results
+    # Partition the simulation, run it, and save the (merged) results.
     split_simulation = simulation.split(partition_array)
 
     split_simulation.write(tmp_path, binary=False)
@@ -198,9 +201,10 @@ def test_partitioning_structured_with_inactive_cells(
     head = split_simulation.open_head()
     _ = split_simulation.open_flow_budget()
 
-    # compare the head result of the original simulation with the result of the partitioned simulation
+    # Compare the head result of the original simulation with the result of the
+    # partitioned simulation.
     np.testing.assert_allclose(
-        head["head"].values, orig_head.values, rtol=1e-4, atol=1e-4
+        head["head"].values, original_head.values, rtol=1e-4, atol=1e-4
     )
 
 
@@ -228,18 +232,19 @@ def test_partitioning_structured_with_vpt_cells(
                             {"x": 32500, "y": slice(67500, 7500)}
                         ] = -1
 
-    # run the original example, so without partitioning, and save the simulation results
-    orig_dir = tmp_path / "original"
-    simulation.write(orig_dir, binary=False)
+    # Run the original example, so without partitioning, and save the simulation
+    # results.
+    original_dir = tmp_path / "original"
+    simulation.write(original_dir, binary=False)
 
     simulation.run()
 
-    orig_head = imod.mf6.open_hds(
-        orig_dir / "GWF_1/GWF_1.hds",
-        orig_dir / "GWF_1/dis.dis.grb",
+    original_head = imod.mf6.open_hds(
+        original_dir / "GWF_1/GWF_1.hds",
+        original_dir / "GWF_1/dis.dis.grb",
     )
 
-    # partition the simulation, run it, and save the (merged) results
+    # Partition the simulation, run it, and save the (merged) results.
     split_simulation = simulation.split(partition_array)
 
     split_simulation.write(tmp_path, binary=False)
@@ -248,9 +253,10 @@ def test_partitioning_structured_with_vpt_cells(
     head = split_simulation.open_head()
     _ = split_simulation.open_flow_budget()
 
-    # compare the head result of the original simulation with the result of the partitioned simulation
+    # Compare the head result of the original simulation with the result of the
+    # partitioned simulation.
     np.testing.assert_allclose(
-        head["head"].values, orig_head.values, rtol=1e-4, atol=1e-4
+        head["head"].values, original_head.values, rtol=1e-4, atol=1e-4
     )
 
 
@@ -263,7 +269,7 @@ def test_partitioning_structured_geometry_auxiliary_variables(
 ):
     simulation = transient_twri_model
 
-    # partition the simulation, run it, and save the (merged) results
+    # Partition the simulation, run it, and save the (merged) results
     split_simulation = simulation.split(partition_array)
 
     np.testing.assert_almost_equal(
@@ -349,17 +355,18 @@ def test_partitioning_structured_one_high_level_well(
     # Create and fill the groundwater model.
     simulation["GWF_1"]["wel"] = well
 
-    # run the original example, so without partitioning, and save the simulation results
-    orig_dir = tmp_path / "original"
-    simulation.write(orig_dir, binary=False)
+    # Run the original example, so without partitioning, and save the simulation
+    # results.
+    original_dir = tmp_path / "original"
+    simulation.write(original_dir, binary=False)
     simulation.run()
 
-    orig_head = imod.mf6.open_hds(
-        orig_dir / "GWF_1/GWF_1.hds",
-        orig_dir / "GWF_1/dis.dis.grb",
+    original_head = imod.mf6.open_hds(
+        original_dir / "GWF_1/GWF_1.hds",
+        original_dir / "GWF_1/dis.dis.grb",
     )
 
-    # partition the simulation, run it, and save the (merged) results
+    # Partition the simulation, run it, and save the (merged) results
     split_simulation = simulation.split(partition_array)
 
     split_simulation.write(tmp_path, binary=False)
@@ -368,7 +375,8 @@ def test_partitioning_structured_one_high_level_well(
     head = split_simulation.open_head()
     _ = split_simulation.open_flow_budget()
 
-    # compare the head result of the original simulation with the result of the partitioned simulation
+    # Compare the head result of the original simulation with the result of the
+    # partitioned simulation.
     np.testing.assert_allclose(
-        head["head"].values, orig_head.values, rtol=1e-4, atol=1e-4
+        head["head"].values, original_head.values, rtol=1e-4, atol=1e-4
     )

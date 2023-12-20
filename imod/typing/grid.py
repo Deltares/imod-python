@@ -128,7 +128,11 @@ def bounding_polygon(active: xr.DataArray):
 @typedispatch
 def bounding_polygon(active: xu.UgridDataArray):
     """Return bounding polygon of active cells"""
-    return active.ugrid.grid.bounding_polygon()
+    active_indices = np.where(active > 0)[0]
+    domain_slice = {f"{active.ugrid.grid.face_dimension}": active_indices}
+    active_clipped = active.isel(domain_slice, missing_dims="ignore")
+
+    return active_clipped.ugrid.grid.bounding_polygon()
 
 
 @typedispatch

@@ -18,6 +18,7 @@ from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.grid import broadcast_to_full_domain
+from imod.schemata import EmptyIndexesSchema
 from imod.typing import GridDataArray
 
 
@@ -268,7 +269,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
     _period_data = ()
     _init_schemata = {}
-    _write_schemata = {}
+    _write_schemata = {"geometry": [EmptyIndexesSchema()]}
 
     _regrid_method = {}
 
