@@ -16,7 +16,7 @@ Fixed
   :class:`imod.mf6.SpecificStorage`, :class:`imod.mf6.StorageCoefficient`.
 - Fixed bug where simulations with :class:`imod.mf6.Well` were not partitioned
   into multiple models.
-- Fixed erronous default value for the ``out_of_bounds`` in
+- Fixed erroneous default value for the ``out_of_bounds`` in
   :function:`imod.select.points.point_values`
 - Fixed bug where :class:`imod.mf6.Well` could not be assigned to the first cell
   of an unstructured grid.
@@ -31,11 +31,14 @@ Fixed
 Changed
 ~~~~~~~
 - All the references to GitLab have been replaced by GitHub references as
-  part of our migration to GitHub.
+  part of the GitHub migration.
 
 Added
 ~~~~~
 - Added comment in Modflow6 exchanges file (GWFGWF) denoting column header.
+- Added Python 3.11 support.
+- The GWF-GWF exchange options are derived the user created packages and
+  set automatically.
 
 Changed
 ~~~~~~~
