@@ -22,7 +22,7 @@ except ImportError:
 
 REGISTRY = pooch.create(
     path=pooch.os_cache("imod"),
-    base_url="https://gitlab.com/deltares/imod/imod-artifacts/-/raw/main/",
+    base_url="https://github.com/Deltares/imod-artifacts/raw/main/",
     version=None,
     version_dev="main",
     env="IMOD_DATA_DIR",
