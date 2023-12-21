@@ -72,8 +72,7 @@ all = [
 dev = [
     "imod[all]",
     "black",
-    "flake8",
-    "Flake8-pyproject",
+    "ruff",
     "flopy",
     "hypothesis",
     "mypy",
@@ -93,25 +92,47 @@ exclude_lines = [
     "pragma: no cover",
 ]
 
-[tool.flake8]
+[tool.ruff.lint]
+select = ["C4", "E", "F", "I"]
 ignore = [
-    # whitespace before ':' - doesn't work well with black
-    "E203",
-    # module level import not at top of file
+    "C401",
+    "C402",
+    "C403",
+    "C404",
+    "C408",
+    "C416",
+    "C417",
+    "C419",
+    "D202",
+    "D205",
+    "D206",
+    "D400",
+    "D404",
+    "C405",
     "E402",
-    # line too long - let black worry about that
     "E501",
-    # line break before binary operator
-    "W503",
-    # duplicate function definitions, doesn't work with type dispatching.
+    "E703",
+    "E713",
+    "E721",
+    "E731",
+    "E741",
     "F811",
+    "PD002",
+    "PD901",
+    "PD003",
+    "PD004",
 ]
-per-file-ignores = [
-    "./docs/conf.py:F401",
-    "__init__.py:F401",
-    "conftest.py:F401",
-    "test_examples.py:F401",
-]
+fixable = ["I"]
+ignore-init-module-imports = true
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.per-file-ignores]
+"./docs/conf.py" = ["F401"]
+"__init__.py" = ["F401"]
+"conftest.py" = ["F401"]
+"test_examples.py" = ["F401"]
 
 [tool.mypy]
 files = "imod/mf6/**.py"
