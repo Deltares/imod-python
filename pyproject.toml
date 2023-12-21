@@ -2,12 +2,115 @@
 requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "imod"
+version = "0.15.0"
+requires-python = ">=3.10"
+authors = [
+    { name = "Deltares", email = "huite.bootsma@deltares.nl" },
+]
+maintainers = [
+    { name = "Deltares", email = "huite.bootsma@deltares.nl" }
+]
+description = "Make massive MODFLOW models!"
+readme = "README.rst"
+license = { file = "LICENSE" }
+keywords = ["imod", "modflow", "groundwater modeling"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Hydrology",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "opic :: Scientific/Engineering"
+]
+dependencies = [
+    "affine",
+    "cftime >=1",
+    "dask",
+    "fastcore",
+    "Jinja2",
+    "matplotlib",
+    "numba",
+    "numpy",
+    "pandas",
+    "pooch",
+    "scipy",
+    "tomli_w",
+    "toolz",
+    "tqdm",
+    "xarray >=0.15",
+    "xugrid >=0.3.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/Deltares/imod-python"
+Documentation = "https://deltares.github.io/imod-python/"
+Repository = "https://github.com/Deltares/imod-python.git"
+"Bug Tracker" = "https://github.com/Deltares/imod-python/issues"
+Changelog = "https://github.com/Deltares/imod-python/blob/master/docs/api/changelog.rst"
+
+[project.optional-dependencies]
+all = [
+    "bottleneck",
+    "contextily >=1",
+    "cytoolz",
+    "geopandas",
+    "pyvista",
+    "rasterio >=1",
+    "rioxarray",
+    "shapely >=1.8",
+    "tomli >= 1.1.0 ; python_version < '3.11'",
+    "zarr",
+]
+dev = [
+    "imod[all]",
+    "black",
+    "flake8",
+    "Flake8-pyproject",
+    "flopy",
+    "hypothesis",
+    "mypy",
+    "pydata-sphinx-theme",
+    "pytest",
+    "pytest-cov",
+    "pytest-benchmark",
+    "sphinx",
+    "sphinx-gallery",
+]
+
 [tool.isort]
 profile = "black"
 
 [tool.coverage.report]
 exclude_lines = [
-  "pragma: no cover",
+    "pragma: no cover",
+]
+
+[tool.flake8]
+ignore = [
+    # whitespace before ':' - doesn't work well with black
+    "E203",
+    # module level import not at top of file
+    "E402",
+    # line too long - let black worry about that
+    "E501",
+    # line break before binary operator
+    "W503",
+    # duplicate function definitions, doesn't work with type dispatching.
+    "F811",
+]
+per-file-ignores = [
+    "./docs/conf.py:F401",
+    "__init__.py:F401",
+    "conftest.py:F401",
+    "test_examples.py:F401",
 ]
 
 [tool.mypy]
