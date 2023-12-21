@@ -12,7 +12,7 @@ from imod.mf6 import Modflow6Simulation
 from imod.mf6.wel import Well
 from imod.typing.grid import zeros_like
 from pytest_cases import parametrize_with_cases
-
+import xarray as xr
 
 @pytest.mark.usefixtures("circle_model")
 @pytest.fixture(scope="function")
@@ -512,33 +512,44 @@ def test_specific_discharge_results(
     split_balances["npf-qx"] .ugrid.grid.node_y = split_balances["npf-qx"] .ugrid.grid.node_y.round(5)
     original_balances["npf-qx"].ugrid.grid.node_x = original_balances["npf-qx"].ugrid.grid.node_x.round(5)        
     original_balances["npf-qx"].ugrid.grid.node_y = original_balances["npf-qx"].ugrid.grid.node_y.round(5)
-    split_balances["npf-qx"] = split_balances["npf-qx"].ugrid.reindex_like( original_balances["npf-qx"] , tolerance=1e-4)
 
+    split_balances["npf-qy"] .ugrid.grid.node_x = split_balances["npf-qy"] .ugrid.grid.node_x.round(5)
+    split_balances["npf-qy"] .ugrid.grid.node_y = split_balances["npf-qy"] .ugrid.grid.node_y.round(5)
+    original_balances["npf-qy"].ugrid.grid.node_x = original_balances["npf-qy"].ugrid.grid.node_x.round(5)        
+    original_balances["npf-qy"].ugrid.grid.node_y = original_balances["npf-qy"].ugrid.grid.node_y.round(5)
+
+    split_balances["npf-qx"].ugrid.to_netcdf(tmp_path / "split_balances_x.nc")
+    split_balances["npf-qy"].ugrid.to_netcdf(tmp_path / "split_balances_y.nc")    
+    original_balances["npf-qx"].ugrid.to_netcdf(tmp_path / "original_balances_x.nc")
+    original_balances["npf-qy"].ugrid.to_netcdf(tmp_path / "original_balances_y.nc")
+ 
+    split_balances_x_v2 = xu.open_dataset(tmp_path /  "split_balances_x.nc")
+    split_balances_y_v2 = xu.open_dataset(tmp_path /  "split_balances_y.nc")    
+    original_balances_x_v2 =  xu.open_dataset(tmp_path /  "original_balances_x.nc")
+    original_balances_y_v2 =  xu.open_dataset(tmp_path /  "original_balances_y.nc")
+
+
+    split_balances_x_v2["npf-qx"] = split_balances_x_v2["npf-qx"].ugrid.reindex_like( original_balances_x_v2)
+    split_balances_y_v2["npf-qy"] = split_balances_y_v2["npf-qy"].ugrid.reindex_like( original_balances_y_v2 )
     head_diff = original_heads.isel(layer=0, time=-1) - split_head.isel(layer = 0, time =-1)
 
-    veldif_x = original_balances["npf-qx"] - split_balances["npf-qx"]
-    veldif_y = original_balances["npf-qy"] - split_balances["npf-qy"]
-
-    print(f"orig balance x:")
-    print( original_balances["npf-qx"].isel(layer=0).values)    
-    print(f"split_balances x: ")
-    print(split_balances["npf-qx"].isel(layer=0).values)
-
-    print(f"veldif x:")
-    print("----------")
-    print(veldif_x.isel(layer=0).values)
-    print(f"veldif y: {veldif_y.values.max() }")    
+    veldif_x = original_balances_x_v2["data-spdis"] - split_balances_x_v2["npf-qx"]
+    veldif_y = original_balances_y_v2 ["data-spdis"]- split_balances_y_v2["npf-qy"]
 
     assert veldif_x.values.max() < 1e-6
     assert veldif_y.values.max() < 1e-6
 
-    reldif_x = abs(veldif_x / original_balances["npf-qx"])
-    reldif_y = abs(veldif_y / original_balances["npf-qy"])
+    reldif_x = abs(veldif_x / original_balances_x_v2)
+    reldif_y = abs(veldif_y / original_balances_y_v2)
 
-    print(f"reldif x: {reldif_x.values.max() }")
-    print(f"reldif y: {reldif_y.values.max() }")
-    assert reldif_x.values.max() < 1e-5
-    assert reldif_y.values.max() < 0.12
+    mask_x = abs(original_balances_x_v2["data-spdis"])  < 1e-15
+    mask_y = abs(original_balances_y_v2["data-spdis"])  < 1e-15    
+    reldif_x = xr.where(mask_x, 0, reldif_x["data-spdis"])
+    reldif_y =  xr.where(mask_y, 0, reldif_y["data-spdis"])
+    print(f"reldif x: {reldif_x.max() }")
+    print(f"reldif y: {reldif_y.max() }")
+    assert reldif_x.max() < 1e-5
+    assert reldif_y.max() < 0.12
 
 
     pass
