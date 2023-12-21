@@ -1,9 +1,11 @@
 from pathlib import Path
-from typing import Dict
 
+import geopandas as gpd
 import numpy as np
 import pytest
-import xarray as xr
+import shapely
+import xugrid as xu
+from pytest_cases import parametrize_with_cases
 
 import imod
 from imod.mf6 import Modflow6Simulation
@@ -12,30 +14,68 @@ from imod.typing.grid import zeros_like
 from copy import deepcopy
 
 
-def setup_partitioning_arrays(idomain_top: xr.DataArray) -> Dict[str, xr.DataArray]:
-    result = {}
+@pytest.mark.usefixtures("circle_model")
+@pytest.fixture(scope="function")
+def idomain_top(circle_model):
+    idomain = circle_model["GWF_1"].domain
+    return idomain.isel(layer=0)
 
-    end_range = 75
-    two_parts = zeros_like(idomain_top)
-    two_parts.values[end_range:] = 1
 
-    result["two_parts"] = two_parts
+class PartitionArrayCases:
+    def case_two_parts(self, idomain_top) -> xu.UgridDataArray:
+        two_parts = zeros_like(idomain_top)
+        two_parts.values[:108] = 0
+        two_parts.values[108:] = 1
+        return two_parts
 
+    def case_three_parts(self, idomain_top) -> xu.UgridDataArray:
     two_parts_inverse = zeros_like(idomain_top)
     two_parts_inverse.values[:end_range] = 1
 
     result["two_parts_inverse"] = two_parts_inverse
 
-    three_parts = zeros_like(idomain_top)
-
-    three_parts.values[:72] = 0
-    three_parts.values[72:144] = 1
-    three_parts.values[144:] = 2
-    result["three_parts"] = three_parts
-
-    return result
+        three_parts = zeros_like(idomain_top)
+        three_parts.values[:72] = 0
+        three_parts.values[72:144] = 1
+        three_parts.values[144:] = 2
+        return three_parts
 
 
+class WellCases:
+    def case_one_well(self):
+        return imod.mf6.Well(
+            x=[500.0], y=[0.0], screen_top=[3.0], screen_bottom=[2.0], rate=[1.0]
+        )
+
+    def case_all_wells(self, idomain_top):
+        x = idomain_top.ugrid.grid.face_x
+        y = idomain_top.ugrid.grid.face_y
+        size = len(x)
+
+        return imod.mf6.Well(
+            x=x,
+            y=y,
+            screen_top=size * [3.0],
+            screen_bottom=size * [2.0],
+            rate=size * [1.0],
+            minimum_k=1e-19,
+        )
+
+
+class HorizontalFlowBarrierCases:
+    def case_hfb_vertical(self):
+        # Vertical line at x = -100
+        barrier_y = [-990.0, 990.0]
+        barrier_x = [-100.0, -100.0]
+
+        return gpd.GeoDataFrame(
+            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            data={
+                "resistance": [10.0],
+                "ztop": [10.0],
+                "zbottom": [0.0],
+            },
+            
 def setup_reference_results() -> Dict[str, np.ndarray]:
     result = {}
     result["two_parts"] = np.array(
@@ -63,7 +103,7 @@ def setup_reference_results() -> Dict[str, np.ndarray]:
             300.0,
             360.0,
             360.0,
-            360.0,
+            360.0,            
             360.0,
             225.0,
             349.63376582,
@@ -110,38 +150,92 @@ def setup_reference_results() -> Dict[str, np.ndarray]:
     return result
 
 
+        )
+
+    def case_hfb_horizontal(self):
+        # Horizontal line at y = -100.0
+        barrier_x = [-990.0, 990.0]
+        barrier_y = [-100.0, -100.0]
+
+        return gpd.GeoDataFrame(
+            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            data={
+                "resistance": [10.0],
+                "ztop": [10.0],
+                "zbottom": [0.0],
+            },
+        )
+
+    def case_hfb_horizontal_outside_domain(self):
+        # Horizontal line at y = -100.0 running outside domain
+        barrier_x = [-990.0, 10_000.0]
+        barrier_y = [-100.0, -100.0]
+
+        return gpd.GeoDataFrame(
+            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            data={
+                "resistance": [10.0],
+                "ztop": [10.0],
+                "zbottom": [0.0],
+            },
+        )
+
+    def case_hfb_horizontal_origin(self):
+        # Horizontal line through origin
+        barrier_x = [-990.0, 990.0]
+        barrier_y = [0.0, 0.0]
+
+        return gpd.GeoDataFrame(
+            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            data={
+                "resistance": [10.0],
+                "ztop": [10.0],
+                "zbottom": [0.0],
+            },
+        )
+
+    def case_hfb_diagonal(self):
+        # Diagonal line
+        barrier_y = [-480.0, 480.0]
+        barrier_x = [-480.0, 480.0]
+
+        return gpd.GeoDataFrame(
+            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            data={
+                "resistance": [10.0],
+                "ztop": [10.0],
+                "zbottom": [0.0],
+            },
+        )
+
+
 @pytest.mark.usefixtures("circle_model")
-@pytest.mark.parametrize(
-    "partition_name",
-    ["two_parts", "three_parts"],
-)
+@parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partitioning_unstructured(
-    tmp_path: Path, circle_model: Modflow6Simulation, partition_name: str
+    tmp_path: Path, circle_model: Modflow6Simulation, partition_array: xu.UgridDataArray
 ):
     simulation = circle_model
-    # increase the recharge to make the head gradient more pronounced
+    # Increase the recharge to make the head gradient more pronounced.
     simulation["GWF_1"]["rch"]["rate"] *= 100
 
-    # run the original example, so without partitioning, and save the simulation results
-    orig_dir = tmp_path / "original"
-    simulation.write(orig_dir, binary=False)
+    # Run the original example, so without partitioning, and save the simulation
+    # results.
+    original_dir = tmp_path / "original"
+    simulation.write(original_dir, binary=False)
     simulation.run()
 
-    orig_head = imod.mf6.open_hds(
-        orig_dir / "GWF_1/GWF_1.hds",
-        orig_dir / "GWF_1/disv.disv.grb",
+    original_head = imod.mf6.open_hds(
+        original_dir / "GWF_1/GWF_1.hds",
+        original_dir / "GWF_1/disv.disv.grb",
     )
 
-    orig_cbc = imod.mf6.open_cbc(
-        orig_dir / "GWF_1/GWF_1.cbc",
-        orig_dir / "GWF_1/disv.disv.grb",
+    original_cbc = imod.mf6.open_cbc(
+        original_dir / "GWF_1/GWF_1.cbc",
+        original_dir / "GWF_1/disv.disv.grb",
     )
 
-    # partition the simulation, run it, and save the (merged) results
-    idomain = simulation["GWF_1"].domain
-    partitioning_arrays = setup_partitioning_arrays(idomain.isel(layer=0))
-
-    split_simulation = simulation.split(partitioning_arrays[partition_name])
+    # Partition the simulation, run it, and save the (merged) results.
+    split_simulation = simulation.split(partition_array)
 
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()
@@ -149,29 +243,26 @@ def test_partitioning_unstructured(
     head = split_simulation.open_head()
     cbc = split_simulation.open_flow_budget()
 
-    # compare the head result of the original simulation with the result of the partitioned simulation
+    # Compare the head result of the original simulation with the result of the partitioned simulation.
     np.testing.assert_allclose(
-        head["head"].values, orig_head.values, rtol=1e-5, atol=1e-3
+        head["head"].values, original_head.values, rtol=1e-5, atol=1e-3
     )
     np.testing.assert_allclose(
-        cbc["chd"].values, orig_cbc["chd"].values, rtol=1e-5, atol=1e-3
+        cbc["chd"].values, original_cbc["chd"].values, rtol=1e-5, atol=1e-3
     )
 
 
 @pytest.mark.usefixtures("circle_model")
-@pytest.mark.parametrize(
-    "partition_name",
-    ["two_parts", "three_parts"],
-)
+@parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partitioning_unstructured_with_inactive_cells(
-    tmp_path: Path, circle_model: Modflow6Simulation, partition_name: str
+    tmp_path: Path, circle_model: Modflow6Simulation, partition_array: xu.UgridDataArray
 ):
     simulation = circle_model
 
-    # increase the recharge to make the head gradient more pronounced
+    # Increase the recharge to make the head gradient more pronounced
     simulation["GWF_1"]["rch"]["rate"] *= 100
 
-    # deactivate some cells on idomain
+    # Deactivate some cells on idomain
     idomain = simulation["GWF_1"].domain
     deactivated_cells = slice(93, 97)
     idomain.loc[{"mesh2d_nFaces": deactivated_cells}] = 0
@@ -189,27 +280,25 @@ def test_partitioning_unstructured_with_inactive_cells(
                         {"mesh2d_nFaces": deactivated_cells}
                     ] = mask_value
 
-    # run the original example, so without partitioning, and save the simulation results
-    orig_dir = tmp_path / "original"
-    simulation.write(orig_dir, binary=False)
+    # Run the original example, so without partitioning, and save the simulation results
+    original_dir = tmp_path / "original"
+    simulation.write(original_dir, binary=False)
 
     simulation.run()
 
-    orig_head = imod.mf6.open_hds(
-        orig_dir / "GWF_1/GWF_1.hds",
-        orig_dir / "GWF_1/disv.disv.grb",
+    original_head = imod.mf6.open_hds(
+        original_dir / "GWF_1/GWF_1.hds",
+        original_dir / "GWF_1/disv.disv.grb",
     )
 
     # TODO: Fix issue 669
-    #    orig_cbc = imod.mf6.open_cbc(
-    #        orig_dir / "GWF_1/GWF_1.cbc",
-    #        orig_dir / "GWF_1/disv.disv.grb",
+    #    original_cbc = imod.mf6.open_cbc(
+    #        original_dir / "GWF_1/GWF_1.cbc",
+    #        original_dir / "GWF_1/disv.disv.grb",
     #    )
 
-    # partition the simulation, run it, and save the (merged) results
-    partitioning_arrays = setup_partitioning_arrays(idomain.isel(layer=0))
-
-    split_simulation = simulation.split(partitioning_arrays[partition_name])
+    # Partition the simulation, run it, and save the (merged) results
+    split_simulation = simulation.split(partition_array)
 
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()
@@ -217,32 +306,29 @@ def test_partitioning_unstructured_with_inactive_cells(
     head = split_simulation.open_head()
     # _ = split_simulation.open_flow_budget()
 
-    # compare the head result of the original simulation with the result of the partitioned simulation
+    # Compare the head result of the original simulation with the result of the partitioned simulation
     np.testing.assert_allclose(
-        head["head"].values, orig_head.values, rtol=1e-5, atol=1e-3
+        head["head"].values, original_head.values, rtol=1e-5, atol=1e-3
     )
 
 
 @pytest.mark.usefixtures("circle_model")
-@pytest.mark.parametrize(
-    "partition_name",
-    ["two_parts", "three_parts"],
-)
+@parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partitioning_unstructured_with_vpt_cells(
-    tmp_path: Path, circle_model: Modflow6Simulation, partition_name: str
+    tmp_path: Path, circle_model: Modflow6Simulation, partition_array: xu.UgridDataArray
 ):
     simulation = circle_model
 
-    # increase the recharge to make the head gradient more pronounced
+    # Increase the recharge to make the head gradient more pronounced
     simulation["GWF_1"]["rch"]["rate"] *= 100
 
-    # deactivate some cells on idomain
+    # Deactivate some cells on idomain
     idomain = simulation["GWF_1"].domain
     deactivated_cells = slice(93, 101)
     idomain.loc[{"mesh2d_nFaces": deactivated_cells}] = 0
 
     # The cells we just deactivated on idomain must be deactivated on package inputs too.
-    for name, package in simulation["GWF_1"].items():
+    for _, package in simulation["GWF_1"].items():
         if not isinstance(package, Well):
             for arrayname in package.dataset.keys():
                 if "mesh2d_nFaces" in package[arrayname].coords:
@@ -254,27 +340,26 @@ def test_partitioning_unstructured_with_vpt_cells(
                         {"mesh2d_nFaces": deactivated_cells}
                     ] = mask_value
 
-    # run the original example, so without partitioning, and save the simulation results
-    orig_dir = tmp_path / "original"
-    simulation.write(orig_dir, binary=False)
+    # Run the original example, so without partitioning, and save the simulation
+    # results
+    original_dir = tmp_path / "original"
+    simulation.write(original_dir, binary=False)
 
     simulation.run()
 
-    orig_head = imod.mf6.open_hds(
-        orig_dir / "GWF_1/GWF_1.hds",
-        orig_dir / "GWF_1/disv.disv.grb",
+    original_head = imod.mf6.open_hds(
+        original_dir / "GWF_1/GWF_1.hds",
+        original_dir / "GWF_1/disv.disv.grb",
     )
 
     # TODO: Fix issue 669
-    #    orig_cbc = imod.mf6.open_cbc(
-    #        orig_dir / "GWF_1/GWF_1.cbc",
-    #        orig_dir / "GWF_1/disv.disv.grb",
+    #    original_cbc = imod.mf6.open_cbc(
+    #        original_dir / "GWF_1/GWF_1.cbc",
+    #        original_dir / "GWF_1/disv.disv.grb",
     #    )
 
-    # partition the simulation, run it, and save the (merged) results
-    partitioning_arrays = setup_partitioning_arrays(idomain.isel(layer=0))
-
-    split_simulation = simulation.split(partitioning_arrays[partition_name])
+    # Partition the simulation, run it, and save the (merged) results
+    split_simulation = simulation.split(partition_array)
 
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()
@@ -282,101 +367,113 @@ def test_partitioning_unstructured_with_vpt_cells(
     head = split_simulation.open_head()
     # _ = split_simulation.open_flow_budget()
 
-    # compare the head result of the original simulation with the result of the partitioned simulation
+    # Compare the head result of the original simulation with the result of the partitioned simulation
     np.testing.assert_allclose(
-        head["head"].values, orig_head.values, rtol=1e-5, atol=1e-3
+        head["head"].values, original_head.values, rtol=1e-5, atol=1e-3
     )
 
 
 @pytest.mark.usefixtures("circle_model")
-@pytest.mark.parametrize(
-    "partition_name",
-    ["two_parts", "two_parts_inverse"],
-)
-def test_partitioning_unstructured_geometric_constants(
-    tmp_path: Path, circle_model: Modflow6Simulation, partition_name: str
+@parametrize_with_cases("partition_array", cases=PartitionArrayCases)
+@parametrize_with_cases("hfb", cases=HorizontalFlowBarrierCases)
+def test_partitioning_unstructured_hfb(
+    tmp_path: Path,
+    circle_model: Modflow6Simulation,
+    partition_array: xu.UgridDataArray,
+    hfb: imod.mf6.HorizontalFlowBarrierBase,
 ):
     simulation = circle_model
-    simulation.write(tmp_path / "orig", binary=False)
-    # increase the recharge to make the head gradient more pronounced
+    # Increase the recharge to make the head gradient more pronounced
     simulation["GWF_1"]["rch"]["rate"] *= 100
-    idomain = simulation["GWF_1"].domain
-    partitioning_arrays = setup_partitioning_arrays(idomain.isel(layer=0))
 
-    # partition the simulation, run it, and save the (merged) results
-    split_simulation = simulation.split(partitioning_arrays[partition_name])
-    split_simulation.write(tmp_path / partition_name, binary=False)
-    references = setup_reference_results()
+    simulation["GWF_1"]["hfb"] = imod.mf6.HorizontalFlowBarrierResistance(geometry=hfb)
 
-    assert np.allclose(
-        split_simulation["split_exchanges"][0]["angldegx"].values,
-        references[partition_name],
+    # Run the original example, so without partitioning, and save the simulation
+    # results
+    original_dir = tmp_path / "original"
+    simulation.write(original_dir, binary=False)
+    simulation.run()
+
+    original_head = imod.mf6.open_hds(
+        original_dir / "GWF_1/GWF_1.hds",
+        original_dir / "GWF_1/disv.disv.grb",
     )
+
+    original_cbc = imod.mf6.open_cbc(
+        original_dir / "GWF_1/GWF_1.cbc",
+        original_dir / "GWF_1/disv.disv.grb",
+    )
+
+    # Partition the simulation, run it, and save the (merged) results
+    split_simulation = simulation.split(partition_array)
+
+    split_simulation.write(tmp_path, binary=False)
+    split_simulation.run()
+
+    head = split_simulation.open_head()
+
+    cbc = split_simulation.open_flow_budget()
+
+    # Compare the head result of the original simulation with the result of the
+    # partitioned simulation. Criteria are a bit looser than in other tests
+    # because we are dealing with a problem with heads ranging roughly from 2000
+    # m to 0 m, and the HFB adds extra complexity to this.
+    np.testing.assert_allclose(head["head"].values, original_head.values, rtol=1e-4)
+    np.testing.assert_allclose(cbc["chd"].values, original_cbc["chd"].values, rtol=1e-4)
 
 
 @pytest.mark.usefixtures("circle_model")
-@pytest.mark.parametrize(
-    "partition_name",
-    ["two_parts", "two_parts_inverse"],
-)
-def test_specific_discharge_results(
-    tmp_path: Path, circle_model: Modflow6Simulation, partition_name: str
+@parametrize_with_cases("partition_array", cases=PartitionArrayCases)
+@parametrize_with_cases("well", cases=WellCases)
+def test_partitioning_unstructured_with_well(
+    tmp_path: Path,
+    circle_model: Modflow6Simulation,
+    partition_array: xu.UgridDataArray,
+    well: imod.mf6.Well,
 ):
     simulation = circle_model
-    label_arrays = setup_partitioning_arrays(simulation["GWF_1"].domain.isel(layer=0))
-    label_array = label_arrays[partition_name]
+    # Increase the recharge to make the head gradient more pronounced
+    simulation["GWF_1"]["rch"]["rate"] *= 100
 
-    simulation["GWF_1"]["npf"].dataset["save_specific_discharge"] = True
-    ip_unsplit_dir = tmp_path / "original"
+    # Add well
+    simulation["GWF_1"]["well"] = well
 
-    simulation.write(ip_unsplit_dir, binary=False, use_absolute_paths=True)
-
-    # now do the same for imod-python
-    ip_dir = tmp_path / "ip_split"
-    new_sim = simulation.split(label_array)
-    new_sim.write(ip_dir, False)
-
+    # Run the original example, so without partitioning, and save the simulation
+    # results.
+    original_dir = tmp_path / "original"
+    simulation.write(original_dir, binary=False)
     simulation.run()
-    original_balances = simulation.open_flow_budget()
-    original_heads = simulation.open_head()
 
-    new_sim.run()
-    split_balances = new_sim.open_flow_budget()
-    split_head = new_sim.open_head()
+    original_head = imod.mf6.open_hds(
+        original_dir / "GWF_1/GWF_1.hds",
+        original_dir / "GWF_1/disv.disv.grb",
+    )
 
-    head_diff = original_heads.isel(layer=0, time=-1) - split_head.isel(layer = 0, time =-1)
-    print(f"orig head")
-    print( original_heads.isel(layer=0).values)    
-    print(f"split head ")
-    print(split_head["head"].isel(layer=0).values)
-    print(f"head_diff")
-    print( head_diff["head"].values)    
+    # TODO:
+    # Uncomment when fixed: https://gitlab.com/deltares/imod/imod-python/-/issues/683
+    # original_cbc = imod.mf6.open_cbc(
+    #     original_dir / "GWF_1/GWF_1.cbc",
+    #     original_dir / "GWF_1/disv.disv.grb",
+    # )
 
+    # Partition the simulation, run it, and save the (merged) results
+    split_simulation = simulation.split(partition_array)
 
+    split_simulation.write(tmp_path, binary=False)
+    split_simulation.run()
 
-    veldif_x = original_balances["npf-qx"] - split_balances["npf-qx"]
-    veldif_y = original_balances["npf-qy"] - split_balances["npf-qy"]
+    head = split_simulation.open_head()
+    # TODO:
+    # Uncomment when fixed: https://gitlab.com/deltares/imod/imod-python/-/issues/683
+    # cbc = split_simulation.open_flow_budget()
 
-    print(f"orig balance x:")
-    print( original_balances["npf-qx"].isel(layer=0).values)    
-    print(f"split_balances x: ")
-    print(split_balances["npf-qx"].isel(layer=0).values)
-
-    print(f"veldif x:")
-    print("----------")
-    print(veldif_x.isel(layer=0).values)
-    print(f"veldif y: {veldif_y.values.max() }")    
-
-    assert veldif_x.values.max() < 1e-6
-    assert veldif_y.values.max() < 1e-6
-
-    reldif_x = abs(veldif_x / original_balances["npf-qx"])
-    reldif_y = abs(veldif_y / original_balances["npf-qy"])
-
-    print(f"reldif x: {reldif_x.values.max() }")
-    print(f"reldif y: {reldif_y.values.max() }")
-    assert reldif_x.values.max() < 1e-5
-    assert reldif_y.values.max() < 0.12
-
-
-    pass
+    # Compare the head result of the original simulation with the result of the
+    # partitioned simulation.
+    np.testing.assert_allclose(
+        head["head"].values, original_head.values, rtol=1e-5, atol=1e-3
+    )
+    # TODO:
+    # Uncomment when fixed: https://gitlab.com/deltares/imod/imod-python/-/issues/683
+    # np.testing.assert_allclose(
+    #     cbc["chd"].values, original_cbc["chd"].values, rtol=1e-5, atol=1e-3
+    # )

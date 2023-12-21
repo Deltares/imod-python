@@ -175,7 +175,7 @@ def test_write_ascii_griddata_2d_3d(idomain_and_bottom, tmp_path):
 
     dis = imod.mf6.StructuredDiscretization(top=top, bottom=bottom, idomain=idomain)
     # 2D data should be rows and colums; 3D should be a single row.
-    # https://gitlab.com/deltares/imod/imod-python/-/issues/270
+    # https://github.com/Deltares/imod-python/issues/270
     directory = tmp_path / "dis_griddata"
     directory.mkdir()
     write_context = WriteContext(simulation_directory=directory)

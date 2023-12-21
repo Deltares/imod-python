@@ -3,12 +3,10 @@ iMOD Python: make massive MODFLOW models
 
 .. image:: https://img.shields.io/badge/lifecycle-maturing-blue
    :target: https://www.tidyverse.org/lifecycle/
-.. image:: https://gitlab.com/deltares/imod/imod-python/badges/master/pipeline.svg
-   :target: https://gitlab.com/deltares/imod/imod-python/commits/master
+.. image:: https://dpcbuild.deltares.nl/app/rest/builds/buildType:id:iMOD6_IMODPython_Windows_Build/statusIcon.svg
+   :target: https://github.com/Deltares/imod-python/commits/master/
 .. image:: https://img.shields.io/pypi/l/imod
    :target: https://choosealicense.com/licenses/mit/
-.. image:: https://gitlab.com/deltares/imod/imod-python/badges/master/coverage.svg
-   :target: https://gitlab.com/deltares/imod/imod-python/commits/master
 .. image:: https://img.shields.io/conda/vn/conda-forge/imod.svg
    :target: https://github.com/conda-forge/imod-feedstock
 
@@ -43,11 +41,11 @@ standards for reproducible modeling and data analysis:
 * `Snakemake`_: workflow manager to turn a collection of scripts into a
   workflow.
 
-Documentation: https://deltares.gitlab.io/imod/imod-python/
+Documentation: https://deltares.github.io/imod-python
 
-Source code: https://gitlab.com/deltares/imod/imod-python
+Source code: https://github.com/Deltares/imod-python
 
-Issues: https://gitlab.com/deltares/imod/imod-python/-/issues/
+Issues: https://github.com/Deltares/imod-python/issues
 
 .. raw:: html
 

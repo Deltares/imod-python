@@ -194,16 +194,16 @@ class DimsSchema(BaseSchema):
             raise ValidationError(f"dim mismatch: expected {expected}, got {actual}")
 
 
-class IndexesSchema(BaseSchema):
+class EmptyIndexesSchema(BaseSchema):
     """
-    Verify indexes, check if no dims with zero size are included and that
-    indexes are monotonic. Skips unstructured grid dimensions.
+    Verify indexes, check if no dims with zero size are included. Skips
+    unstructured grid dimensions.
     """
 
     def __init__(self) -> None:
         pass
 
-    def validate(self, obj: Union[xr.DataArray, xu.UgridDataArray], **kwargs) -> None:
+    def get_dims_to_validate(self, obj: Union[xr.DataArray, xu.UgridDataArray]):
         dims_to_validate = list(obj.dims)
 
         # Remove face dim from list to validate, as it has no ``indexes``
@@ -213,10 +213,30 @@ class IndexesSchema(BaseSchema):
             dims_to_validate = [
                 dim for dim in dims_to_validate if dim not in ugrid_dims
             ]
+        return dims_to_validate
+
+    def validate(self, obj: Union[xr.DataArray, xu.UgridDataArray], **kwargs) -> None:
+        dims_to_validate = self.get_dims_to_validate(obj)
 
         for dim in dims_to_validate:
             if len(obj.indexes[dim]) == 0:
                 raise ValidationError(f"provided dimension {dim} with size 0")
+
+
+class IndexesSchema(EmptyIndexesSchema):
+    """
+    Verify indexes, check if no dims with zero size are included and that
+    indexes are monotonic. Skips unstructured grid dimensions.
+    """
+
+    def __init__(self) -> None:
+        pass
+
+    def validate(self, obj: Union[xr.DataArray, xu.UgridDataArray], **kwargs) -> None:
+        # Test if indexes all empty
+        super().validate(obj)
+
+        dims_to_validate = self.get_dims_to_validate(obj)
 
         for dim in dims_to_validate:
             if dim == "y":

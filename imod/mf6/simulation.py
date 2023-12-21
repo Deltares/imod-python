@@ -289,8 +289,7 @@ class Modflow6Simulation(collections.UserDict):
         Run Modflow 6 simulation. This method runs a subprocess calling
         ``mf6path``. This argument is set to ``mf6``, which means the Modflow 6
         executable is expected to be added to your PATH environment variable.
-        `See this writeup how to add Modflow 6 to your PATH on Windows
-        <https://deltares.gitlab.io/imod/imod-python/examples/mf6/index.html>`_
+        :doc:`See this writeup how to add Modflow 6 to your PATH on Windows </examples/mf6/index>`
 
         Note that the ``write`` method needs to be called before this method is
         called.

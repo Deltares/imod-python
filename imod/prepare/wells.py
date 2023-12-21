@@ -167,7 +167,7 @@ def assign_wells(
     wells_in_bounds["overlap"] = 1.0
     wells_in_bounds["k"] = 1.0
     wells_in_bounds["transmissivity"] = 1.0
-    columns = list(set(wells_in_bounds.columns).difference(df))
+    columns = list(set(wells_in_bounds.columns).difference(df.columns))
 
     indexes = ["id"]
     for dim in ["species", "time"]:
