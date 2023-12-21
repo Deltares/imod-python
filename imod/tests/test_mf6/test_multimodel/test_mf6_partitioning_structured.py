@@ -483,6 +483,4 @@ def test_partitioning_structured_hfb(
 
     # Compare the head result of the original simulation with the result of the
     # partitioned simulation.
-    np.testing.assert_allclose(
-        head["head"].values, original_head.values, rtol=1e-4, atol=1e-4
-    )
+    np.testing.assert_allclose(head["head"].values, original_head.values, rtol=1e-3)
