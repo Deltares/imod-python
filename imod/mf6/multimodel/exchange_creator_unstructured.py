@@ -72,7 +72,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         centroid_1 = grid.centroids[face1]
         centroid_2 = grid.centroids[face2]
 
-        cdist =  np.linalg.norm(centroid_2-centroid_1, axis=1)
+        cdist = np.linalg.norm(centroid_2 - centroid_1, axis=1)
 
         edge_coordinates = grid.edge_node_coordinates[self._connected_cell_edge_indices]
 
@@ -99,10 +99,9 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         )
         norm_normal = np.sqrt(normal[:, 0] * normal[:, 0] + normal[:, 1] * normal[:, 1])
         cos = (normal[:, 0]) / norm_normal
-        back_cos = ( -normal[:,0]/ norm_normal)
-        backangle = 180+np.degrees(np.arccos(back_cos))
         angle = np.degrees(np.arccos(cos))
-        real_angle = np.where(normal[:,1]>0, angle, backangle)
+
+        real_angle = np.where(normal[:, 1] > 0, angle, 360- angle)
 
         # now that we have an outward pointing normal, let's compute angldegx
 
