@@ -1,17 +1,17 @@
+from copy import deepcopy
 from pathlib import Path
+from typing import Dict
 
 import geopandas as gpd
+import imod
 import numpy as np
 import pytest
 import shapely
 import xugrid as xu
-from pytest_cases import parametrize_with_cases
-
-import imod
 from imod.mf6 import Modflow6Simulation
 from imod.mf6.wel import Well
 from imod.typing.grid import zeros_like
-from copy import deepcopy
+from pytest_cases import parametrize_with_cases
 
 
 @pytest.mark.usefixtures("circle_model")
@@ -24,18 +24,16 @@ def idomain_top(circle_model):
 class PartitionArrayCases:
     def case_two_parts(self, idomain_top) -> xu.UgridDataArray:
         two_parts = zeros_like(idomain_top)
-        two_parts.values[:108] = 0
         two_parts.values[108:] = 1
         return two_parts
 
+    def case_two_parts_inverse(self, idomain_top) -> xu.UgridDataArray:
+        two_parts_inverse = zeros_like(idomain_top)
+        two_parts_inverse.values[:108] = 1
+        return two_parts_inverse
+
     def case_three_parts(self, idomain_top) -> xu.UgridDataArray:
-    two_parts_inverse = zeros_like(idomain_top)
-    two_parts_inverse.values[:end_range] = 1
-
-    result["two_parts_inverse"] = two_parts_inverse
-
         three_parts = zeros_like(idomain_top)
-        three_parts.values[:72] = 0
         three_parts.values[72:144] = 1
         three_parts.values[144:] = 2
         return three_parts
@@ -75,7 +73,9 @@ class HorizontalFlowBarrierCases:
                 "ztop": [10.0],
                 "zbottom": [0.0],
             },
-            
+        )
+
+
 def setup_reference_results() -> Dict[str, np.ndarray]:
     result = {}
     result["two_parts"] = np.array(
@@ -103,7 +103,7 @@ def setup_reference_results() -> Dict[str, np.ndarray]:
             300.0,
             360.0,
             360.0,
-            360.0,            
+            360.0,
             360.0,
             225.0,
             349.63376582,
@@ -148,9 +148,6 @@ def setup_reference_results() -> Dict[str, np.ndarray]:
         ]
     )
     return result
-
-
-        )
 
     def case_hfb_horizontal(self):
         # Horizontal line at y = -100.0
@@ -477,3 +474,71 @@ def test_partitioning_unstructured_with_well(
     # np.testing.assert_allclose(
     #     cbc["chd"].values, original_cbc["chd"].values, rtol=1e-5, atol=1e-3
     # )
+
+@pytest.mark.usefixtures("circle_model")
+@parametrize_with_cases("partition_array", cases=PartitionArrayCases)
+def test_specific_discharge_results(
+    tmp_path: Path, circle_model: Modflow6Simulation, partition_array: xu.UgridDataArray
+):
+    simulation = circle_model
+    label_array = partition_array
+
+    simulation["GWF_1"]["npf"].dataset["save_specific_discharge"] = True
+    ip_unsplit_dir = tmp_path / "original"
+
+    simulation.write(ip_unsplit_dir, binary=False, use_absolute_paths=True)
+
+    # now do the same for imod-python
+    ip_dir = tmp_path / "ip_split"
+    new_sim = simulation.split(label_array)
+    new_sim.write(ip_dir, False)
+
+    simulation.run()
+    original_balances = simulation.open_flow_budget()
+    original_heads = simulation.open_head()
+
+    new_sim.run()
+    split_balances = new_sim.open_flow_budget()
+    split_head = new_sim.open_head()
+
+    split_head.ugrid.grid.node_x = split_head.ugrid.grid.node_x.round(5)
+    split_head.ugrid.grid.node_y = split_head.ugrid.grid.node_y.round(5)    
+    original_heads.ugrid.grid.node_x = original_heads.ugrid.grid.node_x.round(5)
+    original_heads.ugrid.grid.node_y = original_heads.ugrid.grid.node_y.round(5)
+    split_head = split_head.ugrid.reindex_like(original_heads)
+
+
+    split_balances["npf-qx"] .ugrid.grid.node_x = split_balances["npf-qx"] .ugrid.grid.node_x.round(5)
+    split_balances["npf-qx"] .ugrid.grid.node_y = split_balances["npf-qx"] .ugrid.grid.node_y.round(5)
+    original_balances["npf-qx"].ugrid.grid.node_x = original_balances["npf-qx"].ugrid.grid.node_x.round(5)        
+    original_balances["npf-qx"].ugrid.grid.node_y = original_balances["npf-qx"].ugrid.grid.node_y.round(5)
+    split_balances["npf-qx"] = split_balances["npf-qx"].ugrid.reindex_like( original_balances["npf-qx"] , tolerance=1e-4)
+
+    head_diff = original_heads.isel(layer=0, time=-1) - split_head.isel(layer = 0, time =-1)
+
+    veldif_x = original_balances["npf-qx"] - split_balances["npf-qx"]
+    veldif_y = original_balances["npf-qy"] - split_balances["npf-qy"]
+
+    print(f"orig balance x:")
+    print( original_balances["npf-qx"].isel(layer=0).values)    
+    print(f"split_balances x: ")
+    print(split_balances["npf-qx"].isel(layer=0).values)
+
+    print(f"veldif x:")
+    print("----------")
+    print(veldif_x.isel(layer=0).values)
+    print(f"veldif y: {veldif_y.values.max() }")    
+
+    assert veldif_x.values.max() < 1e-6
+    assert veldif_y.values.max() < 1e-6
+
+    reldif_x = abs(veldif_x / original_balances["npf-qx"])
+    reldif_y = abs(veldif_y / original_balances["npf-qy"])
+
+    print(f"reldif x: {reldif_x.values.max() }")
+    print(f"reldif y: {reldif_y.values.max() }")
+    assert reldif_x.values.max() < 1e-5
+    assert reldif_y.values.max() < 0.12
+
+
+    pass
