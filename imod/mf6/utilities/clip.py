@@ -117,9 +117,14 @@ def clip_by_grid(package: ILineDataPackage, active: GridDataArray) -> ILineDataP
     bounding_gdf = bounding_polygon(active)
     package_gdf_clipped = package_gdf.clip(bounding_gdf)
     # Catch edge case: when line crosses only vertex of polygon, a point
-    # (type_id == 0) is returned. Drop these.
-    is_points = shapely.get_type_id(package_gdf_clipped.geometry) == 0
+    # or multipoint is returned. Drop these.
+    type_ids = shapely.get_type_id(package_gdf_clipped.geometry)
+    is_points = (type_ids == shapely.GeometryType.POINT) | (
+        type_ids == shapely.GeometryType.MULTIPOINT
+    )
     package_gdf_clipped = package_gdf_clipped[~is_points]
+    # Separate MultiLinestrings ino separate Linestrings
+    package_gdf_clipped = package_gdf_clipped.explode("geometry")
     # Get settings
     settings = _get_settings(package)
     # Create new instance
