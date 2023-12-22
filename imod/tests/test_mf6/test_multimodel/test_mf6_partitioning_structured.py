@@ -442,6 +442,21 @@ def test_partitioning_structured_one_high_level_well(
     )
 
 
+def is_expected_hfb_partition_combination_fail(current_cases):
+    """
+    Helper function for all expected failures
+
+    Idea taken from:
+    https://github.com/smarie/python-pytest-cases/issues/195#issuecomment-834232905
+    """
+    # In this combination the hfb lays along partition model domain.
+    if (current_cases["partition_array"].id == "four_squares") and (
+        current_cases["hfb"].id == "hfb_diagonal"
+    ):
+        return True
+    return False
+
+
 @pytest.mark.usefixtures("transient_twri_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 @parametrize_with_cases("hfb", cases=HorizontalFlowBarrierCases)
@@ -450,6 +465,7 @@ def test_partitioning_structured_hfb(
     transient_twri_model: Modflow6Simulation,
     partition_array: xr.DataArray,
     hfb: imod.mf6.HorizontalFlowBarrierResistance,
+    current_cases,
 ):
     """
     In this test we include a high-level well package with 1 well in it to the
@@ -474,6 +490,10 @@ def test_partitioning_structured_hfb(
 
     # Partition the simulation, run it, and save the (merged) results
     split_simulation = simulation.split(partition_array)
+
+    # Certain combinations are expected to fail
+    if is_expected_hfb_partition_combination_fail(current_cases):
+        pytest.xfail("Combination hfb - partition_array expected to fail.")
 
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()
