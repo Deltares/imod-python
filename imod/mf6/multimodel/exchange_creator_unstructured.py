@@ -101,7 +101,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         cos = (normal[:, 0]) / norm_normal
         angle = np.degrees(np.arccos(cos))
 
-        real_angle = np.where(normal[:, 1] > 0, angle, 360- angle)
+        real_angle = np.where(normal[:, 1] > 0, angle, 360 - angle)
 
         # now that we have an outward pointing normal, let's compute angldegx
 
