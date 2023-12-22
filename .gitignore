@@ -137,3 +137,6 @@ examples/user-guide/*
 examples/visualize/*
 examples/data
 !examples/**/*.py
+# pixi environments
+.pixi
+
