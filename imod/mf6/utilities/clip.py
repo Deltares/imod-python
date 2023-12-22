@@ -124,7 +124,7 @@ def clip_by_grid(package: ILineDataPackage, active: GridDataArray) -> ILineDataP
     )
     package_gdf_clipped = package_gdf_clipped[~is_points]
     # Separate MultiLinestrings ino separate Linestrings
-    package_gdf_clipped = package_gdf_clipped.explode("geometry")
+    package_gdf_clipped = package_gdf_clipped.explode("geometry", ignore_index=True)
     # Get settings
     settings = _get_settings(package)
     # Create new instance
