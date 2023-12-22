@@ -1,20 +1,21 @@
+import copy
+import uuid
 from copy import deepcopy
 from pathlib import Path
 from typing import Dict
 
 import geopandas as gpd
-import imod
 import numpy as np
 import pytest
 import shapely
+import xarray as xr
 import xugrid as xu
+from pytest_cases import parametrize_with_cases
+
+import imod
 from imod.mf6 import Modflow6Simulation
 from imod.mf6.wel import Well
 from imod.typing.grid import zeros_like
-from pytest_cases import parametrize_with_cases
-import xarray as xr
-import uuid
-import copy
 
 
 def reduce_coordinate_precision(ugrid):

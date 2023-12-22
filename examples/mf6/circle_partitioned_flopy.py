@@ -4,17 +4,19 @@ The split method returns a simulation object that can be run as is. In this
 case the 3 submodels are roughly equal sized partitions that have the shape
 of pie pieces.
 """
+import os
+import shutil
+
+import flopy
 import matplotlib.pyplot as plt
-from example_models import create_circle_simulation
 import numpy as np
+import xugrid as xu
+from example_models import create_circle_simulation
+from flopy.mf6.utils import Mf6Splitter
+
 import imod
 from imod.mf6.multimodel.partition_generator import get_label_array
-import os
-import flopy
-from flopy.mf6.utils import Mf6Splitter
-import xugrid as xu
 from imod.typing.grid import merge
-import shutil
 
 simulation = create_circle_simulation()
 
