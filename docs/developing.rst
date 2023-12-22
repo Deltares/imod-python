@@ -233,4 +233,4 @@ At this point, everything should be ready to run the tests on the Docker image.
 .. _embedded: https://sphinx-gallery.github.io/stable/syntax.html#embedding-rst
 .. _IPython Sphinx Directives: https://ipython.readthedocs.io/en/stable/sphinxext.html
 .. _isort: https://github.com/PyCQA/isort
-.. _flake8: https://github.com/PyCQA/flake8
+.. _ruff: https://github.com/astral-sh/ruff
