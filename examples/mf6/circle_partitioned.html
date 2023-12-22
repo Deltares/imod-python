@@ -255,8 +255,8 @@ document.write(`
           
           
           
-          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitLab</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
       
@@ -402,8 +402,8 @@ document.write(`
           
           
           
-          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitLab</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
         
@@ -547,7 +547,7 @@ of pie pieces.</p>
 <span class="kn">from</span> <span class="nn">example_models</span> <span class="kn">import</span> <span class="n">create_circle_simulation</span>
 
 <span class="kn">import</span> <span class="nn">imod</span>
-<span class="kn">from</span> <span class="nn">imod.mf6.partition_generator</span> <span class="kn">import</span> <span class="n">get_label_array</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.multimodel.partition_generator</span> <span class="kn">import</span> <span class="n">get_label_array</span>
 
 <span class="n">simulation</span> <span class="o">=</span> <span class="n">create_circle_simulation</span><span class="p">()</span>
 <span class="n">tmp_path</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">temporary_directory</span><span class="p">()</span>
@@ -576,7 +576,7 @@ of pie pieces.</p>
 <span class="n">head</span><span class="p">[</span><span class="s2">&quot;head&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">time</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_circle_partitioned_001.png" srcset="../../_images/sphx_glr_circle_partitioned_001.png" alt="layer = 1, time = 1.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.tri._tricontour.TriContourSet object at 0x0000014B270ACBE0&gt;
+<img src="../../_images/sphx_glr_circle_partitioned_001.png" srcset="../../_images/sphx_glr_circle_partitioned_001.png" alt="layer = 1, time = 1.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.tri._tricontour.TriContourSet object at 0x0000026453730D90&gt;
 </pre></div>
 </div>
 <p>Visualize the flow-horizontal-face-x componenty of the balances.</p>
@@ -587,7 +587,7 @@ of pie pieces.</p>
 <span class="k">pass</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_circle_partitioned_002.png" srcset="../../_images/sphx_glr_circle_partitioned_002.png" alt="layer = 1, time = 1.0" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 4.783 seconds)</p>
+<img src="../../_images/sphx_glr_circle_partitioned_002.png" srcset="../../_images/sphx_glr_circle_partitioned_002.png" alt="layer = 1, time = 1.0" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 3.083 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-circle-partitioned-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/beeeba1ec165d52bbb3122b703653992/circle_partitioned.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">circle_partitioned.ipynb</span></code></a></p>

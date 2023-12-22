@@ -69,9 +69,8 @@ mean_heads_in_grid.head(5)
 
 # %%
 # The previous head information needs to be assigned to the model grid.
-# imod-python has a tool called `imod.select.points_set_values
-# <https://deltares.gitlab.io/imod/imod-python/api/select.html#imod.select.points_set_values>`_, which
-# assigns values based on x-y coordinates to a previously defined array. In this
+# imod-python has a tool called :doc:`/api/generated/select/imod.select.points_set_values`,
+# which assigns values based on x-y coordinates to a previously defined array. In this
 # case, the array is the starting_heads_larger, the values are the mean
 # calculated heads and the x and y are the coordinates corresponding to the
 # heads.
@@ -93,8 +92,7 @@ heads_grid.plot.imshow(ax=ax)
 # %%
 # The previous information is still only available at certain points, so it
 # needs to be interpolated. The iMOD Python tool
-# `imod.prepare.laplace_interpolate
-# <https://deltares.gitlab.io/imod/imod-python/api/prepare.html#imod.prepare.laplace_interpolate>`_ will be
+# :doc:`/api/generated/prepare/imod.prepare.laplace_interpolate` will be
 # used to do an interpolation of the previously indicated head values. It is
 # possible to assign interpolation parameters such as the number of iterations
 # and the closing criteria.

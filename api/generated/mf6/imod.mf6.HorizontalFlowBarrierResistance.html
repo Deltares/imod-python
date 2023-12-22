@@ -255,8 +255,8 @@ document.write(`
           
           
           
-          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitLab</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
       
@@ -402,8 +402,8 @@ document.write(`
           
           
           
-          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitLab</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
         
@@ -554,6 +554,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.SpecificStorage.html">imod.mf6.SpecificStorage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.StorageCoefficient.html">imod.mf6.StorageCoefficient</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.UnsaturatedZoneFlow.html">imod.mf6.UnsaturatedZoneFlow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.mf6.Well.html">imod.mf6.Well</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.WellDisStructured.html">imod.mf6.WellDisStructured</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.WellDisVertices.html">imod.mf6.WellDisVertices</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.AdvectionCentral.html">imod.mf6.AdvectionCentral</a></li>
@@ -745,18 +746,19 @@ specified for a GWF model.
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<p>&gt;&gt; barrier_x = [-1000.0, 0.0, 1000.0]
-&gt;&gt; barrier_y = [500.0, 250.0, 500.0]
-&gt;&gt; barrier_gdf = gpd.GeoDataFrame(
-&gt;&gt;     geometry=[shapely.linestrings(barrier_x, barrier_y),],
-&gt;&gt;     data={
-&gt;&gt;         “resistance”: [1e3,],
-&gt;&gt;         “ztop”: [10.0,],
-&gt;&gt;         “zbottom”: [0.0,],
-&gt;&gt;     },
-&gt;&gt; )
-&gt;&gt;
-&gt;&gt; hfb = imod.mf6.HorizontalFlowBarrierResistance(barrier_gdf)</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">barrier_x</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">1000.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">barrier_y</span> <span class="o">=</span> <span class="p">[</span><span class="mf">500.0</span><span class="p">,</span> <span class="mf">250.0</span><span class="p">,</span> <span class="mf">500.0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">barrier_gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">geometry</span><span class="o">=</span><span class="p">[</span><span class="n">shapely</span><span class="o">.</span><span class="n">linestrings</span><span class="p">(</span><span class="n">barrier_x</span><span class="p">,</span> <span class="n">barrier_y</span><span class="p">),],</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">data</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s2">&quot;resistance&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1e3</span><span class="p">,],</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s2">&quot;ztop&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">10.0</span><span class="p">,],</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s2">&quot;zbottom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,],</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="p">},</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hfb</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">HorizontalFlowBarrierResistance</span><span class="p">(</span><span class="n">barrier_gdf</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="imod.mf6.HorizontalFlowBarrierResistance.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">GeoDataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/imod/mf6/hfb.html#HorizontalFlowBarrierResistance.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imod.mf6.HorizontalFlowBarrierResistance.__init__" title="Permalink to this definition">#</a></dt>

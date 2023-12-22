@@ -360,17 +360,16 @@ outside the domain.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-78
+.. GENERATED FROM PYTHON SOURCE LINES 71-77
 
 The previous head information needs to be assigned to the model grid.
-imod-python has a tool called `imod.select.points_set_values
-<https://deltares.gitlab.io/imod/imod-python/api/select.html#imod.select.points_set_values>`_, which
-assigns values based on x-y coordinates to a previously defined array. In this
+imod-python has a tool called :doc:`/api/generated/select/imod.select.points_set_values`,
+which assigns values based on x-y coordinates to a previously defined array. In this
 case, the array is the starting_heads_larger, the values are the mean
 calculated heads and the x and y are the coordinates corresponding to the
 heads.
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-93
+.. GENERATED FROM PYTHON SOURCE LINES 77-92
 
 .. code-block:: Python
 
@@ -403,21 +402,20 @@ heads.
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x0000014B2B1AB2E0>
+    <matplotlib.image.AxesImage object at 0x0000026456F510D0>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-101
+.. GENERATED FROM PYTHON SOURCE LINES 93-99
 
 The previous information is still only available at certain points, so it
 needs to be interpolated. The iMOD Python tool
-`imod.prepare.laplace_interpolate
-<https://deltares.gitlab.io/imod/imod-python/api/prepare.html#imod.prepare.laplace_interpolate>`_ will be
+:doc:`/api/generated/prepare/imod.prepare.laplace_interpolate` will be
 used to do an interpolation of the previously indicated head values. It is
 possible to assign interpolation parameters such as the number of iterations
 and the closing criteria.
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-110
+.. GENERATED FROM PYTHON SOURCE LINES 99-108
 
 .. code-block:: Python
 
@@ -444,11 +442,11 @@ and the closing criteria.
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x0000014B2EE66BF0>
+    <matplotlib.image.AxesImage object at 0x0000026457F45B90>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 111-119
+.. GENERATED FROM PYTHON SOURCE LINES 109-117
 
 It might be nice to have the locations of the boreholes plotted together with
 the interpolation, so that we can better judge the quality of the
@@ -459,7 +457,7 @@ observation. Consequently we can plot this as an overlay, setting cells
 without an observation as transparent. ``imshow`` accepts a matrix with alpha
 values as well, which allows us to set transparency per cell.
 
-.. GENERATED FROM PYTHON SOURCE LINES 119-133
+.. GENERATED FROM PYTHON SOURCE LINES 117-131
 
 .. code-block:: Python
 
@@ -491,14 +489,14 @@ values as well, which allows us to set transparency per cell.
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x0000014B2ADBBE20>
+    <matplotlib.image.AxesImage object at 0x000002645357FBD0>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 5.436 seconds)
+   **Total running time of the script:** (0 minutes 3.448 seconds)
 
 
 .. _sphx_glr_download_examples_prepare_point_interpolation.py:

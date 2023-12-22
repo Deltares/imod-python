@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:10.191** total execution time for 2 files **from examples\visualize**:
+**00:07.473** total execution time for 2 files **from examples\visualize**:
 
 .. container::
 
@@ -32,9 +32,9 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_examples_visualize_flowvel_streamlines.py` (``flowvel_streamlines.py``)
-     - 00:05.242
-     - 0.0
    * - :ref:`sphx_glr_examples_visualize_plot_map.py` (``plot_map.py``)
-     - 00:04.949
+     - 00:04.075
+     - 0.0
+   * - :ref:`sphx_glr_examples_visualize_flowvel_streamlines.py` (``flowvel_streamlines.py``)
+     - 00:03.398
      - 0.0

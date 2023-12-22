@@ -105,7 +105,7 @@ Let's plot the k-field. This is going to be the input for the regridder, and the
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x0000014B276E98D0>
+    <matplotlib.collections.QuadMesh object at 0x0000026453AEA590>
 
 
 
@@ -167,7 +167,7 @@ specifies that field "k" uses an OVERLAP regridder in combination with the avera
 
  .. code-block:: none
 
-    D:\buildAgent\work\6818356b8b2759b2\imod_python_test_env\lib\site-packages\xarray\core\utils.py:494: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
+    D:\buildAgent\work\6818356b8b2759b2\imod_python_test_env\Lib\site-packages\xarray\core\utils.py:494: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
       warnings.warn(
 
 
@@ -200,7 +200,7 @@ Let's plot the k-field. This is the regridded output, and it should should somew
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x0000014B2AA81240>
+    <matplotlib.collections.QuadMesh object at 0x000002645B7DC650>
 
 
 
@@ -234,10 +234,10 @@ A second way to regrid  twri  is to regrid the groundwater flow model.
 
  .. code-block:: none
 
-    D:\buildAgent\work\6818356b8b2759b2\imod_python_test_env\lib\site-packages\xarray\core\utils.py:494: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
+    D:\buildAgent\work\6818356b8b2759b2\imod_python_test_env\Lib\site-packages\xarray\core\utils.py:494: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
       warnings.warn(
 
-    <matplotlib.collections.QuadMesh object at 0x0000014B2B749330>
+    <matplotlib.collections.QuadMesh object at 0x0000026456EB5C90>
 
 
 
@@ -275,14 +275,14 @@ in this example we'll regrid the npf package manually and the rest of the packag
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x0000014B2C5BA8F0>
+    <matplotlib.collections.QuadMesh object at 0x0000026457FCB1D0>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 7.413 seconds)
+   **Total running time of the script:** (0 minutes 4.740 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_twri_regridding.py:

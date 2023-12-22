@@ -252,8 +252,8 @@ document.write(`
           
           
           
-          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitLab</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
       
@@ -395,8 +395,8 @@ document.write(`
           
           
           
-          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitLab</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
         
@@ -477,6 +477,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">imod.mf6.package</span> <span class="kn">import</span> <span class="n">Package</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.utilities.clip</span> <span class="kn">import</span> <span class="n">clip_by_grid</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.utilities.grid</span> <span class="kn">import</span> <span class="n">broadcast_to_full_domain</span>
+<span class="kn">from</span> <span class="nn">imod.schemata</span> <span class="kn">import</span> <span class="n">EmptyIndexesSchema</span>
 <span class="kn">from</span> <span class="nn">imod.typing</span> <span class="kn">import</span> <span class="n">GridDataArray</span>
 
 
@@ -727,7 +728,7 @@ document.write(`
 
     <span class="n">_period_data</span> <span class="o">=</span> <span class="p">()</span>
     <span class="n">_init_schemata</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">_write_schemata</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_write_schemata</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">EmptyIndexesSchema</span><span class="p">()]}</span>
 
     <span class="n">_regrid_method</span> <span class="o">=</span> <span class="p">{}</span>
 
@@ -1111,18 +1112,17 @@ document.write(`
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 
-<span class="sd">    &gt;&gt; barrier_x = [-1000.0, 0.0, 1000.0]</span>
-<span class="sd">    &gt;&gt; barrier_y = [500.0, 250.0, 500.0]</span>
-<span class="sd">    &gt;&gt; barrier_gdf = gpd.GeoDataFrame(</span>
-<span class="sd">    &gt;&gt;     geometry=[shapely.linestrings(barrier_x, barrier_y),],</span>
-<span class="sd">    &gt;&gt;     data={</span>
-<span class="sd">    &gt;&gt;         &quot;hydraulic_characteristic&quot;: [1e-3,],</span>
-<span class="sd">    &gt;&gt;         &quot;ztop&quot;: [10.0,],</span>
-<span class="sd">    &gt;&gt;         &quot;zbottom&quot;: [0.0,],</span>
-<span class="sd">    &gt;&gt;     },</span>
-<span class="sd">    &gt;&gt; )</span>
-<span class="sd">    &gt;&gt;</span>
-<span class="sd">    &gt;&gt; hfb = imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic(barrier_gdf)</span>
+<span class="sd">    &gt;&gt;&gt; barrier_x = [-1000.0, 0.0, 1000.0]</span>
+<span class="sd">    &gt;&gt;&gt; barrier_y = [500.0, 250.0, 500.0]</span>
+<span class="sd">    &gt;&gt;&gt; barrier_gdf = gpd.GeoDataFrame(</span>
+<span class="sd">    &gt;&gt;&gt;     geometry=[shapely.linestrings(barrier_x, barrier_y),],</span>
+<span class="sd">    &gt;&gt;&gt;     data={</span>
+<span class="sd">    &gt;&gt;&gt;         &quot;hydraulic_characteristic&quot;: [1e-3,],</span>
+<span class="sd">    &gt;&gt;&gt;         &quot;ztop&quot;: [10.0,],</span>
+<span class="sd">    &gt;&gt;&gt;         &quot;zbottom&quot;: [0.0,],</span>
+<span class="sd">    &gt;&gt;&gt;     },</span>
+<span class="sd">    &gt;&gt;&gt; )</span>
+<span class="sd">    &gt;&gt;&gt; hfb = imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic(barrier_gdf)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1173,17 +1173,16 @@ document.write(`
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 
-<span class="sd">    &gt;&gt; barrier_x = [-1000.0, 0.0, 1000.0]</span>
-<span class="sd">    &gt;&gt; barrier_y = [500.0, 250.0, 500.0]</span>
-<span class="sd">    &gt;&gt; barrier_gdf = gpd.GeoDataFrame(</span>
-<span class="sd">    &gt;&gt;     geometry=[shapely.linestrings(barrier_x, barrier_y),],</span>
-<span class="sd">    &gt;&gt;     data={</span>
-<span class="sd">    &gt;&gt;         &quot;hydraulic_characteristic&quot;: [1e-3,],</span>
-<span class="sd">    &gt;&gt;         &quot;layer&quot;: [1,]</span>
-<span class="sd">    &gt;&gt;     },</span>
-<span class="sd">    &gt;&gt; )</span>
-<span class="sd">    &gt;&gt;</span>
-<span class="sd">    &gt;&gt; hfb = imod.mf6.LayeredHorizontalFlowBarrierHydraulicCharacteristic(barrier_gdf)</span>
+<span class="sd">    &gt;&gt;&gt; barrier_x = [-1000.0, 0.0, 1000.0]</span>
+<span class="sd">    &gt;&gt;&gt; barrier_y = [500.0, 250.0, 500.0]</span>
+<span class="sd">    &gt;&gt;&gt; barrier_gdf = gpd.GeoDataFrame(</span>
+<span class="sd">    &gt;&gt;&gt;     geometry=[shapely.linestrings(barrier_x, barrier_y),],</span>
+<span class="sd">    &gt;&gt;&gt;     data={</span>
+<span class="sd">    &gt;&gt;&gt;         &quot;hydraulic_characteristic&quot;: [1e-3,],</span>
+<span class="sd">    &gt;&gt;&gt;         &quot;layer&quot;: [1,]</span>
+<span class="sd">    &gt;&gt;&gt;     },</span>
+<span class="sd">    &gt;&gt;&gt; )</span>
+<span class="sd">    &gt;&gt;&gt; hfb = imod.mf6.LayeredHorizontalFlowBarrierHydraulicCharacteristic(barrier_gdf)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1239,18 +1238,17 @@ document.write(`
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 
-<span class="sd">    &gt;&gt; barrier_x = [-1000.0, 0.0, 1000.0]</span>
-<span class="sd">    &gt;&gt; barrier_y = [500.0, 250.0, 500.0]</span>
-<span class="sd">    &gt;&gt; barrier_gdf = gpd.GeoDataFrame(</span>
-<span class="sd">    &gt;&gt;     geometry=[shapely.linestrings(barrier_x, barrier_y),],</span>
-<span class="sd">    &gt;&gt;     data={</span>
-<span class="sd">    &gt;&gt;         &quot;multiplier&quot;: [1.5,],</span>
-<span class="sd">    &gt;&gt;         &quot;ztop&quot;: [10.0,],</span>
-<span class="sd">    &gt;&gt;         &quot;zbottom&quot;: [0.0,],</span>
-<span class="sd">    &gt;&gt;     },</span>
-<span class="sd">    &gt;&gt; )</span>
-<span class="sd">    &gt;&gt;</span>
-<span class="sd">    &gt;&gt; hfb = imod.mf6.HorizontalFlowBarrierMultiplier(barrier_gdf)</span>
+<span class="sd">    &gt;&gt;&gt; barrier_x = [-1000.0, 0.0, 1000.0]</span>
+<span class="sd">    &gt;&gt;&gt; barrier_y = [500.0, 250.0, 500.0]</span>
+<span class="sd">    &gt;&gt;&gt; barrier_gdf = gpd.GeoDataFrame(</span>
+<span class="sd">    &gt;&gt;&gt;     geometry=[shapely.linestrings(barrier_x, barrier_y),],</span>
+<span class="sd">    &gt;&gt;&gt;     data={</span>
+<span class="sd">    &gt;&gt;&gt;         &quot;multiplier&quot;: [1.5,],</span>
+<span class="sd">    &gt;&gt;&gt;         &quot;ztop&quot;: [10.0,],</span>
+<span class="sd">    &gt;&gt;&gt;         &quot;zbottom&quot;: [0.0,],</span>
+<span class="sd">    &gt;&gt;&gt;     },</span>
+<span class="sd">    &gt;&gt;&gt; )</span>
+<span class="sd">    &gt;&gt;&gt; hfb = imod.mf6.HorizontalFlowBarrierMultiplier(barrier_gdf)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1306,18 +1304,16 @@ document.write(`
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 
-<span class="sd">    &gt;&gt; barrier_x = [-1000.0, 0.0, 1000.0]</span>
-<span class="sd">    &gt;&gt; barrier_y = [500.0, 250.0, 500.0]</span>
-<span class="sd">    &gt;&gt; barrier_gdf = gpd.GeoDataFrame(</span>
-<span class="sd">    &gt;&gt;     geometry=[shapely.linestrings(barrier_x, barrier_y),],</span>
-<span class="sd">    &gt;&gt;     data={</span>
-<span class="sd">    &gt;&gt;         &quot;multiplier&quot;: [1.5,],</span>
-<span class="sd">    &gt;&gt;         &quot;layer&quot;: [1,],</span>
-
-<span class="sd">    &gt;&gt;     },</span>
-<span class="sd">    &gt;&gt; )</span>
-<span class="sd">    &gt;&gt;</span>
-<span class="sd">    &gt;&gt; hfb = imod.mf6.LayeredHorizontalFlowBarrierMultiplier(barrier_gdf)</span>
+<span class="sd">    &gt;&gt;&gt; barrier_x = [-1000.0, 0.0, 1000.0]</span>
+<span class="sd">    &gt;&gt;&gt; barrier_y = [500.0, 250.0, 500.0]</span>
+<span class="sd">    &gt;&gt;&gt; barrier_gdf = gpd.GeoDataFrame(</span>
+<span class="sd">    &gt;&gt;&gt;     geometry=[shapely.linestrings(barrier_x, barrier_y),],</span>
+<span class="sd">    &gt;&gt;&gt;     data={</span>
+<span class="sd">    &gt;&gt;&gt;         &quot;multiplier&quot;: [1.5,],</span>
+<span class="sd">    &gt;&gt;&gt;         &quot;layer&quot;: [1,],</span>
+<span class="sd">    &gt;&gt;&gt;     },</span>
+<span class="sd">    &gt;&gt;&gt; )</span>
+<span class="sd">    &gt;&gt;&gt; hfb = imod.mf6.LayeredHorizontalFlowBarrierMultiplier(barrier_gdf)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1391,18 +1387,17 @@ document.write(`
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 
-<span class="sd">    &gt;&gt; barrier_x = [-1000.0, 0.0, 1000.0]</span>
-<span class="sd">    &gt;&gt; barrier_y = [500.0, 250.0, 500.0]</span>
-<span class="sd">    &gt;&gt; barrier_gdf = gpd.GeoDataFrame(</span>
-<span class="sd">    &gt;&gt;     geometry=[shapely.linestrings(barrier_x, barrier_y),],</span>
-<span class="sd">    &gt;&gt;     data={</span>
-<span class="sd">    &gt;&gt;         &quot;resistance&quot;: [1e3,],</span>
-<span class="sd">    &gt;&gt;         &quot;ztop&quot;: [10.0,],</span>
-<span class="sd">    &gt;&gt;         &quot;zbottom&quot;: [0.0,],</span>
-<span class="sd">    &gt;&gt;     },</span>
-<span class="sd">    &gt;&gt; )</span>
-<span class="sd">    &gt;&gt;</span>
-<span class="sd">    &gt;&gt; hfb = imod.mf6.HorizontalFlowBarrierResistance(barrier_gdf)</span>
+<span class="sd">    &gt;&gt;&gt; barrier_x = [-1000.0, 0.0, 1000.0]</span>
+<span class="sd">    &gt;&gt;&gt; barrier_y = [500.0, 250.0, 500.0]</span>
+<span class="sd">    &gt;&gt;&gt; barrier_gdf = gpd.GeoDataFrame(</span>
+<span class="sd">    &gt;&gt;&gt;     geometry=[shapely.linestrings(barrier_x, barrier_y),],</span>
+<span class="sd">    &gt;&gt;&gt;     data={</span>
+<span class="sd">    &gt;&gt;&gt;         &quot;resistance&quot;: [1e3,],</span>
+<span class="sd">    &gt;&gt;&gt;         &quot;ztop&quot;: [10.0,],</span>
+<span class="sd">    &gt;&gt;&gt;         &quot;zbottom&quot;: [0.0,],</span>
+<span class="sd">    &gt;&gt;&gt;     },</span>
+<span class="sd">    &gt;&gt;&gt; )</span>
+<span class="sd">    &gt;&gt;&gt; hfb = imod.mf6.HorizontalFlowBarrierResistance(barrier_gdf)</span>
 
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1454,17 +1449,16 @@ document.write(`
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 
-<span class="sd">    &gt;&gt; barrier_x = [-1000.0, 0.0, 1000.0]</span>
-<span class="sd">    &gt;&gt; barrier_y = [500.0, 250.0, 500.0]</span>
-<span class="sd">    &gt;&gt; barrier_gdf = gpd.GeoDataFrame(</span>
-<span class="sd">    &gt;&gt;     geometry=[shapely.linestrings(barrier_x, barrier_y),],</span>
-<span class="sd">    &gt;&gt;     data={</span>
-<span class="sd">    &gt;&gt;         &quot;resistance&quot;: [1e3,],</span>
-<span class="sd">    &gt;&gt;         &quot;layer&quot;: [2,],</span>
-<span class="sd">    &gt;&gt;     },</span>
-<span class="sd">    &gt;&gt; )</span>
-<span class="sd">    &gt;&gt;</span>
-<span class="sd">    &gt;&gt; hfb = imod.mf6.LayeredHorizontalFlowBarrierResistance(barrier_gdf)</span>
+<span class="sd">    &gt;&gt;&gt; barrier_x = [-1000.0, 0.0, 1000.0]</span>
+<span class="sd">    &gt;&gt;&gt; barrier_y = [500.0, 250.0, 500.0]</span>
+<span class="sd">    &gt;&gt;&gt; barrier_gdf = gpd.GeoDataFrame(</span>
+<span class="sd">    &gt;&gt;&gt;     geometry=[shapely.linestrings(barrier_x, barrier_y),],</span>
+<span class="sd">    &gt;&gt;&gt;     data={</span>
+<span class="sd">    &gt;&gt;&gt;         &quot;resistance&quot;: [1e3,],</span>
+<span class="sd">    &gt;&gt;&gt;         &quot;layer&quot;: [2,],</span>
+<span class="sd">    &gt;&gt;&gt;     },</span>
+<span class="sd">    &gt;&gt;&gt; )</span>
+<span class="sd">    &gt;&gt;&gt; hfb = imod.mf6.LayeredHorizontalFlowBarrierResistance(barrier_gdf)</span>
 
 
 <span class="sd">    &quot;&quot;&quot;</span>

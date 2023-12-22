@@ -255,8 +255,8 @@ document.write(`
           
           
           
-          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitLab</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
       
@@ -402,8 +402,8 @@ document.write(`
           
           
           
-          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitLab</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
         
@@ -560,8 +560,7 @@ regridding are shown next.</p>
 </pre></div>
 </div>
 <p>Obtain the simulation, write it, run it, and plot some heads.
-There is a separate example contained in
-<a class="reference external" href="https://deltares.gitlab.io/imod/imod-python/examples/mf6/hondsrug.html#sphx-glr-examples-mf6-hondsrug-py">hondsrug</a>
+There is a separate example contained in <a class="reference internal" href="hondsrug.html"><span class="doc">Regional model</span></a>
 that you should look at if you are interested in the model building</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">gwf_simulation</span> <span class="o">=</span> <span class="n">create_hondsrug_simulation</span><span class="p">()</span>
 
@@ -574,7 +573,7 @@ that you should look at if you are interested in the model building</p>
 <span class="n">hds_original</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_hondsrug_regridding_001.png" srcset="../../_images/sphx_glr_hondsrug_regridding_001.png" alt="dx = 25.0, dy = -25.0, layer = 3, time = 2.191e+03" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x0000014B2B980E50&gt;
+<img src="../../_images/sphx_glr_hondsrug_regridding_001.png" srcset="../../_images/sphx_glr_hondsrug_regridding_001.png" alt="dx = 25.0, dy = -25.0, layer = 3, time = 2.191e+03" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x000002645741F190&gt;
 </pre></div>
 </div>
 <p>Create the target grid we will regrid to.</p>
@@ -767,7 +766,7 @@ range is reduced, which can be seen in tailings in the histograms becoming short
 <span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_hondsrug_regridding_013.png" srcset="../../_images/sphx_glr_hondsrug_regridding_013.png" alt="drn-pipe conductance (original), drn-pipe conductance (regridded)" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (2 minutes 55.522 seconds)</p>
+<img src="../../_images/sphx_glr_hondsrug_regridding_013.png" srcset="../../_images/sphx_glr_hondsrug_regridding_013.png" alt="drn-pipe conductance (original), drn-pipe conductance (regridded)" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (2 minutes 43.039 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-hondsrug-regridding-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/c09851a21b1aee213ea29046f1845e3f/hondsrug_regridding.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">hondsrug_regridding.ipynb</span></code></a></p>

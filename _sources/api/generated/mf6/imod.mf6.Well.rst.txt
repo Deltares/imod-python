@@ -1,0 +1,49 @@
+﻿imod.mf6.Well
+=============
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: Well
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Well.__init__
+      ~Well.clip_box
+      ~Well.copy
+      ~Well.from_file
+      ~Well.get_period_varnames
+      ~Well.get_regrid_methods
+      ~Well.is_grid_agnostic_package
+      ~Well.is_regridding_supported
+      ~Well.isel
+      ~Well.mask
+      ~Well.regrid_like
+      ~Well.render
+      ~Well.sel
+      ~Well.skip_masking_dataarray
+      ~Well.to_mf6_pkg
+      ~Well.to_netcdf
+      ~Well.write
+      ~Well.write_binary_griddata
+      ~Well.write_blockfile
+      ~Well.write_text_griddata
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Well.dataset
+      ~Well.x
+      ~Well.y
+   
+   

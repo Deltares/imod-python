@@ -21,6 +21,7 @@
       ~GroundwaterFlowModel.from_file
       ~GroundwaterFlowModel.fromkeys
       ~GroundwaterFlowModel.get
+      ~GroundwaterFlowModel.is_use_newton
       ~GroundwaterFlowModel.items
       ~GroundwaterFlowModel.keys
       ~GroundwaterFlowModel.model_id
@@ -28,6 +29,7 @@
       ~GroundwaterFlowModel.popitem
       ~GroundwaterFlowModel.regrid_like
       ~GroundwaterFlowModel.render
+      ~GroundwaterFlowModel.set_newton
       ~GroundwaterFlowModel.setdefault
       ~GroundwaterFlowModel.update
       ~GroundwaterFlowModel.values

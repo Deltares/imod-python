@@ -255,8 +255,8 @@ document.write(`
           
           
           
-          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitLab</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
       
@@ -402,8 +402,8 @@ document.write(`
           
           
           
-          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitLab</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
         
@@ -801,8 +801,8 @@ outside the domain.</p>
 </div>
 <br />
 <br /><p>The previous head information needs to be assigned to the model grid.
-imod-python has a tool called <a class="reference external" href="https://deltares.gitlab.io/imod/imod-python/api/select.html#imod.select.points_set_values">imod.select.points_set_values</a>, which
-assigns values based on x-y coordinates to a previously defined array. In this
+imod-python has a tool called <a class="reference internal" href="../../api/generated/select/imod.select.points_set_values.html"><span class="doc">imod.select.points_set_values</span></a>,
+which assigns values based on x-y coordinates to a previously defined array. In this
 case, the array is the starting_heads_larger, the values are the mean
 calculated heads and the x and y are the coordinates corresponding to the
 heads.</p>
@@ -821,12 +821,12 @@ heads.</p>
 <span class="n">heads_grid</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_point_interpolation_001.png" srcset="../../_images/sphx_glr_point_interpolation_001.png" alt="dx = 100.0, dy = -100.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x0000014B2B1AB2E0&gt;
+<img src="../../_images/sphx_glr_point_interpolation_001.png" srcset="../../_images/sphx_glr_point_interpolation_001.png" alt="dx = 100.0, dy = -100.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x0000026456F510D0&gt;
 </pre></div>
 </div>
 <p>The previous information is still only available at certain points, so it
 needs to be interpolated. The iMOD Python tool
-<a class="reference external" href="https://deltares.gitlab.io/imod/imod-python/api/prepare.html#imod.prepare.laplace_interpolate">imod.prepare.laplace_interpolate</a> will be
+<a class="reference internal" href="../../api/generated/prepare/imod.prepare.laplace_interpolate.html"><span class="doc">imod.prepare.laplace_interpolate</span></a> will be
 used to do an interpolation of the previously indicated head values. It is
 possible to assign interpolation parameters such as the number of iterations
 and the closing criteria.</p>
@@ -839,7 +839,7 @@ and the closing criteria.</p>
 <span class="n">interpolated_heads</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_point_interpolation_002.png" srcset="../../_images/sphx_glr_point_interpolation_002.png" alt="dx = 100.0, dy = -100.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x0000014B2EE66BF0&gt;
+<img src="../../_images/sphx_glr_point_interpolation_002.png" srcset="../../_images/sphx_glr_point_interpolation_002.png" alt="dx = 100.0, dy = -100.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x0000026457F45B90&gt;
 </pre></div>
 </div>
 <p>It might be nice to have the locations of the boreholes plotted together with
@@ -863,10 +863,10 @@ values as well, which allows us to set transparency per cell.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_point_interpolation_003.png" srcset="../../_images/sphx_glr_point_interpolation_003.png" alt="dx = 100.0, dy = -100.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x0000014B2ADBBE20&gt;
+<img src="../../_images/sphx_glr_point_interpolation_003.png" srcset="../../_images/sphx_glr_point_interpolation_003.png" alt="dx = 100.0, dy = -100.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x000002645357FBD0&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 5.436 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 3.448 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-prepare-point-interpolation-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/90e0bbff5fbb2ff1990dfd9a32f2489c/point_interpolation.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">point_interpolation.ipynb</span></code></a></p>

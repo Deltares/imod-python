@@ -41,5 +41,6 @@
    .. autosummary::
    
       ~OutputControl.dataset
+      ~OutputControl.is_budget_output
    
    

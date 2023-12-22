@@ -76,6 +76,7 @@ Flow Packages
     SpecificStorage
     StorageCoefficient
     UnsaturatedZoneFlow
+    Well
     WellDisStructured
     WellDisVertices
 

@@ -255,8 +255,8 @@ document.write(`
           
           
           
-          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitLab</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
       
@@ -402,8 +402,8 @@ document.write(`
           
           
           
-          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitLab</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
         
@@ -554,6 +554,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.SpecificStorage.html">imod.mf6.SpecificStorage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.StorageCoefficient.html">imod.mf6.StorageCoefficient</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.UnsaturatedZoneFlow.html">imod.mf6.UnsaturatedZoneFlow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.mf6.Well.html">imod.mf6.Well</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.WellDisStructured.html">imod.mf6.WellDisStructured</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">imod.mf6.WellDisVertices</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.AdvectionCentral.html">imod.mf6.AdvectionCentral</a></li>
@@ -725,6 +726,11 @@ document.write(`
 <dd><p>WEL package for discretization by vertices (DISV) models. Any number of WEL
 Packages can be specified for a single groundwater flow model.
 <a class="reference external" href="https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=63">https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=63</a></p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This class is deprecated and will be deleted in a future release.
+Consider changing your code to use the <code class="docutils literal notranslate"><span class="pre">imod.mf6.Well</span></code> package.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

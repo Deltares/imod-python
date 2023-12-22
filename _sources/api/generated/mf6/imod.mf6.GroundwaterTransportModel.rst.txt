@@ -21,6 +21,7 @@
       ~GroundwaterTransportModel.from_file
       ~GroundwaterTransportModel.fromkeys
       ~GroundwaterTransportModel.get
+      ~GroundwaterTransportModel.is_use_newton
       ~GroundwaterTransportModel.items
       ~GroundwaterTransportModel.keys
       ~GroundwaterTransportModel.model_id

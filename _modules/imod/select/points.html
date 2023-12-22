@@ -252,8 +252,8 @@ document.write(`
           
           
           
-          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitLab</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
       
@@ -395,8 +395,8 @@ document.write(`
           
           
           
-          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitLab</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
         
@@ -563,7 +563,7 @@ document.write(`
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">):</span>
         <span class="n">index</span> <span class="o">=</span> <span class="n">get_unstructured_cell2d_from_xy</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="o">**</span><span class="n">points</span><span class="p">)</span>
         <span class="c1"># xu.Ugrid2d.locate_points makes cells outside grid -1</span>
-        <span class="n">in_bounds</span> <span class="o">=</span> <span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="n">in_bounds</span> <span class="o">=</span> <span class="n">index</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span>
         <span class="n">points</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
         <span class="n">points</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
 
@@ -702,7 +702,7 @@ document.write(`
     <span class="k">return</span> <span class="n">indices</span></div>
 
 
-<div class="viewcode-block" id="points_values"><a class="viewcode-back" href="../../../api/generated/select/imod.select.points_values.html#imod.select.points_values">[docs]</a><span class="k">def</span> <span class="nf">points_values</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">points</span><span class="p">):</span>
+<div class="viewcode-block" id="points_values"><a class="viewcode-back" href="../../../api/generated/select/imod.select.points_values.html#imod.select.points_values">[docs]</a><span class="k">def</span> <span class="nf">points_values</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">points</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get values from specified points.</span>
 

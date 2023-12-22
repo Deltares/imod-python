@@ -61,14 +61,13 @@ regridding are shown next.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-29
+.. GENERATED FROM PYTHON SOURCE LINES 25-28
 
 Obtain the simulation, write it, run it, and plot some heads.
-There is a separate example contained in
-`hondsrug <https://deltares.gitlab.io/imod/imod-python/examples/mf6/hondsrug.html#sphx-glr-examples-mf6-hondsrug-py>`_
+There is a separate example contained in :doc:`/examples/mf6/hondsrug`
 that you should look at if you are interested in the model building
 
-.. GENERATED FROM PYTHON SOURCE LINES 29-39
+.. GENERATED FROM PYTHON SOURCE LINES 28-38
 
 .. code-block:: Python
 
@@ -96,15 +95,15 @@ that you should look at if you are interested in the model building
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x0000014B2B980E50>
+    <matplotlib.collections.QuadMesh object at 0x000002645741F190>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-41
+.. GENERATED FROM PYTHON SOURCE LINES 39-40
 
 Create the target grid we will regrid to.
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-63
+.. GENERATED FROM PYTHON SOURCE LINES 40-62
 
 .. code-block:: Python
 
@@ -137,12 +136,12 @@ Create the target grid we will regrid to.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-66
+.. GENERATED FROM PYTHON SOURCE LINES 63-65
 
 Regridding
 ==========
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-79
+.. GENERATED FROM PYTHON SOURCE LINES 65-78
 
 .. code-block:: Python
 
@@ -166,12 +165,12 @@ Regridding
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-82
+.. GENERATED FROM PYTHON SOURCE LINES 79-81
 
 Results visualization
 =====================
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-129
+.. GENERATED FROM PYTHON SOURCE LINES 81-128
 
 .. code-block:: Python
 
@@ -246,7 +245,7 @@ Results visualization
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 130-137
+.. GENERATED FROM PYTHON SOURCE LINES 129-136
 
 Comparison with histograms
 ==========================
@@ -256,7 +255,7 @@ We advice to always check how your input is regridded. In this example we upscal
 many input parameters are regridded with a ``mean`` method. This means that their input
 range is reduced, which can be seen in tailings in the histograms becoming shorter.
 
-.. GENERATED FROM PYTHON SOURCE LINES 137-142
+.. GENERATED FROM PYTHON SOURCE LINES 136-141
 
 .. code-block:: Python
 
@@ -277,11 +276,11 @@ range is reduced, which can be seen in tailings in the histograms becoming short
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 143-144
+.. GENERATED FROM PYTHON SOURCE LINES 142-143
 
 Compare constant head arrays.
 
-.. GENERATED FROM PYTHON SOURCE LINES 144-150
+.. GENERATED FROM PYTHON SOURCE LINES 143-149
 
 .. code-block:: Python
 
@@ -303,11 +302,11 @@ Compare constant head arrays.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 151-152
+.. GENERATED FROM PYTHON SOURCE LINES 150-151
 
 Compare horizontal hydraulic conductivities.
 
-.. GENERATED FROM PYTHON SOURCE LINES 152-157
+.. GENERATED FROM PYTHON SOURCE LINES 151-156
 
 .. code-block:: Python
 
@@ -328,11 +327,11 @@ Compare horizontal hydraulic conductivities.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 158-159
+.. GENERATED FROM PYTHON SOURCE LINES 157-158
 
 Compare vertical hydraulic conductivities.
 
-.. GENERATED FROM PYTHON SOURCE LINES 159-164
+.. GENERATED FROM PYTHON SOURCE LINES 158-163
 
 .. code-block:: Python
 
@@ -353,11 +352,11 @@ Compare vertical hydraulic conductivities.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 165-166
+.. GENERATED FROM PYTHON SOURCE LINES 164-165
 
 Compare starting heads.
 
-.. GENERATED FROM PYTHON SOURCE LINES 166-172
+.. GENERATED FROM PYTHON SOURCE LINES 165-171
 
 .. code-block:: Python
 
@@ -379,11 +378,11 @@ Compare starting heads.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 173-174
+.. GENERATED FROM PYTHON SOURCE LINES 172-173
 
 Compare river stages.
 
-.. GENERATED FROM PYTHON SOURCE LINES 174-180
+.. GENERATED FROM PYTHON SOURCE LINES 173-179
 
 .. code-block:: Python
 
@@ -405,11 +404,11 @@ Compare river stages.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 181-182
+.. GENERATED FROM PYTHON SOURCE LINES 180-181
 
 Compare river bottom elevations.
 
-.. GENERATED FROM PYTHON SOURCE LINES 182-188
+.. GENERATED FROM PYTHON SOURCE LINES 181-187
 
 .. code-block:: Python
 
@@ -431,11 +430,11 @@ Compare river bottom elevations.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 189-190
+.. GENERATED FROM PYTHON SOURCE LINES 188-189
 
 Compare riverbed conductance.
 
-.. GENERATED FROM PYTHON SOURCE LINES 190-196
+.. GENERATED FROM PYTHON SOURCE LINES 189-195
 
 .. code-block:: Python
 
@@ -457,11 +456,11 @@ Compare riverbed conductance.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 197-198
+.. GENERATED FROM PYTHON SOURCE LINES 196-197
 
 Compare recharge rates.
 
-.. GENERATED FROM PYTHON SOURCE LINES 198-204
+.. GENERATED FROM PYTHON SOURCE LINES 197-203
 
 .. code-block:: Python
 
@@ -483,11 +482,11 @@ Compare recharge rates.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 205-206
+.. GENERATED FROM PYTHON SOURCE LINES 204-205
 
 Compare drainage elevations.
 
-.. GENERATED FROM PYTHON SOURCE LINES 206-212
+.. GENERATED FROM PYTHON SOURCE LINES 205-211
 
 .. code-block:: Python
 
@@ -509,11 +508,11 @@ Compare drainage elevations.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 213-214
+.. GENERATED FROM PYTHON SOURCE LINES 212-213
 
 Compare drain conductances.
 
-.. GENERATED FROM PYTHON SOURCE LINES 214-219
+.. GENERATED FROM PYTHON SOURCE LINES 213-218
 
 .. code-block:: Python
 
@@ -537,7 +536,7 @@ Compare drain conductances.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (2 minutes 55.522 seconds)
+   **Total running time of the script:** (2 minutes 43.039 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_hondsrug_regridding.py:

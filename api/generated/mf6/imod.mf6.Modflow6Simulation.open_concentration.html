@@ -255,8 +255,8 @@ document.write(`
           
           
           
-          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitLab</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
       
@@ -402,8 +402,8 @@ document.write(`
           
           
           
-          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitLab</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
         
@@ -554,6 +554,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.SpecificStorage.html">imod.mf6.SpecificStorage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.StorageCoefficient.html">imod.mf6.StorageCoefficient</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.UnsaturatedZoneFlow.html">imod.mf6.UnsaturatedZoneFlow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.mf6.Well.html">imod.mf6.Well</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.WellDisStructured.html">imod.mf6.WellDisStructured</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.WellDisVertices.html">imod.mf6.WellDisVertices</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.AdvectionCentral.html">imod.mf6.AdvectionCentral</a></li>
@@ -721,7 +722,7 @@ document.write(`
 <h1>imod.mf6.Modflow6Simulation.open_concentration<a class="headerlink" href="#imod-mf6-modflow6simulation-open-concentration" title="Permalink to this heading">#</a></h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="imod.mf6.Modflow6Simulation.open_concentration">
-<span class="sig-prename descclassname"><span class="pre">Modflow6Simulation.</span></span><span class="sig-name descname"><span class="pre">open_concentration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">species_ls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_nan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">DataArray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">UgridDataArray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../_modules/imod/mf6/simulation.html#Modflow6Simulation.open_concentration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imod.mf6.Modflow6Simulation.open_concentration" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Modflow6Simulation.</span></span><span class="sig-name descname"><span class="pre">open_concentration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">species_ls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_nan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">DataArray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">UgridDataArray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../_modules/imod/mf6/simulation.html#Modflow6Simulation.open_concentration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imod.mf6.Modflow6Simulation.open_concentration" title="Permalink to this definition">#</a></dt>
 <dd><p>Open concentration of finished simulation, requires that the <code class="docutils literal notranslate"><span class="pre">run</span></code>
 method has been called.</p>
 <p>The data is lazily read per timestep and automatically converted into

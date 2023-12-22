@@ -252,8 +252,8 @@ document.write(`
           
           
           
-          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitLab</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
       
@@ -395,8 +395,8 @@ document.write(`
           
           
           
-          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitLab</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
         
@@ -475,15 +475,17 @@ document.write(`
 <span class="kn">import</span> <span class="nn">xugrid</span> <span class="k">as</span> <span class="nn">xu</span>
 
 <span class="kn">import</span> <span class="nn">imod</span>
-<span class="kn">from</span> <span class="nn">imod.mf6.exchange_creator_structured</span> <span class="kn">import</span> <span class="n">ExchangeCreator_Structured</span>
-<span class="kn">from</span> <span class="nn">imod.mf6.exchange_creator_unstructured</span> <span class="kn">import</span> <span class="n">ExchangeCreator_Unstructured</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.gwfgwf</span> <span class="kn">import</span> <span class="n">GWFGWF</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.model</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">GroundwaterFlowModel</span><span class="p">,</span>
     <span class="n">GroundwaterTransportModel</span><span class="p">,</span>
     <span class="n">Modflow6Model</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">imod.mf6.modelsplitter</span> <span class="kn">import</span> <span class="n">create_partition_info</span><span class="p">,</span> <span class="n">slice_model</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.multimodel.exchange_creator_structured</span> <span class="kn">import</span> <span class="n">ExchangeCreator_Structured</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.multimodel.exchange_creator_unstructured</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ExchangeCreator_Unstructured</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.multimodel.modelsplitter</span> <span class="kn">import</span> <span class="n">create_partition_info</span><span class="p">,</span> <span class="n">slice_model</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.out</span> <span class="kn">import</span> <span class="n">open_cbc</span><span class="p">,</span> <span class="n">open_conc</span><span class="p">,</span> <span class="n">open_hds</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.package</span> <span class="kn">import</span> <span class="n">Package</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.pkgbase</span> <span class="kn">import</span> <span class="n">PackageBase</span>
@@ -746,8 +748,7 @@ document.write(`
 <span class="sd">        Run Modflow 6 simulation. This method runs a subprocess calling</span>
 <span class="sd">        ``mf6path``. This argument is set to ``mf6``, which means the Modflow 6</span>
 <span class="sd">        executable is expected to be added to your PATH environment variable.</span>
-<span class="sd">        `See this writeup how to add Modflow 6 to your PATH on Windows</span>
-<span class="sd">        &lt;https://deltares.gitlab.io/imod/imod-python/examples/mf6/index.html&gt;`_</span>
+<span class="sd">        :doc:`See this writeup how to add Modflow 6 to your PATH on Windows &lt;/examples/mf6/index&gt;`</span>
 
 <span class="sd">        Note that the ``write`` method needs to be called before this method is</span>
 <span class="sd">        called.</span>
@@ -1327,7 +1328,10 @@ document.write(`
         <span class="n">new_simulation</span><span class="p">[</span><span class="s2">&quot;solver&quot;</span><span class="p">][</span><span class="s2">&quot;modelnames&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
             <span class="nb">list</span><span class="p">(</span><span class="n">get_models</span><span class="p">(</span><span class="n">new_simulation</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="p">)</span>
+
         <span class="n">new_simulation</span><span class="o">.</span><span class="n">_add_modelsplit_exchanges</span><span class="p">(</span><span class="n">exchanges</span><span class="p">)</span>
+        <span class="n">new_simulation</span><span class="o">.</span><span class="n">_set_exchange_options</span><span class="p">()</span>
+
         <span class="n">new_simulation</span><span class="o">.</span><span class="n">_filter_inactive_cells_from_exchanges</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">new_simulation</span></div>
 
@@ -1378,6 +1382,19 @@ document.write(`
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_split</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;split_exchanges&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;split_exchanges&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">exchanges_list</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_exchange_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># collect some options that we will auto-set</span>
+        <span class="k">for</span> <span class="n">exchange</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;split_exchanges&quot;</span><span class="p">]:</span>
+            <span class="n">model_name_1</span> <span class="o">=</span> <span class="n">exchange</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;model_name_1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[()]</span>
+            <span class="n">model_1</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">model_name_1</span><span class="p">]</span>
+            <span class="n">exchange</span><span class="o">.</span><span class="n">set_options</span><span class="p">(</span>
+                <span class="n">save_flows</span><span class="o">=</span><span class="n">model_1</span><span class="p">[</span><span class="s2">&quot;oc&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">is_budget_output</span><span class="p">,</span>
+                <span class="n">dewatered</span><span class="o">=</span><span class="n">model_1</span><span class="p">[</span><span class="s2">&quot;npf&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">is_dewatered</span><span class="p">,</span>
+                <span class="n">variablecv</span><span class="o">=</span><span class="n">model_1</span><span class="p">[</span><span class="s2">&quot;npf&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">is_variable_vertical_conductance</span><span class="p">,</span>
+                <span class="n">xt3d</span><span class="o">=</span><span class="n">model_1</span><span class="p">[</span><span class="s2">&quot;npf&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_xt3d_option</span><span class="p">(),</span>
+                <span class="n">newton</span><span class="o">=</span><span class="n">model_1</span><span class="o">.</span><span class="n">is_use_newton</span><span class="p">(),</span>
+            <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_filter_inactive_cells_from_exchanges</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">ex</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;split_exchanges&quot;</span><span class="p">]:</span>

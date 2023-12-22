@@ -252,8 +252,8 @@ document.write(`
           
           
           
-          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitLab</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
       
@@ -395,8 +395,8 @@ document.write(`
           
           
           
-          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitLab</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
         
@@ -635,7 +635,7 @@ document.write(`
 
     <span class="k">def</span> <span class="nf">__get_k</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">npf</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">NodePropertyFlow</span><span class="o">.</span><span class="n">get_pkg_id</span><span class="p">()]</span>
+            <span class="n">npf</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">NodePropertyFlow</span><span class="o">.</span><span class="n">_pkg_id</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;expected one package of type ModePropertyFlow&quot;</span><span class="p">)</span>
 
@@ -982,6 +982,9 @@ document.write(`
             <span class="n">content</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">typename</span><span class="si">}</span><span class="s2">(&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">options</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;)</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">]</span>
         <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">is_use_newton</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
 
 <div class="viewcode-block" id="GroundwaterFlowModel"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.GroundwaterFlowModel.html#imod.mf6.GroundwaterFlowModel">[docs]</a><span class="k">class</span> <span class="nc">GroundwaterFlowModel</span><span class="p">(</span><span class="n">Modflow6Model</span><span class="p">):</span>
     <span class="n">_mandatory_packages</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;npf&quot;</span><span class="p">,</span> <span class="s2">&quot;ic&quot;</span><span class="p">,</span> <span class="s2">&quot;oc&quot;</span><span class="p">,</span> <span class="s2">&quot;sto&quot;</span><span class="p">)</span>
@@ -1094,7 +1097,13 @@ document.write(`
 
         <span class="k">return</span> <span class="n">create_clipped_boundary</span><span class="p">(</span>
             <span class="n">model</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="n">state_for_boundary</span><span class="p">,</span> <span class="n">constant_head_packages</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">is_use_newton</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;newton&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">set_newton</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">is_newton</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;newton&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">is_newton</span></div>
 
 
 <div class="viewcode-block" id="GroundwaterTransportModel"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.GroundwaterTransportModel.html#imod.mf6.GroundwaterTransportModel">[docs]</a><span class="k">class</span> <span class="nc">GroundwaterTransportModel</span><span class="p">(</span><span class="n">Modflow6Model</span><span class="p">):</span>

@@ -255,8 +255,8 @@ document.write(`
           
           
           
-          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitLab</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
       
@@ -402,8 +402,8 @@ document.write(`
           
           
           
-          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitLab</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
         
@@ -553,12 +553,12 @@ comparison.</p>
 <span class="kn">from</span> <span class="nn">example_models</span> <span class="kn">import</span> <span class="n">create_hondsrug_simulation</span>
 
 <span class="kn">import</span> <span class="nn">imod</span>
-<span class="kn">from</span> <span class="nn">imod.mf6.partition_generator</span> <span class="kn">import</span> <span class="n">get_label_array</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.multimodel.partition_generator</span> <span class="kn">import</span> <span class="n">get_label_array</span>
 </pre></div>
 </div>
 <p>Obtain the simulation, write it, run it, and plot some heads.
 There is a separate example contained in
-<a class="reference external" href="https://deltares.gitlab.io/imod/imod-python/examples/mf6/hondsrug.html#sphx-glr-examples-mf6-hondsrug-py">hondsrug</a>
+<a class="reference internal" href="hondsrug.html"><span class="doc">hondsrug</span></a>
 that you should look at if you are interested in the model building</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">gwf_simulation</span> <span class="o">=</span> <span class="n">create_hondsrug_simulation</span><span class="p">()</span>
 </pre></div>
@@ -632,7 +632,7 @@ package chd removed in partition 10, because all empty
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, &#39;hondsrug diff &#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (5 minutes 27.643 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (4 minutes 19.928 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-hondsrug-partitioning-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/c36f338498698f0b51edf3b5cbb2ebe2/hondsrug_partitioning.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">hondsrug_partitioning.ipynb</span></code></a></p>

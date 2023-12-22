@@ -252,8 +252,8 @@ document.write(`
           
           
           
-          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitLab</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
       
@@ -395,8 +395,8 @@ document.write(`
           
           
           
-          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitLab</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
         
@@ -460,7 +460,6 @@ document.write(`
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -477,13 +476,12 @@ document.write(`
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.interfaces.ipointdatapackage</span> <span class="kn">import</span> <span class="n">IPointDataPackage</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.mf6_wel_adapter</span> <span class="kn">import</span> <span class="n">Mf6Wel</span>
-<span class="kn">from</span> <span class="nn">imod.mf6.package</span> <span class="kn">import</span> <span class="n">Package</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.utilities.clip</span> <span class="kn">import</span> <span class="n">clip_by_grid</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.utilities.dataset</span> <span class="kn">import</span> <span class="n">remove_inactive</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.write_context</span> <span class="kn">import</span> <span class="n">WriteContext</span>
 <span class="kn">from</span> <span class="nn">imod.prepare</span> <span class="kn">import</span> <span class="n">assign_wells</span>
 <span class="kn">from</span> <span class="nn">imod.schemata</span> <span class="kn">import</span> <span class="n">AllNoDataSchema</span><span class="p">,</span> <span class="n">DTypeSchema</span>
-<span class="kn">from</span> <span class="nn">imod.select.points</span> <span class="kn">import</span> <span class="n">points_indices</span>
+<span class="kn">from</span> <span class="nn">imod.select.points</span> <span class="kn">import</span> <span class="n">points_indices</span><span class="p">,</span> <span class="n">points_values</span>
 <span class="kn">from</span> <span class="nn">imod.typing</span> <span class="kn">import</span> <span class="n">GridDataArray</span>
 <span class="kn">from</span> <span class="nn">imod.typing.grid</span> <span class="kn">import</span> <span class="n">ones_like</span>
 <span class="kn">from</span> <span class="nn">imod.util</span> <span class="kn">import</span> <span class="n">values_within_range</span>
@@ -506,7 +504,19 @@ document.write(`
         <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">Well</span><span class="p">(</span><span class="n">BoundaryCondition</span><span class="p">,</span> <span class="n">IPointDataPackage</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">mask_2D</span><span class="p">(</span><span class="n">package</span><span class="p">:</span> <span class="n">Well</span><span class="p">,</span> <span class="n">domain_2d</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Well</span><span class="p">:</span>
+    <span class="n">point_active</span> <span class="o">=</span> <span class="n">points_values</span><span class="p">(</span><span class="n">domain_2d</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">package</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">package</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+
+    <span class="n">is_inside_exterior</span> <span class="o">=</span> <span class="n">point_active</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="n">selection</span> <span class="o">=</span> <span class="n">package</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">loc</span><span class="p">[{</span><span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="n">is_inside_exterior</span><span class="p">}]</span>
+
+    <span class="bp">cls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">package</span><span class="p">)</span>
+    <span class="n">new</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+    <span class="n">new</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">selection</span>
+    <span class="k">return</span> <span class="n">new</span>
+
+
+<div class="viewcode-block" id="Well"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Well.html#imod.mf6.Well">[docs]</a><span class="k">class</span> <span class="nc">Well</span><span class="p">(</span><span class="n">BoundaryCondition</span><span class="p">,</span> <span class="n">IPointDataPackage</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Agnostic WEL package, which accepts x, y and a top and bottom of the well screens.</span>
 
@@ -595,7 +605,7 @@ document.write(`
 
     <span class="n">_regrid_method</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="Well.__init__"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Well.html#imod.mf6.Well.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">x</span><span class="p">,</span>
         <span class="n">y</span><span class="p">,</span>
@@ -635,7 +645,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;concentration&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">concentration</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;concentration_boundary_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">concentration_boundary_type</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span></div>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">is_grid_agnostic_package</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -651,7 +661,7 @@ document.write(`
         <span class="n">x_max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">y_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">y_max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Well&quot;</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Well</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Clip a package by a bounding box (time, layer, y, x).</span>
 
@@ -714,7 +724,7 @@ document.write(`
         <span class="n">mf6_package</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_mf6_pkg</span><span class="p">(</span>
             <span class="n">idomain</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">write_context</span><span class="o">.</span><span class="n">is_partitioned</span>
         <span class="p">)</span>
-        <span class="c1"># TODO: make options like &quot;save_flows&quot; configurable. Issue gitlab #623</span>
+        <span class="c1"># TODO: make options like &quot;save_flows&quot; configurable. Issue github #623</span>
         <span class="n">mf6_package</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;save_flows&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">mf6_package</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">pkgname</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">write_context</span><span class="p">)</span>
 
@@ -931,7 +941,7 @@ document.write(`
 
         <span class="k">if</span> <span class="n">nwells_df</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No wells were assigned in package. None were present.&quot;</span><span class="p">)</span>
-        <span class="c1"># @TODO: reinstate this check. issue gitlab #621.</span>
+        <span class="c1"># @TODO: reinstate this check. issue github #621.</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_partitioned</span> <span class="ow">and</span> <span class="n">nwells_df</span> <span class="o">!=</span> <span class="n">nwells_assigned</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;One or more well(s) are completely invalid due to minimum conductivity and thickness constraints.&quot;</span>
@@ -947,24 +957,30 @@ document.write(`
 
         <span class="k">return</span> <span class="n">Mf6Wel</span><span class="p">(</span><span class="o">**</span><span class="n">ds</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">regrid_like</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_grid</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Well&quot;</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">regrid_like</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_grid</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Well</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The regrid_like method is irrelevant for this package as it is</span>
 <span class="sd">        grid-agnostic, instead this method clips the package based on the grid</span>
 <span class="sd">        exterior.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">clip_by_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_grid</span><span class="p">)</span>
+        <span class="n">target_grid_2d</span> <span class="o">=</span> <span class="n">target_grid</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">missing_dims</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">clip_by_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_grid_2d</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Package</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Well</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        The Well package has no mask method implemented. Wells falling in</span>
-<span class="sd">        inactive cells are automatically removed in the call to write to</span>
-<span class="sd">        Modflow 6 package. You can verify this by calling the ``to_mf6_pkg``</span>
-<span class="sd">        method.</span>
+<span class="sd">        Mask wells based on two-dimensional domain. For three-dimensional</span>
+<span class="sd">        masking: Wells falling in inactive cells are automatically removed in</span>
+<span class="sd">        the call to write to Modflow 6 package. You can verify this by calling</span>
+<span class="sd">        the ``to_mf6_pkg`` method.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># TODO: Add docsting message to logger</span>
-        <span class="c1"># message = textwrap.dedent(self.mask.__doc__)</span>
-        <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="c1"># Drop layer coordinate if present, otherwise a layer coordinate is assigned</span>
+        <span class="c1"># which causes conflicts downstream when assigning wells and deriving</span>
+        <span class="c1"># cellids.</span>
+        <span class="n">domain_2d</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">missing_dims</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span>
+            <span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">mask_2D</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_2d</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="WellDisStructured"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.WellDisStructured.html#imod.mf6.WellDisStructured">[docs]</a><span class="k">class</span> <span class="nc">WellDisStructured</span><span class="p">(</span><span class="n">DisStructuredBoundaryCondition</span><span class="p">):</span>
@@ -972,6 +988,10 @@ document.write(`
 <span class="sd">    WEL package for structured discretization (DIS) models .</span>
 <span class="sd">    Any number of WEL Packages can be specified for a single groundwater flow model.</span>
 <span class="sd">    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=63</span>
+
+<span class="sd">    .. warning::</span>
+<span class="sd">        This class is deprecated and will be deleted in a future release.</span>
+<span class="sd">        Consider changing your code to use the ``imod.mf6.Well`` package.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1136,6 +1156,10 @@ document.write(`
 <span class="sd">    WEL package for discretization by vertices (DISV) models. Any number of WEL</span>
 <span class="sd">    Packages can be specified for a single groundwater flow model.</span>
 <span class="sd">    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=63</span>
+
+<span class="sd">    .. warning::</span>
+<span class="sd">        This class is deprecated and will be deleted in a future release.</span>
+<span class="sd">        Consider changing your code to use the ``imod.mf6.Well`` package.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>

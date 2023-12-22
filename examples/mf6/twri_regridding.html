@@ -255,8 +255,8 @@ document.write(`
           
           
           
-          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitLab</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
       
@@ -402,8 +402,8 @@ document.write(`
           
           
           
-          <a href="https://gitlab.com/deltares/imod/imod-python" title="GitLab" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-gitlab fa-lg" aria-hidden="true"></i></span>
-            <span class="sr-only">GitLab</span></a>
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
         
@@ -576,7 +576,7 @@ To better illustrate the regridding, we replace the K field with a lognormal ran
 <span class="n">heterogeneous_k</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_twri_regridding_001.png" srcset="../../_images/sphx_glr_twri_regridding_001.png" alt="layer = 1, dx = 5e+03, dy = -5e+03" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x0000014B276E98D0&gt;
+<img src="../../_images/sphx_glr_twri_regridding_001.png" srcset="../../_images/sphx_glr_twri_regridding_001.png" alt="layer = 1, dx = 5e+03, dy = -5e+03" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x0000026453AEA590&gt;
 </pre></div>
 </div>
 <p>Now we create a new grid for this simulation. It has 3 layers,  45 rows and 20 columns.
@@ -609,7 +609,7 @@ specifies that field “k” uses an OVERLAP regridder in combination with the a
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">new_simulation</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">regrid_like</span><span class="p">(</span><span class="s2">&quot;regridded_twri&quot;</span><span class="p">,</span> <span class="n">target_grid</span><span class="o">=</span><span class="n">target_grid</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>D:\buildAgent\work\6818356b8b2759b2\imod_python_test_env\lib\site-packages\xarray\core\utils.py:494: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>D:\buildAgent\work\6818356b8b2759b2\imod_python_test_env\Lib\site-packages\xarray\core\utils.py:494: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
   warnings.warn(
 </pre></div>
 </div>
@@ -620,7 +620,7 @@ specifies that field “k” uses an OVERLAP regridder in combination with the a
 <span class="n">regridded_k_1</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_twri_regridding_002.png" srcset="../../_images/sphx_glr_twri_regridding_002.png" alt="layer = 1, dx = 5e+03, dy = -5e+03" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x0000014B2AA81240&gt;
+<img src="../../_images/sphx_glr_twri_regridding_002.png" srcset="../../_images/sphx_glr_twri_regridding_002.png" alt="layer = 1, dx = 5e+03, dy = -5e+03" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x000002645B7DC650&gt;
 </pre></div>
 </div>
 <p>A second way to regrid  twri  is to regrid the groundwater flow model.</p>
@@ -632,10 +632,10 @@ specifies that field “k” uses an OVERLAP regridder in combination with the a
 <span class="n">regridded_k_2</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_twri_regridding_003.png" srcset="../../_images/sphx_glr_twri_regridding_003.png" alt="layer = 1, dx = 5e+03, dy = -5e+03" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>D:\buildAgent\work\6818356b8b2759b2\imod_python_test_env\lib\site-packages\xarray\core\utils.py:494: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
+<img src="../../_images/sphx_glr_twri_regridding_003.png" srcset="../../_images/sphx_glr_twri_regridding_003.png" alt="layer = 1, dx = 5e+03, dy = -5e+03" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>D:\buildAgent\work\6818356b8b2759b2\imod_python_test_env\Lib\site-packages\xarray\core\utils.py:494: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
   warnings.warn(
 
-&lt;matplotlib.collections.QuadMesh object at 0x0000014B2B749330&gt;
+&lt;matplotlib.collections.QuadMesh object at 0x0000026456EB5C90&gt;
 </pre></div>
 </div>
 <p>Finally, we can regrid package per package. This allows us to choose the regridding method as well.
@@ -652,10 +652,10 @@ in this example we’ll regrid the npf package manually and the rest of the pack
 <span class="n">regridded_k_3</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_twri_regridding_004.png" srcset="../../_images/sphx_glr_twri_regridding_004.png" alt="layer = 1, dx = 5e+03, dy = -5e+03" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x0000014B2C5BA8F0&gt;
+<img src="../../_images/sphx_glr_twri_regridding_004.png" srcset="../../_images/sphx_glr_twri_regridding_004.png" alt="layer = 1, dx = 5e+03, dy = -5e+03" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x0000026457FCB1D0&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 7.413 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 4.740 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-twri-regridding-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/4990753e2e175c4c8ddc4b97830ffbfc/twri_regridding.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">twri_regridding.ipynb</span></code></a></p>

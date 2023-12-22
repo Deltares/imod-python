@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from example_models import create_circle_simulation
 
 import imod
-from imod.mf6.partition_generator import get_label_array
+from imod.mf6.multimodel.partition_generator import get_label_array
 
 simulation = create_circle_simulation()
 tmp_path = imod.util.temporary_directory()

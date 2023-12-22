@@ -17,8 +17,8 @@
       ~NodePropertyFlow.clip_box
       ~NodePropertyFlow.copy
       ~NodePropertyFlow.from_file
-      ~NodePropertyFlow.get_pkg_id
       ~NodePropertyFlow.get_regrid_methods
+      ~NodePropertyFlow.get_xt3d_option
       ~NodePropertyFlow.is_grid_agnostic_package
       ~NodePropertyFlow.is_regridding_supported
       ~NodePropertyFlow.isel
@@ -26,6 +26,7 @@
       ~NodePropertyFlow.regrid_like
       ~NodePropertyFlow.render
       ~NodePropertyFlow.sel
+      ~NodePropertyFlow.set_xt3d_option
       ~NodePropertyFlow.skip_masking_dataarray
       ~NodePropertyFlow.to_netcdf
       ~NodePropertyFlow.write
@@ -42,5 +43,7 @@
    .. autosummary::
    
       ~NodePropertyFlow.dataset
+      ~NodePropertyFlow.is_dewatered
+      ~NodePropertyFlow.is_variable_vertical_conductance
    
    
