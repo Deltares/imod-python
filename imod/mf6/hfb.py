@@ -354,6 +354,14 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             barrier_values, unstructured_grid, edge_index
         )
 
+        if (barrier_values.size == 0) | np.isnan(barrier_values).all():
+            raise ValueError(
+                "No barriers could be assigned to cell edges, this is caused by either one of the following:\n"
+                "\t- Barriers fall completely outside the model grid\n"
+                "\t- Barriers were assigned to the edge of the model domain\n"
+                "\t- Barriers were assigned to edges of inactive cells\n"
+            )
+
         barrier_dataset = typing.cast(
             xr.Dataset,
             to_connected_cells_dataset(
