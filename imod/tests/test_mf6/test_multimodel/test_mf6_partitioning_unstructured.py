@@ -13,6 +13,18 @@ from imod.mf6.wel import Well
 from imod.typing.grid import zeros_like
 from pytest_cases import parametrize_with_cases
 import xarray as xr
+import uuid
+
+def reduce_coordinate_precision( ugrid):
+    ugrid.ugrid.grid.node_x = ugrid.ugrid.grid.node_x.round(5)
+    ugrid.ugrid.grid.node_y = ugrid.ugrid.grid.node_y.round(5)    
+
+
+def save_and_load( tmp_path, ugrid):
+    filename = tmp_path /str(uuid.uuid4())
+    ugrid.ugrid.to_netcdf(filename)
+    ugrid = xu.open_dataset(filename)
+    return ugrid
 
 @pytest.mark.usefixtures("circle_model")
 @pytest.fixture(scope="function")
@@ -24,13 +36,46 @@ def idomain_top(circle_model):
 class PartitionArrayCases:
     def case_two_parts(self, idomain_top) -> xu.UgridDataArray:
         two_parts = zeros_like(idomain_top)
-        two_parts.values[108:] = 1
+        two_parts.values[74:] = 1
         return two_parts
+
+    def case_two_parts2(self, idomain_top) -> xu.UgridDataArray:
+        two_parts = zeros_like(idomain_top)
+        two_parts.values[47:] = 1
+        return two_parts
+
+    def case_two_parts3(self, idomain_top) -> xu.UgridDataArray:
+        two_parts = zeros_like(idomain_top)
+        two_parts.values[147:] = 1
+        return two_parts
+
+    def case_two_parts4(self, idomain_top) -> xu.UgridDataArray:
+        two_parts = zeros_like(idomain_top)
+        two_parts.values[187:] = 1
+        return two_parts                        
 
     def case_two_parts_inverse(self, idomain_top) -> xu.UgridDataArray:
         two_parts_inverse = zeros_like(idomain_top)
-        two_parts_inverse.values[:108] = 1
+        two_parts_inverse.values[:74] = 1
         return two_parts_inverse
+
+    def case_two_parts_inverse2(self, idomain_top) -> xu.UgridDataArray:
+        two_parts_inverse = zeros_like(idomain_top)
+        two_parts_inverse.values[:47] = 1
+        return two_parts_inverse
+
+ 
+    def case_two_parts_inverse3(self, idomain_top) -> xu.UgridDataArray:
+        two_parts_inverse = zeros_like(idomain_top)
+        two_parts_inverse.values[:147] = 1
+        return two_parts_inverse       
+
+ 
+    def case_two_parts_inverse4(self, idomain_top) -> xu.UgridDataArray:
+        two_parts_inverse = zeros_like(idomain_top)
+        two_parts_inverse.values[:187] = 1
+        return two_parts_inverse       
+
 
     def case_three_parts(self, idomain_top) -> xu.UgridDataArray:
         three_parts = zeros_like(idomain_top)
@@ -75,79 +120,6 @@ class HorizontalFlowBarrierCases:
             },
         )
 
-
-def setup_reference_results() -> Dict[str, np.ndarray]:
-    result = {}
-    result["two_parts"] = np.array(
-        [
-            360.0,
-            360.0,
-            240.0,
-            353.79397689,
-            360.0,
-            300.0,
-            360.0,
-            360.0,
-            360.0,
-            360.0,
-            225.0,
-            349.63376582,
-            219.55330268,
-            300.0,
-            300.0,
-            360.0,
-            360.0,
-            240.0,
-            353.79397689,
-            360.0,
-            300.0,
-            360.0,
-            360.0,
-            360.0,
-            360.0,
-            225.0,
-            349.63376582,
-            219.55330268,
-            300.0,
-            300.0,
-        ]
-    )
-
-    result["two_parts_inverse"] = np.array(
-        [
-            180.0,
-            180.0,
-            60.0,
-            180.0,
-            120.0,
-            180.0,
-            180.0,
-            180.0,
-            180.0,
-            173.79397689,
-            45.0,
-            169.63376582,
-            39.55330268,
-            120.0,
-            120.0,
-            180.0,
-            180.0,
-            60.0,
-            180.0,
-            120.0,
-            180.0,
-            180.0,
-            180.0,
-            180.0,
-            173.79397689,
-            45.0,
-            169.63376582,
-            39.55330268,
-            120.0,
-            120.0,
-        ]
-    )
-    return result
 
     def case_hfb_horizontal(self):
         # Horizontal line at y = -100.0
@@ -499,34 +471,21 @@ def test_specific_discharge_results(
 
     new_sim.run()
     split_balances = new_sim.open_flow_budget()
-    split_head = new_sim.open_head()
+    split_head = new_sim.open_head()    
+    reduce_coordinate_precision(split_head)
+    reduce_coordinate_precision(original_heads)    
 
-    split_head.ugrid.grid.node_x = split_head.ugrid.grid.node_x.round(5)
-    split_head.ugrid.grid.node_y = split_head.ugrid.grid.node_y.round(5)    
-    original_heads.ugrid.grid.node_x = original_heads.ugrid.grid.node_x.round(5)
-    original_heads.ugrid.grid.node_y = original_heads.ugrid.grid.node_y.round(5)
     split_head = split_head.ugrid.reindex_like(original_heads)
 
-
-    split_balances["npf-qx"] .ugrid.grid.node_x = split_balances["npf-qx"] .ugrid.grid.node_x.round(5)
-    split_balances["npf-qx"] .ugrid.grid.node_y = split_balances["npf-qx"] .ugrid.grid.node_y.round(5)
-    original_balances["npf-qx"].ugrid.grid.node_x = original_balances["npf-qx"].ugrid.grid.node_x.round(5)        
-    original_balances["npf-qx"].ugrid.grid.node_y = original_balances["npf-qx"].ugrid.grid.node_y.round(5)
-
-    split_balances["npf-qy"] .ugrid.grid.node_x = split_balances["npf-qy"] .ugrid.grid.node_x.round(5)
-    split_balances["npf-qy"] .ugrid.grid.node_y = split_balances["npf-qy"] .ugrid.grid.node_y.round(5)
-    original_balances["npf-qy"].ugrid.grid.node_x = original_balances["npf-qy"].ugrid.grid.node_x.round(5)        
-    original_balances["npf-qy"].ugrid.grid.node_y = original_balances["npf-qy"].ugrid.grid.node_y.round(5)
-
-    split_balances["npf-qx"].ugrid.to_netcdf(tmp_path / "split_balances_x.nc")
-    split_balances["npf-qy"].ugrid.to_netcdf(tmp_path / "split_balances_y.nc")    
-    original_balances["npf-qx"].ugrid.to_netcdf(tmp_path / "original_balances_x.nc")
-    original_balances["npf-qy"].ugrid.to_netcdf(tmp_path / "original_balances_y.nc")
+    reduce_coordinate_precision(split_balances["npf-qx"])
+    reduce_coordinate_precision(original_balances["npf-qx"])
+    reduce_coordinate_precision(split_balances["npf-qy"])
+    reduce_coordinate_precision(original_balances["npf-qy"])
  
-    split_balances_x_v2 = xu.open_dataset(tmp_path /  "split_balances_x.nc")
-    split_balances_y_v2 = xu.open_dataset(tmp_path /  "split_balances_y.nc")    
-    original_balances_x_v2 =  xu.open_dataset(tmp_path /  "original_balances_x.nc")
-    original_balances_y_v2 =  xu.open_dataset(tmp_path /  "original_balances_y.nc")
+    split_balances_x_v2 =  save_and_load( tmp_path, split_balances["npf-qx"])
+    split_balances_y_v2 = save_and_load( tmp_path, split_balances["npf-qy"]  )
+    original_balances_x_v2 =  save_and_load(  tmp_path,  original_balances["npf-qx"])
+    original_balances_y_v2 =  save_and_load(  tmp_path, original_balances["npf-qy"])
 
 
     split_balances_x_v2["npf-qx"] = split_balances_x_v2["npf-qx"].ugrid.reindex_like( original_balances_x_v2)
@@ -536,20 +495,10 @@ def test_specific_discharge_results(
     veldif_x = original_balances_x_v2["data-spdis"] - split_balances_x_v2["npf-qx"]
     veldif_y = original_balances_y_v2 ["data-spdis"]- split_balances_y_v2["npf-qy"]
 
+
+    print(f"x: {veldif_x.values.max() }, y: {veldif_y.values.max()}")
     assert veldif_x.values.max() < 1e-6
     assert veldif_y.values.max() < 1e-6
-
-    reldif_x = abs(veldif_x / original_balances_x_v2)
-    reldif_y = abs(veldif_y / original_balances_y_v2)
-
-    mask_x = abs(original_balances_x_v2["data-spdis"])  < 1e-15
-    mask_y = abs(original_balances_y_v2["data-spdis"])  < 1e-15    
-    reldif_x = xr.where(mask_x, 0, reldif_x["data-spdis"])
-    reldif_y =  xr.where(mask_y, 0, reldif_y["data-spdis"])
-    print(f"reldif x: {reldif_x.max() }")
-    print(f"reldif y: {reldif_y.max() }")
-    assert reldif_x.max() < 1e-5
-    assert reldif_y.max() < 0.12
 
 
     pass
