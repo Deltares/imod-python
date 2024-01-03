@@ -896,7 +896,9 @@ def _zonal_aggregate_raster(
     # This may result in areas significantly smaller than the polygon geometry,
     # but should come in handy for weighting later?
     df = df[df["data"].notnull()]
-    result = df.groupby(column, as_index=False).agg(["count", method]).reset_index()
+    result = df.groupby(column, as_index=False).agg(["count", method])
+    # Reset index to set "column" as column again, make sure index is dropped
+    result = result.reset_index(drop=True)
     # Compute the area from the counted number of cells
     result["data", "count"] *= resolution * resolution
     name = raster.name if raster.name else "aggregated"
@@ -946,7 +948,9 @@ def _zonal_aggregate_polygons(
     # Remove entries where the raster has nodata.
     # This may result in areas significantly smaller than the polygon geometry,
     # but should come in handy for weighting later?
-    result = df.groupby(column_a, as_index=False).agg(["count", method]).reset_index()
+    result = df.groupby(column_a, as_index=False).agg(["count", method])
+    # Reset index to set "column_a" as column again, make sure index is dropped
+    result = result.reset_index(drop=True)
     # Compute the area from the counted number of cells
     result[column_b, "count"] *= resolution * resolution
     result.columns = [column_a, "area", column_b]
