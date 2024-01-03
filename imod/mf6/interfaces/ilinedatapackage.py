@@ -12,10 +12,10 @@ class ILineDataPackage(IPackageBase):
 
     @property
     @abstractmethod
-    def geometry(self) -> gpd.GeoDataFrame:
+    def line_data(self) -> gpd.GeoDataFrame:
         raise NotImplementedError
 
-    @geometry.setter
+    @line_data.setter
     @abstractmethod
-    def geometry(self, value: gpd.GeoDataFrame) -> None:
+    def line_data(self, value: gpd.GeoDataFrame) -> None:
         raise NotImplementedError

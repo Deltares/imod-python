@@ -282,7 +282,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         super().__init__(locals())
         self.dataset["print_input"] = print_input
 
-        self.geometry = geometry
+        self.line_data = geometry
 
     def _get_variable_names_for_gdf(self) -> list[str]:
         return [
@@ -291,15 +291,15 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         ] + self._get_vertical_variables()
 
     @property
-    def geometry(self) -> gpd.GeoDataFrame:
+    def line_data(self) -> gpd.GeoDataFrame:
         variables_for_gdf = self._get_variable_names_for_gdf()
         return gpd.GeoDataFrame(
             self.dataset[variables_for_gdf].to_dataframe(),
             geometry="geometry",
         )
 
-    @geometry.setter
-    def geometry(self, value: gpd.GeoDataFrame) -> None:
+    @line_data.setter
+    def line_data(self, value: gpd.GeoDataFrame) -> None:
         variables_for_gdf = self._get_variable_names_for_gdf()
         self.dataset = self.dataset.merge(
             value.to_xarray(), overwrite_vars=variables_for_gdf, join="right"

@@ -95,20 +95,20 @@ def clip_by_grid(package: ILineDataPackage, active: GridDataArray) -> ILineDataP
 
     # Clip line with polygon
     bounding_gdf = bounding_polygon(active)
-    clipped_geometry = package.geometry.clip(bounding_gdf)
+    clipped_line_data = package.line_data.clip(bounding_gdf)
 
     # Catch edge case: when line crosses only vertex of polygon, a point
     # or multipoint is returned. Drop these.
-    type_ids = shapely.get_type_id(clipped_geometry.geometry)
+    type_ids = shapely.get_type_id(clipped_line_data.geometry)
     is_points = (type_ids == shapely.GeometryType.POINT) | (
         type_ids == shapely.GeometryType.MULTIPOINT
     )
-    clipped_geometry = clipped_geometry[~is_points]
+    clipped_line_data = clipped_line_data[~is_points]
 
     # Convert MultiLineStrings to LineStrings
-    clipped_geometry = clipped_geometry.explode("geometry", ignore_index=True)
+    clipped_line_data = clipped_line_data.explode("geometry", ignore_index=True)
 
     # Create new instance
     clipped_package = deepcopy(package)
-    clipped_package.geometry = clipped_geometry
+    clipped_package.line_data = clipped_line_data
     return clipped_package
