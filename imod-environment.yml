@@ -45,6 +45,6 @@ dependencies:
   - twine
   - vtk>=9.0
   - vtk * qt* # Select only qt builds
-  - xarray>=0.15
+  - xarray>=2023.04.0
   - xugrid>=0.6.4
   - zarr
