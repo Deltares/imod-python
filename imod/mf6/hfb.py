@@ -1,5 +1,6 @@
 import abc
 import copy
+import textwrap
 import typing
 from copy import deepcopy
 from enum import Enum
@@ -356,10 +357,15 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
         if (barrier_values.size == 0) | np.isnan(barrier_values).all():
             raise ValueError(
-                "No barriers could be assigned to cell edges, this is caused by either one of the following:\n"
-                "\t- Barriers fall completely outside the model grid\n"
-                "\t- Barriers were assigned to the edge of the model domain\n"
-                "\t- Barriers were assigned to edges of inactive cells\n"
+                textwrap.dedent(
+                    """
+                    No barriers could be assigned to cell edges,
+                    this is caused by either one of the following:
+                    \t- Barriers fall completely outside the model grid
+                    \t- Barriers were assigned to the edge of the model domain
+                    \t- Barriers were assigned to edges of inactive cells
+                    """
+                )
             )
 
         barrier_dataset = typing.cast(
