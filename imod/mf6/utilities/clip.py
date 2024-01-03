@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from copy import deepcopy
+
 import geopandas as gpd
 import numpy as np
 import shapely
@@ -70,26 +72,6 @@ def clip_by_grid(
     return new
 
 
-def _get_settings(package: IPackageBase) -> ScalarDataset:
-    scalar_variables = get_scalar_variables(package.dataset)
-    return package.dataset[scalar_variables]
-
-
-def _get_variable_names_for_gdf(package: ILineDataPackage) -> list[str]:
-    return [
-        package._get_variable_name(),
-        "geometry",
-    ] + package._get_vertical_variables()
-
-
-def _line_package_to_gdf(package: ILineDataPackage) -> gpd.GeoDataFrame:
-    variables_for_gdf = _get_variable_names_for_gdf(package)
-    return gpd.GeoDataFrame(
-        package.dataset[variables_for_gdf].to_dataframe(),
-        geometry="geometry",
-    )
-
-
 def _filter_inactive_cells(package, active):
     if package.is_grid_agnostic_package():
         return
@@ -111,22 +93,22 @@ def _filter_inactive_cells(package, active):
 def clip_by_grid(package: ILineDataPackage, active: GridDataArray) -> ILineDataPackage:
     """Clip LineDataPackage outside unstructured/structured grid."""
 
-    # Convert package to Geopandas' GeoDataFrame
-    package_gdf = _line_package_to_gdf(package)
     # Clip line with polygon
     bounding_gdf = bounding_polygon(active)
-    package_gdf_clipped = package_gdf.clip(bounding_gdf)
+    clipped_geometry = package.geometry.clip(bounding_gdf)
+
     # Catch edge case: when line crosses only vertex of polygon, a point
     # or multipoint is returned. Drop these.
-    type_ids = shapely.get_type_id(package_gdf_clipped.geometry)
+    type_ids = shapely.get_type_id(clipped_geometry.geometry)
     is_points = (type_ids == shapely.GeometryType.POINT) | (
         type_ids == shapely.GeometryType.MULTIPOINT
     )
-    package_gdf_clipped = package_gdf_clipped[~is_points]
-    # Separate MultiLinestrings ino separate Linestrings
-    package_gdf_clipped = package_gdf_clipped.explode("geometry", ignore_index=True)
-    # Get settings
-    settings = _get_settings(package)
+    clipped_geometry = clipped_geometry[~is_points]
+
+    # Convert MultiLineStrings to LineStrings
+    clipped_geometry = clipped_geometry.explode("geometry", ignore_index=True)
+
     # Create new instance
-    cls = type(package)
-    return cls(package_gdf_clipped, **settings)
+    clipped_package = deepcopy(package)
+    clipped_package.geometry = clipped_geometry
+    return clipped_package
