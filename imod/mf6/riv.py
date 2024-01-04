@@ -1,3 +1,5 @@
+import inspect
+
 import numpy as np
 
 from imod.mf6.auxiliary_variables import add_periodic_auxiliary_variable
@@ -15,6 +17,8 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
+
+ARGS_TO_EXCLUDE = ["validate"]
 
 
 class River(BoundaryCondition):
@@ -144,6 +148,14 @@ class River(BoundaryCondition):
         validate: bool = True,
         repeat_stress=None,
     ):
+        locals_at_init = locals()
+        variable_names = list(inspect.signature(self.__init__).parameters.keys())
+        for var_to_exclude in ARGS_TO_EXCLUDE:
+            if var_to_exclude in variable_names:
+                variable_names.remove(var_to_exclude)
+        variables_to_merge = {name: locals_at_init[name] for name in variable_names}
+        xr.merge([variables_to_merge], join="exact")
+
         super().__init__(locals())
         self.dataset["stage"] = stage
         self.dataset["conductance"] = conductance
