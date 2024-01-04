@@ -7,13 +7,6 @@ from pathlib import Path
 import pytest
 
 
-def on_gitlab_ci():
-    """
-    Don't test the examples on CI: they run during building of documentation.
-    """
-    return os.environ.get("GITLAB_CI") is not None
-
-
 def get_examples():
     # Where are we? --> __file__
     # Move three up.
@@ -23,7 +16,7 @@ def get_examples():
     return examples
 
 
-@pytest.mark.skipif(on_gitlab_ci(), reason="Examples are run during docs build")
+@pytest.mark.example
 @pytest.mark.parametrize("example", get_examples())
 def test_example(example):
     subprocess.run([sys.executable, example], check=True)
