@@ -6,6 +6,21 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[Unreleased]
+------------
+
+Fixed
+~~~~~
+- iMOD Python now supports versions of pandas >= 2
+- Fixed bugs with clipping :class:`imod.mf6.HorizontalFlowBarrier` for
+  structured grids
+
+Changed
+~~~~~~~
+- We moved to using `pixi <https://pixi.sh/>`_ to create development
+  environments. This replaces the ``imod-environment.yml`` conda environment. We
+  advice doing development installations with pixi from now on. `See the
+  documentation. <https://deltares.github.io/imod-python/installation.html>`_
 
 [0.15.1] - 2023-12-22
 ---------------------
