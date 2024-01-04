@@ -1,4 +1,5 @@
 import abc
+import inspect
 import numbers
 import pathlib
 
@@ -11,6 +12,7 @@ from imod.mf6.interfaces.ipackagebase import IPackageBase
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 EXCHANGE_PACKAGES = "gwfgwf"
+ARGS_TO_EXCLUDE = ["validate"]
 
 
 class PackageBase(IPackageBase, abc.ABC):
@@ -32,6 +34,17 @@ class PackageBase(IPackageBase, abc.ABC):
                     self.__dataset = xu.UgridDataset(grids=arg.ugrid.grid)
                     return
         self.__dataset = xr.Dataset()
+
+    def _get_variable_names(init_method):
+        """
+        Return variable names based on the arguments provided to the classes'
+        __init__ method. Removes argument names that need to be excluded.
+        """
+        variable_names = list(inspect.signature(init_method).parameters.keys())
+        for var_to_exclude in ARGS_TO_EXCLUDE:
+            if var_to_exclude in variable_names:
+                variable_names.remove(var_to_exclude)
+        return variable_names
 
     @property
     def dataset(self) -> xr.Dataset:
