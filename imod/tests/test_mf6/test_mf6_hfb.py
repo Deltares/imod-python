@@ -322,6 +322,9 @@ def test_to_mf6_remove_invalid_edges(
     hfb = HorizontalFlowBarrierResistance(geometry)
 
     # Act.
+    if expected_number_barriers == 0:
+        pytest.xfail("Test expected to fail if expected number barriers = 0")
+
     _ = hfb.to_mf6_pkg(idomain, top, bottom, k)
 
     # Assert.

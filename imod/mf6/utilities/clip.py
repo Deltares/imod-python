@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-import geopandas as gpd
+from copy import deepcopy
+
 import numpy as np
 import shapely
 import xarray as xr
@@ -10,9 +11,8 @@ from fastcore.dispatch import typedispatch
 from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.interfaces.ipackagebase import IPackageBase
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
-from imod.mf6.utilities.dataset import get_scalar_variables
 from imod.mf6.utilities.grid import get_active_domain_slice
-from imod.typing import GridDataArray, ScalarDataset
+from imod.typing import GridDataArray
 from imod.typing.grid import bounding_polygon, is_spatial_2D
 
 
@@ -70,26 +70,6 @@ def clip_by_grid(
     return new
 
 
-def _get_settings(package: IPackageBase) -> ScalarDataset:
-    scalar_variables = get_scalar_variables(package.dataset)
-    return package.dataset[scalar_variables]
-
-
-def _get_variable_names_for_gdf(package: ILineDataPackage) -> list[str]:
-    return [
-        package._get_variable_name(),
-        "geometry",
-    ] + package._get_vertical_variables()
-
-
-def _line_package_to_gdf(package: ILineDataPackage) -> gpd.GeoDataFrame:
-    variables_for_gdf = _get_variable_names_for_gdf(package)
-    return gpd.GeoDataFrame(
-        package.dataset[variables_for_gdf].to_dataframe(),
-        geometry="geometry",
-    )
-
-
 def _filter_inactive_cells(package, active):
     if package.is_grid_agnostic_package():
         return
@@ -111,17 +91,22 @@ def _filter_inactive_cells(package, active):
 def clip_by_grid(package: ILineDataPackage, active: GridDataArray) -> ILineDataPackage:
     """Clip LineDataPackage outside unstructured/structured grid."""
 
-    # Convert package to Geopandas' GeoDataFrame
-    package_gdf = _line_package_to_gdf(package)
     # Clip line with polygon
     bounding_gdf = bounding_polygon(active)
-    package_gdf_clipped = package_gdf.clip(bounding_gdf)
+    clipped_line_data = package.line_data.clip(bounding_gdf)
+
     # Catch edge case: when line crosses only vertex of polygon, a point
-    # (type_id == 0) is returned. Drop these.
-    is_points = shapely.get_type_id(package_gdf_clipped.geometry) == 0
-    package_gdf_clipped = package_gdf_clipped[~is_points]
-    # Get settings
-    settings = _get_settings(package)
+    # or multipoint is returned. Drop these.
+    type_ids = shapely.get_type_id(clipped_line_data.geometry)
+    is_points = (type_ids == shapely.GeometryType.POINT) | (
+        type_ids == shapely.GeometryType.MULTIPOINT
+    )
+    clipped_line_data = clipped_line_data[~is_points]
+
+    # Convert MultiLineStrings to LineStrings
+    clipped_line_data = clipped_line_data.explode("geometry", ignore_index=True)
+
     # Create new instance
-    cls = type(package)
-    return cls(package_gdf_clipped, **settings)
+    clipped_package = deepcopy(package)
+    clipped_package.line_data = clipped_line_data
+    return clipped_package
