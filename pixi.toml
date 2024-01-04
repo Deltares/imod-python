@@ -59,7 +59,7 @@ netcdf4 = "*"
 numba = ">=0.50"
 numpy = "*"
 pandamesh = "*"
-pandas = "<2.0"  # TODO: unpin when newer xarray on conda-forge
+pandas = "*"
 pooch = "*"
 pydata-sphinx-theme = "*"
 pymetis = "*"
@@ -86,7 +86,7 @@ toolz = "*"
 tqdm = "*"
 twine = "*"
 vtk = { version = ">=9.0", build = "*qt*", channel = "conda-forge" }
-xarray = ">=0.15"
+xarray = ">=2023.04.0"
 xugrid = ">=0.6.4"
 zarr = "*"
 
