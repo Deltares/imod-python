@@ -6,12 +6,8 @@ build-backend = "setuptools.build_meta"
 name = "imod"
 version = "0.15.1"
 requires-python = ">=3.10"
-authors = [
-    { name = "Deltares", email = "huite.bootsma@deltares.nl" },
-]
-maintainers = [
-    { name = "Deltares", email = "huite.bootsma@deltares.nl" }
-]
+authors = [{ name = "Deltares", email = "huite.bootsma@deltares.nl" }, ]
+maintainers = [{ name = "Deltares", email = "huite.bootsma@deltares.nl" }]
 description = "Make massive MODFLOW models!"
 readme = "README.rst"
 license = { file = "LICENSE" }
@@ -85,6 +81,7 @@ dev = [
 
 [tool.isort]
 profile = "black"
+skip = [".gitignore", ".dockerignore"]
 
 [tool.coverage.report]
 exclude_lines = [
@@ -98,6 +95,7 @@ ignore = [
     "C402",
     "C403",
     "C404",
+    "C405",
     "C408",
     "C416",
     "C417",
@@ -107,7 +105,6 @@ ignore = [
     "D206",
     "D400",
     "D404",
-    "C405",
     "E402",
     "E501",
     "E703",
@@ -117,9 +114,9 @@ ignore = [
     "E741",
     "F811",
     "PD002",
-    "PD901",
     "PD003",
     "PD004",
+    "PD901",
 ]
 fixable = ["I"]
 ignore-init-module-imports = true
