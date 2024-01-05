@@ -118,5 +118,13 @@ def test_hfb_writing_one_layer(barrier, tmp_path):
     hfb.write("hfb", None, write_context)
 
     # Assert
-    data = np.loadtxt(tmp_path / "hfb" / "hfb.dat")
+    hfb_bin_path = tmp_path / "hfb" / "hfb.bin"
+    hfb_txt_path = tmp_path / "hfb" / "hfb.dat"
+
+    # Test if not written to binary file
+    assert not hfb_bin_path.exists()
+    # Test if text file exists
+    assert hfb_txt_path.exists()
+
+    data = np.loadtxt(hfb_txt_path)
     np.testing.assert_almost_equal(data, expected_hfb_data)
