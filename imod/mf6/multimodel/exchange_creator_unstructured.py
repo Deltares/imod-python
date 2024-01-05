@@ -90,6 +90,8 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         normal = np.array((dy[:], -dx[:]), dtype=np.float_).T
         outward_vector = centroid_2 - centroid_1
 
+        # the inproduct between the edge normal and the outward vector is positive if they go in the same direction.
+        # we use this to swap the normal if needed so that it goes outward. 
         inprod = (
             normal[:, 0] * outward_vector[:, 0] + normal[:, 1] * outward_vector[:, 1]
         )
@@ -97,16 +99,14 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         normal = np.where(
             np.transpose((inprod[:] > 0, inprod[:] > 0)), normal[:], -normal[:]
         )
+
+        # using the normal and the norm of the normal we can compute the angle of the normal
         norm_normal = np.sqrt(normal[:, 0] * normal[:, 0] + normal[:, 1] * normal[:, 1])
         cos = (normal[:, 0]) / norm_normal
         angle = np.degrees(np.arccos(cos))
 
-        real_angle = np.where(normal[:, 1] > 0, angle, 360 - angle)
-
-        # now that we have an outward pointing normal, let's compute angldegx
-
-        # The cross product of U and V equals the area of the parallellogram,
-        # dividing by length (the base of the parallellogram) gives the orthogonal distances cl1 & cl2.
+        # adjust the angle for being in the 2 lower quadrants
+        real_angle = np.where(normal[:, 1] > 0, angle, - angle)
 
         df = pd.DataFrame(
             {
