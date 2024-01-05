@@ -64,7 +64,11 @@ def hondsrug_drainage() -> xr.Dataset:
 
 def head_observations() -> pd.DataFrame:
     fname = REGISTRY.fetch("head-observations.csv")
-    return pd.read_csv(fname)
+    df = pd.read_csv(fname)
+    # Manually convert time column to datetime type because pandas >2.0 doesn't
+    # do this automatically anymore upon reading.
+    df["time"] = pd.to_datetime(df["time"])
+    return df
 
 
 def fluxes() -> xr.Dataset:

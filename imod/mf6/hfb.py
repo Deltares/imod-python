@@ -1,5 +1,6 @@
 import abc
 import copy
+import textwrap
 import typing
 from copy import deepcopy
 from enum import Enum
@@ -281,11 +282,28 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         super().__init__(locals())
         self.dataset["print_input"] = print_input
 
-        self.dataset = self.dataset.merge(geometry.to_xarray())
+        self.line_data = geometry
+
+    def _get_variable_names_for_gdf(self) -> list[str]:
+        return [
+            self._get_variable_name(),
+            "geometry",
+        ] + self._get_vertical_variables()
 
     @property
-    def geometry(self) -> np.ndarray[object]:
-        return self.dataset["geometry"].values
+    def line_data(self) -> gpd.GeoDataFrame:
+        variables_for_gdf = self._get_variable_names_for_gdf()
+        return gpd.GeoDataFrame(
+            self.dataset[variables_for_gdf].to_dataframe(),
+            geometry="geometry",
+        )
+
+    @line_data.setter
+    def line_data(self, value: gpd.GeoDataFrame) -> None:
+        variables_for_gdf = self._get_variable_names_for_gdf()
+        self.dataset = self.dataset.merge(
+            value.to_xarray(), overwrite_vars=variables_for_gdf, join="right"
+        )
 
     def render(self, directory, pkgname, globaltimes, binary):
         raise NotImplementedError(
@@ -353,6 +371,19 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         barrier_values = self.__remove_edge_values_connected_to_inactive_cells(
             barrier_values, unstructured_grid, edge_index
         )
+
+        if (barrier_values.size == 0) | np.isnan(barrier_values).all():
+            raise ValueError(
+                textwrap.dedent(
+                    """
+                    No barriers could be assigned to cell edges,
+                    this is caused by either one of the following:
+                    \t- Barriers fall completely outside the model grid
+                    \t- Barriers were assigned to the edge of the model domain
+                    \t- Barriers were assigned to edges of inactive cells
+                    """
+                )
+            )
 
         barrier_dataset = typing.cast(
             xr.Dataset,

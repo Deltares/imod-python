@@ -159,3 +159,8 @@ module = [
     "xugrid.*",
 ]
 ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+markers = [
+    "example: marks test as example (deselect with '-m \"not example\"')",
+]

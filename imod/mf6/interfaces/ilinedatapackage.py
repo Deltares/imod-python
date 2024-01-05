@@ -1,6 +1,6 @@
 from abc import abstractmethod
 
-from numpy import ndarray
+import geopandas as gpd
 
 from imod.mf6.interfaces.ipackagebase import IPackageBase
 
@@ -12,5 +12,10 @@ class ILineDataPackage(IPackageBase):
 
     @property
     @abstractmethod
-    def geometry(self) -> ndarray[object]:
+    def line_data(self) -> gpd.GeoDataFrame:
+        raise NotImplementedError
+
+    @line_data.setter
+    @abstractmethod
+    def line_data(self, value: gpd.GeoDataFrame) -> None:
         raise NotImplementedError

@@ -1,7 +1,9 @@
 from pathlib import Path
 
+import geopandas as gpd
 import numpy as np
 import pytest
+import shapely
 import xarray as xr
 from pytest_cases import case, parametrize_with_cases
 
@@ -119,6 +121,64 @@ class WellCases:
             screen_bottom=size * [-450.0],
             rate=size * [-5.0],
             minimum_k=1e-19,
+        )
+
+
+class HorizontalFlowBarrierCases:
+    def case_hfb_vertical(self):
+        # Vertical line at x = 52500.0
+        barrier_y = [0.0, 52500.0]
+        barrier_x = [52500.0, 52500.0]
+
+        return gpd.GeoDataFrame(
+            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            data={
+                "resistance": [10.0],
+                "ztop": [10.0],
+                "zbottom": [0.0],
+            },
+        )
+
+    def case_hfb_horizontal(self):
+        # Horizontal line at y = 52500.0
+        barrier_x = [0.0, 52500.0]
+        barrier_y = [52500.0, 52500.0]
+
+        return gpd.GeoDataFrame(
+            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            data={
+                "resistance": [10.0],
+                "ztop": [10.0],
+                "zbottom": [0.0],
+            },
+        )
+
+    def case_hfb_horizontal_outside_domain(self):
+        # Horizontal line at y = -100.0 running outside domain
+        barrier_x = [0.0, 1_000_000.0]
+        barrier_y = [52500.0, 52500.0]
+
+        return gpd.GeoDataFrame(
+            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            data={
+                "resistance": [10.0],
+                "ztop": [10.0],
+                "zbottom": [0.0],
+            },
+        )
+
+    def case_hfb_diagonal(self):
+        # Diagonal line
+        barrier_y = [0.0, 52500.0]
+        barrier_x = [0.0, 52500.0]
+
+        return gpd.GeoDataFrame(
+            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            data={
+                "resistance": [10.0],
+                "ztop": [10.0],
+                "zbottom": [0.0],
+            },
         )
 
 
@@ -380,3 +440,67 @@ def test_partitioning_structured_one_high_level_well(
     np.testing.assert_allclose(
         head["head"].values, original_head.values, rtol=1e-4, atol=1e-4
     )
+
+
+def is_expected_hfb_partition_combination_fail(current_cases):
+    """
+    Helper function for all expected failures
+
+    Idea taken from:
+    https://github.com/smarie/python-pytest-cases/issues/195#issuecomment-834232905
+    """
+    # In this combination the hfb lays along partition model domain.
+    if (current_cases["partition_array"].id == "four_squares") and (
+        current_cases["hfb"].id == "hfb_diagonal"
+    ):
+        return True
+    return False
+
+
+@pytest.mark.usefixtures("transient_twri_model")
+@parametrize_with_cases("partition_array", cases=PartitionArrayCases)
+@parametrize_with_cases("hfb", cases=HorizontalFlowBarrierCases)
+def test_partitioning_structured_hfb(
+    tmp_path: Path,
+    transient_twri_model: Modflow6Simulation,
+    partition_array: xr.DataArray,
+    hfb: imod.mf6.HorizontalFlowBarrierResistance,
+    current_cases,
+):
+    """
+    In this test we include a high-level well package with 1 well in it to the
+    simulation. The well will be in active in 1 partition and should therefore
+    be inactive or non-present in the other partitions This should not give
+    validation errors.
+    """
+    simulation = transient_twri_model
+
+    simulation["GWF_1"]["hfb"] = imod.mf6.HorizontalFlowBarrierResistance(geometry=hfb)
+
+    # Run the original example, so without partitioning, and save the simulation
+    # results.
+    original_dir = tmp_path / "original"
+    simulation.write(original_dir, binary=False)
+    simulation.run()
+
+    original_head = imod.mf6.open_hds(
+        original_dir / "GWF_1/GWF_1.hds",
+        original_dir / "GWF_1/dis.dis.grb",
+    )
+
+    # Partition the simulation, run it, and save the (merged) results
+    split_simulation = simulation.split(partition_array)
+
+    # Certain combinations are expected to fail
+    if is_expected_hfb_partition_combination_fail(current_cases):
+        pytest.xfail("Combination hfb - partition_array expected to fail.")
+
+    split_simulation.write(tmp_path, binary=False)
+    split_simulation.run()
+
+    head = split_simulation.open_head()
+    _ = split_simulation.open_flow_budget()
+
+    # Compare the head result of the original simulation with the result of the
+    # partitioned simulation.
+    np.testing.assert_allclose(head["head"].values, original_head.values, rtol=1e-3)
