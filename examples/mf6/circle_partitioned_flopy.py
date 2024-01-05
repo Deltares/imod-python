@@ -22,7 +22,7 @@ import imod
 from imod.mf6.multimodel.partition_generator import get_label_array
 from imod.typing.grid import merge
 
-# Set up the simulation and write the MF6 inputfiles 
+# Set up the simulation and write the MF6 inputfiles
 simulation = create_circle_simulation()
 tmp_path = imod.util.temporary_directory()
 ip_unsplit_dir = tmp_path / "original"
@@ -61,9 +61,9 @@ flopy_split_sim.write_simulation(silent=False)
 flopy_split_sim.run_simulation(silent=False)
 
 
-# Load the results. Note that flopy has written some of its output to the folder where 
-# the output of the model before splitting was supposed to go. That is because loading and splitting  
-# a simulation in flopy does not affect the folders specified in the oc file ( which are absolute paths in this case). 
+# Load the results. Note that flopy has written some of its output to the folder where
+# the output of the model before splitting was supposed to go. That is because loading and splitting
+# a simulation in flopy does not affect the folders specified in the oc file ( which are absolute paths in this case).
 q1 = imod.mf6.open_cbc(
     ip_unsplit_dir / "GWF_1/GWF_1_0.cbc", flopy_split_dir / "gwf_1_0.disv.grb"
 )
@@ -78,7 +78,7 @@ array_dict = {0: q1["npf-qx"].values, 1: q2["npf-qx"].values}
 new_vel_array = mf_splitter.reconstruct_array(array_dict)
 q_merged.values = new_vel_array
 
-# Run the original imod-python simulation, load the results 
+# Run the original imod-python simulation, load the results
 simulation.run()
 original_balances = simulation.open_flow_budget()
 
@@ -92,7 +92,7 @@ diff.isel(layer=0, time=0).ugrid.plot.contourf(ax=ax)
 # negligible absolute error, so we throw these out
 reldif = abs(diff) / abs(original_balances["npf-qx"])
 fig, ax = plt.subplots()
-reldif.values = np.where(original_balances["npf-qx"].values < 1e-8 , 0, reldif.values) #
+reldif.values = np.where(original_balances["npf-qx"].values < 1e-8, 0, reldif.values)  #
 reldif.isel(layer=0, time=0).ugrid.plot.contourf(ax=ax)
 
 
@@ -116,12 +116,16 @@ veldif_x.isel(layer=0, time=-1).ugrid.plot()
 # Compute and plot the relative differences
 fig, ax = plt.subplots()
 reldif_x = abs(veldif_x) / abs(balances["npf-qx"])
-reldif_x.values = np.where(original_balances["npf-qx"].values < 1e-8, 0 , reldif_x.values)
+reldif_x.values = np.where(
+    original_balances["npf-qx"].values < 1e-8, 0, reldif_x.values
+)
 reldif_x.isel(layer=0, time=-1).ugrid.plot()
 
 
 reldif_y = veldif_y / balances["npf-qy"]
-reldif_y.values = np.where(original_balances["npf-qx"].values < 1e-8, 0, reldif_y.values)
+reldif_y.values = np.where(
+    original_balances["npf-qx"].values < 1e-8, 0, reldif_y.values
+)
 reldif_y.isel(layer=0, time=-1).ugrid.plot()
 
 # %%
