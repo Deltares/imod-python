@@ -26,6 +26,7 @@ unittests = { cmd = [
     "--verbose",
     "--junitxml=unittest_report.xml",
     "--cov=imod",
+    "--cov-branch",
     "--cov-report=term",
     "--cov-report=html:coverage",
     "--cov-config=.coveragerc"
