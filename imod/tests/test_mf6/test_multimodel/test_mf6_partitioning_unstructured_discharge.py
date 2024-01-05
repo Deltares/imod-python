@@ -3,7 +3,6 @@ import uuid
 from copy import deepcopy
 from pathlib import Path
 from typing import Dict, Union
-from imod.typing import UnstructuredData
 
 import geopandas as gpd
 import numpy as np
@@ -16,6 +15,7 @@ from pytest_cases import parametrize_with_cases
 import imod
 from imod.mf6 import Modflow6Simulation
 from imod.mf6.wel import Well
+from imod.typing import UnstructuredData
 from imod.typing.grid import zeros_like
 
 
