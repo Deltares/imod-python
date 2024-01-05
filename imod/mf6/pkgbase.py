@@ -9,6 +9,7 @@ import xugrid as xu
 
 import imod
 from imod.mf6.interfaces.ipackagebase import IPackageBase
+from imod.typing.grid import GridDataset
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 EXCHANGE_PACKAGES = "gwfgwf"
@@ -47,11 +48,11 @@ class PackageBase(IPackageBase, abc.ABC):
         return variable_names
 
     @property
-    def dataset(self) -> xr.Dataset:
+    def dataset(self) -> GridDataset:
         return self.__dataset
 
     @dataset.setter
-    def dataset(self, value: xr.Dataset) -> None:
+    def dataset(self, value: GridDataset) -> None:
         self.__dataset = value
 
     def __getitem__(self, key):
