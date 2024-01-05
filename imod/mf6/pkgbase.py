@@ -16,6 +16,37 @@ EXCHANGE_PACKAGES = "gwfgwf"
 ARGS_TO_EXCLUDE = ["validate"]
 
 
+def merge_unstructured_dataset(variables_to_merge):
+    """Work around xugrid issue https://github.com/Deltares/xugrid/issues/179"""
+
+    # Separate variables into list of grids and dict of scalar variables
+    grids_ls = []
+    scalar_dict = {}
+    for name, variable in variables_to_merge.items():
+        if isinstance(variable, xu.UgridDataArray):
+            grids_ls.append(variable.rename(name))
+        else:
+            scalar_dict[name] = variable
+
+    # Merge grids
+    dataset = xu.merge(grids_ls, join="exact")
+
+    # Assign scalar variables manually
+    for name, variable in scalar_dict.items():
+        dataset[name] = variable
+
+    return dataset
+
+
+def merge_at_init(variables_to_merge):
+    if variables_to_merge is not None:
+        for arg in variables_to_merge.values():
+            if isinstance(arg, xu.UgridDataArray):
+                return merge_unstructured_dataset(variables_to_merge)
+
+    return xr.merge([variables_to_merge], join="exact")
+
+
 class PackageBase(IPackageBase, abc.ABC):
     """
     This class is used for storing a collection of Xarray DataArrays or UgridDataArrays
@@ -28,15 +59,10 @@ class PackageBase(IPackageBase, abc.ABC):
     def __new__(cls, *_, **__):
         return super(PackageBase, cls).__new__(cls)
 
-    def __init__(self, allargs=None):
-        if allargs is not None:
-            for arg in allargs.values():
-                if isinstance(arg, xu.UgridDataArray):
-                    self.__dataset = xu.UgridDataset(grids=arg.ugrid.grid)
-                    return
-        self.__dataset = xr.Dataset()
+    def __init__(self, variables_to_merge=None):
+        self.__dataset = merge_at_init(variables_to_merge)
 
-    def _get_variable_names(init_method):
+    def _get_variable_names(self, init_method):
         """
         Return variable names based on the arguments provided to the classes'
         __init__ method. Removes argument names that need to be excluded.
