@@ -99,7 +99,7 @@ def test_hfb_render(barrier):
 
 
 @parametrize_with_cases("barrier", cases=GridBarriers)
-def test_hfb_writing_one_layer__unstructured(barrier, tmp_path):
+def test_hfb_writing_one_layer(barrier, tmp_path):
     # Arrange
     hfb = Mf6HorizontalFlowBarrier(**barrier)
     write_context = WriteContext(tmp_path)
