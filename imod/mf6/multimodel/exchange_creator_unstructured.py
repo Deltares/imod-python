@@ -91,7 +91,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         outward_vector = centroid_2 - centroid_1
 
         # the inproduct between the edge normal and the outward vector is positive if they go in the same direction.
-        # we use this to swap the normal if needed so that it goes outward. 
+        # we use this to swap the normal if needed so that it goes outward.
         inprod = (
             normal[:, 0] * outward_vector[:, 0] + normal[:, 1] * outward_vector[:, 1]
         )
@@ -106,7 +106,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         angle = np.degrees(np.arccos(cos))
 
         # adjust the angle for being in the 2 lower quadrants
-        real_angle = np.where(normal[:, 1] > 0, angle, - angle)
+        adjusted_angle = np.where(normal[:, 1] > 0, angle, -angle)
 
         df = pd.DataFrame(
             {
@@ -115,7 +115,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
                 "cl1": np.abs(np.cross(U, Vi)) / length,
                 "cl2": np.abs(np.cross(U, Vj)) / length,
                 "hwva": length,
-                "angldegx": real_angle,
+                "angldegx": adjusted_angle,
                 "cdist": cdist,
             }
         )

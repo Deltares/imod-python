@@ -1,33 +1,18 @@
-import copy
-import uuid
 from copy import deepcopy
 from pathlib import Path
 from typing import Dict
 
 import geopandas as gpd
+import imod
 import numpy as np
 import pytest
 import shapely
 import xarray as xr
 import xugrid as xu
-from pytest_cases import parametrize_with_cases
-
-import imod
 from imod.mf6 import Modflow6Simulation
 from imod.mf6.wel import Well
 from imod.typing.grid import zeros_like
-
-
-def reduce_coordinate_precision(ugrid):
-    ugrid.ugrid.grid.node_x = ugrid.ugrid.grid.node_x.round(5)
-    ugrid.ugrid.grid.node_y = ugrid.ugrid.grid.node_y.round(5)
-
-
-def save_and_load(tmp_path, ugrid):
-    filename = tmp_path / str(uuid.uuid4())
-    ugrid.ugrid.to_netcdf(filename)
-    ugrid = xu.open_dataset(filename)
-    return ugrid
+from pytest_cases import parametrize_with_cases
 
 
 @pytest.mark.usefixtures("circle_model")

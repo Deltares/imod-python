@@ -2,7 +2,8 @@ import copy
 import uuid
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Union
+from imod.typing import UnstructuredData
 
 import geopandas as gpd
 import numpy as np
@@ -18,12 +19,18 @@ from imod.mf6.wel import Well
 from imod.typing.grid import zeros_like
 
 
-def reduce_coordinate_precision(ugrid):
+def reduce_coordinate_precision(ugrid: UnstructuredData) -> None:
+    """
+    Reduces the precision of x and y coordinates in an ugrid dataset to 5 decimals.
+    """
     ugrid.ugrid.grid.node_x = ugrid.ugrid.grid.node_x.round(5)
     ugrid.ugrid.grid.node_y = ugrid.ugrid.grid.node_y.round(5)
 
 
-def save_and_load(tmp_path, ugrid):
+def save_and_load(tmp_path: Path, ugrid: UnstructuredData) -> xu.UgridDataset:
+    """
+    Saves an ugrid dataset to file, loads the resulting file and returns the ugrid dataset in it.
+    """
     filename = tmp_path / str(uuid.uuid4())
     ugrid.ugrid.to_netcdf(filename)
     ugrid = xu.open_dataset(filename)
@@ -93,53 +100,57 @@ def test_specific_discharge_results(
     simulation = circle_model
     label_array = partition_array
 
+    # Turn on specific discharge calculation
     simulation["GWF_1"]["npf"].dataset["save_specific_discharge"] = True
-    ip_unsplit_dir = tmp_path / "original"
 
+    # Write the original simulation (unsplit) to file.
+    ip_unsplit_dir = tmp_path / "original"
     simulation.write(ip_unsplit_dir, binary=False, use_absolute_paths=True)
 
-    # now do the same for imod-python
+    # Split the original simulation and write it to file
     ip_dir = tmp_path / "ip_split"
     new_sim = simulation.split(label_array)
     new_sim.write(ip_dir, False)
 
+    # Run the simulations and load the balance results
     simulation.run()
+    new_sim.run()
     original_balances = simulation.open_flow_budget()
     original_heads = simulation.open_head()
-
-    new_sim.run()
     split_balances = new_sim.open_flow_budget()
     split_head = new_sim.open_head()
+
+    # Reduce the coordinate precision of the heads and balances
     reduce_coordinate_precision(split_head)
     reduce_coordinate_precision(original_heads)
-
-    split_head = split_head.ugrid.reindex_like(original_heads)
-
     reduce_coordinate_precision(split_balances["npf-qx"])
     reduce_coordinate_precision(original_balances["npf-qx"])
     reduce_coordinate_precision(split_balances["npf-qy"])
     reduce_coordinate_precision(original_balances["npf-qy"])
 
+    # Reload the ugrid dataarrays to avoid issues with the subsequent reindexing
     split_balances_x_v2 = save_and_load(tmp_path, split_balances["npf-qx"])
     split_balances_y_v2 = save_and_load(tmp_path, split_balances["npf-qy"])
     original_balances_x_v2 = save_and_load(tmp_path, original_balances["npf-qx"])
     original_balances_y_v2 = save_and_load(tmp_path, original_balances["npf-qy"])
 
+    # Reindex the arrays that come from modflow output to match the indexing of unsplit results
+    split_head = split_head.ugrid.reindex_like(original_heads)
     split_balances_x_v2["npf-qx"] = split_balances_x_v2["npf-qx"].ugrid.reindex_like(
         original_balances_x_v2
     )
     split_balances_y_v2["npf-qy"] = split_balances_y_v2["npf-qy"].ugrid.reindex_like(
         original_balances_y_v2
     )
+
+    # Compute differences in head and specific discharge results
     head_diff = original_heads.isel(layer=0, time=-1) - split_head.isel(
         layer=0, time=-1
     )
-
     veldif_x = original_balances_x_v2["data-spdis"] - split_balances_x_v2["npf-qx"]
     veldif_y = original_balances_y_v2["data-spdis"] - split_balances_y_v2["npf-qy"]
 
-    print(f"x: {veldif_x.values.max() }, y: {veldif_y.values.max()}")
-    assert veldif_x.values.max() < 1e-6
-    assert veldif_y.values.max() < 1e-6
-
-    pass
+    # Assert results are close for head and specific discharge
+    assert np.abs(head_diff["head"].values).max() < 1e-5
+    assert np.abs(veldif_x.values).max() < 1e-6
+    assert np.abs(veldif_y.values).max() < 1e-6
