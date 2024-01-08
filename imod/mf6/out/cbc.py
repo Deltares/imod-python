@@ -119,10 +119,7 @@ def read_cbc_headers(
                 datasize = (
                     # Multiply by -1 because ndim3 is stored as a negative for some reason.
                     # (ndim3 is the integer size of the third dimension)
-                    header["ndim1"]
-                    * header["ndim2"]
-                    * header["ndim3"]
-                    * -1
+                    header["ndim1"] * header["ndim2"] * header["ndim3"] * -1
                 ) * 8
                 header["pos"] = f.tell()
                 key = header["text"]

@@ -8,9 +8,6 @@ In this example we do all this to show how model splitting works in flopy and im
 and how the resulting output matches.  This may be of interest to the user when 
 flopy supports splitting something that imod-pythone cannot (such as transport models)
 """
-import os
-import shutil
-
 import flopy
 import matplotlib.pyplot as plt
 import numpy as np
@@ -19,8 +16,6 @@ from example_models import create_circle_simulation
 from flopy.mf6.utils import Mf6Splitter
 
 import imod
-from imod.mf6.multimodel.partition_generator import get_label_array
-from imod.typing.grid import merge
 
 # Set up the simulation and write the MF6 inputfiles
 simulation = create_circle_simulation()

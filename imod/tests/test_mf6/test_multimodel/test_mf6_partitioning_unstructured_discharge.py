@@ -8,7 +8,6 @@ import geopandas as gpd
 import numpy as np
 import pytest
 import shapely
-import xarray as xr
 import xugrid as xu
 from pytest_cases import parametrize_with_cases
 
