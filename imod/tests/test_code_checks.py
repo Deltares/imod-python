@@ -30,12 +30,10 @@ def test_check_modules():
     paths = glob(test_directory + "/../**/*.py")
     ok = True
     for path in paths:
-        # fmt: off
-        if (
-            test_directory in os.path.realpath(path)
+        if test_directory in os.path.realpath(
+            path
         ):  # if it's a test we don't care. this very file contains print statements itself.
             continue
-        # fmt: on
         try:
             with open(path) as f:
                 content = f.read()

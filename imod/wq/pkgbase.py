@@ -138,11 +138,9 @@ class Package(abc.ABC):
         rendered : str
             The rendered runfile part for a single boundary condition system.
         """
-        # fmt: off
         d = {
             k: v.values for k, v in self.dataset.data_vars.items()
         }  # pylint: disable=no-member
-        # fmt: on
         if hasattr(self, "_keywords"):
             for key in self._keywords.keys():
                 self._replace_keyword(d, key)

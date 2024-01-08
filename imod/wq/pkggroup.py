@@ -47,12 +47,12 @@ class PackageGroup(collections.UserDict, abc.ABC):
         d = {}
         d["n_systems"] = len(self.keys())
         d["n_max_active"] = sum(
-            # fmt: off
             [
-                v._max_active_n(self._cellcount_varname, nlayer, nrow, ncol)  # pylint:disable=no-member
+                v._max_active_n(
+                    self._cellcount_varname, nlayer, nrow, ncol
+                )  # pylint:disable=no-member
                 for v in self.values()
             ]
-            # fmt: on
         )
         d["save_budget"] = (
             1 if any([v.dataset.save_budget for v in self.values()]) else 0
