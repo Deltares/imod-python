@@ -1,19 +1,12 @@
-import copy
 import uuid
-from copy import deepcopy
 from pathlib import Path
-from typing import Dict, Union
 
-import geopandas as gpd
 import numpy as np
 import pytest
-import shapely
 import xugrid as xu
 from pytest_cases import parametrize_with_cases
 
-import imod
 from imod.mf6 import Modflow6Simulation
-from imod.mf6.wel import Well
 from imod.typing import UnstructuredData
 from imod.typing.grid import zeros_like
 
