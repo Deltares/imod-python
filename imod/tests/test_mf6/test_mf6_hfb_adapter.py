@@ -99,7 +99,7 @@ def test_hfb_render(barrier):
 
 
 @parametrize_with_cases("barrier", cases=GridBarriers)
-def test_hfb_writing_one_layer__unstructured(barrier, tmp_path):
+def test_hfb_writing_one_layer(barrier, tmp_path):
     # Arrange
     hfb = Mf6HorizontalFlowBarrier(**barrier)
     write_context = WriteContext(tmp_path)
@@ -118,5 +118,11 @@ def test_hfb_writing_one_layer__unstructured(barrier, tmp_path):
     hfb.write("hfb", None, write_context)
 
     # Assert
-    data = np.loadtxt(tmp_path / "hfb" / "hfb.dat")
+    hfb_bin_path = tmp_path / "hfb" / "hfb.bin"
+    hfb_txt_path = tmp_path / "hfb" / "hfb.dat"
+
+    assert not hfb_bin_path.exists()
+    assert hfb_txt_path.exists()
+
+    data = np.loadtxt(hfb_txt_path)
     np.testing.assert_almost_equal(data, expected_hfb_data)
