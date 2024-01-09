@@ -144,19 +144,17 @@ class River(BoundaryCondition):
         validate: bool = True,
         repeat_stress=None,
     ):
-        super().__init__(locals())
-        self.dataset["stage"] = stage
-        self.dataset["conductance"] = conductance
-        self.dataset["bottom_elevation"] = bottom_elevation
+        locals_at_init = locals()
+        variable_names = self._get_variable_names(self.__init__)
+        if concentration is None:
+            variable_names.remove("concentration")
+            variable_names.remove("concentration_boundary_type")
+        variables_to_merge = {name: locals_at_init[name] for name in variable_names}
+
+        super().__init__(variables_to_merge)
         if concentration is not None:
-            self.dataset["concentration"] = concentration
-            self.dataset["concentration_boundary_type"] = concentration_boundary_type
             add_periodic_auxiliary_variable(self)
-        self.dataset["print_input"] = print_input
-        self.dataset["print_flows"] = print_flows
-        self.dataset["save_flows"] = save_flows
-        self.dataset["observations"] = observations
-        self.dataset["repeat_stress"] = repeat_stress
+
         self._validate_init_schemata(validate)
 
     def _validate(self, schemata, **kwargs):

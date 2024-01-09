@@ -6,6 +6,8 @@ import textwrap
 import numpy as np
 import pytest
 import xarray as xr
+import xugrid as xu
+from pytest_cases import parametrize_with_cases
 
 import imod
 from imod.mf6.write_context import WriteContext
@@ -49,8 +51,29 @@ def riv_dict(make_da):
     return dict(stage=da, conductance=da, bottom_elevation=bottom)
 
 
-def test_render(riv_dict):
-    river = imod.mf6.River(**riv_dict)
+def make_dict_unstructured(d):
+    return {key: xu.UgridDataArray.from_structured(value) for key, value in d.items()}
+
+
+class RivCases:
+    def case_structured(self, riv_dict):
+        return riv_dict
+
+    def case_unstructured(self, riv_dict):
+        return make_dict_unstructured(riv_dict)
+
+
+class RivDisCases:
+    def case_structured(self, riv_dict, dis_dict):
+        return riv_dict, dis_dict
+
+    def case_unstructured(self, riv_dict, dis_dict):
+        return make_dict_unstructured(riv_dict), make_dict_unstructured(dis_dict)
+
+
+@parametrize_with_cases("riv_data", cases=RivCases)
+def test_render(riv_data):
+    river = imod.mf6.River(**riv_data)
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
     actual = river.render(directory, "river", globaltimes, True)
@@ -71,21 +94,23 @@ def test_render(riv_dict):
     assert actual == expected
 
 
-def test_wrong_dtype(riv_dict):
-    riv_dict["stage"] = riv_dict["stage"].astype(int)
+@parametrize_with_cases("riv_data", cases=RivCases)
+def test_wrong_dtype(riv_data):
+    riv_data["stage"] = riv_data["stage"].astype(int)
 
     with pytest.raises(ValidationError):
-        imod.mf6.River(**riv_dict)
+        imod.mf6.River(**riv_data)
 
 
-def test_all_nan(riv_dict, dis_dict):
+@parametrize_with_cases("riv_data,dis_data", cases=RivDisCases)
+def test_all_nan(riv_data, dis_data):
     # Use where to set everything to np.nan
     for var in ["stage", "conductance", "bottom_elevation"]:
-        riv_dict[var] = riv_dict[var].where(False)
+        riv_data[var] = riv_data[var].where(False)
 
-    river = imod.mf6.River(**riv_dict)
+    river = imod.mf6.River(**riv_data)
 
-    errors = river._validate(river._write_schemata, **dis_dict)
+    errors = river._validate(river._write_schemata, **dis_data)
 
     assert len(errors) == 1
 
@@ -93,20 +118,22 @@ def test_all_nan(riv_dict, dis_dict):
         assert var == "stage"
 
 
-def test_inconsistent_nan(riv_dict, dis_dict):
-    riv_dict["stage"][:, 1, 2] = np.nan
-    river = imod.mf6.River(**riv_dict)
+@parametrize_with_cases("riv_data,dis_data", cases=RivDisCases)
+def test_inconsistent_nan(riv_data, dis_data):
+    riv_data["stage"][..., 2] = np.nan
+    river = imod.mf6.River(**riv_data)
 
-    errors = river._validate(river._write_schemata, **dis_dict)
+    errors = river._validate(river._write_schemata, **dis_data)
 
     assert len(errors) == 1
 
 
-def test_check_layer(riv_dict):
+@parametrize_with_cases("riv_data", cases=RivCases)
+def test_check_layer(riv_data):
     """
     Test for error thrown if variable has no layer coord
     """
-    riv_dict["stage"] = riv_dict["stage"].sel(layer=2, drop=True)
+    riv_data["stage"] = riv_data["stage"].sel(layer=2, drop=True)
 
     message = textwrap.dedent(
         """
@@ -118,7 +145,7 @@ def test_check_layer(riv_dict):
         ValidationError,
         match=re.escape(message),
     ):
-        imod.mf6.River(**riv_dict)
+        imod.mf6.River(**riv_data)
 
 
 def test_check_dimsize_zero():
@@ -152,69 +179,73 @@ def test_check_dimsize_zero():
         imod.mf6.River(stage=da, conductance=da, bottom_elevation=da - 1.0)
 
 
-def test_check_zero_conductance(riv_dict, dis_dict):
+@parametrize_with_cases("riv_data,dis_data", cases=RivDisCases)
+def test_check_zero_conductance(riv_data, dis_data):
     """
     Test for zero conductance
     """
-    riv_dict["conductance"] = riv_dict["conductance"] * 0.0
+    riv_data["conductance"] = riv_data["conductance"] * 0.0
 
-    river = imod.mf6.River(**riv_dict)
+    river = imod.mf6.River(**riv_data)
 
-    errors = river._validate(river._write_schemata, **dis_dict)
+    errors = river._validate(river._write_schemata, **dis_data)
 
     assert len(errors) == 1
     for var, var_errors in errors.items():
         assert var == "conductance"
 
 
-def test_check_bottom_above_stage(riv_dict, dis_dict):
+@parametrize_with_cases("riv_data,dis_data", cases=RivDisCases)
+def test_check_bottom_above_stage(riv_data, dis_data):
     """
     Check that river bottom is not above stage.
     """
 
-    riv_dict["bottom_elevation"] = riv_dict["bottom_elevation"] + 10.0
+    riv_data["bottom_elevation"] = riv_data["bottom_elevation"] + 10.0
 
-    river = imod.mf6.River(**riv_dict)
+    river = imod.mf6.River(**riv_data)
 
-    errors = river._validate(river._write_schemata, **dis_dict)
+    errors = river._validate(river._write_schemata, **dis_data)
 
     assert len(errors) == 1
     for var, var_errors in errors.items():
         assert var == "stage"
 
 
-def test_check_riv_bottom_above_dis_bottom(riv_dict, dis_dict):
+@parametrize_with_cases("riv_data,dis_data", cases=RivDisCases)
+def test_check_riv_bottom_above_dis_bottom(riv_data, dis_data):
     """
     Check that river bottom not above dis bottom.
     """
 
-    river = imod.mf6.River(**riv_dict)
+    river = imod.mf6.River(**riv_data)
 
-    river._validate(river._write_schemata, **dis_dict)
+    river._validate(river._write_schemata, **dis_data)
 
-    dis_dict["bottom"] += 2.0
+    dis_data["bottom"] += 2.0
 
-    errors = river._validate(river._write_schemata, **dis_dict)
+    errors = river._validate(river._write_schemata, **dis_data)
 
     assert len(errors) == 1
     for var, var_errors in errors.items():
         assert var == "bottom_elevation"
 
 
-def test_check_boundary_outside_active_domain(riv_dict, dis_dict):
+@parametrize_with_cases("riv_data,dis_data", cases=RivDisCases)
+def test_check_boundary_outside_active_domain(riv_data, dis_data):
     """
     Check that river not outside idomain
     """
 
-    river = imod.mf6.River(**riv_dict)
+    river = imod.mf6.River(**riv_data)
 
-    errors = river._validate(river._write_schemata, **dis_dict)
+    errors = river._validate(river._write_schemata, **dis_data)
 
     assert len(errors) == 0
 
-    dis_dict["idomain"][0, 0, 0] = 0
+    dis_data["idomain"][..., 0] = 0
 
-    errors = river._validate(river._write_schemata, **dis_dict)
+    errors = river._validate(river._write_schemata, **dis_data)
 
     assert len(errors) == 1
 
