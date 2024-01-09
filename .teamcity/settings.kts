@@ -1,17 +1,11 @@
 import jetbrains.buildServer.configs.kotlin.*
-import jetbrains.buildServer.configs.kotlin.CustomChart
-import jetbrains.buildServer.configs.kotlin.CustomChart.*
-import jetbrains.buildServer.configs.kotlin.buildFeatures.PullRequests
-import jetbrains.buildServer.configs.kotlin.buildFeatures.XmlReport
-import jetbrains.buildServer.configs.kotlin.buildFeatures.commitStatusPublisher
-import jetbrains.buildServer.configs.kotlin.buildFeatures.pullRequests
-import jetbrains.buildServer.configs.kotlin.buildFeatures.xmlReport
+import jetbrains.buildServer.configs.kotlin.CustomChart.Serie
+import jetbrains.buildServer.configs.kotlin.CustomChart.SeriesKey
+import jetbrains.buildServer.configs.kotlin.buildFeatures.*
 import jetbrains.buildServer.configs.kotlin.buildSteps.exec
 import jetbrains.buildServer.configs.kotlin.buildSteps.powerShell
 import jetbrains.buildServer.configs.kotlin.buildSteps.script
-import jetbrains.buildServer.configs.kotlin.buildTypeCustomChart
 import jetbrains.buildServer.configs.kotlin.projectFeatures.ProjectReportTab
-import jetbrains.buildServer.configs.kotlin.projectFeatures.buildReportTab
 import jetbrains.buildServer.configs.kotlin.projectFeatures.projectReportTab
 import jetbrains.buildServer.configs.kotlin.triggers.finishBuildTrigger
 import jetbrains.buildServer.configs.kotlin.triggers.vcs
@@ -48,11 +42,6 @@ project {
     buildType(Tests)
 
     features {
-        buildReportTab {
-            id = "PROJECT_EXT_17"
-            title = "Code Coverage"
-            startPage = "coverage.zip!index.html"
-        }
         buildTypeCustomChart {
             id = "PROJECT_EXT_41"
             title = "Build Duration (all stages)"
@@ -66,7 +55,7 @@ project {
             id = "PROJECT_EXT_88"
             title = "Code Coverage"
             startPage = "coverage.zip!index.html"
-            buildType = "iMOD6_IMODPython_Windows_Build"
+            buildType = "iMOD6_IMODPython_Windows_Tests"
             sourceBuildRule = ProjectReportTab.SourceBuildRule.LAST_FINISHED
             sourceBuildBranchFilter = "+:<default>"
         }
