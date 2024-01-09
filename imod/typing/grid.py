@@ -1,3 +1,4 @@
+import textwrap
 from typing import Callable, Sequence
 
 import numpy as np
@@ -93,6 +94,44 @@ def _type_dispatch_functions_on_grid_sequence(
     )
 
 
+# Typedispatching doesn't work based on types of dict elements, therefore resort
+# to manual type testing
+def _type_dispatch_functions_on_dict(
+    dict_of_objects: dict[str, GridDataArray | float | bool | int],
+    unstructured_func: Callable,
+    structured_func: Callable,
+    *args,
+    **kwargs,
+):
+    """
+    Typedispatch function on grid and scalar variables provided in dictionary.
+    Types do not need to be homogeneous as scalars and grids can be mixed. No
+    mixing of structured and unstructured grids is allowed. Also allows running
+    function on dictionary with purely scalars, in which case it will call to
+    the xarray function.
+    """
+
+    error_msg = textwrap.dedent(
+        """
+        Received both xr.DataArray and xu.UgridDataArray. This means structured
+        grids as well as unstructured grids were provided.
+        """
+    )
+
+    if dict_of_objects is None:
+        return xr.Dataset()
+
+    types = [type(arg) for arg in dict_of_objects.values()]
+    has_unstructured = xu.UgridDataArray in types
+    has_structured = xr.DataArray in types
+    if has_structured and has_unstructured:
+        raise TypeError(error_msg)
+    if has_unstructured:
+        return unstructured_func([dict_of_objects], *args, **kwargs)
+
+    return structured_func([dict_of_objects], *args, **kwargs)
+
+
 def merge(
     objects: Sequence[GridDataArray | GridDataset], *args, **kwargs
 ) -> GridDataset:
@@ -114,6 +153,52 @@ def concat(
 ) -> GridDataArray | GridDataset:
     return _type_dispatch_functions_on_grid_sequence(
         objects, xu.concat, xr.concat, *args, **kwargs
+    )
+
+
+def merge_unstructured_dataset(variables_to_merge: list[dict], *args, **kwargs):
+    """
+    Work around xugrid issue https://github.com/Deltares/xugrid/issues/179
+
+    Expects only one dictionary in list. List is used to have same API as
+    xr.merge().
+
+    Merges unstructured grids first, then manually assigns scalar variables.
+    """
+    if len(variables_to_merge) > 1:
+        raise ValueError(
+            f"Only one dict of variables expected, got {len(variables_to_merge)}"
+        )
+
+    variables_to_merge_dict = variables_to_merge[0]
+
+    if not isinstance(variables_to_merge_dict, dict):
+        raise TypeError(f"Expected dict, got {type(variables_to_merge_dict)}")
+
+    # Separate variables into list of grids and dict of scalar variables
+    grids_ls = []
+    scalar_dict = {}
+    for name, variable in variables_to_merge_dict.items():
+        if isinstance(variable, xu.UgridDataArray):
+            grids_ls.append(variable.rename(name))
+        else:
+            scalar_dict[name] = variable
+
+    # Merge grids
+    dataset = xu.merge(grids_ls, *args, **kwargs)
+
+    # Assign scalar variables manually
+    for name, variable in scalar_dict.items():
+        dataset[name] = variable
+
+    return dataset
+
+
+def merge_with_dictionary(
+    variables_to_merge: dict[str, GridDataArray | float | bool | int], *args, **kwargs
+):
+    return _type_dispatch_functions_on_dict(
+        variables_to_merge, merge_unstructured_dataset, xr.merge, *args, **kwargs
     )
 
 

@@ -2,7 +2,6 @@ import abc
 import inspect
 import numbers
 import pathlib
-import textwrap
 
 import numpy as np
 import xarray as xr
@@ -10,62 +9,11 @@ import xugrid as xu
 
 import imod
 from imod.mf6.interfaces.ipackagebase import IPackageBase
-from imod.typing.grid import GridDataset
+from imod.typing.grid import GridDataset, merge_with_dictionary
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 EXCHANGE_PACKAGES = "gwfgwf"
 ARGS_TO_EXCLUDE = ["validate"]
-
-
-def merge_unstructured_dataset(variables_to_merge):
-    """Work around xugrid issue https://github.com/Deltares/xugrid/issues/179"""
-
-    # Separate variables into list of grids and dict of scalar variables
-    grids_ls = []
-    scalar_dict = {}
-    for name, variable in variables_to_merge.items():
-        if isinstance(variable, xu.UgridDataArray):
-            grids_ls.append(variable.rename(name))
-        else:
-            scalar_dict[name] = variable
-
-    # Merge grids
-    dataset = xu.merge(grids_ls, join="exact")
-
-    # Assign scalar variables manually
-    for name, variable in scalar_dict.items():
-        dataset[name] = variable
-
-    return dataset
-
-
-def merge_with_dictionary(variables_to_merge):
-    """
-    Merge grid and scalar variables provided in dictionary to dataset. Function
-    checks if there is no mixing going on between structured and unstructured
-    grids. Also allows running function on dictionary with purely scalars, in
-    which case it will call to the xarray function.
-    """
-
-    error_msg = textwrap.dedent(
-        """
-        Received both xr.DataArray and xu.UgridDataArray. This means structured
-        grids as well as unstructured grids were provided.
-        """
-    )
-
-    if variables_to_merge is None:
-        return xr.Dataset()
-
-    types = [type(arg) for arg in variables_to_merge.values()]
-    has_unstructured = xu.UgridDataArray in types
-    has_structured = xr.DataArray in types
-    if has_structured and has_unstructured:
-        raise TypeError(error_msg)
-    if has_unstructured:
-        return merge_unstructured_dataset(variables_to_merge)
-
-    return xr.merge([variables_to_merge], join="exact")
 
 
 class PackageBase(IPackageBase, abc.ABC):
@@ -81,7 +29,9 @@ class PackageBase(IPackageBase, abc.ABC):
         return super(PackageBase, cls).__new__(cls)
 
     def __init__(self, variables_to_merge=None):
-        self.__dataset = merge_with_dictionary(variables_to_merge)
+        # Merge variables, perform exact join to verify if coordinates values
+        # are consistent amongst variables.
+        self.__dataset = merge_with_dictionary(variables_to_merge, join="exact")
 
     def _get_variable_names(self, init_method):
         """
