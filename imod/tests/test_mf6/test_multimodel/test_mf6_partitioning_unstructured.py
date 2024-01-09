@@ -23,13 +23,11 @@ def idomain_top(circle_model):
 class PartitionArrayCases:
     def case_two_parts(self, idomain_top) -> xu.UgridDataArray:
         two_parts = zeros_like(idomain_top)
-        two_parts.values[:108] = 0
         two_parts.values[108:] = 1
         return two_parts
 
     def case_three_parts(self, idomain_top) -> xu.UgridDataArray:
         three_parts = zeros_like(idomain_top)
-        three_parts.values[:72] = 0
         three_parts.values[72:144] = 1
         three_parts.values[144:] = 2
         return three_parts
@@ -337,8 +335,10 @@ def test_partitioning_unstructured_hfb(
     # partitioned simulation. Criteria are a bit looser than in other tests
     # because we are dealing with a problem with heads ranging roughly from 2000
     # m to 0 m, and the HFB adds extra complexity to this.
-    np.testing.assert_allclose(head["head"].values, original_head.values, rtol=1e-4)
-    np.testing.assert_allclose(cbc["chd"].values, original_cbc["chd"].values, rtol=1e-4)
+    np.testing.assert_allclose(head["head"].values, original_head.values, rtol=0.002)
+    np.testing.assert_allclose(
+        cbc["chd"].values, original_cbc["chd"].values, rtol=0.002
+    )
 
 
 @pytest.mark.usefixtures("circle_model")

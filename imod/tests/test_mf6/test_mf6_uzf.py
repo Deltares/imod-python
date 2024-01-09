@@ -93,7 +93,6 @@ def test_to_sparsedata(test_data):
     layer = bin_data.isel(time=0)["layer"].values
     struct_array = uzf._to_struct_array(arrdict, layer)
     expected_iuzno = np.array([1, 2, 3, 4, 5, 6])
-
     assert struct_array.dtype[0] == np.dtype(
         "int32"
     )  # pylint: disable=unsubscriptable-object
