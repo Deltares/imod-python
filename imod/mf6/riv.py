@@ -2,6 +2,7 @@ import numpy as np
 
 from imod.mf6.auxiliary_variables import add_periodic_auxiliary_variable
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.pkgbase import pkg_init_with_exclude
 from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
@@ -130,6 +131,7 @@ class River(BoundaryCondition):
         "concentration": (RegridderType.OVERLAP, "mean"),
     }
 
+    @pkg_init_with_exclude(["validate"])
     def __init__(
         self,
         stage,
@@ -144,15 +146,11 @@ class River(BoundaryCondition):
         validate: bool = True,
         repeat_stress=None,
     ):
-        locals_at_init = locals()
-        variable_names = self._get_variable_names(self.__init__)
         if concentration is None:
-            variable_names.remove("concentration")
-            variable_names.remove("concentration_boundary_type")
-        variables_to_merge = {name: locals_at_init[name] for name in variable_names}
-
-        super().__init__(variables_to_merge)
-        if concentration is not None:
+            # Remove vars inplace
+            del self.dataset["concentration"]
+            del self.dataset["concentration_boundary_type"]
+        else:
             add_periodic_auxiliary_variable(self)
 
         self._validate_init_schemata(validate)

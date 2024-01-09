@@ -2,6 +2,8 @@ import abc
 import inspect
 import numbers
 import pathlib
+from functools import wraps
+from typing import Callable
 
 import numpy as np
 import xarray as xr
@@ -14,6 +16,31 @@ from imod.typing.grid import GridDataset, merge_with_dictionary
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 EXCHANGE_PACKAGES = "gwfgwf"
 ARGS_TO_EXCLUDE = ["validate"]
+
+
+def pkg_init_with_exclude(exclude_in_dataset: list[str]):
+    def pkg_init(init: Callable):
+        @wraps(init)
+        def merge_init(self, *args, **kwargs):
+            args_dict = (
+                inspect.signature(self.__init__).bind_partial(*args, **kwargs).arguments
+            )
+            for k, v in inspect.signature(self.__init__).parameters.items():
+                if k not in args_dict and v.default is not inspect.Parameter.empty:
+                    args_dict[k] = v.default
+
+            arg_dict_dataset = {
+                key: value
+                for key, value in args_dict.items()
+                if key not in exclude_in_dataset
+            }
+
+            super(type(self), self).__init__(arg_dict_dataset)
+            return init(self, **args_dict)
+
+        return merge_init
+
+    return pkg_init
 
 
 class PackageBase(IPackageBase, abc.ABC):
