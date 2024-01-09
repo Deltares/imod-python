@@ -2,6 +2,7 @@ import abc
 import inspect
 import numbers
 import pathlib
+import textwrap
 
 import numpy as np
 import xarray as xr
@@ -38,11 +39,31 @@ def merge_unstructured_dataset(variables_to_merge):
     return dataset
 
 
-def merge_at_init(variables_to_merge):
-    if variables_to_merge is not None:
-        for arg in variables_to_merge.values():
-            if isinstance(arg, xu.UgridDataArray):
-                return merge_unstructured_dataset(variables_to_merge)
+def merge_with_dictionary(variables_to_merge):
+    """
+    Merge grid and scalar variables provided in dictionary to dataset. Function
+    checks if there is no mixing going on between structured and unstructured
+    grids. Also allows running function on dictionary with purely scalars, in
+    which case it will call to the xarray function.
+    """
+
+    error_msg = textwrap.dedent(
+        """
+        Received both xr.DataArray and xu.UgridDataArray. This means structured
+        grids as well as unstructured grids were provided.
+        """
+    )
+
+    if variables_to_merge is None:
+        return xr.Dataset()
+
+    types = [type(arg) for arg in variables_to_merge.values()]
+    has_unstructured = xu.UgridDataArray in types
+    has_structured = xr.DataArray in types
+    if has_structured and has_unstructured:
+        raise TypeError(error_msg)
+    if has_unstructured:
+        return merge_unstructured_dataset(variables_to_merge)
 
     return xr.merge([variables_to_merge], join="exact")
 
@@ -60,7 +81,7 @@ class PackageBase(IPackageBase, abc.ABC):
         return super(PackageBase, cls).__new__(cls)
 
     def __init__(self, variables_to_merge=None):
-        self.__dataset = merge_at_init(variables_to_merge)
+        self.__dataset = merge_with_dictionary(variables_to_merge)
 
     def _get_variable_names(self, init_method):
         """
