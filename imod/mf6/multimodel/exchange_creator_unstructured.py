@@ -87,13 +87,8 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
             np.transpose((inprod[:] > 0, inprod[:] > 0)), normal[:], -normal[:]
         )
 
-        # using the normal and the norm of the normal we can compute the angle of the normal
-        norm_normal = np.linalg.norm(normal, axis=1)
-        cos = (normal[:, 0]) / norm_normal
-        angle = np.degrees(np.arccos(cos))
+        angle = np.degrees(np.arctan2(normal[:,1],  normal[:,0]))
 
-        # adjust the angle for being in the 2 lower quadrants
-        adjusted_angle = np.where(normal[:, 1] > 0, angle, -angle)
 
         df = pd.DataFrame(
             {
@@ -102,7 +97,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
                 "cl1": np.abs(np.cross(U, Vi)) / length,
                 "cl2": np.abs(np.cross(U, Vj)) / length,
                 "hwva": length,
-                "angldegx": adjusted_angle,
+                "angldegx": angle,
                 "cdist": cdist,
             }
         )
