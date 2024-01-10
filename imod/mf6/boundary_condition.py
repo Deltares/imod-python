@@ -7,7 +7,10 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 
-from imod.mf6.auxiliary_variables import get_variable_names
+from imod.mf6.auxiliary_variables import (
+    add_periodic_auxiliary_variable,
+    get_variable_names,
+)
 from imod.mf6.package import Package
 from imod.mf6.write_context import WriteContext
 
@@ -63,6 +66,15 @@ class BoundaryCondition(Package, abc.ABC):
     <https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=19>`_,
     not the array input which is used in :class:`Package`.
     """
+
+    def __init__(self, allargs=None):
+        super().__init__(allargs)
+        if allargs["concentration"] is None:
+            # Remove vars inplace
+            del self.dataset["concentration"]
+            del self.dataset["concentration_boundary_type"]
+        else:
+            add_periodic_auxiliary_variable(self)
 
     def _max_active_n(self):
         """

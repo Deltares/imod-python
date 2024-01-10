@@ -1,6 +1,5 @@
 import numpy as np
 
-from imod.mf6.auxiliary_variables import add_periodic_auxiliary_variable
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.pkgbase import pkg_init
 from imod.mf6.regridding_utils import RegridderType
@@ -146,13 +145,6 @@ class River(BoundaryCondition):
         validate: bool = True,
         repeat_stress=None,
     ):
-        if concentration is None:
-            # Remove vars inplace
-            del self.dataset["concentration"]
-            del self.dataset["concentration_boundary_type"]
-        else:
-            add_periodic_auxiliary_variable(self)
-
         self._validate_init_schemata(validate)
 
     def _validate(self, schemata, **kwargs):
