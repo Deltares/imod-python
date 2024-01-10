@@ -14,6 +14,9 @@ Fixed
 - iMOD Python now supports versions of pandas >= 2
 - Fixed bugs with clipping :class:`imod.mf6.HorizontalFlowBarrier` for
   structured grids
+- Packages and boundary conditions in the ``imod.mf6`` module will now throw an
+  error upon initialization if coordinate labels are inconsistent amongst
+  variables 
 
 Changed
 ~~~~~~~
