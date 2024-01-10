@@ -8,7 +8,6 @@ from typing import Tuple
 
 import geopandas as gpd
 import numpy as np
-import numpy.typing as npt
 import shapely.wkt
 import xarray as xr
 import xugrid as xu
