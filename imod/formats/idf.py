@@ -13,6 +13,7 @@ import pathlib
 import re
 import struct
 import warnings
+from collections import defaultdict
 
 import dask
 import numpy as np
@@ -20,6 +21,7 @@ import xarray as xr
 
 from imod import util
 from imod.formats import array_io
+from imod.typing.structured import merge_partitions
 
 # Make sure we can still use the built-in function...
 f_open = open
@@ -284,7 +286,7 @@ def _merge_subdomains(pathlists, use_cftime, pattern):
     return out
 
 
-def open_subdomains(path, use_cftime=False, pattern=None):
+def old_open_subdomains(path, use_cftime=False, pattern=None):
     """
     Combine IDF files of multiple subdomains.
 
@@ -440,6 +442,30 @@ def open_subdomains(path, use_cftime=False, pattern=None):
             coords = array_io.reading._scalar_z_coord(coords, tops, bots)
 
     return xr.DataArray(data, coords, dims)
+
+
+def open_subdomains(
+    path, use_cftime=False, pattern=r"{name}_{time}_l{layer}_p{subdomain}"
+):
+    paths = sorted(glob.glob(str(path)))
+    parsed = [util.decompose(path, pattern) for path in paths]
+    grouped = defaultdict(list)
+    for match, path in zip(parsed, paths):
+        key = match["subdomain"]
+        grouped[key].append(path)
+
+    n_idf = {k: len(v) for k, v in grouped.items()}
+    if len(set(n_idf.values())) != 1:
+        raise ValueError(
+            f"Each partition must have the same number of IDF files, found: {n_idf}"
+        )
+
+    das = []
+    for pathlist in grouped.values():
+        da = open(pathlist, use_cftime=use_cftime, pattern=pattern)
+        das.append(da)
+
+    return merge_partitions(das)
 
 
 def open_dataset(globpath, use_cftime=False, pattern=None):
