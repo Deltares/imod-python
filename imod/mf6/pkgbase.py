@@ -18,29 +18,34 @@ EXCHANGE_PACKAGES = "gwfgwf"
 ARGS_TO_EXCLUDE = ["validate"]
 
 
-def pkg_init_with_exclude(exclude_in_dataset: list[str]):
-    def pkg_init(init: Callable):
+def pkg_init(exclude_in_dataset: list[str]):
+    # Nested decorator to support arguments, see:
+    # https://stackoverflow.com/a/42581103
+    def pkg_init_decorator(init: Callable):
         @wraps(init)
         def merge_init(self, *args, **kwargs):
+            # Collect user specified args and kwargs
             args_dict = (
                 inspect.signature(self.__init__).bind_partial(*args, **kwargs).arguments
             )
+            # Add default values
             for k, v in inspect.signature(self.__init__).parameters.items():
                 if k not in args_dict and v.default is not inspect.Parameter.empty:
                     args_dict[k] = v.default
-
-            arg_dict_dataset = {
+            # Create dict of args to be added to dataset by removing args in
+            # exclude_in_dataset.
+            args_dict_dataset = {
                 key: value
                 for key, value in args_dict.items()
                 if key not in exclude_in_dataset
             }
 
-            super(type(self), self).__init__(arg_dict_dataset)
+            super(type(self), self).__init__(args_dict_dataset)
             return init(self, **args_dict)
 
         return merge_init
 
-    return pkg_init
+    return pkg_init_decorator
 
 
 class PackageBase(IPackageBase, abc.ABC):
@@ -59,17 +64,6 @@ class PackageBase(IPackageBase, abc.ABC):
         # Merge variables, perform exact join to verify if coordinates values
         # are consistent amongst variables.
         self.__dataset = merge_with_dictionary(variables_to_merge, join="exact")
-
-    def _get_variable_names(self, init_method):
-        """
-        Return variable names based on the arguments provided to the classes'
-        __init__ method. Removes argument names that need to be excluded.
-        """
-        variable_names = list(inspect.signature(init_method).parameters.keys())
-        for var_to_exclude in ARGS_TO_EXCLUDE:
-            if var_to_exclude in variable_names:
-                variable_names.remove(var_to_exclude)
-        return variable_names
 
     @property
     def dataset(self) -> GridDataset:
