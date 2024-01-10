@@ -130,7 +130,7 @@ class River(BoundaryCondition):
         "concentration": (RegridderType.OVERLAP, "mean"),
     }
 
-    @pkg_init(["validate"])
+    @pkg_init(exclude_in_dataset=["validate"])
     def __init__(
         self,
         stage,
