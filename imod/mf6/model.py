@@ -383,7 +383,14 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         state_for_boundary :
         """
         clipped = self._clip_box_packages(
-            time_min, time_max, layer_min, layer_max, x_min, x_max, y_min, y_max
+            time_min,
+            time_max,
+            layer_min,
+            layer_max,
+            x_min,
+            x_max,
+            y_min,
+            y_max,
         )
 
         return clipped
@@ -398,6 +405,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         x_max: Optional[float] = None,
         y_min: Optional[float] = None,
         y_max: Optional[float] = None,
+        state_for_boundary: Optional[GridDataArray] = None,
     ):
         """
         Clip a model by a bounding box (time, layer, y, x).
@@ -426,6 +434,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         -------
         clipped : Modflow6Model
         """
+
+        top, bottom, idomain = self.__get_domain_geometry()
+
         clipped = type(self)(**self._options)
         for key, pkg in self.items():
             clipped[key] = pkg.clip_box(
@@ -437,6 +448,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 x_max=x_max,
                 y_min=y_min,
                 y_max=y_max,
+                top=top,
+                bottom=bottom,
+                state_for_boundary=state_for_boundary,
             )
 
         return clipped

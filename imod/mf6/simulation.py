@@ -764,7 +764,7 @@ class Modflow6Simulation(collections.UserDict):
         y_min: Optional[float] = None,
         y_max: Optional[float] = None,
         states_for_boundary: Optional[dict[str, GridDataArray]] = None,
-    ) -> "Modflow6Simulation":
+    ) -> Modflow6Simulation:
         """
         Clip a simulation by a bounding box (time, layer, y, x).
 

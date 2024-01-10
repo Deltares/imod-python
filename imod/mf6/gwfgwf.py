@@ -5,6 +5,7 @@ import xarray as xr
 
 from imod.mf6.auxiliary_variables import add_periodic_auxiliary_variable
 from imod.mf6.package import Package
+from imod.typing import GridDataArray
 
 
 class GWFGWF(Package):
@@ -90,14 +91,16 @@ class GWFGWF(Package):
 
     def clip_box(
         self,
-        time_min=None,
-        time_max=None,
-        layer_min=None,
-        layer_max=None,
-        x_min=None,
-        x_max=None,
-        y_min=None,
-        y_max=None,
-        state_for_boundary=None,
+        time_min: Optional[str] = None,
+        time_max: Optional[str] = None,
+        layer_min: Optional[int] = None,
+        layer_max: Optional[int] = None,
+        x_min: Optional[float] = None,
+        x_max: Optional[float] = None,
+        y_min: Optional[float] = None,
+        y_max: Optional[float] = None,
+        top: Optional[GridDataArray] = None,
+        bottom: Optional[GridDataArray] = None,
+        state_for_boundary: Optional[GridDataArray] = None,
     ) -> Package:
         raise NotImplementedError("this package cannot be clipped")

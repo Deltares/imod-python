@@ -195,15 +195,18 @@ class Well(BoundaryCondition, IPointDataPackage):
 
     def clip_box(
         self,
-        time_min=None,
-        time_max=None,
-        z_min=None,
-        z_max=None,
-        x_min=None,
-        x_max=None,
-        y_min=None,
-        y_max=None,
-    ) -> Well:
+        time_min: Optional[str] = None,
+        time_max: Optional[str] = None,
+        layer_min: Optional[int] = None,
+        layer_max: Optional[int] = None,
+        x_min: Optional[float] = None,
+        x_max: Optional[float] = None,
+        y_min: Optional[float] = None,
+        y_max: Optional[float] = None,
+        top: Optional[GridDataArray] = None,
+        bottom: Optional[GridDataArray] = None,
+        state_for_boundary: Optional[GridDataArray] = None,
+    ) -> Package:
         """
         Clip a package by a bounding box (time, layer, y, x).
 
@@ -220,12 +223,15 @@ class Well(BoundaryCondition, IPointDataPackage):
         ----------
         time_min: optional
         time_max: optional
-        z_min: optional, float
-        z_max: optional, float
+        layer_min: optional, int
+        layer_max: optional, int
         x_min: optional, float
         x_max: optional, float
         y_min: optional, float
         y_max: optional, float
+        top: optional, GridDataArray
+        bottom: optional, GridDataArray
+        state_for_boundary: optional, GridDataArray
 
         Returns
         -------
@@ -236,6 +242,9 @@ class Well(BoundaryCondition, IPointDataPackage):
         new = super().clip_box(time_min=time_min, time_max=time_max)
 
         ds = new.dataset
+
+        z_max = None if layer_max is None else top.isel(layer=layer_max)
+        z_min = None if layer_min is None else bottom.isel(layer=layer_min)
 
         # Initiate array of True with right shape to deal with case no spatial
         # selection needs to be done.
@@ -640,14 +649,17 @@ class WellDisStructured(DisStructuredBoundaryCondition):
 
     def clip_box(
         self,
-        time_min=None,
-        time_max=None,
-        layer_min=None,
-        layer_max=None,
-        x_min=None,
-        x_max=None,
-        y_min=None,
-        y_max=None,
+        time_min: Optional[str] = None,
+        time_max: Optional[str] = None,
+        layer_min: Optional[int] = None,
+        layer_max: Optional[int] = None,
+        x_min: Optional[float] = None,
+        x_max: Optional[float] = None,
+        y_min: Optional[float] = None,
+        y_max: Optional[float] = None,
+        top: Optional[GridDataArray] = None,
+        bottom: Optional[GridDataArray] = None,
+        state_for_boundary: Optional[GridDataArray] = None,
     ) -> Package:
         """
         Clip a package by a bounding box (time, layer, y, x).
@@ -668,9 +680,12 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         layer_min: optional, int
         layer_max: optional, int
         x_min: optional, float
-        x_min: optional, float
+        x_max: optional, float
+        y_min: optional, float
         y_max: optional, float
-        y_max: optional, float
+        top: optional, GridDataArray
+        bottom: optional, GridDataArray
+        state_for_boundary: optional, GridDataArray
 
         Returns
         -------
@@ -791,14 +806,17 @@ class WellDisVertices(DisVerticesBoundaryCondition):
 
     def clip_box(
         self,
-        time_min=None,
-        time_max=None,
-        layer_min=None,
-        layer_max=None,
-        x_min=None,
-        x_max=None,
-        y_min=None,
-        y_max=None,
+        time_min: Optional[str] = None,
+        time_max: Optional[str] = None,
+        layer_min: Optional[int] = None,
+        layer_max: Optional[int] = None,
+        x_min: Optional[float] = None,
+        x_max: Optional[float] = None,
+        y_min: Optional[float] = None,
+        y_max: Optional[float] = None,
+        top: Optional[GridDataArray] = None,
+        bottom: Optional[GridDataArray] = None,
+        state_for_boundary: Optional[GridDataArray] = None,
     ) -> Package:
         """
         Clip a package by a bounding box (time, layer, y, x).
@@ -819,9 +837,12 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         layer_min: optional, int
         layer_max: optional, int
         x_min: optional, float
-        x_min: optional, float
+        x_max: optional, float
+        y_min: optional, float
         y_max: optional, float
-        y_max: optional, float
+        top: optional, GridDataArray
+        bottom: optional, GridDataArray
+        state_for_boundary: optional, GridDataArray
 
         Returns
         -------
