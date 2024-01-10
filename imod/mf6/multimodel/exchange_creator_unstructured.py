@@ -55,20 +55,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
 
     def _compute_geometric_information(self) -> pd.DataFrame:
         grid = self._submodel_labels.ugrid.grid
-        edge_face_connectivity = grid.edge_face_connectivity
-
-        unordered_face1, unordered_face2 = edge_face_connectivity[
-            self._connected_cell_edge_indices
-        ].T
-        face_partition_1 = self._get_partition_numbers(unordered_face1)
-        face_partition_2 = self._get_partition_numbers(unordered_face2)
-        face1 = np.where(
-            face_partition_1 > face_partition_2, unordered_face2, unordered_face1
-        )
-        face2 = np.where(
-            face_partition_1 > face_partition_2, unordered_face1, unordered_face2
-        )
-
+        face1, face2 = self._get_partition_sorted_connected_faces ()
         centroid_1 = grid.centroids[face1]
         centroid_2 = grid.centroids[face2]
 
@@ -84,8 +71,8 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         length = np.linalg.norm(U, axis=1)
 
         # vertex index, coordinate index, point 1 or point 2
-        dx = edge_coordinates[:, 1, 0] - edge_coordinates[:, 0, 0]
-        dy = edge_coordinates[:, 1, 1] - edge_coordinates[:, 0, 1]
+        dx = U[:,0]
+        dy = U[:,1]
 
         normal = np.array((dy[:], -dx[:]), dtype=np.float_).T
         outward_vector = centroid_2 - centroid_1
@@ -101,7 +88,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         )
 
         # using the normal and the norm of the normal we can compute the angle of the normal
-        norm_normal = np.sqrt(normal[:, 0] * normal[:, 0] + normal[:, 1] * normal[:, 1])
+        norm_normal = np.linalg.norm(normal, axis=1)
         cos = (normal[:, 0]) / norm_normal
         angle = np.degrees(np.arccos(cos))
 
@@ -174,3 +161,24 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
 
     def _get_partition_numbers(self, face: np.ndarray) -> np.ndarray:
         return self._submodel_labels.data[face]
+
+
+    def _get_partition_sorted_connected_faces (self) -> ( np.ndarray,  np.ndarray):
+        grid = self._submodel_labels.ugrid.grid
+        edge_face_connectivity = grid.edge_face_connectivity
+
+        unordered_face1, unordered_face2 = edge_face_connectivity[
+            self._connected_cell_edge_indices
+        ].T
+
+        # Obtain the cellface indices on both sides of each edge.
+        # They should be ordered by giving the cellface with the lowest partition number first. 
+        face_partition_1 = self._get_partition_numbers(unordered_face1)
+        face_partition_2 = self._get_partition_numbers(unordered_face2)
+        face1 = np.where(
+            face_partition_1 > face_partition_2, unordered_face2, unordered_face1
+        )
+        face2 = np.where(
+            face_partition_1 > face_partition_2, unordered_face1, unordered_face2
+        )
+        return (face1, face2)
