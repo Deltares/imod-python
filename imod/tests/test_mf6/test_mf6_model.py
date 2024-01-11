@@ -233,7 +233,12 @@ class TestGroundwaterFlowModel:
         # Arrange.
         state_for_boundary = None
 
+        discretization_mock = MagicMock(spec_set=Package)
+        discretization_mock._pkg_id = "dis"
+        discretization_mock.clip_box.return_value = discretization_mock
+
         model = GroundwaterFlowModel()
+        model["dis"] = discretization_mock
 
         # Act.
         clipped = model.clip_box(state_for_boundary=state_for_boundary)

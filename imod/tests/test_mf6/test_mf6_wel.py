@@ -162,9 +162,15 @@ def test_clip_box__high_lvl_stationary(
     assert dict(ds.dims) == {"index": 4, "species": 2}
 
 
-def test_clip_box__high_lvl_transient(well_high_lvl_test_data_transient):
+@pytest.mark.parametrize(
+    "parameterizable_basic_dis",
+    [BasicDisSettings(nlay=10, zstop=-10.0)],
+    indirect=True,
+)
+def test_clip_box__high_lvl_transient(well_high_lvl_test_data_transient, parameterizable_basic_dis):
     # Arrange
     wel = imod.mf6.Well(*well_high_lvl_test_data_transient)
+    _, top, bottom = parameterizable_basic_dis
 
     # Act & Assert
     # Test clipping x & y without specified time
@@ -172,9 +178,9 @@ def test_clip_box__high_lvl_transient(well_high_lvl_test_data_transient):
     assert dict(ds.dims) == {"index": 3, "time": 5, "species": 2}
 
     # Test clipping with z
-    ds = wel.clip_box(z_max=-2.0).dataset
+    ds = wel.clip_box(layer_max=2, top=top, bottom=bottom).dataset
     assert dict(ds.dims) == {"index": 4, "time": 5, "species": 2}
-    ds = wel.clip_box(z_min=-8.0).dataset
+    ds = wel.clip_box(layer_min=7, top=top, bottom=bottom).dataset
     assert dict(ds.dims) == {"index": 4, "time": 5, "species": 2}
 
     # Test clipping with specified time
