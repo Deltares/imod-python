@@ -70,22 +70,15 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         Vj = centroid_2 - edge_coordinates[:, 0]
         length = np.linalg.norm(U, axis=1)
 
-        # vertex index, coordinate index, point 1 or point 2
+        # get the normal to the cell edge from U
         dx = U[:, 0]
         dy = U[:, 1]
-
         normal = np.array((dy[:], -dx[:]), dtype=np.float_).T
-        outward_vector = centroid_2 - centroid_1
-
-        # the inproduct between the edge normal and the outward vector is positive if they go in the same direction.
-        # we use this to swap the normal if needed so that it goes outward.
-        inprod = (
-            normal[:, 0] * outward_vector[:, 0] + normal[:, 1] * outward_vector[:, 1]
-        )
-
-        normal = np.where(
-            np.transpose((inprod[:] > 0, inprod[:] > 0)), normal[:], -normal[:]
-        )
+        
+        # If the inner product of the normal with a vector on the edge to the face centroid is positive
+        # then the normal vector points inwards
+        inward_vector_mask = np.sum(normal * Vi, axis=-1) > 0
+        normal[inward_vector_mask] = -normal[inward_vector_mask]
 
         angle = np.degrees(np.arctan2(normal[:, 1], normal[:, 0]))
 
