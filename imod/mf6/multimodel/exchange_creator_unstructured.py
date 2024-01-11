@@ -74,7 +74,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         dx = U[:, 0]
         dy = U[:, 1]
         normal = np.array((dy[:], -dx[:]), dtype=np.float_).T
-        
+
         # If the inner product of the normal with a vector on the edge to the face centroid is positive
         # then the normal vector points inwards
         inward_vector_mask = np.sum(normal * Vi, axis=-1) > 0
