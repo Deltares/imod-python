@@ -521,3 +521,22 @@ def test_slice_and_run(transient_twri_model, tmp_path):
     modeldir = tmp_path / "ex01-twri-transient-slice"
     simulation.write(modeldir, binary=True)
     simulation.run()
+
+@pytest.mark.usefixtures("transient_twri_model")
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
+def test_slice_and_run_purge_empty_package(transient_twri_model, tmp_path):
+    # TODO: bring back well once slicing is implemented...
+    transient_twri_model["GWF_1"].pop("wel")
+    simulation = transient_twri_model.clip_box(
+        time_min="2000-01-10",
+        time_max="2000-01-20",
+        layer_min=1,
+        layer_max=2,
+        x_min=None,
+        x_max=65_000.0,
+        y_min=None,
+        y_max=12500.0,
+    )
+    modeldir = tmp_path / "ex01-twri-transient-slice"
+    simulation.write(modeldir, binary=True)
+    simulation.run()    

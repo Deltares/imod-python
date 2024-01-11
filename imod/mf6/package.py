@@ -22,9 +22,9 @@ from imod.mf6.regridding_utils import (
 )
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext
-from imod.schemata import ValidationError
+from imod.schemata import ValidationError, AllNoDataSchema, EmptyIndexesSchema
 from imod.typing import GridDataArray
-
+from imod.mf6.utilities.schemata import filter_schemata_dict
 
 class Package(PackageBase, abc.ABC):
     """
@@ -277,6 +277,16 @@ class Package(PackageBase, abc.ABC):
                     except ValidationError as e:
                         errors[variable].append(e)
         return errors
+
+    def is_empty(self):
+
+        allnodata_schemata = filter_schemata_dict(
+            self._write_schemata, (AllNoDataSchema, EmptyIndexesSchema)
+        )
+
+        allnodata_errors = self._validate(allnodata_schemata)
+        return len(allnodata_errors) > 0
+       
 
     def _validate_init_schemata(self, validate: bool):
         """

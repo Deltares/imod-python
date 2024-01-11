@@ -466,6 +466,23 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         for pkgname, pkg in self.items():
             self[pkgname] = pkg.mask(domain)
 
+    def purge_empty_packages(self, model_name: Optional[str] = None) -> Model:
+        '''
+        MF6 will throw an error when running a simulation containing packages 
+        with AllNoData.Therefore we'll have to drop these packages. 
+        Create schemata dict only containing the variables with a AllNoDataSchema
+        and EmptyIndexesSchema (in case of HFB) in the write schemata.
+        '''       
+
+        empty_packages = [package_name for package_name, package in self.items() if package.is_empty()  ]
+        for package_name in empty_packages:
+            self.pop(package_name)
+            # TODO: Add this to logger
+            print(
+                f"package {package_name} removed from model {model_name}, because all empty"
+            )        
+
+
     @property
     def domain(self):
         dis = self._get_diskey()
@@ -599,6 +616,7 @@ class GroundwaterFlowModel(Modflow6Model):
         if clipped_boundary_condition is not None:
             clipped["chd_clipped"] = clipped_boundary_condition
 
+        clipped.purge_empty_packages()
         return clipped
 
     def __create_boundary_condition_clipped_boundary(
