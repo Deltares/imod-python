@@ -278,8 +278,10 @@ class Package(PackageBase, abc.ABC):
                         errors[variable].append(e)
         return errors
 
-    def is_empty(self):
-
+    def is_empty(self)->bool:
+        '''
+        Returns True if the package is empty- for example if it contains only no-data values.
+        '''
         allnodata_schemata = filter_schemata_dict(
             self._write_schemata, (AllNoDataSchema, EmptyIndexesSchema)
         )

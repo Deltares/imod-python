@@ -91,10 +91,8 @@ def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6
 
         sliced_package = sliced_package.mask(new_idomain)
         # The masking can result in packages with AllNoData.Therefore we'll have
-        # to drop these packages. Create schemata dict only containing the
-        # variables with a AllNoDataSchema and EmptyIndexesSchema (in case of
-        # HFB) in the write schemata.
-        if not package.is_empty():
+        # to drop these packages.
+        if not sliced_package.is_empty():
             new_model[pkg_name] = sliced_package
         else:
             # TODO: Add this to logger
