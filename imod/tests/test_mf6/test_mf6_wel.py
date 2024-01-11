@@ -167,7 +167,9 @@ def test_clip_box__high_lvl_stationary(
     [BasicDisSettings(nlay=10, zstop=-10.0)],
     indirect=True,
 )
-def test_clip_box__high_lvl_transient(well_high_lvl_test_data_transient, parameterizable_basic_dis):
+def test_clip_box__high_lvl_transient(
+    well_high_lvl_test_data_transient, parameterizable_basic_dis
+):
     # Arrange
     wel = imod.mf6.Well(*well_high_lvl_test_data_transient)
     _, top, bottom = parameterizable_basic_dis
