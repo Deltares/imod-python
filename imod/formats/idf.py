@@ -5,17 +5,12 @@ The primary functions to use are :func:`imod.idf.open` and
 :func:`imod.idf.save`, though lower level functions are also available.
 """
 
-import collections
-import functools
 import glob
-import itertools
 import pathlib
-import re
 import struct
 import warnings
 from collections import defaultdict
 
-import dask
 import numpy as np
 import xarray as xr
 
