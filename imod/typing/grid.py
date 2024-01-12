@@ -6,7 +6,7 @@ import xugrid as xu
 from fastcore.dispatch import typedispatch
 
 from imod.prepare import polygonize
-from imod.typing import GridDataArray, GridDataset
+from imod.typing import GridDataArray, GridDataset, structured
 
 
 @typedispatch
@@ -105,7 +105,7 @@ def merge_partitions(
     objects: Sequence[GridDataArray | GridDataset], *args, **kwargs
 ) -> GridDataArray | GridDataset:
     return _type_dispatch_functions_on_grid_sequence(
-        objects, xu.merge_partitions, xr.merge, *args, **kwargs
+        objects, xu.merge_partitions, structured.merge_partitions, *args, **kwargs
     )
 
 
