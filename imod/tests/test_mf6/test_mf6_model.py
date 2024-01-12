@@ -4,8 +4,10 @@ from typing import Tuple
 from unittest import mock
 from unittest.mock import MagicMock
 
+import geopandas as gpd
 import numpy as np
 import pytest
+import shapely
 import xarray as xr
 from jinja2 import Template
 from xugrid.core.wrap import UgridDataArray
@@ -397,3 +399,35 @@ def test_masked_model_layered_and_scalar_package_input(
     errors = unstructured_flow_model._validate("model")
     assert len(errors.errors) == 0
     assert_model_can_run(unstructured_flow_model, "disv", tmp_path)
+
+
+def test_purge_empty_package(
+    tmp_path: Path,
+    unstructured_flow_model: GroundwaterFlowModel,
+):
+    # test that purging leaves the non-empty packages in place
+    original_nr_packages = len(unstructured_flow_model.items())
+    unstructured_flow_model.purge_empty_packages()
+    assert original_nr_packages == len(unstructured_flow_model.items())
+
+    # test that purging removes empty packages by adding an empty well and an empty hfb
+    unstructured_flow_model["wel"] = imod.mf6.Well(
+        x=[],
+        y=[],
+        screen_top=[],
+        screen_bottom=[],
+        rate=[],
+        minimum_k=0.0001,
+    )
+    geometry = gpd.GeoDataFrame(
+        geometry=[shapely.linestrings([], [])],
+        data={
+            "resistance": [],
+            "ztop": [],
+            "zbottom": [],
+        },
+    )
+
+    unstructured_flow_model["hfb"] = imod.mf6.HorizontalFlowBarrierResistance(geometry)
+    unstructured_flow_model.purge_empty_packages()
+    assert original_nr_packages == len(unstructured_flow_model.items())
