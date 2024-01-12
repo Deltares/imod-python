@@ -58,8 +58,8 @@ def check_dim_sizes(das: Sequence[xr.DataArray]) -> None:
 def check_coords(das):
     def drop_xy(coords) -> Dict[str, Any]:
         coords = dict(coords)
-        coords.drop("y")
-        coords.drop("x")
+        coords.pop("y")
+        coords.pop("x")
         return xr.Coordinates(coords)
 
     first_coords = drop_xy(das[0].coords)
