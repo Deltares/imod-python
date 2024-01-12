@@ -55,11 +55,11 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
 
     def _compute_geometric_information(self) -> pd.DataFrame:
         grid = self._submodel_labels.ugrid.grid
-        edge_face_connectivity = grid.edge_face_connectivity
-
-        face1, face2 = edge_face_connectivity[self._connected_cell_edge_indices].T
+        face1, face2 = self._get_partition_sorted_connected_faces()
         centroid_1 = grid.centroids[face1]
         centroid_2 = grid.centroids[face2]
+
+        cdist = np.linalg.norm(centroid_2 - centroid_1, axis=1)
 
         edge_coordinates = grid.edge_node_coordinates[self._connected_cell_edge_indices]
 
@@ -70,8 +70,17 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         Vj = centroid_2 - edge_coordinates[:, 0]
         length = np.linalg.norm(U, axis=1)
 
-        # The cross product of U and V equals the area of the parallellogram,
-        # dividing by length (the base of the parallellogram) gives the orthogonal distances cl1 & cl2.
+        # get the normal to the cell edge from U
+        dx = U[:, 0]
+        dy = U[:, 1]
+        normal = np.array((dy[:], -dx[:]), dtype=np.float_).T
+
+        # If the inner product of the normal with a vector on the edge to the face centroid is positive
+        # then the normal vector points inwards
+        inward_vector_mask = np.sum(normal * Vi, axis=-1) > 0
+        normal[inward_vector_mask] = -normal[inward_vector_mask]
+
+        angle = np.degrees(np.arctan2(normal[:, 1], normal[:, 0]))
 
         df = pd.DataFrame(
             {
@@ -80,6 +89,8 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
                 "cl1": np.abs(np.cross(U, Vi)) / length,
                 "cl2": np.abs(np.cross(U, Vj)) / length,
                 "hwva": length,
+                "angldegx": angle,
+                "cdist": cdist,
             }
         )
         return df
@@ -134,3 +145,26 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         is_inter_domain_edge = ~is_internal_edge & ~is_external_boundary_edge
 
         return is_inter_domain_edge
+
+    def _get_partition_numbers(self, face: np.ndarray) -> np.ndarray:
+        return self._submodel_labels.data[face]
+
+    def _get_partition_sorted_connected_faces(self) -> (np.ndarray, np.ndarray):
+        grid = self._submodel_labels.ugrid.grid
+        edge_face_connectivity = grid.edge_face_connectivity
+
+        unordered_face1, unordered_face2 = edge_face_connectivity[
+            self._connected_cell_edge_indices
+        ].T
+
+        # Obtain the cellface indices on both sides of each edge.
+        # They should be ordered by giving the cellface with the lowest partition number first.
+        face_partition_1 = self._get_partition_numbers(unordered_face1)
+        face_partition_2 = self._get_partition_numbers(unordered_face2)
+        face1 = np.where(
+            face_partition_1 > face_partition_2, unordered_face2, unordered_face1
+        )
+        face2 = np.where(
+            face_partition_1 > face_partition_2, unordered_face1, unordered_face2
+        )
+        return (face1, face2)
