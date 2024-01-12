@@ -102,13 +102,26 @@ class SubdomainCases:
         return das, expected
 
 
+def _save_subdomains_no_species(subdomains, tmp_path):
+    for i, subdomain in enumerate(subdomains):
+        for layer, da in subdomain.groupby("layer"):
+            idf.write(tmp_path / f"subdomains_20000101_l{layer}_p00{i}.idf", da)
+
+
+def _save_subdomains_species(subdomains, tmp_path):
+    for i, subdomain in enumerate(subdomains):
+        for species, das in subdomain.groupby("species"):
+            for layer, da in das.groupby("layer"):
+                idf.write(
+                    tmp_path / f"subdomains_c{species}_20000101_l{layer}_p00{i}.idf", da
+                )
+
+
 @parametrize_with_cases(
     "subdomains,expected", cases=SubdomainCases, has_tag="no_species"
 )
 def test_open_subdomains(subdomains, expected, tmp_path):
-    for i, subdomain in enumerate(subdomains):
-        for layer, da in subdomain.groupby("layer"):
-            idf.write(tmp_path / f"subdomains_20000101_l{layer}_p00{i}.idf", da)
+    _save_subdomains_no_species(subdomains, tmp_path)
 
     da = idf.open_subdomains(tmp_path / "subdomains_*.idf").load()
 
@@ -125,15 +138,25 @@ def test_open_subdomains(subdomains, expected, tmp_path):
     assert isinstance(da, xr.DataArray)
 
 
+@parametrize_with_cases(
+    "subdomains,expected", cases=SubdomainCases, has_tag="no_species"
+)
+def test_open_subdomains_pattern_None(subdomains, expected, tmp_path):
+    """Read without provided pattern, function should interpet dimensions correctly"""
+    _save_subdomains_no_species(subdomains, tmp_path)
+    # Test with pattern is None
+    da = idf.open_subdomains(tmp_path / "subdomains_*.idf").load()
+
+    assert da.dims == ("time", "layer", "y", "x")
+
+    assert np.all(da.isel(time=0) == expected)
+
+
 @parametrize_with_cases("subdomains,expected", cases=SubdomainCases, has_tag="species")
 def test_open_subdomains_species(subdomains, expected, tmp_path):
-    for i, subdomain in enumerate(subdomains):
-        for species, das in subdomain.groupby("species"):
-            for layer, da in das.groupby("layer"):
-                idf.write(
-                    tmp_path / f"subdomains_c{species}_20000101_l{layer}_p00{i}.idf", da
-                )
+    _save_subdomains_species(subdomains, tmp_path)
 
+    # Test with pattern
     pattern = r"{name}_c{species}_{time}_l{layer}_p{subdomain}"
 
     da = idf.open_subdomains(tmp_path / "subdomains_*.idf", pattern=pattern).load()
@@ -151,17 +174,28 @@ def test_open_subdomains_species(subdomains, expected, tmp_path):
     assert isinstance(da, xr.DataArray)
 
 
+@parametrize_with_cases("subdomains,expected", cases=SubdomainCases, has_tag="species")
+def test_open_subdomains_species_pattern_None(subdomains, expected, tmp_path):
+    """Read without provided pattern, function should interpet dimensions correctly"""
+    _save_subdomains_species(subdomains, tmp_path)
+
+    # Test with pattern is None
+    da = idf.open_subdomains(tmp_path / "subdomains_*.idf").load()
+
+    assert da.dims == ("species", "time", "layer", "y", "x")
+
+    assert np.all(da.isel(time=0) == expected)
+
+
 @parametrize_with_cases("subdomains,_", cases=SubdomainCases, has_tag="no_species")
 def test_open_subdomains_error(subdomains, _, tmp_path):
-    for i, subdomain in enumerate(subdomains):
-        for layer, da in subdomain.groupby("layer"):
-            idf.write(tmp_path / f"subdomains_20000101_l{layer}_p00{i}.idf", da)
+    _save_subdomains_no_species(subdomains, tmp_path)
 
     # Add an additional subdomain with only one layer
-    idf.write(tmp_path / "subdomains_20000101_l1_p010.idf", subdomain.sel(layer=1))
+    idf.write(tmp_path / "subdomains_20000101_l1_p010.idf", subdomains[0].sel(layer=1))
 
     with pytest.raises(ValueError):
-        da = idf.open_subdomains(tmp_path / "subdomains_*.idf")
+        idf.open_subdomains(tmp_path / "subdomains_*.idf")
 
 
 def test_xycoords_equidistant():
