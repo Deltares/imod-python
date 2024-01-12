@@ -254,38 +254,6 @@ def open(path, use_cftime=False, pattern=None):
     return array_io.reading._open(path, use_cftime, pattern, header, _read)
 
 
-def _merge_subdomains(pathlists, use_cftime, pattern):
-    das = []
-    for paths in pathlists.values():
-        headers = [header(p, pattern) for p in paths]
-        das.append(array_io.reading._load(paths, use_cftime, _read, headers))
-
-    x = np.unique(np.concatenate([da.x.values for da in das]))
-    y = np.unique(np.concatenate([da.y.values for da in das]))
-
-    nrow = y.size
-    ncol = x.size
-    nlayer = das[0].coords["layer"].size
-    if "species" in das[0].dims:
-        has_species = True
-        nspecies = das[0].coords["species"].size
-        out = np.full((nspecies, 1, nlayer, nrow, ncol), np.nan)
-    else:
-        has_species = False
-        out = np.full((1, nlayer, nrow, ncol), np.nan)
-
-    for da in das:
-        ix = np.searchsorted(x, da.x.values[0], side="left")
-        iy = nrow - np.searchsorted(y, da.y.values[0], side="right")
-        ysize, xsize = da.shape[-2:]
-        if has_species:
-            out[:, :, :, iy : iy + ysize, ix : ix + xsize] = da.values
-        else:
-            out[:, :, iy : iy + ysize, ix : ix + xsize] = da.values
-
-    return out
-
-
 def open_subdomains(path, use_cftime=False, pattern=None):
     """
     Combine IDF files of multiple subdomains.
