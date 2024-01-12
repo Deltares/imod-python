@@ -466,7 +466,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         for pkgname, pkg in self.items():
             self[pkgname] = pkg.mask(domain)
 
-    def purge_empty_packages(self, model_name: Optional[str] = None) -> Model:
+    def purge_empty_packages(self, model_name: Optional[str] = None) -> Modflow6Model:
         """
         MF6 will throw an error when running a simulation containing packages
         with AllNoData.Therefore we'll have to drop these packages.

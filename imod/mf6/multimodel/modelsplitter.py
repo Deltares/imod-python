@@ -6,9 +6,7 @@ from imod.mf6.hfb import HorizontalFlowBarrierBase
 from imod.mf6.model import GroundwaterFlowModel, Modflow6Model
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.grid import get_active_domain_slice
-from imod.mf6.utilities.schemata import filter_schemata_dict
 from imod.mf6.wel import Well
-from imod.schemata import AllNoDataSchema, EmptyIndexesSchema
 from imod.typing import GridDataArray
 from imod.typing.grid import is_unstructured, ones_like
 
