@@ -14,7 +14,7 @@ Fixed
 - iMOD Python now supports versions of pandas >= 2
 - Fixed bugs with clipping :class:`imod.mf6.HorizontalFlowBarrier` for
   structured grids
-- Improved performance for merging multimodel Modflow 6 output
+- Improved performance for merging structured multimodel Modflow 6 output
 - ``imod.formats.idf.open_subdomains`` now properly supports custom patterns
 
 Changed
