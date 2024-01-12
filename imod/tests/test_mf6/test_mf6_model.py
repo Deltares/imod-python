@@ -249,9 +249,12 @@ class TestGroundwaterFlowModel:
         discretization_mock._pkg_id = "dis"
         discretization_mock.clip_box.return_value = discretization_mock
 
+        clipped_boundary_mock = MagicMock(spec_set=ConstantHead)
+        clipped_boundary_mock.is_empty.return_value = False
+
         create_clipped_boundary_mock.side_effect = [
             None,
-            MagicMock(spec_set=ConstantHead),
+            clipped_boundary_mock,
         ]
 
         model = GroundwaterFlowModel()
@@ -290,6 +293,7 @@ class TestGroundwaterFlowModel:
         unassigned_boundary_original_constant_head_mock.is_empty.side_effect = [False]
         assigned_boundary_clipped_constant_head_mock=unassigned_boundary_original_constant_head_mock
 
+
         create_clipped_boundary_mock.side_effect = [
            unassigned_boundary_original_constant_head_mock,
            assigned_boundary_clipped_constant_head_mock,
@@ -307,7 +311,7 @@ class TestGroundwaterFlowModel:
         create_clipped_boundary_mock.assert_called_with(
             discretization_mock["idomain"],
             state_for_boundary,
-            [constant_head_mock, unassigned_boundary_constant_head_mock],
+            [constant_head_mock, unassigned_boundary_original_constant_head_mock],
         )
 
 
