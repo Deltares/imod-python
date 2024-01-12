@@ -33,6 +33,18 @@ def check_sizes(sizes: DefaultDict[str, Set[int]], attribute: str) -> None:
     return
 
 
+def check_dims(das: Sequence[xr.DataArray]) -> None:
+    all_dims = set(da.dims for da in das)
+    if len(all_dims) != 1:
+        raise ValueError(
+            f"All DataArrays should have exactly the same dimensions. Found: {all_dims}"
+        )
+    last_dims = das[0].dims[-2:]
+    if not last_dims == ("y", "x"):
+        raise ValueError(f'Last dimensions must be ("y", "x"). Found: {last_dims}')
+    check_dim_sizes(das)
+
+
 def check_dim_sizes(das: Sequence[xr.DataArray]) -> None:
     """Check whether all non-xy dims are equally sized."""
     sizes = defaultdict(set)
@@ -98,7 +110,7 @@ def merge_arrays(
 def merge_partitions(das: Sequence[xr.DataArray]) -> xr.DataArray:
     # Do some input checking
     check_dtypes(das)
-    check_dim_sizes(das)
+    check_dims(das)
     check_chunk_sizes(das)
 
     # Create the x and y coordinates of the merged grid.
