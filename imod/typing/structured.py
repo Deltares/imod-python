@@ -2,7 +2,7 @@
 
 import itertools
 from collections import defaultdict
-from typing import DefaultDict, List, Sequence, Set, Tuple
+from typing import Any, DefaultDict, Dict, List, Sequence, Set, Tuple
 
 import dask
 import numpy as np
@@ -52,6 +52,26 @@ def check_dim_sizes(das: Sequence[xr.DataArray]) -> None:
         for key, value in da.sizes.items():
             sizes[key].add(value)
     check_sizes(sizes, "size")
+    return
+
+
+def check_coords(das):
+    def drop_xy(coords) -> Dict[str, Any]:
+        coords = dict(coords)
+        coords.drop("y")
+        coords.drop("x")
+        return xr.Coordinates(coords)
+
+    first_coords = drop_xy(das[0].coords)
+    disjoint = [
+        i + 1
+        for i, da in enumerate(das[1:])
+        if not first_coords.equals(drop_xy(da.coords))
+    ]
+    if disjoint:
+        raise ValueError(
+            f"Non x-y coordinates do not match for partition 0 with partitions: {disjoint}"
+        )
     return
 
 
@@ -112,6 +132,7 @@ def merge_partitions(das: Sequence[xr.DataArray]) -> xr.DataArray:
     check_dtypes(das)
     check_dims(das)
     check_chunk_sizes(das)
+    check_coords(das)
 
     # Create the x and y coordinates of the merged grid.
     x = np.unique(np.concatenate([da.x.values for da in das]))
