@@ -144,8 +144,11 @@ def merge_partitions(das: Sequence[xr.DataArray]) -> xr.DataArray:
         merged_blocks = np.empty(np.prod(block_shape), dtype=object)
         dimension_ranges = [range(size) for size in block_shape]
         for i, index in enumerate(itertools.product(*dimension_ranges)):
+            # This is a workaround for python 3.10
+            # FUTURE: can be rewritten to arr.blocks[*index, ...] in python 3.11
+            index_with_ellipsis = tuple(index) + (...,)
             # arr.blocks provides us access to the chunks of the array.
-            arrays_to_merge = [arr.blocks[*index, ...] for arr in arrays]
+            arrays_to_merge = [arr.blocks[index_with_ellipsis] for arr in arrays]
             delayed_merged = dask.delayed(merge_arrays)(
                 arrays_to_merge, ixs, iys, yx_shape
             )
