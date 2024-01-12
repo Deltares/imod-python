@@ -57,18 +57,28 @@ def to_datetime(s):
     return time
 
 
-def _groupdict(stem: str, pattern: str) -> Dict:
+def _custom_pattern_to_regex_pattern(pattern: str):
+    """
+    Compile iMOD Python's simplified custom pattern to regex pattern:
+    _custom_pattern_to_regex_pattern({name}_c{species})
+    is the same as calling:
+    (?P<{name}>[\\w.-]+)_c(?P<{species}>[\\w.-]+)).compile()
+    """
+    pattern = pattern.lower()
+    # Get the variables between curly braces
+    in_curly = re.compile(r"{(.*?)}").findall(pattern)
+    regex_parts = {key: f"(?P<{key}>[\\w.-]+)" for key in in_curly}
+    # Format the regex string, by filling in the variables
+    simple_regex = pattern.format(**regex_parts)
+    return re.compile(simple_regex)
+
+
+def _groupdict(stem: str, pattern: str | Pattern) -> Dict:
     if pattern is not None:
         if isinstance(pattern, Pattern):
             d = pattern.match(stem).groupdict()
         else:
-            pattern = pattern.lower()
-            # Get the variables between curly braces
-            in_curly = re.compile(r"{(.*?)}").findall(pattern)
-            regex_parts = {key: f"(?P<{key}>[\\w.-]+)" for key in in_curly}
-            # Format the regex string, by filling in the variables
-            simple_regex = pattern.format(**regex_parts)
-            re_pattern = re.compile(simple_regex)
+            re_pattern = _custom_pattern_to_regex_pattern(pattern)
             # Use it to get the required variables
             d = re_pattern.match(stem).groupdict()
     else:  # Default to "iMOD conventions": {name}_c{species}_{time}_l{layer}

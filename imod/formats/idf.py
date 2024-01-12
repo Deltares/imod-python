@@ -444,10 +444,36 @@ def old_open_subdomains(path, use_cftime=False, pattern=None):
     return xr.DataArray(data, coords, dims)
 
 
-def open_subdomains(
-    path, use_cftime=False, pattern=r"{name}_{time}_l{layer}_p{subdomain}"
-):
+def open_subdomains(path, use_cftime=False, pattern=None):
+    """
+    Combine IDF files of multiple subdomains.
+
+    Parameters
+    ----------
+    path : str, Path or list
+    use_cftime : bool, optional
+    pattern : str, regex pattern, optional
+        If no pattern is provided, the function will first try:
+        "{name}_c{species}_{time}_l{layer}_p{subdomain}"
+        and if that fails:
+        "{name}_{time}_l{layer}_p{subdomain}"
+        Following the iMOD5/iMOD-WQ filename conventions.
+
+    Returns
+    -------
+    xarray.DataArray
+
+    """
     paths = sorted(glob.glob(str(path)))
+
+    if pattern is None:
+        # If no pattern provided test if
+        pattern = "{name}_c{species}_{time}_l{layer}_p{subdomain}"
+        re_pattern_species = util._custom_pattern_to_regex_pattern(pattern)
+        has_species = re_pattern_species.search(paths[0])
+        if not has_species:
+            pattern = "{name}_{time}_l{layer}_p{subdomain}"
+
     parsed = [util.decompose(path, pattern) for path in paths]
     grouped = defaultdict(list)
     for match, path in zip(parsed, paths):
@@ -463,6 +489,7 @@ def open_subdomains(
     das = []
     for pathlist in grouped.values():
         da = open(pathlist, use_cftime=use_cftime, pattern=pattern)
+        da = da.isel(subdomain=0, drop=True)
         das.append(da)
 
     return merge_partitions(das)
