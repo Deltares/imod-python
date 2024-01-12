@@ -498,8 +498,8 @@ class Well(BoundaryCondition, IPointDataPackage):
 
         return Mf6Wel(**ds)
 
-    def is_empty(self)->bool:
-        return len(self.x)  == 0
+    def is_empty(self) -> bool:
+        return len(self.x) == 0
 
     def regrid_like(self, target_grid: GridDataArray, *_) -> Well:
         """

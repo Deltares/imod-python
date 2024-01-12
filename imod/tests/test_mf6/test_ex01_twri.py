@@ -522,6 +522,7 @@ def test_slice_and_run(transient_twri_model, tmp_path):
     simulation.write(modeldir, binary=True)
     simulation.run()
 
+
 @pytest.mark.usefixtures("transient_twri_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_slice_and_run_purge_empty_package(transient_twri_model, tmp_path):
@@ -539,4 +540,4 @@ def test_slice_and_run_purge_empty_package(transient_twri_model, tmp_path):
     )
     modeldir = tmp_path / "ex01-twri-transient-slice"
     simulation.write(modeldir, binary=True)
-    simulation.run()    
+    simulation.run()
