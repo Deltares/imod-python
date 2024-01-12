@@ -14,6 +14,8 @@ Fixed
 - iMOD Python now supports versions of pandas >= 2
 - Fixed bugs with clipping :class:`imod.mf6.HorizontalFlowBarrier` for
   structured grids
+- Improved performance for merging multimodel Modflow 6 output
+- ``imod.formats.idf.open_subdomains`` now properly supports custom patterns
 
 Changed
 ~~~~~~~
@@ -21,6 +23,7 @@ Changed
   environments. This replaces the ``imod-environment.yml`` conda environment. We
   advice doing development installations with pixi from now on. `See the
   documentation. <https://deltares.github.io/imod-python/installation.html>`_
+
 
 [0.15.1] - 2023-12-22
 ---------------------
