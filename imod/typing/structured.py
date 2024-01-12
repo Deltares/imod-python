@@ -10,13 +10,12 @@ import xarray as xr
 
 # %%
 
+
 def check_dtypes(das: Sequence[xr.DataArray]) -> None:
     """Check whether the dtypes of all arrays are the same."""
     dtypes = set(da.dtype for da in das)
     if len(dtypes) != 1:
-        raise TypeError(
-            f"DataArrays do not match in dtype: {dtypes}"
-        )
+        raise TypeError(f"DataArrays do not match in dtype: {dtypes}")
     return
 
 
@@ -27,12 +26,12 @@ def check_sizes(sizes: DefaultDict[str, Set[int]], attribute: str) -> None:
     conflicting = {k: v for k, v in sizes.items() if len(v) != 1}
     if conflicting:
         message = (
-           f"DataArrays do not match in {attribute} along dimension(s):\n" + 
-            "\n".join([f"   {k}: {v}" for k, v in conflicting.items()])
+            f"DataArrays do not match in {attribute} along dimension(s):\n"
+            + "\n".join([f"   {k}: {v}" for k, v in conflicting.items()])
         )
         raise ValueError(message)
     return
-    
+
 
 def check_dim_sizes(das: Sequence[xr.DataArray]) -> None:
     """Check whether all non-xy dims are equally sized."""
@@ -53,7 +52,7 @@ def check_chunk_sizes(das: Sequence[xr.DataArray]) -> None:
         return
     if any(iterator) != allnone:
         raise ValueError("Some DataArrays are chunked, while others are not.")
-    
+
     sizes = defaultdict(set)
     for da in das:
         for key, value in zip(da.dims, da.chunks):
@@ -62,10 +61,15 @@ def check_chunk_sizes(das: Sequence[xr.DataArray]) -> None:
     return
 
 
-def merge_arrays(arrays: List[np.ndarray], ixs: List[np.ndarray], iys: List[np.ndarray], yx_shape: Tuple[int, int]) -> np.ndarray:
+def merge_arrays(
+    arrays: List[np.ndarray],
+    ixs: List[np.ndarray],
+    iys: List[np.ndarray],
+    yx_shape: Tuple[int, int],
+) -> np.ndarray:
     """
     Merge the arrays in the last two (y, x) dimensions.
-    
+
     Parameters
     ----------
     arrays: list of N np.ndarray
@@ -77,7 +81,7 @@ def merge_arrays(arrays: List[np.ndarray], ixs: List[np.ndarray], iys: List[np.n
         array.
     yx_shape: tuple of int
         The number of rows and columns of the merged array.
-    
+
     Returns
     -------
     merged: np.ndarray
@@ -90,7 +94,7 @@ def merge_arrays(arrays: List[np.ndarray], ixs: List[np.ndarray], iys: List[np.n
         out[..., iy : iy + ysize, ix : ix + xsize] = a
     return out
 
-    
+
 def merge_partitions(das: Sequence[xr.DataArray]) -> xr.DataArray:
     # Do some input checking
     check_dtypes(das)
@@ -111,7 +115,7 @@ def merge_partitions(das: Sequence[xr.DataArray]) -> xr.DataArray:
     first = das[0]
     coords = dict(first.coords)
     coords["x"] = x
-    coords["y"] = y
+    coords["y"] = y[::-1]
 
     arrays = [da.data for da in das]
     if first.chunks is None:
@@ -142,14 +146,16 @@ def merge_partitions(das: Sequence[xr.DataArray]) -> xr.DataArray:
         for i, index in enumerate(itertools.product(*dimension_ranges)):
             # arr.blocks provides us access to the chunks of the array.
             arrays_to_merge = [arr.blocks[*index, ...] for arr in arrays]
-            delayed_merged = dask.delayed(merge_arrays)(arrays_to_merge, ixs, iys, yx_shape)
+            delayed_merged = dask.delayed(merge_arrays)(
+                arrays_to_merge, ixs, iys, yx_shape
+            )
             dask_merged = dask.array.from_delayed(
                 delayed_merged,
                 shape=arrays_to_merge[0].shape[:-2] + yx_shape,
                 dtype=first.dtype,
             )
             merged_blocks[i] = dask_merged
-        
+
         # After merging, the xy chunks are always (1, 1)
         reshaped = merged_blocks.reshape(block_shape + (1, 1))
         data = dask.array.block(reshaped.tolist())
@@ -159,4 +165,3 @@ def merge_partitions(das: Sequence[xr.DataArray]) -> xr.DataArray:
         coords=coords,
         dims=first.dims,
     )
-    
