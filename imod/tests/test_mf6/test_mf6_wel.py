@@ -253,7 +253,7 @@ def test_clip_box__high_lvl_transient(
     # Test clipping with z
     ds = wel.clip_box(layer_max=2, top=top, bottom=bottom).dataset
     assert dict(ds.dims) == {"index": 4, "time": 5, "species": 2}
-    ds = wel.clip_box(layer_min=7, top=top, bottom=bottom).dataset
+    ds = wel.clip_box(layer_min=5, top=top, bottom=bottom).dataset
     assert dict(ds.dims) == {"index": 4, "time": 5, "species": 2}
 
     # Test clipping with specified time
