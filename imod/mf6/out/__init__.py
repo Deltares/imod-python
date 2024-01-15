@@ -37,7 +37,8 @@ def open_cbc(
 (These could be implemented via Reader classes, but why bother with mutable
 state or a class with exclusively staticmethods?)
 """
-from typing import Any, Callable, Dict, Union, Optional
+import datetime
+from typing import Any, Callable, Dict, Optional, Union
 
 import xarray as xr
 import xugrid as xu
@@ -45,7 +46,6 @@ import xugrid as xu
 from . import dis, disu, disv
 from .cbc import read_cbc_headers
 from .common import FilePath, _grb_text
-import datetime
 
 _READ_GRB = {
     "grid dis": dis.read_grb,
@@ -100,7 +100,11 @@ def read_grb(path: FilePath) -> Dict[str, Any]:
 
 
 def open_hds(
-    hds_path: FilePath, grb_path: FilePath, dry_nan: bool = False, simulation_start_time: Optional[datetime] = None, time_unit: Optional[str]="d"
+    hds_path: FilePath,
+    grb_path: FilePath,
+    dry_nan: bool = False,
+    simulation_start_time: Optional[datetime] = None,
+    time_unit: Optional[str] = "d",
 ) -> Union[xr.DataArray, xu.UgridDataArray]:
     """
     Open modflow6 heads (.hds) file.

@@ -1,6 +1,7 @@
+import datetime
 import os
 import struct
-from typing import Any, BinaryIO, Dict, List, Tuple, Optional
+from typing import Any, BinaryIO, Dict, List, Optional, Tuple
 
 import dask
 import numba
@@ -9,11 +10,11 @@ import scipy.sparse
 import xarray as xr
 import xugrid as xu
 
+from imod.mf6.utilities.dataset import convert_time_column
+
 from . import cbc
 from .common import FilePath, FloatArray, IntArray, _to_nan
 
-import datetime
-from imod.mf6.utilities.dataset import convert_time_column
 
 def _ugrid_iavert_javert(
     iavert: IntArray, javert: IntArray
@@ -141,7 +142,13 @@ def read_hds_timestep(
     return _to_nan(a2d, dry_nan)
 
 
-def open_hds(path: FilePath, d: Dict[str, Any], dry_nan: bool, simulation_start_time: Optional[datetime] = None, time_unit: Optional[str]="d") -> xu.UgridDataArray:
+def open_hds(
+    path: FilePath,
+    d: Dict[str, Any],
+    dry_nan: bool,
+    simulation_start_time: Optional[datetime] = None,
+    time_unit: Optional[str] = "d",
+) -> xu.UgridDataArray:
     grid = d["grid"]
     nlayer, ncells_per_layer = d["nlayer"], d["ncells_per_layer"]
     filesize = os.path.getsize(path)
