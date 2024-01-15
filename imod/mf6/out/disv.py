@@ -13,6 +13,7 @@ from . import cbc
 from .common import FilePath, FloatArray, IntArray, _to_nan
 
 import datetime
+from imod.mf6.utilities.dataset import convert_time_column
 
 def _ugrid_iavert_javert(
     iavert: IntArray, javert: IntArray
@@ -168,7 +169,7 @@ def open_hds(path: FilePath, d: Dict[str, Any], dry_nan: bool, simulation_start_
     )
 
     if simulation_start_time is not None:
-        data_array = convert_time_column(data_array, simulation_start_time, time_unit)
+        da = convert_time_column(da, simulation_start_time, time_unit)
     return xu.UgridDataArray(da, grid)
 
 

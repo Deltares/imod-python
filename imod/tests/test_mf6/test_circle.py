@@ -6,7 +6,8 @@ import xugrid as xu
 
 import imod
 from imod.mf6.write_context import WriteContext
-
+import numpy as np
+from datetime import datetime
 
 @pytest.mark.usefixtures("circle_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
@@ -23,9 +24,10 @@ def test_simulation_write_and_run(circle_model, tmp_path):
     simulation.run()
 
     head = imod.mf6.open_hds(
-        modeldir / "GWF_1/GWF_1.hds", modeldir / "GWF_1/disv.disv.grb"
+        modeldir / "GWF_1/GWF_1.hds", modeldir / "GWF_1/disv.disv.grb", simulation_start_time= "01-01-1999", time_unit="s"
     )
     assert isinstance(head, xu.UgridDataArray)
+    assert np.all(head["time"].values == np.array(datetime(1999,1,1,0,0,1), dtype= 'datetime64[ns]'))
     assert head.dims == ("time", "layer", "mesh2d_nFaces")
     assert head.shape == (1, 2, 216)
 
