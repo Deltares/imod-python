@@ -30,13 +30,13 @@ def ones_like(grid: xu.UgridDataArray, *args, **kwargs):
 
 
 @typedispatch
-def nan_like(grid: xr.DataArray, *args, **kwargs):
-    return xr.full_like(grid, fill_value=np.nan, dtype=np.float32, *args, **kwargs)
+def nan_like(grid: xr.DataArray, dtype=np.float32, *args, **kwargs):
+    return xr.full_like(grid, fill_value=np.nan, dtype=dtype, *args, **kwargs)
 
 
 @typedispatch
-def nan_like(grid: xu.UgridDataArray, *args, **kwargs):
-    return xu.full_like(grid, fill_value=np.nan, dtype=np.float32, *args, **kwargs)
+def nan_like(grid: xu.UgridDataArray, dtype=np.float32, *args, **kwargs):
+    return xu.full_like(grid, fill_value=np.nan, dtype=dtype, *args, **kwargs)
 
 
 @typedispatch
