@@ -163,7 +163,7 @@ class ClipBoxCases:
     @staticmethod
     def case_clip_layer_min(parameterizable_basic_dis):
         _, top, bottom = parameterizable_basic_dis
-        clip_arguments = {"layer_min": 7, "bottom": bottom, "top": top}
+        clip_arguments = {"layer_min": 5, "bottom": bottom, "top": top}
 
         expected_dims = {"index": 4, "species": 2}
         return clip_arguments, expected_dims, does_not_raise()

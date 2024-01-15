@@ -260,14 +260,21 @@ class Well(BoundaryCondition, IPointDataPackage):
         z_max = None if layer_max is None else top.isel(layer=layer_max)
         z_min = None if layer_min is None else bottom.isel(layer=layer_min)
 
+        if z_max:
+            ds["screen_top"] = ds["screen_top"].clip(None, z_max)
+        if z_min:
+            ds["screen_bottom"] = ds["screen_bottom"].clip(z_min, None)
+
         # Initiate array of True with right shape to deal with case no spatial
         # selection needs to be done.
         in_bounds = np.full(ds.dims["index"], True)
         # Select all variables along "index" dimension
         in_bounds &= values_within_range(ds["x"], x_min, x_max)
         in_bounds &= values_within_range(ds["y"], y_min, y_max)
-        in_bounds &= values_within_range(ds["screen_top"], z_max, None)
-        in_bounds &= values_within_range(ds["screen_bottom"], None, z_min)
+        in_bounds &= values_within_range(ds["screen_top"], z_min, z_max)
+        in_bounds &= values_within_range(ds["screen_bottom"], z_min, z_max)
+        # remove wells where the screen bottom and top are the same
+        in_bounds &= abs(ds["screen_bottom"] - ds["screen_top"]) > 1e-5
         # Replace dataset with reduced dataset based on booleans
         new.dataset = ds.loc[{"index": in_bounds}]
 
