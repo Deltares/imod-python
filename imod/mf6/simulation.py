@@ -34,7 +34,7 @@ from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
-from imod.typing.grid import concat, is_unstructured, merge, merge_partitions
+from imod.typing.grid import concat, is_unstructured, merge, merge_partitions, nan_like
 
 OUTPUT_FUNC_MAPPING = {
     "head": (open_hds, GroundwaterFlowModel),
@@ -565,6 +565,16 @@ class Modflow6Simulation(collections.UserDict):
             if not is_unstructured(cbc):
                 cbc = cbc.where(partition_domain, other=np.nan)
             cbc_per_partition.append(cbc)
+
+        # Boundary conditions can be missing in certain partitions, as do their
+        # fluxes, in which case we manually assign an empty grid of nans.
+        unique_keys = set([key for cbc in cbc_per_partition for key in cbc.keys()])
+        for cbc in cbc_per_partition:
+            missing_keys = unique_keys - set(cbc.keys())
+            present_keys = unique_keys & set(cbc.keys())
+            first_present_key = next(iter(present_keys))
+            for missing in missing_keys:
+                cbc[missing] = nan_like(cbc[first_present_key], dtype=np.float64)
 
         return merge_partitions(cbc_per_partition)
 
