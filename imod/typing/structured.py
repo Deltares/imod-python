@@ -55,7 +55,7 @@ def check_dim_sizes(das: Sequence[xr.DataArray]) -> None:
     return
 
 
-def check_coords(das):
+def check_coords(das: Sequence[xr.DataArray]):
     def drop_xy(coords) -> Dict[str, Any]:
         coords = dict(coords)
         coords.pop("y")
