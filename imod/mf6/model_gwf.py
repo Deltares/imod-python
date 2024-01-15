@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from typing import Dict, List, Optional
 
+import cftime
+import numpy as np
+
 from imod.mf6 import ConstantHead
 from imod.mf6.clipped_boundary_condition_creator import create_clipped_boundary
 from imod.mf6.model import Modflow6Model, initialize_template
@@ -61,8 +64,8 @@ class GroundwaterFlowModel(Modflow6Model):
 
     def clip_box(
         self,
-        time_min: Optional[str] = None,
-        time_max: Optional[str] = None,
+        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
+        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
         layer_min: Optional[int] = None,
         layer_max: Optional[int] = None,
         x_min: Optional[float] = None,

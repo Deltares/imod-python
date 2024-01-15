@@ -3,6 +3,7 @@ from __future__ import annotations
 import warnings
 from typing import Any, List, Optional, Tuple, Union
 
+import cftime
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
@@ -20,6 +21,7 @@ from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.dataset import remove_inactive
+from imod.mf6.utilities.grid import create_layered_top
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
 from imod.schemata import AllNoDataSchema, DTypeSchema
@@ -195,8 +197,8 @@ class Well(BoundaryCondition, IPointDataPackage):
 
     def clip_box(
         self,
-        time_min: Optional[str] = None,
-        time_max: Optional[str] = None,
+        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
+        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
         layer_min: Optional[int] = None,
         layer_max: Optional[int] = None,
         x_min: Optional[float] = None,
@@ -209,6 +211,12 @@ class Well(BoundaryCondition, IPointDataPackage):
     ) -> Package:
         """
         Clip a package by a bounding box (time, layer, y, x).
+
+        The well package doesn't use the layer attribute to describe its depth and length.
+        Instead, it uses the screen_top and screen_bottom parameters which corresponds with
+        the z-coordinates of the top and bottom of the well. To go from a layer_min and
+        layer_max to z-values used for clipping the well a top and bottom array have to be
+        provided as well.
 
         Slicing intervals may be half-bounded, by providing None:
 
@@ -237,6 +245,12 @@ class Well(BoundaryCondition, IPointDataPackage):
         -------
         sliced : Package
         """
+        if (layer_max or layer_min) and (top is None or bottom is None):
+            raise ValueError("Both the layer_max and the top should be defined")
+
+        if top is not None:
+            if not isinstance(top, GridDataArray) or "layer" not in top.coords:
+                top = create_layered_top(bottom, top)
 
         # The super method will select in the time dimension without issues.
         new = super().clip_box(time_min=time_min, time_max=time_max)
@@ -252,8 +266,8 @@ class Well(BoundaryCondition, IPointDataPackage):
         # Select all variables along "index" dimension
         in_bounds &= values_within_range(ds["x"], x_min, x_max)
         in_bounds &= values_within_range(ds["y"], y_min, y_max)
-        in_bounds &= values_within_range(ds["screen_top"], None, z_max)
-        in_bounds &= values_within_range(ds["screen_bottom"], z_min, None)
+        in_bounds &= values_within_range(ds["screen_top"], z_max, None)
+        in_bounds &= values_within_range(ds["screen_bottom"], None, z_min)
         # Replace dataset with reduced dataset based on booleans
         new.dataset = ds.loc[{"index": in_bounds}]
 
@@ -649,8 +663,8 @@ class WellDisStructured(DisStructuredBoundaryCondition):
 
     def clip_box(
         self,
-        time_min: Optional[str] = None,
-        time_max: Optional[str] = None,
+        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
+        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
         layer_min: Optional[int] = None,
         layer_max: Optional[int] = None,
         x_min: Optional[float] = None,
@@ -806,8 +820,8 @@ class WellDisVertices(DisVerticesBoundaryCondition):
 
     def clip_box(
         self,
-        time_min: Optional[str] = None,
-        time_max: Optional[str] = None,
+        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
+        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
         layer_min: Optional[int] = None,
         layer_max: Optional[int] = None,
         x_min: Optional[float] = None,

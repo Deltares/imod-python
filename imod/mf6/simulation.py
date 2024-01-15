@@ -8,6 +8,7 @@ import warnings
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
+import cftime
 import jinja2
 import numpy as np
 import tomli
@@ -755,8 +756,8 @@ class Modflow6Simulation(collections.UserDict):
 
     def clip_box(
         self,
-        time_min: Optional[str] = None,
-        time_max: Optional[str] = None,
+        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
+        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
         layer_min: Optional[int] = None,
         layer_max: Optional[int] = None,
         x_min: Optional[float] = None,

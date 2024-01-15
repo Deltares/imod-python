@@ -6,6 +6,7 @@ from copy import deepcopy
 from enum import Enum
 from typing import Optional, Tuple
 
+import cftime
 import geopandas as gpd
 import numpy as np
 import shapely.wkt
@@ -518,8 +519,8 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
     def clip_box(
         self,
-        time_min: Optional[str] = None,
-        time_max: Optional[str] = None,
+        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
+        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
         layer_min: Optional[int] = None,
         layer_max: Optional[int] = None,
         x_min: Optional[float] = None,
