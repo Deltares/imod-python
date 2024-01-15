@@ -1,5 +1,5 @@
 import struct
-from typing import Any, BinaryIO, Dict, List
+from typing import Any, BinaryIO, Dict, List, Optional
 
 import numpy as np
 import xarray as xr
@@ -7,7 +7,7 @@ import xugrid as xu
 
 from . import cbc
 from .common import FilePath, _grb_text
-
+import datetime
 
 def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> Dict[str, Any]:
     read_vertices = lentxt > 10
@@ -67,7 +67,7 @@ def read_hds_timestep(
     raise NotImplementedError
 
 
-def open_hds(path: FilePath, d: Dict[str, Any], dry_nan: bool) -> xr.DataArray:
+def open_hds(path: FilePath, d: Dict[str, Any], dry_nan: bool, simulation_start_time: Optional[datetime] = None, time_unit: Optional[str]="d") -> xr.DataArray:
     raise NotImplementedError
 
 

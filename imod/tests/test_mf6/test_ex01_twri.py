@@ -425,11 +425,12 @@ def test_simulation_write_and_run(twri_model, tmp_path):
     simulation.run()
 
     head = imod.mf6.open_hds(
-        modeldir / "GWF_1/GWF_1.hds", modeldir / "GWF_1/dis.dis.grb"
+        modeldir / "GWF_1/GWF_1.hds", modeldir / "GWF_1/dis.dis.grb", simulation_start_time= "01-01-1999", time_unit="d"
     )
     assert isinstance(head, xr.DataArray)
     assert head.dims == ("time", "layer", "y", "x")
     assert head.shape == (1, 3, 15, 15)
+    assert np.all(head["time"].values == np.array(datetime.datetime(1999,1,2), dtype= 'datetime64[ns]'))
     meanhead_layer = head.groupby("layer").mean(dim=xr.ALL_DIMS)
     mean_answer = np.array([59.79181509, 30.44132373, 24.88576811])
     assert np.allclose(meanhead_layer, mean_answer)

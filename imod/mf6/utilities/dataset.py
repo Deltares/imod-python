@@ -5,7 +5,8 @@ import xarray as xr
 from xarray.core.utils import is_scalar
 
 from imod.typing import GridDataArray
-
+import pandas as pd
+import datetime
 
 def remove_inactive(ds: xr.Dataset, active: xr.DataArray) -> xr.Dataset:
     """
@@ -46,3 +47,11 @@ def is_dataarray_none(datarray: Any) -> bool:
 def get_scalar_variables(ds: GridDataArray) -> list[str]:
     """Returns scalar variables in a dataset."""
     return [var for var, arr in ds.variables.items() if is_scalar(arr)]
+
+def convert_time_column(ds: GridDataArray,simulation_start_time: datetime , time_unit:str="d" )->GridDataArray:
+    if not "time" in ds.coords:
+        raise ValueError("cannot convert time column, because a time column could not be found")
+
+    ds["time"] = pd.Timestamp(simulation_start_time) + pd.to_timedelta(ds["time"], unit=time_unit)
+    return ds
+    

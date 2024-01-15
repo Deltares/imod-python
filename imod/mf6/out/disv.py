@@ -1,6 +1,6 @@
 import os
 import struct
-from typing import Any, BinaryIO, Dict, List, Tuple
+from typing import Any, BinaryIO, Dict, List, Tuple, Optional
 
 import dask
 import numba
@@ -12,6 +12,7 @@ import xugrid as xu
 from . import cbc
 from .common import FilePath, FloatArray, IntArray, _to_nan
 
+import datetime
 
 def _ugrid_iavert_javert(
     iavert: IntArray, javert: IntArray
@@ -139,7 +140,7 @@ def read_hds_timestep(
     return _to_nan(a2d, dry_nan)
 
 
-def open_hds(path: FilePath, d: Dict[str, Any], dry_nan: bool) -> xu.UgridDataArray:
+def open_hds(path: FilePath, d: Dict[str, Any], dry_nan: bool, simulation_start_time: Optional[datetime] = None, time_unit: Optional[str]="d") -> xu.UgridDataArray:
     grid = d["grid"]
     nlayer, ncells_per_layer = d["nlayer"], d["ncells_per_layer"]
     filesize = os.path.getsize(path)
@@ -165,6 +166,9 @@ def open_hds(path: FilePath, d: Dict[str, Any], dry_nan: bool) -> xu.UgridDataAr
     da = xr.DataArray(
         daskarr, coords, ("time", "layer", grid.face_dimension), name=d["name"]
     )
+
+    if simulation_start_time is not None:
+        data_array = convert_time_column(data_array, simulation_start_time, time_unit)
     return xu.UgridDataArray(da, grid)
 
 

@@ -1,6 +1,6 @@
 import os
 import struct
-from typing import Any, BinaryIO, Dict, List, Tuple
+from typing import Any, BinaryIO, Dict, List, Tuple, Optional
 
 import dask
 import numba
@@ -11,8 +11,8 @@ import imod
 
 from . import cbc
 from .common import FilePath, FloatArray, IntArray, _to_nan
-
-
+from imod.mf6.utilities.dataset import convert_time_column
+import datetime
 # Binary Grid File / DIS Grids
 # https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=162
 def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> Dict[str, Any]:
@@ -114,7 +114,7 @@ def read_hds_timestep(
     return _to_nan(a3d, dry_nan)
 
 
-def open_hds(path: FilePath, d: Dict[str, Any], dry_nan: bool) -> xr.DataArray:
+def open_hds(path: FilePath, d: Dict[str, Any], dry_nan: bool, simulation_start_time: Optional[datetime] = None, time_unit: Optional[str]="d") -> xr.DataArray:
     nlayer, nrow, ncol = d["nlayer"], d["nrow"], d["ncol"]
     filesize = os.path.getsize(path)
     ntime = filesize // (nlayer * (52 + (nrow * ncol * 8)))
@@ -132,8 +132,10 @@ def open_hds(path: FilePath, d: Dict[str, Any], dry_nan: bool) -> xr.DataArray:
         dask_list.append(x)
 
     daskarr = dask.array.stack(dask_list, axis=0)
-    return xr.DataArray(daskarr, coords, ("time", "layer", "y", "x"), name=d["name"])
-
+    data_array = xr.DataArray(daskarr, coords, ("time", "layer", "y", "x"), name=d["name"])
+    if simulation_start_time is not None:
+        data_array = convert_time_column(data_array, simulation_start_time, time_unit)
+    return data_array
 
 def open_imeth1_budgets(
     cbc_path: FilePath, grb_content: dict, header_list: List[cbc.Imeth1Header]
