@@ -127,7 +127,7 @@ def merge_arrays(
     return out
 
 
-def merge_partitions(das: Sequence[xr.DataArray]) -> xr.DataArray:
+def _merge_partitions(das: Sequence[xr.DataArray]) -> xr.DataArray:
     # Do some input checking
     check_dtypes(das)
     check_dims(das)
@@ -201,3 +201,23 @@ def merge_partitions(das: Sequence[xr.DataArray]) -> xr.DataArray:
         coords=coords,
         dims=first.dims,
     )
+
+
+def merge_partitions(
+    das: Sequence[xr.DataArray | xr.Dataset],
+) -> xr.DataArray | xr.Dataset:
+    first_item = das[0]
+    if isinstance(first_item, xr.Dataset):
+        unique_keys = set([key for da in das for key in da.keys()])
+        merged_ls = []
+        for key in unique_keys:
+            merged_ls.append(_merge_partitions([da[key] for da in das]).rename(key))
+        return xr.merge(merged_ls)
+    elif isinstance(first_item, xr.DataArray):
+        # Store name to rename after concatenation
+        name = das[0].name
+        return _merge_partitions(das).to_dataset(name=name)
+    else:
+        raise TypeError(
+            f"Expected type: xr.DataArray or xr.Dataset, got {type(first_item)}"
+        )
