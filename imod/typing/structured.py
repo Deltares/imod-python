@@ -120,11 +120,13 @@ def merge_arrays(
     """
     first = arrays[0]
     shape = first.shape[:-2] + yx_shape
-    out = np.full(shape, np.nan)
+    out = np.zeros(shape)
+    active = np.zeros(shape, dtype=bool)
     for a, ix, iy in zip(arrays, ixs, iys):
         ysize, xsize = a.shape[-2:]
-        out[..., iy : iy + ysize, ix : ix + xsize] = a
-    return out
+        out[..., iy : iy + ysize, ix : ix + xsize] += np.nan_to_num(a)
+        active[..., iy : iy + ysize, ix : ix + xsize] |= ~np.isnan(a)
+    return np.where(active, out, np.nan)
 
 
 def _merge_partitions(das: Sequence[xr.DataArray]) -> xr.DataArray:
