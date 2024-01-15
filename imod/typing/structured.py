@@ -124,8 +124,11 @@ def merge_arrays(
     active = np.zeros(shape, dtype=bool)
     for a, ix, iy in zip(arrays, ixs, iys):
         ysize, xsize = a.shape[-2:]
+        # Sum overlapping values, set nan to 0.0
         out[..., iy : iy + ysize, ix : ix + xsize] += np.nan_to_num(a)
+        # Incrementily set non-nan cells to active
         active[..., iy : iy + ysize, ix : ix + xsize] |= ~np.isnan(a)
+    # Mask inactive values
     return np.where(active, out, np.nan)
 
 
