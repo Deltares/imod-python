@@ -37,9 +37,9 @@ def open_cbc(
 (These could be implemented via Reader classes, but why bother with mutable
 state or a class with exclusively staticmethods?)
 """
-import datetime
 from typing import Any, Callable, Dict, Optional, Union
 
+import numpy as np
 import xarray as xr
 import xugrid as xu
 
@@ -103,7 +103,7 @@ def open_hds(
     hds_path: FilePath,
     grb_path: FilePath,
     dry_nan: bool = False,
-    simulation_start_time: Optional[datetime] = None,
+    simulation_start_time: Optional[np.datetime64] = None,
     time_unit: Optional[str] = "d",
 ) -> Union[xr.DataArray, xu.UgridDataArray]:
     """

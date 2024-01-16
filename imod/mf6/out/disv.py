@@ -1,4 +1,3 @@
-import datetime
 import os
 import struct
 from typing import Any, BinaryIO, Dict, List, Optional, Tuple
@@ -146,7 +145,7 @@ def open_hds(
     path: FilePath,
     d: Dict[str, Any],
     dry_nan: bool,
-    simulation_start_time: Optional[datetime] = None,
+    simulation_start_time: Optional[np.datetime64] = None,
     time_unit: Optional[str] = "d",
 ) -> xu.UgridDataArray:
     grid = d["grid"]

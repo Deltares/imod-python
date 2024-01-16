@@ -1,4 +1,3 @@
-import datetime
 from typing import Any
 
 import numpy as np
@@ -51,7 +50,7 @@ def get_scalar_variables(ds: GridDataArray) -> list[str]:
 
 
 def convert_time_column(
-    ds: GridDataArray, simulation_start_time: datetime, time_unit: str = "d"
+    ds: GridDataArray, simulation_start_time: np.datetime64, time_unit: str = "d"
 ) -> GridDataArray:
     if not "time" in ds.coords:
         raise ValueError(
