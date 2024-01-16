@@ -468,11 +468,12 @@ def test_partitioning_structured_hfb(
     current_cases,
 ):
     """
-    In this test we include a high-level well package with 1 well in it to the
-    simulation. The well will be in active in 1 partition and should therefore
-    be inactive or non-present in the other partitions This should not give
-    validation errors.
+    In this test we include a high-level hfb package with 1 horizontal flow barrier
+    in it to the simulation. The hfb will be in active in 1 partition and should
+    therefore be inactive or non-present in the other partitions This should not
+    give validation errors.
     """
+
     simulation = transient_twri_model
 
     simulation["GWF_1"]["hfb"] = imod.mf6.HorizontalFlowBarrierResistance(geometry=hfb)

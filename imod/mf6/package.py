@@ -20,9 +20,10 @@ from imod.mf6.regridding_utils import (
     RegridderType,
     get_non_grid_data,
 )
+from imod.mf6.utilities.schemata import filter_schemata_dict
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext
-from imod.schemata import ValidationError
+from imod.schemata import AllNoDataSchema, EmptyIndexesSchema, ValidationError
 from imod.typing import GridDataArray
 
 
@@ -277,6 +278,23 @@ class Package(PackageBase, abc.ABC):
                     except ValidationError as e:
                         errors[variable].append(e)
         return errors
+
+    def is_empty(self) -> bool:
+        """
+        Returns True if the package is empty- for example if it contains only no-data values.
+        """
+
+        # Create schemata dict only containing the
+        # variables with a AllNoDataSchema and EmptyIndexesSchema (in case of
+        # HFB) in the write schemata.
+        allnodata_schemata = filter_schemata_dict(
+            self._write_schemata, (AllNoDataSchema, EmptyIndexesSchema)
+        )
+
+        # Find if packages throws ValidationError for AllNoDataSchema or
+        # EmptyIndexesSchema.
+        allnodata_errors = self._validate(allnodata_schemata)
+        return len(allnodata_errors) > 0
 
     def _validate_init_schemata(self, validate: bool):
         """
