@@ -462,7 +462,8 @@ class Modflow6Simulation(collections.UserDict):
         return self._open_output("budget-flow", flowja=flowja)
 
     def open_concentration(
-        self, species_ls: list[str] = None, dry_nan: bool = False
+        self, species_ls: list[str] = None, dry_nan: bool = False, simulation_start_time: Optional[np.datetime64] = None,
+        time_unit: Optional[str] = "d",
     ) -> GridDataArray:
         """
         Open concentration of finished simulation, requires that the ``run``
@@ -499,7 +500,8 @@ class Modflow6Simulation(collections.UserDict):
         >>> concentration = simulation.open_concentration()
         """
         return self._open_output(
-            "concentration", species_ls=species_ls, dry_nan=dry_nan
+            "concentration", species_ls=species_ls, dry_nan=dry_nan, simulation_start_time=simulation_start_time,
+            time_unit=time_unit
         )
 
     def _open_output(self, output: str, **settings) -> GridDataArray | GridDataset:

@@ -29,12 +29,13 @@ from .fixtures.mf6_flow_with_transport_fixture import (
     distcoef_fc,
     elevation_fc,
     flow_model_with_concentration,
+    flow_transport_simulation,
     head_fc,
     porosity_fc,
     proportion_depth_fc,
     proportion_rate_fc,
     rate_fc,
-    sp2_fc,
+    sp2_fc
 )
 from .fixtures.mf6_lake_package_fixture import (
     ijsselmeer,

@@ -81,3 +81,15 @@ def test_flowmodel_validation(twri_model):
     flow_model = twri_model["GWF_1"]
     with pytest.raises(ValueError):
         imod.mf6.SourceSinkMixing.from_flow_model(flow_model, "salinity")
+
+
+@pytest.mark.usefixtures("flow_transport_simulation")
+def test_transport_result_loading(tmp_path, flow_transport_simulation):
+
+    flow_transport_simulation.write(tmp_path)
+    flow_transport_simulation.run()
+
+    conc_notime = flow_transport_simulation.open_conc()
+
+    conc_time = flow_transport_simulation.open_conc(simulation_start_time = "2000-01-31", time_unit = "s")
+    
