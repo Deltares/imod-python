@@ -117,16 +117,16 @@ def read_hds_timestep(
 
 def open_hds(
     path: FilePath,
-    d: Dict[str, Any],
+    grid_info: Dict[str, Any],
     dry_nan: bool,
     simulation_start_time: Optional[np.datetime64] = None,
     time_unit: Optional[str] = "d",
 ) -> xr.DataArray:
-    nlayer, nrow, ncol = d["nlayer"], d["nrow"], d["ncol"]
+    nlayer, nrow, ncol = grid_info["nlayer"], grid_info["nrow"], grid_info["ncol"]
     filesize = os.path.getsize(path)
     ntime = filesize // (nlayer * (52 + (nrow * ncol * 8)))
     times = read_times(path, ntime, nlayer, nrow, ncol)
-    coords = d["coords"]
+    coords = grid_info["coords"]
     coords["time"] = times
 
     dask_list = []
@@ -140,7 +140,7 @@ def open_hds(
 
     daskarr = dask.array.stack(dask_list, axis=0)
     data_array = xr.DataArray(
-        daskarr, coords, ("time", "layer", "y", "x"), name=d["name"]
+        daskarr, coords, ("time", "layer", "y", "x"), name=grid_info["name"]
     )
     if simulation_start_time is not None:
         data_array = assign_datetime_coords(

@@ -69,7 +69,7 @@ def read_hds_timestep(
 
 def open_hds(
     path: FilePath,
-    d: Dict[str, Any],
+    grid_info: Dict[str, Any],
     dry_nan: bool,
     simulation_start_time: Optional[np.datetime64] = None,
     time_unit: Optional[str] = "d",

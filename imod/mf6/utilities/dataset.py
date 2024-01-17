@@ -50,14 +50,14 @@ def get_scalar_variables(ds: GridDataArray) -> list[str]:
 
 
 def assign_datetime_coords(
-    ds: GridDataArray, simulation_start_time: np.datetime64, time_unit: str = "d"
+    da: GridDataArray, simulation_start_time: np.datetime64, time_unit: str = "d"
 ) -> GridDataArray:
-    if not "time" in ds.coords:
+    if not "time" in da.coords:
         raise ValueError(
             "cannot convert time column, because a time column could not be found"
         )
 
     time = pd.Timestamp(simulation_start_time) + pd.to_timedelta(
-        ds["time"], unit=time_unit
+        da["time"], unit=time_unit
     )
-    return ds.assign_coords(time=time)
+    return da.assign_coords(time=time)
