@@ -4,8 +4,10 @@ from typing import Tuple
 from unittest import mock
 from unittest.mock import MagicMock
 
+import geopandas as gpd
 import numpy as np
 import pytest
+import shapely
 import xarray as xr
 from jinja2 import Template
 from xugrid.core.wrap import UgridDataArray
@@ -249,9 +251,12 @@ class TestGroundwaterFlowModel:
         discretization_mock._pkg_id = "dis"
         discretization_mock.clip_box.return_value = discretization_mock
 
+        clipped_boundary_mock = MagicMock(spec_set=ConstantHead)
+        clipped_boundary_mock.is_empty.return_value = False
+
         create_clipped_boundary_mock.side_effect = [
             None,
-            MagicMock(spec_set=ConstantHead),
+            clipped_boundary_mock,
         ]
 
         model = GroundwaterFlowModel()
@@ -277,16 +282,24 @@ class TestGroundwaterFlowModel:
 
         discretization_mock = MagicMock(spec_set=Package)
         discretization_mock._pkg_id = "dis"
+        discretization_mock.is_empty.side_effect = [False, False]
         discretization_mock.clip_box.return_value = discretization_mock
 
         constant_head_mock = MagicMock(spec_set=ConstantHead)
+        constant_head_mock.is_empty.side_effect = [False, False]
         constant_head_mock.clip_box.return_value = constant_head_mock
 
-        unassigned_boundary_constant_head_mock = MagicMock(spec_set=ConstantHead)
+        unassigned_boundary_original_constant_head_mock = MagicMock(
+            spec_set=ConstantHead
+        )
+        unassigned_boundary_original_constant_head_mock.is_empty.side_effect = [False]
+        assigned_boundary_clipped_constant_head_mock = (
+            unassigned_boundary_original_constant_head_mock
+        )
 
         create_clipped_boundary_mock.side_effect = [
-            unassigned_boundary_constant_head_mock,
-            MagicMock(spec_set=ConstantHead),
+            unassigned_boundary_original_constant_head_mock,
+            assigned_boundary_clipped_constant_head_mock,
         ]
 
         model = GroundwaterFlowModel()
@@ -301,7 +314,7 @@ class TestGroundwaterFlowModel:
         create_clipped_boundary_mock.assert_called_with(
             discretization_mock["idomain"],
             state_for_boundary,
-            [constant_head_mock, unassigned_boundary_constant_head_mock],
+            [constant_head_mock, unassigned_boundary_original_constant_head_mock],
         )
 
 
@@ -386,3 +399,35 @@ def test_masked_model_layered_and_scalar_package_input(
     errors = unstructured_flow_model._validate("model")
     assert len(errors.errors) == 0
     assert_model_can_run(unstructured_flow_model, "disv", tmp_path)
+
+
+def test_purge_empty_package(
+    tmp_path: Path,
+    unstructured_flow_model: GroundwaterFlowModel,
+):
+    # test that purging leaves the non-empty packages in place
+    original_nr_packages = len(unstructured_flow_model.items())
+    unstructured_flow_model.purge_empty_packages()
+    assert original_nr_packages == len(unstructured_flow_model.items())
+
+    # test that purging removes empty packages by adding an empty well and an empty hfb
+    unstructured_flow_model["wel"] = imod.mf6.Well(
+        x=[],
+        y=[],
+        screen_top=[],
+        screen_bottom=[],
+        rate=[],
+        minimum_k=0.0001,
+    )
+    geometry = gpd.GeoDataFrame(
+        geometry=[shapely.linestrings([], [])],
+        data={
+            "resistance": [],
+            "ztop": [],
+            "zbottom": [],
+        },
+    )
+
+    unstructured_flow_model["hfb"] = imod.mf6.HorizontalFlowBarrierResistance(geometry)
+    unstructured_flow_model.purge_empty_packages()
+    assert original_nr_packages == len(unstructured_flow_model.items())
