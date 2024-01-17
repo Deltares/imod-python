@@ -2,6 +2,7 @@ import numpy as np
 import xarray as xr
 
 from imod.mf6.boundary_condition import AdvancedBoundaryCondition, BoundaryCondition
+from imod.mf6.pkgbase import pkg_init
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -202,6 +203,9 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
 
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
+    @pkg_init(
+        exclude_in_dataset=["validate", "landflag", "simulate_groundwater_seepage"]
+    )
     def __init__(
         self,
         surface_depression_depth,
@@ -230,13 +234,6 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         validate: bool = True,
     ):
         super().__init__(locals())
-        # Package data
-        self.dataset["surface_depression_depth"] = surface_depression_depth
-        self.dataset["kv_sat"] = kv_sat
-        self.dataset["theta_res"] = theta_res
-        self.dataset["theta_sat"] = theta_sat
-        self.dataset["theta_init"] = theta_init
-        self.dataset["epsilon"] = epsilon
 
         # Stress period data
         self._check_options(
@@ -248,28 +245,6 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
             root_potential,
             root_activity,
         )
-
-        self.dataset["infiltration_rate"] = infiltration_rate
-        self.dataset["et_pot"] = et_pot
-        self.dataset["extinction_depth"] = extinction_depth
-        self.dataset["extinction_theta"] = extinction_theta
-        self.dataset["air_entry_potential"] = air_entry_potential
-        self.dataset["root_potential"] = root_potential
-        self.dataset["root_activity"] = root_activity
-
-        # Dimensions
-        self.dataset["ntrailwaves"] = ntrailwaves
-        self.dataset["nwavesets"] = nwavesets
-
-        # Options
-        self.dataset["groundwater_ET_function"] = groundwater_ET_function
-        self.dataset["simulate_gwseep"] = simulate_groundwater_seepage
-        self.dataset["print_input"] = print_input
-        self.dataset["print_flows"] = print_flows
-        self.dataset["save_flows"] = save_flows
-        self.dataset["observations"] = observations
-        self.dataset["water_mover"] = water_mover
-        self.dataset["timeseries"] = timeseries
 
         # Additonal indices for Packagedata
         self.dataset["landflag"] = self._determine_landflag(kv_sat)

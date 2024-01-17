@@ -2,6 +2,7 @@ import numpy as np
 
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.package import Package
+from imod.mf6.pkgbase import pkg_init
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -67,6 +68,7 @@ class MassSourceLoading(BoundaryCondition):
         ],
     }
 
+    @pkg_init(exclude_in_dataset=["validate"])
     def __init__(
         self,
         rate,
@@ -76,10 +78,4 @@ class MassSourceLoading(BoundaryCondition):
         observations=None,
         validate: bool = True,
     ):
-        super().__init__()
-        self.dataset["rate"] = rate
-        self.dataset["print_input"] = print_input
-        self.dataset["print_flows"] = print_flows
-        self.dataset["save_flows"] = save_flows
-        self.dataset["observations"] = observations
         self._validate_init_schemata(validate)

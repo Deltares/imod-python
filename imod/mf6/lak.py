@@ -17,7 +17,7 @@ import xarray as xr
 from imod import mf6
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.package import Package
-from imod.mf6.pkgbase import PackageBase
+from imod.mf6.pkgbase import PackageBase, pkg_init
 from imod.mf6.write_context import WriteContext
 from imod.schemata import AllValueSchema, DimsSchema, DTypeSchema
 
@@ -31,8 +31,8 @@ class LakeApi_Base(PackageBase):
     Base class for lake and outlet object.
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, variables_to_merge=None):
+        super().__init__(variables_to_merge)
 
 
 class LakeData(LakeApi_Base):
@@ -78,6 +78,7 @@ class LakeData(LakeApi_Base):
         "auxiliary",
     ]
 
+    @pkg_init(exclude_in_dataset=timeseries_names)
     def __init__(
         self,
         starting_stage: float,
@@ -98,25 +99,7 @@ class LakeData(LakeApi_Base):
         auxiliary=None,
         lake_table=None,
     ):
-        super().__init__()
-        self.dataset["starting_stage"] = starting_stage
-        self.dataset["boundname"] = boundname
-        self.dataset["connection_type"] = (connection_type.dims, connection_type.values)
-        self.dataset["bed_leak"] = (bed_leak.dims, bed_leak.values)
-        self.dataset["top_elevation"] = (top_elevation.dims, top_elevation.values)
-        self.dataset["bottom_elevation"] = (bot_elevation.dims, bot_elevation.values)
-        self.dataset["connection_length"] = (
-            connection_length.dims,
-            connection_length.values,
-        )
-        self.dataset["connection_width"] = (
-            connection_width.dims,
-            connection_width.values,
-        )
-        self.dataset["lake_table"] = lake_table
-
         # timeseries data
-
         times = []
         timeseries_dict = {
             "status": status,
@@ -153,11 +136,9 @@ class OutletBase(LakeApi_Base):
 
     timeseries_names = ["rate", "invert", "rough", "width", "slope"]
 
-    def __init__(self, lakein: str, lakeout: str):
-        super().__init__()
-        self.dataset = xr.Dataset()
-        self.dataset["lakein"] = lakein
-        self.dataset["lakeout"] = lakeout
+    def __init__(self, allargs=None):
+        super().__init__(allargs)
+        # Set default settings
         self.dataset["invert"] = None
         self.dataset["width"] = None
         self.dataset["roughness"] = None
@@ -172,6 +153,7 @@ class OutletManning(OutletBase):
 
     _couttype = "manning"
 
+    @pkg_init
     def __init__(
         self,
         lakein: str,
@@ -181,11 +163,7 @@ class OutletManning(OutletBase):
         roughness,
         slope,
     ):
-        super().__init__(lakein, lakeout)
-        self.dataset["invert"] = invert
-        self.dataset["width"] = width
-        self.dataset["roughness"] = roughness
-        self.dataset["slope"] = slope
+        pass
 
 
 class OutletWeir(OutletBase):
@@ -195,10 +173,9 @@ class OutletWeir(OutletBase):
 
     _couttype = "weir"
 
+    @pkg_init
     def __init__(self, lakein: str, lakeout: str, invert, width):
-        super().__init__(lakein, lakeout)
-        self.dataset["invert"] = invert
-        self.dataset["width"] = width
+        pass
 
 
 class OutletSpecified(OutletBase):
@@ -208,9 +185,9 @@ class OutletSpecified(OutletBase):
 
     _couttype = "specified"
 
+    @pkg_init
     def __init__(self, lakein: str, lakeout: str, rate):
-        super().__init__(lakein, lakeout)
-        self.dataset["rate"] = rate
+        pass
 
 
 def create_connection_data(lakes):
@@ -672,6 +649,7 @@ class Lake(BoundaryCondition):
         "outlet_width": [AllValueSchema(">", 0)],
     }
 
+    @pkg_init(exclude_in_dataset=["validate"])
     def __init__(
         # lake
         self,
@@ -726,11 +704,6 @@ class Lake(BoundaryCondition):
         length_conversion=None,
         validate=True,
     ):
-        super().__init__(locals())
-        self.dataset["lake_boundname"] = lake_boundname
-        self.dataset["lake_number"] = lake_number
-        self.dataset["lake_starting_stage"] = lake_starting_stage
-
         nr_indices = int(self.dataset["lake_number"].data.max())
         if outlet_lakein is not None:
             nroutlets = len(outlet_lakein.data)
@@ -738,56 +711,10 @@ class Lake(BoundaryCondition):
 
         self.dataset = self.dataset.assign_coords(index=range(1, nr_indices + 1, 1))
 
-        self.dataset["connection_lake_number"] = connection_lake_number
-        self.dataset["connection_cell_id"] = connection_cell_id
-        self.dataset["connection_type"] = connection_type
-        self.dataset["connection_bed_leak"] = connection_bed_leak
-        self.dataset["connection_bottom_elevation"] = connection_bottom_elevation
-        self.dataset["connection_top_elevation"] = connection_top_elevation
-        self.dataset["connection_width"] = connection_width
-        self.dataset["connection_length"] = connection_length
-
-        self.dataset["outlet_lakein"] = outlet_lakein
-        self.dataset["outlet_lakeout"] = outlet_lakeout
-        self.dataset["outlet_couttype"] = outlet_couttype
-        self.dataset["outlet_invert"] = outlet_invert
-        self.dataset["outlet_roughness"] = outlet_roughness
-        self.dataset["outlet_width"] = outlet_width
-        self.dataset["outlet_slope"] = outlet_slope
-
-        self.dataset["print_input"] = print_input
-        self.dataset["print_stage"] = print_stage
-        self.dataset["print_flows"] = print_flows
-        self.dataset["save_flows"] = save_flows
-
-        self.dataset["stagefile"] = stagefile
-        self.dataset["budgetfile"] = budgetfile
-        self.dataset["budgetcsvfile"] = budgetcsvfile
-        self.dataset["package_convergence_filename"] = package_convergence_filename
-        self.dataset["ts6_filename"] = ts6_filename
-        self.dataset["time_conversion"] = time_conversion
-        self.dataset["length_conversion"] = length_conversion
-
-        self.dataset["ts_status"] = ts_status
         if ts_status is not None:
             self.dataset["ts_status"] = self._convert_to_string_dataarray(
                 self.dataset["ts_status"]
             )
-        self.dataset["ts_stage"] = ts_stage
-        self.dataset["ts_rainfall"] = ts_rainfall
-        self.dataset["ts_evaporation"] = ts_evaporation
-        self.dataset["ts_runoff"] = ts_runoff
-        self.dataset["ts_inflow"] = ts_inflow
-        self.dataset["ts_withdrawal"] = ts_withdrawal
-        self.dataset["ts_auxiliary"] = ts_auxiliary
-
-        self.dataset["ts_rate"] = ts_rate
-        self.dataset["ts_invert"] = ts_invert
-        self.dataset["ts_rough"] = ts_rough
-        self.dataset["ts_width"] = ts_width
-        self.dataset["ts_slope"] = ts_slope
-
-        self.dataset["lake_tables"] = lake_tables
 
         self._validate_init_schemata(validate)
 

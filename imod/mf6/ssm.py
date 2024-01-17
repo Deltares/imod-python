@@ -2,6 +2,7 @@ import numpy as np
 
 from imod.mf6 import GroundwaterFlowModel
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.pkgbase import pkg_init
 from imod.schemata import DTypeSchema
 
 
@@ -38,6 +39,14 @@ class SourceSinkMixing(BoundaryCondition):
 
     _write_schemata = {}
 
+    @pkg_init(
+        exclude_in_dataset=[
+            "validate",
+            "package_names",
+            "concentration_boundary_type",
+            "auxiliary_variable_name",
+        ]
+    )
     def __init__(
         self,
         package_names,
@@ -47,7 +56,6 @@ class SourceSinkMixing(BoundaryCondition):
         save_flows: bool = False,
         validate: bool = True,
     ):
-        super().__init__()
         # By sharing the index, this will raise an error if lengths do not
         # match.
         self.dataset["package_names"] = with_index_dim(package_names)
@@ -57,8 +65,6 @@ class SourceSinkMixing(BoundaryCondition):
         self.dataset["auxiliary_variable_name"] = with_index_dim(
             auxiliary_variable_name
         )
-        self.dataset["print_flows"] = print_flows
-        self.dataset["save_flows"] = save_flows
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):

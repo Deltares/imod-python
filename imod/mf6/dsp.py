@@ -1,6 +1,7 @@
 import numpy as np
 
 from imod.mf6.package import Package
+from imod.mf6.pkgbase import pkg_init
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import DTypeSchema, IdentityNoDataSchema, IndexesSchema
 
@@ -133,6 +134,7 @@ class Dispersion(Package):
         ),
     }
 
+    @pkg_init(exclude_in_dataset=["validate"])
     def __init__(
         self,
         diffusion_coefficient,
@@ -145,13 +147,4 @@ class Dispersion(Package):
         xt3d_rhs=False,
         validate: bool = True,
     ):
-        super().__init__(locals())
-        self.dataset["xt3d_off"] = xt3d_off
-        self.dataset["xt3d_rhs"] = xt3d_rhs
-        self.dataset["diffusion_coefficient"] = diffusion_coefficient
-        self.dataset["longitudinal_horizontal"] = longitudinal_horizontal
-        self.dataset["transversal_horizontal1"] = transversal_horizontal1
-        self.dataset["longitudinal_vertical"] = longitudinal_vertical
-        self.dataset["transversal_horizontal2"] = transversal_horizontal2
-        self.dataset["transversal_vertical"] = transversal_vertical
         self._validate_init_schemata(validate)

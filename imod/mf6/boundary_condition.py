@@ -69,12 +69,13 @@ class BoundaryCondition(Package, abc.ABC):
 
     def __init__(self, allargs=None):
         super().__init__(allargs)
-        if allargs["concentration"] is None:
-            # Remove vars inplace
-            del self.dataset["concentration"]
-            del self.dataset["concentration_boundary_type"]
-        else:
-            add_periodic_auxiliary_variable(self)
+        if "concentration" in allargs.keys():
+            if allargs["concentration"] is None:
+                # Remove vars inplace
+                del self.dataset["concentration"]
+                del self.dataset["concentration_boundary_type"]
+            else:
+                add_periodic_auxiliary_variable(self)
 
     def _max_active_n(self):
         """

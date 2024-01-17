@@ -2,6 +2,7 @@ import cftime
 import numpy as np
 
 from imod.mf6.package import Package
+from imod.mf6.pkgbase import pkg_init
 from imod.schemata import DimsSchema, DTypeSchema
 
 
@@ -54,6 +55,7 @@ class TimeDiscretization(Package):
 
     _write_schemata = {}
 
+    @pkg_init(exclude_in_dataset=["validate"])
     def __init__(
         self,
         timestep_duration,
@@ -61,10 +63,6 @@ class TimeDiscretization(Package):
         timestep_multiplier=1.0,
         validate: bool = True,
     ):
-        super().__init__()
-        self.dataset["timestep_duration"] = timestep_duration
-        self.dataset["n_timesteps"] = n_timesteps
-        self.dataset["timestep_multiplier"] = timestep_multiplier
         self._validate_init_schemata(validate)
 
     def render(self):

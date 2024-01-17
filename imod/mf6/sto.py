@@ -3,6 +3,7 @@ import abc
 import numpy as np
 
 from imod.mf6.package import Package
+from imod.mf6.pkgbase import pkg_init
 from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
@@ -163,6 +164,7 @@ class SpecificStorage(StorageBase):
 
     _template = Package._initialize_template(_pkg_id)
 
+    @pkg_init(exclude_in_dataset=["validate"])
     def __init__(
         self,
         specific_storage,
@@ -172,12 +174,6 @@ class SpecificStorage(StorageBase):
         save_flows: bool = False,
         validate: bool = True,
     ):
-        super().__init__(locals())
-        self.dataset["specific_storage"] = specific_storage
-        self.dataset["specific_yield"] = specific_yield
-        self.dataset["convertible"] = convertible
-        self.dataset["transient"] = transient
-        self.dataset["save_flows"] = save_flows
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):
@@ -295,6 +291,7 @@ class StorageCoefficient(StorageBase):
 
     _template = Package._initialize_template(_pkg_id)
 
+    @pkg_init(exclude_in_dataset=["validate"])
     def __init__(
         self,
         storage_coefficient,
@@ -304,12 +301,6 @@ class StorageCoefficient(StorageBase):
         save_flows: bool = False,
         validate: bool = True,
     ):
-        super().__init__(locals())
-        self.dataset["storage_coefficient"] = storage_coefficient
-        self.dataset["specific_yield"] = specific_yield
-        self.dataset["convertible"] = convertible
-        self.dataset["transient"] = transient
-        self.dataset["save_flows"] = save_flows
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):

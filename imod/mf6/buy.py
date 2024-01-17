@@ -4,6 +4,7 @@ import numpy as np
 import xarray as xr
 
 from imod.mf6.package import Package
+from imod.mf6.pkgbase import pkg_init
 from imod.schemata import DTypeSchema
 
 
@@ -99,6 +100,15 @@ class Buoyancy(Package):
 
     _write_schemata = {}
 
+    @pkg_init(
+        exclude_in_dataset=[
+            "density_concentration_slope",
+            "reference_concentration",
+            "modelname",
+            "species",
+            "validate",
+        ]
+    )
     def __init__(
         self,
         reference_density: float,
@@ -110,8 +120,6 @@ class Buoyancy(Package):
         densityfile: str = None,
         validate: bool = True,
     ):
-        super().__init__(locals())
-        self.dataset["reference_density"] = reference_density
         # Assign a shared index: this also forces equal lenghts
         self.dataset["density_concentration_slope"] = assign_index(
             density_concentration_slope
@@ -119,8 +127,6 @@ class Buoyancy(Package):
         self.dataset["reference_concentration"] = assign_index(reference_concentration)
         self.dataset["modelname"] = assign_index(modelname)
         self.dataset["species"] = assign_index(species)
-        self.dataset["hhformulation_rhs"] = hhformulation_rhs
-        self.dataset["densityfile"] = densityfile
         self.dependencies = []
         self._validate_init_schemata(validate)
 
