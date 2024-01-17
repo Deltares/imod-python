@@ -9,7 +9,7 @@ import scipy.sparse
 import xarray as xr
 import xugrid as xu
 
-from imod.mf6.utilities.dataset import convert_time_column
+from imod.mf6.utilities.dataset import assign_datetime_coords
 
 from . import cbc
 from .common import FilePath, FloatArray, IntArray, _to_nan
@@ -175,7 +175,7 @@ def open_hds(
     )
 
     if simulation_start_time is not None:
-        da = convert_time_column(da, simulation_start_time, time_unit)
+        da = assign_datetime_coords(da, simulation_start_time, time_unit)
     return xu.UgridDataArray(da, grid)
 
 

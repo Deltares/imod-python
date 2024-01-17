@@ -121,6 +121,22 @@ def open_hds(
     grb_path: Union[str, pathlib.Path]
     dry_nan: bool, default value: False.
         Whether to convert dry values to NaN.
+    simulation_start_time : Optional datetime
+        The time and date correpsonding to the beginning of the simulation.
+        Use this to convert the time coordinates of the output array to
+        calendar time/dates. time_unit must also be present if this argument is present.
+    time_unit: Optional str
+        The time unit MF6 is working in, in string representation.
+        Only used if simulation_start_time was provided.
+        Admissible values are:
+        ns -> nanosecond
+        ms -> microsecond
+        s -> second
+        m -> minute
+        h -> hour
+        d -> day
+        w -> week
+        Units "month" or "year" are not supported, as they do not represent unambiguous timedelta values durations.
 
     Returns
     -------

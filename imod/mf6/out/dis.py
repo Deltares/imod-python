@@ -8,7 +8,7 @@ import numpy as np
 import xarray as xr
 
 import imod
-from imod.mf6.utilities.dataset import convert_time_column
+from imod.mf6.utilities.dataset import assign_datetime_coords
 
 from . import cbc
 from .common import FilePath, FloatArray, IntArray, _to_nan
@@ -143,7 +143,9 @@ def open_hds(
         daskarr, coords, ("time", "layer", "y", "x"), name=d["name"]
     )
     if simulation_start_time is not None:
-        data_array = convert_time_column(data_array, simulation_start_time, time_unit)
+        data_array = assign_datetime_coords(
+            data_array, simulation_start_time, time_unit
+        )
     return data_array
 
 
