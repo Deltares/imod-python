@@ -57,7 +57,7 @@ def assign_datetime_coords(
             "cannot convert time column, because a time column could not be found"
         )
 
-    ds["time"] = pd.Timestamp(simulation_start_time) + pd.to_timedelta(
+    time = pd.Timestamp(simulation_start_time) + pd.to_timedelta(
         ds["time"], unit=time_unit
     )
-    return ds
+    return ds.assign_coords(time=time)
