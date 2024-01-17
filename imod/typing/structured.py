@@ -120,16 +120,14 @@ def merge_arrays(
     """
     first = arrays[0]
     shape = first.shape[:-2] + yx_shape
-    out = np.zeros(shape)
-    active = np.zeros(shape, dtype=bool)
+    out = np.full(shape, np.nan)
     for a, ix, iy in zip(arrays, ixs, iys):
         ysize, xsize = a.shape[-2:]
-        # Sum overlapping values, set nan to 0.0
-        out[..., iy : iy + ysize, ix : ix + xsize] += np.nan_to_num(a)
-        # Incrementily set non-nan cells to active
-        active[..., iy : iy + ysize, ix : ix + xsize] |= ~np.isnan(a)
-    # Mask inactive values
-    return np.where(active, out, np.nan)
+        # Create view of partition
+        out_partition_view = out[..., iy : iy + ysize, ix : ix + xsize]
+        # Assign active values to view (updates `out` inplace)
+        out_partition_view[...] = np.where(~np.isnan(a), a, out_partition_view)
+    return out
 
 
 def _merge_partitions(das: Sequence[xr.DataArray]) -> xr.DataArray:
