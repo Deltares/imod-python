@@ -1,6 +1,7 @@
 from typing import Any
 
 import numpy as np
+import pandas as pd
 import xarray as xr
 from xarray.core.utils import is_scalar
 
@@ -46,3 +47,17 @@ def is_dataarray_none(datarray: Any) -> bool:
 def get_scalar_variables(ds: GridDataArray) -> list[str]:
     """Returns scalar variables in a dataset."""
     return [var for var, arr in ds.variables.items() if is_scalar(arr)]
+
+
+def assign_datetime_coords(
+    da: GridDataArray, simulation_start_time: np.datetime64, time_unit: str = "d"
+) -> GridDataArray:
+    if not "time" in da.coords:
+        raise ValueError(
+            "cannot convert time column, because a time column could not be found"
+        )
+
+    time = pd.Timestamp(simulation_start_time) + pd.to_timedelta(
+        da["time"], unit=time_unit
+    )
+    return da.assign_coords(time=time)
