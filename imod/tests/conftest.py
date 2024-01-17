@@ -71,4 +71,4 @@ from .fixtures.mf6_welltest_fixture import (
 from .fixtures.msw_fixture import fixed_format_parser
 from .fixtures.msw_model_fixture import coupled_mf6_model, msw_model
 
-from .fixtures.flow_transport_simulation import flow_transport_simulation
+from .fixtures.flow_transport_simulation_fixture import flow_transport_simulation

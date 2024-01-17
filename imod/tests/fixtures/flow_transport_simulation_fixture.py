@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 import xarray as xr
-
+import pytest
 import imod
 
 def create_transport_model(flowmodel, speciesname, dispersivity, retardation, decay):
@@ -180,22 +180,6 @@ def flow_transport_simulation():
     simulation.create_time_discretization(additional_times=[start, start + duration])
     simulation["time_discretization"]["n_timesteps"] = 100
 
-    # %%
-    # Run the simulation.
-    modeldir = imod.util.temporary_directory()
-    simulation.write(modeldir, binary=False)
-    simulation.run()
-
-    # %%
-    # Open the concentration results and store them in a single DataArray.
-
-    concentration = simulation.open_concentration(species_ls=["a", "b", "c", "d"])
-    mass_budgets = simulation.open_transport_budget(species_ls=["a", "b", "c", "d"])
-
-    # %%
-    # Visualize the last concentration profiles of the model run for the different
-    # species.
-
-    concentration.isel(time=-1, y=0).plot(x="x", hue="species")
-
+    
+    return simulation
     # %%

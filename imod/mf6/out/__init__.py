@@ -150,7 +150,9 @@ def open_hds(
 
 
 def open_conc(
-    ucn_path: FilePath, grb_path: FilePath, dry_nan: bool = False
+    ucn_path: FilePath, grb_path: FilePath, dry_nan: bool = False,
+    simulation_start_time: Optional[np.datetime64] = None,
+    time_unit: Optional[str] = "d",
 ) -> Union[xr.DataArray, xu.UgridDataArray]:
     """
     Open Modflow6 "Unformatted Concentration" (.ucn) file.
