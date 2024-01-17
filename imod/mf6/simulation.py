@@ -375,7 +375,8 @@ class Modflow6Simulation(collections.UserDict):
         )
 
     def open_transport_budget(
-        self, species_ls: list[str] = None
+        self, species_ls: list[str] = None, simulation_start_time: Optional[np.datetime64] = None,
+        time_unit: Optional[str] = "d"
     ) -> dict[str, GridDataArray]:
         """
         Open transport budgets of finished simulation, requires that the ``run``
@@ -403,7 +404,8 @@ class Modflow6Simulation(collections.UserDict):
         """
         return self._open_output("budget-transport", species_ls=species_ls)
 
-    def open_flow_budget(self, flowja: bool = False) -> dict[str, GridDataArray]:
+    def open_flow_budget(self, flowja: bool = False, simulation_start_time: Optional[np.datetime64] = None,
+        time_unit: Optional[str] = "d") -> dict[str, GridDataArray]:
         """
         Open flow budgets of finished simulation, requires that the ``run``
         method has been called.
