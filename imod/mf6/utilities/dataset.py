@@ -49,7 +49,7 @@ def get_scalar_variables(ds: GridDataArray) -> list[str]:
     return [var for var, arr in ds.variables.items() if is_scalar(arr)]
 
 
-def convert_time_column(
+def assign_datetime_coords(
     ds: GridDataArray, simulation_start_time: np.datetime64, time_unit: str = "d"
 ) -> GridDataArray:
     if not "time" in ds.coords:
