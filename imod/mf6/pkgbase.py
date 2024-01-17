@@ -15,7 +15,6 @@ from imod.typing.grid import GridDataset, merge_with_dictionary
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 EXCHANGE_PACKAGES = "gwfgwf"
-ARGS_TO_EXCLUDE = ["validate"]
 
 
 def pkg_init(exclude_in_dataset: list[str]):
