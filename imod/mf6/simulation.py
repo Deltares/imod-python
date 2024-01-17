@@ -461,7 +461,7 @@ class Modflow6Simulation(collections.UserDict):
         >>> drn_budget = budget["drn]
         >>> mean = drn_budget.sel(layer=1).mean("time")
         """
-        return self._open_output("budget-flow", flowja=flowja)
+        return self._open_output("budget-flow", flowja=flowja,simulation_start_time=simulation_start_time, time_unit=time_unit )
 
     def open_concentration(
         self, species_ls: list[str] = None, dry_nan: bool = False, simulation_start_time: Optional[np.datetime64] = None,
