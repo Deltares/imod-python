@@ -123,7 +123,8 @@ def merge_arrays(
     out = np.full(shape, np.nan)
     for a, ix, iy in zip(arrays, ixs, iys):
         ysize, xsize = a.shape[-2:]
-        # Create view of partition
+        # Create view of partition, see:
+        # https://numpy.org/doc/stable/user/basics.indexing.html#slicing-and-striding
         out_partition_view = out[..., iy : iy + ysize, ix : ix + xsize]
         # Assign active values to view (updates `out` inplace)
         out_partition_view[...] = np.where(~np.isnan(a), a, out_partition_view)
