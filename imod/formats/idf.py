@@ -297,7 +297,8 @@ def open_subdomains(path, use_cftime=False, pattern=None):
         da = da.isel(subdomain=0, drop=True)
         das.append(da)
 
-    return merge_partitions(das)
+    name = das[0].name
+    return merge_partitions(das)[name]  # as DataArray for backwards compatibility
 
 
 def open_dataset(globpath, use_cftime=False, pattern=None):
