@@ -136,7 +136,7 @@ def open_hds(
         h -> hour
         d -> day
         w -> week
-        Units "month" or "year" are not supported, as they do not represent unambiguous timedelta values durations.        
+        Units "month" or "year" are not supported, as they do not represent unambiguous timedelta values durations.
 
     Returns
     -------

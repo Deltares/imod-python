@@ -143,7 +143,9 @@ def open_hds(
         daskarr, coords, ("time", "layer", "y", "x"), name=d["name"]
     )
     if simulation_start_time is not None:
-        data_array = assign_datetime_coords(data_array, simulation_start_time, time_unit)
+        data_array = assign_datetime_coords(
+            data_array, simulation_start_time, time_unit
+        )
     return data_array
 
 

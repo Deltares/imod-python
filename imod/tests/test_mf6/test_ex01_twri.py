@@ -435,7 +435,7 @@ def test_simulation_write_and_run(twri_model, tmp_path):
     assert head.shape == (1, 3, 15, 15)
     assert np.all(
         head["time"].values
-        == np.array('1999-01-02T00:00:00.000000000', dtype="datetime64[ns]")
+        == np.array("1999-01-02T00:00:00.000000000", dtype="datetime64[ns]")
     )
     meanhead_layer = head.groupby("layer").mean(dim=xr.ALL_DIMS)
     mean_answer = np.array([59.79181509, 30.44132373, 24.88576811])
