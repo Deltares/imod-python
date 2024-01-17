@@ -177,7 +177,7 @@ def open_conc(
     grb_content["name"] = "concentration"
     distype = grb_content["distype"]
     _open = _get_function(_OPEN_HDS, distype)
-    return _open(ucn_path, grb_content, dry_nan)
+    return _open(ucn_path, grb_content, dry_nan, simulation_start_time,time_unit )
 
 
 def open_hds_like(

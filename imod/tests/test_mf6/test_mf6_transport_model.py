@@ -93,4 +93,4 @@ def test_transport_result_loading(tmp_path, flow_transport_simulation):
     assert conc_notime.coords["time"].dtype == float
 
     conc_time = flow_transport_simulation.open_concentration(species_ls=["a", "b", "c", "d"] ,simulation_start_time = "2000-01-31", time_unit = "s")
-    
+    assert conc_time.coords["time"].dtype ==  np.dtype('datetime64[ns]')
