@@ -294,7 +294,10 @@ def open_subdomains(
     parsed = [util.decompose(path, pattern) for path in paths]
     grouped = defaultdict(list)
     for match, path in zip(parsed, paths):
-        key = match["subdomain"]
+        try:
+            key = match["subdomain"]
+        except KeyError as e:
+            raise KeyError(f"{e} in path: {path} with pattern: {pattern}")
         grouped[key].append(path)
 
     n_idf_per_subdomain = {
