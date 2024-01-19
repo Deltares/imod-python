@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import xarray as xr
 from pytest import approx
-from pytest_cases import case, parametrize_with_cases
+from pytest_cases import case, parametrize, parametrize_with_cases
 
 from imod import idf, util
 
@@ -47,10 +47,19 @@ def test_layerda():
     return da
 
 
-class SubdomainCases:
-    def create_da(self, subdomain_factor: int = 0):
-        nspecies, nlayer, nrow, ncol = (2, 3, 4, 5)
+def dxdy(equidistant: bool):
+    if equidistant:
         dx, dy = (1.0, -1.0)
+    else:
+        dy = np.array([-0.5, -1.5, -0.5, -1.5])
+        dx = np.array([1.0, 1.0, 1.0, 1.0, 1.0])
+    return dx, dy
+
+
+class SubdomainCases:
+    def create_da(self, subdomain_factor: int = 0, equidistant: bool = True):
+        nspecies, nlayer, nrow, ncol = (2, 3, 4, 5)
+        dx, dy = dxdy(equidistant=equidistant)
         layer = [1, 2, 3]
         species = [1, 2]
         xmin = (0.0, 3.0, 3.0, 0.0)
@@ -72,34 +81,38 @@ class SubdomainCases:
         return das
 
     @case(tags="no_species")
-    def case_constant(self):
-        das = [da.sel(species=1, drop=True) for da in self.create_da(0)]
+    @parametrize(equidistant=[True, False])
+    def case_constant(self, equidistant):
+        das = [da.sel(species=1, drop=True) for da in self.create_da(0, equidistant)]
         expected = np.ones((3, 6, 8))
-        return das, expected
+        return das, expected, equidistant
 
     @case(tags="no_species")
-    def case_labeled(self):
-        das = [da.sel(species=1, drop=True) for da in self.create_da(1)]
+    @parametrize(equidistant=[True, False])
+    def case_labeled(self, equidistant):
+        das = [da.sel(species=1, drop=True) for da in self.create_da(1, equidistant)]
         expected = np.ones((3, 6, 8))
         expected[..., 0:4, 3:] = 2
         expected[..., 2:, 3:] = 3
         expected[..., 0:4, 0:5] = 4
-        return das, expected
+        return das, expected, equidistant
 
     @case(tags="species")
-    def case_constant_species(self):
-        das = self.create_da(0)
+    @parametrize(equidistant=[True, False])
+    def case_constant_species(self, equidistant):
+        das = self.create_da(0, equidistant)
         expected = np.ones((2, 3, 6, 8))
-        return das, expected
+        return das, expected, equidistant
 
     @case(tags="species")
-    def case_labeled_species(self):
-        das = self.create_da(1)
+    @parametrize(equidistant=[True, False])
+    def case_labeled_species(self, equidistant):
+        das = self.create_da(1, equidistant)
         expected = np.ones((2, 3, 6, 8))
         expected[..., 0:4, 3:] = 2
         expected[..., 2:, 3:] = 3
         expected[..., 0:4, 0:5] = 4
-        return das, expected
+        return das, expected, equidistant
 
 
 def _save_subdomains_no_species(subdomains, tmp_path):
@@ -118,12 +131,15 @@ def _save_subdomains_species(subdomains, tmp_path):
 
 
 @parametrize_with_cases(
-    "subdomains,expected", cases=SubdomainCases, has_tag="no_species"
+    "subdomains,expected,equidistant", cases=SubdomainCases, has_tag="no_species"
 )
-def test_open_subdomains(subdomains, expected, tmp_path):
+def test_open_subdomains(subdomains, expected, equidistant, tmp_path):
     _save_subdomains_no_species(subdomains, tmp_path)
 
     da = idf.open_subdomains(tmp_path / "subdomains_*.idf").load()
+
+    dx, dy = dxdy(equidistant)
+    expected_coords = util._xycoords((0.0, 8.0, 0.0, 6.0), (dx, dy))
 
     assert da.dims == ("time", "layer", "y", "x")
 
@@ -131,17 +147,16 @@ def test_open_subdomains(subdomains, expected, tmp_path):
     assert len(da.x) == 8
     assert len(da.y) == 6
 
-    coords = util._xycoords((0.0, 8.0, 0.0, 6.0), (1.0, -1.0))
-    assert np.all(da["y"].values == coords["y"])
-    assert np.all(da["x"].values == coords["x"])
+    assert np.all(da["y"].values == expected_coords["y"])
+    assert np.all(da["x"].values == expected_coords["x"])
 
     assert isinstance(da, xr.DataArray)
 
 
 @parametrize_with_cases(
-    "subdomains,expected", cases=SubdomainCases, has_tag="no_species"
+    "subdomains,expected,equidistant", cases=SubdomainCases, has_tag="no_species"
 )
-def test_open_subdomains_pattern_None(subdomains, expected, tmp_path):
+def test_open_subdomains_pattern_None(subdomains, expected, equidistant, tmp_path):
     """Read without provided pattern, function should interpet dimensions correctly"""
     _save_subdomains_no_species(subdomains, tmp_path)
     # Test with pattern is None
@@ -152,8 +167,10 @@ def test_open_subdomains_pattern_None(subdomains, expected, tmp_path):
     assert np.all(da.isel(time=0) == expected)
 
 
-@parametrize_with_cases("subdomains,expected", cases=SubdomainCases, has_tag="species")
-def test_open_subdomains_species(subdomains, expected, tmp_path):
+@parametrize_with_cases(
+    "subdomains,expected,equidistant", cases=SubdomainCases, has_tag="species"
+)
+def test_open_subdomains_species(subdomains, expected, equidistant, tmp_path):
     _save_subdomains_species(subdomains, tmp_path)
 
     # Test with pattern
@@ -161,21 +178,25 @@ def test_open_subdomains_species(subdomains, expected, tmp_path):
 
     da = idf.open_subdomains(tmp_path / "subdomains_*.idf", pattern=pattern).load()
 
+    dx, dy = dxdy(equidistant)
+    expected_coords = util._xycoords((0.0, 8.0, 0.0, 6.0), (dx, dy))
+
     assert da.dims == ("species", "time", "layer", "y", "x")
 
     assert np.all(da.isel(time=0) == expected)
     assert len(da.x) == 8
     assert len(da.y) == 6
 
-    coords = util._xycoords((0.0, 8.0, 0.0, 6.0), (1.0, -1.0))
-    assert np.all(da["y"].values == coords["y"])
-    assert np.all(da["x"].values == coords["x"])
+    assert np.all(da["y"].values == expected_coords["y"])
+    assert np.all(da["x"].values == expected_coords["x"])
 
     assert isinstance(da, xr.DataArray)
 
 
-@parametrize_with_cases("subdomains,expected", cases=SubdomainCases, has_tag="species")
-def test_open_subdomains_species_pattern_None(subdomains, expected, tmp_path):
+@parametrize_with_cases(
+    "subdomains,expected,_", cases=SubdomainCases, has_tag="species"
+)
+def test_open_subdomains_species_pattern_None(subdomains, expected, _, tmp_path):
     """Read without provided pattern, function should interpet dimensions correctly"""
     _save_subdomains_species(subdomains, tmp_path)
 
@@ -187,8 +208,10 @@ def test_open_subdomains_species_pattern_None(subdomains, expected, tmp_path):
     assert np.all(da.isel(time=0) == expected)
 
 
-@parametrize_with_cases("subdomains,_", cases=SubdomainCases, has_tag="no_species")
-def test_open_subdomains_error(subdomains, _, tmp_path):
+@parametrize_with_cases(
+    "subdomains,expected,equidistant", cases=SubdomainCases, has_tag="no_species"
+)
+def test_open_subdomains_error(subdomains, expected, equidistant, tmp_path):
     _save_subdomains_no_species(subdomains, tmp_path)
 
     # Add an additional subdomain with only one layer
