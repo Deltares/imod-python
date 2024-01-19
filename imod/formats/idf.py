@@ -290,7 +290,7 @@ def open_subdomains(path, use_cftime=False, pattern=None):
     }
     if len(set(n_idf_per_subdomain.values())) != 1:
         raise ValueError(
-            f"Each subdomainn must have the same number of IDF files, found: {n_idf_per_subdomain}"
+            f"Each subdomain must have the same number of IDF files, found: {n_idf_per_subdomain}"
         )
 
     das = []
