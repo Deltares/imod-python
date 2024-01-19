@@ -84,7 +84,7 @@ def test_flowmodel_validation(twri_model):
 
 
 @pytest.mark.usefixtures("flow_transport_simulation")
-def test_transport_result_loading(tmp_path, flow_transport_simulation):
+def test_transport_concentration_loading(tmp_path, flow_transport_simulation):
 
     flow_transport_simulation.write(tmp_path)
     flow_transport_simulation.run()
@@ -94,3 +94,18 @@ def test_transport_result_loading(tmp_path, flow_transport_simulation):
 
     conc_time = flow_transport_simulation.open_concentration(species_ls=["a", "b", "c", "d"] ,simulation_start_time = "2000-01-31", time_unit = "s")
     assert conc_time.coords["time"].dtype ==  np.dtype('datetime64[ns]')
+
+
+@pytest.mark.usefixtures("flow_transport_simulation")
+def test_transport_balance_loading(tmp_path, flow_transport_simulation):
+
+    flow_transport_simulation.write(tmp_path)
+    flow_transport_simulation.run()
+
+    balance_notime = flow_transport_simulation.open_transport_budget(species_ls=["a", "b", "d"])
+    assert balance_notime.coords["time"].dtype == float
+
+    balance_time = flow_transport_simulation.open_transport_budget(species_ls=["a", "b", "d"],simulation_start_time = "2000-01-31", time_unit = "s")
+    assert balance_time.coords["time"].dtype == np.dtype('datetime64[ns]')
+
+    assert np.all(balance_notime.sel(species = "a")["ssm"].values == balance_time.sel(species = "a")["ssm"].values)

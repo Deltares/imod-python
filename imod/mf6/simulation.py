@@ -402,7 +402,7 @@ class Modflow6Simulation(collections.UserDict):
             "layer", "y", "x").
 
         """
-        return self._open_output("budget-transport", species_ls=species_ls)
+        return self._open_output("budget-transport", species_ls=species_ls,simulation_start_time=simulation_start_time, time_unit=time_unit)
 
     def open_flow_budget(self, flowja: bool = False, simulation_start_time: Optional[np.datetime64] = None,
         time_unit: Optional[str] = "d") -> dict[str, GridDataArray]:
