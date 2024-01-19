@@ -190,6 +190,8 @@ def test_open_subdomains_species(subdomains, expected, equidistant, tmp_path):
     assert np.all(da["y"].values == expected_coords["y"])
     assert np.all(da["x"].values == expected_coords["x"])
 
+    assert da.values.dtype == np.float32
+
     assert isinstance(da, xr.DataArray)
 
 
