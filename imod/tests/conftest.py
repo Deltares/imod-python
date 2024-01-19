@@ -30,7 +30,6 @@ from .fixtures.mf6_flow_with_transport_fixture import (
     distcoef_fc,
     elevation_fc,
     flow_model_with_concentration,
-    flow_transport_simulation,
     head_fc,
     porosity_fc,
     proportion_depth_fc,

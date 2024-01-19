@@ -3,16 +3,11 @@ import pytest
 import xarray as xr
 
 from imod.mf6 import (
-    AdvectionCentral,
-    Dispersion,
     GroundwaterFlowModel,
-    GroundwaterTransportModel,
     InitialConditions,
-    MobileStorageTransfer,
     NodePropertyFlow,
     OutputControl,
     River,
-    SourceSinkMixing,
     SpecificStorage,
 )
 
@@ -215,29 +210,3 @@ def flow_model_with_concentration(concentration_fc):
     )
 
     return gwf_model
-
-
-@pytest.fixture(scope="function")
-@pytest.mark.usefixtures("flow_model_with_concentration")
-def flow_transport_simulation(flow_model_with_concentration):
-    transport_model = GroundwaterTransportModel()
-
-    transport_model["adv"] = AdvectionCentral()
-    transport_model["dsp"] = Dispersion(1e-4, 1.0, 10.0, 1.0, 2.0, 3.0, True, True)
-    transport_model["ssm"] = SourceSinkMixing.from_flow_model(
-        flow_model_with_concentration, "salinity", save_flows=True, print_flows=True
-    )
-    max_concentration = 35.0
-    transport_model["ic"] = InitialConditions(start=max_concentration)
-    transport_model["oc"] = OutputControl(save_concentration="last", save_budget="last")
-    transport_model["dis"] = flow_model_with_concentration["dis"]
-
-    # %%
-    # now let's define a simulation using the flow and transport models.
-
-    # Attach it to a simulation
-    simulation = imod.mf6.Modflow6Simulation("flow_and_transport_sim")
-
-    simulation["flow"] = flow_model_with_concentration
-    simulation["transport"] = transport_model
-    return simulation
