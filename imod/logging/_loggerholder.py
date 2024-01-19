@@ -50,14 +50,14 @@ class _LoggerHolder(ILogger):
     def debug(self, message: str) -> None:
         self.instance.debug(message)
 
+    def info(self, message: str) -> None:
+        self.instance.info(message)
+
     def warning(self, message: str) -> None:
         self.instance.warning(message)
 
     def error(self, message: str) -> None:
         self.instance.error(message)
-
-    def info(self, message: str) -> None:
-        self.instance.info(message)
 
     def critical(self, message: str) -> None:
         self.instance.critical(message)
