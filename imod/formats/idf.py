@@ -11,6 +11,8 @@ import struct
 import warnings
 from collections import defaultdict
 from collections.abc import Iterable
+from pathlib import Path
+from re import Pattern
 from typing import Any
 
 import numpy as np
@@ -256,13 +258,16 @@ def _more_than_one_unique_value(values: Iterable[Any]):
     return len(set(values)) != 1
 
 
-def open_subdomains(path, use_cftime=False, pattern=None):
+def open_subdomains(
+    path: str | Path, use_cftime: bool = False, pattern: str | Pattern = None
+) -> xr.DataArray:
     """
     Combine IDF files of multiple subdomains.
 
     Parameters
     ----------
-    path : str, Path or list
+    path : str or Path
+        Global path.
     use_cftime : bool, optional
     pattern : str, regex pattern, optional
         If no pattern is provided, the function will first try:
