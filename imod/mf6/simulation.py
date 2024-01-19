@@ -536,11 +536,11 @@ class Modflow6Simulation(collections.UserDict):
         exchange_names = [
             key for key in cbc.keys() if ("gwf-gwf" in key) or ("gwt-gwt" in key)
         ]
-        exchange_flux = cbc[exchange_names].to_array().sum(dim="variable")
+        exchange_budgets = cbc[exchange_names].to_array().sum(dim="variable")
         cbc = cbc.drop_vars(exchange_names)
         # "gwf-gwf" or "gwt-gwt"
         exchange_key = exchange_names[0].split("_")[0]
-        cbc[exchange_key] = exchange_flux
+        cbc[exchange_key] = exchange_budgets
         return cbc
 
     def _merge_budgets(
