@@ -285,12 +285,12 @@ def open_subdomains(path, use_cftime=False, pattern=None):
         key = match["subdomain"]
         grouped[key].append(path)
 
-    n_idf_per_partition = {
+    n_idf_per_subdomain = {
         subdomain_id: len(path_ls) for subdomain_id, path_ls in grouped.items()
     }
-    if len(set(n_idf_per_partition.values())) != 1:
+    if len(set(n_idf_per_subdomain.values())) != 1:
         raise ValueError(
-            f"Each partition must have the same number of IDF files, found: {n_idf_per_partition}"
+            f"Each subdomainn must have the same number of IDF files, found: {n_idf_per_subdomain}"
         )
 
     das = []
