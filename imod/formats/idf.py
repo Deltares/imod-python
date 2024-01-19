@@ -10,6 +10,8 @@ import pathlib
 import struct
 import warnings
 from collections import defaultdict
+from collections.abc import Iterable
+from typing import Any
 
 import numpy as np
 import xarray as xr
@@ -249,6 +251,11 @@ def open(path, use_cftime=False, pattern=None):
     return array_io.reading._open(path, use_cftime, pattern, header, _read)
 
 
+def _more_than_one_unique_value(values: Iterable[Any]):
+    """Returns if more than one unique value in list"""
+    return len(set(values)) != 1
+
+
 def open_subdomains(path, use_cftime=False, pattern=None):
     """
     Combine IDF files of multiple subdomains.
@@ -288,7 +295,7 @@ def open_subdomains(path, use_cftime=False, pattern=None):
     n_idf_per_subdomain = {
         subdomain_id: len(path_ls) for subdomain_id, path_ls in grouped.items()
     }
-    if len(set(n_idf_per_subdomain.values())) != 1:
+    if _more_than_one_unique_value(n_idf_per_subdomain.values()):
         raise ValueError(
             f"Each subdomain must have the same number of IDF files, found: {n_idf_per_subdomain}"
         )
