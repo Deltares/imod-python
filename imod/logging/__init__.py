@@ -6,22 +6,23 @@ Examples
 
 If you want to directly use the logger in your project and make use of the default handlers
 
->>> # How to setup imod python logging using the python logging framework
+>>> #Setup imod python logging using the python logging framework
 >>> import imod
->>> from imod.logging import LoggerType, LogLevel
+>>> from imod.logging import LoggerType
 >>>
->>> imod.logging.configure(LoggerType.LOGURU, LogLevel.INFO)
+>>> imod.logging.configure(LoggerType.LOGURU)
 
->>> # How to setup imod python logging using the python logging framework and write the log output to a file
+>>> # Setup imod python logging using the python logging framework and write the log output to a file
 >>> import imod
->>> from imod.logging import LoggerType, LogLevel
+>>> from imod.logging import LoggerType
 >>>
->>> imod.logging.configure(LoggerType.PYTHON, LogLevel.INFO, add_default_file_handler=True)
+>>> imod.logging.configure(LoggerType.PYTHON, add_default_file_handler=True)
 
 If you want to integrate imod-python logging into your own logging framework
 
->>> # How to setup imod python logging integration into an existing python logger
+>>> # Setup imod python logging integration into an existing python logger
 >>> import imod
+>>> from imod.logging import LoggerType, LogLevel
 >>> import logging
 >>>
 >>> imod.logging.configure(LoggerType.PYTHON, LogLevel.INFO, add_default_stream_handler=False, add_default_file_handler=False)
@@ -38,9 +39,10 @@ If you want to integrate imod-python logging into your own logging framework
 >>> logger = logging.getLogger()
 >>> logger.info('info message')
 
->>> # How to setup imod python logging integration into an existing loguru logger
+>>> # Setup imod python logging integration into an existing loguru logger
 >>> import sys
 >>> import imod
+>>> from imod.logging import LoggerType, LogLevel
 >>> from loguru import logger
 >>>
 >>> imod.logging.configure(LoggerType.LOGURU, LogLevel.INFO, add_default_stream_handler=False, add_default_file_handler=False)
