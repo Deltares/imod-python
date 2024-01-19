@@ -15,6 +15,6 @@ Before requesting review, please go through this checklist:
 
 - [ ] Links to correct issue
 - [ ] Update changelog, if changes affect users
-- [ ] PR title starts with ``#issue-nr``, e.g. #737
+- [ ] PR title starts with ``Issue #nr``, e.g. ``Issue #737``
 - [ ] Unit tests were added
 - [ ] **If feature added**: Added/extended example
