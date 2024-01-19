@@ -246,7 +246,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         sliced : Package
         """
         if (layer_max or layer_min) and (top is None or bottom is None):
-            raise ValueError("Both the layer_max and the top should be defined")
+            raise ValueError("When clipping by layer both the top and bottom should be defined")
 
         if top is not None:
             if not isinstance(top, GridDataArray) or "layer" not in top.coords:
@@ -260,9 +260,16 @@ class Well(BoundaryCondition, IPointDataPackage):
         z_max = None if layer_max is None else top.isel(layer=layer_max)
         z_min = None if layer_min is None else bottom.isel(layer=layer_min)
 
-        if z_max:
+        # if z is a grid select the the values at the well locations and drop the dimensions
+        if (z_max is not None) and ("x" in z_max.coords or "y" in z_max.coords):
+            z_max = z_max.sel(x=ds["x"], y=ds["y"], method="nearest").drop_vars(lambda x: x.coords)
+
+        if (z_min is not None) and ("x" in z_min.coords or "y" in z_min.coords):
+            z_min = z_min.sel(x=ds["x"], y=ds["y"], method="nearest").drop_vars(lambda x: x.coords)
+
+        if z_max is not None:
             ds["screen_top"] = ds["screen_top"].clip(None, z_max)
-        if z_min:
+        if z_min is not None:
             ds["screen_bottom"] = ds["screen_bottom"].clip(z_min, None)
 
         # Initiate array of True with right shape to deal with case no spatial

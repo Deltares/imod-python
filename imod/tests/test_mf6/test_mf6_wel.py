@@ -9,6 +9,7 @@ import xarray as xr
 from pytest_cases import parametrize_with_cases
 
 import imod
+from imod.mf6.utilities.grid import broadcast_to_full_domain
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
@@ -195,6 +196,16 @@ class ClipBoxCases:
         return clip_arguments, expected_dims, does_not_raise()
 
     @staticmethod
+    def case_clip_top_is_layered_griddataarray(parameterizable_basic_dis):
+        idomain, top, bottom = parameterizable_basic_dis
+
+        top, bottom = broadcast_to_full_domain(idomain, top, bottom)
+        clip_arguments = {"layer_max": 2, "bottom": bottom, "top": top}
+
+        expected_dims = {"index": 4, "species": 2}
+        return clip_arguments, expected_dims, does_not_raise()
+
+    @staticmethod
     def case_clip_missing_top(parameterizable_basic_dis):
         _, _, bottom = parameterizable_basic_dis
         clip_arguments = {"layer_max": 2, "bottom": bottom}
@@ -213,7 +224,7 @@ class ClipBoxCases:
 
 @pytest.mark.parametrize(
     "parameterizable_basic_dis",
-    [BasicDisSettings(nlay=10, zstop=-10.0)],
+    [BasicDisSettings(nlay=10, zstop=-10.0,  xstart=50.0, xstop=100.0, ystart=50.0, ystop=100.0, nrow=10, ncol=10)],
     indirect=True,
 )
 @parametrize_with_cases(
