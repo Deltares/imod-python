@@ -502,7 +502,7 @@ class Modflow6Simulation(collections.UserDict):
             return self._open_output_single_model(modelname, output, **settings)
         elif is_split(self):
             if "budget" in output:
-                return self._merge_fluxes(modelnames, output, **settings)
+                return self._merge_budgets(modelnames, output, **settings)
             else:
                 return self._merge_states(modelnames, output, **settings)
         elif output == "concentration":
@@ -528,9 +528,9 @@ class Modflow6Simulation(collections.UserDict):
             )
         return merge_partitions(state_partitions)
 
-    def _merge_and_assign_exchange_fluxes(self, cbc: GridDataset) -> GridDataset:
+    def _merge_and_assign_exchange_budgets(self, cbc: GridDataset) -> GridDataset:
         """
-        Merge and assign exchange fluxes to cell by cell budgets:
+        Merge and assign exchange budgets to cell by cell budgets:
         cbc[[gwf-gwf_1, gwf-gwf_3]] to cbc[gwf-gwf]
         """
         exchange_names = [
@@ -543,11 +543,11 @@ class Modflow6Simulation(collections.UserDict):
         cbc[exchange_key] = exchange_flux
         return cbc
 
-    def _merge_fluxes(
+    def _merge_budgets(
         self, modelnames: list[str], output: str, **settings
     ) -> GridDataset:
         if settings["flowja"] is True:
-            raise ValueError("``flowja`` cannot be set to True when merging fluxes.")
+            raise ValueError("``flowja`` cannot be set to True when merging budgets.")
 
         cbc_per_partition = []
         for modelname in modelnames:
@@ -558,16 +558,16 @@ class Modflow6Simulation(collections.UserDict):
             # https://github.com/Deltares/xugrid/issues/179
             cbc_list = [da.rename(key) for key, da in cbc_dict.items()]
             cbc = merge(cbc_list)
-            # Merge and assign exchange fluxes to dataset
-            # FUTURE: Refactor to insert these exchange fluxes in horizontal
+            # Merge and assign exchange budgets to dataset
+            # FUTURE: Refactor to insert these exchange budgets in horizontal
             # flows.
-            cbc = self._merge_and_assign_exchange_fluxes(cbc)
+            cbc = self._merge_and_assign_exchange_budgets(cbc)
             if not is_unstructured(cbc):
                 cbc = cbc.where(partition_domain, other=np.nan)
             cbc_per_partition.append(cbc)
 
         # Boundary conditions can be missing in certain partitions, as do their
-        # fluxes, in which case we manually assign an empty grid of nans.
+        # budgets, in which case we manually assign an empty grid of nans.
         unique_keys = set([key for cbc in cbc_per_partition for key in cbc.keys()])
         for cbc in cbc_per_partition:
             missing_keys = unique_keys - set(cbc.keys())
