@@ -3101,6 +3101,102 @@ package:
   size: 322086
   timestamp: 1695990976742
 - platform: linux-64
+  name: build
+  version: 0.7.0
+  category: main
+  manager: conda
+  dependencies:
+  - importlib-metadata
+  - packaging
+  - pep517 >=0.9.1
+  - python >=3.6
+  - tomli
+  url: https://conda.anaconda.org/conda-forge/noarch/build-0.7.0-pyhd8ed1ab_0.tar.bz2
+  hash:
+    md5: add7f31586d03678695b32b78a1337a1
+    sha256: 44e2d3270209d1f10b8adec2a159699ed66914e851ec34775902e856ea04afeb
+  build: pyhd8ed1ab_0
+  arch: x86_64
+  subdir: linux-64
+  build_number: 0
+  license: MIT
+  license_family: MIT
+  noarch: python
+  size: 17759
+  timestamp: 1631843776429
+- platform: osx-64
+  name: build
+  version: 0.7.0
+  category: main
+  manager: conda
+  dependencies:
+  - importlib-metadata
+  - packaging
+  - pep517 >=0.9.1
+  - python >=3.6
+  - tomli
+  url: https://conda.anaconda.org/conda-forge/noarch/build-0.7.0-pyhd8ed1ab_0.tar.bz2
+  hash:
+    md5: add7f31586d03678695b32b78a1337a1
+    sha256: 44e2d3270209d1f10b8adec2a159699ed66914e851ec34775902e856ea04afeb
+  build: pyhd8ed1ab_0
+  arch: x86_64
+  subdir: osx-64
+  build_number: 0
+  license: MIT
+  license_family: MIT
+  noarch: python
+  size: 17759
+  timestamp: 1631843776429
+- platform: osx-arm64
+  name: build
+  version: 0.7.0
+  category: main
+  manager: conda
+  dependencies:
+  - importlib-metadata
+  - packaging
+  - pep517 >=0.9.1
+  - python >=3.6
+  - tomli
+  url: https://conda.anaconda.org/conda-forge/noarch/build-0.7.0-pyhd8ed1ab_0.tar.bz2
+  hash:
+    md5: add7f31586d03678695b32b78a1337a1
+    sha256: 44e2d3270209d1f10b8adec2a159699ed66914e851ec34775902e856ea04afeb
+  build: pyhd8ed1ab_0
+  arch: aarch64
+  subdir: osx-arm64
+  build_number: 0
+  license: MIT
+  license_family: MIT
+  noarch: python
+  size: 17759
+  timestamp: 1631843776429
+- platform: win-64
+  name: build
+  version: 0.7.0
+  category: main
+  manager: conda
+  dependencies:
+  - importlib-metadata
+  - packaging
+  - pep517 >=0.9.1
+  - python >=3.6
+  - tomli
+  url: https://conda.anaconda.org/conda-forge/noarch/build-0.7.0-pyhd8ed1ab_0.tar.bz2
+  hash:
+    md5: add7f31586d03678695b32b78a1337a1
+    sha256: 44e2d3270209d1f10b8adec2a159699ed66914e851ec34775902e856ea04afeb
+  build: pyhd8ed1ab_0
+  arch: x86_64
+  subdir: win-64
+  build_number: 0
+  license: MIT
+  license_family: MIT
+  noarch: python
+  size: 17759
+  timestamp: 1631843776429
+- platform: linux-64
   name: bzip2
   version: 1.0.8
   category: main
@@ -24073,6 +24169,90 @@ package:
   size: 880802
   timestamp: 1698611415241
 - platform: linux-64
+  name: pep517
+  version: 0.13.0
+  category: main
+  manager: conda
+  dependencies:
+  - python >=3.8
+  - tomli
+  url: https://conda.anaconda.org/conda-forge/noarch/pep517-0.13.0-pyhd8ed1ab_0.tar.bz2
+  hash:
+    md5: d94aa03d99d8adc9898f783eba0d84d2
+    sha256: 6a6f2fa6bc9106b2edcccc142242dc3ab1f2f77a6debbd5b480f08482f052636
+  build: pyhd8ed1ab_0
+  arch: x86_64
+  subdir: linux-64
+  build_number: 0
+  license: MIT
+  license_family: MIT
+  noarch: python
+  size: 19044
+  timestamp: 1667916747996
+- platform: osx-64
+  name: pep517
+  version: 0.13.0
+  category: main
+  manager: conda
+  dependencies:
+  - python >=3.8
+  - tomli
+  url: https://conda.anaconda.org/conda-forge/noarch/pep517-0.13.0-pyhd8ed1ab_0.tar.bz2
+  hash:
+    md5: d94aa03d99d8adc9898f783eba0d84d2
+    sha256: 6a6f2fa6bc9106b2edcccc142242dc3ab1f2f77a6debbd5b480f08482f052636
+  build: pyhd8ed1ab_0
+  arch: x86_64
+  subdir: osx-64
+  build_number: 0
+  license: MIT
+  license_family: MIT
+  noarch: python
+  size: 19044
+  timestamp: 1667916747996
+- platform: osx-arm64
+  name: pep517
+  version: 0.13.0
+  category: main
+  manager: conda
+  dependencies:
+  - python >=3.8
+  - tomli
+  url: https://conda.anaconda.org/conda-forge/noarch/pep517-0.13.0-pyhd8ed1ab_0.tar.bz2
+  hash:
+    md5: d94aa03d99d8adc9898f783eba0d84d2
+    sha256: 6a6f2fa6bc9106b2edcccc142242dc3ab1f2f77a6debbd5b480f08482f052636
+  build: pyhd8ed1ab_0
+  arch: aarch64
+  subdir: osx-arm64
+  build_number: 0
+  license: MIT
+  license_family: MIT
+  noarch: python
+  size: 19044
+  timestamp: 1667916747996
+- platform: win-64
+  name: pep517
+  version: 0.13.0
+  category: main
+  manager: conda
+  dependencies:
+  - python >=3.8
+  - tomli
+  url: https://conda.anaconda.org/conda-forge/noarch/pep517-0.13.0-pyhd8ed1ab_0.tar.bz2
+  hash:
+    md5: d94aa03d99d8adc9898f783eba0d84d2
+    sha256: 6a6f2fa6bc9106b2edcccc142242dc3ab1f2f77a6debbd5b480f08482f052636
+  build: pyhd8ed1ab_0
+  arch: x86_64
+  subdir: win-64
+  build_number: 0
+  license: MIT
+  license_family: MIT
+  noarch: python
+  size: 19044
+  timestamp: 1667916747996
+- platform: linux-64
   name: pillow
   version: 10.2.0
   category: main
@@ -29179,6 +29359,8 @@ package:
   license_family: MIT
   size: 5483251
   timestamp: 1704293303507
+  purls:
+  - pkg:pypi/ruff
 - platform: osx-64
   name: ruff
   version: 0.1.11
@@ -29200,6 +29382,8 @@ package:
   license_family: MIT
   size: 5296599
   timestamp: 1704298924933
+  purls:
+  - pkg:pypi/ruff
 - platform: osx-arm64
   name: ruff
   version: 0.1.11
@@ -29222,6 +29406,8 @@ package:
   license_family: MIT
   size: 5093204
   timestamp: 1704300759924
+  purls:
+  - pkg:pypi/ruff
 - platform: win-64
   name: ruff
   version: 0.1.11
@@ -29245,6 +29431,8 @@ package:
   license_family: MIT
   size: 5337963
   timestamp: 1704304941343
+  purls:
+  - pkg:pypi/ruff
 - platform: linux-64
   name: s2n
   version: 1.4.1
