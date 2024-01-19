@@ -458,7 +458,10 @@ def disv_open_face_budgets(
 
 
 def open_cbc(
-    cbc_path: FilePath, grb_content: Dict[str, Any], flowja: bool = False,  simulation_start_time: Optional[np.datetime64] = None,
+    cbc_path: FilePath,
+    grb_content: Dict[str, Any],
+    flowja: bool = False,
+    simulation_start_time: Optional[np.datetime64] = None,
     time_unit: Optional[str] = "d",
 ) -> Dict[str, xu.UgridDataArray]:
     headers = cbc.read_cbc_headers(cbc_path)
@@ -496,7 +499,9 @@ def open_cbc(
 
     if simulation_start_time is not None:
         for cbc_name, cbc_array in cbc_content.items():
-            cbc_content[cbc_name] = assign_datetime_coords(cbc_array,simulation_start_time , time_unit)                
+            cbc_content[cbc_name] = assign_datetime_coords(
+                cbc_array, simulation_start_time, time_unit
+            )
     return cbc_content
 
 

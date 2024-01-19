@@ -145,14 +145,14 @@ def test_partitioning_unstructured(
         original_dir / "GWF_1/GWF_1.hds",
         original_dir / "GWF_1/disv.disv.grb",
         simulation_start_time=np.datetime64("1999-01-01"),
-        time_unit="d"
+        time_unit="d",
     )
 
     original_cbc = imod.mf6.open_cbc(
         original_dir / "GWF_1/GWF_1.cbc",
         original_dir / "GWF_1/disv.disv.grb",
         simulation_start_time=np.datetime64("1999-01-01"),
-        time_unit="d"        
+        time_unit="d",
     )
 
     # Partition the simulation, run it, and save the (merged) results.
@@ -162,10 +162,12 @@ def test_partitioning_unstructured(
     split_simulation.run()
 
     head = split_simulation.open_head(simulation_start_time="01-01-1999", time_unit="d")
-    assert head.coords["time"].dtype == np.dtype('datetime64[ns]')
+    assert head.coords["time"].dtype == np.dtype("datetime64[ns]")
 
-    cbc = split_simulation.open_flow_budget(simulation_start_time=np.datetime64("1999-01-01"), time_unit="d"   )
-    assert cbc.coords["time"].dtype == np.dtype('datetime64[ns]')
+    cbc = split_simulation.open_flow_budget(
+        simulation_start_time=np.datetime64("1999-01-01"), time_unit="d"
+    )
+    assert cbc.coords["time"].dtype == np.dtype("datetime64[ns]")
 
     # Compare the head result of the original simulation with the result of the partitioned simulation.
     np.testing.assert_allclose(

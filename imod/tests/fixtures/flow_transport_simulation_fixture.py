@@ -2,9 +2,11 @@
 
 import numpy as np
 import pandas as pd
-import xarray as xr
 import pytest
+import xarray as xr
+
 import imod
+
 
 def create_transport_model(flowmodel, speciesname, dispersivity, retardation, decay):
     """
@@ -85,7 +87,9 @@ def flow_transport_simulation():
     grid_dims = ("layer", "y", "x")
     grid_coords = {"layer": layer, "y": y, "x": x}
     grid_shape = (nlay, nrow, ncol)
-    grid = xr.DataArray(np.ones(grid_shape, dtype=int), coords=grid_coords, dims=grid_dims)
+    grid = xr.DataArray(
+        np.ones(grid_shape, dtype=int), coords=grid_coords, dims=grid_dims
+    )
     bottom = xr.full_like(grid, -1.0, dtype=float)
 
     gwf_model = imod.mf6.GroundwaterFlowModel()
@@ -140,7 +144,9 @@ def flow_transport_simulation():
     simulation["tpt_a"] = create_transport_model(gwf_model, "species_a", 0.0, 1.0, 0.0)
     simulation["tpt_b"] = create_transport_model(gwf_model, "species_b", 10.0, 1.0, 0.0)
     simulation["tpt_c"] = create_transport_model(gwf_model, "species_c", 10.0, 5.0, 0.0)
-    simulation["tpt_d"] = create_transport_model(gwf_model, "species_d", 10.0, 5.0, 0.002)
+    simulation["tpt_d"] = create_transport_model(
+        gwf_model, "species_d", 10.0, 5.0, 0.002
+    )
 
     simulation["flow_solver"] = imod.mf6.Solution(
         modelnames=["flow"],
@@ -180,6 +186,5 @@ def flow_transport_simulation():
     simulation.create_time_discretization(additional_times=[start, start + duration])
     simulation["time_discretization"]["n_timesteps"] = 100
 
-    
     return simulation
     # %%

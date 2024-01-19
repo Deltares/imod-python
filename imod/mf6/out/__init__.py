@@ -150,7 +150,9 @@ def open_hds(
 
 
 def open_conc(
-    ucn_path: FilePath, grb_path: FilePath, dry_nan: bool = False,
+    ucn_path: FilePath,
+    grb_path: FilePath,
+    dry_nan: bool = False,
     simulation_start_time: Optional[np.datetime64] = None,
     time_unit: Optional[str] = "d",
 ) -> Union[xr.DataArray, xu.UgridDataArray]:
@@ -177,7 +179,7 @@ def open_conc(
     grb_content["name"] = "concentration"
     distype = grb_content["distype"]
     _open = _get_function(_OPEN_HDS, distype)
-    return _open(ucn_path, grb_content, dry_nan, simulation_start_time,time_unit )
+    return _open(ucn_path, grb_content, dry_nan, simulation_start_time, time_unit)
 
 
 def open_hds_like(
@@ -219,7 +221,10 @@ def open_hds_like(
 
 
 def open_cbc(
-    cbc_path: FilePath, grb_path: FilePath, flowja: bool = False,    simulation_start_time: Optional[np.datetime64] = None,
+    cbc_path: FilePath,
+    grb_path: FilePath,
+    flowja: bool = False,
+    simulation_start_time: Optional[np.datetime64] = None,
     time_unit: Optional[str] = "d",
 ) -> Dict[str, Union[xr.DataArray, xu.UgridDataArray]]:
     """
@@ -281,4 +286,4 @@ def open_cbc(
     grb_content = read_grb(grb_path)
     distype = grb_content["distype"]
     _open = _get_function(_OPEN_CBC, distype)
-    return _open(cbc_path, grb_content, flowja, simulation_start_time,time_unit )
+    return _open(cbc_path, grb_content, flowja, simulation_start_time, time_unit)

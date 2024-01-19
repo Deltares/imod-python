@@ -229,16 +229,20 @@ def test_open_cbc__dis_transient(transient_twri_result):
             # Test if no errors are thrown if the array is loaded into memory
             array.load()
 
+
 @pytest.mark.usefixtures("transient_twri_result")
 def test_open_cbc__dis_datetime(transient_twri_result):
     modeldir = transient_twri_result
     with imod.util.cd(modeldir):
-        cbc = imod.mf6.open_cbc("GWF_1/GWF_1.cbc", "GWF_1/dis.dis.grb",  simulation_start_time="01-01-1999",
-        time_unit="d")
+        cbc = imod.mf6.open_cbc(
+            "GWF_1/GWF_1.cbc",
+            "GWF_1/dis.dis.grb",
+            simulation_start_time="01-01-1999",
+            time_unit="d",
+        )
 
     for array in cbc.values():
-        assert array.coords["time"].dtype == np.dtype('datetime64[ns]')
-            
+        assert array.coords["time"].dtype == np.dtype("datetime64[ns]")
 
 
 @pytest.mark.usefixtures("transient_unconfined_twri_result")
@@ -301,12 +305,16 @@ def test_open_cbc__disv(circle_result):
 def test_open_cbc__disv_datetime(circle_result):
     modeldir = circle_result
     with imod.util.cd(modeldir):
-        cbc = imod.mf6.open_cbc("GWF_1/GWF_1.cbc", "GWF_1/disv.disv.grb",  simulation_start_time="01-01-1999",
-        time_unit="d")
-
+        cbc = imod.mf6.open_cbc(
+            "GWF_1/GWF_1.cbc",
+            "GWF_1/disv.disv.grb",
+            simulation_start_time="01-01-1999",
+            time_unit="d",
+        )
 
     for array in cbc.values():
-        assert array.coords["time"].dtype == np.dtype('datetime64[ns]')
+        assert array.coords["time"].dtype == np.dtype("datetime64[ns]")
+
 
 @pytest.mark.usefixtures("circle_result_sto")
 def test_open_cbc__disv_sto(circle_result_sto):
