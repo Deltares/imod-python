@@ -54,6 +54,9 @@ Added
 - Added Python 3.11 support.
 - The GWF-GWF exchange options are derived from user created packages (NPF, OC) and
   set automatically.
+- Head, concentration, and balance simulation results can now be loaded in such a way that 
+  the time coordinate is converted to datetimes. The simulation start time and time unit must be
+  passed as optional arguments to the result loading methods to achieve this. 
 
 Changed
 ~~~~~~~
