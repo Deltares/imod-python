@@ -224,7 +224,18 @@ class ClipBoxCases:
 
 @pytest.mark.parametrize(
     "parameterizable_basic_dis",
-    [BasicDisSettings(nlay=10, zstop=-10.0,  xstart=50.0, xstop=100.0, ystart=50.0, ystop=100.0, nrow=10, ncol=10)],
+    [
+        BasicDisSettings(
+            nlay=10,
+            zstop=-10.0,
+            xstart=50.0,
+            xstop=100.0,
+            ystart=50.0,
+            ystop=100.0,
+            nrow=10,
+            ncol=10,
+        )
+    ],
     indirect=True,
 )
 @parametrize_with_cases(
