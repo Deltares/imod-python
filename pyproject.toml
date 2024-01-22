@@ -79,10 +79,6 @@ dev = [
     "sphinx-gallery",
 ]
 
-[tool.isort]
-profile = "black"
-skip = [".gitignore", ".dockerignore"]
-
 [tool.coverage.report]
 exclude_lines = [
     "pragma: no cover",
