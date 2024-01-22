@@ -265,3 +265,36 @@ def test_regridding_can_skip_validation():
         str(pkg_errors["specific_yield"])
         == "[ValidationError('not all values comply with criterion: >= 0.0')]"
     )
+
+
+def test_regridding_layer_based_array():
+    """
+    This tests if dx/dy coordinates are correctly assigned when when regridding a package with layer-based input
+    """
+    nlay = 3
+    storage_coefficient = xr.DataArray(
+        [1e-4, 1e-4, 1e-4], {"layer": np.arange(1, nlay + 1)}, ("layer")
+    )
+    specific_yield = xr.DataArray(
+        [1e-4, 1e-4, 1e-4], {"layer": np.arange(1, nlay + 1)}, ("layer")
+    )
+    sto_package = imod.mf6.StorageCoefficient(
+        storage_coefficient,
+        specific_yield=specific_yield,
+        transient=True,
+        convertible=False,
+        save_flows=True,
+        validate=False,
+    )
+
+    new_grid = grid_data_structured(np.float64, 1.0, 0.025)
+    regridded_package = sto_package.regrid_like(new_grid)
+
+    assert (
+        regridded_package.dataset.coords["dx"].values[()]
+        == new_grid.coords["dx"].values[()]
+    )
+    assert (
+        regridded_package.dataset.coords["dy"].values[()]
+        == new_grid.coords["dy"].values[()]
+    )

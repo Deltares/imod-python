@@ -688,6 +688,15 @@ class Package(PackageBase, abc.ABC):
 
         new_package = self.__class__(**new_package_data)
 
+        # set dx and dy if present in target_grid
+        if "dx" in target_grid.coords:
+            new_package.dataset = new_package.dataset.assign_coords(
+                {"dx": target_grid.coords["dx"].values[()]}
+            )
+        if "dy" in target_grid.coords:
+            new_package.dataset = new_package.dataset.assign_coords(
+                {"dy": target_grid.coords["dy"].values[()]}
+            )
         return new_package
 
     def skip_masking_dataarray(self, array_name: str) -> bool:
