@@ -350,7 +350,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         return uzf_number.shift(layer=-1, fill_value=0)
 
     def _package_data_to_sparse(self):
-        notnull = self.dataset["landflag"].values == 1
+        notnull = np.isfinite(self.dataset["landflag"].values)
         iuzno = self.dataset["iuzno"].values[notnull]
         landflag = self.dataset["landflag"].values[notnull]
         ivertcon = self.dataset["ivertcon"].values[notnull]
@@ -390,7 +390,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         d = self._get_options(d, not_options=not_options)
         path = directory / pkgname / f"{self._pkg_id}-pkgdata.dat"
         d["packagedata"] = path.as_posix()
-        d["nuzfcells"] = self._max_active_n()
+        d["nuzfcells"] = np.count_nonzero(np.isfinite(d['landflag'])) # self._max_active_n()
         return self._template.render(d)
 
     def _to_struct_array(self, arrdict, layer):

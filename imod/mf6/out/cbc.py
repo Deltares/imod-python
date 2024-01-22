@@ -131,10 +131,10 @@ def read_cbc_headers(
                 imeth6_header = read_imeth6_header(f)
                 datasize = imeth6_header["nlist"] * (8 + imeth6_header["ndat"] * 8)
                 header["pos"] = f.tell()
-                key = imeth6_header["txt2id2"]
+                key = header['text']
                 # npf-key can be present multiple times in cases of saved saturation + specific discharge
-                if header["text"].startswith("data-"):
-                    key = key + "-" + header["text"].replace("data-", "")
+                # if header["text"].startswith("data-"):
+                #     key = key + "-" + header["text"].replace("data-", "")
                 headers[key].append(Imeth6Header(**header, **imeth6_header))
             else:
                 raise ValueError(
