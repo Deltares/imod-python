@@ -6,6 +6,7 @@ from contextlib import nullcontext as does_not_raise
 import numpy as np
 import pytest
 import xarray as xr
+import xugrid as xu
 from pytest_cases import parametrize_with_cases
 
 import imod
@@ -187,19 +188,47 @@ class ClipBoxCases:
         return clip_arguments, expected_dims, does_not_raise()
 
     @staticmethod
-    def case_clip_top_is_non_layered_griddataarray(parameterizable_basic_dis):
-        _, top, bottom = parameterizable_basic_dis
+    def case_clip_top_is_non_layered_structuredgrid(parameterizable_basic_dis):
+        idomain, top, bottom = parameterizable_basic_dis
+        top, bottom = broadcast_to_full_domain(idomain, top, bottom)
         top = top.isel(layer=0).drop_vars("layer")
+
         clip_arguments = {"layer_max": 2, "bottom": bottom, "top": top}
 
         expected_dims = {"index": 4, "species": 2}
         return clip_arguments, expected_dims, does_not_raise()
 
     @staticmethod
-    def case_clip_top_is_layered_griddataarray(parameterizable_basic_dis):
+    def case_clip_top_is_layered_structuredgrid(parameterizable_basic_dis):
         idomain, top, bottom = parameterizable_basic_dis
 
         top, bottom = broadcast_to_full_domain(idomain, top, bottom)
+        clip_arguments = {"layer_max": 2, "bottom": bottom, "top": top}
+
+        expected_dims = {"index": 4, "species": 2}
+        return clip_arguments, expected_dims, does_not_raise()
+
+    @staticmethod
+    def case_clip_top_is_non_layered_unstructuredgrid(parameterizable_basic_dis):
+        idomain, top, bottom = parameterizable_basic_dis
+        top, bottom = broadcast_to_full_domain(idomain, top, bottom)
+        top = xu.UgridDataArray.from_structured(top)
+        bottom = xu.UgridDataArray.from_structured(bottom)
+
+        top = top.isel(layer=0).drop_vars("layer")
+
+        clip_arguments = {"layer_max": 2, "bottom": bottom, "top": top}
+
+        expected_dims = {"index": 4, "species": 2}
+        return clip_arguments, expected_dims, does_not_raise()
+
+    @staticmethod
+    def case_clip_top_is_layered_unstructuredgrid(parameterizable_basic_dis):
+        idomain, top, bottom = parameterizable_basic_dis
+        top, bottom = broadcast_to_full_domain(idomain, top, bottom)
+        top = xu.UgridDataArray.from_structured(top)
+        bottom = xu.UgridDataArray.from_structured(bottom)
+
         clip_arguments = {"layer_max": 2, "bottom": bottom, "top": top}
 
         expected_dims = {"index": 4, "species": 2}

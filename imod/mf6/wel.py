@@ -10,6 +10,7 @@ import pandas as pd
 import xarray as xr
 import xugrid as xu
 
+import imod
 from imod.mf6.auxiliary_variables import add_periodic_auxiliary_variable
 from imod.mf6.boundary_condition import (
     BoundaryCondition,
@@ -27,7 +28,7 @@ from imod.prepare import assign_wells
 from imod.schemata import AllNoDataSchema, DTypeSchema
 from imod.select.points import points_indices, points_values
 from imod.typing import GridDataArray
-from imod.typing.grid import ones_like
+from imod.typing.grid import is_spatial_2D, ones_like
 from imod.util import values_within_range
 
 
@@ -259,19 +260,8 @@ class Well(BoundaryCondition, IPointDataPackage):
 
         ds = new.dataset
 
-        z_max = None if layer_max is None else top.isel(layer=layer_max)
-        z_min = None if layer_min is None else bottom.isel(layer=layer_min)
-
-        # if z is a grid select the the values at the well locations and drop the dimensions
-        if (z_max is not None) and ("x" in z_max.coords or "y" in z_max.coords):
-            z_max = z_max.sel(x=ds["x"], y=ds["y"], method="nearest").drop_vars(
-                lambda x: x.coords
-            )
-
-        if (z_min is not None) and ("x" in z_min.coords or "y" in z_min.coords):
-            z_min = z_min.sel(x=ds["x"], y=ds["y"], method="nearest").drop_vars(
-                lambda x: x.coords
-            )
+        z_max = self._find_well_value_at_layer(ds, top, layer_max)
+        z_min = self._find_well_value_at_layer(ds, bottom, layer_min)
 
         if z_max is not None:
             ds["screen_top"] = ds["screen_top"].clip(None, z_max)
@@ -292,6 +282,23 @@ class Well(BoundaryCondition, IPointDataPackage):
         new.dataset = ds.loc[{"index": in_bounds}]
 
         return new
+
+    @staticmethod
+    def _find_well_value_at_layer(
+        well_dataset: xr.Dataset, grid: GridDataArray, layer: int
+    ):
+        value = None if layer is None else grid.isel(layer=layer)
+
+        # if value is a grid select the values at the well locations and drop the dimensions
+        if (value is not None) and is_spatial_2D(value):
+            value = imod.select.points_values(
+                value,
+                x=well_dataset["x"].values,
+                y=well_dataset["y"].values,
+                out_of_bounds="ignore",
+            ).drop_vars(lambda x: x.coords)
+
+        return value
 
     def write(
         self,
