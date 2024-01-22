@@ -38,7 +38,7 @@ examples = { cmd = [
     "--verbose",
     "--junitxml=examples_report.xml",
 ], depends_on = ["install"], cwd = "imod/tests" }
-pypi-publish = { cmd = "rm --recursive --force dist && python -m build && twine check dist/*" }
+pypi-publish = { cmd = "rm --recursive --force dist && python -m build && twine check dist/* && twine upload dist/*" }
 
 black_lint = "black --check ."
 black_format = "black ."
