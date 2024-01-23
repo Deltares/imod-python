@@ -54,6 +54,7 @@ Added
 - Added Python 3.11 support.
 - The GWF-GWF exchange options are derived from user created packages (NPF, OC) and
   set automatically.
+- Added the ``simulation_start_time`` and ``time_unit`` arguments. To the ``Modflow6Simulation.open_`` methods, and ``imod.mf6.out.open_`` functions. This converts the ``"time"`` coordinate to datetimes.
 
 Changed
 ~~~~~~~
