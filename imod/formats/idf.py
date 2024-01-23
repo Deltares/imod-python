@@ -5,21 +5,22 @@ The primary functions to use are :func:`imod.idf.open` and
 :func:`imod.idf.save`, though lower level functions are also available.
 """
 
-import collections
-import functools
 import glob
-import itertools
 import pathlib
-import re
 import struct
 import warnings
+from collections import defaultdict
+from collections.abc import Iterable
+from pathlib import Path
+from re import Pattern
+from typing import Any
 
-import dask
 import numpy as np
 import xarray as xr
 
 from imod import util
 from imod.formats import array_io
+from imod.typing.structured import merge_partitions
 
 # Make sure we can still use the built-in function...
 f_open = open
@@ -252,194 +253,69 @@ def open(path, use_cftime=False, pattern=None):
     return array_io.reading._open(path, use_cftime, pattern, header, _read)
 
 
-def _merge_subdomains(pathlists, use_cftime, pattern):
-    das = []
-    for paths in pathlists.values():
-        headers = [header(p, pattern) for p in paths]
-        das.append(array_io.reading._load(paths, use_cftime, _read, headers))
-
-    x = np.unique(np.concatenate([da.x.values for da in das]))
-    y = np.unique(np.concatenate([da.y.values for da in das]))
-
-    nrow = y.size
-    ncol = x.size
-    nlayer = das[0].coords["layer"].size
-    if "species" in das[0].dims:
-        has_species = True
-        nspecies = das[0].coords["species"].size
-        out = np.full((nspecies, 1, nlayer, nrow, ncol), np.nan)
-    else:
-        has_species = False
-        out = np.full((1, nlayer, nrow, ncol), np.nan)
-
-    for da in das:
-        ix = np.searchsorted(x, da.x.values[0], side="left")
-        iy = nrow - np.searchsorted(y, da.y.values[0], side="right")
-        ysize, xsize = da.shape[-2:]
-        if has_species:
-            out[:, :, :, iy : iy + ysize, ix : ix + xsize] = da.values
-        else:
-            out[:, :, iy : iy + ysize, ix : ix + xsize] = da.values
-
-    return out
+def _more_than_one_unique_value(values: Iterable[Any]):
+    """Returns if more than one unique value in list"""
+    return len(set(values)) != 1
 
 
-def open_subdomains(path, use_cftime=False, pattern=None):
+def open_subdomains(
+    path: str | Path, use_cftime: bool = False, pattern: str | Pattern = None
+) -> xr.DataArray:
     """
     Combine IDF files of multiple subdomains.
 
     Parameters
     ----------
-    path : str, Path or list
+    path : str or Path
+        Global path.
     use_cftime : bool, optional
-    pattern : regex pattern, optional
+    pattern : str, regex pattern, optional
+        If no pattern is provided, the function will first try:
+        "{name}_c{species}_{time}_l{layer}_p{subdomain}"
+        and if that fails:
+        "{name}_{time}_l{layer}_p{subdomain}"
+        Following the iMOD5/iMOD-WQ filename conventions.
 
     Returns
     -------
     xarray.DataArray
 
     """
-    if isinstance(path, pathlib.Path):
-        path = str(path)
-    paths = glob.glob(path)
-    n = len(paths)
-    if n == 0:
-        raise FileNotFoundError(f"Could not find any files matching {path}")
+    paths = sorted(glob.glob(str(path)))
 
     if pattern is None:
-        pattern = re.compile(
-            r"[\w-]+_(?P<time>[0-9-]+)_l(?P<layer>[0-9]+)_p(?P<subdomain>[0-9]{3})",
-            re.IGNORECASE,
+        # If no pattern provided test if
+        pattern = "{name}_c{species}_{time}_l{layer}_p{subdomain}"
+        re_pattern_species = util._custom_pattern_to_regex_pattern(pattern)
+        has_species = re_pattern_species.search(paths[0])
+        if not has_species:
+            pattern = "{name}_{time}_l{layer}_p{subdomain}"
+
+    parsed = [util.decompose(path, pattern) for path in paths]
+    grouped = defaultdict(list)
+    for match, path in zip(parsed, paths):
+        try:
+            key = match["subdomain"]
+        except KeyError as e:
+            raise KeyError(f"{e} in path: {path} with pattern: {pattern}")
+        grouped[key].append(path)
+
+    n_idf_per_subdomain = {
+        subdomain_id: len(path_ls) for subdomain_id, path_ls in grouped.items()
+    }
+    if _more_than_one_unique_value(n_idf_per_subdomain.values()):
+        raise ValueError(
+            f"Each subdomain must have the same number of IDF files, found: {n_idf_per_subdomain}"
         )
-        pattern_species = re.compile(
-            r"[\w-]+_c(?P<species>[0-9]+)_(?P<time>[0-9-]+)_l(?P<layer>[0-9]+)_p(?P<subdomain>[0-9]{3})",
-            re.IGNORECASE,
-        )
-    else:
-        pattern_species = None
 
-    # There are no real benefits to itertools.groupby in this case, as there's
-    # no benefit to using a (lazy) iterator in this case
-    grouped_by_time = collections.defaultdict(
-        functools.partial(collections.defaultdict, list)
-    )
-    count_per_subdomain = collections.defaultdict(int)  # used only for checking counts
-    timestrings = []
-    layers = []
-    numbers = []
-    species = []
+    das = []
+    for pathlist in grouped.values():
+        da = open(pathlist, use_cftime=use_cftime, pattern=pattern)
+        da = da.isel(subdomain=0, drop=True)
+        das.append(da)
 
-    # Check if species are present:
-    if pattern_species and pattern_species.search(paths[0]) is not None:
-        has_species = True
-        pattern = pattern_species
-    else:
-        has_species = False
-
-    for p in paths:
-        search = pattern.search(p)
-        timestr = search["time"]
-        layer = int(search["layer"])
-        number = int(search["subdomain"])
-        grouped_by_time[timestr][number].append(p)
-        count_per_subdomain[number] += 1
-        numbers.append(number)
-        layers.append(layer)
-        timestrings.append(timestr)
-        if has_species:
-            species.append(int(search["species"]))
-
-    # Test whether subdomains are complete
-    numbers = sorted(set(numbers))
-    first = numbers[0]
-    first_len = count_per_subdomain[first]
-    for number in numbers:
-        group_len = count_per_subdomain[number]
-        if group_len != first_len:
-            raise ValueError(
-                f"The number of IDFs are not identical for every subdomain. "
-                f"Subdomain p{first} has {first_len} IDF files, subdomain p{number} "
-                f"has {group_len} IDF files."
-            )
-
-    if has_species:
-        pattern = r"{name}_c{species}_{time}_l{layer}_p\d+"
-    else:
-        pattern = r"{name}_{time}_l{layer}_p\d+"
-    timestrings = list(grouped_by_time.keys())
-
-    # Prepare output coordinates
-    coords = {}
-    first_time = timestrings[0]
-    samplingpaths = [
-        pathlist[first] for pathlist in grouped_by_time[first_time].values()
-    ]
-    headers = [header(path, pattern) for path in samplingpaths]
-    subdomain_bounds = [(h["xmin"], h["xmax"], h["ymin"], h["ymax"]) for h in headers]
-    subdomain_cellsizes = [(h["dx"], h["dy"]) for h in headers]
-    subdomain_coords = [
-        util._xycoords(bounds, cellsizes)
-        for bounds, cellsizes in zip(subdomain_bounds, subdomain_cellsizes)
-    ]
-    coords["y"] = np.unique(
-        np.concatenate([coords["y"] for coords in subdomain_coords])
-    )[::-1]
-    coords["x"] = np.unique(
-        np.concatenate([coords["x"] for coords in subdomain_coords])
-    )
-    coords["layer"] = np.array(sorted(set(layers)))
-
-    times = [util.to_datetime(timestr) for timestr in timestrings]
-    times, use_cftime = util._convert_datetimes(times, use_cftime)
-    if use_cftime:
-        # unique also sorts
-        coords["time"] = xr.CFTimeIndex(np.unique(times))
-    else:
-        coords["time"] = np.unique(times)
-
-    if has_species:
-        coords["species"] = np.array(sorted(set(species)))
-        shape = (
-            coords["species"].size,
-            1,
-            coords["layer"].size,
-            coords["y"].size,
-            coords["x"].size,
-        )
-        dims = ("species", "time", "layer", "y", "x")
-        time_axis = 1
-    else:
-        shape = (1, coords["layer"].size, coords["y"].size, coords["x"].size)
-        dims = ("time", "layer", "y", "x")
-        time_axis = 0
-
-    # Collect and merge data
-    merged = []
-    dtype = headers[0]["dtype"]
-    sorted_order = np.argsort(times)  # get time ordering right before merging
-    sorted_timestrings = np.array(timestrings)[sorted_order]
-    for timestr in sorted_timestrings:
-        group = grouped_by_time[timestr]
-        # Build a single array per timestep
-        timestep_data = dask.delayed(_merge_subdomains)(group, use_cftime, pattern)
-        dask_array = dask.array.from_delayed(timestep_data, shape, dtype=dtype)
-        merged.append(dask_array)
-    data = dask.array.concatenate(merged, axis=time_axis)
-
-    # Get tops and bottoms if possible
-    headers = [header(path, pattern) for path in grouped_by_time[first_time][first]]
-    tops = [c.get("top", None) for c in headers]
-    bots = [c.get("bot", None) for c in headers]
-    layers = [c.get("layer", None) for c in headers]
-    _, unique_indices = np.unique(layers, return_index=True)
-    all_have_z = all(map(lambda v: v is not None, itertools.chain(tops, bots)))
-    if all_have_z:
-        if coords["layer"].size > 1:
-            coords = array_io.reading._array_z_coord(coords, tops, bots, unique_indices)
-        else:
-            coords = array_io.reading._scalar_z_coord(coords, tops, bots)
-
-    return xr.DataArray(data, coords, dims)
+    name = das[0].name
+    return merge_partitions(das)[name]  # as DataArray for backwards compatibility
 
 
 def open_dataset(globpath, use_cftime=False, pattern=None):
