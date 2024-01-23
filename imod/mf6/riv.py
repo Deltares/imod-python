@@ -130,7 +130,6 @@ class River(BoundaryCondition):
         "concentration": (RegridderType.OVERLAP, "mean"),
     }
 
-    @pkg_init(exclude_in_dataset=["validate"])
     def __init__(
         self,
         stage,
@@ -145,6 +144,20 @@ class River(BoundaryCondition):
         validate: bool = True,
         repeat_stress=None,
     ):
+        dict_dataset = {
+            "stage": stage,
+            "conductance": conductance,
+            "bottom_elevation": bottom_elevation,
+            "concentration": concentration,
+            "concentration_boundary_type": concentration_boundary_type,
+            "print_input": print_input,
+            "print_flows": print_flows,
+            "save_flows": save_flows,
+            "observations": observations,
+            "repeat_stress": repeat_stress,
+        }
+        super(type(self), self).__init__(dict_dataset)
+
         self._validate_init_schemata(validate)
 
     def _validate(self, schemata, **kwargs):
