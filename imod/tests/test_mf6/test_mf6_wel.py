@@ -1,14 +1,19 @@
 import pathlib
 import tempfile
 import textwrap
+from contextlib import nullcontext as does_not_raise
 
 import numpy as np
 import pytest
 import xarray as xr
+import xugrid as xu
+from pytest_cases import parametrize_with_cases
 
 import imod
+from imod.mf6.utilities.grid import broadcast_to_full_domain
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
+from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
 
 
 def test_to_mf6_pkg__high_lvl_stationary(basic_dis, well_high_lvl_test_data_stationary):
@@ -137,25 +142,159 @@ def test_to_mf6_pkg__high_lvl_transient(basic_dis, well_high_lvl_test_data_trans
     np.testing.assert_equal(mf6_ds["rate"].values, rate_expected)
 
 
-def test_clip_box__high_lvl_stationary(well_high_lvl_test_data_stationary):
+class ClipBoxCases:
+    @staticmethod
+    def case_clip_xy(parameterizable_basic_dis):
+        clip_arguments = {
+            "x_min": 52.0,
+            "x_max": 76.0,
+            "y_max": 67.0,
+        }
+
+        expected_dims = {"index": 3, "species": 2}
+        return clip_arguments, expected_dims, does_not_raise()
+
+    @staticmethod
+    def case_clip_layer_max(parameterizable_basic_dis):
+        _, top, bottom = parameterizable_basic_dis
+        clip_arguments = {"layer_max": 2, "bottom": bottom, "top": top}
+
+        expected_dims = {"index": 4, "species": 2}
+        return clip_arguments, expected_dims, does_not_raise()
+
+    @staticmethod
+    def case_clip_layer_min(parameterizable_basic_dis):
+        _, top, bottom = parameterizable_basic_dis
+        clip_arguments = {"layer_min": 5, "bottom": bottom, "top": top}
+
+        expected_dims = {"index": 4, "species": 2}
+        return clip_arguments, expected_dims, does_not_raise()
+
+    @staticmethod
+    def case_clip_layer_min_layer_max(parameterizable_basic_dis):
+        _, top, bottom = parameterizable_basic_dis
+        clip_arguments = {"layer_min": 1, "layer_max": 1, "bottom": bottom, "top": top}
+
+        expected_dims = {"index": 4, "species": 2}
+        return clip_arguments, expected_dims, does_not_raise()
+
+    @staticmethod
+    def case_clip_top_is_scalar(parameterizable_basic_dis):
+        _, _, bottom = parameterizable_basic_dis
+        top = 0.0
+        clip_arguments = {"layer_max": 2, "bottom": bottom, "top": top}
+
+        expected_dims = {"index": 4, "species": 2}
+        return clip_arguments, expected_dims, does_not_raise()
+
+    @staticmethod
+    def case_clip_top_is_non_layered_structuredgrid(parameterizable_basic_dis):
+        idomain, top, bottom = parameterizable_basic_dis
+        top, bottom = broadcast_to_full_domain(idomain, top, bottom)
+        top = top.isel(layer=0).drop_vars("layer")
+
+        clip_arguments = {"layer_max": 2, "bottom": bottom, "top": top}
+
+        expected_dims = {"index": 4, "species": 2}
+        return clip_arguments, expected_dims, does_not_raise()
+
+    @staticmethod
+    def case_clip_top_is_layered_structuredgrid(parameterizable_basic_dis):
+        idomain, top, bottom = parameterizable_basic_dis
+
+        top, bottom = broadcast_to_full_domain(idomain, top, bottom)
+        clip_arguments = {"layer_max": 2, "bottom": bottom, "top": top}
+
+        expected_dims = {"index": 4, "species": 2}
+        return clip_arguments, expected_dims, does_not_raise()
+
+    @staticmethod
+    def case_clip_top_is_non_layered_unstructuredgrid(parameterizable_basic_dis):
+        idomain, top, bottom = parameterizable_basic_dis
+        top, bottom = broadcast_to_full_domain(idomain, top, bottom)
+        top = xu.UgridDataArray.from_structured(top)
+        bottom = xu.UgridDataArray.from_structured(bottom)
+
+        top = top.isel(layer=0).drop_vars("layer")
+
+        clip_arguments = {"layer_max": 2, "bottom": bottom, "top": top}
+
+        expected_dims = {"index": 4, "species": 2}
+        return clip_arguments, expected_dims, does_not_raise()
+
+    @staticmethod
+    def case_clip_top_is_layered_unstructuredgrid(parameterizable_basic_dis):
+        idomain, top, bottom = parameterizable_basic_dis
+        top, bottom = broadcast_to_full_domain(idomain, top, bottom)
+        top = xu.UgridDataArray.from_structured(top)
+        bottom = xu.UgridDataArray.from_structured(bottom)
+
+        clip_arguments = {"layer_max": 2, "bottom": bottom, "top": top}
+
+        expected_dims = {"index": 4, "species": 2}
+        return clip_arguments, expected_dims, does_not_raise()
+
+    @staticmethod
+    def case_clip_missing_top(parameterizable_basic_dis):
+        _, _, bottom = parameterizable_basic_dis
+        clip_arguments = {"layer_max": 2, "bottom": bottom}
+
+        expected_dims = {}
+        return clip_arguments, expected_dims, pytest.raises(ValueError)
+
+    @staticmethod
+    def case_clip_missing_bottom(parameterizable_basic_dis):
+        _, top, _ = parameterizable_basic_dis
+        clip_arguments = {"layer_max": 2, "top": top}
+
+        expected_dims = {}
+        return clip_arguments, expected_dims, pytest.raises(ValueError)
+
+
+@pytest.mark.parametrize(
+    "parameterizable_basic_dis",
+    [
+        BasicDisSettings(
+            nlay=10,
+            zstop=-10.0,
+            xstart=50.0,
+            xstop=100.0,
+            ystart=50.0,
+            ystop=100.0,
+            nrow=10,
+            ncol=10,
+        )
+    ],
+    indirect=True,
+)
+@parametrize_with_cases(
+    ("clip_box_args", "expected_dims", "expectation"), cases=ClipBoxCases
+)
+def test_clip_box__high_lvl_stationary(
+    well_high_lvl_test_data_stationary, clip_box_args, expected_dims, expectation
+):
     # Arrange
     wel = imod.mf6.Well(*well_high_lvl_test_data_stationary)
 
-    # Act & Assert
-    # Test clipping x & y without specified time
-    ds = wel.clip_box(x_min=52.0, x_max=76.0, y_max=67.0).dataset
-    assert dict(ds.dims) == {"index": 3, "species": 2}
+    with expectation:
+        # Act
+        ds = wel.clip_box(**clip_box_args).dataset
 
-    # Test clipping with z
-    ds = wel.clip_box(z_max=-2.0).dataset
-    assert dict(ds.dims) == {"index": 4, "species": 2}
-    ds = wel.clip_box(z_min=-8.0).dataset
-    assert dict(ds.dims) == {"index": 4, "species": 2}
+        # Assert
+        assert dict(ds.dims) == expected_dims
 
 
-def test_clip_box__high_lvl_transient(well_high_lvl_test_data_transient):
+@pytest.mark.parametrize(
+    "parameterizable_basic_dis",
+    [BasicDisSettings(nlay=10, zstop=-10.0)],
+    indirect=True,
+)
+def test_clip_box__high_lvl_transient(
+    well_high_lvl_test_data_transient, parameterizable_basic_dis
+):
     # Arrange
     wel = imod.mf6.Well(*well_high_lvl_test_data_transient)
+    _, top, bottom = parameterizable_basic_dis
 
     # Act & Assert
     # Test clipping x & y without specified time
@@ -163,9 +302,9 @@ def test_clip_box__high_lvl_transient(well_high_lvl_test_data_transient):
     assert dict(ds.dims) == {"index": 3, "time": 5, "species": 2}
 
     # Test clipping with z
-    ds = wel.clip_box(z_max=-2.0).dataset
+    ds = wel.clip_box(layer_max=2, top=top, bottom=bottom).dataset
     assert dict(ds.dims) == {"index": 4, "time": 5, "species": 2}
-    ds = wel.clip_box(z_min=-8.0).dataset
+    ds = wel.clip_box(layer_min=5, top=top, bottom=bottom).dataset
     assert dict(ds.dims) == {"index": 4, "time": 5, "species": 2}
 
     # Test clipping with specified time

@@ -8,6 +8,7 @@ import warnings
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
+import cftime
 import jinja2
 import numpy as np
 import tomli
@@ -755,8 +756,8 @@ class Modflow6Simulation(collections.UserDict):
 
     def clip_box(
         self,
-        time_min: Optional[str] = None,
-        time_max: Optional[str] = None,
+        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
+        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
         layer_min: Optional[int] = None,
         layer_max: Optional[int] = None,
         x_min: Optional[float] = None,
@@ -764,7 +765,7 @@ class Modflow6Simulation(collections.UserDict):
         y_min: Optional[float] = None,
         y_max: Optional[float] = None,
         states_for_boundary: Optional[dict[str, GridDataArray]] = None,
-    ) -> "Modflow6Simulation":
+    ) -> Modflow6Simulation:
         """
         Clip a simulation by a bounding box (time, layer, y, x).
 

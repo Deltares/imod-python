@@ -3,12 +3,14 @@ from __future__ import annotations
 import warnings
 from typing import Any, List, Optional, Tuple, Union
 
+import cftime
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
 import xarray as xr
 import xugrid as xu
 
+import imod
 from imod.mf6.auxiliary_variables import add_periodic_auxiliary_variable
 from imod.mf6.boundary_condition import (
     BoundaryCondition,
@@ -20,12 +22,13 @@ from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.dataset import remove_inactive
+from imod.mf6.utilities.grid import create_layered_top
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
 from imod.schemata import AllNoDataSchema, DTypeSchema
 from imod.select.points import points_indices, points_values
 from imod.typing import GridDataArray
-from imod.typing.grid import ones_like
+from imod.typing.grid import is_spatial_2D, ones_like
 from imod.util import values_within_range
 
 
@@ -195,17 +198,26 @@ class Well(BoundaryCondition, IPointDataPackage):
 
     def clip_box(
         self,
-        time_min=None,
-        time_max=None,
-        z_min=None,
-        z_max=None,
-        x_min=None,
-        x_max=None,
-        y_min=None,
-        y_max=None,
-    ) -> Well:
+        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
+        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
+        layer_min: Optional[int] = None,
+        layer_max: Optional[int] = None,
+        x_min: Optional[float] = None,
+        x_max: Optional[float] = None,
+        y_min: Optional[float] = None,
+        y_max: Optional[float] = None,
+        top: Optional[GridDataArray] = None,
+        bottom: Optional[GridDataArray] = None,
+        state_for_boundary: Optional[GridDataArray] = None,
+    ) -> Package:
         """
         Clip a package by a bounding box (time, layer, y, x).
+
+        The well package doesn't use the layer attribute to describe its depth and length.
+        Instead, it uses the screen_top and screen_bottom parameters which corresponds with
+        the z-coordinates of the top and bottom of the well. To go from a layer_min and
+        layer_max to z-values used for clipping the well a top and bottom array have to be
+        provided as well.
 
         Slicing intervals may be half-bounded, by providing None:
 
@@ -220,22 +232,41 @@ class Well(BoundaryCondition, IPointDataPackage):
         ----------
         time_min: optional
         time_max: optional
-        z_min: optional, float
-        z_max: optional, float
+        layer_min: optional, int
+        layer_max: optional, int
         x_min: optional, float
         x_max: optional, float
         y_min: optional, float
         y_max: optional, float
+        top: optional, GridDataArray
+        bottom: optional, GridDataArray
+        state_for_boundary: optional, GridDataArray
 
         Returns
         -------
         sliced : Package
         """
+        if (layer_max or layer_min) and (top is None or bottom is None):
+            raise ValueError(
+                "When clipping by layer both the top and bottom should be defined"
+            )
+
+        if top is not None:
+            if not isinstance(top, GridDataArray) or "layer" not in top.coords:
+                top = create_layered_top(bottom, top)
 
         # The super method will select in the time dimension without issues.
         new = super().clip_box(time_min=time_min, time_max=time_max)
 
         ds = new.dataset
+
+        z_max = self._find_well_value_at_layer(ds, top, layer_max)
+        z_min = self._find_well_value_at_layer(ds, bottom, layer_min)
+
+        if z_max is not None:
+            ds["screen_top"] = ds["screen_top"].clip(None, z_max)
+        if z_min is not None:
+            ds["screen_bottom"] = ds["screen_bottom"].clip(z_min, None)
 
         # Initiate array of True with right shape to deal with case no spatial
         # selection needs to be done.
@@ -243,12 +274,31 @@ class Well(BoundaryCondition, IPointDataPackage):
         # Select all variables along "index" dimension
         in_bounds &= values_within_range(ds["x"], x_min, x_max)
         in_bounds &= values_within_range(ds["y"], y_min, y_max)
-        in_bounds &= values_within_range(ds["screen_top"], None, z_max)
-        in_bounds &= values_within_range(ds["screen_bottom"], z_min, None)
+        in_bounds &= values_within_range(ds["screen_top"], z_min, z_max)
+        in_bounds &= values_within_range(ds["screen_bottom"], z_min, z_max)
+        # remove wells where the screen bottom and top are the same
+        in_bounds &= abs(ds["screen_bottom"] - ds["screen_top"]) > 1e-5
         # Replace dataset with reduced dataset based on booleans
         new.dataset = ds.loc[{"index": in_bounds}]
 
         return new
+
+    @staticmethod
+    def _find_well_value_at_layer(
+        well_dataset: xr.Dataset, grid: GridDataArray, layer: int
+    ):
+        value = None if layer is None else grid.isel(layer=layer)
+
+        # if value is a grid select the values at the well locations and drop the dimensions
+        if (value is not None) and is_spatial_2D(value):
+            value = imod.select.points_values(
+                value,
+                x=well_dataset["x"].values,
+                y=well_dataset["y"].values,
+                out_of_bounds="ignore",
+            ).drop_vars(lambda x: x.coords)
+
+        return value
 
     def write(
         self,
@@ -640,14 +690,17 @@ class WellDisStructured(DisStructuredBoundaryCondition):
 
     def clip_box(
         self,
-        time_min=None,
-        time_max=None,
-        layer_min=None,
-        layer_max=None,
-        x_min=None,
-        x_max=None,
-        y_min=None,
-        y_max=None,
+        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
+        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
+        layer_min: Optional[int] = None,
+        layer_max: Optional[int] = None,
+        x_min: Optional[float] = None,
+        x_max: Optional[float] = None,
+        y_min: Optional[float] = None,
+        y_max: Optional[float] = None,
+        top: Optional[GridDataArray] = None,
+        bottom: Optional[GridDataArray] = None,
+        state_for_boundary: Optional[GridDataArray] = None,
     ) -> Package:
         """
         Clip a package by a bounding box (time, layer, y, x).
@@ -668,9 +721,12 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         layer_min: optional, int
         layer_max: optional, int
         x_min: optional, float
-        x_min: optional, float
+        x_max: optional, float
+        y_min: optional, float
         y_max: optional, float
-        y_max: optional, float
+        top: optional, GridDataArray
+        bottom: optional, GridDataArray
+        state_for_boundary: optional, GridDataArray
 
         Returns
         -------
@@ -791,14 +847,17 @@ class WellDisVertices(DisVerticesBoundaryCondition):
 
     def clip_box(
         self,
-        time_min=None,
-        time_max=None,
-        layer_min=None,
-        layer_max=None,
-        x_min=None,
-        x_max=None,
-        y_min=None,
-        y_max=None,
+        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
+        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
+        layer_min: Optional[int] = None,
+        layer_max: Optional[int] = None,
+        x_min: Optional[float] = None,
+        x_max: Optional[float] = None,
+        y_min: Optional[float] = None,
+        y_max: Optional[float] = None,
+        top: Optional[GridDataArray] = None,
+        bottom: Optional[GridDataArray] = None,
+        state_for_boundary: Optional[GridDataArray] = None,
     ) -> Package:
         """
         Clip a package by a bounding box (time, layer, y, x).
@@ -819,9 +878,12 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         layer_min: optional, int
         layer_max: optional, int
         x_min: optional, float
-        x_min: optional, float
+        x_max: optional, float
+        y_min: optional, float
         y_max: optional, float
-        y_max: optional, float
+        top: optional, GridDataArray
+        bottom: optional, GridDataArray
+        state_for_boundary: optional, GridDataArray
 
         Returns
         -------

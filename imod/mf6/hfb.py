@@ -4,8 +4,9 @@ import textwrap
 import typing
 from copy import deepcopy
 from enum import Enum
-from typing import Tuple
+from typing import Optional, Tuple
 
+import cftime
 import geopandas as gpd
 import numpy as np
 import shapely.wkt
@@ -518,15 +519,17 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
     def clip_box(
         self,
-        time_min=None,
-        time_max=None,
-        layer_min=None,
-        layer_max=None,
-        x_min=None,
-        x_max=None,
-        y_min=None,
-        y_max=None,
-        *args,
+        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
+        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
+        layer_min: Optional[int] = None,
+        layer_max: Optional[int] = None,
+        x_min: Optional[float] = None,
+        x_max: Optional[float] = None,
+        y_min: Optional[float] = None,
+        y_max: Optional[float] = None,
+        top: Optional[GridDataArray] = None,
+        bottom: Optional[GridDataArray] = None,
+        state_for_boundary: Optional[GridDataArray] = None,
     ) -> "HorizontalFlowBarrierBase":
         """
         Clip a package by a bounding box (time, layer, y, x).
@@ -550,6 +553,9 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         x_max: optional, float
         y_min: optional, float
         y_max: optional, float
+        top: optional, GridDataArray
+        bottom: optional, GridDataArray
+        state_for_boundary: optional, GridDataArray
 
         Returns
         -------
