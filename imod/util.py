@@ -62,7 +62,7 @@ def _custom_pattern_to_regex_pattern(pattern: str):
     Compile iMOD Python's simplified custom pattern to regex pattern:
     _custom_pattern_to_regex_pattern({name}_c{species})
     is the same as calling:
-    (?P<{name}>[\\w.-]+)_c(?P<{species}>[\\w.-]+)).compile()
+    (?P<name>[\\w.-]+)_c(?P<species>[\\w.-]+)).compile()
     """
     pattern = pattern.lower()
     # Get the variables between curly braces
