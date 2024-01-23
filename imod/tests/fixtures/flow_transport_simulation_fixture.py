@@ -8,15 +8,15 @@ import xarray as xr
 import imod
 
 
-def create_transport_model(flowmodel, speciesname, dispersivity, retardation, decay):
+def create_transport_model(flow_model, species_name, dispersivity, retardation, decay):
     """
     Function to create a transport model, as we intend to create four similar
     transport models.
 
     Parameters
     ----------
-    flowmodel: GroundwaterFlowModel
-    speciesname: str
+    flow_model: GroundwaterFlowModel
+    species_name: str
     dispersivity: float
     retardation: float
     decay: float
@@ -29,12 +29,12 @@ def create_transport_model(flowmodel, speciesname, dispersivity, retardation, de
     rhobulk = 1150.0
     porosity = 0.25
 
-    tpt_model = imod.mf6.GroundwaterTransportModel()
-    tpt_model["ssm"] = imod.mf6.SourceSinkMixing.from_flow_model(
-        flowmodel, speciesname, save_flows=True
+    transport_model = imod.mf6.GroundwaterTransportModel()
+    transport_model["ssm"] = imod.mf6.SourceSinkMixing.from_flow_model(
+        flow_model, species_name, save_flows=True
     )
-    tpt_model["adv"] = imod.mf6.AdvectionUpstream()
-    tpt_model["dsp"] = imod.mf6.Dispersion(
+    transport_model["adv"] = imod.mf6.AdvectionUpstream()
+    transport_model["dsp"] = imod.mf6.Dispersion(
         diffusion_coefficient=0.0,
         longitudinal_horizontal=dispersivity,
         transversal_horizontal1=0.0,
@@ -52,7 +52,7 @@ def create_transport_model(flowmodel, speciesname, dispersivity, retardation, de
         sorption = None
         kd = 1.0
 
-    tpt_model["mst"] = imod.mf6.MobileStorageTransfer(
+    transport_model["mst"] = imod.mf6.MobileStorageTransfer(
         porosity=porosity,
         decay=decay,
         decay_sorbed=decay,
@@ -62,12 +62,12 @@ def create_transport_model(flowmodel, speciesname, dispersivity, retardation, de
         sorption=sorption,
     )
 
-    tpt_model["ic"] = imod.mf6.InitialConditions(start=0.0)
-    tpt_model["oc"] = imod.mf6.OutputControl(
+    transport_model["ic"] = imod.mf6.InitialConditions(start=0.0)
+    transport_model["oc"] = imod.mf6.OutputControl(
         save_concentration="all", save_budget="last"
     )
-    tpt_model["dis"] = flowmodel["dis"]
-    return tpt_model
+    transport_model["dis"] = flow_model["dis"]
+    return transport_model
 
 
 # %%
