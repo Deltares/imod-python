@@ -15,8 +15,8 @@ repository = "https://github.com/Deltares/imod-python.git"
 [tasks]
 docs =  { cmd = "make html", depends_on = ["install"], cwd = "docs" }
 install = "python -m pip install --no-deps --editable ."
-format = { depends_on = ["isort_format", "black_format", "ruff_format"] }
-lint = { depends_on = ["isort_lint", "black_lint", "ruff_lint"] }
+format = { depends_on = ["sort_format", "black_format", "ruff_format"] }
+lint = { depends_on = ["sort_lint", "black_lint", "ruff_lint"] }
 tests = { depends_on = ["unittests", "examples"] }
 unittests = { cmd = [
     "NUMBA_DISABLE_JIT=1",
@@ -41,8 +41,8 @@ examples = { cmd = [
 
 black_lint = "black --check ."
 black_format = "black ."
-isort_lint = "isort --skip-gitignore --check ."
-isort_format = "isort --skip-gitignore ."
+sort_lint = "ruff check --select I ."
+sort_format = "ruff check --select I --fix ."
 mypy_lint = { cmd ="mypy", depends_on = ["install"]}
 mypy_report = { cmd ="mypy | mypy2junit > mypy-report.xml", depends_on = ["install"]}
 ruff_lint = "ruff check ."
@@ -61,8 +61,8 @@ flopy = "*"
 geopandas = "*"
 graphviz = "*"
 hypothesis = "*"
-isort = "*"
 jinja2 = "*"
+loguru = "*"
 matplotlib = "*"
 mypy = "*"
 netcdf4 = "*"

@@ -84,6 +84,8 @@ class GroundwaterFlowModel(Modflow6Model):
         if clipped_boundary_condition is not None:
             clipped["chd_clipped"] = clipped_boundary_condition
 
+        clipped.purge_empty_packages()
+
         return clipped
 
     def __create_boundary_condition_clipped_boundary(

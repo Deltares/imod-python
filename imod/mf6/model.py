@@ -490,7 +490,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         output_domain = self._get_regridding_domain(target_grid, methods)
         new_model[self._get_diskey()]["idomain"] = output_domain
         new_model._mask_all_packages(output_domain)
-
+        new_model.purge_empty_packages()
         if validate:
             status_info = NestedStatusInfo("Model validation status")
             status_info.add(new_model._validate("Regridded model"))
@@ -509,6 +509,16 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         """
         for pkgname, pkg in self.items():
             self[pkgname] = pkg.mask(domain)
+
+    def purge_empty_packages(self, model_name: Optional[str] = "") -> None:
+        """
+        This function removes empty packages from the model.
+        """
+        empty_packages = [
+            package_name for package_name, package in self.items() if package.is_empty()
+        ]
+        for package_name in empty_packages:
+            self.pop(package_name)
 
     @property
     def domain(self):

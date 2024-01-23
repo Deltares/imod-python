@@ -315,7 +315,12 @@ class Modflow6Simulation(collections.UserDict):
                     f"{result.returncode}, and error message:\n\n{result.stdout.decode()} "
                 )
 
-    def open_head(self, dry_nan: bool = False) -> GridDataArray:
+    def open_head(
+        self,
+        dry_nan: bool = False,
+        simulation_start_time: Optional[np.datetime64] = None,
+        time_unit: Optional[str] = "d",
+    ) -> GridDataArray:
         """
         Open heads of finished simulation, requires that the ``run`` method has
         been called.
@@ -329,6 +334,22 @@ class Modflow6Simulation(collections.UserDict):
         ----------
         dry_nan: bool, default value: False.
             Whether to convert dry values to NaN.
+        simulation_start_time : Optional datetime
+            The time and date correpsonding to the beginning of the simulation.
+            Use this to convert the time coordinates of the output array to
+            calendar time/dates. time_unit must also be present if this argument is present.
+        time_unit: Optional str
+            The time unit MF6 is working in, in string representation.
+            Only used if simulation_start_time was provided.
+            Admissible values are:
+            ns -> nanosecond
+            ms -> microsecond
+            s -> second
+            m -> minute
+            h -> hour
+            d -> day
+            w -> week
+            Units "month" or "year" are not supported, as they do not represent unambiguous timedelta values durations.
 
         Returns
         -------
@@ -345,7 +366,12 @@ class Modflow6Simulation(collections.UserDict):
 
         >>> head = simulation.open_head()
         """
-        return self._open_output("head", dry_nan=dry_nan)
+        return self._open_output(
+            "head",
+            dry_nan=dry_nan,
+            simulation_start_time=simulation_start_time,
+            time_unit=time_unit,
+        )
 
     def open_transport_budget(
         self, species_ls: list[str] = None

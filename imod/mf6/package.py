@@ -22,9 +22,15 @@ from imod.mf6.regridding_utils import (
     RegridderType,
     get_non_grid_data,
 )
+from imod.mf6.utilities.schemata import filter_schemata_dict
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext
-from imod.schemata import ValidationError, ValueSchema
+from imod.schemata import (
+    AllNoDataSchema,
+    EmptyIndexesSchema,
+    ValidationError,
+    ValueSchema,
+)
 from imod.typing import GridDataArray
 
 
@@ -280,6 +286,23 @@ class Package(PackageBase, abc.ABC):
                     except ValidationError as e:
                         errors[variable].append(e)
         return errors
+
+    def is_empty(self) -> bool:
+        """
+        Returns True if the package is empty- for example if it contains only no-data values.
+        """
+
+        # Create schemata dict only containing the
+        # variables with a AllNoDataSchema and EmptyIndexesSchema (in case of
+        # HFB) in the write schemata.
+        allnodata_schemata = filter_schemata_dict(
+            self._write_schemata, (AllNoDataSchema, EmptyIndexesSchema)
+        )
+
+        # Find if packages throws ValidationError for AllNoDataSchema or
+        # EmptyIndexesSchema.
+        allnodata_errors = self._validate(allnodata_schemata)
+        return len(allnodata_errors) > 0
 
     def _validate_init_schemata(self, validate: bool):
         """
@@ -679,6 +702,15 @@ class Package(PackageBase, abc.ABC):
 
         new_package = self.__class__(**new_package_data)
 
+        # set dx and dy if present in target_grid
+        if "dx" in target_grid.coords:
+            new_package.dataset = new_package.dataset.assign_coords(
+                {"dx": target_grid.coords["dx"].values[()]}
+            )
+        if "dy" in target_grid.coords:
+            new_package.dataset = new_package.dataset.assign_coords(
+                {"dy": target_grid.coords["dy"].values[()]}
+            )
         return new_package
 
     def skip_masking_dataarray(self, array_name: str) -> bool:

@@ -1,6 +1,6 @@
 """
-TWRI regridding
-===============
+Diffferent ways to regrid models
+================================
 
 This example focuses on regridding. It uses the TWRI model from modflow6 (`Harbaugh, 2005`_).
 More information about this model can be found in an example dedicated to building this model ( ex01_twri.py)
@@ -47,12 +47,12 @@ heterogeneous_k.sel(layer=1).plot(y="y", yincrease=False, ax=ax)
 # x axis and y axis of  15*5000 = 75000 on both axes, but the new grid that is  75020 on the x axis and  75015 on the y axis
 
 nlay = 3
-nrow = 45
-ncol = 20
+nrow = 21
+ncol = 12
 shape = (nlay, nrow, ncol)
 
-dx = 3751.0
-dy = -1667.0
+dx = 6251
+dy = -3572
 xmin = 0.0
 xmax = dx * ncol
 ymin = 0.0
@@ -76,9 +76,7 @@ new_simulation = simulation.regrid_like("regridded_twri", target_grid=target_gri
 # Let's plot the k-field. This is the regridded output, and it should should somewhat resemble the original k-field plotted earlier.
 regridded_k_1 = new_simulation["GWF_1"]["npf"]["k"]
 fig, ax = plt.subplots()
-
 regridded_k_1.sel(layer=1).plot(y="y", yincrease=False, ax=ax)
-
 # %%
 # A second way to regrid  twri  is to regrid the groundwater flow model.
 

@@ -7,9 +7,7 @@ from imod.mf6.model import Modflow6Model
 from imod.mf6.model_gwf import GroundwaterFlowModel
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.grid import get_active_domain_slice
-from imod.mf6.utilities.schemata import filter_schemata_dict
 from imod.mf6.wel import Well
-from imod.schemata import AllNoDataSchema, EmptyIndexesSchema
 from imod.typing import GridDataArray
 from imod.typing.grid import is_unstructured, ones_like
 
@@ -92,17 +90,8 @@ def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6
 
         sliced_package = sliced_package.mask(new_idomain)
         # The masking can result in packages with AllNoData.Therefore we'll have
-        # to drop these packages. Create schemata dict only containing the
-        # variables with a AllNoDataSchema and EmptyIndexesSchema (in case of
-        # HFB) in the write schemata.
-        allnodata_schemata = filter_schemata_dict(
-            package._write_schemata, (AllNoDataSchema, EmptyIndexesSchema)
-        )
-        # Find if packages throws ValidationError for AllNoDataSchema or
-        # EmptyIndexesSchema.
-        allnodata_errors = sliced_package._validate(allnodata_schemata)
-        # Drop if allnodata error thrown
-        if not allnodata_errors:
+        # to drop these packages.
+        if not sliced_package.is_empty():
             new_model[pkg_name] = sliced_package
         else:
             # TODO: Add this to logger
