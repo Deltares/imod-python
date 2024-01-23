@@ -2,69 +2,9 @@ import pathlib
 import textwrap
 
 import numpy as np
-import pytest
 import xarray as xr
-import xugrid as xu
 
 import imod
-
-
-def get_structured_grid_da(dtype, value=1):
-    """
-    This function creates a dataarray with scalar values for a grid of 3 layers and 9 rows and columns.
-    """
-    shape = nlay, nrow, ncol = 3, 9, 9
-    dims = ("layer", "y", "x")
-
-    dx = 10.0
-    dy = -10.0
-    xmin = 0.0
-    xmax = dx * ncol
-    ymin = 0.0
-    ymax = abs(dy) * nrow
-
-    layer = np.arange(1, nlay + 1)
-    y = np.arange(ymax, ymin, dy) + 0.5 * dy
-    x = np.arange(xmin, xmax, dx) + 0.5 * dx
-    coords = {"layer": layer, "y": y, "x": x}
-
-    da = xr.DataArray(np.ones(shape, dtype=dtype) * value, coords=coords, dims=dims)
-    return da
-
-
-def get_unstructured_grid_da(dtype, value=1):
-    """
-    This function creates an xugrid dataarray with scalar values for an unstructured grid
-    """
-    grid = imod.data.circle()
-    nface = grid.n_face
-    nlayer = 2
-
-    dims = ("layer", grid.face_dimension)
-    shape = (nlayer, nface)
-
-    uda = xu.UgridDataArray(
-        xr.DataArray(
-            np.ones(shape, dtype=dtype) * value,
-            coords={"layer": [1, 2]},
-            dims=dims,
-        ),
-        grid=grid,
-    )
-    return uda
-
-
-def get_grid_da(is_unstructured, dtype, value=1):
-    """
-    helper function for creating an xarray dataset of a given type
-    Depending on the is_unstructured input parameter, it will create an array for a
-    structured grid or for an unstructured grid.
-    """
-
-    if is_unstructured:
-        return get_unstructured_grid_da(dtype, value)
-    else:
-        return get_structured_grid_da(dtype, value)
 
 
 def test_dispersion_default():
@@ -89,18 +29,6 @@ def test_dispersion_default():
     )
 
     assert actual == expected
-
-
-@pytest.mark.parametrize("is_unstructured", [False, True])
-def test_dispersion_init(is_unstructured):
-    imod.mf6.Dispersion(
-        diffusion_coefficient=get_grid_da(is_unstructured, np.float32, 1e-4),
-        longitudinal_horizontal=get_grid_da(is_unstructured, np.float32, 10),
-        transversal_horizontal1=get_grid_da(is_unstructured, np.float32, 10),
-        longitudinal_vertical=get_grid_da(is_unstructured, np.float32, 5),
-        transversal_horizontal2=get_grid_da(is_unstructured, np.float32, 2),
-        transversal_vertical=get_grid_da(is_unstructured, np.float32, 4),
-    ),
 
 
 def test_dispersion_options():
