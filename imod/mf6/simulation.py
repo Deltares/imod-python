@@ -17,7 +17,10 @@ import xarray as xr
 import xugrid as xu
 
 import imod
+import imod.logging
+import imod.mf6.exchangebase
 from imod.mf6.gwfgwf import GWFGWF
+from imod.mf6.gwfgwt import GWFGWT
 from imod.mf6.model import Modflow6Model
 from imod.mf6.model_gwf import GroundwaterFlowModel
 from imod.mf6.model_gwt import GroundwaterTransportModel
@@ -236,6 +239,10 @@ class Modflow6Simulation(collections.UserDict):
             if isinstance(model, Modflow6Model):
                 model._model_checks(key)
 
+        # Generate GWF-GWT exchanges
+        if gwfgwt_exchanges := self._generate_gwfgwt_exchanges():
+            self["gwtgwf_exchanges"] = gwfgwt_exchanges
+
         directory = pathlib.Path(directory)
         directory.mkdir(exist_ok=True, parents=True)
 
@@ -273,7 +280,7 @@ class Modflow6Simulation(collections.UserDict):
                     value.write(key, globaltimes, ims_write_context)
             elif isinstance(value, list):
                 for exchange in value:
-                    if isinstance(exchange, imod.mf6.GWFGWF):
+                    if isinstance(exchange, imod.mf6.exchangebase.ExchangeBase):
                         exchange.write(
                             exchange.packagename(), globaltimes, write_context
                         )
@@ -791,16 +798,10 @@ class Modflow6Simulation(collections.UserDict):
 
     def get_exchange_relationships(self):
         result = []
-        flowmodels = self.get_models_of_type("gwf6")
-        transportmodels = self.get_models_of_type("gwt6")
-        # exchange for flow and transport
-        if len(flowmodels) == 1 and len(transportmodels) > 0:
-            exchange_type = "GWF6-GWT6"
-            modelname_a = list(flowmodels.keys())[0]
-            for counter, key in enumerate(transportmodels.keys()):
-                filename = f"simulation{counter}.exg"
-                modelname_b = key
-                result.append((exchange_type, filename, modelname_a, modelname_b))
+
+        if "gwtgwf_exchanges" in self:
+            for exchange in self["gwtgwf_exchanges"]:
+                result.append(exchange.get_specification())
 
         # exchange for splitting models
         if is_split(self):
@@ -1044,3 +1045,16 @@ class Modflow6Simulation(collections.UserDict):
         else:
             content = attrs + ["){}"]
         return "\n".join(content)
+
+    def _generate_gwfgwt_exchanges(self):
+        flow_models = self.get_models_of_type("gwf6")
+        transport_models = self.get_models_of_type("gwt6")
+
+        # exchange for flow and transport
+        exchanges = []
+        if len(flow_models) == 1 and len(transport_models) > 0:
+            flow_model_name = list(flow_models.keys())[0]
+            for transport_model_name in transport_models.keys():
+                exchanges.append(GWFGWT(flow_model_name, transport_model_name))
+
+        return exchanges
