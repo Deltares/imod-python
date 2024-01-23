@@ -15,7 +15,8 @@ Fixed
 - Fixed bugs with clipping :class:`imod.mf6.HorizontalFlowBarrier` for
   structured grids
 - Improved performance for merging structured multimodel Modflow 6 output
-- ``imod.formats.idf.open_subdomains`` now properly supports custom patterns
+- Bug where :function:`imod.formats.idf.open_subdomains` did not properly support custom
+  patterns
 
 Changed
 ~~~~~~~
