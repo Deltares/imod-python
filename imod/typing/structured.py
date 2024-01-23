@@ -2,7 +2,7 @@
 
 import itertools
 from collections import defaultdict
-from typing import Any, DefaultDict, Dict, List, Sequence, Set, Tuple
+from typing import Any, DefaultDict, Dict, List, Set, Tuple
 
 import dask
 import numpy as np
@@ -11,7 +11,7 @@ import xarray as xr
 # %%
 
 
-def check_dtypes(das: Sequence[xr.DataArray]) -> None:
+def check_dtypes(das: List[xr.DataArray]) -> None:
     """Check whether the dtypes of all arrays are the same."""
     dtypes = set(da.dtype for da in das)
     if len(dtypes) != 1:
@@ -33,7 +33,7 @@ def check_sizes(sizes: DefaultDict[str, Set[int]], attribute: str) -> None:
     return
 
 
-def check_dims(das: Sequence[xr.DataArray]) -> None:
+def check_dims(das: List[xr.DataArray]) -> None:
     all_dims = set(da.dims for da in das)
     if len(all_dims) != 1:
         raise ValueError(
@@ -45,7 +45,7 @@ def check_dims(das: Sequence[xr.DataArray]) -> None:
     check_dim_sizes(das)
 
 
-def check_dim_sizes(das: Sequence[xr.DataArray]) -> None:
+def check_dim_sizes(das: List[xr.DataArray]) -> None:
     """Check whether all non-xy dims are equally sized."""
     sizes = defaultdict(set)
     for da in das:
@@ -55,7 +55,7 @@ def check_dim_sizes(das: Sequence[xr.DataArray]) -> None:
     return
 
 
-def check_coords(das: Sequence[xr.DataArray]):
+def check_coords(das: List[xr.DataArray]):
     def drop_xy(coords) -> Dict[str, Any]:
         coords = dict(coords)
         coords.pop("y")
@@ -75,7 +75,7 @@ def check_coords(das: Sequence[xr.DataArray]):
     return
 
 
-def check_chunk_sizes(das: Sequence[xr.DataArray]) -> None:
+def check_chunk_sizes(das: List[xr.DataArray]) -> None:
     """Check whether all chunks are equal on non-xy dims."""
     chunks = [da.chunks for da in das]
     iterator = (item is None for item in chunks)
@@ -131,7 +131,22 @@ def merge_arrays(
     return out
 
 
-def _merge_partitions(das: Sequence[xr.DataArray]) -> xr.DataArray:
+def _unique_coords(das: List[xr.DataArray], dim: str) -> xr.DataArray:
+    """Collect unique coords in list of dataarrays"""
+    return np.unique(np.concatenate([da.coords[dim].values for da in das]))
+
+
+def _merge_nonequidistant_coords(
+    das: List[xr.DataArray], coordname: str, indices: List[np.ndarray], nsize: int
+):
+    out = np.full((nsize,), np.nan)
+    for da, index in zip(das, indices):
+        coords = da.coords[coordname]
+        out[index : index + coords.size] = coords.values
+    return out
+
+
+def _merge_partitions(das: List[xr.DataArray]) -> xr.DataArray:
     # Do some input checking
     check_dtypes(das)
     check_dims(das)
@@ -139,8 +154,8 @@ def _merge_partitions(das: Sequence[xr.DataArray]) -> xr.DataArray:
     check_coords(das)
 
     # Create the x and y coordinates of the merged grid.
-    x = np.unique(np.concatenate([da.x.values for da in das]))
-    y = np.unique(np.concatenate([da.y.values for da in das]))
+    x = _unique_coords(das, "x")
+    y = _unique_coords(das, "y")
     nrow = y.size
     ncol = x.size
     # Compute the indices for where the different subdomain parts belong
@@ -149,10 +164,15 @@ def _merge_partitions(das: Sequence[xr.DataArray]) -> xr.DataArray:
     iys = [nrow - np.searchsorted(y, da.y.values[0], side="right") for da in das]
     yx_shape = (nrow, ncol)
 
+    # Collect coordinates
     first = das[0]
     coords = dict(first.coords)
     coords["x"] = x
     coords["y"] = y[::-1]
+    if "dx" in first.coords:
+        coords["dx"] = ("x", _merge_nonequidistant_coords(das, "dx", ixs, ncol))
+    if "dy" in first.coords:
+        coords["dy"] = ("y", _merge_nonequidistant_coords(das, "dy", iys, nrow)[::-1])
 
     arrays = [da.data for da in das]
     if first.chunks is None:
@@ -208,7 +228,7 @@ def _merge_partitions(das: Sequence[xr.DataArray]) -> xr.DataArray:
 
 
 def merge_partitions(
-    das: Sequence[xr.DataArray | xr.Dataset],
+    das: List[xr.DataArray | xr.Dataset],
 ) -> xr.Dataset:
     first_item = das[0]
     if isinstance(first_item, xr.Dataset):

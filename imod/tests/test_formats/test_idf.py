@@ -51,8 +51,17 @@ def dxdy(equidistant: bool):
     if equidistant:
         dx, dy = (1.0, -1.0)
     else:
-        dy = np.array([-0.5, -1.5, -0.5, -1.5])
-        dx = np.array([1.0, 1.0, 1.0, 1.0, 1.0])
+        dy = np.array([-0.5, -1.5] * 2)
+        dx = np.array([1.0] * 5)
+    return dx, dy
+
+
+def dxdy_full(equidistant: bool):
+    if equidistant:
+        dx, dy = (1.0, -1.0)
+    else:
+        dy = np.array([-0.5, -1.5] * 3)
+        dx = np.array([1.0] * 8)
     return dx, dy
 
 
@@ -138,7 +147,7 @@ def test_open_subdomains(subdomains, expected, equidistant, tmp_path):
 
     da = idf.open_subdomains(tmp_path / "subdomains_*.idf").load()
 
-    dx, dy = dxdy(equidistant)
+    dx, dy = dxdy_full(equidistant)
     expected_coords = util._xycoords((0.0, 8.0, 0.0, 6.0), (dx, dy))
 
     assert da.dims == ("time", "layer", "y", "x")
@@ -178,7 +187,7 @@ def test_open_subdomains_species(subdomains, expected, equidistant, tmp_path):
 
     da = idf.open_subdomains(tmp_path / "subdomains_*.idf", pattern=pattern).load()
 
-    dx, dy = dxdy(equidistant)
+    dx, dy = dxdy_full(equidistant)
     expected_coords = util._xycoords((0.0, 8.0, 0.0, 6.0), (dx, dy))
 
     assert da.dims == ("species", "time", "layer", "y", "x")
