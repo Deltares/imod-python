@@ -19,11 +19,15 @@ def check_dtypes(das: List[xr.DataArray]) -> None:
     return
 
 
+def _is_nonunique_dimsize(sizes: Set[int]) -> bool:
+    return len(sizes) != 1
+
+
 def check_sizes(sizes: DefaultDict[str, Set[int]], attribute: str) -> None:
     """Utility for checking a dict of dimension names and sizes. Skips x and y."""
     sizes.pop("x", None)
     sizes.pop("y", None)
-    conflicting = {k: v for k, v in sizes.items() if len(v) != 1}
+    conflicting = {k: v for k, v in sizes.items() if _is_nonunique_dimsize(v)}
     if conflicting:
         message = (
             f"DataArrays do not match in {attribute} along dimension(s):\n"
