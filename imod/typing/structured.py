@@ -120,7 +120,7 @@ def merge_arrays(
     """
     first = arrays[0]
     shape = first.shape[:-2] + yx_shape
-    out = np.full(shape, np.nan)
+    out = np.full(shape, np.nan, dtype=first.dtype)
     for a, ix, iy in zip(arrays, ixs, iys):
         ysize, xsize = a.shape[-2:]
         # Create view of partition, see:
@@ -139,7 +139,8 @@ def _unique_coords(das: List[xr.DataArray], dim: str) -> xr.DataArray:
 def _merge_nonequidistant_coords(
     das: List[xr.DataArray], coordname: str, indices: List[np.ndarray], nsize: int
 ):
-    out = np.full((nsize,), np.nan)
+    dtype = das[0].coords[coordname].dtype
+    out = np.full((nsize,), np.nan, dtype=dtype)
     for da, index in zip(das, indices):
         coords = da.coords[coordname]
         out[index : index + coords.size] = coords.values
