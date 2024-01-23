@@ -244,7 +244,7 @@ def merge_partitions(
         return xr.merge(merged_ls)
     elif isinstance(first_item, xr.DataArray):
         # Store name to rename after concatenation
-        name = das[0].name
+        name = first_item.name
         return _merge_partitions(das).to_dataset(name=name)
     else:
         raise TypeError(
