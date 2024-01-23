@@ -14,8 +14,8 @@ consisting of layer, row, and column, closely resembling input for Modflow6.
 
 import numpy as np
 
+from imod.mf6.auxiliary_variables import add_periodic_auxiliary_variable
 from imod.mf6.boundary_condition import BoundaryCondition
-from imod.mf6.pkgbase import pkg_init
 from imod.schemata import DTypeSchema
 
 # FUTURE: There was an idea to autogenerate modflow 6 adapters.
@@ -47,7 +47,6 @@ class Mf6Wel(BoundaryCondition):
     }
     _write_schemata = {}
 
-    @pkg_init(exclude_in_dataset=["validate"])
     def __init__(
         self,
         cellid,
@@ -56,6 +55,14 @@ class Mf6Wel(BoundaryCondition):
         concentration_boundary_type="aux",
         validate: bool = True,
     ):
+        super().__init__()
+        self.dataset["cellid"] = cellid
+        self.dataset["rate"] = rate
+
+        if concentration is not None:
+            self.dataset["concentration"] = concentration
+            self.dataset["concentration_boundary_type"] = concentration_boundary_type
+            add_periodic_auxiliary_variable(self)
         self._validate_init_schemata(validate)
 
     def _ds_to_arrdict(self, ds):

@@ -9,6 +9,7 @@ import xarray as xr
 import xugrid as xu
 from numpy import ndarray
 
+from imod.mf6.auxiliary_variables import add_periodic_auxiliary_variable
 from imod.mf6.boundary_condition import (
     BoundaryCondition,
     DisStructuredBoundaryCondition,
@@ -16,7 +17,6 @@ from imod.mf6.boundary_condition import (
 )
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.mf6_wel_adapter import Mf6Wel
-from imod.mf6.pkgbase import pkg_init
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.write_context import WriteContext
@@ -146,17 +146,6 @@ class Well(BoundaryCondition, IPointDataPackage):
 
     _regrid_method = {}
 
-    @pkg_init(
-        exclude_in_dataset=[
-            "screen_top",
-            "screen_bottom",
-            "y",
-            "x",
-            "rate",
-            "id",
-            "validate",
-        ]
-    )
     def __init__(
         self,
         x,
@@ -176,6 +165,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         validate: bool = True,
         repeat_stress=None,
     ):
+        super().__init__()
         self.dataset["screen_top"] = _assign_dims(screen_top)
         self.dataset["screen_bottom"] = _assign_dims(screen_bottom)
         self.dataset["y"] = _assign_dims(y)
@@ -184,6 +174,17 @@ class Well(BoundaryCondition, IPointDataPackage):
         if id is None:
             id = np.arange(self.dataset["x"].size).astype(str)
         self.dataset["id"] = _assign_dims(id)
+        self.dataset["minimum_k"] = minimum_k
+        self.dataset["minimum_thickness"] = minimum_thickness
+
+        self.dataset["print_input"] = print_input
+        self.dataset["print_flows"] = print_flows
+        self.dataset["save_flows"] = save_flows
+        self.dataset["observations"] = observations
+        self.dataset["repeat_stress"] = repeat_stress
+        if concentration is not None:
+            self.dataset["concentration"] = concentration
+            self.dataset["concentration_boundary_type"] = concentration_boundary_type
 
         self._validate_init_schemata(validate)
 
@@ -597,7 +598,6 @@ class WellDisStructured(DisStructuredBoundaryCondition):
 
     _write_schemata = {}
 
-    @pkg_init(exclude_in_dataset=["layer", "row", "column", "rate"])
     def __init__(
         self,
         layer,
@@ -613,10 +613,21 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         validate: bool = True,
         repeat_stress=None,
     ):
+        super().__init__()
         self.dataset["layer"] = _assign_dims(layer)
         self.dataset["row"] = _assign_dims(row)
         self.dataset["column"] = _assign_dims(column)
         self.dataset["rate"] = _assign_dims(rate)
+        self.dataset["print_input"] = print_input
+        self.dataset["print_flows"] = print_flows
+        self.dataset["save_flows"] = save_flows
+        self.dataset["observations"] = observations
+        self.dataset["repeat_stress"] = repeat_stress
+
+        if concentration is not None:
+            self.dataset["concentration"] = concentration
+            self.dataset["concentration_boundary_type"] = concentration_boundary_type
+            add_periodic_auxiliary_variable(self)
 
         self._validate_init_schemata(validate)
 
@@ -742,7 +753,6 @@ class WellDisVertices(DisVerticesBoundaryCondition):
 
     _write_schemata = {}
 
-    @pkg_init(exclude_in_dataset=["layer", "cell2d", "rate"])
     def __init__(
         self,
         layer,
@@ -760,6 +770,15 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         self.dataset["layer"] = _assign_dims(layer)
         self.dataset["cell2d"] = _assign_dims(cell2d)
         self.dataset["rate"] = _assign_dims(rate)
+        self.dataset["print_input"] = print_input
+        self.dataset["print_flows"] = print_flows
+        self.dataset["save_flows"] = save_flows
+        self.dataset["observations"] = observations
+
+        if concentration is not None:
+            self.dataset["concentration"] = concentration
+            self.dataset["concentration_boundary_type"] = concentration_boundary_type
+            add_periodic_auxiliary_variable(self)
 
         self._validate_init_schemata(validate)
 

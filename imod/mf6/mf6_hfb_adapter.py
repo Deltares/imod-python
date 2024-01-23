@@ -5,7 +5,6 @@ import numpy as np
 import xarray as xr
 
 from imod.mf6.boundary_condition import BoundaryCondition
-from imod.mf6.pkgbase import pkg_init
 from imod.mf6.write_context import WriteContext
 from imod.schemata import (
     AnyValueSchema,
@@ -107,7 +106,6 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
-    @pkg_init(exclude_in_dataset=["validate"])
     def __init__(
         self,
         cell_id1: xr.DataArray,
@@ -117,7 +115,12 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
         print_input: Union[bool, xr.DataArray] = False,
         validate: Union[bool, xr.DataArray] = True,
     ):
-        pass
+        super().__init__(locals())
+        self.dataset["cell_id1"] = cell_id1
+        self.dataset["cell_id2"] = cell_id2
+        self.dataset["layer"] = layer
+        self.dataset["hydraulic_characteristic"] = hydraulic_characteristic
+        self.dataset["print_input"] = print_input
 
     def _get_bin_ds(self):
         bin_ds = self.dataset[

@@ -1,7 +1,6 @@
 import numpy as np
 
 from imod.mf6.package import Package
-from imod.mf6.pkgbase import pkg_init
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
@@ -185,7 +184,6 @@ class ImmobileStorageTransfer(Package):
         ],
     }
 
-    @pkg_init(exclude_in_dataset=["validate", "budgetbinfile"])
     def __init__(
         self,
         initial_immobile_concentration,
@@ -229,5 +227,25 @@ class ImmobileStorageTransfer(Package):
                         "provided.",
                     )
 
+        super().__init__(locals())
+        self.dataset["initial_immobile_concentration"] = initial_immobile_concentration
+        self.dataset[
+            "mobile_immobile_mass_transfer_rate"
+        ] = mobile_immobile_mass_transfer_rate
+        self.dataset["immobile_porosity"] = immobile_porosity
+        self.dataset["decay"] = decay
+        self.dataset["decay_sorbed"] = decay_sorbed
+        self.dataset["bulk_density"] = bulk_density
+        self.dataset["distribution_coefficient"] = distribution_coefficient
+        self.dataset["save_flows"] = save_flows
         self.dataset["budgetfile"] = budgetbinfile
+        self.dataset["budgetcsvfile"] = budgetcsvfile
+        self.dataset["sorption"] = sorption
+        self.dataset["first_order_decay"] = first_order_decay
+        self.dataset["zero_order_decay"] = zero_order_decay
+        self.dataset["cimfile"] = cimfile
+        self.dataset["columns "] = columns
+        self.dataset["width"] = width
+        self.dataset["digits"] = digits
+        self.dataset["format"] = format
         self._validate_init_schemata(validate)

@@ -117,7 +117,7 @@ def create_instance_packages(is_unstructured):
     """
     return [
         imod.mf6.Dispersion(
-            get_grid_da(is_unstructured, np.float32, 1e-4),
+            diffusion_coefficient=get_grid_da(is_unstructured, np.float32, 1e-4),
             longitudinal_horizontal=get_grid_da(is_unstructured, np.float32, 10),
             transversal_horizontal1=get_grid_da(is_unstructured, np.float32, 10),
             longitudinal_vertical=get_grid_da(is_unstructured, np.float32, 5),

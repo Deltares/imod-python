@@ -6,7 +6,7 @@ from typing import List, Union
 import numpy as np
 
 from imod.mf6.package import Package
-from imod.mf6.pkgbase import pkg_init
+from imod.mf6.utilities.dataset import is_dataarray_none
 from imod.mf6.write_context import WriteContext
 from imod.schemata import DTypeSchema
 
@@ -81,7 +81,6 @@ class OutputControl(Package):
     _write_schemata = {}
     _regrid_method = {}
 
-    @pkg_init(exclude_in_dataset=["validate"])
     def __init__(
         self,
         save_head=None,
@@ -92,9 +91,23 @@ class OutputControl(Package):
         concentration_file=None,
         validate: bool = True,
     ):
+        super().__init__()
+
+        save_concentration = (
+            None if is_dataarray_none(save_concentration) else save_concentration
+        )
+        save_head = None if is_dataarray_none(save_head) else save_head
+        save_budget = None if is_dataarray_none(save_budget) else save_budget
+
         if save_head is not None and save_concentration is not None:
             raise ValueError("save_head and save_concentration cannot both be defined.")
 
+        self.dataset["save_head"] = save_head
+        self.dataset["save_concentration"] = save_concentration
+        self.dataset["save_budget"] = save_budget
+        self.dataset["head_file"] = head_file
+        self.dataset["budget_file"] = budget_file
+        self.dataset["concentration_file"] = concentration_file
         self._validate_init_schemata(validate)
 
     def _get_ocsetting(self, setting):

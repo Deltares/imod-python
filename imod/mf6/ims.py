@@ -2,7 +2,6 @@ import numpy as np
 import xarray as xr
 
 from imod.mf6.package import Package
-from imod.mf6.pkgbase import pkg_init
 from imod.schemata import DTypeSchema
 
 
@@ -364,7 +363,6 @@ class Solution(Package):
     }
     _template = Package._initialize_template(_pkg_id)
 
-    @pkg_init(exclude_in_dataset=["validate", "modelnames"])
     def __init__(
         self,
         modelnames,
@@ -395,11 +393,38 @@ class Solution(Package):
         no_ptc=False,
         validate: bool = True,
     ):
+        super().__init__()
+        self.dataset = xr.Dataset()
         # Make sure the modelnames are set as a variable rather than dimension:
         if isinstance(modelnames, xr.DataArray):
             self.dataset["modelnames"] = modelnames
         else:
             self.dataset["modelnames"] = ("model", modelnames)
+        self.dataset["outer_dvclose"] = outer_dvclose
+        self.dataset["outer_maximum"] = outer_maximum
+        self.dataset["under_relaxation"] = under_relaxation
+        self.dataset["under_relaxation_theta"] = under_relaxation_theta
+        self.dataset["under_relaxation_kappa"] = under_relaxation_kappa
+        self.dataset["under_relaxation_gamma"] = under_relaxation_gamma
+        self.dataset["under_relaxation_momentum"] = under_relaxation_momentum
+        self.dataset["backtracking_number"] = backtracking_number
+        self.dataset["backtracking_tolerance"] = backtracking_tolerance
+        self.dataset["backtracking_reduction_factor"] = backtracking_reduction_factor
+        self.dataset["backtracking_residual_limit"] = backtracking_residual_limit
+        self.dataset["inner_maximum"] = inner_maximum
+        self.dataset["inner_dvclose"] = inner_dvclose
+        self.dataset["inner_rclose"] = inner_rclose
+        self.dataset["rclose_option"] = rclose_option
+        self.dataset["linear_acceleration"] = linear_acceleration
+        self.dataset["relaxation_factor"] = relaxation_factor
+        self.dataset["preconditioner_levels"] = preconditioner_levels
+        self.dataset["preconditioner_drop_tolerance"] = preconditioner_drop_tolerance
+        self.dataset["number_orthogonalizations"] = number_orthogonalizations
+        self.dataset["scaling_method"] = scaling_method
+        self.dataset["reordering_method"] = reordering_method
+        self.dataset["print_option"] = print_option
+        self.dataset["csv_output"] = csv_output
+        self.dataset["no_ptc"] = no_ptc
         self._validate_init_schemata(validate)
 
 

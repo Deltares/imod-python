@@ -1,7 +1,7 @@
 import numpy as np
 
+from imod.mf6.auxiliary_variables import add_periodic_auxiliary_variable
 from imod.mf6.boundary_condition import BoundaryCondition
-from imod.mf6.pkgbase import pkg_init
 from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
@@ -114,7 +114,6 @@ class ConstantHead(BoundaryCondition):
         "concentration": (RegridderType.OVERLAP, "mean"),
     }
 
-    @pkg_init(exclude_in_dataset=["validate"])
     def __init__(
         self,
         head,
@@ -127,6 +126,17 @@ class ConstantHead(BoundaryCondition):
         validate: bool = True,
         repeat_stress=None,
     ):
+        super().__init__(locals())
+        self.dataset["head"] = head
+        if concentration is not None:
+            self.dataset["concentration"] = concentration
+            self.dataset["concentration_boundary_type"] = concentration_boundary_type
+            add_periodic_auxiliary_variable(self)
+        self.dataset["print_input"] = print_input
+        self.dataset["print_flows"] = print_flows
+        self.dataset["save_flows"] = save_flows
+        self.dataset["observations"] = observations
+        self.dataset["repeat_stress"] = repeat_stress
         self._validate_init_schemata(validate)
 
     def _validate(self, schemata, **kwargs):

@@ -1,10 +1,10 @@
 from typing import Dict, Optional, Tuple
 
+import numpy as np
 import xarray as xr
 
 from imod.mf6.auxiliary_variables import add_periodic_auxiliary_variable
 from imod.mf6.package import Package
-from imod.mf6.pkgbase import pkg_init
 
 
 class GWFGWF(Package):
@@ -19,7 +19,6 @@ class GWFGWF(Package):
     _pkg_id = "gwfgwf"
     _template = Package._initialize_template(_pkg_id)
 
-    @pkg_init(exclude_in_dataset=["angldegx", "cdist"])
     def __init__(
         self,
         model_id1: str,
@@ -33,7 +32,16 @@ class GWFGWF(Package):
         angldegx: Optional[xr.DataArray] = None,
         cdist: Optional[xr.DataArray] = None,
     ):
-        self.dataset["ihc"] = xr.ones_like(self.dataset["cl1"], dtype=int)
+        super().__init__(locals())
+        self.dataset["cell_id1"] = cell_id1
+        self.dataset["cell_id2"] = cell_id2
+        self.dataset["layer"] = layer
+        self.dataset["model_name_1"] = model_id1
+        self.dataset["model_name_2"] = model_id2
+        self.dataset["ihc"] = xr.DataArray(np.ones_like(cl1, dtype=int))
+        self.dataset["cl1"] = cl1
+        self.dataset["cl2"] = cl2
+        self.dataset["hwva"] = hwva
 
         auxiliary_variables = [var for var in [angldegx, cdist] if var is not None]
         if auxiliary_variables:

@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 
 from imod.mf6.package import Package
-from imod.mf6.pkgbase import pkg_init
 from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import DisBottomSchema
 from imod.mf6.write_context import WriteContext
@@ -72,8 +71,11 @@ class VerticesDiscretization(Package):
 
     _skip_mask_arrays = ["bottom", "idomain"]
 
-    @pkg_init(exclude_in_dataset=["validate"])
     def __init__(self, top, bottom, idomain, validate: bool = True):
+        super().__init__(locals())
+        self.dataset["idomain"] = idomain
+        self.dataset["top"] = top
+        self.dataset["bottom"] = bottom
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, binary):

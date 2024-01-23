@@ -15,6 +15,10 @@ class Advection(Package):
     _pkg_id = "adv"
     _template = Package._initialize_template(_pkg_id)
 
+    def __init__(self, scheme):
+        super().__init__()
+        self.dataset["scheme"] = scheme
+
     def render(self, directory, pkgname, globaltimes, binary):
         scheme = self.dataset["scheme"].item()
         return self._template.render({"scheme": scheme})
@@ -28,8 +32,7 @@ class AdvectionUpstream(Advection):
     """
 
     def __init__(self):
-        super().__init__()
-        self.dataset["scheme"] = "upstream"
+        super().__init__(scheme="upstream")
 
 
 class AdvectionCentral(Advection):
@@ -44,8 +47,7 @@ class AdvectionCentral(Advection):
     """
 
     def __init__(self):
-        super().__init__()
-        self.dataset["scheme"] = "central"
+        super().__init__(scheme="central")
 
 
 class AdvectionTVD(Advection):
@@ -55,5 +57,4 @@ class AdvectionTVD(Advection):
     """
 
     def __init__(self):
-        super().__init__()
-        self.dataset["scheme"] = "TVD"
+        super().__init__(scheme="TVD")

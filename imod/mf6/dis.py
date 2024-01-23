@@ -4,7 +4,6 @@ import numpy as np
 
 import imod
 from imod.mf6.package import Package
-from imod.mf6.pkgbase import pkg_init
 from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import DisBottomSchema
 from imod.schemata import (
@@ -91,8 +90,11 @@ class StructuredDiscretization(Package):
 
     _skip_mask_arrays = ["bottom", "idomain"]
 
-    @pkg_init(exclude_in_dataset=["validate"])
     def __init__(self, top, bottom, idomain, validate: bool = True):
+        super(__class__, self).__init__(locals())
+        self.dataset["idomain"] = idomain
+        self.dataset["top"] = top
+        self.dataset["bottom"] = bottom
         self._validate_init_schemata(validate)
 
     def _delrc(self, dx):

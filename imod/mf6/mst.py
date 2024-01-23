@@ -1,7 +1,6 @@
 import numpy as np
 
 from imod.mf6.package import Package
-from imod.mf6.pkgbase import pkg_init
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
@@ -96,7 +95,6 @@ class MobileStorageTransfer(Package):
         "sp2": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),
     }
 
-    @pkg_init(exclude_in_dataset=["validate"])
     def __init__(
         self,
         porosity,
@@ -115,4 +113,15 @@ class MobileStorageTransfer(Package):
             raise ValueError(
                 "zero_order_decay and first_order_decay may not both be True"
             )
+        super().__init__(locals())
+        self.dataset["porosity"] = porosity
+        self.dataset["decay"] = decay
+        self.dataset["decay_sorbed"] = decay_sorbed
+        self.dataset["bulk_density"] = bulk_density
+        self.dataset["distcoef"] = distcoef
+        self.dataset["sp2"] = sp2
+        self.dataset["save_flows"] = save_flows
+        self.dataset["sorption"] = sorption
+        self.dataset["zero_order_decay"] = zero_order_decay
+        self.dataset["first_order_decay"] = first_order_decay
         self._validate_init_schemata(validate)

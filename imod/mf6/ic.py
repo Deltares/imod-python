@@ -3,7 +3,6 @@ import warnings
 import numpy as np
 
 from imod.mf6.package import Package
-from imod.mf6.pkgbase import pkg_init
 from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import DTypeSchema, IdentityNoDataSchema, IndexesSchema
@@ -67,8 +66,8 @@ class InitialConditions(Package):
         ),  # TODO set to barycentric once supported
     }
 
-    @pkg_init(exclude_in_dataset=["head", "validate"])
     def __init__(self, start=None, head=None, validate: bool = True):
+        super().__init__(locals())
         if start is None:
             start = head
             warnings.warn(
@@ -77,11 +76,11 @@ class InitialConditions(Package):
             )
             if head is None:
                 raise ValueError("start and head arguments cannot both be None")
-            self.dataset["start"] = start
         else:
             if head is not None:
                 raise ValueError("start and head arguments cannot both be defined")
 
+        self.dataset["start"] = start
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):
