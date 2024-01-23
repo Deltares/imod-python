@@ -1159,7 +1159,9 @@ def replace(da: xr.DataArray, to_replace: Any, value: Any) -> xr.DataArray:
     )
 
 
-def values_within_range(da, min: Optional[float] = None, max: Optional[float] = None):
+def values_within_range(
+    da: xr.DataArray, min: Optional[float] = None, max: Optional[float] = None
+) -> xr.DataArray | bool:
     """
     Find which values are within range.
     Function checks which values are unaffected by the clip method, to

@@ -28,8 +28,8 @@ from imod.mf6.write_context import WriteContext
 from imod.schemata import (
     AllNoDataSchema,
     EmptyIndexesSchema,
+    SchemaType,
     ValidationError,
-    ValueSchema,
 )
 from imod.typing import GridDataArray
 
@@ -48,8 +48,8 @@ class Package(PackageBase, abc.ABC):
     """
 
     _pkg_id = ""
-    _init_schemata: Dict[str, List[ValueSchema] | Tuple[ValueSchema]] = {}
-    _write_schemata: Dict[str, List[ValueSchema] | Tuple[ValueSchema]] = {}
+    _init_schemata: Dict[str, List[SchemaType] | Tuple[SchemaType]] = {}
+    _write_schemata: Dict[str, List[SchemaType] | Tuple[SchemaType]] = {}
     _keyword_map: Dict[str, str] = {}
 
     def __init__(self, allargs=None):
