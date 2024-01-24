@@ -2,11 +2,11 @@ from contextlib import nullcontext as does_not_raise
 
 import pytest
 
-from imod.mf6.exchangebase import ExchangeBase, ExchangeType
+from imod.mf6.exchangebase import ExchangeBase, _pkg_id_to_type
 
 
 class DummyExchange(ExchangeBase):
-    _exchange_type = ExchangeType.GWFGWT
+    _pkg_id = "gwfgwt"
 
     def __init__(self, model_id1: str = None, model_id2: str = None):
         super().__init__()
@@ -63,7 +63,7 @@ def test_get_specification():
     ) = exchange.get_specification()
 
     # Assert
-    assert spec_exchange_type is DummyExchange._exchange_type.value
+    assert spec_exchange_type is _pkg_id_to_type[DummyExchange._pkg_id]
     assert model_name1 in spec_filename
     assert model_name2 in spec_filename
     assert DummyExchange._pkg_id in spec_filename
