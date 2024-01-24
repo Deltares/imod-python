@@ -38,6 +38,7 @@ examples = { cmd = [
     "--verbose",
     "--junitxml=examples_report.xml",
 ], depends_on = ["install"], cwd = "imod/tests" }
+pypi-publish = { cmd = "rm --recursive --force dist && python -m build && twine check dist/* && twine upload dist/*" }
 
 black_lint = "black --check ."
 black_format = "black ."
@@ -99,6 +100,7 @@ vtk = { version = ">=9.0", build = "*qt*", channel = "conda-forge" }
 xarray = ">=2023.04.0"
 xugrid = ">=0.6.4"
 zarr = "*"
+build = "*"
 
 [pypi-dependencies]
 mypy2junit = "*"
