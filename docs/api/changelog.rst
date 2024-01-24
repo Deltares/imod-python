@@ -25,6 +25,11 @@ Changed
   advice doing development installations with pixi from now on. `See the
   documentation. <https://deltares.github.io/imod-python/installation.html>`_
 
+Added
+~~~~~
+- Added support for coupling a GroundwaterFlowModel and Transport Model i.c.w.
+  the 6.4.3 release of MODFLOW. Using an older version of iMOD Python
+  with this version of MODFLOW will result in an error.
 
 [0.15.1] - 2023-12-22
 ---------------------
