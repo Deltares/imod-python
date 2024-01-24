@@ -9,7 +9,6 @@ import xarray as xr
 import xugrid as xu
 from numpy import ndarray
 
-from imod.mf6.auxiliary_variables import add_periodic_auxiliary_variable
 from imod.mf6.boundary_condition import (
     BoundaryCondition,
     DisStructuredBoundaryCondition,
@@ -165,27 +164,27 @@ class Well(BoundaryCondition, IPointDataPackage):
         validate: bool = True,
         repeat_stress=None,
     ):
-        super().__init__()
-        self.dataset["screen_top"] = _assign_dims(screen_top)
-        self.dataset["screen_bottom"] = _assign_dims(screen_bottom)
-        self.dataset["y"] = _assign_dims(y)
-        self.dataset["x"] = _assign_dims(x)
-        self.dataset["rate"] = _assign_dims(rate)
         if id is None:
             id = np.arange(self.dataset["x"].size).astype(str)
-        self.dataset["id"] = _assign_dims(id)
-        self.dataset["minimum_k"] = minimum_k
-        self.dataset["minimum_thickness"] = minimum_thickness
 
-        self.dataset["print_input"] = print_input
-        self.dataset["print_flows"] = print_flows
-        self.dataset["save_flows"] = save_flows
-        self.dataset["observations"] = observations
-        self.dataset["repeat_stress"] = repeat_stress
-        if concentration is not None:
-            self.dataset["concentration"] = concentration
-            self.dataset["concentration_boundary_type"] = concentration_boundary_type
-
+        dict_dataset = {
+            "screen_top": _assign_dims(screen_top),
+            "screen_bottom": _assign_dims(screen_bottom),
+            "y": _assign_dims(y),
+            "x": _assign_dims(x),
+            "rate": _assign_dims(rate),
+            "id": _assign_dims(id),
+            "minimum_k": minimum_k,
+            "minimum_thickness": minimum_thickness,
+            "print_input": print_input,
+            "print_flows": print_flows,
+            "save_flows": save_flows,
+            "observations": observations,
+            "repeat_stress": repeat_stress,
+            "concentration": concentration,
+            "concentration_boundary_type": concentration_boundary_type,
+        }
+        super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
     @classmethod
@@ -613,22 +612,20 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         validate: bool = True,
         repeat_stress=None,
     ):
-        super().__init__()
-        self.dataset["layer"] = _assign_dims(layer)
-        self.dataset["row"] = _assign_dims(row)
-        self.dataset["column"] = _assign_dims(column)
-        self.dataset["rate"] = _assign_dims(rate)
-        self.dataset["print_input"] = print_input
-        self.dataset["print_flows"] = print_flows
-        self.dataset["save_flows"] = save_flows
-        self.dataset["observations"] = observations
-        self.dataset["repeat_stress"] = repeat_stress
-
-        if concentration is not None:
-            self.dataset["concentration"] = concentration
-            self.dataset["concentration_boundary_type"] = concentration_boundary_type
-            add_periodic_auxiliary_variable(self)
-
+        dict_dataset = {
+            "layer": _assign_dims(layer),
+            "row": _assign_dims(row),
+            "column": _assign_dims(column),
+            "rate": _assign_dims(rate),
+            "print_input": print_input,
+            "print_flows": print_flows,
+            "save_flows": save_flows,
+            "observations": observations,
+            "repeat_stress": repeat_stress,
+            "concentration": concentration,
+            "concentration_boundary_type": concentration_boundary_type,
+        }
+        super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
         warnings.warn(
@@ -766,20 +763,18 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         observations=None,
         validate: bool = True,
     ):
-        super().__init__()
-        self.dataset["layer"] = _assign_dims(layer)
-        self.dataset["cell2d"] = _assign_dims(cell2d)
-        self.dataset["rate"] = _assign_dims(rate)
-        self.dataset["print_input"] = print_input
-        self.dataset["print_flows"] = print_flows
-        self.dataset["save_flows"] = save_flows
-        self.dataset["observations"] = observations
-
-        if concentration is not None:
-            self.dataset["concentration"] = concentration
-            self.dataset["concentration_boundary_type"] = concentration_boundary_type
-            add_periodic_auxiliary_variable(self)
-
+        dict_dataset = {
+            "layer": _assign_dims(layer),
+            "cell2d": _assign_dims(cell2d),
+            "rate": _assign_dims(rate),
+            "print_input": print_input,
+            "print_flows": print_flows,
+            "save_flows": save_flows,
+            "observations": observations,
+            "concentration": concentration,
+            "concentration_boundary_type": concentration_boundary_type,
+        }
+        super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
         warnings.warn(

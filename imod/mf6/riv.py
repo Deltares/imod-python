@@ -1,7 +1,6 @@
 import numpy as np
 
 from imod.mf6.boundary_condition import BoundaryCondition
-from imod.mf6.pkgbase import pkg_init
 from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
@@ -156,7 +155,7 @@ class River(BoundaryCondition):
             "observations": observations,
             "repeat_stress": repeat_stress,
         }
-        super(type(self), self).__init__(dict_dataset)
+        super().__init__(dict_dataset)
 
         self._validate_init_schemata(validate)
 

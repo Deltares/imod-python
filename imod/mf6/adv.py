@@ -16,8 +16,8 @@ class Advection(Package):
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, scheme):
-        super().__init__()
-        self.dataset["scheme"] = scheme
+        dict_dataset = {"scheme": scheme}
+        super().__init__(dict_dataset)
 
     def render(self, directory, pkgname, globaltimes, binary):
         scheme = self.dataset["scheme"].item()

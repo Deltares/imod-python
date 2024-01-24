@@ -31,8 +31,8 @@ class LakeApi_Base(PackageBase):
     Base class for lake and outlet object.
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, allargs):
+        super().__init__(allargs)
 
 
 class LakeData(LakeApi_Base):
@@ -98,25 +98,20 @@ class LakeData(LakeApi_Base):
         auxiliary=None,
         lake_table=None,
     ):
-        super().__init__()
-        self.dataset["starting_stage"] = starting_stage
-        self.dataset["boundname"] = boundname
-        self.dataset["connection_type"] = (connection_type.dims, connection_type.values)
-        self.dataset["bed_leak"] = (bed_leak.dims, bed_leak.values)
-        self.dataset["top_elevation"] = (top_elevation.dims, top_elevation.values)
-        self.dataset["bottom_elevation"] = (bot_elevation.dims, bot_elevation.values)
-        self.dataset["connection_length"] = (
-            connection_length.dims,
-            connection_length.values,
-        )
-        self.dataset["connection_width"] = (
-            connection_width.dims,
-            connection_width.values,
-        )
-        self.dataset["lake_table"] = lake_table
+        dict_dataset = {
+            "starting_stage": starting_stage,
+            "boundname": boundname,
+            "connection_type": (connection_type.dims, connection_type.values),
+            "bed_leak": (bed_leak.dims, bed_leak.values),
+            "top_elevation": (top_elevation.dims, top_elevation.values),
+            "bottom_elevation": (bot_elevation.dims, bot_elevation.values),
+            "connection_length": (connection_length.dims, connection_length.values),
+            "connection_width": (connection_width.dims, connection_width.values),
+            "lake_table": lake_table,
+        }
+        super().__init__(dict_dataset)
 
         # timeseries data
-
         times = []
         timeseries_dict = {
             "status": status,
@@ -153,15 +148,8 @@ class OutletBase(LakeApi_Base):
 
     timeseries_names = ["rate", "invert", "rough", "width", "slope"]
 
-    def __init__(self, lakein: str, lakeout: str):
-        super().__init__()
-        self.dataset = xr.Dataset()
-        self.dataset["lakein"] = lakein
-        self.dataset["lakeout"] = lakeout
-        self.dataset["invert"] = None
-        self.dataset["width"] = None
-        self.dataset["roughness"] = None
-        self.dataset["slope"] = None
+    def __init__(self, allargs):
+        super().__init__(allargs)
 
 
 class OutletManning(OutletBase):
@@ -181,11 +169,15 @@ class OutletManning(OutletBase):
         roughness,
         slope,
     ):
-        super().__init__(lakein, lakeout)
-        self.dataset["invert"] = invert
-        self.dataset["width"] = width
-        self.dataset["roughness"] = roughness
-        self.dataset["slope"] = slope
+        dict_dataset = {
+            "lakein": lakein,
+            "lakeout": lakeout,
+            "invert": invert,
+            "width": width,
+            "roughness": roughness,
+            "slope": slope,
+        }
+        super().__init__(dict_dataset)
 
 
 class OutletWeir(OutletBase):
@@ -196,9 +188,15 @@ class OutletWeir(OutletBase):
     _couttype = "weir"
 
     def __init__(self, lakein: str, lakeout: str, invert, width):
-        super().__init__(lakein, lakeout)
-        self.dataset["invert"] = invert
-        self.dataset["width"] = width
+        dict_dataset = {
+            "lakein": lakein,
+            "lakeout": lakeout,
+            "invert": invert,
+            "width": width,
+            "roughness": None,
+            "slope": None,
+        }
+        super().__init__(dict_dataset)
 
 
 class OutletSpecified(OutletBase):
@@ -209,8 +207,16 @@ class OutletSpecified(OutletBase):
     _couttype = "specified"
 
     def __init__(self, lakein: str, lakeout: str, rate):
-        super().__init__(lakein, lakeout)
-        self.dataset["rate"] = rate
+        dict_dataset = {
+            "lakein": lakein,
+            "lakeout": lakeout,
+            "invert": None,
+            "width": None,
+            "roughness": None,
+            "slope": None,
+            "rate": rate,
+        }
+        super().__init__(dict_dataset)
 
 
 def create_connection_data(lakes):

@@ -74,10 +74,12 @@ class ConstantConcentration(BoundaryCondition):
         observations=None,
         validate: bool = True,
     ):
-        super().__init__(locals())
-        self.dataset["concentration"] = concentration
-        self.dataset["print_input"] = print_input
-        self.dataset["print_flows"] = print_flows
-        self.dataset["save_flows"] = save_flows
-        self.dataset["observations"] = observations
+        dict_dataset = {
+            "concentration": concentration,
+            "print_input": print_input,
+            "print_flows": print_flows,
+            "save_flows": save_flows,
+            "observations": observations,
+        }
+        super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
