@@ -11,20 +11,21 @@ class ExchangeType(Enum):
 
 class ExchangeBase(Package):
     _keyword_map: Dict[str, str] = {}
+    _exchange_type: ExchangeType
 
     @property
-    def model_name_1(self):
+    def model_name1(self):
         return self.dataset["model_name_1"].values[()].take(0)
 
     @property
-    def model_name_2(self):
+    def model_name2(self):
         return self.dataset["model_name_2"].values[()].take(0)
 
-    def packagename(self) -> str:
-        return f"{self.dataset['model_name_1'].values[()]}_{self.dataset['model_name_2'].values[()]}"
+    def package_name(self) -> str:
+        return f"{self.model_name1}_{self.model_name2}"
 
     def _filename(self) -> str:
-        return f"{self.packagename()}.{self._pkg_id}"
+        return f"{self.package_name()}.{self._pkg_id}"
 
     def get_specification(self) -> Tuple[str, str, str, str]:
         """
@@ -34,6 +35,6 @@ class ExchangeBase(Package):
         return (
             self._exchange_type.value,
             self._filename(),
-            self.model_name_1,
-            self.model_name_2,
+            self.model_name1,
+            self.model_name2,
         )

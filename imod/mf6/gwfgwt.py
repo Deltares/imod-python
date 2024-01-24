@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Optional
 
 import cftime
@@ -35,4 +36,4 @@ class GWFGWT(ExchangeBase):
         """
         The GWF-GWT exchange does not have any spatial coordinates that can be clipped.
         """
-        pass
+        return deepcopy(self)

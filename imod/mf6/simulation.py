@@ -282,7 +282,7 @@ class Modflow6Simulation(collections.UserDict):
                 for exchange in value:
                     if isinstance(exchange, imod.mf6.exchangebase.ExchangeBase):
                         exchange.write(
-                            exchange.packagename(), globaltimes, write_context
+                            exchange.package_name(), globaltimes, write_context
                         )
 
         if status_info.has_errors():
