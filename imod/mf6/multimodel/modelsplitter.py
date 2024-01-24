@@ -9,6 +9,8 @@ from imod.mf6.utilities.grid import get_active_domain_slice
 from imod.mf6.wel import Well
 from imod.typing import GridDataArray
 from imod.typing.grid import is_unstructured, ones_like
+from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.auxiliary_variables import add_periodic_auxiliary_variable, remove_periodic_auxiliary_variable, has_auxiliary_variable
 
 HIGH_LEVEL_PKGS = (HorizontalFlowBarrierBase, Well)
 
@@ -85,6 +87,10 @@ def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6
         new_idomain = model.domain.sel(coords).where(sliced_domain_2D, other=0)
 
     for pkg_name, package in model.items():
+        if issubclass(type(package), BoundaryCondition):
+            if has_auxiliary_variable(package):
+                remove_periodic_auxiliary_variable(package)
+
         sliced_package = clip_by_grid(package, partition_info.active_domain)
 
         sliced_package = sliced_package.mask(new_idomain)
@@ -98,4 +104,6 @@ def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6
                 f"package {pkg_name} removed in partition {partition_info.id}, because all empty"
             )
 
+        if issubclass(type(package), BoundaryCondition):
+           add_periodic_auxiliary_variable( package )
     return new_model

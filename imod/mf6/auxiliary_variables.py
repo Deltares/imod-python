@@ -33,3 +33,16 @@ def add_periodic_auxiliary_variable(package):
                 package.dataset[s] = package.dataset[aux_var_name].sel(
                     {aux_var_dimensions: s}
                 )
+
+def remove_periodic_auxiliary_variable(package):
+    if "species" in package.dataset.coords:
+        for species in package.dataset.coords["species"].values:
+            if species in list(package.dataset.keys()):
+                package.dataset = package.dataset.drop_vars(species)
+            
+def has_auxiliary_variable(package):
+    if hasattr(package, "_auxiliary_data"):
+        for aux_var_name, _ in package._auxiliary_data.items():
+            if aux_var_name in package.dataset.keys():
+                return True
+    return False
