@@ -139,26 +139,29 @@ def flow_transport_simulation():
     )
     recharge_rate = xr.full_like(grid, np.nan, dtype=float)
     recharge_rate[..., 20:60] = 0.001
-    gwf_model["rch"] = imod.mf6.Recharge(recharge_rate,recharge_conc,"AUX" )
+    gwf_model["rch"] = imod.mf6.Recharge(recharge_rate, recharge_conc, "AUX")
     # %%
     # Create the simulation.
 
     rate = [1.0, 1.0]
     injection_concentration = xr.DataArray(
-        [[0.2, 0.23],[ 0.5, 0.2], [0.2, 0.23], [0.5, 0.2]],
-        coords={"species":["species_a", "species_b", "species_c", "species_d"], "index":[0,1]},
-        dims=("species","index"),
+        [[0.2, 0.23], [0.5, 0.2], [0.2, 0.23], [0.5, 0.2]],
+        coords={
+            "species": ["species_a", "species_b", "species_c", "species_d"],
+            "index": [0, 1],
+        },
+        dims=("species", "index"),
     )
 
     gwf_model["well"] = imod.mf6.Well(
-        x=[20., 580.],
+        x=[20.0, 580.0],
         y=[0.6, 1.2],
-        concentration_boundary_type = "Aux",
-        screen_top=[0., 0.],
-        screen_bottom=[-1., -1.],
+        concentration_boundary_type="Aux",
+        screen_top=[0.0, 0.0],
+        screen_bottom=[-1.0, -1.0],
         rate=[1.0, -2.0],
         minimum_k=0.0001,
-        concentration =injection_concentration
+        concentration=injection_concentration,
     )
 
     simulation = imod.mf6.Modflow6Simulation("1d_tpt_benchmark")
