@@ -151,7 +151,7 @@ def flow_transport_simulation():
     )
 
     gwf_model["well"] = imod.mf6.Well(
-        x=[20., 80.],
+        x=[20., 580.],
         y=[0.6, 1.2],
         concentration_boundary_type = "Aux",
         screen_top=[0., 0.],
