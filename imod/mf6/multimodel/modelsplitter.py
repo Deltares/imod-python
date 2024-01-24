@@ -10,7 +10,11 @@ from imod.mf6.wel import Well
 from imod.typing import GridDataArray
 from imod.typing.grid import is_unstructured, ones_like
 from imod.mf6.boundary_condition import BoundaryCondition
-from imod.mf6.auxiliary_variables import add_periodic_auxiliary_variable, remove_periodic_auxiliary_variable, has_auxiliary_variable
+from imod.mf6.auxiliary_variables import (
+    add_periodic_auxiliary_variable,
+    remove_periodic_auxiliary_variable,
+    has_auxiliary_variable,
+)
 
 HIGH_LEVEL_PKGS = (HorizontalFlowBarrierBase, Well)
 
@@ -105,5 +109,5 @@ def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6
             )
 
         if issubclass(type(package), BoundaryCondition):
-           add_periodic_auxiliary_variable( package )
+            add_periodic_auxiliary_variable(package)
     return new_model
