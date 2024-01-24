@@ -34,7 +34,7 @@ validation xarray library becomes.
 import abc
 import operator
 from functools import partial
-from typing import Any, Callable, Dict, Optional, Tuple, Union
+from typing import Any, Callable, Dict, Optional, Tuple, TypeVar, Union
 
 import numpy as np
 import scipy
@@ -45,7 +45,6 @@ from numpy.typing import DTypeLike  # noqa: F401
 DimsT = Tuple[Union[str, None]]
 ShapeT = Tuple[Union[int, None]]
 ChunksT = Union[bool, Dict[str, Union[int, None]]]
-
 
 OPERATORS = {
     "<": operator.lt,
@@ -94,6 +93,9 @@ class BaseSchema(abc.ABC):
         And get a SchemaUnion back.
         """
         return SchemaUnion(self, other)
+
+
+SchemaType = TypeVar("SchemaType", bound=BaseSchema)
 
 
 class SchemaUnion:

@@ -14,6 +14,9 @@ Fixed
 - iMOD Python now supports versions of pandas >= 2
 - Fixed bugs with clipping :class:`imod.mf6.HorizontalFlowBarrier` for
   structured grids
+- Improved performance for merging structured multimodel Modflow 6 output
+- Bug where :function:`imod.formats.idf.open_subdomains` did not properly support custom
+  patterns
 
 Changed
 ~~~~~~~
@@ -27,6 +30,7 @@ Changed
   development install are adviced to run ``pip uninstall imod`` and ``pip
   install -e .`` again. This does not affect users who installed with ``pip
   install imod``, ``mamba install imod`` or ``conda install imod``.
+
 
 [0.15.1] - 2023-12-22
 ---------------------
@@ -60,6 +64,7 @@ Added
 - Added Python 3.11 support.
 - The GWF-GWF exchange options are derived from user created packages (NPF, OC) and
   set automatically.
+- Added the ``simulation_start_time`` and ``time_unit`` arguments. To the ``Modflow6Simulation.open_`` methods, and ``imod.mf6.out.open_`` functions. This converts the ``"time"`` coordinate to datetimes.
 
 Changed
 ~~~~~~~

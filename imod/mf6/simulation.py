@@ -8,6 +8,7 @@ import warnings
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
+import cftime
 import jinja2
 import numpy as np
 import tomli
@@ -17,11 +18,9 @@ import xugrid as xu
 
 import imod
 from imod.mf6.gwfgwf import GWFGWF
-from imod.mf6.model import (
-    GroundwaterFlowModel,
-    GroundwaterTransportModel,
-    Modflow6Model,
-)
+from imod.mf6.model import Modflow6Model
+from imod.mf6.model_gwf import GroundwaterFlowModel
+from imod.mf6.model_gwt import GroundwaterTransportModel
 from imod.mf6.multimodel.exchange_creator_structured import ExchangeCreator_Structured
 from imod.mf6.multimodel.exchange_creator_unstructured import (
     ExchangeCreator_Unstructured,
@@ -34,7 +33,7 @@ from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
-from imod.typing.grid import concat, is_unstructured, merge, merge_partitions
+from imod.typing.grid import concat, is_unstructured, merge, merge_partitions, nan_like
 
 OUTPUT_FUNC_MAPPING = {
     "head": (open_hds, GroundwaterFlowModel),
@@ -375,7 +374,10 @@ class Modflow6Simulation(collections.UserDict):
         )
 
     def open_transport_budget(
-        self, species_ls: list[str] = None
+        self,
+        species_ls: list[str] = None,
+        simulation_start_time: Optional[np.datetime64] = None,
+        time_unit: Optional[str] = "d",
     ) -> dict[str, GridDataArray]:
         """
         Open transport budgets of finished simulation, requires that the ``run``
@@ -401,9 +403,19 @@ class Modflow6Simulation(collections.UserDict):
             "layer", "y", "x").
 
         """
-        return self._open_output("budget-transport", species_ls=species_ls)
+        return self._open_output(
+            "budget-transport",
+            species_ls=species_ls,
+            simulation_start_time=simulation_start_time,
+            time_unit=time_unit,
+        )
 
-    def open_flow_budget(self, flowja: bool = False) -> dict[str, GridDataArray]:
+    def open_flow_budget(
+        self,
+        flowja: bool = False,
+        simulation_start_time: Optional[np.datetime64] = None,
+        time_unit: Optional[str] = "d",
+    ) -> dict[str, GridDataArray]:
         """
         Open flow budgets of finished simulation, requires that the ``run``
         method has been called.
@@ -459,10 +471,19 @@ class Modflow6Simulation(collections.UserDict):
         >>> drn_budget = budget["drn]
         >>> mean = drn_budget.sel(layer=1).mean("time")
         """
-        return self._open_output("budget-flow", flowja=flowja)
+        return self._open_output(
+            "budget-flow",
+            flowja=flowja,
+            simulation_start_time=simulation_start_time,
+            time_unit=time_unit,
+        )
 
     def open_concentration(
-        self, species_ls: list[str] = None, dry_nan: bool = False
+        self,
+        species_ls: list[str] = None,
+        dry_nan: bool = False,
+        simulation_start_time: Optional[np.datetime64] = None,
+        time_unit: Optional[str] = "d",
     ) -> GridDataArray:
         """
         Open concentration of finished simulation, requires that the ``run``
@@ -499,7 +520,11 @@ class Modflow6Simulation(collections.UserDict):
         >>> concentration = simulation.open_concentration()
         """
         return self._open_output(
-            "concentration", species_ls=species_ls, dry_nan=dry_nan
+            "concentration",
+            species_ls=species_ls,
+            dry_nan=dry_nan,
+            simulation_start_time=simulation_start_time,
+            time_unit=time_unit,
         )
 
     def _open_output(self, output: str, **settings) -> GridDataArray | GridDataset:
@@ -528,7 +553,7 @@ class Modflow6Simulation(collections.UserDict):
             return self._open_output_single_model(modelname, output, **settings)
         elif is_split(self):
             if "budget" in output:
-                return self._merge_fluxes(modelnames, output, **settings)
+                return self._merge_budgets(modelnames, output, **settings)
             else:
                 return self._merge_states(modelnames, output, **settings)
         elif output == "concentration":
@@ -554,26 +579,26 @@ class Modflow6Simulation(collections.UserDict):
             )
         return merge_partitions(state_partitions)
 
-    def _merge_and_assign_exchange_fluxes(self, cbc: GridDataset) -> GridDataset:
+    def _merge_and_assign_exchange_budgets(self, cbc: GridDataset) -> GridDataset:
         """
-        Merge and assign exchange fluxes to cell by cell budgets:
+        Merge and assign exchange budgets to cell by cell budgets:
         cbc[[gwf-gwf_1, gwf-gwf_3]] to cbc[gwf-gwf]
         """
         exchange_names = [
             key for key in cbc.keys() if ("gwf-gwf" in key) or ("gwt-gwt" in key)
         ]
-        exchange_flux = cbc[exchange_names].to_array().sum(dim="variable")
+        exchange_budgets = cbc[exchange_names].to_array().sum(dim="variable")
         cbc = cbc.drop_vars(exchange_names)
         # "gwf-gwf" or "gwt-gwt"
         exchange_key = exchange_names[0].split("_")[0]
-        cbc[exchange_key] = exchange_flux
+        cbc[exchange_key] = exchange_budgets
         return cbc
 
-    def _merge_fluxes(
+    def _merge_budgets(
         self, modelnames: list[str], output: str, **settings
     ) -> GridDataset:
         if settings["flowja"] is True:
-            raise ValueError("``flowja`` cannot be set to True when merging fluxes.")
+            raise ValueError("``flowja`` cannot be set to True when merging budgets.")
 
         cbc_per_partition = []
         for modelname in modelnames:
@@ -584,13 +609,23 @@ class Modflow6Simulation(collections.UserDict):
             # https://github.com/Deltares/xugrid/issues/179
             cbc_list = [da.rename(key) for key, da in cbc_dict.items()]
             cbc = merge(cbc_list)
-            # Merge and assign exchange fluxes to dataset
-            # FUTURE: Refactor to insert these exchange fluxes in horizontal
+            # Merge and assign exchange budgets to dataset
+            # FUTURE: Refactor to insert these exchange budgets in horizontal
             # flows.
-            cbc = self._merge_and_assign_exchange_fluxes(cbc)
+            cbc = self._merge_and_assign_exchange_budgets(cbc)
             if not is_unstructured(cbc):
                 cbc = cbc.where(partition_domain, other=np.nan)
             cbc_per_partition.append(cbc)
+
+        # Boundary conditions can be missing in certain partitions, as do their
+        # budgets, in which case we manually assign an empty grid of nans.
+        unique_keys = set([key for cbc in cbc_per_partition for key in cbc.keys()])
+        for cbc in cbc_per_partition:
+            missing_keys = unique_keys - set(cbc.keys())
+            present_keys = unique_keys & set(cbc.keys())
+            first_present_key = next(iter(present_keys))
+            for missing in missing_keys:
+                cbc[missing] = nan_like(cbc[first_present_key], dtype=np.float64)
 
         return merge_partitions(cbc_per_partition)
 
@@ -783,8 +818,8 @@ class Modflow6Simulation(collections.UserDict):
 
     def clip_box(
         self,
-        time_min: Optional[str] = None,
-        time_max: Optional[str] = None,
+        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
+        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
         layer_min: Optional[int] = None,
         layer_max: Optional[int] = None,
         x_min: Optional[float] = None,
@@ -792,7 +827,7 @@ class Modflow6Simulation(collections.UserDict):
         y_min: Optional[float] = None,
         y_max: Optional[float] = None,
         states_for_boundary: Optional[dict[str, GridDataArray]] = None,
-    ) -> "Modflow6Simulation":
+    ) -> Modflow6Simulation:
         """
         Clip a simulation by a bounding box (time, layer, y, x).
 
