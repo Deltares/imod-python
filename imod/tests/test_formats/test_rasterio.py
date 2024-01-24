@@ -101,11 +101,10 @@ def test_rasterio_ascii(test_da, tmp_path, value, nodata, dtype, precision, digi
     def assert_equal_content(path_a, path_b):
         assert Path(path_a).exists()
         assert Path(path_b).exists()
-        with open(path_a, "r") as f:
-            content_a = f.read()
-        with open(path_b, "r") as f:
-            content_b = f.read()
-        assert content_a == content_b
+        ds_a = xr.open_dataset(path_a, engine="rasterio")
+        ds_b = xr.open_dataset(path_b, engine="rasterio")
+
+        xr.testing.assert_identical(ds_a, ds_b)
 
     da = xr.full_like(test_da, value)
     profile = {
