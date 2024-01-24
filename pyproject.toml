@@ -138,6 +138,7 @@ module = [
     "contextily.*",
     "dateutil.*",
     "flopy.*",
+    "fastcore.*",
     "geopandas.*",
     "matplotlib.*",
     "mpl_toolkits.*",
