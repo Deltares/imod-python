@@ -448,7 +448,8 @@ class TestModflow6Simulation:
         transient_twri_model.write(tmp_path, True, True, True)
 
         # Assert
-        assert Path.exists(tmp_path / sample_gwfgwf_structured._filename())
+        _, filename, _, _ = sample_gwfgwf_structured.get_specification()
+        assert Path.exists(tmp_path / filename)
 
     @pytest.mark.usefixtures("split_transient_twri_model")
     def test_prevent_split_after_split(
