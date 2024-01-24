@@ -1,9 +1,6 @@
 import abc
-import inspect
 import numbers
 import pathlib
-from functools import wraps
-from typing import Callable
 
 import numpy as np
 import xarray as xr
@@ -15,36 +12,6 @@ from imod.typing.grid import GridDataset, merge_with_dictionary
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 EXCHANGE_PACKAGES = "gwfgwf"
-
-
-def pkg_init(exclude_in_dataset: list[str]):
-    # Nested decorator to support arguments, see:
-    # https://stackoverflow.com/a/42581103
-    def pkg_init_decorator(init: Callable):
-        @wraps(init)
-        def merge_init(self, *args, **kwargs):
-            # Collect user specified args and kwargs
-            args_dict = (
-                inspect.signature(self.__init__).bind_partial(*args, **kwargs).arguments
-            )
-            # Add default values
-            for k, v in inspect.signature(self.__init__).parameters.items():
-                if k not in args_dict and v.default is not inspect.Parameter.empty:
-                    args_dict[k] = v.default
-            # Create dict of args to be added to dataset by removing args in
-            # exclude_in_dataset.
-            args_dict_dataset = {
-                key: value
-                for key, value in args_dict.items()
-                if key not in exclude_in_dataset
-            }
-
-            super(type(self), self).__init__(args_dict_dataset)
-            return init(self, **args_dict)
-
-        return merge_init
-
-    return pkg_init_decorator
 
 
 class PackageBase(IPackageBase, abc.ABC):
