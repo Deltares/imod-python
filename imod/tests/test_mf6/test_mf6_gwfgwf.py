@@ -169,7 +169,7 @@ def test_option_xt3d_propagated(circle_model, xt3d_option, tmp_path):
     label_array = get_label_array(circle_model, 3)
     split_simulation = circle_model.split(label_array)
 
-    # check that the created exchagnes have the same newton option
+    # check that the created exchanges have the same newton option
     for exchange in split_simulation["split_exchanges"]:
         assert exchange.dataset["xt3d"].values[()] == xt3d_option
         textrep = exchange.render(tmp_path, "gwfgwf", [], False)
@@ -185,7 +185,7 @@ def test_option_variablecv_propagated(circle_model, variablecv_option: bool, tmp
     label_array = get_label_array(circle_model, 3)
     split_simulation = circle_model.split(label_array)
 
-    # check that the created exchagnes have the same variablecv option
+    # check that the created exchanges have the same variablecv option
     for exchange in split_simulation["split_exchanges"]:
         assert exchange.dataset["variablecv"].values[()] == variablecv_option
         textrep = exchange.render(tmp_path, "gwfgwf", [], False)
@@ -202,7 +202,7 @@ def test_option_dewatered_propagated(circle_model, dewatered_option: bool, tmp_p
     label_array = get_label_array(circle_model, 3)
     split_simulation = circle_model.split(label_array)
 
-    # check that the created exchagnes have the same dewatered option
+    # check that the created exchanges have the same dewatered option
     for exchange in split_simulation["split_exchanges"]:
         assert exchange.dataset["dewatered"].values[()] == dewatered_option
         textrep = exchange.render(tmp_path, "gwfgwf", [], False)
@@ -219,7 +219,7 @@ def test_save_flows_propagated(circle_model, budget_option: bool, tmp_path):
     label_array = get_label_array(circle_model, 3)
     split_simulation = circle_model.split(label_array)
 
-    # check that the created exchagnes have the same dewatered option
+    # check that the created exchanges have the same dewatered option
     for exchange in split_simulation["split_exchanges"]:
         assert exchange.dataset["save_flows"].values[()] == budget_option
         textrep = exchange.render(tmp_path, "gwfgwf", [], False)
