@@ -95,4 +95,10 @@ def test_slice_model_with_auxiliary_variables(tmp_path, flow_transport_simulatio
     split_simulation = flow_simulation.split(submodel_labels)
     split_simulation.write(tmp_path, binary=False)
     assert_simulation_can_run(split_simulation, "dis", tmp_path)
+    assert "species_d" in list(split_simulation["flow_0"]["chd"].dataset.keys())
+    assert "species_d" in list(split_simulation["flow_0"]["rch"].dataset.keys())
+    assert "concentration" in list(split_simulation["flow_0"]["well"].dataset.keys())    
+    assert "species_d" in list(split_simulation["flow_1"]["chd"].dataset.keys())
+    assert "species_d" in list(split_simulation["flow_1"]["rch"].dataset.keys())
+    assert "concentration" in list(split_simulation["flow_1"]["well"].dataset.keys())    
     pass
