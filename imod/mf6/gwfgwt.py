@@ -4,13 +4,12 @@ from typing import Optional
 import cftime
 import numpy as np
 
-from imod.mf6.exchangebase import ExchangeBase, ExchangeType
+from imod.mf6.exchangebase import ExchangeBase
 from imod.mf6.package import Package
 from imod.typing import GridDataArray
 
 
 class GWFGWT(ExchangeBase):
-    _exchange_type = ExchangeType.GWFGWT
     _pkg_id = "gwfgwt"
     _template = Package._initialize_template(_pkg_id)
 

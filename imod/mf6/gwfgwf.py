@@ -5,7 +5,7 @@ import numpy as np
 import xarray as xr
 
 from imod.mf6.auxiliary_variables import add_periodic_auxiliary_variable
-from imod.mf6.exchangebase import ExchangeBase, ExchangeType
+from imod.mf6.exchangebase import ExchangeBase
 from imod.mf6.package import Package
 from imod.typing import GridDataArray
 
@@ -18,7 +18,6 @@ class GWFGWF(ExchangeBase):
     simulation class."""
 
     _auxiliary_data = {"auxiliary_data": "variable"}
-    _exchange_type = ExchangeType.GWFGWF
     _pkg_id = "gwfgwf"
     _template = Package._initialize_template(_pkg_id)
 
