@@ -91,7 +91,7 @@ object Examples : BuildType({
             publisher = github {
                 githubUrl = "https://api.github.com"
                 authType = personalToken {
-                    token = "credentialsJSON:20000534-30a2-41f4-9fc1-b93297dd4a0a"
+                    token = "credentialsJSON:558df52e-822f-4d9d-825a-854846a9a2ff"
                 }
             }
         }
@@ -103,7 +103,7 @@ object Examples : BuildType({
             vcsRootExtId = "${DslContext.settingsRoot.id}"
             provider = github {
                 authType = token {
-                    token = "credentialsJSON:20000534-30a2-41f4-9fc1-b93297dd4a0a"
+                    token = "credentialsJSON:558df52e-822f-4d9d-825a-854846a9a2ff"
                 }
                 filterAuthorRole = PullRequests.GitHubRoleFilter.MEMBER
             }
@@ -157,7 +157,7 @@ object Lint : BuildType({
             publisher = github {
                 githubUrl = "https://api.github.com"
                 authType = personalToken {
-                    token = "credentialsJSON:20000534-30a2-41f4-9fc1-b93297dd4a0a"
+                    token = "credentialsJSON:558df52e-822f-4d9d-825a-854846a9a2ff"
                 }
             }
         }
@@ -165,7 +165,7 @@ object Lint : BuildType({
             vcsRootExtId = "${DslContext.settingsRoot.id}"
             provider = github {
                 authType = token {
-                    token = "credentialsJSON:20000534-30a2-41f4-9fc1-b93297dd4a0a"
+                    token = "credentialsJSON:558df52e-822f-4d9d-825a-854846a9a2ff"
                 }
                 filterAuthorRole = PullRequests.GitHubRoleFilter.MEMBER
             }
@@ -207,7 +207,7 @@ object Tests : BuildType({
             vcsRootExtId = "${DslContext.settingsRoot.id}"
             provider = github {
                 authType = token {
-                    token = "credentialsJSON:20000534-30a2-41f4-9fc1-b93297dd4a0a"
+                    token = "credentialsJSON:558df52e-822f-4d9d-825a-854846a9a2ff"
                 }
                 filterAuthorRole = PullRequests.GitHubRoleFilter.MEMBER
             }
@@ -281,7 +281,7 @@ object UnitTests : BuildType({
             publisher = github {
                 githubUrl = "https://api.github.com"
                 authType = personalToken {
-                    token = "credentialsJSON:20000534-30a2-41f4-9fc1-b93297dd4a0a"
+                    token = "credentialsJSON:558df52e-822f-4d9d-825a-854846a9a2ff"
                 }
             }
         }
@@ -293,7 +293,7 @@ object UnitTests : BuildType({
             vcsRootExtId = "${DslContext.settingsRoot.id}"
             provider = github {
                 authType = token {
-                    token = "credentialsJSON:20000534-30a2-41f4-9fc1-b93297dd4a0a"
+                    token = "credentialsJSON:558df52e-822f-4d9d-825a-854846a9a2ff"
                 }
                 filterAuthorRole = PullRequests.GitHubRoleFilter.MEMBER
             }
