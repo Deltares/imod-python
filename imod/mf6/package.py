@@ -32,9 +32,10 @@ from imod.schemata import (
     ValidationError,
 )
 from imod.typing import GridDataArray
+from imod.mf6.interfaces.ipackage import IPackage
 
 
-class Package(PackageBase, abc.ABC):
+class Package(PackageBase, IPackage, abc.ABC):
     """
     Package is used to share methods for specific packages with no time
     component.
@@ -729,3 +730,9 @@ class Package(PackageBase, abc.ABC):
     def _repr_html_(self) -> str:
         typename = type(self).__name__
         return f"<div>{typename}</div>{self.dataset._repr_html_()}"
+
+    def auxiliary_data_fields(self) -> Dict[str, str]:
+        if (hasattr(self, "_auxiliary_data")):
+            return self._auxiliary_data
+        else: 
+            return {}
