@@ -229,15 +229,6 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         timeseries=None,
         validate: bool = True,
     ):
-        self._check_options(
-            groundwater_ET_function,
-            et_pot,
-            extinction_depth,
-            extinction_theta,
-            air_entry_potential,
-            root_potential,
-            root_activity,
-        )
         landflag = self._determine_landflag(kv_sat)
         iuzno = self._create_uzf_numbers(landflag)
         ivertcon = self._determine_vertical_connection(iuzno)
@@ -277,6 +268,15 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         }
         super().__init__(dict_dataset)
         self.dataset["iuzno"].name = "uzf_number"
+        self._check_options(
+            groundwater_ET_function,
+            et_pot,
+            extinction_depth,
+            extinction_theta,
+            air_entry_potential,
+            root_potential,
+            root_activity,
+        )
         self._validate_init_schemata(validate)
 
     def fill_stress_perioddata(self):
