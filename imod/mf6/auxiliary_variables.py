@@ -1,5 +1,6 @@
 from imod.mf6.interfaces.ipackage import IPackage
 
+
 def get_variable_names(package: IPackage):
     auxiliaries = _get_auxiliary_data_variable_names_mapping(
         package
