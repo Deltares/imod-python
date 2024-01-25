@@ -11,7 +11,7 @@ from imod.mf6.interfaces.ipackagebase import IPackageBase
 from imod.typing.grid import GridDataset, merge_with_dictionary
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
-EXCHANGE_PACKAGES = "gwfgwf"
+EXCHANGE_PACKAGES = ("gwfgwf", "gwfgwt")
 
 
 class PackageBase(IPackageBase, abc.ABC):

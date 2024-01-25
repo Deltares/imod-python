@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import abc
 import copy
 import numbers
@@ -20,9 +22,15 @@ from imod.mf6.regridding_utils import (
     RegridderType,
     get_non_grid_data,
 )
+from imod.mf6.utilities.schemata import filter_schemata_dict
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext
-from imod.schemata import ValidationError
+from imod.schemata import (
+    AllNoDataSchema,
+    EmptyIndexesSchema,
+    SchemaType,
+    ValidationError,
+)
 from imod.typing import GridDataArray
 
 
@@ -40,8 +48,9 @@ class Package(PackageBase, abc.ABC):
     """
 
     _pkg_id = ""
-    _init_schemata = {}
-    _write_schemata = {}
+    _init_schemata: Dict[str, List[SchemaType] | Tuple[SchemaType]] = {}
+    _write_schemata: Dict[str, List[SchemaType] | Tuple[SchemaType]] = {}
+    _keyword_map: Dict[str, str] = {}
 
     def __init__(self, allargs=None):
         super().__init__(allargs)
@@ -278,6 +287,23 @@ class Package(PackageBase, abc.ABC):
                         errors[variable].append(e)
         return errors
 
+    def is_empty(self) -> bool:
+        """
+        Returns True if the package is empty- for example if it contains only no-data values.
+        """
+
+        # Create schemata dict only containing the
+        # variables with a AllNoDataSchema and EmptyIndexesSchema (in case of
+        # HFB) in the write schemata.
+        allnodata_schemata = filter_schemata_dict(
+            self._write_schemata, (AllNoDataSchema, EmptyIndexesSchema)
+        )
+
+        # Find if packages throws ValidationError for AllNoDataSchema or
+        # EmptyIndexesSchema.
+        allnodata_errors = self._validate(allnodata_schemata)
+        return len(allnodata_errors) > 0
+
     def _validate_init_schemata(self, validate: bool):
         """
         Run the "cheap" schema validations.
@@ -400,16 +426,18 @@ class Package(PackageBase, abc.ABC):
 
     def clip_box(
         self,
-        time_min=None,
-        time_max=None,
-        layer_min=None,
-        layer_max=None,
-        x_min=None,
-        x_max=None,
-        y_min=None,
-        y_max=None,
-        state_for_boundary=None,
-    ) -> "Package":
+        time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
+        time_max: Optional[cftime.datetime | np.datetime64 | str] = None,
+        layer_min: Optional[int] = None,
+        layer_max: Optional[int] = None,
+        x_min: Optional[float] = None,
+        x_max: Optional[float] = None,
+        y_min: Optional[float] = None,
+        y_max: Optional[float] = None,
+        top: Optional[GridDataArray] = None,
+        bottom: Optional[GridDataArray] = None,
+        state_for_boundary: Optional[GridDataArray] = None,
+    ) -> Package:
         """
         Clip a package by a bounding box (time, layer, y, x).
 
@@ -432,6 +460,10 @@ class Package(PackageBase, abc.ABC):
         x_max: optional, float
         y_min: optional, float
         y_max: optional, float
+        top: optional, GridDataArray
+        bottom: optional, GridDataArray
+        state_for_boundary: optional, GridDataArray
+
 
         Returns
         -------
@@ -670,6 +702,15 @@ class Package(PackageBase, abc.ABC):
 
         new_package = self.__class__(**new_package_data)
 
+        # set dx and dy if present in target_grid
+        if "dx" in target_grid.coords:
+            new_package.dataset = new_package.dataset.assign_coords(
+                {"dx": target_grid.coords["dx"].values[()]}
+            )
+        if "dy" in target_grid.coords:
+            new_package.dataset = new_package.dataset.assign_coords(
+                {"dy": target_grid.coords["dy"].values[()]}
+            )
         return new_package
 
     def skip_masking_dataarray(self, array_name: str) -> bool:

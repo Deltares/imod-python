@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "imod"
-version = "0.15.1"
+dynamic = ["version"]
 requires-python = ">=3.10"
 authors = [{ name = "Deltares", email = "huite.bootsma@deltares.nl" }, ]
 maintainers = [{ name = "Deltares", email = "huite.bootsma@deltares.nl" }]
@@ -69,6 +69,7 @@ dev = [
     "black",
     "ruff",
     "flopy",
+    "hatchling",
     "hypothesis",
     "mypy",
     "pydata-sphinx-theme",
@@ -78,10 +79,6 @@ dev = [
     "sphinx",
     "sphinx-gallery",
 ]
-
-[tool.isort]
-profile = "black"
-skip = [".gitignore", ".dockerignore"]
 
 [tool.coverage.report]
 exclude_lines = [
@@ -142,6 +139,7 @@ module = [
     "contextily.*",
     "dateutil.*",
     "flopy.*",
+    "fastcore.*",
     "geopandas.*",
     "matplotlib.*",
     "mpl_toolkits.*",
@@ -164,3 +162,9 @@ ignore_missing_imports = true
 markers = [
     "example: marks test as example (deselect with '-m \"not example\"')",
 ]
+
+[tool.hatch.version]
+path = "imod/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+only-include = ["imod"]

@@ -1,6 +1,6 @@
 import os
 import struct
-from typing import Any, BinaryIO, Dict, List, Tuple
+from typing import Any, BinaryIO, Dict, List, Optional, Tuple
 
 import dask
 import numba
@@ -8,6 +8,8 @@ import numpy as np
 import scipy.sparse
 import xarray as xr
 import xugrid as xu
+
+from imod.mf6.utilities.dataset import assign_datetime_coords
 
 from . import cbc
 from .common import FilePath, FloatArray, IntArray, _to_nan
@@ -139,13 +141,19 @@ def read_hds_timestep(
     return _to_nan(a2d, dry_nan)
 
 
-def open_hds(path: FilePath, d: Dict[str, Any], dry_nan: bool) -> xu.UgridDataArray:
-    grid = d["grid"]
-    nlayer, ncells_per_layer = d["nlayer"], d["ncells_per_layer"]
+def open_hds(
+    path: FilePath,
+    grid_info: Dict[str, Any],
+    dry_nan: bool,
+    simulation_start_time: Optional[np.datetime64] = None,
+    time_unit: Optional[str] = "d",
+) -> xu.UgridDataArray:
+    grid = grid_info["grid"]
+    nlayer, ncells_per_layer = grid_info["nlayer"], grid_info["ncells_per_layer"]
     filesize = os.path.getsize(path)
     ntime = filesize // (nlayer * (52 + (ncells_per_layer * 8)))
     times = read_times(path, ntime, nlayer, ncells_per_layer)
-    coords = d["coords"]
+    coords = grid_info["coords"]
     coords["time"] = times
 
     dask_list = []
@@ -163,8 +171,11 @@ def open_hds(path: FilePath, d: Dict[str, Any], dry_nan: bool) -> xu.UgridDataAr
 
     daskarr = dask.array.stack(dask_list, axis=0)
     da = xr.DataArray(
-        daskarr, coords, ("time", "layer", grid.face_dimension), name=d["name"]
+        daskarr, coords, ("time", "layer", grid.face_dimension), name=grid_info["name"]
     )
+
+    if simulation_start_time is not None:
+        da = assign_datetime_coords(da, simulation_start_time, time_unit)
     return xu.UgridDataArray(da, grid)
 
 
@@ -447,7 +458,11 @@ def disv_open_face_budgets(
 
 
 def open_cbc(
-    cbc_path: FilePath, grb_content: Dict[str, Any], flowja: bool = False
+    cbc_path: FilePath,
+    grb_content: Dict[str, Any],
+    flowja: bool = False,
+    simulation_start_time: Optional[np.datetime64] = None,
+    time_unit: Optional[str] = "d",
 ) -> Dict[str, xu.UgridDataArray]:
     headers = cbc.read_cbc_headers(cbc_path)
     cbc_content = {}
@@ -481,6 +496,12 @@ def open_cbc(
                 cbc_content[key] = open_imeth6_budgets(
                     cbc_path, grb_content, header_list
                 )
+
+    if simulation_start_time is not None:
+        for cbc_name, cbc_array in cbc_content.items():
+            cbc_content[cbc_name] = assign_datetime_coords(
+                cbc_array, simulation_start_time, time_unit
+            )
     return cbc_content
 
 

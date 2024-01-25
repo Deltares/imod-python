@@ -1,5 +1,3 @@
-from importlib.metadata import PackageNotFoundError, distribution
-
 # exports
 from imod import (
     couplers,
@@ -17,9 +15,4 @@ from imod import (
 )
 from imod.formats import gen, idf, ipf, prj, rasterio
 
-# version
-try:
-    __version__ = distribution(__name__).version
-except PackageNotFoundError:
-    # package is not installed
-    pass
+__version__ = "0.15.1"

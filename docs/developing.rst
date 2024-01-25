@@ -81,7 +81,8 @@ To follow these steps, you need to be one of the maintainers for imod on both
 `PyPI <https://pypi.org/project/imod/>`_ and `conda-forge
 <https://github.com/conda-forge/imod-feedstock>`_.
 
-1. Update the :doc:`../api/changelog` and the pyproject.toml files.
+1. Update the :doc:`../api/changelog` and the ``__version__`` in ``imod/__init__.py``,
+   and the version entry in the ``pixi.toml`` for complenetess.
 
 2. Create a tag on your local machine and push it GitHub. `Old tags are here
    <https://github.com/Deltares/imod-python/tags>`_. `Old releases are
@@ -96,14 +97,10 @@ To follow these steps, you need to be one of the maintainers for imod on both
 
 4. Locally, ``git fetch --tags`` and ``git pull``, verify you are on the commit
    you want to release, and that it is clean.
+   
+5. Run ``pixi run pypi-publish`` to build the package and upload to PyPI.
 
-5. Remove the ``build``,  ``dist``, ``imod.egg-info`` folders if present.
-
-6. Create a source distribution under ``dist/`` with ``python -m build --sdist``
-
-7. Upload the files from step 6 to PyPI with ``twine upload dist/*``
-
-8. For `conda-forge <https://github.com/conda-forge/imod-feedstock>`_, a PR
+6. For `conda-forge <https://github.com/conda-forge/imod-feedstock>`_, a PR
    will be created automatically. If the requirements are up to date in
    `meta.yaml
    <https://github.com/conda-forge/imod-feedstock/blob/master/recipe/meta.yaml>`_

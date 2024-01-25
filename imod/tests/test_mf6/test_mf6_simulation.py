@@ -2,6 +2,7 @@ import os
 import re
 import sys
 import textwrap
+from datetime import datetime
 from pathlib import Path
 from unittest import mock
 from unittest.mock import MagicMock
@@ -61,11 +62,20 @@ def test_simulation_open_head(circle_model, tmp_path):
     simulation.write(modeldir)
     simulation.run()
 
-    head = simulation.open_head()
+    # open heads without time conversion
+    head_notime = simulation.open_head()
 
-    assert isinstance(head, xu.UgridDataArray)
+    assert isinstance(head_notime, xu.UgridDataArray)
+    assert head_notime.dims == ("time", "layer", "mesh2d_nFaces")
+    assert head_notime.shape == (1, 2, 216)
+
+    # open heads with time conversion.
+    head = simulation.open_head(
+        simulation_start_time=datetime(2013, 3, 11, 22, 0, 0), time_unit="w"
+    )
     assert head.dims == ("time", "layer", "mesh2d_nFaces")
     assert head.shape == (1, 2, 216)
+    assert str(head.coords["time"].values[()][0]) == "2013-03-18T22:00:00.000000000"
 
 
 @pytest.mark.usefixtures("circle_model")
@@ -438,7 +448,8 @@ class TestModflow6Simulation:
         transient_twri_model.write(tmp_path, True, True, True)
 
         # Assert
-        assert Path.exists(tmp_path / sample_gwfgwf_structured.filename())
+        _, filename, _, _ = sample_gwfgwf_structured.get_specification()
+        assert Path.exists(tmp_path / filename)
 
     @pytest.mark.usefixtures("split_transient_twri_model")
     def test_prevent_split_after_split(

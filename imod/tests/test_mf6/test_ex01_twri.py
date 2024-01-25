@@ -425,11 +425,18 @@ def test_simulation_write_and_run(twri_model, tmp_path):
     simulation.run()
 
     head = imod.mf6.open_hds(
-        modeldir / "GWF_1/GWF_1.hds", modeldir / "GWF_1/dis.dis.grb"
+        modeldir / "GWF_1/GWF_1.hds",
+        modeldir / "GWF_1/dis.dis.grb",
+        simulation_start_time="01-01-1999",
+        time_unit="d",
     )
     assert isinstance(head, xr.DataArray)
     assert head.dims == ("time", "layer", "y", "x")
     assert head.shape == (1, 3, 15, 15)
+    assert np.all(
+        head["time"].values
+        == np.array("1999-01-02T00:00:00.000000000", dtype="datetime64[ns]")
+    )
     meanhead_layer = head.groupby("layer").mean(dim=xr.ALL_DIMS)
     mean_answer = np.array([59.79181509, 30.44132373, 24.88576811])
     assert np.allclose(meanhead_layer, mean_answer)
@@ -518,6 +525,39 @@ def test_slice_and_run(transient_twri_model, tmp_path):
         y_min=10_000.0,
         y_max=65_000.0,
     )
+    modeldir = tmp_path / "ex01-twri-transient-slice"
+    simulation.write(modeldir, binary=True)
+    simulation.run()
+
+
+@pytest.mark.usefixtures("transient_twri_model")
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
+def test_slice_and_run_purge_empty_package(transient_twri_model, tmp_path):
+    # TODO: bring back well once slicing is implemented...
+    transient_twri_model["GWF_1"].pop("wel")
+
+    # add a package out of the clipping area
+    faraway_constant_head = xr.full_like(
+        transient_twri_model["GWF_1"].domain, np.nan, dtype=float
+    )
+    faraway_constant_head.isel(x=14, y=0, layer=0).values[()] = 1
+    faraway_constant_head_package = imod.mf6.ConstantHead(
+        faraway_constant_head, print_input=True, print_flows=True, save_flows=True
+    )
+    assert not faraway_constant_head_package.is_empty()
+    transient_twri_model["GWF_1"]["chd_far"] = faraway_constant_head_package
+
+    simulation = transient_twri_model.clip_box(
+        time_min="2000-01-10",
+        time_max="2000-01-20",
+        layer_min=1,
+        layer_max=2,
+        x_min=None,
+        x_max=65_000.0,
+        y_min=None,
+        y_max=12500.0,
+    )
+    assert "chd_far" not in list(simulation["GWF_1"].keys())
     modeldir = tmp_path / "ex01-twri-transient-slice"
     simulation.write(modeldir, binary=True)
     simulation.run()

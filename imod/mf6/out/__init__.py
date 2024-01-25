@@ -37,8 +37,9 @@ def open_cbc(
 (These could be implemented via Reader classes, but why bother with mutable
 state or a class with exclusively staticmethods?)
 """
-from typing import Any, Callable, Dict, Union
+from typing import Any, Callable, Dict, Optional, Union
 
+import numpy as np
 import xarray as xr
 import xugrid as xu
 
@@ -99,7 +100,11 @@ def read_grb(path: FilePath) -> Dict[str, Any]:
 
 
 def open_hds(
-    hds_path: FilePath, grb_path: FilePath, dry_nan: bool = False
+    hds_path: FilePath,
+    grb_path: FilePath,
+    dry_nan: bool = False,
+    simulation_start_time: Optional[np.datetime64] = None,
+    time_unit: Optional[str] = "d",
 ) -> Union[xr.DataArray, xu.UgridDataArray]:
     """
     Open modflow6 heads (.hds) file.
@@ -116,6 +121,22 @@ def open_hds(
     grb_path: Union[str, pathlib.Path]
     dry_nan: bool, default value: False.
         Whether to convert dry values to NaN.
+    simulation_start_time : Optional datetime
+        The time and date correpsonding to the beginning of the simulation.
+        Use this to convert the time coordinates of the output array to
+        calendar time/dates. time_unit must also be present if this argument is present.
+    time_unit: Optional str
+        The time unit MF6 is working in, in string representation.
+        Only used if simulation_start_time was provided.
+        Admissible values are:
+        ns -> nanosecond
+        ms -> microsecond
+        s -> second
+        m -> minute
+        h -> hour
+        d -> day
+        w -> week
+        Units "month" or "year" are not supported, as they do not represent unambiguous timedelta values durations.
 
     Returns
     -------
@@ -125,11 +146,15 @@ def open_hds(
     grb_content["name"] = "head"
     distype = grb_content["distype"]
     _open = _get_function(_OPEN_HDS, distype)
-    return _open(hds_path, grb_content, dry_nan)
+    return _open(hds_path, grb_content, dry_nan, simulation_start_time, time_unit)
 
 
 def open_conc(
-    ucn_path: FilePath, grb_path: FilePath, dry_nan: bool = False
+    ucn_path: FilePath,
+    grb_path: FilePath,
+    dry_nan: bool = False,
+    simulation_start_time: Optional[np.datetime64] = None,
+    time_unit: Optional[str] = "d",
 ) -> Union[xr.DataArray, xu.UgridDataArray]:
     """
     Open Modflow6 "Unformatted Concentration" (.ucn) file.
@@ -154,7 +179,7 @@ def open_conc(
     grb_content["name"] = "concentration"
     distype = grb_content["distype"]
     _open = _get_function(_OPEN_HDS, distype)
-    return _open(ucn_path, grb_content, dry_nan)
+    return _open(ucn_path, grb_content, dry_nan, simulation_start_time, time_unit)
 
 
 def open_hds_like(
@@ -196,7 +221,11 @@ def open_hds_like(
 
 
 def open_cbc(
-    cbc_path: FilePath, grb_path: FilePath, flowja: bool = False
+    cbc_path: FilePath,
+    grb_path: FilePath,
+    flowja: bool = False,
+    simulation_start_time: Optional[np.datetime64] = None,
+    time_unit: Optional[str] = "d",
 ) -> Dict[str, Union[xr.DataArray, xu.UgridDataArray]]:
     """
     Open modflow6 cell-by-cell (.cbc) file.
@@ -257,4 +286,4 @@ def open_cbc(
     grb_content = read_grb(grb_path)
     distype = grb_content["distype"]
     _open = _get_function(_OPEN_CBC, distype)
-    return _open(cbc_path, grb_content, flowja)
+    return _open(cbc_path, grb_content, flowja, simulation_start_time, time_unit)

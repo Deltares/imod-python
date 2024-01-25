@@ -386,3 +386,28 @@ def test_to_mf6_remove_barrier_parts_adjacent_to_inactive_cells(
     assert args["cell_id1"][0, :].size == expected_number_barriers
     assert args["cell_id2"][0, :].size == expected_number_barriers
     assert args["layer"].size == expected_number_barriers
+
+
+def test_is_empty():
+    geometry = gpd.GeoDataFrame(
+        geometry=[shapely.linestrings([], [])],
+        data={
+            "resistance": [],
+            "ztop": [],
+            "zbottom": [],
+        },
+    )
+    hfb = HorizontalFlowBarrierResistance(geometry)
+    assert hfb.is_empty()
+
+    geometry = gpd.GeoDataFrame(
+        geometry=[shapely.linestrings([0, 0], [1, 1])],
+        data={
+            "resistance": [1.0],
+            "ztop": [1.0],
+            "zbottom": [1.0],
+        },
+    )
+
+    hfb = HorizontalFlowBarrierResistance(geometry)
+    assert not hfb.is_empty()
