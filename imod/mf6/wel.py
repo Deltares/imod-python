@@ -169,7 +169,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         repeat_stress: Optional[xr.DataArray] = None,
     ):
         if id is None:
-            id = np.arange(self.dataset["x"].size).astype(str)
+            id = np.arange(len(x)).astype(str)
 
         dict_dataset = {
             "screen_top": _assign_dims(screen_top),
