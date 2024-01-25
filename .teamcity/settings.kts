@@ -70,6 +70,8 @@ object Examples : BuildType({
     vcs {
         root(DslContext.settingsRoot, "+:. => imod-python")
         root(AbsoluteId("iMOD6_IMODPython_MetaSwapLookupTable"), ". => lookup_table")
+
+        cleanCheckout = true
     }
 
     steps {
@@ -137,6 +139,8 @@ object Lint : BuildType({
 
     vcs {
         root(DslContext.settingsRoot, "+:. => imod-python")
+
+        cleanCheckout = true
     }
 
     steps {
@@ -241,6 +245,8 @@ object UnitTests : BuildType({
 
     vcs {
         root(DslContext.settingsRoot, "+:. => imod-python")
+
+        cleanCheckout = true
     }
 
     steps {
