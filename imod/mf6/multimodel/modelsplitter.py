@@ -2,6 +2,12 @@ from typing import List, NamedTuple
 
 import numpy as np
 
+from imod.mf6.auxiliary_variables import (
+    add_periodic_auxiliary_variable,
+    has_auxiliary_variable_source_array,
+    remove_periodic_auxiliary_variable,
+)
+from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.hfb import HorizontalFlowBarrierBase
 from imod.mf6.model import Modflow6Model
 from imod.mf6.model_gwf import GroundwaterFlowModel
@@ -10,12 +16,6 @@ from imod.mf6.utilities.grid import get_active_domain_slice
 from imod.mf6.wel import Well
 from imod.typing import GridDataArray
 from imod.typing.grid import is_unstructured, ones_like
-from imod.mf6.boundary_condition import BoundaryCondition
-from imod.mf6.auxiliary_variables import (
-    add_periodic_auxiliary_variable,
-    remove_periodic_auxiliary_variable,
-    has_auxiliary_variable_source_array,
-)
 
 HIGH_LEVEL_PKGS = (HorizontalFlowBarrierBase, Well)
 

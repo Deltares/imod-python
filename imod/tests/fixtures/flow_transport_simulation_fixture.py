@@ -142,8 +142,6 @@ def flow_transport_simulation():
     gwf_model["rch"] = imod.mf6.Recharge(recharge_rate, recharge_conc, "AUX")
     # %%
     # Create the simulation.
-
-    rate = [1.0, 1.0]
     injection_concentration = xr.DataArray(
         [[0.2, 0.23], [0.5, 0.2], [0.2, 0.23], [0.5, 0.2]],
         coords={
