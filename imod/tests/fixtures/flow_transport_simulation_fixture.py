@@ -72,7 +72,7 @@ def create_transport_model(flow_model, species_name, dispersivity, retardation, 
 
 # %%
 # Create the spatial discretization.
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def flow_transport_simulation():
     nlay = 1
     nrow = 2

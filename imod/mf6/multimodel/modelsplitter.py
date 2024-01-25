@@ -3,9 +3,8 @@ from typing import List, NamedTuple
 import numpy as np
 
 from imod.mf6.auxiliary_variables import (
-    add_periodic_auxiliary_variable,
-    has_auxiliary_variable_source_array,
-    remove_periodic_auxiliary_variable,
+    expand_transient_auxiliary_variables,
+    remove_expanded_auxiliary_variables_from_dataset,
 )
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.hfb import HorizontalFlowBarrierBase
@@ -93,8 +92,7 @@ def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6
 
     for pkg_name, package in model.items():
         if isinstance(package, BoundaryCondition):
-            if has_auxiliary_variable_source_array(package):
-                remove_periodic_auxiliary_variable(package)
+            remove_expanded_auxiliary_variables_from_dataset(package)
 
         sliced_package = clip_by_grid(package, partition_info.active_domain)
 
@@ -110,6 +108,5 @@ def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6
             )
 
         if isinstance(package, BoundaryCondition):
-            if has_auxiliary_variable_source_array(package):
-                add_periodic_auxiliary_variable(package)
+            expand_transient_auxiliary_variables(package)
     return new_model

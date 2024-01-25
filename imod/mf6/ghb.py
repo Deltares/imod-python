@@ -1,6 +1,6 @@
 import numpy as np
 
-from imod.mf6.auxiliary_variables import add_periodic_auxiliary_variable
+from imod.mf6.auxiliary_variables import expand_transient_auxiliary_variables
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
@@ -139,7 +139,7 @@ class GeneralHeadBoundary(BoundaryCondition):
         if concentration is not None:
             self.dataset["concentration"] = concentration
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
-            add_periodic_auxiliary_variable(self)
+            expand_transient_auxiliary_variables(self)
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
