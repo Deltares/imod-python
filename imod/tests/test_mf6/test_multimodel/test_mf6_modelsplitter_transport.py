@@ -16,3 +16,5 @@ def test_slice_model_structured(flow_transport_simulation):
         submodel_list.append( slice_model(
             submodel_partition_info, transport_model
         ))
+
+    assert len(submodel_list) ==  2

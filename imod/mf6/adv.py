@@ -24,18 +24,17 @@ class Advection(Package):
         return self._template.render({"scheme": scheme})
 
 
-class AdvectionUpstream(Advection):
+def AdvectionUpstream():
     """
     The upstream weighting (first order upwind) scheme sets the concentration
     at the cellface between two adjacent cells equal to the concentration in
     the cell where the flow comes from. It surpresses oscillations.
     """
 
-    def __init__(self):
-        super().__init__(scheme="upstream")
+    return Advection(scheme="upstream")
 
 
-class AdvectionCentral(Advection):
+def AdvectionCentral(Advection):
     """
     The central-in-space weighting scheme is based on a simple
     distance-weighted linear interpolation between the center of cell n and the
@@ -46,15 +45,13 @@ class AdvectionCentral(Advection):
     programs, such as MT3D.
     """
 
-    def __init__(self):
-        super().__init__(scheme="central")
+    return Advection(scheme="central")
 
 
-class AdvectionTVD(Advection):
+def AdvectionTVD(Advection):
     """
     An implicit second order TVD scheme. More expensive than upstream
     weighting but more robust.
     """
 
-    def __init__(self):
-        super().__init__(scheme="TVD")
+    return Advection(scheme="TVD")
