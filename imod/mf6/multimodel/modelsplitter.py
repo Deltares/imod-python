@@ -65,7 +65,8 @@ def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6
     that are sliced using the domain_slice. A domain_slice can be created using the
     :func:`imod.mf6.modelsplitter.create_domain_slices` function.
     """
-    new_model = GroundwaterFlowModel(**model._options)
+    modelclass = type(model)
+    new_model = modelclass(**model._options)
     domain_slice2d = get_active_domain_slice(partition_info.active_domain)
     if is_unstructured(model.domain):
         new_idomain = model.domain.sel(domain_slice2d)
