@@ -24,7 +24,18 @@ Changed
   environments. This replaces the ``imod-environment.yml`` conda environment. We
   advice doing development installations with pixi from now on. `See the
   documentation. <https://deltares.github.io/imod-python/installation.html>`_
+  This does not affect users who installed with ``pip install imod``, ``mamba
+  install imod`` or ``conda install imod``.
+- Changed build system from ``setuptools`` to ``hatchling``. Users who did a
+  development install are adviced to run ``pip uninstall imod`` and ``pip
+  install -e .`` again. This does not affect users who installed with ``pip
+  install imod``, ``mamba install imod`` or ``conda install imod``.
 
+Added
+~~~~~
+- Added support for coupling a GroundwaterFlowModel and Transport Model i.c.w.
+  the 6.4.3 release of MODFLOW. Using an older version of iMOD Python
+  with this version of MODFLOW will result in an error.
 
 [0.15.1] - 2023-12-22
 ---------------------

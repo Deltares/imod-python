@@ -299,6 +299,7 @@ GRIDLESS_PACKAGES = [
             },
         ),
     ),
+    imod.mf6.GWFGWT("model_name1", "model_name2"),
 ]
 
 
