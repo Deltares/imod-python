@@ -46,9 +46,9 @@ def convertible(idomain):
 
 @pytest.fixture(scope="function")
 def dis(idomain):
-    top = idomain.sel(layer=1)
+    top = idomain.sel(layer=1, drop=True)
     bottom = idomain - xr.DataArray(
-        data=[1.0, 2.0], dims=("layer",), coords={"layer": [2, 3]}
+        data=[0.0, 1.0, 2.0], dims=("layer",), coords={"layer": [1, 2, 3]}
     )
 
     return imod.mf6.StructuredDiscretization(
