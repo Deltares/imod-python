@@ -79,14 +79,14 @@ object LintTemplate : Template({
     }
 
     steps {
-        exec {
-            name = "Static code analysis"
-            id = "Static_code_analysis"
-            workingDir = "imod-python"
-            path = "pixi"
-            arguments = "run --frozen lint"
-            formatStderrAsError = true
-            param("script.content", "pixi run lint")
+        script {
+                name = "Static code analysis"
+                id = "Static_code_analysis"
+                workingDir = "imod-python"
+                scriptContent = """
+                    pixi run --frozen lint
+                """.trimIndent()
+                formatStderrAsError = true
         }
     }
 
