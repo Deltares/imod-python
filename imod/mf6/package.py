@@ -48,8 +48,8 @@ class Package(PackageBase, abc.ABC):
     """
 
     _pkg_id = ""
-    _init_schemata: Dict[str, List[SchemaType] | Tuple[SchemaType]] = {}
-    _write_schemata: Dict[str, List[SchemaType] | Tuple[SchemaType]] = {}
+    _init_schemata: Dict[str, List[SchemaType] | Tuple[SchemaType, ...]] = {}
+    _write_schemata: Dict[str, List[SchemaType] | Tuple[SchemaType, ...]] = {}
     _keyword_map: Dict[str, str] = {}
 
     def __init__(self, allargs=None):
