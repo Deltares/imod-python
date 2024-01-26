@@ -4,7 +4,6 @@ import numpy as np
 
 from imod.mf6.hfb import HorizontalFlowBarrierBase
 from imod.mf6.model import Modflow6Model
-from imod.mf6.model_gwf import GroundwaterFlowModel
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.grid import get_active_domain_slice
 from imod.mf6.wel import Well
