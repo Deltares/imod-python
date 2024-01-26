@@ -2,7 +2,6 @@ import jetbrains.buildServer.configs.kotlin.*
 import jetbrains.buildServer.configs.kotlin.CustomChart.Serie
 import jetbrains.buildServer.configs.kotlin.CustomChart.SeriesKey
 import jetbrains.buildServer.configs.kotlin.buildFeatures.*
-import jetbrains.buildServer.configs.kotlin.buildSteps.exec
 import jetbrains.buildServer.configs.kotlin.buildSteps.powerShell
 import jetbrains.buildServer.configs.kotlin.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.projectFeatures.ProjectReportTab
@@ -169,6 +168,13 @@ object UnitTestsTemplate : Template({
         }
     }
 
+    features {
+        xmlReport {
+            reportType = XmlReport.XmlReportType.JUNIT
+            rules = "imod-python/imod/tests/*report.xml"
+        }
+    }
+
     requirements {
         equals("env.OS", "Windows_NT")
     }
@@ -199,6 +205,13 @@ object ExamplesTemplate : Template({
         }
     }
 
+    features {
+        xmlReport {
+            reportType = XmlReport.XmlReportType.JUNIT
+            rules = "imod-python/imod/tests/*report.xml"
+        }
+    }
+
     requirements {
         equals("env.OS", "Windows_NT")
     }
@@ -208,13 +221,6 @@ object Examples : BuildType({
     name = "Examples"
 
     templates(ExamplesTemplate, GitHubIntegrationTemplate)
-
-    features {
-        xmlReport {
-            reportType = XmlReport.XmlReportType.JUNIT
-            rules = "imod-python/imod/tests/*report.xml"
-        }
-    }
 
     dependencies {
         dependency(AbsoluteId("MetaSWAP_Modflow_Modflow6Release642")) {
@@ -296,13 +302,6 @@ object UnitTests : BuildType({
 
     templates(UnitTestsTemplate, GitHubIntegrationTemplate)
 
-    features {
-        xmlReport {
-            reportType = XmlReport.XmlReportType.JUNIT
-            rules = "imod-python/imod/tests/*report.xml"
-        }
-    }
-
     dependencies {
         dependency(AbsoluteId("MetaSWAP_Modflow_Modflow6Release642")) {
             snapshot {
@@ -338,13 +337,6 @@ object NightlyUnitTests : BuildType({
     name = "UnitTests"
 
     templates(UnitTestsTemplate)
-
-    features {
-        xmlReport {
-            reportType = XmlReport.XmlReportType.JUNIT
-            rules = "imod-python/imod/tests/*report.xml"
-        }
-    }
 
     dependencies {
         snapshot(NightlyLint) {
@@ -419,13 +411,6 @@ object NightlyExamples : BuildType({
     name = "Examples"
 
     templates(ExamplesTemplate)
-
-    features {
-        xmlReport {
-            reportType = XmlReport.XmlReportType.JUNIT
-            rules = "imod-python/imod/tests/*report.xml"
-        }
-    }
 
     dependencies {
         snapshot(NightlyLint) {
