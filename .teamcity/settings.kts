@@ -281,15 +281,6 @@ object Tests : BuildType({
         showDependenciesChanges = true
     }
 
-    triggers {
-        finishBuildTrigger {
-            buildType = "iMOD6_Modflow6buildWin64"
-            successfulOnly = true
-        }
-        vcs {
-        }
-    }
-
     features {
         pullRequests {
             vcsRootExtId = "${DslContext.settingsRoot.id}"
