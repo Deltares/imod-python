@@ -30,7 +30,7 @@ class WriteContext:
 
     def __init__(
         self,
-        simulation_directory: Path = ".",
+        simulation_directory: Path = Path("."),
         use_binary: bool = False,
         use_absolute_paths: bool = False,
         write_directory: Optional[Union[str, Path]] = None,
