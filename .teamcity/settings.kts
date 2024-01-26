@@ -217,6 +217,33 @@ object ExamplesTemplate : Template({
     }
 })
 
+object Lint : BuildType({
+    name = "Lint"
+
+    templates(LintTemplate, GitHubIntegrationTemplate)
+})
+
+object UnitTests : BuildType({
+    name = "UnitTests"
+
+    templates(UnitTestsTemplate, GitHubIntegrationTemplate)
+
+    dependencies {
+        dependency(AbsoluteId("MetaSWAP_Modflow_Modflow6Release642")) {
+            snapshot {
+                onDependencyFailure = FailureAction.FAIL_TO_START
+            }
+
+            artifacts {
+                artifactRules = "+:MODFLOW6.zip!** => modflow6"
+            }
+        }
+        snapshot(Lint) {
+            onDependencyFailure = FailureAction.FAIL_TO_START
+        }
+    }
+})
+
 object Examples : BuildType({
     name = "Examples"
 
@@ -236,12 +263,6 @@ object Examples : BuildType({
             onDependencyFailure = FailureAction.FAIL_TO_START
         }
     }
-})
-
-object Lint : BuildType({
-    name = "Lint"
-
-    templates(LintTemplate, GitHubIntegrationTemplate)
 })
 
 object Tests : BuildType({
@@ -297,27 +318,6 @@ object Tests : BuildType({
     }
 })
 
-object UnitTests : BuildType({
-    name = "UnitTests"
-
-    templates(UnitTestsTemplate, GitHubIntegrationTemplate)
-
-    dependencies {
-        dependency(AbsoluteId("MetaSWAP_Modflow_Modflow6Release642")) {
-            snapshot {
-                onDependencyFailure = FailureAction.FAIL_TO_START
-            }
-
-            artifacts {
-                artifactRules = "+:MODFLOW6.zip!** => modflow6"
-            }
-        }
-        snapshot(Lint) {
-            onDependencyFailure = FailureAction.FAIL_TO_START
-        }
-    }
-})
-
 object Nightly : Project({
     name = "Nightly"
 
@@ -337,6 +337,27 @@ object NightlyUnitTests : BuildType({
     name = "UnitTests"
 
     templates(UnitTestsTemplate)
+
+    dependencies {
+        snapshot(NightlyLint) {
+            onDependencyFailure = FailureAction.FAIL_TO_START
+        }
+        dependency(AbsoluteId("iMOD6_Modflow6buildWin64")) {
+            snapshot {
+                onDependencyFailure = FailureAction.FAIL_TO_START
+            }
+
+            artifacts {
+                artifactRules = "+:MODFLOW6.zip!** => modflow6"
+            }
+        }
+    }
+})
+
+object NightlyExamples : BuildType({
+    name = "Examples"
+
+    templates(ExamplesTemplate)
 
     dependencies {
         snapshot(NightlyLint) {
@@ -402,27 +423,6 @@ object NightlyTests : BuildType({
 
             artifacts {
                 artifactRules = "+:coverage.zip => ."
-            }
-        }
-    }
-})
-
-object NightlyExamples : BuildType({
-    name = "Examples"
-
-    templates(ExamplesTemplate)
-
-    dependencies {
-        snapshot(NightlyLint) {
-            onDependencyFailure = FailureAction.FAIL_TO_START
-        }
-        dependency(AbsoluteId("iMOD6_Modflow6buildWin64")) {
-            snapshot {
-                onDependencyFailure = FailureAction.FAIL_TO_START
-            }
-
-            artifacts {
-                artifactRules = "+:MODFLOW6.zip!** => modflow6"
             }
         }
     }
