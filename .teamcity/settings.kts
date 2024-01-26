@@ -41,7 +41,8 @@ project {
     buildType(Lint)
     buildType(Tests)
 
-    subProject(Nightly)
+    template(LintTemplate)
+    template(UnitTestsTemplate)
 
     features {
         buildTypeCustomChart {
@@ -62,10 +63,92 @@ project {
             sourceBuildBranchFilter = "+:<default>"
         }
     }
+
+    subProject(Nightly)
 }
 
-object Examples : BuildType({
-    name = "Examples"
+object LintTemplate : Template({
+    name = "LintTemplate"
+
+    detectHangingBuilds = false
+
+    vcs {
+        root(DslContext.settingsRoot, "+:. => imod-python")
+
+        cleanCheckout = true
+    }
+
+    steps {
+        exec {
+            name = "Static code analysis"
+            id = "Static_code_analysis"
+            workingDir = "imod-python"
+            path = "pixi"
+            arguments = "run --frozen lint"
+            formatStderrAsError = true
+            param("script.content", "pixi run lint")
+        }
+    }
+
+    requirements {
+        equals("env.OS", "Windows_NT")
+    }
+})
+
+object UnitTestsTemplate : Template({
+    name = "UnitTestsTemplate"
+
+    allowExternalStatus = true
+    artifactRules = """
+        imod-python\imod\tests\temp => test_output.zip
+        imod-python\imod\tests\coverage => coverage.zip
+    """.trimIndent()
+
+    vcs {
+        root(DslContext.settingsRoot, "+:. => imod-python")
+
+        cleanCheckout = true
+    }
+
+    steps {
+        script {
+            name = "Run unittests"
+            id = "Run_unittests"
+            workingDir = "imod-python"
+            scriptContent = """
+                set Path=%system.teamcity.build.checkoutDir%\modflow6;%env.Path% 
+                pixi run --frozen unittests
+            """.trimIndent()
+            formatStderrAsError = true
+        }
+        powerShell {
+            name = "Extract coverage statistics"
+            id = "Extract_coverage_statistics"
+            workingDir = "imod-python/imod/tests"
+            scriptMode = script {
+                content = """
+                    ${'$'}REPORT = echo "coverage report" | pixi shell
+                    
+                    ${'$'}TOTALS = ${'$'}REPORT | Select-String -Pattern 'TOTAL' -CaseSensitive -SimpleMatch
+                    ${'$'}STATISTICS = ${'$'}TOTALS -split "\s+"
+                    ${'$'}TOTALLINES = ${'$'}STATISTICS[1]
+                    ${'$'}MISSEDLINES = ${'$'}STATISTICS[2]
+                    ${'$'}COVEREDLINES = ${'$'}TOTALLINES - ${'$'}MISSEDLINES
+                    
+                    Write-Host "##teamcity[buildStatisticValue key='CodeCoverageAbsLCovered' value='${'$'}COVEREDLINES']"
+                    Write-Host "##teamcity[buildStatisticValue key='CodeCoverageAbsLTotal' value='${'$'}TOTALLINES']"
+                """.trimIndent()
+            }
+        }
+    }
+
+    requirements {
+        equals("env.OS", "Windows_NT")
+    }
+})
+
+object ExamplesTemplate : Template({
+    name = "ExamplesTemplate"
 
     artifactRules = """imod-python\imod\tests\temp => test_output.zip"""
 
@@ -88,6 +171,16 @@ object Examples : BuildType({
             formatStderrAsError = true
         }
     }
+
+    requirements {
+        equals("env.OS", "Windows_NT")
+    }
+})
+
+object Examples : BuildType({
+    name = "Examples"
+
+    templates(LintTemplate)
 
     features {
         commitStatusPublisher {
@@ -128,34 +221,12 @@ object Examples : BuildType({
             onDependencyFailure = FailureAction.FAIL_TO_START
         }
     }
-
-    requirements {
-        equals("env.OS", "Windows_NT")
-    }
 })
 
 object Lint : BuildType({
     name = "Lint"
 
-    detectHangingBuilds = false
-
-    vcs {
-        root(DslContext.settingsRoot, "+:. => imod-python")
-
-        cleanCheckout = true
-    }
-
-    steps {
-        exec {
-            name = "Static code analysis"
-            id = "Static_code_analysis"
-            workingDir = "imod-python"
-            path = "pixi"
-            arguments = "run --frozen lint"
-            formatStderrAsError = true
-            param("script.content", "pixi run lint")
-        }
-    }
+    templates(LintTemplate)
 
     features {
         commitStatusPublisher {
@@ -177,17 +248,13 @@ object Lint : BuildType({
             }
         }
     }
-
-    requirements {
-        equals("env.OS", "Windows_NT")
-    }
 })
 
 object Tests : BuildType({
     name = "Tests"
 
     allowExternalStatus = true
-    type = BuildTypeSettings.Type.COMPOSITE
+    type = Type.COMPOSITE
 
     vcs {
         root(DslContext.settingsRoot)
@@ -239,49 +306,7 @@ object Tests : BuildType({
 object UnitTests : BuildType({
     name = "UnitTests"
 
-    allowExternalStatus = true
-    artifactRules = """
-        imod-python\imod\tests\temp => test_output.zip
-        imod-python\imod\tests\coverage => coverage.zip
-    """.trimIndent()
-
-    vcs {
-        root(DslContext.settingsRoot, "+:. => imod-python")
-
-        cleanCheckout = true
-    }
-
-    steps {
-        script {
-            name = "Run unittests"
-            id = "Run_unittests"
-            workingDir = "imod-python"
-            scriptContent = """
-                set Path=%system.teamcity.build.checkoutDir%\modflow6;%env.Path% 
-                pixi run --frozen unittests
-            """.trimIndent()
-            formatStderrAsError = true
-        }
-        powerShell {
-            name = "Extract coverage statistics"
-            id = "Extract_coverage_statistics"
-            workingDir = "imod-python/imod/tests"
-            scriptMode = script {
-                content = """
-                    ${'$'}REPORT = echo "coverage report" | pixi shell
-                    
-                    ${'$'}TOTALS = ${'$'}REPORT | Select-String -Pattern 'TOTAL' -CaseSensitive -SimpleMatch
-                    ${'$'}STATISTICS = ${'$'}TOTALS -split "\s+"
-                    ${'$'}TOTALLINES = ${'$'}STATISTICS[1]
-                    ${'$'}MISSEDLINES = ${'$'}STATISTICS[2]
-                    ${'$'}COVEREDLINES = ${'$'}TOTALLINES - ${'$'}MISSEDLINES
-                    
-                    Write-Host "##teamcity[buildStatisticValue key='CodeCoverageAbsLCovered' value='${'$'}COVEREDLINES']"
-                    Write-Host "##teamcity[buildStatisticValue key='CodeCoverageAbsLTotal' value='${'$'}TOTALLINES']"
-                """.trimIndent()
-            }
-        }
-    }
+    templates(UnitTestsTemplate)
 
     features {
         commitStatusPublisher {
@@ -322,10 +347,6 @@ object UnitTests : BuildType({
             onDependencyFailure = FailureAction.FAIL_TO_START
         }
     }
-
-    requirements {
-        equals("env.OS", "Windows_NT")
-    }
 })
 
 object Nightly : Project({
@@ -340,23 +361,7 @@ object Nightly : Project({
 object NightlyLint : BuildType({
     name = "Lint"
 
-    detectHangingBuilds = false
-
-    vcs {
-        root(AbsoluteId("iMOD6_IMODPython_ImodPython"), "+:. => imod-python")
-    }
-
-    steps {
-        exec {
-            name = "Static code analysis"
-            id = "Static_code_analysis"
-            workingDir = "imod-python"
-            path = "pixi"
-            arguments = "run --frozen lint"
-            formatStderrAsError = true
-            param("script.content", "pixi run lint")
-        }
-    }
+    templates(LintTemplate)
 
     features {
         commitStatusPublisher {
@@ -364,63 +369,17 @@ object NightlyLint : BuildType({
             publisher = github {
                 githubUrl = "https://api.github.com"
                 authType = personalToken {
-                    token = "zxx405f832770c7eeafe3bc4661cb60c2319d28aed5b8b69ab115b35746b5d73b63514210dbd32edbe1775d03cbe80d301b"
+                    token = "credentialsJSON:558df52e-822f-4d9d-825a-854846a9a2ff"
                 }
             }
         }
-    }
-
-    requirements {
-        equals("env.OS", "Windows_NT")
     }
 })
 
 object NightlyUnitTests : BuildType({
     name = "UnitTests"
 
-    allowExternalStatus = true
-    artifactRules = """
-        imod-python\imod\tests\temp => test_output.zip
-        imod-python\imod\tests\coverage => coverage.zip
-    """.trimIndent()
-
-    vcs {
-        root(AbsoluteId("iMOD6_IMODPython_ImodPython"), "+:. => imod-python")
-
-        cleanCheckout = true
-    }
-
-    steps {
-        script {
-            name = "Run unittests"
-            id = "Run_unittests"
-            workingDir = "imod-python"
-            scriptContent = """
-                set Path=%system.teamcity.build.checkoutDir%\modflow6;%env.Path%
-                pixi run --frozen unittests
-            """.trimIndent()
-            formatStderrAsError = true
-        }
-        powerShell {
-            name = "Extract coverage statistics"
-            id = "Extract_coverage_statistics"
-            workingDir = "imod-python/imod/tests"
-            scriptMode = script {
-                content = """
-                    ${'$'}REPORT = echo "coverage report" | pixi shell
-
-                    ${'$'}TOTALS = ${'$'}REPORT | Select-String -Pattern 'TOTAL' -CaseSensitive -SimpleMatch
-                    ${'$'}STATISTICS = ${'$'}TOTALS -split "\s+"
-                    ${'$'}TOTALLINES = ${'$'}STATISTICS[1]
-                    ${'$'}MISSEDLINES = ${'$'}STATISTICS[2]
-                    ${'$'}COVEREDLINES = ${'$'}TOTALLINES - ${'$'}MISSEDLINES
-
-                    Write-Host "##teamcity[buildStatisticValue key='CodeCoverageAbsLCovered' value='${'$'}COVEREDLINES']"
-                    Write-Host "##teamcity[buildStatisticValue key='CodeCoverageAbsLTotal' value='${'$'}TOTALLINES']"
-                """.trimIndent()
-            }
-        }
-    }
+    templates(UnitTestsTemplate)
 
     features {
         xmlReport {
@@ -443,17 +402,13 @@ object NightlyUnitTests : BuildType({
             }
         }
     }
-
-    requirements {
-        equals("env.OS", "Windows_NT")
-    }
 })
 
 object NightlyTests : BuildType({
     name = "Tests"
 
     allowExternalStatus = true
-    type = BuildTypeSettings.Type.COMPOSITE
+    type = Type.COMPOSITE
 
     vcs {
         root(AbsoluteId("iMOD6_IMODPython_ImodPython"))
@@ -505,27 +460,7 @@ object NightlyTests : BuildType({
 object NightlyExamples : BuildType({
     name = "Examples"
 
-    artifactRules = """imod-python\imod\tests\temp => test_output.zip"""
-
-    vcs {
-        root(AbsoluteId("iMOD6_IMODPython_ImodPython"), "+:. => imod-python")
-        root(AbsoluteId("iMOD6_IMODPython_MetaSwapLookupTable"), ". => lookup_table")
-
-        cleanCheckout = true
-    }
-
-    steps {
-        script {
-            name = "Run examples"
-            id = "Run_examples"
-            workingDir = "imod-python"
-            scriptContent = """
-                set Path=%system.teamcity.build.checkoutDir%\modflow6;%env.Path%
-                pixi run --frozen examples
-            """.trimIndent()
-            formatStderrAsError = true
-        }
-    }
+    templates(LintTemplate)
 
     features {
         xmlReport {
@@ -547,9 +482,5 @@ object NightlyExamples : BuildType({
                 artifactRules = "+:MODFLOW6.zip!** => modflow6"
             }
         }
-    }
-
-    requirements {
-        equals("env.OS", "Windows_NT")
     }
 })
