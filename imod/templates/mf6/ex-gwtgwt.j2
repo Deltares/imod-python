@@ -1,0 +1,36 @@
+# this file contains the exchanges from a transport model associated to flow model{{flow_model_name_1}}
+# to a transport model associated to flow model{{flow_model_name_2}}
+
+begin options
+{{flow_model_name_1}}
+{{flow_model_name_2}}
+{% if auxiliary is defined %}  auxiliary {{auxiliary|join(" ")}}
+{% endif -%}  
+{%- if print_input is defined -%}  print_input
+{% endif -%}
+{%- if print_flows is defined -%}  print_flows
+{% endif -%}
+{%- if save_flows is defined -%}  save_flows
+{% endif -%}
+{%- if adv_scheme is defined -%} adv_scheme
+{% endif -%}
+{%- if dsp_xt3d_off is defined -%} dsp_xt3d_off
+{% endif -%}
+{%- if dsp_xt3d_rhs is defined -%}  dsp_xt3d_rhs 
+{% endif -%}
+{%- if obs is defined -%}  obs6 filein {{obs}}
+{% endif -%}
+end options
+{% set nexg = layer | length %}
+begin dimensions
+  nexg {{nexg}}
+end dimensions
+
+begin exchangedata
+# first 3 (structured) or 2 (unstructured) columns are the exchange boundary cell indices in the numbering local to {{model_name_1}}
+# second 3 (structured) or 2 (unstructured) columns are the exchange boundary cell indices in the numbering local to {{model_name_2}}
+# followed by columns ihc, cl1, cl2, hwva and auxiliary variables, if any
+{%- for i in range(nexg) %}
+  {{layer[i]}} {{cell_id1[i]|join(" ")}} {{layer[i]}} {{cell_id2[i]|join(" ")}} {{ihc[i]}} {{cl1[i]}} {{cl2[i]}} {{hwva[i]}} {%- if auxiliary_data is defined %} {{auxiliary_data.T[i]|join(" ")}}{% endif %}
+{%- endfor %}
+end exchangedata
