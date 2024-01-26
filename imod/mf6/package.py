@@ -20,6 +20,7 @@ from imod.mf6.pkgbase import EXCHANGE_PACKAGES, TRANSPORT_PACKAGES, PackageBase
 from imod.mf6.regridding_utils import (
     RegridderInstancesCollection,
     RegridderType,
+    assign_coord_if_present,
     get_non_grid_data,
 )
 from imod.mf6.utilities.schemata import filter_schemata_dict
@@ -699,19 +700,11 @@ class Package(PackageBase, abc.ABC):
                 regridder_function,
                 target_grid,
             )
+            # set dx and dy if present in target_grid
+            new_package_data[varname] = assign_coord_if_present("dx", target_grid, new_package_data[varname])
+            new_package_data[varname] = assign_coord_if_present("dy", target_grid, new_package_data[varname])
 
-        new_package = self.__class__(**new_package_data)
-
-        # set dx and dy if present in target_grid
-        if "dx" in target_grid.coords:
-            new_package.dataset = new_package.dataset.assign_coords(
-                {"dx": target_grid.coords["dx"].values[()]}
-            )
-        if "dy" in target_grid.coords:
-            new_package.dataset = new_package.dataset.assign_coords(
-                {"dy": target_grid.coords["dy"].values[()]}
-            )
-        return new_package
+        return self.__class__(**new_package_data)
 
     def skip_masking_dataarray(self, array_name: str) -> bool:
         if hasattr(self, "_skip_mask_arrays"):
