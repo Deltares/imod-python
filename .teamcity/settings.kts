@@ -41,6 +41,8 @@ project {
     buildType(Lint)
     buildType(Tests)
 
+    subProject(Nightly)
+
     features {
         buildTypeCustomChart {
             id = "PROJECT_EXT_41"
@@ -318,6 +320,232 @@ object UnitTests : BuildType({
         }
         snapshot(Lint) {
             onDependencyFailure = FailureAction.FAIL_TO_START
+        }
+    }
+
+    requirements {
+        equals("env.OS", "Windows_NT")
+    }
+})
+
+object Nightly : Project({
+    name = "Nightly"
+
+    buildType(NightlyLint)
+    buildType(NightlyUnitTests)
+    buildType(NightlyExamples)
+    buildType(NightlyTests)
+})
+
+object NightlyLint : BuildType({
+    name = "Lint"
+
+    detectHangingBuilds = false
+
+    vcs {
+        root(AbsoluteId("iMOD6_IMODPython_ImodPython"), "+:. => imod-python")
+    }
+
+    steps {
+        exec {
+            name = "Static code analysis"
+            id = "Static_code_analysis"
+            workingDir = "imod-python"
+            path = "pixi"
+            arguments = "run --frozen lint"
+            formatStderrAsError = true
+            param("script.content", "pixi run lint")
+        }
+    }
+
+    features {
+        commitStatusPublisher {
+            vcsRootExtId = "iMOD6_IMODPython_ImodPython"
+            publisher = github {
+                githubUrl = "https://api.github.com"
+                authType = personalToken {
+                    token = "zxx405f832770c7eeafe3bc4661cb60c2319d28aed5b8b69ab115b35746b5d73b63514210dbd32edbe1775d03cbe80d301b"
+                }
+            }
+        }
+    }
+
+    requirements {
+        equals("env.OS", "Windows_NT")
+    }
+})
+
+object NightlyUnitTests : BuildType({
+    name = "UnitTests"
+
+    allowExternalStatus = true
+    artifactRules = """
+        imod-python\imod\tests\temp => test_output.zip
+        imod-python\imod\tests\coverage => coverage.zip
+    """.trimIndent()
+
+    vcs {
+        root(AbsoluteId("iMOD6_IMODPython_ImodPython"), "+:. => imod-python")
+
+        cleanCheckout = true
+    }
+
+    steps {
+        script {
+            name = "Run unittests"
+            id = "Run_unittests"
+            workingDir = "imod-python"
+            scriptContent = """
+                set Path=%system.teamcity.build.checkoutDir%\modflow6;%env.Path%
+                pixi run --frozen unittests
+            """.trimIndent()
+            formatStderrAsError = true
+        }
+        powerShell {
+            name = "Extract coverage statistics"
+            id = "Extract_coverage_statistics"
+            workingDir = "imod-python/imod/tests"
+            scriptMode = script {
+                content = """
+                    ${'$'}REPORT = echo "coverage report" | pixi shell
+
+                    ${'$'}TOTALS = ${'$'}REPORT | Select-String -Pattern 'TOTAL' -CaseSensitive -SimpleMatch
+                    ${'$'}STATISTICS = ${'$'}TOTALS -split "\s+"
+                    ${'$'}TOTALLINES = ${'$'}STATISTICS[1]
+                    ${'$'}MISSEDLINES = ${'$'}STATISTICS[2]
+                    ${'$'}COVEREDLINES = ${'$'}TOTALLINES - ${'$'}MISSEDLINES
+
+                    Write-Host "##teamcity[buildStatisticValue key='CodeCoverageAbsLCovered' value='${'$'}COVEREDLINES']"
+                    Write-Host "##teamcity[buildStatisticValue key='CodeCoverageAbsLTotal' value='${'$'}TOTALLINES']"
+                """.trimIndent()
+            }
+        }
+    }
+
+    features {
+        xmlReport {
+            reportType = XmlReport.XmlReportType.JUNIT
+            rules = "imod-python/imod/tests/*report.xml"
+        }
+    }
+
+    dependencies {
+        snapshot(NightlyLint) {
+            onDependencyFailure = FailureAction.FAIL_TO_START
+        }
+        dependency(AbsoluteId("iMOD6_Modflow6buildWin64")) {
+            snapshot {
+                onDependencyFailure = FailureAction.FAIL_TO_START
+            }
+
+            artifacts {
+                artifactRules = "+:MODFLOW6.zip!** => modflow6"
+            }
+        }
+    }
+
+    requirements {
+        equals("env.OS", "Windows_NT")
+    }
+})
+
+object NightlyTests : BuildType({
+    name = "Tests"
+
+    allowExternalStatus = true
+    type = BuildTypeSettings.Type.COMPOSITE
+
+    vcs {
+        root(AbsoluteId("iMOD6_IMODPython_ImodPython"))
+
+        branchFilter = """
+            +:*
+            -:release_imod56
+        """.trimIndent()
+        showDependenciesChanges = true
+    }
+
+    triggers {
+        finishBuildTrigger {
+            buildType = "iMOD6_Modflow6buildWin64"
+            successfulOnly = true
+        }
+    }
+
+    features {
+        notifications {
+            notifierSettings = emailNotifier {
+                email = """
+                    joeri.vanengelen@deltares.nl
+                    luitjan.slooten@deltares.nl
+                    sunny.titus@deltares.nl
+                """.trimIndent()
+            }
+            buildFailedToStart = true
+            buildFailed = true
+        }
+    }
+
+    dependencies {
+        snapshot(NightlyExamples) {
+            onDependencyFailure = FailureAction.FAIL_TO_START
+        }
+        dependency(NightlyUnitTests) {
+            snapshot {
+                onDependencyFailure = FailureAction.FAIL_TO_START
+            }
+
+            artifacts {
+                artifactRules = "+:coverage.zip => ."
+            }
+        }
+    }
+})
+
+object NightlyExamples : BuildType({
+    name = "Examples"
+
+    artifactRules = """imod-python\imod\tests\temp => test_output.zip"""
+
+    vcs {
+        root(AbsoluteId("iMOD6_IMODPython_ImodPython"), "+:. => imod-python")
+        root(AbsoluteId("iMOD6_IMODPython_MetaSwapLookupTable"), ". => lookup_table")
+
+        cleanCheckout = true
+    }
+
+    steps {
+        script {
+            name = "Run examples"
+            id = "Run_examples"
+            workingDir = "imod-python"
+            scriptContent = """
+                set Path=%system.teamcity.build.checkoutDir%\modflow6;%env.Path%
+                pixi run --frozen examples
+            """.trimIndent()
+            formatStderrAsError = true
+        }
+    }
+
+    features {
+        xmlReport {
+            reportType = XmlReport.XmlReportType.JUNIT
+            rules = "imod-python/imod/tests/*report.xml"
+        }
+    }
+
+    dependencies {
+        snapshot(NightlyLint) {
+            onDependencyFailure = FailureAction.FAIL_TO_START
+        }
+        dependency(AbsoluteId("iMOD6_Modflow6buildWin64")) {
+            snapshot {
+                onDependencyFailure = FailureAction.FAIL_TO_START
+            }
+
+            artifacts {
+                artifactRules = "+:MODFLOW6.zip!** => modflow6"
+            }
         }
     }
 
