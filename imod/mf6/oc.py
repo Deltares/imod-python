@@ -1,11 +1,12 @@
 import collections
 import os
 from pathlib import Path
-from typing import List, Union
+from typing import Dict, List, Tuple, Union
 
 import numpy as np
 
 from imod.mf6.package import Package
+from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.utilities.dataset import is_dataarray_none
 from imod.mf6.write_context import WriteContext
 from imod.schemata import DTypeSchema
@@ -79,7 +80,7 @@ class OutputControl(Package):
     }
 
     _write_schemata = {}
-    _regrid_method = {}
+    _regrid_method: Dict[str, Tuple[RegridderType, str]] = {}
 
     def __init__(
         self,

@@ -4,7 +4,7 @@ import textwrap
 import typing
 from copy import deepcopy
 from enum import Enum
-from typing import Optional, Tuple
+from typing import Dict, Optional, Tuple
 
 import cftime
 import geopandas as gpd
@@ -18,6 +18,7 @@ from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
+from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.grid import broadcast_to_full_domain
 from imod.schemata import EmptyIndexesSchema
@@ -273,7 +274,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
     _init_schemata = {}
     _write_schemata = {"geometry": [EmptyIndexesSchema()]}
 
-    _regrid_method = {}
+    _regrid_method: Dict[str, Tuple[RegridderType, str]] = {}
 
     def __init__(
         self,

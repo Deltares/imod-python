@@ -634,7 +634,7 @@ class Package(PackageBase, abc.ABC):
     def regrid_like(
         self,
         target_grid: GridDataArray,
-        regridder_types: Dict[str, Tuple[RegridderType, str]] = None,
+        regridder_types: Optional[Dict[str, Tuple[RegridderType, str]]] = None,
     ) -> "Package":
         """
         Creates a package of the same type as this package, based on another discretization.

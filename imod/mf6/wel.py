@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import cftime
 import numpy as np
@@ -20,6 +20,7 @@ from imod.mf6.boundary_condition import (
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
+from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.utilities.grid import create_layered_top
@@ -148,7 +149,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         "x": [AllNoDataSchema()],
     }
 
-    _regrid_method = {}
+    _regrid_method: Dict[str, Tuple[RegridderType, str]] = {}
 
     def __init__(
         self,

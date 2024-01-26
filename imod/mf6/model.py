@@ -583,3 +583,6 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
     def is_use_newton(self):
         return False
+
+    def _get_unique_regridder_types(self):
+        raise NotImplementedError(f"Regridding not supported for {self}")
