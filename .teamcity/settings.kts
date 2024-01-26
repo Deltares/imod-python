@@ -41,8 +41,10 @@ project {
     buildType(Lint)
     buildType(Tests)
 
+    template(GitHubIntegrationTemplate)
     template(LintTemplate)
     template(UnitTestsTemplate)
+    template(ExamplesTemplate)
 
     features {
         buildTypeCustomChart {
@@ -66,6 +68,31 @@ project {
 
     subProject(Nightly)
 }
+
+object GitHubIntegrationTemplate : Template({
+    name = "GitHubIntegrationTemplate"
+
+    features {
+        commitStatusPublisher {
+            vcsRootExtId = "${DslContext.settingsRoot.id}"
+            publisher = github {
+                githubUrl = "https://api.github.com"
+                authType = personalToken {
+                    token = "credentialsJSON:558df52e-822f-4d9d-825a-854846a9a2ff"
+                }
+            }
+        }
+        pullRequests {
+            vcsRootExtId = "${DslContext.settingsRoot.id}"
+            provider = github {
+                authType = token {
+                    token = "credentialsJSON:558df52e-822f-4d9d-825a-854846a9a2ff"
+                }
+                filterAuthorRole = PullRequests.GitHubRoleFilter.MEMBER
+            }
+        }
+    }
+})
 
 object LintTemplate : Template({
     name = "LintTemplate"
@@ -180,30 +207,12 @@ object ExamplesTemplate : Template({
 object Examples : BuildType({
     name = "Examples"
 
-    templates(LintTemplate)
+    templates(ExamplesTemplate, GitHubIntegrationTemplate)
 
     features {
-        commitStatusPublisher {
-            vcsRootExtId = "${DslContext.settingsRoot.id}"
-            publisher = github {
-                githubUrl = "https://api.github.com"
-                authType = personalToken {
-                    token = "credentialsJSON:558df52e-822f-4d9d-825a-854846a9a2ff"
-                }
-            }
-        }
         xmlReport {
             reportType = XmlReport.XmlReportType.JUNIT
             rules = "imod-python/imod/tests/*report.xml"
-        }
-        pullRequests {
-            vcsRootExtId = "${DslContext.settingsRoot.id}"
-            provider = github {
-                authType = token {
-                    token = "credentialsJSON:558df52e-822f-4d9d-825a-854846a9a2ff"
-                }
-                filterAuthorRole = PullRequests.GitHubRoleFilter.MEMBER
-            }
         }
     }
 
@@ -226,28 +235,7 @@ object Examples : BuildType({
 object Lint : BuildType({
     name = "Lint"
 
-    templates(LintTemplate)
-
-    features {
-        commitStatusPublisher {
-            vcsRootExtId = "${DslContext.settingsRoot.id}"
-            publisher = github {
-                githubUrl = "https://api.github.com"
-                authType = personalToken {
-                    token = "credentialsJSON:558df52e-822f-4d9d-825a-854846a9a2ff"
-                }
-            }
-        }
-        pullRequests {
-            vcsRootExtId = "${DslContext.settingsRoot.id}"
-            provider = github {
-                authType = token {
-                    token = "credentialsJSON:558df52e-822f-4d9d-825a-854846a9a2ff"
-                }
-                filterAuthorRole = PullRequests.GitHubRoleFilter.MEMBER
-            }
-        }
-    }
+    templates(LintTemplate, GitHubIntegrationTemplate)
 })
 
 object Tests : BuildType({
@@ -306,30 +294,12 @@ object Tests : BuildType({
 object UnitTests : BuildType({
     name = "UnitTests"
 
-    templates(UnitTestsTemplate)
+    templates(UnitTestsTemplate, GitHubIntegrationTemplate)
 
     features {
-        commitStatusPublisher {
-            vcsRootExtId = "${DslContext.settingsRoot.id}"
-            publisher = github {
-                githubUrl = "https://api.github.com"
-                authType = personalToken {
-                    token = "credentialsJSON:558df52e-822f-4d9d-825a-854846a9a2ff"
-                }
-            }
-        }
         xmlReport {
             reportType = XmlReport.XmlReportType.JUNIT
             rules = "imod-python/imod/tests/*report.xml"
-        }
-        pullRequests {
-            vcsRootExtId = "${DslContext.settingsRoot.id}"
-            provider = github {
-                authType = token {
-                    token = "credentialsJSON:558df52e-822f-4d9d-825a-854846a9a2ff"
-                }
-                filterAuthorRole = PullRequests.GitHubRoleFilter.MEMBER
-            }
         }
     }
 
@@ -362,18 +332,6 @@ object NightlyLint : BuildType({
     name = "Lint"
 
     templates(LintTemplate)
-
-    features {
-        commitStatusPublisher {
-            vcsRootExtId = "iMOD6_IMODPython_ImodPython"
-            publisher = github {
-                githubUrl = "https://api.github.com"
-                authType = personalToken {
-                    token = "credentialsJSON:558df52e-822f-4d9d-825a-854846a9a2ff"
-                }
-            }
-        }
-    }
 })
 
 object NightlyUnitTests : BuildType({
@@ -460,7 +418,7 @@ object NightlyTests : BuildType({
 object NightlyExamples : BuildType({
     name = "Examples"
 
-    templates(LintTemplate)
+    templates(ExamplesTemplate)
 
     features {
         xmlReport {
