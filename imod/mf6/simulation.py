@@ -991,13 +991,14 @@ class Modflow6Simulation(collections.UserDict):
         for exchange in self["split_exchanges"]:
             model_name_1 = exchange.dataset["model_name_1"].values[()]
             model_1 = self[model_name_1]
-            exchange.set_options(
-                save_flows=model_1["oc"].is_budget_output,
-                dewatered=model_1["npf"].is_dewatered,
-                variablecv=model_1["npf"].is_variable_vertical_conductance,
-                xt3d=model_1["npf"].get_xt3d_option(),
-                newton=model_1.is_use_newton(),
-            )
+            if isinstance (model_1, GroundwaterFlowModel):
+                exchange.set_options(
+                    save_flows=model_1["oc"].is_budget_output,
+                    dewatered=model_1["npf"].is_dewatered,
+                    variablecv=model_1["npf"].is_variable_vertical_conductance,
+                    xt3d=model_1["npf"].get_xt3d_option(),
+                    newton=model_1.is_use_newton(),
+                )
 
     def _filter_inactive_cells_from_exchanges(self) -> None:
         for ex in self["split_exchanges"]:
