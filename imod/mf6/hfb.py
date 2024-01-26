@@ -334,6 +334,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         top: GridDataArray,
         bottom: GridDataArray,
         k: GridDataArray,
+        validate: bool = False,
     ) -> Mf6HorizontalFlowBarrier:
         """
         Write package to Modflow 6 package.
@@ -344,6 +345,8 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
         Parameters
         ----------
+        validate: bool
+            Run validation before converting
         idomain: GridDataArray
              Grid with active cells.
         top: GridDataArray
@@ -357,6 +360,9 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         -------
 
         """
+        if validate:
+            self._validate(self._write_schemata)
+
         top, bottom = broadcast_to_full_domain(idomain, top, bottom)
         k = idomain * k
         unstructured_grid, top, bottom, k = (

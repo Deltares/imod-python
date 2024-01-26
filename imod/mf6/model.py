@@ -11,7 +11,6 @@ from typing import Dict, Optional, Tuple, Union
 import cftime
 import jinja2
 import numpy as np
-import numpy.typing as npt
 import tomli
 import tomli_w
 import xarray as xr
@@ -23,7 +22,6 @@ from imod.mf6.package import Package
 from imod.mf6.regridding_utils import RegridderInstancesCollection, RegridderType
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.validation import pkg_errors_to_status_info
-from imod.mf6.wel import Well
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray
@@ -222,20 +220,6 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         return model_status_info
 
-    def __write_well(
-        self,
-        wellpackage: Well,
-        pkg_name: str,
-        globaltimes: npt.NDArray[np.datetime64],
-        write_context: WriteContext,
-        validate: bool = True,
-    ):
-        top, bottom, idomain = self.__get_domain_geometry()
-        k = self.__get_k()
-        wellpackage.write(
-            pkg_name, globaltimes, validate, write_context, idomain, top, bottom, k
-        )
-
     def write(
         self, modelname, globaltimes, validate: bool, write_context: WriteContext
     ) -> StatusInfoBase:
@@ -265,13 +249,28 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         for pkg_name, pkg in self.items():
             try:
                 if isinstance(pkg, imod.mf6.Well):
-                    self.__write_well(
-                        pkg, pkg_name, globaltimes, pkg_write_context, validate
-                    )
-                elif isinstance(pkg, imod.mf6.HorizontalFlowBarrierBase):
                     top, bottom, idomain = self.__get_domain_geometry()
                     k = self.__get_k()
-                    mf6_pkg = pkg.to_mf6_pkg(idomain, top, bottom, k)
+                    mf6_pkg = pkg.to_mf6_pkg(
+                        idomain,
+                        top,
+                        bottom,
+                        k,
+                        validate,
+                        pkg_write_context.is_partitioned,
+                    )
+
+                    mf6_pkg.write(
+                        pkgname=pkg_name,
+                        globaltimes=globaltimes,
+                        write_context=pkg_write_context,
+                    )
+                elif isinstance(
+                    pkg, imod.mf6.HorizontalFlowBarrierBase | imod.mf6.Well
+                ):
+                    top, bottom, idomain = self.__get_domain_geometry()
+                    k = self.__get_k()
+                    mf6_pkg = pkg.to_mf6_pkg(idomain, top, bottom, k, validate)
                     mf6_pkg.write(
                         pkgname=pkg_name,
                         globaltimes=globaltimes,

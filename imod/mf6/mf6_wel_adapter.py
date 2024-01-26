@@ -53,11 +53,13 @@ class Mf6Wel(BoundaryCondition):
         rate,
         concentration=None,
         concentration_boundary_type="aux",
+        save_flows: bool = False,
         validate: bool = True,
     ):
         super().__init__()
         self.dataset["cellid"] = cellid
         self.dataset["rate"] = rate
+        self.dataset["save_flows"] = save_flows
 
         if concentration is not None:
             self.dataset["concentration"] = concentration

@@ -1,7 +1,7 @@
 import abc
 import pathlib
 from copy import copy, deepcopy
-from typing import Dict, List
+from typing import Dict, List, Union
 
 import numpy as np
 import xarray as xr
@@ -230,7 +230,12 @@ class BoundaryCondition(Package, abc.ABC):
             path = directory / pkgname / f"{self._pkg_id}.{ext}"
             self._write_datafile(path, bin_ds, binary=binary)
 
-    def write(self, pkgname: str, globaltimes: np.ndarray, write_context: WriteContext):
+    def write(
+        self,
+        pkgname: str,
+        globaltimes: Union[List, np.ndarray],
+        write_context: WriteContext,
+    ):
         """
         writes the blockfile and binary data
 
@@ -297,7 +302,12 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
         package_data = self._package_data_to_sparse()
         self._write_file(outpath, package_data)
 
-    def write(self, pkgname: str, globaltimes: np.ndarray, write_context: WriteContext):
+    def write(
+        self,
+        pkgname: str,
+        globaltimes: Union[List, np.ndarray],
+        write_context: WriteContext,
+    ):
         boundary_condition_write_context = deepcopy(write_context)
         boundary_condition_write_context.use_binary = False
 
