@@ -6,7 +6,7 @@ import pathlib
 import subprocess
 import warnings
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Callable, DefaultDict, Dict, List, Optional, Union
 
 import cftime
 import jinja2
@@ -38,11 +38,20 @@ from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
 from imod.typing.grid import concat, is_unstructured, merge, merge_partitions, nan_like
 
-OUTPUT_FUNC_MAPPING = {
-    "head": (open_hds, GroundwaterFlowModel),
-    "concentration": (open_conc, GroundwaterTransportModel),
-    "budget-flow": (open_cbc, GroundwaterFlowModel),
-    "budget-transport": (open_cbc, GroundwaterTransportModel),
+OUTPUT_FUNC_MAPPING: Dict[str, Callable] = {
+    "head": open_hds,
+    "concentration": open_conc,
+    "budget-flow": open_cbc,
+    "budget-transport": open_cbc,
+}
+
+OUTPUT_MODEL_MAPPING: Dict[
+    str, type[GroundwaterFlowModel] | type[GroundwaterTransportModel]
+] = {
+    "head": GroundwaterFlowModel,
+    "concentration": GroundwaterTransportModel,
+    "budget-flow": GroundwaterFlowModel,
+    "budget-transport": GroundwaterTransportModel,
 }
 
 
@@ -382,7 +391,7 @@ class Modflow6Simulation(collections.UserDict):
 
     def open_transport_budget(
         self,
-        species_ls: list[str] = None,
+        species_ls: Optional[list[str]] = None,
         simulation_start_time: Optional[np.datetime64] = None,
         time_unit: Optional[str] = "d",
     ) -> dict[str, GridDataArray]:
@@ -487,7 +496,7 @@ class Modflow6Simulation(collections.UserDict):
 
     def open_concentration(
         self,
-        species_ls: list[str] = None,
+        species_ls: Optional[list[str]] = None,
         dry_nan: bool = False,
         simulation_start_time: Optional[np.datetime64] = None,
         time_unit: Optional[str] = "d",
@@ -546,7 +555,7 @@ class Modflow6Simulation(collections.UserDict):
             Extra settings that need to be passed through to the respective
             output function.
         """
-        _, modeltype = OUTPUT_FUNC_MAPPING[output]
+        modeltype = OUTPUT_MODEL_MAPPING[output]
         modelnames = self.get_models_of_type(modeltype._model_id).keys()
         # Pop species_ls, set to modelnames in case not found
         species_ls = settings.pop("species_ls", modelnames)
@@ -677,7 +686,8 @@ class Modflow6Simulation(collections.UserDict):
             Extra settings that need to be passed through to the respective
             output function.
         """
-        open_func, expected_modeltype = OUTPUT_FUNC_MAPPING[output]
+        open_func = OUTPUT_FUNC_MAPPING[output]
+        expected_modeltype = OUTPUT_MODEL_MAPPING[output]
 
         if self.directory is None:
             raise RuntimeError(f"Simulation {self.name} has not been written yet.")
@@ -753,7 +763,7 @@ class Modflow6Simulation(collections.UserDict):
         directory = pathlib.Path(directory)
         directory.mkdir(parents=True, exist_ok=True)
 
-        toml_content = collections.defaultdict(dict)
+        toml_content: DefaultDict[str, dict] = collections.defaultdict(dict)
         for key, value in self.items():
             cls_name = type(value).__name__
             if isinstance(value, Modflow6Model):
