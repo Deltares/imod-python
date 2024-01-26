@@ -136,7 +136,7 @@ class LakeData(LakeApi_Base):
         self.dataset.assign_coords({"time": times})
         for ts_name, ts_object in timeseries_dict.items():
             if ts_object is not None:
-                fillvalue = np.nan
+                fillvalue: float | str = np.nan
                 if not pd.api.types.is_numeric_dtype(ts_object.dtype):
                     fillvalue = ""
                 self.dataset[ts_name] = ts_object.reindex(
