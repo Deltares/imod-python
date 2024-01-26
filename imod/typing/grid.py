@@ -123,6 +123,7 @@ def _type_dispatch_functions_on_dict(
 
     types = [type(arg) for arg in dict_of_objects.values()]
     has_unstructured = xu.UgridDataArray in types
+    # TODO: Test structured if xr.DataArray and spatial.
     has_structured = xr.DataArray in types
     if has_structured and has_unstructured:
         raise TypeError(error_msg)
