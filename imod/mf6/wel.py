@@ -286,7 +286,7 @@ class Well(BoundaryCondition, IPointDataPackage):
 
     @staticmethod
     def _find_well_value_at_layer(
-        well_dataset: xr.Dataset, grid: GridDataArray, layer: int
+        well_dataset: xr.Dataset, grid: GridDataArray, layer: Optional[int]
     ):
         value = None if layer is None else grid.isel(layer=layer)
 

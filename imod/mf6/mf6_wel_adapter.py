@@ -11,6 +11,7 @@ The high-level class contains grids with x, y, z coordinates, closely linked to
 GIS systems. The low-level classes contain a dataset based on cellid,
 consisting of layer, row, and column, closely resembling input for Modflow6.
 """
+from typing import Optional
 
 import numpy as np
 
@@ -53,7 +54,7 @@ class Mf6Wel(BoundaryCondition):
         rate,
         concentration=None,
         concentration_boundary_type="aux",
-        save_flows: bool = False,
+        save_flows: Optional[bool] = None,
         validate: bool = True,
     ):
         super().__init__()
