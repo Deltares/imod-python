@@ -1,7 +1,7 @@
 import abc
 import pathlib
 from copy import copy, deepcopy
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 import numpy as np
 import xarray as xr
@@ -172,7 +172,9 @@ class BoundaryCondition(Package, abc.ABC):
 
         return periods
 
-    def _get_options(self, predefined_options: Dict, not_options: List = None):
+    def _get_options(
+        self, predefined_options: Dict, not_options: Optional[List] = None
+    ):
         options = copy(predefined_options)
 
         if not_options is None:
