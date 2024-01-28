@@ -1,9 +1,10 @@
-from typing import Sequence
+from typing import Dict, Optional, Sequence
 
 import numpy as np
 import xarray as xr
 
 from imod.mf6.package import Package
+from imod.msw.fixed_format import VariableMetaData
 from imod.schemata import DTypeSchema
 
 
@@ -89,7 +90,7 @@ class Buoyancy(Package):
 
     _pkg_id = "buy"
     _template = Package._initialize_template(_pkg_id)
-    _metadata_dict = {}
+    _metadata_dict: Dict[str, VariableMetaData] = {}
 
     _init_schemata = {
         "reference_density": [DTypeSchema(np.floating)],
@@ -107,7 +108,7 @@ class Buoyancy(Package):
         modelname: Sequence[str],
         species: Sequence[str],
         hhformulation_rhs: bool = False,
-        densityfile: str = None,
+        densityfile: Optional[str] = None,
         validate: bool = True,
     ):
         super().__init__(locals())
