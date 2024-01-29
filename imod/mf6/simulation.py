@@ -923,14 +923,16 @@ class Modflow6Simulation(collections.UserDict):
                 )
 
         exchanges = []
+        flowmodels = self.get_models_of_type("gwf6")
         for model_name, model in original_models.items():
-            exchanges += exchange_creator.create_exchanges(
-                model_name, model.domain.layer
-            )
-
-        new_simulation["solver"]["modelnames"] = xr.DataArray(
-            list(get_models(new_simulation).keys())
-        )
+            if isinstance(model, GroundwaterFlowModel):
+                exchanges += exchange_creator.create_gwfgwf_exchanges(
+                    model_name, model.domain.layer
+                )
+            if isinstance(model, GroundwaterTransportModel):
+                exchanges += exchange_creator.create_gwfgwt_exchanges(
+                    model_name,model, flowmodels, model.domain.layer
+                )
 
         new_simulation._add_modelsplit_exchanges(exchanges)
         new_simulation._set_exchange_options()
