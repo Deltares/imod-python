@@ -329,9 +329,9 @@ def create_outlet_data(outlets, name_to_number):
 
 def concatenate_timeseries(list_of_lakes_or_outlets, timeseries_name):
     """
-    In this function we create a dataarray with a given time coorridnate axis. We add all
-    the timeseries of lakes or outlets with the given name. We also create a dimension to
-    specify the lake or outlet number.
+    In this function we create a dataarray with a given time coordinate axis. We
+    add all the timeseries of lakes or outlets with the given name. We also
+    create a dimension to specify the lake or outlet number.
     """
     if list_of_lakes_or_outlets is None:
         return None
