@@ -732,68 +732,74 @@ class Lake(BoundaryCondition):
         length_conversion=None,
         validate=True,
     ):
-        super().__init__(locals())
-        self.dataset["lake_boundname"] = lake_boundname
-        self.dataset["lake_number"] = lake_number
-        self.dataset["lake_starting_stage"] = lake_starting_stage
-
-        nr_indices = int(self.dataset["lake_number"].data.max())
+        
+        nr_indices = int(lake_number.data.max())
         if outlet_lakein is not None:
             nroutlets = len(outlet_lakein.data)
             nr_indices = max(nr_indices, nroutlets)
 
-        self.dataset = self.dataset.assign_coords(index=range(1, nr_indices + 1, 1))
+        indices = range(1, nr_indices + 1, 1)
 
-        self.dataset["connection_lake_number"] = connection_lake_number
-        self.dataset["connection_cell_id"] = connection_cell_id
-        self.dataset["connection_type"] = connection_type
-        self.dataset["connection_bed_leak"] = connection_bed_leak
-        self.dataset["connection_bottom_elevation"] = connection_bottom_elevation
-        self.dataset["connection_top_elevation"] = connection_top_elevation
-        self.dataset["connection_width"] = connection_width
-        self.dataset["connection_length"] = connection_length
-
-        self.dataset["outlet_lakein"] = outlet_lakein
-        self.dataset["outlet_lakeout"] = outlet_lakeout
-        self.dataset["outlet_couttype"] = outlet_couttype
-        self.dataset["outlet_invert"] = outlet_invert
-        self.dataset["outlet_roughness"] = outlet_roughness
-        self.dataset["outlet_width"] = outlet_width
-        self.dataset["outlet_slope"] = outlet_slope
-
-        self.dataset["print_input"] = print_input
-        self.dataset["print_stage"] = print_stage
-        self.dataset["print_flows"] = print_flows
-        self.dataset["save_flows"] = save_flows
-
-        self.dataset["stagefile"] = stagefile
-        self.dataset["budgetfile"] = budgetfile
-        self.dataset["budgetcsvfile"] = budgetcsvfile
-        self.dataset["package_convergence_filename"] = package_convergence_filename
-        self.dataset["ts6_filename"] = ts6_filename
-        self.dataset["time_conversion"] = time_conversion
-        self.dataset["length_conversion"] = length_conversion
-
-        self.dataset["ts_status"] = ts_status
         if ts_status is not None:
-            self.dataset["ts_status"] = self._convert_to_string_dataarray(
-                self.dataset["ts_status"]
+            ts_status = self._convert_to_string_dataarray(
+                xr.DataArray(ts_status)
             )
-        self.dataset["ts_stage"] = ts_stage
-        self.dataset["ts_rainfall"] = ts_rainfall
-        self.dataset["ts_evaporation"] = ts_evaporation
-        self.dataset["ts_runoff"] = ts_runoff
-        self.dataset["ts_inflow"] = ts_inflow
-        self.dataset["ts_withdrawal"] = ts_withdrawal
-        self.dataset["ts_auxiliary"] = ts_auxiliary
 
-        self.dataset["ts_rate"] = ts_rate
-        self.dataset["ts_invert"] = ts_invert
-        self.dataset["ts_rough"] = ts_rough
-        self.dataset["ts_width"] = ts_width
-        self.dataset["ts_slope"] = ts_slope
+        dict_dataset = {
+            "lake_boundname": lake_boundname,
+            "lake_number": lake_number,
+            "lake_starting_stage": lake_starting_stage,
 
-        self.dataset["lake_tables"] = lake_tables
+            "connection_lake_number": connection_lake_number,
+            "connection_cell_id": connection_cell_id,
+            "connection_type": connection_type,
+            "connection_bed_leak": connection_bed_leak,
+            "connection_bottom_elevation": connection_bottom_elevation,
+            "connection_top_elevation": connection_top_elevation,
+            "connection_width": connection_width,
+            "connection_length": connection_length,
+
+            "outlet_lakein": outlet_lakein,
+            "outlet_lakeout": outlet_lakeout,
+            "outlet_couttype": outlet_couttype,
+            "outlet_invert": outlet_invert,
+            "outlet_roughness": outlet_roughness,
+            "outlet_width": outlet_width,
+            "outlet_slope": outlet_slope,
+
+            "print_input": print_input,
+            "print_stage": print_stage,
+            "print_flows": print_flows,
+            "save_flows": save_flows,
+
+            "stagefile": stagefile,
+            "budgetfile": budgetfile,
+            "budgetcsvfile": budgetcsvfile,
+            "package_convergence_filename": package_convergence_filename,
+            "ts6_filename": ts6_filename,
+            "time_conversion": time_conversion,
+            "length_conversion": length_conversion,
+
+            "ts_status": ts_status,
+
+            "ts_stage": ts_stage,
+            "ts_rainfall": ts_rainfall,
+            "ts_evaporation": ts_evaporation,
+            "ts_runoff": ts_runoff,
+            "ts_inflow": ts_inflow,
+            "ts_withdrawal": ts_withdrawal,
+            "ts_auxiliary": ts_auxiliary,
+
+            "ts_rate": ts_rate,
+            "ts_invert": ts_invert,
+            "ts_rough": ts_rough,
+            "ts_width": ts_width,
+            "ts_slope": ts_slope,
+
+            "lake_tables": lake_tables,
+        }
+
+        super().__init__(dict_dataset)
 
         self._validate_init_schemata(validate)
 
@@ -845,6 +851,12 @@ class Lake(BoundaryCondition):
         for ts_name in Lake._period_data_outlets:
             shortname = ts_name[3:]
             package_content[ts_name] = concatenate_timeseries(outlets, shortname)
+
+        # Align timeseries variables
+        ts_vars = Lake._period_data_lakes + Lake._period_data_outlets
+        assigned_ts_vars = [ts_var for ts_var in ts_vars if package_content[ts_var] is not None]
+        aligned_timeseries = xr.align(*(package_content[ts_var] for ts_var in assigned_ts_vars), join="outer")
+        package_content.update({ts_var: ts for ts_var, ts in zip(assigned_ts_vars, aligned_timeseries)})
 
         if outlets is not None:
             outlet_data = create_outlet_data(outlets, name_to_number)
