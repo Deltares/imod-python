@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 
 from imod.mf6.multimodel.modelsplitter import create_partition_info, slice_model
+from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
 from imod.typing.grid import zeros_like
 
 
@@ -71,3 +72,33 @@ def test_slice_model_unstructured(circle_model):
     for submodel_label in unique_labels:
         active_count = new_models[submodel_label].domain.sel({"layer": 1}).count()
         assert label_counts[submodel_label] == active_count.values
+
+
+@pytest.mark.usefixtures("flow_transport_simulation")
+def test_slice_model_with_auxiliary_variables(tmp_path, flow_transport_simulation):
+    flow_simulation = flow_transport_simulation
+    flow_simulation.pop("tpt_a")
+    flow_simulation.pop("tpt_b")
+    flow_simulation.pop("tpt_c")
+    flow_simulation.pop("tpt_d")
+    flow_simulation.pop("transport_solver")
+
+    flow_model = flow_simulation["flow"]
+    active = flow_model.domain
+
+    submodel_labels = zeros_like(active)
+    submodel_labels = submodel_labels.drop_vars("layer")
+    submodel_labels.values[:, :, 50:] = 1
+    submodel_labels = submodel_labels.sel(layer=0, drop=True)
+
+    flow_simulation.write(tmp_path, binary=False)
+    split_simulation = flow_simulation.split(submodel_labels)
+    split_simulation.write(tmp_path, binary=False)
+    assert_simulation_can_run(split_simulation, "dis", tmp_path)
+    assert "species_d" in list(split_simulation["flow_0"]["chd"].dataset.keys())
+    assert "species_d" in list(split_simulation["flow_0"]["rch"].dataset.keys())
+    assert "concentration" in list(split_simulation["flow_0"]["well"].dataset.keys())
+    assert "species_d" in list(split_simulation["flow_1"]["chd"].dataset.keys())
+    assert "species_d" in list(split_simulation["flow_1"]["rch"].dataset.keys())
+    assert "concentration" in list(split_simulation["flow_1"]["well"].dataset.keys())
+    pass
