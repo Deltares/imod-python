@@ -8,6 +8,8 @@ because it can result in spurious oscillations in the simulated concentrations.
 Upstream weighting is a fast alternative, and TVD is a more expensive and more
 robust alternative.
 """
+from copy import deepcopy
+
 from imod.mf6.package import Package
 
 
@@ -23,6 +25,13 @@ class Advection(Package):
         scheme = self.dataset["scheme"].item()
         return self._template.render({"scheme": scheme})
 
+    def mask(self, _) -> Package:
+        """
+        The mask method is irrelevant for this package , instead this method
+        retuns a copy of itself.
+        """
+        return deepcopy(self)
+
 
 class AdvectionUpstream(Advection):
     """
@@ -32,7 +41,7 @@ class AdvectionUpstream(Advection):
     Note: all constructor arguments will be ignored
     """
 
-    def __init__(self, **ignored):
+    def __init__(self):
         super().__init__(scheme="upstream")
 
 
@@ -48,7 +57,7 @@ class AdvectionCentral(Advection):
     Note: all constructor arguments will be ignored
     """
 
-    def __init__(self, **ignored):
+    def __init__(self):
         super().__init__(scheme="central")
 
 
@@ -59,5 +68,5 @@ class AdvectionTVD(Advection):
     Note: all constructor arguments will be ignored
     """
 
-    def __init__(self, **ignored):
+    def __init__(self):
         super().__init__(scheme="TVD")
