@@ -255,5 +255,10 @@ class ExchangeCreator(abc.ABC):
         self._connected_cells = df
 
     def create_gwfgwt_exchanges(self, model_name: str, layers: GridDataArray) -> List[GWFGWT]:
-        pass
+        
+        layers = layers.to_dataframe().filter(["layer"])
+
+        connected_cells_with_geometric_info = pd.merge(
+            self._connected_cells, self._geometric_information
+        )
         
