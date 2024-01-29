@@ -14,7 +14,7 @@ consisting of layer, row, and column, closely resembling input for Modflow6.
 
 import numpy as np
 
-from imod.mf6.auxiliary_variables import add_periodic_auxiliary_variable
+from imod.mf6.auxiliary_variables import expand_transient_auxiliary_variables
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.schemata import DTypeSchema
 
@@ -62,7 +62,7 @@ class Mf6Wel(BoundaryCondition):
         if concentration is not None:
             self.dataset["concentration"] = concentration
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
-            add_periodic_auxiliary_variable(self)
+            expand_transient_auxiliary_variables(self)
         self._validate_init_schemata(validate)
 
     def _ds_to_arrdict(self, ds):
