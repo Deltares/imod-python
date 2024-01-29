@@ -281,6 +281,11 @@ object Tests : BuildType({
         showDependenciesChanges = true
     }
 
+    triggers {
+        vcs {
+        }
+    }
+
     features {
         pullRequests {
             vcsRootExtId = "${DslContext.settingsRoot.id}"
