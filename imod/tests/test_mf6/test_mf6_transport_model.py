@@ -2,6 +2,7 @@ import textwrap
 
 import numpy as np
 import pytest
+import xarray as xr
 
 import imod
 from imod.mf6.adv import AdvectionCentral
@@ -45,7 +46,8 @@ def test_transport_model_rendering():
 
 def test_assign_flow_discretization(basic_dis, concentration_fc):
     # define a grid
-    idomain, _, bottom = basic_dis
+    _, _, bottom = basic_dis
+    idomain = xr.ones_like(concentration_fc.isel(species=0, time=0, drop=True), dtype=int)
 
     like = idomain.sel(layer=1).astype(np.float32)
     concentration = concentration_fc.sel(layer=1)
@@ -54,6 +56,7 @@ def test_assign_flow_discretization(basic_dis, concentration_fc):
     gwf_model["dis"] = imod.mf6.StructuredDiscretization(
         top=200.0, bottom=bottom, idomain=idomain
     )
+
     gwf_model["riv-1"] = imod.mf6.River(
         stage=like,
         conductance=like,
