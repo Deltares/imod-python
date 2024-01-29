@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from imod.mf6.boundary_condition import BoundaryCondition
 
 
@@ -7,7 +9,7 @@ class StreamFlowRouting(BoundaryCondition):
     """
 
     _pkg_id = "sfr"
-    _period_data = []
+    _period_data: Tuple[str, ...] = ()
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 

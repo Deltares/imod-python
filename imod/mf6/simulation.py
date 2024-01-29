@@ -651,6 +651,10 @@ class Modflow6Simulation(collections.UserDict):
         concentrations = []
         for modelname, species in zip(modelnames, species_ls):
             conc = self._open_output_single_model(modelname, output, **settings)
+            if not isinstance(conc, GridDataArray):
+                raise RuntimeError(
+                    f"Type error. Expected GridDataArray but got {type(conc)}"
+                )
             conc = conc.assign_coords(species=species)
             concentrations.append(conc)
         return concat(concentrations, dim="species")

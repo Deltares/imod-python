@@ -122,7 +122,6 @@ class Buoyancy(Package):
         self.dataset["species"] = assign_index(species)
         self.dataset["hhformulation_rhs"] = hhformulation_rhs
         self.dataset["densityfile"] = densityfile
-        self.dependencies = []
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):

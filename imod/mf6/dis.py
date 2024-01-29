@@ -91,7 +91,7 @@ class StructuredDiscretization(Package):
     _skip_mask_arrays = ["bottom", "idomain"]
 
     def __init__(self, top, bottom, idomain, validate: bool = True):
-        super(__class__, self).__init__(locals())
+        super().__init__(locals())
         self.dataset["idomain"] = idomain
         self.dataset["top"] = top
         self.dataset["bottom"] = bottom

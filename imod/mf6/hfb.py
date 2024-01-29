@@ -412,7 +412,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         return Mf6HorizontalFlowBarrier(**barrier_dataset)
 
     def is_empty(self) -> bool:
-        if super(__class__, self).is_empty():
+        if super().is_empty():
             return True
 
         linestrings = self.dataset["geometry"]
