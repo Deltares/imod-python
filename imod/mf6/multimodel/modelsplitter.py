@@ -2,6 +2,11 @@ from typing import List, NamedTuple
 
 import numpy as np
 
+from imod.mf6.auxiliary_variables import (
+    expand_transient_auxiliary_variables,
+    remove_expanded_auxiliary_variables_from_dataset,
+)
+from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.hfb import HorizontalFlowBarrierBase
 from imod.mf6.model import Modflow6Model
 from imod.mf6.utilities.clip import clip_by_grid
@@ -86,6 +91,9 @@ def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6
         new_idomain = model.domain.sel(coords).where(sliced_domain_2D, other=0)
 
     for pkg_name, package in model.items():
+        if isinstance(package, BoundaryCondition):
+            remove_expanded_auxiliary_variables_from_dataset(package)
+
         sliced_package = clip_by_grid(package, partition_info.active_domain)
 
         sliced_package = sliced_package.mask(new_idomain)
@@ -99,4 +107,6 @@ def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6
                 f"package {pkg_name} removed in partition {partition_info.id}, because all empty"
             )
 
+        if isinstance(package, BoundaryCondition):
+            expand_transient_auxiliary_variables(package)
     return new_model

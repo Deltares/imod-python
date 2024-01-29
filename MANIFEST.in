@@ -1,5 +1,0 @@
-include README.rst
-include LICENSE
-include imod/data/registry.txt
-include imod/templates/*.j2
-include imod/templates/mf6/*.j2

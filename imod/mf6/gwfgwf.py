@@ -1,22 +1,22 @@
-from typing import Dict, Optional, Tuple
+from typing import Optional
 
 import cftime
 import numpy as np
 import xarray as xr
 
-from imod.mf6.auxiliary_variables import add_periodic_auxiliary_variable
+from imod.mf6.auxiliary_variables import expand_transient_auxiliary_variables
+from imod.mf6.exchangebase import ExchangeBase
 from imod.mf6.package import Package
 from imod.typing import GridDataArray
 
 
-class GWFGWF(Package):
+class GWFGWF(ExchangeBase):
     """
     This package is for writing an exchange file, used for splitting up a model
     into different submodels (that can be solved in parallel). It (usually)
     is not instantiated by users, but created by the "split" method of the
     simulation class."""
 
-    _keyword_map: Dict[str, str] = {}
     _auxiliary_data = {"auxiliary_data": "variable"}
     _pkg_id = "gwfgwf"
     _template = Package._initialize_template(_pkg_id)
@@ -50,7 +50,7 @@ class GWFGWF(Package):
             self.dataset["auxiliary_data"] = xr.merge(auxiliary_variables).to_array(
                 name="auxiliary_data"
             )
-            add_periodic_auxiliary_variable(self)
+            expand_transient_auxiliary_variables(self)
 
     def set_options(
         self,
@@ -71,24 +71,6 @@ class GWFGWF(Package):
         self.dataset["variablecv"] = variablecv
         self.dataset["xt3d"] = xt3d
         self.dataset["newton"] = newton
-
-    def filename(self) -> str:
-        return f"{self.packagename()}.{self._pkg_id}"
-
-    def packagename(self) -> str:
-        return f"{self.dataset['model_name_1'].values[()]}_{self.dataset['model_name_2'].values[()]}"
-
-    def get_specification(self) -> Tuple[str, str, str, str]:
-        """
-        Returns a tuple containing the exchange type, the exchange file name, and the model names. This can be used
-        to write the exchange information in the simulation .nam input file
-        """
-        return (
-            "GWF6-GWF6",
-            self.filename(),
-            self.dataset["model_name_1"].values[()].take(0),
-            self.dataset["model_name_2"].values[()].take(0),
-        )
 
     def clip_box(
         self,

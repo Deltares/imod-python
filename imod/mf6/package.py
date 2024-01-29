@@ -16,6 +16,7 @@ from xarray.core.utils import is_scalar
 
 import imod
 from imod.mf6.auxiliary_variables import get_variable_names
+from imod.mf6.interfaces.ipackage import IPackage
 from imod.mf6.pkgbase import EXCHANGE_PACKAGES, TRANSPORT_PACKAGES, PackageBase
 from imod.mf6.regridding_utils import (
     RegridderInstancesCollection,
@@ -34,7 +35,7 @@ from imod.schemata import (
 from imod.typing import GridDataArray
 
 
-class Package(PackageBase, abc.ABC):
+class Package(PackageBase, IPackage, abc.ABC):
     """
     Package is used to share methods for specific packages with no time
     component.
@@ -729,3 +730,8 @@ class Package(PackageBase, abc.ABC):
     def _repr_html_(self) -> str:
         typename = type(self).__name__
         return f"<div>{typename}</div>{self.dataset._repr_html_()}"
+
+    def auxiliary_data_fields(self) -> Dict[str, str]:
+        if hasattr(self, "_auxiliary_data"):
+            return self._auxiliary_data
+        return {}
