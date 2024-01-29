@@ -923,14 +923,16 @@ class Modflow6Simulation(collections.UserDict):
                 )
 
         exchanges = []
+        flowmodels = self.get_models_of_type("gwf6")
         for model_name, model in original_models.items():
-            exchanges += exchange_creator.create_exchanges(
-                model_name, model.domain.layer
-            )
+            if isinstance(model, GroundwaterFlowModel):
+                exchanges += exchange_creator.create_gwfgwf_exchanges(
+                    model_name, model.domain.layer
+                )
 
         new_simulation["solver"]["modelnames"] = xr.DataArray(
             list(get_models(new_simulation).keys())
-        )
+        )                
 
         new_simulation._add_modelsplit_exchanges(exchanges)
         new_simulation._set_exchange_options()
@@ -989,15 +991,17 @@ class Modflow6Simulation(collections.UserDict):
     def _set_exchange_options(self):
         # collect some options that we will auto-set
         for exchange in self["split_exchanges"]:
-            model_name_1 = exchange.dataset["model_name_1"].values[()]
-            model_1 = self[model_name_1]
-            exchange.set_options(
-                save_flows=model_1["oc"].is_budget_output,
-                dewatered=model_1["npf"].is_dewatered,
-                variablecv=model_1["npf"].is_variable_vertical_conductance,
-                xt3d=model_1["npf"].get_xt3d_option(),
-                newton=model_1.is_use_newton(),
-            )
+            if isinstance(exchange, GWFGWF): 
+                model_name_1 = exchange.dataset["model_name_1"].values[()]
+                model_1 = self[model_name_1]
+            if isinstance (model_1, GroundwaterFlowModel):
+                exchange.set_options(
+                    save_flows=model_1["oc"].is_budget_output,
+                    dewatered=model_1["npf"].is_dewatered,
+                    variablecv=model_1["npf"].is_variable_vertical_conductance,
+                    xt3d=model_1["npf"].get_xt3d_option(),
+                    newton=model_1.is_use_newton(),
+                )
 
     def _filter_inactive_cells_from_exchanges(self) -> None:
         for ex in self["split_exchanges"]:
@@ -1049,12 +1053,23 @@ class Modflow6Simulation(collections.UserDict):
     def _generate_gwfgwt_exchanges(self):
         flow_models = self.get_models_of_type("gwf6")
         transport_models = self.get_models_of_type("gwt6")
-
         # exchange for flow and transport
         exchanges = []
-        if len(flow_models) == 1 and len(transport_models) > 0:
-            flow_model_name = list(flow_models.keys())[0]
-            for transport_model_name in transport_models.keys():
-                exchanges.append(GWFGWT(flow_model_name, transport_model_name))
+
+        for flow_model_name in flow_models:
+            tpt_models_of_flow_model = []
+            flow_model = self[flow_model_name]
+            domain = flow_model.domain
+            for tpt_model_name in transport_models:
+                tpt_model = self[tpt_model_name]
+                if tpt_model.domain.equals(domain):
+                    tpt_models_of_flow_model.append(tpt_model_name)
+
+            if len(tpt_models_of_flow_model) > 0:
+                for transport_model_name in tpt_models_of_flow_model:
+                    exchanges.append(GWFGWT(flow_model_name, transport_model_name))
+                        
+
+
 
         return exchanges
