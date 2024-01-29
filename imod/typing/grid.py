@@ -1,3 +1,4 @@
+import pickle
 import textwrap
 from typing import Callable, Sequence
 
@@ -187,6 +188,17 @@ def merge_unstructured_dataset(variables_to_merge: list[dict], *args, **kwargs):
 
     # Merge grids
     dataset = xu.merge(grids_ls, *args, **kwargs)
+
+    # Temporarily work around this xugrid issue, until fixed:
+    # https://github.com/Deltares/xugrid/issues/206
+    grid_hashes = [hash(pickle.dumps(grid)) for grid in dataset.ugrid.grids]
+    unique_grid_hashes = np.unique(grid_hashes)
+    if unique_grid_hashes.size > 1:
+        raise ValueError("Multiple grids provided, please provide data on one unique grid")
+    else:
+        # Possibly won't work anymore if this ever gets implemented:
+        # https://github.com/Deltares/xugrid/issues/195
+        dataset._grids = [dataset.grids[0]]
 
     # Assign scalar variables manually
     for name, variable in scalar_dict.items():
