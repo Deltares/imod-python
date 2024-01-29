@@ -113,8 +113,8 @@ def _type_dispatch_functions_on_dict(
 
     error_msg = textwrap.dedent(
         """
-        Received both xr.DataArray and xu.UgridDataArray. This means structured
-        grids as well as unstructured grids were provided.
+        Received both structured grid (xr.DataArray) and xu.UgridDataArray. This
+        means structured grids as well as unstructured grids were provided.
         """
     )
 
@@ -123,9 +123,9 @@ def _type_dispatch_functions_on_dict(
 
     types = [type(arg) for arg in dict_of_objects.values()]
     has_unstructured = xu.UgridDataArray in types
-    # TODO: Test structured if xr.DataArray and spatial.
-    has_structured = xr.DataArray in types
-    if has_structured and has_unstructured:
+    # Test structured if xr.DataArray and spatial.
+    has_structured_grid = any([isinstance(arg, xr.DataArray) and is_spatial_2D(arg) for arg in dict_of_objects.values()])
+    if has_structured_grid and has_unstructured:
         raise TypeError(error_msg)
     if has_unstructured:
         return unstructured_func([dict_of_objects], *args, **kwargs)
@@ -242,3 +242,8 @@ def is_spatial_2D(array: xu.UgridDataArray) -> bool:
     has_spatial_coords = face_dim in coords
     has_spatial_dims = face_dim in dims
     return has_spatial_dims & has_spatial_coords
+
+
+@typedispatch
+def is_spatial_2D(_: object) -> bool:
+    return False
