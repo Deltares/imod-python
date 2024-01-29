@@ -29,9 +29,10 @@ class AdvectionUpstream(Advection):
     The upstream weighting (first order upwind) scheme sets the concentration
     at the cellface between two adjacent cells equal to the concentration in
     the cell where the flow comes from. It surpresses oscillations.
+    Note: all constructor arguments will be ignored
     """
 
-    def __init__(self):
+    def __init__(self, **ignored):
         super().__init__(scheme="upstream")
 
 
@@ -44,9 +45,10 @@ class AdvectionCentral(Advection):
     grids without equal spacing between connected cells, it is retained here
     for consistency with nomenclature used by other MODFLOW-based transport
     programs, such as MT3D.
+    Note: all constructor arguments will be ignored
     """
 
-    def __init__(self):
+    def __init__(self, **ignored):
         super().__init__(scheme="central")
 
 
@@ -54,7 +56,8 @@ class AdvectionTVD(Advection):
     """
     An implicit second order TVD scheme. More expensive than upstream
     weighting but more robust.
+    Note: all constructor arguments will be ignored
     """
 
-    def __init__(self):
+    def __init__(self, **ignored):
         super().__init__(scheme="TVD")
