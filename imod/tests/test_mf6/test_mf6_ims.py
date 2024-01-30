@@ -96,8 +96,9 @@ def test_drop_and_add_model():
 
 def test_remove_non_present_model():
     ims = create_ims()
+    ims.remove_model_from_solution("GWF_1")
     with pytest.raises(ValueError):
-        ims.remove_model_from_solution("non_existing_model")
+        ims.remove_model_from_solution("GWF_1")
 
 
 def test_add_already_present_model():

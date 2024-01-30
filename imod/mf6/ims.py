@@ -428,7 +428,9 @@ class Solution(Package):
         self._validate_init_schemata(validate)
 
     def remove_model_from_solution(self, modelname: str) -> None:
-        models_in_solution = self.dataset["modelnames"].values
+        models_in_solution = []
+        if "modelnames" in self.dataset.keys():
+            models_in_solution = self.dataset["modelnames"].values
         if modelname not in models_in_solution:
             raise ValueError(
                 f"attempted to remove model {modelname} from solution, but it was not found."

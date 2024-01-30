@@ -917,7 +917,7 @@ class Modflow6Simulation(collections.UserDict):
             new_simulation[package_name] = package
 
         for model_name, model in original_models.items():
-            solution_name = self.get_solution(model_name)
+            solution_name = self.get_solution_name(model_name)
             new_simulation[solution_name].remove_model_from_solution(model_name)
             for submodel_partition_info in partition_info:
                 new_model_name = f"{model_name}_{submodel_partition_info.id}"
@@ -1030,7 +1030,7 @@ class Modflow6Simulation(collections.UserDict):
         active_exchange_domain = active_exchange_domain.dropna("index")
         ex.dataset = ex.dataset.sel(index=active_exchange_domain["index"])
 
-    def get_solution(self, model_name: str) -> str:
+    def get_solution_name(self, model_name: str) -> str:
         for k, v in self.items():
             if isinstance(v, Solution):
                 if model_name in v.dataset["modelnames"]:
