@@ -391,9 +391,19 @@ class TestModflow6Simulation:
             submodel_labels, create_partition_info_mock()
         )
 
-        assert exchange_creator_mock.return_value.create_gwfgwf_exchanges.call_count == 2
-        call1 = exchange_creator_mock.return_value.create_gwfgwf_exchanges.call_args_list[0][0]
-        call2 = exchange_creator_mock.return_value.create_gwfgwf_exchanges.call_args_list[1][0]
+        assert (
+            exchange_creator_mock.return_value.create_gwfgwf_exchanges.call_count == 2
+        )
+        call1 = (
+            exchange_creator_mock.return_value.create_gwfgwf_exchanges.call_args_list[
+                0
+            ][0]
+        )
+        call2 = (
+            exchange_creator_mock.return_value.create_gwfgwf_exchanges.call_args_list[
+                1
+            ][0]
+        )
 
         assert call1[0] == "test_model1"
         xr.testing.assert_equal(call1[1], idomain.layer)

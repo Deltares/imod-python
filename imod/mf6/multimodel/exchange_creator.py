@@ -6,11 +6,11 @@ import pandas as pd
 import xarray as xr
 
 from imod.mf6.gwfgwf import GWFGWF
+from imod.mf6.gwfgwt import GWFGWT
 from imod.mf6.multimodel.modelsplitter import PartitionInfo
 from imod.mf6.utilities.grid import get_active_domain_slice, to_cell_idx
 from imod.typing import GridDataArray
 
-from imod.mf6.gwfgwt import GWFGWT
 
 def _adjust_gridblock_indexing(connected_cells: xr.Dataset) -> xr.Dataset:
     """
@@ -111,7 +111,9 @@ class ExchangeCreator(abc.ABC):
 
         self._geometric_information = self._compute_geometric_information()
 
-    def create_gwfgwf_exchanges(self, model_name: str, layers: GridDataArray) -> List[GWFGWF]:
+    def create_gwfgwf_exchanges(
+        self, model_name: str, layers: GridDataArray
+    ) -> List[GWFGWF]:
         """
         Create GroundWaterFlow-GroundWaterFlow exchanges based on the submodel_labels array provided in the class
         constructor. The layer parameter is used to extrude the cell connection through all the layers. An exchange

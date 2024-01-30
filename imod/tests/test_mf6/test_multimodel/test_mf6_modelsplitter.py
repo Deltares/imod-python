@@ -103,10 +103,8 @@ def test_slice_model_with_auxiliary_variables(tmp_path, flow_transport_simulatio
     assert "concentration" in list(split_simulation["flow_1"]["well"].dataset.keys())
 
 
-
 @pytest.mark.usefixtures("flow_transport_simulation")
 def test_split_flow_and_transport_model(tmp_path, flow_transport_simulation):
-
     simulation = flow_transport_simulation
 
     flow_model = simulation["flow"]

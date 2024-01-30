@@ -21,6 +21,7 @@ import imod.logging
 import imod.mf6.exchangebase
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwfgwt import GWFGWT
+from imod.mf6.ims import Solution
 from imod.mf6.model import Modflow6Model
 from imod.mf6.model_gwf import GroundwaterFlowModel
 from imod.mf6.model_gwt import GroundwaterTransportModel
@@ -37,7 +38,6 @@ from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
 from imod.typing.grid import concat, is_unstructured, merge, merge_partitions, nan_like
-from imod.mf6.ims import Solution
 
 OUTPUT_FUNC_MAPPING = {
     "head": (open_hds, GroundwaterFlowModel),
@@ -917,7 +917,7 @@ class Modflow6Simulation(collections.UserDict):
             new_simulation[package_name] = package
 
         for model_name, model in original_models.items():
-            solution_name, solution_group = self.get_solution( model_name)
+            solution_name, solution_group = self.get_solution(model_name)
             new_simulation[solution_name].remove_model_from_solution(model_name)
             for submodel_partition_info in partition_info:
                 new_model_name = f"{model_name}_{submodel_partition_info.id}"
@@ -932,7 +932,7 @@ class Modflow6Simulation(collections.UserDict):
             if isinstance(model, GroundwaterFlowModel):
                 exchanges += exchange_creator.create_gwfgwf_exchanges(
                     model_name, model.domain.layer
-                )        
+                )
 
         new_simulation._add_modelsplit_exchanges(exchanges)
         new_simulation._set_exchange_options()
@@ -991,10 +991,10 @@ class Modflow6Simulation(collections.UserDict):
     def _set_exchange_options(self):
         # collect some options that we will auto-set
         for exchange in self["split_exchanges"]:
-            if isinstance(exchange, GWFGWF): 
+            if isinstance(exchange, GWFGWF):
                 model_name_1 = exchange.dataset["model_name_1"].values[()]
                 model_1 = self[model_name_1]
-            if isinstance (model_1, GroundwaterFlowModel):
+            if isinstance(model_1, GroundwaterFlowModel):
                 exchange.set_options(
                     save_flows=model_1["oc"].is_budget_output,
                     dewatered=model_1["npf"].is_dewatered,
@@ -1031,13 +1031,12 @@ class Modflow6Simulation(collections.UserDict):
         active_exchange_domain = active_exchange_domain.dropna("index")
         ex.dataset = ex.dataset.sel(index=active_exchange_domain["index"])
 
-    def get_solution(self, model_name): 
+    def get_solution(self, model_name):
         for k, v in self.items():
             if isinstance(v, Solution):
                 if model_name in v["modelnames"]:
                     return k, v
         return None
-
 
     def __repr__(self) -> str:
         typename = type(self).__name__
@@ -1076,8 +1075,5 @@ class Modflow6Simulation(collections.UserDict):
             if len(tpt_models_of_flow_model) > 0:
                 for transport_model_name in tpt_models_of_flow_model:
                     exchanges.append(GWFGWT(flow_model_name, transport_model_name))
-                        
-
-
 
         return exchanges
