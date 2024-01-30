@@ -37,6 +37,7 @@ from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
 from imod.typing.grid import concat, is_unstructured, merge, merge_partitions, nan_like
+from imod.mf6.ims import Solution
 
 OUTPUT_FUNC_MAPPING = {
     "head": (open_hds, GroundwaterFlowModel),
@@ -916,11 +917,14 @@ class Modflow6Simulation(collections.UserDict):
             new_simulation[package_name] = package
 
         for model_name, model in original_models.items():
+            solution_name, solution_group = self.get_solution( model_name)
+            new_simulation[solution_name].remove_model_from_solution(model_name)
             for submodel_partition_info in partition_info:
                 new_model_name = f"{model_name}_{submodel_partition_info.id}"
                 new_simulation[new_model_name] = slice_model(
                     submodel_partition_info, model
                 )
+                new_simulation[solution_name].add_model_to_solution(new_model_name)
 
         exchanges = []
         flowmodels = self.get_models_of_type("gwf6")
@@ -928,11 +932,7 @@ class Modflow6Simulation(collections.UserDict):
             if isinstance(model, GroundwaterFlowModel):
                 exchanges += exchange_creator.create_gwfgwf_exchanges(
                     model_name, model.domain.layer
-                )
-
-        new_simulation["solver"]["modelnames"] = xr.DataArray(
-            list(get_models(new_simulation).keys())
-        )                
+                )        
 
         new_simulation._add_modelsplit_exchanges(exchanges)
         new_simulation._set_exchange_options()
@@ -1030,6 +1030,14 @@ class Modflow6Simulation(collections.UserDict):
         active_exchange_domain = exchange_domain.where(exchange_domain.values > 0)
         active_exchange_domain = active_exchange_domain.dropna("index")
         ex.dataset = ex.dataset.sel(index=active_exchange_domain["index"])
+
+    def get_solution(self, model_name): 
+        for k, v in self.items():
+            if isinstance(v, Solution):
+                if model_name in v["modelnames"]:
+                    return k, v
+        return None
+
 
     def __repr__(self) -> str:
         typename = type(self).__name__

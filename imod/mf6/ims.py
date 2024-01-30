@@ -427,6 +427,24 @@ class Solution(Package):
         self.dataset["no_ptc"] = no_ptc
         self._validate_init_schemata(validate)
 
+    def remove_model_from_solution(self, modelname: str):
+        models_in_solution = self.dataset["modelnames"].values
+        filtered_models = []
+        for m in models_in_solution:
+            if m != modelname:
+                filtered_models.append(m)
+        if len(filtered_models) == 0:
+            self.dataset = self.dataset.drop_vars("modelnames")
+        else:
+            self.dataset.update({ "modelnames": ( "model" , filtered_models) })
+
+    def add_model_to_solution(self, modelname: str):
+        models_in_solution = []
+        if  "modelnames" in self.dataset.keys():
+            models_in_solution =  list(self.dataset["modelnames"].values)
+        models_in_solution.append(modelname)
+        # self.dataset["modelnames"] = xr.DataArray(dims = {"model"}, data = models_in_solution)
+        self.dataset.update({ "modelnames": ( "model" , models_in_solution) })
 
 def SolutionPresetSimple(
     modelnames, print_option="summary", csv_output=False, no_ptc=False
