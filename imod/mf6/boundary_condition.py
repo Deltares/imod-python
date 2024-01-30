@@ -13,6 +13,7 @@ from imod.mf6.auxiliary_variables import (
 )
 from imod.mf6.package import Package
 from imod.mf6.write_context import WriteContext
+from imod.typing.grid import GridDataArray
 
 
 def _dis_recarr(arrdict, layer, notnull):
@@ -67,7 +68,7 @@ class BoundaryCondition(Package, abc.ABC):
     not the array input which is used in :class:`Package`.
     """
 
-    def __init__(self, allargs=None):
+    def __init__(self, allargs: dict[str, GridDataArray | float | int | bool | str]):
         super().__init__(allargs)
         if "concentration" in allargs.keys() and allargs["concentration"] is None:
             # Remove vars inplace

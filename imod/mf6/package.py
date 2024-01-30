@@ -54,7 +54,7 @@ class Package(PackageBase, IPackage, abc.ABC):
     _write_schemata: Dict[str, List[SchemaType] | Tuple[SchemaType]] = {}
     _keyword_map: Dict[str, str] = {}
 
-    def __init__(self, allargs=None):
+    def __init__(self, allargs: dict[str, GridDataArray | float | int | bool | str]):
         super().__init__(allargs)
 
     def isel(self):

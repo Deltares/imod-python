@@ -8,7 +8,7 @@ import xugrid as xu
 
 import imod
 from imod.mf6.interfaces.ipackagebase import IPackageBase
-from imod.typing.grid import GridDataset, merge_with_dictionary
+from imod.typing.grid import GridDataArray, GridDataset, merge_with_dictionary
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 EXCHANGE_PACKAGES = ("gwfgwf", "gwfgwt")
@@ -26,7 +26,9 @@ class PackageBase(IPackageBase, abc.ABC):
     def __new__(cls, *_, **__):
         return super(PackageBase, cls).__new__(cls)
 
-    def __init__(self, variables_to_merge=None):
+    def __init__(
+        self, variables_to_merge: dict[str, GridDataArray | float | int | bool | str]
+    ):
         # Merge variables, perform exact join to verify if coordinates values
         # are consistent amongst variables.
         self.__dataset = merge_with_dictionary(variables_to_merge, join="exact")
