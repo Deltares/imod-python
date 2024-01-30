@@ -8,7 +8,7 @@ import xarray as xr
 import xugrid as xu
 
 from imod.mf6.auxiliary_variables import (
-    add_periodic_auxiliary_variable,
+    expand_transient_auxiliary_variables,
     get_variable_names,
 )
 from imod.mf6.package import Package
@@ -74,7 +74,7 @@ class BoundaryCondition(Package, abc.ABC):
             del self.dataset["concentration"]
             del self.dataset["concentration_boundary_type"]
         else:
-            add_periodic_auxiliary_variable(self)
+            expand_transient_auxiliary_variables(self)
 
     def _max_active_n(self):
         """
