@@ -72,7 +72,7 @@ def create_transport_model(flow_model, species_name, dispersivity, retardation, 
 
 # %%
 # Create the spatial discretization.
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def flow_transport_simulation():
     nlay = 1
     nrow = 2
@@ -132,8 +132,35 @@ def flow_transport_simulation():
         transient=False,
         convertible=0,
     )
+    recharge_conc = xr.full_like(grid, np.nan, dtype=float)
+    recharge_conc[..., 20:60] = 0.001
+    recharge_conc = recharge_conc.expand_dims(
+        species=["species_a", "species_b", "species_c", "species_d"]
+    )
+    recharge_rate = xr.full_like(grid, np.nan, dtype=float)
+    recharge_rate[..., 20:60] = 0.001
+    gwf_model["rch"] = imod.mf6.Recharge(recharge_rate, recharge_conc, "AUX")
     # %%
     # Create the simulation.
+    injection_concentration = xr.DataArray(
+        [[0.2, 0.23], [0.5, 0.2], [0.2, 0.23], [0.5, 0.2]],
+        coords={
+            "species": ["species_a", "species_b", "species_c", "species_d"],
+            "index": [0, 1],
+        },
+        dims=("species", "index"),
+    )
+
+    gwf_model["well"] = imod.mf6.Well(
+        x=[20.0, 580.0],
+        y=[0.6, 1.2],
+        concentration_boundary_type="Aux",
+        screen_top=[0.0, 0.0],
+        screen_bottom=[-1.0, -1.0],
+        rate=[1.0, -2.0],
+        minimum_k=0.0001,
+        concentration=injection_concentration,
+    )
 
     simulation = imod.mf6.Modflow6Simulation("1d_tpt_benchmark")
     simulation["flow"] = gwf_model
@@ -148,7 +175,7 @@ def flow_transport_simulation():
         gwf_model, "species_d", 10.0, 5.0, 0.002
     )
 
-    simulation["flow_solver"] = imod.mf6.Solution(
+    simulation["solver"] = imod.mf6.Solution(
         modelnames=["flow"],
         print_option="summary",
         csv_output=False,

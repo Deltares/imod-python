@@ -4,7 +4,7 @@ import cftime
 import numpy as np
 import xarray as xr
 
-from imod.mf6.auxiliary_variables import add_periodic_auxiliary_variable
+from imod.mf6.auxiliary_variables import expand_transient_auxiliary_variables
 from imod.mf6.exchangebase import ExchangeBase
 from imod.mf6.package import Package
 from imod.typing import GridDataArray
@@ -52,7 +52,7 @@ class GWFGWF(ExchangeBase):
             self.dataset["auxiliary_data"] = xr.merge(auxiliary_variables).to_array(
                 name="auxiliary_data"
             )
-            add_periodic_auxiliary_variable(self)
+            expand_transient_auxiliary_variables(self)
 
     def set_options(
         self,
