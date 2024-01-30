@@ -1056,7 +1056,7 @@ class Modflow6Simulation(collections.UserDict):
             content = attrs + ["){}"]
         return "\n".join(content)
 
-    def _generate_gwfgwt_exchanges(self):
+    def _generate_gwfgwt_exchanges(self)->list[GWFGWT]:
         flow_models = self.get_models_of_type("gwf6")
         transport_models = self.get_models_of_type("gwt6")
         # exchange for flow and transport
