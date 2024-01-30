@@ -48,7 +48,7 @@ class TestExchangeCreator_Unstructured:
         exchange_creator = ExchangeCreator_Unstructured(submodel_labels, partition_info)
 
         # Act.
-        exchanges = exchange_creator.create_exchanges("flow", idomain.layer)
+        exchanges = exchange_creator.create_gwfgwf_exchanges("flow", idomain.layer)
 
         # Assert.
         assert len(exchanges) == number_partitions - 1
@@ -75,7 +75,7 @@ class TestExchangeCreator_Unstructured:
         exchange_creator = ExchangeCreator_Unstructured(submodel_labels, partition_info)
 
         # Act.
-        exchanges = exchange_creator.create_exchanges("flow", idomain.layer)
+        exchanges = exchange_creator.create_gwfgwf_exchanges("flow", idomain.layer)
 
         # Assert.
         nlayer = 3
@@ -118,7 +118,7 @@ class TestExchangeCreator_Unstructured:
         exchange_creator = ExchangeCreator_Unstructured(submodel_labels, partition_info)
 
         # Act.
-        exchanges = exchange_creator.create_exchanges("flow", idomain.layer)
+        exchanges = exchange_creator.create_gwfgwf_exchanges("flow", idomain.layer)
 
         # Assert.
         assert np.allclose(exchanges[0].dataset["cl1"], expected_cl1)
@@ -159,7 +159,7 @@ class TestExchangeCreator_Unstructured:
         exchange_creator = ExchangeCreator_Unstructured(submodel_labels, partition_info)
 
         # Act.
-        _ = exchange_creator.create_exchanges("flow", idomain.layer)
+        _ = exchange_creator.create_gwfgwf_exchanges("flow", idomain.layer)
         """
         exchanges = exchange_creator.create_exchanges("flow", idomain.layer)
         """
