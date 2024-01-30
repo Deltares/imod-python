@@ -79,7 +79,6 @@ def test_write_well(tmp_path: Path, grid_data, grid_data_layered, reference_outp
         active, top, bottom, k, False, write_context.is_partitioned
     )
     mf6_pkg.write("packagename", globaltimes, write_context)
-    mf6_pkg.write("packagename", globaltimes, write_context)
     assert pathlib.Path.exists(tmp_path / "packagename.wel")
     assert pathlib.Path.exists(tmp_path / "packagename" / "wel.dat")
     df = pd.read_csv(

@@ -235,7 +235,7 @@ class BoundaryCondition(Package, abc.ABC):
     def write(
         self,
         pkgname: str,
-        globaltimes: Union[List, np.ndarray],
+        globaltimes: Union[List[np.datetime64], np.ndarray],
         write_context: WriteContext,
     ):
         """
@@ -307,7 +307,7 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
     def write(
         self,
         pkgname: str,
-        globaltimes: Union[List, np.ndarray],
+        globaltimes: Union[List[np.datetime64], np.ndarray],
         write_context: WriteContext,
     ):
         boundary_condition_write_context = deepcopy(write_context)

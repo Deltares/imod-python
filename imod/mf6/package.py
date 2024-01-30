@@ -252,7 +252,7 @@ class Package(PackageBase, abc.ABC):
     def write(
         self,
         pkgname: str,
-        globaltimes: Union[List, np.ndarray],
+        globaltimes: Union[List[np.datetime64], np.ndarray],
         write_context: WriteContext,
     ):
         directory = write_context.write_directory

@@ -161,7 +161,7 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
     def write(
         self,
         pkgname: str,
-        globaltimes: Union[List, np.ndarray],
+        globaltimes: Union[List[np.datetime64], np.ndarray],
         write_context: WriteContext,
     ):
         # MODFLOW6 does not support binary HFB input.

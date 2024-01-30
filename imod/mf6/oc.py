@@ -180,7 +180,7 @@ class OutputControl(Package):
     def write(
         self,
         pkgname: str,
-        globaltimes: Union[List, np.ndarray],
+        globaltimes: Union[List[np.datetime64], np.ndarray],
         write_context: WriteContext,
     ):
         # We need to overload the write here to ensure the output directory is
