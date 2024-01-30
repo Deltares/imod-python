@@ -47,18 +47,16 @@ class SourceSinkMixing(BoundaryCondition):
         save_flows: bool = False,
         validate: bool = True,
     ):
-        super().__init__()
-        # By sharing the index, this will raise an error if lengths do not
-        # match.
-        self.dataset["package_names"] = with_index_dim(package_names)
-        self.dataset["concentration_boundary_type"] = with_index_dim(
-            concentration_boundary_type
-        )
-        self.dataset["auxiliary_variable_name"] = with_index_dim(
-            auxiliary_variable_name
-        )
-        self.dataset["print_flows"] = print_flows
-        self.dataset["save_flows"] = save_flows
+        dict_dataset = {
+            # By sharing the index, this will raise an error if lengths do not
+            # match.
+            "package_names": with_index_dim(package_names),
+            "concentration_boundary_type": with_index_dim(concentration_boundary_type),
+            "auxiliary_variable_name": with_index_dim(auxiliary_variable_name),
+            "print_flows": print_flows,
+            "save_flows": save_flows,
+        }
+        super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):

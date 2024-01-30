@@ -2,7 +2,6 @@ from typing import Dict, List
 
 import numpy as np
 
-from imod.mf6.auxiliary_variables import expand_transient_auxiliary_variables
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
@@ -193,27 +192,27 @@ class Evapotranspiration(BoundaryCondition):
         validate: bool = True,
         repeat_stress=None,
     ):
-        super().__init__(locals())
-        self.dataset["surface"] = surface
-        self.dataset["rate"] = rate
-        self.dataset["depth"] = depth
         if ("segment" in proportion_rate.dims) ^ ("segment" in proportion_depth.dims):
             raise ValueError(
                 "Segment must be provided for both proportion_rate and"
                 " proportion_depth, or for none at all."
             )
-        self.dataset["proportion_rate"] = proportion_rate
-        self.dataset["proportion_depth"] = proportion_depth
-        if concentration is not None:
-            self.dataset["concentration"] = concentration
-            self.dataset["concentration_boundary_type"] = concentration_boundary_type
-            expand_transient_auxiliary_variables(self)
-        self.dataset["fixed_cell"] = fixed_cell
-        self.dataset["print_input"] = print_input
-        self.dataset["print_flows"] = print_flows
-        self.dataset["save_flows"] = save_flows
-        self.dataset["observations"] = observations
-        self.dataset["repeat_stress"] = repeat_stress
+        dict_dataset = {
+            "surface": surface,
+            "rate": rate,
+            "depth": depth,
+            "proportion_rate": proportion_rate,
+            "proportion_depth": proportion_depth,
+            "concentration": concentration,
+            "concentration_boundary_type": concentration_boundary_type,
+            "fixed_cell": fixed_cell,
+            "print_input": print_input,
+            "print_flows": print_flows,
+            "save_flows": save_flows,
+            "observations": observations,
+            "repeat_stress": repeat_stress,
+        }
+        super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
     def _validate(self, schemata, **kwargs):
