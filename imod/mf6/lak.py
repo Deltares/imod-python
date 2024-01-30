@@ -733,13 +733,6 @@ class Lake(BoundaryCondition):
         validate=True,
     ):
         
-        nr_indices = int(lake_number.data.max())
-        if outlet_lakein is not None:
-            nroutlets = len(outlet_lakein.data)
-            nr_indices = max(nr_indices, nroutlets)
-
-        indices = range(1, nr_indices + 1, 1)
-
         if ts_status is not None:
             ts_status = self._convert_to_string_dataarray(
                 xr.DataArray(ts_status)
