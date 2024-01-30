@@ -119,4 +119,5 @@ def test_split_flow_and_transport_model(tmp_path, flow_transport_simulation):
 
     new_simulation = simulation.split(submodel_labels)
     new_simulation.write(tmp_path, binary=False)
+    assert_simulation_can_run(new_simulation, "dis", tmp_path)
     pass
