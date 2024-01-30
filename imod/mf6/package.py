@@ -702,8 +702,12 @@ class Package(PackageBase, IPackage, abc.ABC):
                 target_grid,
             )
             # set dx and dy if present in target_grid
-            new_package_data[varname] = assign_coord_if_present("dx", target_grid, new_package_data[varname])
-            new_package_data[varname] = assign_coord_if_present("dy", target_grid, new_package_data[varname])
+            new_package_data[varname] = assign_coord_if_present(
+                "dx", target_grid, new_package_data[varname]
+            )
+            new_package_data[varname] = assign_coord_if_present(
+                "dy", target_grid, new_package_data[varname]
+            )
 
         return self.__class__(**new_package_data)
 

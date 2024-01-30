@@ -125,7 +125,12 @@ def _type_dispatch_functions_on_dict(
     types = [type(arg) for arg in dict_of_objects.values()]
     has_unstructured = xu.UgridDataArray in types
     # Test structured if xr.DataArray and spatial.
-    has_structured_grid = any([isinstance(arg, xr.DataArray) and is_spatial_2D(arg) for arg in dict_of_objects.values()])
+    has_structured_grid = any(
+        [
+            isinstance(arg, xr.DataArray) and is_spatial_2D(arg)
+            for arg in dict_of_objects.values()
+        ]
+    )
     if has_structured_grid and has_unstructured:
         raise TypeError(error_msg)
     if has_unstructured:
@@ -194,7 +199,9 @@ def merge_unstructured_dataset(variables_to_merge: list[dict], *args, **kwargs):
     grid_hashes = [hash(pickle.dumps(grid)) for grid in dataset.ugrid.grids]
     unique_grid_hashes = np.unique(grid_hashes)
     if unique_grid_hashes.size > 1:
-        raise ValueError("Multiple grids provided, please provide data on one unique grid")
+        raise ValueError(
+            "Multiple grids provided, please provide data on one unique grid"
+        )
     else:
         # Possibly won't work anymore if this ever gets implemented:
         # https://github.com/Deltares/xugrid/issues/195

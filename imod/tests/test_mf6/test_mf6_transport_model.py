@@ -47,7 +47,9 @@ def test_transport_model_rendering():
 def test_assign_flow_discretization(basic_dis, concentration_fc):
     # define a grid
     _, _, bottom = basic_dis
-    idomain = xr.ones_like(concentration_fc.isel(species=0, time=0, drop=True), dtype=int)
+    idomain = xr.ones_like(
+        concentration_fc.isel(species=0, time=0, drop=True), dtype=int
+    )
 
     like = idomain.sel(layer=1).astype(np.float32)
     concentration = concentration_fc.sel(layer=1)

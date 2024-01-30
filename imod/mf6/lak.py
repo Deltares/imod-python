@@ -732,17 +732,13 @@ class Lake(BoundaryCondition):
         length_conversion=None,
         validate=True,
     ):
-        
         if ts_status is not None:
-            ts_status = self._convert_to_string_dataarray(
-                xr.DataArray(ts_status)
-            )
+            ts_status = self._convert_to_string_dataarray(xr.DataArray(ts_status))
 
         dict_dataset = {
             "lake_boundname": lake_boundname,
             "lake_number": lake_number,
             "lake_starting_stage": lake_starting_stage,
-
             "connection_lake_number": connection_lake_number,
             "connection_cell_id": connection_cell_id,
             "connection_type": connection_type,
@@ -751,7 +747,6 @@ class Lake(BoundaryCondition):
             "connection_top_elevation": connection_top_elevation,
             "connection_width": connection_width,
             "connection_length": connection_length,
-
             "outlet_lakein": outlet_lakein,
             "outlet_lakeout": outlet_lakeout,
             "outlet_couttype": outlet_couttype,
@@ -759,12 +754,10 @@ class Lake(BoundaryCondition):
             "outlet_roughness": outlet_roughness,
             "outlet_width": outlet_width,
             "outlet_slope": outlet_slope,
-
             "print_input": print_input,
             "print_stage": print_stage,
             "print_flows": print_flows,
             "save_flows": save_flows,
-
             "stagefile": stagefile,
             "budgetfile": budgetfile,
             "budgetcsvfile": budgetcsvfile,
@@ -772,9 +765,7 @@ class Lake(BoundaryCondition):
             "ts6_filename": ts6_filename,
             "time_conversion": time_conversion,
             "length_conversion": length_conversion,
-
             "ts_status": ts_status,
-
             "ts_stage": ts_stage,
             "ts_rainfall": ts_rainfall,
             "ts_evaporation": ts_evaporation,
@@ -782,13 +773,11 @@ class Lake(BoundaryCondition):
             "ts_inflow": ts_inflow,
             "ts_withdrawal": ts_withdrawal,
             "ts_auxiliary": ts_auxiliary,
-
             "ts_rate": ts_rate,
             "ts_invert": ts_invert,
             "ts_rough": ts_rough,
             "ts_width": ts_width,
             "ts_slope": ts_slope,
-
             "lake_tables": lake_tables,
         }
 
@@ -847,9 +836,15 @@ class Lake(BoundaryCondition):
 
         # Align timeseries variables
         ts_vars = Lake._period_data_lakes + Lake._period_data_outlets
-        assigned_ts_vars = [ts_var for ts_var in ts_vars if package_content[ts_var] is not None]
-        aligned_timeseries = xr.align(*(package_content[ts_var] for ts_var in assigned_ts_vars), join="outer")
-        package_content.update({ts_var: ts for ts_var, ts in zip(assigned_ts_vars, aligned_timeseries)})
+        assigned_ts_vars = [
+            ts_var for ts_var in ts_vars if package_content[ts_var] is not None
+        ]
+        aligned_timeseries = xr.align(
+            *(package_content[ts_var] for ts_var in assigned_ts_vars), join="outer"
+        )
+        package_content.update(
+            {ts_var: ts for ts_var, ts in zip(assigned_ts_vars, aligned_timeseries)}
+        )
 
         if outlets is not None:
             outlet_data = create_outlet_data(outlets, name_to_number)
