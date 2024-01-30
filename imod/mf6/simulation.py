@@ -927,7 +927,6 @@ class Modflow6Simulation(collections.UserDict):
                 new_simulation[solution_name].add_model_to_solution(new_model_name)
 
         exchanges = []
-        flowmodels = self.get_models_of_type("gwf6")
         for model_name, model in original_models.items():
             if isinstance(model, GroundwaterFlowModel):
                 exchanges += exchange_creator.create_gwfgwf_exchanges(

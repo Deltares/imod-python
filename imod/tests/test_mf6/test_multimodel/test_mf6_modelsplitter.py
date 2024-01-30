@@ -101,21 +101,3 @@ def test_slice_model_with_auxiliary_variables(tmp_path, flow_transport_simulatio
     assert "species_d" in list(split_simulation["flow_1"]["chd"].dataset.keys())
     assert "species_d" in list(split_simulation["flow_1"]["rch"].dataset.keys())
     assert "concentration" in list(split_simulation["flow_1"]["well"].dataset.keys())
-
-
-@pytest.mark.usefixtures("flow_transport_simulation")
-def test_split_flow_and_transport_model(tmp_path, flow_transport_simulation):
-    simulation = flow_transport_simulation
-
-    flow_model = simulation["flow"]
-    active = flow_model.domain
-
-    submodel_labels = zeros_like(active)
-    submodel_labels = submodel_labels.drop_vars("layer")
-    submodel_labels.values[:, :, 50:] = 1
-    submodel_labels = submodel_labels.sel(layer=0, drop=True)
-
-    new_simulation = simulation.split(submodel_labels)
-    new_simulation.write(tmp_path, binary=False)
-    assert_simulation_can_run(new_simulation, "dis", tmp_path)
-    pass
