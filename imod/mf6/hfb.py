@@ -345,8 +345,6 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
         Parameters
         ----------
-        validate: bool
-            Run validation before converting
         idomain: GridDataArray
              Grid with active cells.
         top: GridDataArray
@@ -355,6 +353,8 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             Grid with bottom of model layers.
         k: GridDataArray
             Grid with hydraulic conductivities.
+        validate: bool
+            Run validation before converting
 
         Returns
         -------

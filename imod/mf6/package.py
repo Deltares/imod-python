@@ -319,21 +319,6 @@ class Package(PackageBase, abc.ABC):
             raise ValidationError(message)
         return
 
-    def _get_vars_to_check(self):
-        """
-        Helper function to get all variables which were not set to None
-        """
-        variables = []
-        for var in self._metadata_dict.keys():
-            if (  # Filter optional variables not filled in
-                self.dataset[var].size != 1
-            ) or (
-                self.dataset[var] != None  # noqa: E711
-            ):
-                variables.append(var)
-
-        return variables
-
     def copy(self) -> Any:
         # All state should be contained in the dataset.
         return type(self)(**self.dataset.copy())
