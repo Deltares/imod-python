@@ -917,7 +917,7 @@ class Modflow6Simulation(collections.UserDict):
             new_simulation[package_name] = package
 
         for model_name, model in original_models.items():
-            solution_name, solution_group = self.get_solution(model_name)
+            solution_name = self.get_solution(model_name)
             new_simulation[solution_name].remove_model_from_solution(model_name)
             for submodel_partition_info in partition_info:
                 new_model_name = f"{model_name}_{submodel_partition_info.id}"
@@ -1030,11 +1030,11 @@ class Modflow6Simulation(collections.UserDict):
         active_exchange_domain = active_exchange_domain.dropna("index")
         ex.dataset = ex.dataset.sel(index=active_exchange_domain["index"])
 
-    def get_solution(self, model_name):
+    def get_solution(self, model_name: str) -> str:
         for k, v in self.items():
             if isinstance(v, Solution):
-                if model_name in v["modelnames"]:
-                    return k, v
+                if model_name in v.dataset["modelnames"]:
+                    return k
         return None
 
     def __repr__(self) -> str:
@@ -1056,7 +1056,7 @@ class Modflow6Simulation(collections.UserDict):
             content = attrs + ["){}"]
         return "\n".join(content)
 
-    def _generate_gwfgwt_exchanges(self)->list[GWFGWT]:
+    def _generate_gwfgwt_exchanges(self) -> list[GWFGWT]:
         flow_models = self.get_models_of_type("gwf6")
         transport_models = self.get_models_of_type("gwt6")
         # exchange for flow and transport

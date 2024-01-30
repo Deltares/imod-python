@@ -308,7 +308,9 @@ class TestModflow6Simulation:
         simulation["test_model1"] = model_mock1
         simulation["test_model2"] = model_mock2
 
-        simulation["solver"]["modelnames"] = ["test_model1", "test_model2"]
+        simulation["solver"].dataset = xr.Dataset(
+            {"modelnames": ["test_model1", "test_model2"]}
+        )
 
         slice_model_mock.return_value = MagicMock(spec_set=GroundwaterFlowModel)
 
@@ -372,7 +374,9 @@ class TestModflow6Simulation:
         simulation["test_model1"] = model_mock1
         simulation["test_model2"] = model_mock2
 
-        simulation["solver"]["modelnames"] = ["test_model1", "test_model2"]
+        simulation["solver"].dataset = xr.Dataset(
+            {"modelnames": ["test_model1", "test_model2"]}
+        )
 
         slice_model_mock.return_value = MagicMock(spec_set=GroundwaterFlowModel)
 
