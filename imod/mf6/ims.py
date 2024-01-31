@@ -428,9 +428,7 @@ class Solution(Package):
         self._validate_init_schemata(validate)
 
     def remove_model_from_solution(self, modelname: str) -> None:
-        models_in_solution = []
-        if "modelnames" in self.dataset.keys():
-            models_in_solution = self.dataset["modelnames"].values
+        models_in_solution = self.get_models_in_solution()
         if modelname not in models_in_solution:
             raise ValueError(
                 f"attempted to remove model {modelname} from solution, but it was not found."
@@ -443,15 +441,19 @@ class Solution(Package):
             self.dataset.update({"modelnames": ("model", filtered_models)})
 
     def add_model_to_solution(self, modelname: str) -> None:
-        models_in_solution = []
-        if "modelnames" in self.dataset.keys():
-            models_in_solution = list(self.dataset["modelnames"].values)
+        models_in_solution = self.get_models_in_solution()
         if modelname in models_in_solution:
             raise ValueError(
                 f"attempted to add model {modelname} to solution, but it was already in it."
             )
         models_in_solution.append(modelname)
         self.dataset.update({"modelnames": ("model", models_in_solution)})
+
+    def get_models_in_solution(self) -> list[str]:
+        models_in_solution = []
+        if "modelnames" in self.dataset.keys():
+            models_in_solution = list(self.dataset["modelnames"].values)
+        return models_in_solution
 
 
 def SolutionPresetSimple(
