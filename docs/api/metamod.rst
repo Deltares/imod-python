@@ -7,6 +7,3 @@ MetaMod
     :toctree: generated/metamod
 
     MetaMod
-    NodeSvatMapping
-    RechargeSvatMapping
-    WellSvatMapping
