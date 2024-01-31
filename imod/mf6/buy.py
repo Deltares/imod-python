@@ -1,4 +1,4 @@
-from typing import Sequence
+from typing import Optional, Sequence
 
 import numpy as np
 import xarray as xr
@@ -89,7 +89,6 @@ class Buoyancy(Package):
 
     _pkg_id = "buy"
     _template = Package._initialize_template(_pkg_id)
-    _metadata_dict = {}
 
     _init_schemata = {
         "reference_density": [DTypeSchema(np.floating)],
@@ -107,7 +106,7 @@ class Buoyancy(Package):
         modelname: Sequence[str],
         species: Sequence[str],
         hhformulation_rhs: bool = False,
-        densityfile: str = None,
+        densityfile: Optional[str] = None,
         validate: bool = True,
     ):
         dict_dataset = {
@@ -121,7 +120,6 @@ class Buoyancy(Package):
             "densityfile": densityfile,
         }
         super().__init__(dict_dataset)
-        self.dependencies = []
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):

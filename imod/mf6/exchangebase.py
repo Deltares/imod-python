@@ -1,4 +1,4 @@
-from typing import Dict, Tuple
+from typing import Tuple
 
 from imod.mf6.package import Package
 
@@ -11,7 +11,7 @@ class ExchangeBase(Package):
     This class enables writing the exchanges to file in a uniform way.
     """
 
-    _keyword_map: Dict[str, str] = {}
+    _keyword_map: dict[str, str] = {}
 
     @property
     def model_name1(self) -> str:

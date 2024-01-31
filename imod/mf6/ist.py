@@ -1,4 +1,7 @@
+from typing import Optional
+
 import numpy as np
+import xarray as xr
 
 from imod.mf6.package import Package
 from imod.mf6.validation import PKG_DIMS_SCHEMA
@@ -191,11 +194,11 @@ class ImmobileStorageTransfer(Package):
         mobile_immobile_mass_transfer_rate,
         decay=None,
         decay_sorbed=None,
-        bulk_density=None,
+        bulk_density: Optional[xr.DataArray] = None,
         distribution_coefficient=None,
-        save_flows: bool = None,
-        budgetbinfile: str = None,
-        budgetcsvfile: str = None,
+        save_flows: Optional[bool] = None,
+        budgetbinfile: Optional[str] = None,
+        budgetcsvfile: Optional[str] = None,
         sorption: bool = False,
         first_order_decay: bool = False,
         zero_order_decay: bool = False,

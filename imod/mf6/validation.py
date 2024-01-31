@@ -1,8 +1,6 @@
 """
 This module contains specific validation utilities for Modflow 6.
 """
-from typing import Dict, List
-
 import numpy as np
 import xarray as xr
 
@@ -77,7 +75,7 @@ def validation_pkg_error_message(pkg_errors):
 
 
 def pkg_errors_to_status_info(
-    pkg_name: str, pkg_errors: Dict[str, List[ValidationError]]
+    pkg_name: str, pkg_errors: dict[str, list[ValidationError]]
 ) -> StatusInfoBase:
     pkg_status_info = NestedStatusInfo(f"{pkg_name} package")
     for var_name, var_errors in pkg_errors.items():

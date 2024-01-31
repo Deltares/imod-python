@@ -39,7 +39,8 @@ def test_mf6wel_to_struct_array__stationary(
     mf6wel = imod.mf6.mf6_wel_adapter.Mf6Wel(cellid=cellid, rate=rate)
 
     # Act
-    arrdict = mf6wel._ds_to_arrdict(mf6wel.dataset)
+    bin_ds = mf6wel._get_bin_ds()
+    arrdict = mf6wel._ds_to_arrdict(bin_ds)
     struct_array = mf6wel._to_struct_array(arrdict, None)
 
     # Assert
@@ -52,7 +53,7 @@ def test_mf6wel_to_struct_array__transient(
     # Arrange
     cellid, rate = mf6wel_test_data_transient
     mf6wel = imod.mf6.mf6_wel_adapter.Mf6Wel(cellid=cellid, rate=rate)
-    ds = mf6wel.dataset.isel(time=0)
+    ds = mf6wel._get_bin_ds().isel(time=0)
 
     # Act
     arrdict = mf6wel._ds_to_arrdict(ds)
@@ -69,7 +70,7 @@ def test_mf6wel_write_datafile__stationary(
     cellid, rate = mf6wel_test_data_stationary
     mf6wel = imod.mf6.mf6_wel_adapter.Mf6Wel(cellid=cellid, rate=rate)
 
-    ds = mf6wel.dataset
+    ds = mf6wel._get_bin_ds()
     file_path = Path(tmp_path) / "mf6wel.bin"
 
     # Act

@@ -42,6 +42,7 @@ def test_ist_simple(grid_array):
         initial_immobile_concentration=0.0,
         immobile_porosity=immobile_porosity,
         mobile_immobile_mass_transfer_rate=mobile_immobile_mass_transfer_rate,
+        validate=False,
     )
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]

@@ -1,7 +1,7 @@
 import abc
 import pathlib
 from copy import copy, deepcopy
-from typing import Dict, List
+from typing import Mapping, Optional, Union
 
 import numpy as np
 import xarray as xr
@@ -68,7 +68,7 @@ class BoundaryCondition(Package, abc.ABC):
     not the array input which is used in :class:`Package`.
     """
 
-    def __init__(self, allargs: dict[str, GridDataArray | float | int | bool | str]):
+    def __init__(self, allargs: Mapping[str, GridDataArray | float | int | bool | str]):
         super().__init__(allargs)
         if "concentration" in allargs.keys() and allargs["concentration"] is None:
             # Remove vars inplace
@@ -185,7 +185,9 @@ class BoundaryCondition(Package, abc.ABC):
 
         return periods
 
-    def _get_options(self, predefined_options: Dict, not_options: List = None):
+    def _get_options(
+        self, predefined_options: dict, not_options: Optional[list] = None
+    ):
         options = copy(predefined_options)
 
         if not_options is None:
@@ -243,7 +245,12 @@ class BoundaryCondition(Package, abc.ABC):
             path = directory / pkgname / f"{self._pkg_id}.{ext}"
             self._write_datafile(path, bin_ds, binary=binary)
 
-    def write(self, pkgname: str, globaltimes: np.ndarray, write_context: WriteContext):
+    def write(
+        self,
+        pkgname: str,
+        globaltimes: Union[list[np.datetime64], np.ndarray],
+        write_context: WriteContext,
+    ):
         """
         writes the blockfile and binary data
 
@@ -310,7 +317,12 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
         package_data = self._package_data_to_sparse()
         self._write_file(outpath, package_data)
 
-    def write(self, pkgname: str, globaltimes: np.ndarray, write_context: WriteContext):
+    def write(
+        self,
+        pkgname: str,
+        globaltimes: Union[list[np.datetime64], np.ndarray],
+        write_context: WriteContext,
+    ):
         boundary_condition_write_context = deepcopy(write_context)
         boundary_condition_write_context.use_binary = False
 

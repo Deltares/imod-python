@@ -190,7 +190,7 @@ def test_to_mf6_creates_mf6_adapter_layered(
     hfb = barrier_class(geometry, print_input)
 
     # Act.
-    _ = hfb.to_mf6_pkg(idomain, top, bottom, k)
+    _ = hfb.to_mf6_pkg(idomain, top, bottom, k, False)
 
     # Assert.
     snapped, _ = xu.snap_to_grid(geometry, grid=idomain, max_snap_distance=0.5)

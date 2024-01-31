@@ -1,6 +1,6 @@
 import abc
 from enum import Enum
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Tuple, Union
 
 import xarray as xr
 import xugrid as xu
@@ -35,36 +35,37 @@ class RegridderInstancesCollection:
         source_grid: Union[xr.DataArray, xu.UgridDataArray],
         target_grid: Union[xr.DataArray, xu.UgridDataArray],
     ) -> None:
-        self.regridder_instances = {}
+        self.regridder_instances: dict[
+            Tuple[type[BaseRegridder], Optional[str]], BaseRegridder
+        ] = {}
         self._source_grid = source_grid
         self._target_grid = target_grid
 
     def __has_regridder(
-        self, regridder_type: abc.ABCMeta, method: Optional[str] = None
+        self, regridder_type: type[BaseRegridder], method: Optional[str] = None
     ) -> bool:
         return (regridder_type, method) in self.regridder_instances.keys()
 
     def __get_existing_regridder(
-        self, regridder_type: abc.ABCMeta, method: Optional[str]
+        self, regridder_type: type[BaseRegridder], method: Optional[str]
     ) -> BaseRegridder:
         if self.__has_regridder(regridder_type, method):
             return self.regridder_instances[(regridder_type, method)]
         raise ValueError("no existing regridder of type " + str(regridder_type))
 
     def __create_regridder(
-        self, regridder_type: abc.ABCMeta, method: Optional[str]
+        self, regridder_type: type[BaseRegridder], method: Optional[str]
     ) -> BaseRegridder:
-        if method is None:
-            method_args = ()
-        else:
-            method_args = (method,)
+        method_args = () if method is None else (method,)
 
         self.regridder_instances[(regridder_type, method)] = regridder_type(
             self._source_grid, self._target_grid, *method_args
         )
         return self.regridder_instances[(regridder_type, method)]
 
-    def __get_regridder_class(self, regridder_type: RegridderType) -> abc.ABCMeta:
+    def __get_regridder_class(
+        self, regridder_type: RegridderType | BaseRegridder
+    ) -> type[BaseRegridder]:
         if isinstance(regridder_type, abc.ABCMeta):
             if not issubclass(regridder_type, BaseRegridder):
                 raise ValueError(
@@ -78,7 +79,7 @@ class RegridderInstancesCollection:
 
     def get_regridder(
         self,
-        regridder_type: Union[RegridderType, abc.ABCMeta],
+        regridder_type: Union[RegridderType, BaseRegridder],
         method: Optional[str] = None,
     ) -> BaseRegridder:
         """
@@ -109,7 +110,7 @@ class RegridderInstancesCollection:
         return self.__get_existing_regridder(regridder_class, method)
 
 
-def get_non_grid_data(package, grid_names: List[str]) -> Dict[str, any]:
+def get_non_grid_data(package, grid_names: list[str]) -> dict[str, Any]:
     """
     This function copies the attributes of a dataset that are scalars, such as options.
 
