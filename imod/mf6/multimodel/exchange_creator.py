@@ -6,6 +6,7 @@ import pandas as pd
 import xarray as xr
 
 from imod.mf6.gwfgwf import GWFGWF
+from imod.mf6.gwtgwt import GWTGWT
 from imod.mf6.multimodel.modelsplitter import PartitionInfo
 from imod.mf6.utilities.grid import get_active_domain_slice, to_cell_idx
 from imod.typing import GridDataArray
@@ -186,6 +187,73 @@ class ExchangeCreator(abc.ABC):
 
                 exchanges.append(
                     GWFGWF(
+                        f"{model_name}_{model_id1}",
+                        f"{model_name}_{model_id2}",
+                        **connected_cells_dataset,
+                    )
+                )
+
+        return exchanges
+
+    def create_gwtgwt_exchanges(
+        self, model_name: str, layers: GridDataArray
+    ) -> List[GWTGWT]:
+        layers = layers.to_dataframe().filter(["layer"])
+
+        connected_cells_with_geometric_info = pd.merge(
+            self._connected_cells, self._geometric_information
+        )
+
+        exchanges = []
+        for (
+            model_id1,
+            grouped_connected_models,
+        ) in connected_cells_with_geometric_info.groupby("cell_label1"):
+            for model_id2, connected_domain_pair in grouped_connected_models.groupby(
+                "cell_label2"
+            ):
+                model_id1 = int(model_id1)
+                model_id2 = int(model_id2)
+                mapping1 = (
+                    self._global_to_local_mapping[model_id1]
+                    .drop(columns=["local_idx"])
+                    .rename(
+                        columns={"global_idx": "cell_idx1", "local_cell_id": "cell_id1"}
+                    )
+                )
+
+                mapping2 = (
+                    self._global_to_local_mapping[model_id2]
+                    .drop(columns=["local_idx"])
+                    .rename(
+                        columns={"global_idx": "cell_idx2", "local_cell_id": "cell_id2"}
+                    )
+                )
+
+                connected_cells = (
+                    connected_domain_pair.merge(mapping1)
+                    .merge(mapping2)
+                    .filter(
+                        [
+                            "cell_id1",
+                            "cell_id2",
+                            "cl1",
+                            "cl2",
+                            "hwva",
+                            "angldegx",
+                            "cdist",
+                        ]
+                    )
+                )
+
+                connected_cells = pd.merge(layers, connected_cells, how="cross")
+
+                connected_cells_dataset = self._to_xarray(connected_cells)
+
+                _adjust_gridblock_indexing(connected_cells_dataset)
+
+                exchanges.append(
+                    GWTGWT(
                         f"{model_name}_{model_id1}",
                         f"{model_name}_{model_id2}",
                         **connected_cells_dataset,

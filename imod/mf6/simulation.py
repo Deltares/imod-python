@@ -932,6 +932,10 @@ class Modflow6Simulation(collections.UserDict):
                 exchanges += exchange_creator.create_gwfgwf_exchanges(
                     model_name, model.domain.layer
                 )
+            if isinstance(model, GroundwaterTransportModel):
+                exchanges += exchange_creator.create_gwtgwt_exchanges(
+                    model_name, model.domain.layer
+                )
 
         new_simulation._add_modelsplit_exchanges(exchanges)
         new_simulation._set_exchange_options()
