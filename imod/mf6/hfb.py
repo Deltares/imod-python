@@ -281,8 +281,8 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         geometry: gpd.GeoDataFrame,
         print_input: bool = False,
     ) -> None:
-        super().__init__(locals())
-        self.dataset["print_input"] = print_input
+        dict_dataset = {"print_input": print_input}
+        super().__init__(dict_dataset)
 
         self.line_data = geometry
 

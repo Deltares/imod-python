@@ -16,10 +16,12 @@ from xarray.core.utils import is_scalar
 
 import imod
 from imod.mf6.auxiliary_variables import get_variable_names
+from imod.mf6.interfaces.ipackage import IPackage
 from imod.mf6.pkgbase import EXCHANGE_PACKAGES, TRANSPORT_PACKAGES, PackageBase
 from imod.mf6.regridding_utils import (
     RegridderInstancesCollection,
     RegridderType,
+    assign_coord_if_present,
     get_non_grid_data,
 )
 from imod.mf6.utilities.schemata import filter_schemata_dict
@@ -34,7 +36,7 @@ from imod.schemata import (
 from imod.typing import GridDataArray
 
 
-class Package(PackageBase, abc.ABC):
+class Package(PackageBase, IPackage, abc.ABC):
     """
     Package is used to share methods for specific packages with no time
     component.
@@ -52,7 +54,7 @@ class Package(PackageBase, abc.ABC):
     _write_schemata: Dict[str, List[SchemaType] | Tuple[SchemaType, ...]] = {}
     _keyword_map: Dict[str, str] = {}
 
-    def __init__(self, allargs=None):
+    def __init__(self, allargs: dict[str, GridDataArray | float | int | bool | str]):
         super().__init__(allargs)
 
     def isel(self):
@@ -684,19 +686,15 @@ class Package(PackageBase, abc.ABC):
                 regridder_function,
                 target_grid,
             )
-
-        new_package = self.__class__(**new_package_data)
-
-        # set dx and dy if present in target_grid
-        if "dx" in target_grid.coords:
-            new_package.dataset = new_package.dataset.assign_coords(
-                {"dx": target_grid.coords["dx"].values[()]}
+            # set dx and dy if present in target_grid
+            new_package_data[varname] = assign_coord_if_present(
+                "dx", target_grid, new_package_data[varname]
             )
-        if "dy" in target_grid.coords:
-            new_package.dataset = new_package.dataset.assign_coords(
-                {"dy": target_grid.coords["dy"].values[()]}
+            new_package_data[varname] = assign_coord_if_present(
+                "dy", target_grid, new_package_data[varname]
             )
-        return new_package
+
+        return self.__class__(**new_package_data)
 
     def skip_masking_dataarray(self, array_name: str) -> bool:
         if hasattr(self, "_skip_mask_arrays"):
@@ -714,3 +712,8 @@ class Package(PackageBase, abc.ABC):
     def _repr_html_(self) -> str:
         typename = type(self).__name__
         return f"<div>{typename}</div>{self.dataset._repr_html_()}"
+
+    def auxiliary_data_fields(self) -> Dict[str, str]:
+        if hasattr(self, "_auxiliary_data"):
+            return self._auxiliary_data
+        return {}

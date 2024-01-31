@@ -109,17 +109,17 @@ class Buoyancy(Package):
         densityfile: Optional[str] = None,
         validate: bool = True,
     ):
-        super().__init__(locals())
-        self.dataset["reference_density"] = reference_density
-        # Assign a shared index: this also forces equal lenghts
-        self.dataset["density_concentration_slope"] = assign_index(
-            density_concentration_slope
-        )
-        self.dataset["reference_concentration"] = assign_index(reference_concentration)
-        self.dataset["modelname"] = assign_index(modelname)
-        self.dataset["species"] = assign_index(species)
-        self.dataset["hhformulation_rhs"] = hhformulation_rhs
-        self.dataset["densityfile"] = densityfile
+        dict_dataset = {
+            "reference_density": reference_density,
+            # Assign a shared index: this also forces equal lenghts
+            "density_concentration_slope": assign_index(density_concentration_slope),
+            "reference_concentration": assign_index(reference_concentration),
+            "modelname": assign_index(modelname),
+            "species": assign_index(species),
+            "hhformulation_rhs": hhformulation_rhs,
+            "densityfile": densityfile,
+        }
+        super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):

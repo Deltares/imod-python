@@ -6,6 +6,8 @@ import xarray as xr
 import xugrid as xu
 from xugrid.regrid.regridder import BaseRegridder
 
+from imod.typing.grid import GridDataArray
+
 
 class RegridderType(Enum):
     """
@@ -128,3 +130,18 @@ def get_non_grid_data(package, grid_names: List[str]) -> Dict[str, Any]:
         else:
             result[name] = package.dataset[name].values[()]
     return result
+
+
+def assign_coord_if_present(
+    coordname: str, target_grid: GridDataArray, maybe_has_coords_attr: Any
+):
+    """
+    If ``maybe_has_coords`` has a ``coords`` attribute and if coordname in
+    target_grid, copy coord.
+    """
+    if coordname in target_grid.coords:
+        if coordname in target_grid.coords and hasattr(maybe_has_coords_attr, "coords"):
+            maybe_has_coords_attr = maybe_has_coords_attr.assign_coords(
+                {coordname: target_grid.coords[coordname].values[()]}
+            )
+    return maybe_has_coords_attr

@@ -8,6 +8,8 @@ because it can result in spurious oscillations in the simulated concentrations.
 Upstream weighting is a fast alternative, and TVD is a more expensive and more
 robust alternative.
 """
+from copy import deepcopy
+
 from imod.mf6.package import Package
 
 
@@ -16,12 +18,19 @@ class Advection(Package):
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, scheme):
-        super().__init__()
-        self.dataset["scheme"] = scheme
+        dict_dataset = {"scheme": scheme}
+        super().__init__(dict_dataset)
 
     def render(self, directory, pkgname, globaltimes, binary):
         scheme = self.dataset["scheme"].item()
         return self._template.render({"scheme": scheme})
+
+    def mask(self, _) -> Package:
+        """
+        The mask method is irrelevant for this package , instead this method
+        retuns a copy of itself.
+        """
+        return deepcopy(self)
 
 
 class AdvectionUpstream(Advection):
@@ -29,6 +38,7 @@ class AdvectionUpstream(Advection):
     The upstream weighting (first order upwind) scheme sets the concentration
     at the cellface between two adjacent cells equal to the concentration in
     the cell where the flow comes from. It surpresses oscillations.
+    Note: all constructor arguments will be ignored
     """
 
     def __init__(self):
@@ -44,6 +54,7 @@ class AdvectionCentral(Advection):
     grids without equal spacing between connected cells, it is retained here
     for consistency with nomenclature used by other MODFLOW-based transport
     programs, such as MT3D.
+    Note: all constructor arguments will be ignored
     """
 
     def __init__(self):
@@ -54,6 +65,7 @@ class AdvectionTVD(Advection):
     """
     An implicit second order TVD scheme. More expensive than upstream
     weighting but more robust.
+    Note: all constructor arguments will be ignored
     """
 
     def __init__(self):

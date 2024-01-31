@@ -354,7 +354,6 @@ class NodePropertyFlow(Package):
         rhs_option=False,
         validate: bool = True,
     ):
-        super().__init__(locals())
         # check rewetting
         if not rewet and any(
             [rewet_layer, rewet_factor, rewet_iterations, rewet_method]
@@ -363,38 +362,38 @@ class NodePropertyFlow(Package):
                 "rewet_layer, rewet_factor, rewet_iterations, and rewet_method should"
                 " all be left at a default value of None if rewet is False."
             )
-        self.dataset["icelltype"] = icelltype
-        self.dataset["k"] = k
-        self.dataset["rewet"] = rewet
-        self.dataset["rewet_layer"] = rewet_layer
-        self.dataset["rewet_factor"] = rewet_factor
-        self.dataset["rewet_iterations"] = rewet_iterations
-        self.dataset["rewet_method"] = rewet_method
-        self.dataset["k22"] = k22
-        self.dataset["k33"] = k33
-        self.dataset["angle1"] = angle1
-        self.dataset["angle2"] = angle2
-        self.dataset["angle3"] = angle3
         if cell_averaging is not None:
             warnings.warn(
                 "Use of `cell_averaging` is deprecated, please use `alternative_cell_averaging` instead",
                 DeprecationWarning,
             )
-            self.dataset["alternative_cell_averaging"] = cell_averaging
-        else:
-            self.dataset["alternative_cell_averaging"] = alternative_cell_averaging
+            alternative_cell_averaging = cell_averaging
 
-        self.dataset["save_flows"] = save_flows
-        self.dataset[
-            "starting_head_as_confined_thickness"
-        ] = starting_head_as_confined_thickness
-        self.dataset["variable_vertical_conductance"] = variable_vertical_conductance
-        self.dataset["dewatered"] = dewatered
-        self.dataset["perched"] = perched
-        self.dataset["save_specific_discharge"] = save_specific_discharge
-        self.dataset["save_saturation"] = save_saturation
-        self.dataset["xt3d_option"] = xt3d_option
-        self.dataset["rhs_option"] = rhs_option
+        dict_dataset = {
+            "icelltype": icelltype,
+            "k": k,
+            "rewet": rewet,
+            "rewet_layer": rewet_layer,
+            "rewet_factor": rewet_factor,
+            "rewet_iterations": rewet_iterations,
+            "rewet_method": rewet_method,
+            "k22": k22,
+            "k33": k33,
+            "angle1": angle1,
+            "angle2": angle2,
+            "angle3": angle3,
+            "alternative_cell_averaging": alternative_cell_averaging,
+            "save_flows": save_flows,
+            "starting_head_as_confined_thickness": starting_head_as_confined_thickness,
+            "variable_vertical_conductance": variable_vertical_conductance,
+            "dewatered": dewatered,
+            "perched": perched,
+            "save_specific_discharge": save_specific_discharge,
+            "save_saturation": save_saturation,
+            "xt3d_option": xt3d_option,
+            "rhs_option": rhs_option,
+        }
+        super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
     def get_xt3d_option(self) -> bool:

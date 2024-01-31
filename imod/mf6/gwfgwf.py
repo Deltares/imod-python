@@ -4,7 +4,7 @@ import cftime
 import numpy as np
 import xarray as xr
 
-from imod.mf6.auxiliary_variables import add_periodic_auxiliary_variable
+from imod.mf6.auxiliary_variables import expand_transient_auxiliary_variables
 from imod.mf6.exchangebase import ExchangeBase
 from imod.mf6.package import Package
 from imod.typing import GridDataArray
@@ -34,23 +34,25 @@ class GWFGWF(ExchangeBase):
         angldegx: Optional[xr.DataArray] = None,
         cdist: Optional[xr.DataArray] = None,
     ):
-        super().__init__(locals())
-        self.dataset["cell_id1"] = cell_id1
-        self.dataset["cell_id2"] = cell_id2
-        self.dataset["layer"] = layer
-        self.dataset["model_name_1"] = model_id1
-        self.dataset["model_name_2"] = model_id2
-        self.dataset["ihc"] = xr.DataArray(np.ones_like(cl1, dtype=int))
-        self.dataset["cl1"] = cl1
-        self.dataset["cl2"] = cl2
-        self.dataset["hwva"] = hwva
+        dict_dataset = {
+            "cell_id1": cell_id1,
+            "cell_id2": cell_id2,
+            "layer": layer,
+            "model_name_1": model_id1,
+            "model_name_2": model_id2,
+            "ihc": xr.DataArray(np.ones_like(cl1, dtype=int)),
+            "cl1": cl1,
+            "cl2": cl2,
+            "hwva": hwva,
+        }
+        super().__init__(dict_dataset)
 
         auxiliary_variables = [var for var in [angldegx, cdist] if var is not None]
         if auxiliary_variables:
             self.dataset["auxiliary_data"] = xr.merge(auxiliary_variables).to_array(
                 name="auxiliary_data"
             )
-            add_periodic_auxiliary_variable(self)
+            expand_transient_auxiliary_variables(self)
 
     def set_options(
         self,

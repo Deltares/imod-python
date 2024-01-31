@@ -15,7 +15,6 @@ from typing import Optional
 
 import numpy as np
 
-from imod.mf6.auxiliary_variables import add_periodic_auxiliary_variable
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.schemata import DTypeSchema
 
@@ -57,15 +56,14 @@ class Mf6Wel(BoundaryCondition):
         save_flows: Optional[bool] = None,
         validate: bool = True,
     ):
-        super().__init__()
-        self.dataset["cellid"] = cellid
-        self.dataset["rate"] = rate
-        self.dataset["save_flows"] = save_flows
-
-        if concentration is not None:
-            self.dataset["concentration"] = concentration
-            self.dataset["concentration_boundary_type"] = concentration_boundary_type
-            add_periodic_auxiliary_variable(self)
+        dict_dataset = {
+            "cellid": cellid,
+            "rate": rate,
+            "concentration": concentration,
+            "concentration_boundary_type": concentration_boundary_type,
+            "save_flows": save_flows,
+        }
+        super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
     def _ds_to_arrdict(self, ds):

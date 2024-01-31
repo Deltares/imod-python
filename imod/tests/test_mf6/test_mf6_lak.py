@@ -395,7 +395,8 @@ def test_lake_rendering_transient_all_timeseries(basic_dis, tmp_path):
     )
     outlet1 = OutletManning("Naardermeer", "IJsselmeer", invert, 2, 3, 4)
     outlet2 = OutletSpecified("IJsselmeer", "Naardermeer", rate)
-    outlet3 = OutletWeir("IJsselmeer", "Naardermeer", invert, numeric)
+    invert_outlet3, width_outlet3 = xr.align(invert, numeric, join="inner")
+    outlet3 = OutletWeir("IJsselmeer", "Naardermeer", invert_outlet3, width_outlet3)
 
     lake_with_status = mf_lake.create_lake_data_structured(
         is_lake1,
