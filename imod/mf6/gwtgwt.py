@@ -18,11 +18,13 @@ class GWTGWT(ExchangeBase):
     simulation class."""
 
     _auxiliary_data = {"auxiliary_data": "variable"}
-    _pkg_id = "gwfgwf"
+    _pkg_id = "gwtgwt"
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(
         self,
+        transport_model_id1: str, 
+        transport_model_id2: str,              
         flow_model_id1: str,
         flow_model_id2: str,
         cell_id1: xr.DataArray,
@@ -38,8 +40,10 @@ class GWTGWT(ExchangeBase):
         self.dataset["cell_id1"] = cell_id1
         self.dataset["cell_id2"] = cell_id2
         self.dataset["layer"] = layer
-        self.dataset["model_name_1"] = model_id1
-        self.dataset["model_name_2"] = model_id2
+        self.dataset["model_name_1"] = transport_model_id1
+        self.dataset["model_name_2"] = transport_model_id2        
+        self.dataset["flow_model_name_1"] = flow_model_id1
+        self.dataset["flow_model_name_2"] = flow_model_id2
         self.dataset["ihc"] = xr.DataArray(np.ones_like(cl1, dtype=int))
         self.dataset["cl1"] = cl1
         self.dataset["cl2"] = cl2

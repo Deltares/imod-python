@@ -10,7 +10,7 @@ import imod
 from imod.mf6.interfaces.ipackagebase import IPackageBase
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
-EXCHANGE_PACKAGES = ("gwfgwf", "gwfgwt")
+EXCHANGE_PACKAGES = ("gwfgwf", "gwfgwt", "gwtgwt")
 
 
 class PackageBase(IPackageBase, abc.ABC):

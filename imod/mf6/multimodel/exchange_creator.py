@@ -196,7 +196,7 @@ class ExchangeCreator(abc.ABC):
         return exchanges
 
     def create_gwtgwt_exchanges(
-        self, model_name: str, layers: GridDataArray
+        self, transport_model_name: str, flow_model_name: str, layers: GridDataArray
     ) -> List[GWTGWT]:
         layers = layers.to_dataframe().filter(["layer"])
 
@@ -254,8 +254,10 @@ class ExchangeCreator(abc.ABC):
 
                 exchanges.append(
                     GWTGWT(
-                        f"{model_name}_{model_id1}",
-                        f"{model_name}_{model_id2}",
+                        f"{transport_model_name}_{model_id1}",
+                        f"{transport_model_name}_{model_id2}",                        
+                        f"{flow_model_name}_{model_id1}",
+                        f"{flow_model_name}_{model_id2}",
                         **connected_cells_dataset,
                     )
                 )
