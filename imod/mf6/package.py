@@ -5,7 +5,7 @@ import copy
 import numbers
 import pathlib
 from collections import defaultdict
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Mapping, Optional, Tuple, Union
 
 import cftime
 import jinja2
@@ -54,7 +54,7 @@ class Package(PackageBase, IPackage, abc.ABC):
     _write_schemata: Dict[str, List[SchemaType] | Tuple[SchemaType, ...]] = {}
     _keyword_map: Dict[str, str] = {}
 
-    def __init__(self, allargs: dict[str, GridDataArray | float | int | bool | str]):
+    def __init__(self, allargs: Mapping[str, GridDataArray | float | int | bool | str]):
         super().__init__(allargs)
 
     def isel(self):

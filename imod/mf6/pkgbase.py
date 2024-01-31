@@ -1,6 +1,7 @@
 import abc
 import numbers
 import pathlib
+from typing import Mapping
 
 import numpy as np
 import xarray as xr
@@ -27,7 +28,7 @@ class PackageBase(IPackageBase, abc.ABC):
         return super(PackageBase, cls).__new__(cls)
 
     def __init__(
-        self, variables_to_merge: dict[str, GridDataArray | float | int | bool | str]
+        self, variables_to_merge: Mapping[str, GridDataArray | float | int | bool | str]
     ):
         # Merge variables, perform exact join to verify if coordinates values
         # are consistent amongst variables.

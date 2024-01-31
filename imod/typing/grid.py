@@ -1,6 +1,6 @@
 import pickle
 import textwrap
-from typing import Callable, Sequence
+from typing import Callable, Mapping, Sequence
 
 import numpy as np
 import xarray as xr
@@ -98,7 +98,7 @@ def _type_dispatch_functions_on_grid_sequence(
 # Typedispatching doesn't work based on types of dict elements, therefore resort
 # to manual type testing
 def _type_dispatch_functions_on_dict(
-    dict_of_objects: dict[str, GridDataArray | float | bool | int],
+    dict_of_objects: Mapping[str, GridDataArray | float | bool | int],
     unstructured_func: Callable,
     structured_func: Callable,
     *args,
@@ -215,7 +215,9 @@ def merge_unstructured_dataset(variables_to_merge: list[dict], *args, **kwargs):
 
 
 def merge_with_dictionary(
-    variables_to_merge: dict[str, GridDataArray | float | bool | int], *args, **kwargs
+    variables_to_merge: Mapping[str, GridDataArray | float | bool | int],
+    *args,
+    **kwargs,
 ):
     return _type_dispatch_functions_on_dict(
         variables_to_merge, merge_unstructured_dataset, xr.merge, *args, **kwargs
