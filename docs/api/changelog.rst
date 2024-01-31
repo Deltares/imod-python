@@ -15,7 +15,7 @@ Fixed
 - Fixed bugs with clipping :class:`imod.mf6.HorizontalFlowBarrier` for
   structured grids
 - Improved performance for merging structured multimodel Modflow 6 output
-- Bug where :function:`imod.formats.idf.open_subdomains` did not properly support custom
+- Bug where :func:`imod.formats.idf.open_subdomains` did not properly support custom
   patterns
 
 Changed
@@ -47,7 +47,7 @@ Fixed
 - Fixed bug where simulations with :class:`imod.mf6.Well` were not partitioned
   into multiple models.
 - Fixed erroneous default value for the ``out_of_bounds`` in
-  :function:`imod.select.points.point_values`
+  :func:`imod.select.points.point_values`
 - Fixed bug where :class:`imod.mf6.Well` could not be assigned to the first cell
   of an unstructured grid.
 - HorizontalFlowBarrier package now dropped if completely outside partition in a
@@ -88,8 +88,8 @@ Fixed
   default tile provider being used was Stamen. However Stamen is no longer free
   which caused Contextily to fail. The default tile provider has been changed to
   OpenStreetMap to resolve this issue.
-- :function:`imod.mf6.open_cbc` now reads saved cell saturations and specific discharges.
-- :function:`imod.mf6.open_cbc` failed to read unstructured budgets stored
+- :func:`imod.mf6.open_cbc` now reads saved cell saturations and specific discharges.
+- :func:`imod.mf6.open_cbc` failed to read unstructured budgets stored
   following IMETH1, most importantly the storage fluxes.
 - Fixed support of Python 3.11 by dropping the obsolete ``qgs`` module.
 - Bug in :class:`imod.mf6.SourceSinkMixing` where, in case of multiple active
@@ -121,11 +121,11 @@ Added
 - The unit tests results are now published on GitLab
 - A ``save_saturation`` option to :class:`imod.mf6.NodePropertyFlow` which saves
   cell saturations for unconfined flow.
-- Functions :function:`imod.prepare.layer.get_upper_active_layer_number` and
-  :function:`imod.prepare.layer.get_lower_active_layer_number` to return planar
+- Functions :func:`imod.prepare.layer.get_upper_active_layer_number` and
+  :func:`imod.prepare.layer.get_lower_active_layer_number` to return planar
   grids with numbers of the highest and lowest active cells respectively.
-- Functions :function:`imod.prepare.layer.get_upper_active_grid_cells` and
-  :function:`imod.prepare.layer.get_lower_active_grid_cells` to return boolean
+- Functions :func:`imod.prepare.layer.get_upper_active_grid_cells` and
+  :func:`imod.prepare.layer.get_lower_active_grid_cells` to return boolean
   grids designating respectively the highest and lowest active cells in a grid.
 - validation of ``transient`` argument in :class:`imod.mf6.StorageCoefficient`
   and :class:`imod.mf6.SpecificStorage`.
@@ -142,7 +142,7 @@ Added
   connect the submodels. At the moment auxiliary variables ``cdist`` and
   ``angldegx`` are only computed for structured grids. 
 - The label array can be generated through a convenience function
-  :function:`imod.mf6.partition_generator.get_label_array`
+  :func:`imod.mf6.partition_generator.get_label_array`
 - Once a split simulation has been executed by MF6, we find head and balance
   results in each of the partition models. These can now be merged into head and
   balance datasets for the original domain using
