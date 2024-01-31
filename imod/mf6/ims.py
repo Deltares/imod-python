@@ -427,6 +427,32 @@ class Solution(Package):
         self.dataset["no_ptc"] = no_ptc
         self._validate_init_schemata(validate)
 
+    def remove_model_from_solution(self, modelname: str) -> None:
+        models_in_solution = []
+        if "modelnames" in self.dataset.keys():
+            models_in_solution = self.dataset["modelnames"].values
+        if modelname not in models_in_solution:
+            raise ValueError(
+                f"attempted to remove model {modelname} from solution, but it was not found."
+            )
+        filtered_models = [m for m in models_in_solution if m != modelname]
+
+        if len(filtered_models) == 0:
+            self.dataset = self.dataset.drop_vars("modelnames")
+        else:
+            self.dataset.update({"modelnames": ("model", filtered_models)})
+
+    def add_model_to_solution(self, modelname: str) -> None:
+        models_in_solution = []
+        if "modelnames" in self.dataset.keys():
+            models_in_solution = list(self.dataset["modelnames"].values)
+        if modelname in models_in_solution:
+            raise ValueError(
+                f"attempted to add model {modelname} to solution, but it was already in it."
+            )
+        models_in_solution.append(modelname)
+        self.dataset.update({"modelnames": ("model", models_in_solution)})
+
 
 def SolutionPresetSimple(
     modelnames, print_option="summary", csv_output=False, no_ptc=False

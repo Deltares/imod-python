@@ -14,6 +14,7 @@ import xugrid as xu
 
 import imod
 from imod.mf6.model import Modflow6Model
+from imod.mf6.model_gwf import GroundwaterFlowModel
 from imod.mf6.multimodel.modelsplitter import PartitionInfo
 from imod.mf6.simulation import get_models, get_packages
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo
@@ -298,18 +299,20 @@ class TestModflow6Simulation:
 
         simulation = setup_simulation
 
-        model_mock1 = MagicMock(spec_set=Modflow6Model)
+        model_mock1 = MagicMock(spec_set=GroundwaterFlowModel)
         model_mock1._model_id = "test_model_id1"
 
-        model_mock2 = MagicMock(spec_set=Modflow6Model)
+        model_mock2 = MagicMock(spec_set=GroundwaterFlowModel)
         model_mock2._model_id = "test_model_id2"
 
         simulation["test_model1"] = model_mock1
         simulation["test_model2"] = model_mock2
 
-        simulation["solver"]["modelnames"] = ["test_model1", "test_model2"]
+        simulation["solver"].dataset = xr.Dataset(
+            {"modelnames": ["test_model1", "test_model2"]}
+        )
 
-        slice_model_mock.return_value = MagicMock(spec_set=Modflow6Model)
+        slice_model_mock.return_value = MagicMock(spec_set=GroundwaterFlowModel)
 
         active = idomain.sel(layer=1)
         submodel_labels = xu.zeros_like(active).where(active.grid.face_y > 0.0, 1)
@@ -360,20 +363,22 @@ class TestModflow6Simulation:
 
         simulation = setup_simulation
 
-        model_mock1 = MagicMock(spec_set=Modflow6Model)
+        model_mock1 = MagicMock(spec_set=GroundwaterFlowModel)
         model_mock1._model_id = "test_model_id1"
         model_mock1.domain = idomain
 
-        model_mock2 = MagicMock(spec_set=Modflow6Model)
+        model_mock2 = MagicMock(spec_set=GroundwaterFlowModel)
         model_mock2._model_id = "test_model_id2"
         model_mock2.domain = idomain
 
         simulation["test_model1"] = model_mock1
         simulation["test_model2"] = model_mock2
 
-        simulation["solver"]["modelnames"] = ["test_model1", "test_model2"]
+        simulation["solver"].dataset = xr.Dataset(
+            {"modelnames": ["test_model1", "test_model2"]}
+        )
 
-        slice_model_mock.return_value = MagicMock(spec_set=Modflow6Model)
+        slice_model_mock.return_value = MagicMock(spec_set=GroundwaterFlowModel)
 
         active = idomain.sel(layer=1)
         submodel_labels = xr.zeros_like(active).where(active.y > 50, 1)
@@ -390,9 +395,19 @@ class TestModflow6Simulation:
             submodel_labels, create_partition_info_mock()
         )
 
-        assert exchange_creator_mock.return_value.create_exchanges.call_count == 2
-        call1 = exchange_creator_mock.return_value.create_exchanges.call_args_list[0][0]
-        call2 = exchange_creator_mock.return_value.create_exchanges.call_args_list[1][0]
+        assert (
+            exchange_creator_mock.return_value.create_gwfgwf_exchanges.call_count == 2
+        )
+        call1 = (
+            exchange_creator_mock.return_value.create_gwfgwf_exchanges.call_args_list[
+                0
+            ][0]
+        )
+        call2 = (
+            exchange_creator_mock.return_value.create_gwfgwf_exchanges.call_args_list[
+                1
+            ][0]
+        )
 
         assert call1[0] == "test_model1"
         xr.testing.assert_equal(call1[1], idomain.layer)
