@@ -1068,7 +1068,7 @@ class Modflow6Simulation(collections.UserDict):
             domain = flow_model.domain
             for tpt_model_name in transport_models:
                 tpt_model = self[tpt_model_name]
-                if tpt_model.domain.equals(domain):
+                if tpt_model.domain.equals(flow_model.domain):
                     tpt_models_of_flow_model.append(tpt_model_name)
 
             if len(tpt_models_of_flow_model) > 0:
