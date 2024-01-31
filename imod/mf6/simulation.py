@@ -993,6 +993,8 @@ class Modflow6Simulation(collections.UserDict):
             if isinstance(exchange, GWFGWF):
                 model_name_1 = exchange.dataset["model_name_1"].values[()]
                 model_1 = self[model_name_1]
+            if isinstance(exchange, GWFGWT):
+                continue
             if isinstance(model_1, GroundwaterFlowModel):
                 exchange.set_options(
                     save_flows=model_1["oc"].is_budget_output,
