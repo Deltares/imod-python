@@ -1,5 +1,3 @@
-from typing import List
-
 import imod
 from imod.mf6 import ConstantHead
 from imod.select.grid import active_grid_boundary_xy
@@ -9,7 +7,7 @@ from imod.typing import GridDataArray
 def create_clipped_boundary(
     idomain: GridDataArray,
     state_for_clipped_boundary: GridDataArray,
-    original_constant_head_boundaries: List[ConstantHead],
+    original_constant_head_boundaries: list[ConstantHead],
 ) -> ConstantHead:
     """
     Create a ConstantHead package on boundary cells that don't have any assigned to them. This is useful in
@@ -44,7 +42,7 @@ def create_clipped_boundary(
 
 def _find_unassigned_grid_boundaries(
     active_grid_boundary: GridDataArray,
-    boundary_conditions: List[ConstantHead],
+    boundary_conditions: list[ConstantHead],
 ) -> GridDataArray:
     unassigned_grid_boundaries = active_grid_boundary
     for boundary_condition in boundary_conditions:

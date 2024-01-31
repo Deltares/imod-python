@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Optional, Tuple, Union
 
 import cftime
 import numpy as np
@@ -148,18 +148,18 @@ class Well(BoundaryCondition, IPointDataPackage):
         "x": [AllNoDataSchema()],
     }
 
-    _regrid_method: Dict[str, Tuple[RegridderType, str]] = {}
+    _regrid_method: dict[str, Tuple[RegridderType, str]] = {}
 
     def __init__(
         self,
-        x: List[float],
-        y: List[float],
-        screen_top: List[float],
-        screen_bottom: List[float],
-        rate: List[float],
-        concentration: Optional[List[float] | xr.DataArray] = None,
+        x: list[float],
+        y: list[float],
+        screen_top: list[float],
+        screen_bottom: list[float],
+        rate: list[float],
+        concentration: Optional[list[float] | xr.DataArray] = None,
         concentration_boundary_type="aux",
-        id: Optional[List[int]] = None,
+        id: Optional[list[int]] = None,
         minimum_k: float = 0.1,
         minimum_thickness: float = 1.0,
         print_input: bool = False,
@@ -303,7 +303,7 @@ class Well(BoundaryCondition, IPointDataPackage):
     def write(
         self,
         pkgname: str,
-        globaltimes: Union[List[np.datetime64], np.ndarray],
+        globaltimes: Union[list[np.datetime64], np.ndarray],
         write_context: WriteContext,
     ):
         raise NotImplementedError(
@@ -393,9 +393,9 @@ class Well(BoundaryCondition, IPointDataPackage):
     @staticmethod
     def __derive_cellid_from_points(
         dst_grid: GridDataArray,
-        x: List,
-        y: List,
-        layer: List,
+        x: list,
+        y: list,
+        layer: list,
     ) -> GridDataArray:
         """
         Create DataArray with Modflow6 cell identifiers based on x, y coordinates

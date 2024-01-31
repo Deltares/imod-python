@@ -5,7 +5,7 @@ import copy
 import numbers
 import pathlib
 from collections import defaultdict
-from typing import Any, Dict, List, Mapping, Optional, Tuple, Union
+from typing import Any, Mapping, Optional, Tuple, Union
 
 import cftime
 import jinja2
@@ -50,9 +50,9 @@ class Package(PackageBase, IPackage, abc.ABC):
     """
 
     _pkg_id = ""
-    _init_schemata: Dict[str, List[SchemaType] | Tuple[SchemaType, ...]] = {}
-    _write_schemata: Dict[str, List[SchemaType] | Tuple[SchemaType, ...]] = {}
-    _keyword_map: Dict[str, str] = {}
+    _init_schemata: dict[str, list[SchemaType] | Tuple[SchemaType, ...]] = {}
+    _write_schemata: dict[str, list[SchemaType] | Tuple[SchemaType, ...]] = {}
+    _keyword_map: dict[str, str] = {}
 
     def __init__(self, allargs: Mapping[str, GridDataArray | float | int | bool | str]):
         super().__init__(allargs)
@@ -254,7 +254,7 @@ class Package(PackageBase, IPackage, abc.ABC):
     def write(
         self,
         pkgname: str,
-        globaltimes: Union[List[np.datetime64], np.ndarray],
+        globaltimes: Union[list[np.datetime64], np.ndarray],
         write_context: WriteContext,
     ):
         directory = write_context.write_directory
@@ -276,7 +276,7 @@ class Package(PackageBase, IPackage, abc.ABC):
                             path = pkgdirectory / f"{key}.dat"
                             self.write_text_griddata(path, da, dtype)
 
-    def _validate(self, schemata: Dict, **kwargs) -> Dict[str, List[ValidationError]]:
+    def _validate(self, schemata: dict, **kwargs) -> dict[str, list[ValidationError]]:
         errors = defaultdict(list)
         for variable, var_schemata in schemata.items():
             for schema in var_schemata:
@@ -561,7 +561,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         """
         return hasattr(self, "_regrid_method")
 
-    def get_regrid_methods(self) -> Optional[Dict[str, Tuple[RegridderType, str]]]:
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
         if self.is_regridding_supported():
             return self._regrid_method
         return None
@@ -621,7 +621,7 @@ class Package(PackageBase, IPackage, abc.ABC):
     def regrid_like(
         self,
         target_grid: GridDataArray,
-        regridder_types: Optional[Dict[str, Tuple[RegridderType, str]]] = None,
+        regridder_types: Optional[dict[str, Tuple[RegridderType, str]]] = None,
     ) -> "Package":
         """
         Creates a package of the same type as this package, based on another discretization.
@@ -713,7 +713,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         typename = type(self).__name__
         return f"<div>{typename}</div>{self.dataset._repr_html_()}"
 
-    def auxiliary_data_fields(self) -> Dict[str, str]:
+    def auxiliary_data_fields(self) -> dict[str, str]:
         if hasattr(self, "_auxiliary_data"):
             return self._auxiliary_data
         return {}

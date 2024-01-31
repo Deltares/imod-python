@@ -4,7 +4,7 @@ import textwrap
 import typing
 from copy import deepcopy
 from enum import Enum
-from typing import Dict, Optional, Tuple
+from typing import Optional, Tuple
 
 import cftime
 import geopandas as gpd
@@ -124,7 +124,7 @@ def to_connected_cells_dataset(
     idomain: GridDataArray,
     grid: xu.Ugrid2d,
     edge_index: np.ndarray,
-    edge_values: typing.Dict,
+    edge_values: dict,
 ) -> xr.Dataset:
     """
     Converts a cell edge grid with values defined on the edges to a dataset with the cell ids of the connected cells,
@@ -139,7 +139,7 @@ def to_connected_cells_dataset(
         unstructured grid containing the edge to cell array
     edge_index: np.ndarray
         indices of the edges for which the edge values will be converted to values in the connected cells
-    edge_values: typing.Dict
+    edge_values: dict
         dictionary containing the value name and the edge values that are applied on the edges identified by the
         edge_index
 
@@ -274,7 +274,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
     _init_schemata = {}
     _write_schemata = {"geometry": [EmptyIndexesSchema()]}
 
-    _regrid_method: Dict[str, Tuple[RegridderType, str]] = {}
+    _regrid_method: dict[str, Tuple[RegridderType, str]] = {}
 
     def __init__(
         self,

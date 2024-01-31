@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import List, Union
+from typing import Union
 
 import numpy as np
 import xarray as xr
@@ -163,7 +163,7 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
     def write(
         self,
         pkgname: str,
-        globaltimes: Union[List[np.datetime64], np.ndarray],
+        globaltimes: Union[list[np.datetime64], np.ndarray],
         write_context: WriteContext,
     ):
         # MODFLOW6 does not support binary HFB input.

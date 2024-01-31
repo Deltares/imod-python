@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Optional
 
 import numpy as np
 
@@ -223,7 +223,7 @@ class Evapotranspiration(BoundaryCondition):
         return errors
 
     def _get_options(
-        self, predefined_options: Dict, not_options: Optional[List] = None
+        self, predefined_options: dict, not_options: Optional[list] = None
     ):
         options = super()._get_options(predefined_options, not_options=not_options)
         # Add amount of segments

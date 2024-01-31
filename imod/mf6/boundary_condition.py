@@ -1,7 +1,7 @@
 import abc
 import pathlib
 from copy import copy, deepcopy
-from typing import Dict, List, Mapping, Optional, Union
+from typing import Mapping, Optional, Union
 
 import numpy as np
 import xarray as xr
@@ -186,7 +186,7 @@ class BoundaryCondition(Package, abc.ABC):
         return periods
 
     def _get_options(
-        self, predefined_options: Dict, not_options: Optional[List] = None
+        self, predefined_options: dict, not_options: Optional[list] = None
     ):
         options = copy(predefined_options)
 
@@ -248,7 +248,7 @@ class BoundaryCondition(Package, abc.ABC):
     def write(
         self,
         pkgname: str,
-        globaltimes: Union[List[np.datetime64], np.ndarray],
+        globaltimes: Union[list[np.datetime64], np.ndarray],
         write_context: WriteContext,
     ):
         """
@@ -320,7 +320,7 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
     def write(
         self,
         pkgname: str,
-        globaltimes: Union[List[np.datetime64], np.ndarray],
+        globaltimes: Union[list[np.datetime64], np.ndarray],
         write_context: WriteContext,
     ):
         boundary_condition_write_context = deepcopy(write_context)

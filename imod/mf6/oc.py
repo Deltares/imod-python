@@ -1,7 +1,7 @@
 import collections
 import os
 from pathlib import Path
-from typing import Dict, List, Tuple, Union
+from typing import Tuple, Union
 
 import numpy as np
 
@@ -80,7 +80,7 @@ class OutputControl(Package):
     }
 
     _write_schemata = {}
-    _regrid_method: Dict[str, Tuple[RegridderType, str]] = {}
+    _regrid_method: dict[str, Tuple[RegridderType, str]] = {}
 
     def __init__(
         self,
@@ -181,7 +181,7 @@ class OutputControl(Package):
     def write(
         self,
         pkgname: str,
-        globaltimes: Union[List[np.datetime64], np.ndarray],
+        globaltimes: Union[list[np.datetime64], np.ndarray],
         write_context: WriteContext,
     ):
         # We need to overload the write here to ensure the output directory is

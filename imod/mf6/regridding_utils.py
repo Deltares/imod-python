@@ -1,6 +1,6 @@
 import abc
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Optional, Tuple, Union
 
 import xarray as xr
 import xugrid as xu
@@ -35,7 +35,7 @@ class RegridderInstancesCollection:
         source_grid: Union[xr.DataArray, xu.UgridDataArray],
         target_grid: Union[xr.DataArray, xu.UgridDataArray],
     ) -> None:
-        self.regridder_instances: Dict[
+        self.regridder_instances: dict[
             Tuple[type[BaseRegridder], Optional[str]], BaseRegridder
         ] = {}
         self._source_grid = source_grid
@@ -110,7 +110,7 @@ class RegridderInstancesCollection:
         return self.__get_existing_regridder(regridder_class, method)
 
 
-def get_non_grid_data(package, grid_names: List[str]) -> Dict[str, Any]:
+def get_non_grid_data(package, grid_names: list[str]) -> dict[str, Any]:
     """
     This function copies the attributes of a dataset that are scalars, such as options.
 

@@ -6,7 +6,7 @@ import inspect
 import pathlib
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict, Optional, Tuple, Union
+from typing import Optional, Tuple, Union
 
 import cftime
 import jinja2
@@ -297,7 +297,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             if statusinfo.has_errors():
                 raise ValidationError(statusinfo.to_string())
 
-        toml_content: Dict = collections.defaultdict(dict)
+        toml_content: dict = collections.defaultdict(dict)
         for pkgname, pkg in self.items():
             pkg_path = f"{pkgname}.nc"
             toml_content[type(pkg).__name__][pkgname] = pkg_path
@@ -532,7 +532,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
     def _get_regridding_domain(
         self,
         target_grid: GridDataArray,
-        methods: Dict[RegridderType, str],
+        methods: dict[RegridderType, str],
     ) -> GridDataArray:
         """
         This method computes the output-domain for a regridding operation by regridding idomain with

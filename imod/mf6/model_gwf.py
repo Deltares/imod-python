@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List, Optional
+from typing import Optional
 
 import cftime
 import numpy as np
@@ -36,14 +36,14 @@ class GroundwaterFlowModel(Modflow6Model):
         }
         self._template = initialize_template("gwf-nam.j2")
 
-    def _get_unique_regridder_types(self) -> Dict[RegridderType, str]:
+    def _get_unique_regridder_types(self) -> dict[RegridderType, str]:
         """
         This function loops over the packages and  collects all regridder-types that are in use.
         Differences in associated functions are ignored. It focusses only on the types. So if a
         model uses both Overlap(mean) and Overlap(harmonic_mean), this function will return just one
         Overlap regridder:  the first one found, in this case Overlap(mean)
         """
-        methods: Dict[RegridderType, str] = {}
+        methods: dict[RegridderType, str] = {}
         for pkg_name, pkg in self.items():
             if pkg.is_regridding_supported():
                 pkg_methods = pkg.get_regrid_methods()
@@ -108,7 +108,7 @@ class GroundwaterFlowModel(Modflow6Model):
     def __create_boundary_condition_for_unassigned_boundary(
         model: Modflow6Model,
         state_for_boundary: Optional[GridDataArray],
-        additional_boundaries: Optional[List[ConstantHead]] = None,
+        additional_boundaries: Optional[list[ConstantHead]] = None,
     ):
         if state_for_boundary is None:
             return None

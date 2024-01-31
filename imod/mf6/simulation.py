@@ -6,7 +6,7 @@ import pathlib
 import subprocess
 import warnings
 from pathlib import Path
-from typing import Any, Callable, DefaultDict, Dict, List, Optional, Union
+from typing import Any, Callable, DefaultDict, Optional, Union
 
 import cftime
 import jinja2
@@ -38,14 +38,14 @@ from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
 from imod.typing.grid import concat, is_unstructured, merge, merge_partitions, nan_like
 
-OUTPUT_FUNC_MAPPING: Dict[str, Callable] = {
+OUTPUT_FUNC_MAPPING: dict[str, Callable] = {
     "head": open_hds,
     "concentration": open_conc,
     "budget-flow": open_cbc,
     "budget-transport": open_cbc,
 }
 
-OUTPUT_MODEL_MAPPING: Dict[
+OUTPUT_MODEL_MAPPING: dict[
     str, type[GroundwaterFlowModel] | type[GroundwaterTransportModel]
 ] = {
     "head": GroundwaterFlowModel,
@@ -55,11 +55,11 @@ OUTPUT_MODEL_MAPPING: Dict[
 }
 
 
-def get_models(simulation: Modflow6Simulation) -> Dict[str, Modflow6Model]:
+def get_models(simulation: Modflow6Simulation) -> dict[str, Modflow6Model]:
     return {k: v for k, v in simulation.items() if isinstance(v, Modflow6Model)}
 
 
-def get_packages(simulation: Modflow6Simulation) -> Dict[str, Package]:
+def get_packages(simulation: Modflow6Simulation) -> dict[str, Package]:
     return {
         pkg_name: pkg
         for pkg_name, pkg in simulation.items()
@@ -178,7 +178,7 @@ class Modflow6Simulation(collections.UserDict):
 
     def render(self, write_context: WriteContext):
         """Renders simulation namefile"""
-        d: Dict[str, Any] = {}
+        d: dict[str, Any] = {}
         models = []
         solutiongroups = []
         for key, value in self.items():
@@ -995,7 +995,7 @@ class Modflow6Simulation(collections.UserDict):
 
         return result
 
-    def _add_modelsplit_exchanges(self, exchanges_list: List[GWFGWF]) -> None:
+    def _add_modelsplit_exchanges(self, exchanges_list: list[GWFGWF]) -> None:
         if not is_split(self):
             self["split_exchanges"] = []
         self["split_exchanges"].extend(exchanges_list)
