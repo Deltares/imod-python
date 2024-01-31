@@ -997,6 +997,8 @@ class Modflow6Simulation(collections.UserDict):
             if isinstance(exchange, GWFGWF):
                 model_name_1 = exchange.dataset["model_name_1"].values[()]
                 model_1 = self[model_name_1]
+            if isinstance(exchange, GWFGWT):
+                continue
             if isinstance(model_1, GroundwaterFlowModel):
                 exchange.set_options(
                     save_flows=model_1["oc"].is_budget_output,
@@ -1069,10 +1071,9 @@ class Modflow6Simulation(collections.UserDict):
         for flow_model_name in flow_models:
             tpt_models_of_flow_model = []
             flow_model = self[flow_model_name]
-            domain = flow_model.domain
             for tpt_model_name in transport_models:
                 tpt_model = self[tpt_model_name]
-                if tpt_model.domain.equals(domain):
+                if tpt_model.domain.equals(flow_model.domain):
                     tpt_models_of_flow_model.append(tpt_model_name)
 
             if len(tpt_models_of_flow_model) > 0:
