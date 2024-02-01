@@ -229,16 +229,45 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         timeseries=None,
         validate: bool = True,
     ):
-        super().__init__(locals())
-        # Package data
-        self.dataset["surface_depression_depth"] = surface_depression_depth
-        self.dataset["kv_sat"] = kv_sat
-        self.dataset["theta_res"] = theta_res
-        self.dataset["theta_sat"] = theta_sat
-        self.dataset["theta_init"] = theta_init
-        self.dataset["epsilon"] = epsilon
+        landflag = self._determine_landflag(kv_sat)
+        iuzno = self._create_uzf_numbers(landflag)
+        ivertcon = self._determine_vertical_connection(iuzno)
 
-        # Stress period data
+        dict_dataset = {
+            # Package data
+            "surface_depression_depth": surface_depression_depth,
+            "kv_sat": kv_sat,
+            "theta_res": theta_res,
+            "theta_sat": theta_sat,
+            "theta_init": theta_init,
+            "epsilon": epsilon,
+            # Stress period data
+            "infiltration_rate": infiltration_rate,
+            "et_pot": et_pot,
+            "extinction_depth": extinction_depth,
+            "extinction_theta": extinction_theta,
+            "air_entry_potential": air_entry_potential,
+            "root_potential": root_potential,
+            "root_activity": root_activity,
+            # Dimensions
+            "ntrailwaves": ntrailwaves,
+            "nwavesets": nwavesets,
+            # Options
+            "groundwater_ET_function": groundwater_ET_function,
+            "simulate_gwseep": simulate_groundwater_seepage,
+            "print_input": print_input,
+            "print_flows": print_flows,
+            "save_flows": save_flows,
+            "observations": observations,
+            "water_mover": water_mover,
+            "timeseries": timeseries,
+            # Additonal indices for Packagedata
+            "landflag": landflag,
+            "iuzno": iuzno,
+            "ivertcon": ivertcon,
+        }
+        super().__init__(dict_dataset)
+        self.dataset["iuzno"].name = "uzf_number"
         self._check_options(
             groundwater_ET_function,
             et_pot,
@@ -248,35 +277,6 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
             root_potential,
             root_activity,
         )
-
-        self.dataset["infiltration_rate"] = infiltration_rate
-        self.dataset["et_pot"] = et_pot
-        self.dataset["extinction_depth"] = extinction_depth
-        self.dataset["extinction_theta"] = extinction_theta
-        self.dataset["air_entry_potential"] = air_entry_potential
-        self.dataset["root_potential"] = root_potential
-        self.dataset["root_activity"] = root_activity
-
-        # Dimensions
-        self.dataset["ntrailwaves"] = ntrailwaves
-        self.dataset["nwavesets"] = nwavesets
-
-        # Options
-        self.dataset["groundwater_ET_function"] = groundwater_ET_function
-        self.dataset["simulate_gwseep"] = simulate_groundwater_seepage
-        self.dataset["print_input"] = print_input
-        self.dataset["print_flows"] = print_flows
-        self.dataset["save_flows"] = save_flows
-        self.dataset["observations"] = observations
-        self.dataset["water_mover"] = water_mover
-        self.dataset["timeseries"] = timeseries
-
-        # Additonal indices for Packagedata
-        self.dataset["landflag"] = self._determine_landflag(kv_sat)
-        self.dataset["iuzno"] = self._create_uzf_numbers(self["landflag"])
-        self.dataset["iuzno"].name = "uzf_number"
-        self.dataset["ivertcon"] = self._determine_vertical_connection(self["iuzno"])
-
         self._validate_init_schemata(validate)
 
     def fill_stress_perioddata(self):

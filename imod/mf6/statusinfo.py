@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import List
 
 
 class StatusInfoBase(ABC):
@@ -16,7 +15,7 @@ class StatusInfoBase(ABC):
 
     @property
     @abstractmethod
-    def errors(self) -> List[str]:
+    def errors(self) -> list[str]:
         raise NotImplementedError
 
     @abstractmethod
@@ -37,13 +36,13 @@ class StatusInfo(StatusInfoBase):
 
     def __init__(self, title: str = ""):
         super().__init__(title)
-        self.__errors: List[str] = []
+        self.__errors: list[str] = []
 
     def add_error(self, message: str) -> None:
         self.__errors.append(message)
 
     @property
-    def errors(self) -> List[str]:
+    def errors(self) -> list[str]:
         return self.__errors
 
     def has_errors(self) -> bool:
@@ -62,14 +61,14 @@ class NestedStatusInfo(StatusInfoBase):
 
     def __init__(self, title: str = ""):
         super().__init__(title)
-        self.__children: List[StatusInfoBase] = []
+        self.__children: list[StatusInfoBase] = []
 
     def add(self, status_info: StatusInfoBase):
         self.__children.append(status_info)
 
     @property
-    def errors(self) -> List[str]:
-        errors: List[str] = []
+    def errors(self) -> list[str]:
+        errors: list[str] = []
         for child in self.__children:
             errors += child.errors
         return errors

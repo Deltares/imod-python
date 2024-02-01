@@ -1,11 +1,12 @@
 import collections
 import os
 from pathlib import Path
-from typing import List, Union
+from typing import Tuple, Union
 
 import numpy as np
 
 from imod.mf6.package import Package
+from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.utilities.dataset import is_dataarray_none
 from imod.mf6.write_context import WriteContext
 from imod.schemata import DTypeSchema
@@ -79,7 +80,7 @@ class OutputControl(Package):
     }
 
     _write_schemata = {}
-    _regrid_method = {}
+    _regrid_method: dict[str, Tuple[RegridderType, str]] = {}
 
     def __init__(
         self,
@@ -91,8 +92,6 @@ class OutputControl(Package):
         concentration_file=None,
         validate: bool = True,
     ):
-        super().__init__()
-
         save_concentration = (
             None if is_dataarray_none(save_concentration) else save_concentration
         )
@@ -102,12 +101,15 @@ class OutputControl(Package):
         if save_head is not None and save_concentration is not None:
             raise ValueError("save_head and save_concentration cannot both be defined.")
 
-        self.dataset["save_head"] = save_head
-        self.dataset["save_concentration"] = save_concentration
-        self.dataset["save_budget"] = save_budget
-        self.dataset["head_file"] = head_file
-        self.dataset["budget_file"] = budget_file
-        self.dataset["concentration_file"] = concentration_file
+        dict_dataset = {
+            "save_head": save_head,
+            "save_concentration": save_concentration,
+            "save_budget": save_budget,
+            "head_file": head_file,
+            "budget_file": budget_file,
+            "concentration_file": concentration_file,
+        }
+        super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
     def _get_ocsetting(self, setting):
@@ -179,7 +181,7 @@ class OutputControl(Package):
     def write(
         self,
         pkgname: str,
-        globaltimes: Union[List, np.ndarray],
+        globaltimes: Union[list[np.datetime64], np.ndarray],
         write_context: WriteContext,
     ):
         # We need to overload the write here to ensure the output directory is

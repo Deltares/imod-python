@@ -172,12 +172,14 @@ class SpecificStorage(StorageBase):
         save_flows: bool = False,
         validate: bool = True,
     ):
-        super().__init__(locals())
-        self.dataset["specific_storage"] = specific_storage
-        self.dataset["specific_yield"] = specific_yield
-        self.dataset["convertible"] = convertible
-        self.dataset["transient"] = transient
-        self.dataset["save_flows"] = save_flows
+        dict_dataset = {
+            "specific_storage": specific_storage,
+            "specific_yield": specific_yield,
+            "convertible": convertible,
+            "transient": transient,
+            "save_flows": save_flows,
+        }
+        super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):
@@ -304,12 +306,14 @@ class StorageCoefficient(StorageBase):
         save_flows: bool = False,
         validate: bool = True,
     ):
-        super().__init__(locals())
-        self.dataset["storage_coefficient"] = storage_coefficient
-        self.dataset["specific_yield"] = specific_yield
-        self.dataset["convertible"] = convertible
-        self.dataset["transient"] = transient
-        self.dataset["save_flows"] = save_flows
+        dict_dataset = {
+            "storage_coefficient": storage_coefficient,
+            "specific_yield": specific_yield,
+            "convertible": convertible,
+            "transient": transient,
+            "save_flows": save_flows,
+        }
+        super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):

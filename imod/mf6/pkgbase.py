@@ -1,6 +1,7 @@
 import abc
 import numbers
 import pathlib
+from typing import Mapping
 
 import numpy as np
 import xarray as xr
@@ -8,6 +9,7 @@ import xugrid as xu
 
 import imod
 from imod.mf6.interfaces.ipackagebase import IPackageBase
+from imod.typing.grid import GridDataArray, GridDataset, merge_with_dictionary
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 EXCHANGE_PACKAGES = ("gwfgwf", "gwfgwt", "gwtgwt")
@@ -25,20 +27,19 @@ class PackageBase(IPackageBase, abc.ABC):
     def __new__(cls, *_, **__):
         return super(PackageBase, cls).__new__(cls)
 
-    def __init__(self, allargs=None):
-        if allargs is not None:
-            for arg in allargs.values():
-                if isinstance(arg, xu.UgridDataArray):
-                    self.__dataset = xu.UgridDataset(grids=arg.ugrid.grid)
-                    return
-        self.__dataset = xr.Dataset()
+    def __init__(
+        self, variables_to_merge: Mapping[str, GridDataArray | float | int | bool | str]
+    ):
+        # Merge variables, perform exact join to verify if coordinates values
+        # are consistent amongst variables.
+        self.__dataset = merge_with_dictionary(variables_to_merge, join="exact")
 
     @property
-    def dataset(self) -> xr.Dataset:
+    def dataset(self) -> GridDataset:
         return self.__dataset
 
     @dataset.setter
-    def dataset(self, value: xr.Dataset) -> None:
+    def dataset(self, value: GridDataset) -> None:
         self.__dataset = value
 
     def __getitem__(self, key):

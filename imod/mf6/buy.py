@@ -1,4 +1,4 @@
-from typing import Sequence
+from typing import Optional, Sequence
 
 import numpy as np
 import xarray as xr
@@ -89,7 +89,6 @@ class Buoyancy(Package):
 
     _pkg_id = "buy"
     _template = Package._initialize_template(_pkg_id)
-    _metadata_dict = {}
 
     _init_schemata = {
         "reference_density": [DTypeSchema(np.floating)],
@@ -107,21 +106,20 @@ class Buoyancy(Package):
         modelname: Sequence[str],
         species: Sequence[str],
         hhformulation_rhs: bool = False,
-        densityfile: str = None,
+        densityfile: Optional[str] = None,
         validate: bool = True,
     ):
-        super().__init__(locals())
-        self.dataset["reference_density"] = reference_density
-        # Assign a shared index: this also forces equal lenghts
-        self.dataset["density_concentration_slope"] = assign_index(
-            density_concentration_slope
-        )
-        self.dataset["reference_concentration"] = assign_index(reference_concentration)
-        self.dataset["modelname"] = assign_index(modelname)
-        self.dataset["species"] = assign_index(species)
-        self.dataset["hhformulation_rhs"] = hhformulation_rhs
-        self.dataset["densityfile"] = densityfile
-        self.dependencies = []
+        dict_dataset = {
+            "reference_density": reference_density,
+            # Assign a shared index: this also forces equal lenghts
+            "density_concentration_slope": assign_index(density_concentration_slope),
+            "reference_concentration": assign_index(reference_concentration),
+            "modelname": assign_index(modelname),
+            "species": assign_index(species),
+            "hhformulation_rhs": hhformulation_rhs,
+            "densityfile": densityfile,
+        }
+        super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):

@@ -144,45 +144,29 @@ Setting up an environment
 At some point you will run into a dependency issue. Sometimes the dependency
 requirements of two packages are straight out unsatisfiable. In other cases,
 you'd like to use the latest version, but this would break other packages.
-The solution conda offers is easy switching between different Python
-installations. A conda environment is simply a complete Python installation
-with all necessary dependencies. Creating a new environment will result in a
-new Python installation, without sharing of dependencies with other
+The solution used by imod-python is using Pixi. Pixi creates a complete Python
+installation with all necessary dependencies. Creating a new environment will
+result in a new Python installation, without sharing of dependencies with other
 environments. (This is hardly the most efficient use of your hard disk space
 from a theoretical perspective, but it greatly simplifies matters in the
 practical sense.)
 
-Below is the specification for an environment that should provide you with
-all the dependencies and requirements you need to build groundwater models
-with iMOD Python, and then some (for testing/development).
+To create a Pixi environment open a command prompt and ``cd`` to the imod folder.
+In the imod folder use the following command::
 
-.. literalinclude:: ../../imod-environment.yml
-   :language: yaml
-   :caption: imod-environment.yml
+    pixi run install
 
-Save this text into a file called ``imod-environment.yml``, location doesn't
-really matter. In your command prompt, ``cd`` to this location and run::
+This will create a conda environment inside the imod folder. To activate the environment run::
 
-    mamba env create -f imod-environment.yml
+    pixi shell
 
-This will create a conda environment named ``imod`` as it is specified in the
-file.
 
-Environments can be "activated" by running::
-  
-    conda activate {name of environment}
-
-Active the just installed environment by running:: 
-  
-    conda activate imod
-    
 This essentially temporarily updates your `PATH variable`_, which is the set
-of directories where executable programs are located. After deactivating the
-conda environment, either via ``conda deactivate`` or by closing the command
-prompt, these directories are removed from PATH again so that the Python
-installation is properly isolated.
+of directories where executable programs are located. closing the command prompt,
+these directories are removed from PATH again so that the Python installation is
+properly isolated.
 
-Read more at the full `conda docs`_.
+Read more at the full `pixi docs`_.
 
 
 Installing a newer or old version
@@ -219,5 +203,5 @@ Past versions can also be found on the iMOD Python `releases page`_.
 .. _Terms of Service: https://www.anaconda.com/terms-of-service
 .. _conda-forge: https://conda-forge.org/
 .. _PATH variable: https://en.wikipedia.org/wiki/PATH_(variable)
-.. _conda docs: https://conda.io/projects/conda/en/latest
+.. _pixi docs: https://pixi.sh/
 .. _releases page: https://github.com/Deltares/imod-python/releases

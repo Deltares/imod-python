@@ -61,10 +61,12 @@ class TimeDiscretization(Package):
         timestep_multiplier=1.0,
         validate: bool = True,
     ):
-        super().__init__()
-        self.dataset["timestep_duration"] = timestep_duration
-        self.dataset["n_timesteps"] = n_timesteps
-        self.dataset["timestep_multiplier"] = timestep_multiplier
+        dict_dataset = {
+            "timestep_duration": timestep_duration,
+            "n_timesteps": n_timesteps,
+            "timestep_multiplier": timestep_multiplier,
+        }
+        super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
     def render(self):
