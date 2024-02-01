@@ -162,8 +162,12 @@ class ExchangeCreator(abc.ABC):
         return exchanges
 
     def _collect_geometric_constants_connected_cells(
-        self, model_id1: int, model_id2: int, connected_domain_pair: pd.DataFrame, layers: GridDataArray
-    ):
+        self,
+        model_id1: int,
+        model_id2: int,
+        connected_domain_pair: pd.DataFrame,
+        layers: GridDataArray,
+    ) -> xr.Dataset:
         mapping1 = (
             self._global_to_local_mapping[model_id1]
             .drop(columns=["local_idx"])
