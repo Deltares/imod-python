@@ -481,6 +481,7 @@ class AnyNoDataSchema(NoDataSchema):
         if ~valid.all():
             raise ValidationError("found a nodata value")
 
+
 class NoDataComparisonSchema(BaseSchema):
     """
     Base class for IdentityNoDataSchema and AllInsideNoDataSchema.

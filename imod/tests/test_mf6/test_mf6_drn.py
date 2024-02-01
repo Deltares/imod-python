@@ -72,8 +72,11 @@ def transient_concentration_drainage():
     conductance = time_multiplier * elevation
     concentration = species_multiplier * conductance
 
-    drn = dict(elevation=elevation, conductance=conductance, concentration=concentration)
+    drn = dict(
+        elevation=elevation, conductance=conductance, concentration=concentration
+    )
     return drn
+
 
 def test_write(drainage, tmp_path):
     drn = imod.mf6.Drainage(**drainage)
@@ -142,19 +145,20 @@ def test_validate_concentration(transient_concentration_drainage):
     assert len(errors) == 0
 
     # Error with incongruent data
-    drn.dataset["concentration"] = idomain.where(False) # Set all concentrations to NaN
+    drn.dataset["concentration"] = idomain.where(False)  # Set all concentrations to NaN
     errors = drn._validate(drn._write_schemata, **dis.dataset)
-    assert len(errors) == 1   
+    assert len(errors) == 1
     for var, error in errors.items():
         assert var == "concentration"
-    
+
     # Error with smaller than zero
-    drn.dataset["concentration"] = idomain.where(False, -200.0) # Set concentrations negative
+    drn.dataset["concentration"] = idomain.where(
+        False, -200.0
+    )  # Set concentrations negative
     errors = drn._validate(drn._write_schemata, **dis.dataset)
-    assert len(errors) == 1   
+    assert len(errors) == 1
     for var, error in errors.items():
         assert var == "concentration"
-    
 
 
 def test_discontinuous_layer(drainage):
