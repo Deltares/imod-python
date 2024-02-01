@@ -7,6 +7,7 @@ import jetbrains.buildServer.configs.kotlin.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.projectFeatures.ProjectReportTab
 import jetbrains.buildServer.configs.kotlin.projectFeatures.projectReportTab
 import jetbrains.buildServer.configs.kotlin.triggers.finishBuildTrigger
+import jetbrains.buildServer.configs.kotlin.triggers.schedule
 import jetbrains.buildServer.configs.kotlin.triggers.vcs
 
 /*
@@ -66,6 +67,7 @@ project {
     }
 
     subProject(Nightly)
+    subProject(Pixi)
 }
 
 object GitHubIntegrationTemplate : Template({
@@ -421,5 +423,90 @@ object NightlyTests : BuildType({
                 artifactRules = "+:coverage.zip => ."
             }
         }
+    }
+})
+
+object Pixi : Project({
+    name = "Pixi"
+
+    buildType(UpdateDependencies)
+})
+
+object UpdateDependencies : BuildType({
+    name = "Update Dependencies"
+
+    params {
+        param("GT_USER", "deltares-service-account")
+        password("env.GH_TOKEN", "credentialsJSON:ced4991a-a11d-463b-b79a-a657eea89523")
+    }
+
+    vcs {
+        root(AbsoluteId("iMOD6_IMODPython_ImodPython"), "+:. => imod-python")
+
+        cleanCheckout = true
+    }
+
+    steps {
+        powerShell {
+            name = "Download Github CLI"
+            id = "Download_Github_CLI"
+            formatStderrAsError = true
+            scriptMode = script {
+                content = """
+                    Invoke-WebRequest -Uri  https://github.com/cli/cli/releases/download/v2.42.1/gh_2.42.1_windows_amd64.zip -OutFile gh.zip
+                    Expand-Archive gh.zip -DestinationPath gh
+                """.trimIndent()
+            }
+        }
+        powerShell {
+            name = "Update dependencies"
+            id = "Update_dependencies"
+            workingDir = "imod-python"
+            scriptMode = script {
+                content = """
+                    ${'$'}env:Path = '%system.teamcity.build.checkoutDir%\gh\bin;' + ${'$'}env:Path  
+                    
+                    echo "Create update branch"
+                    
+                    git remote set-url origin https://%GT_USER%:%env.GH_TOKEN%@github.com/Deltares/imod-python.git
+                    git checkout -b pixi_update_%build.counter%
+                    
+                    echo "Update dependencies" 
+                    del pixi.lock
+                    pixi install
+                    
+                    echo "Add any changes" 
+                    git add pixi.lock
+                    
+                    if (git status -suno) 
+                    {
+                      git commit -m "Update pixi.lock"
+                      git push -u origin pixi_update_%build.counter%
+                      gh pr create --title "[TEAMCITY] Update project dependencies" --body "Teamcity automatically updated the dependencies defined the pixi.toml file. Please verify that all tests succeed before merging" --reviewer JoerivanEngelen,luitjansl
+                      echo "Changes pushed and PR created"
+                    }
+                    else
+                    {
+                      echo "No changes found"
+                    }
+                """.trimIndent()
+            }
+            noProfile = false
+        }
+    }
+
+    triggers {
+        schedule {
+            schedulingPolicy = weekly {
+                hour = 15
+            }
+            branchFilter = "+:<default>"
+            triggerBuild = always()
+            withPendingChangesOnly = false
+        }
+    }
+
+    failureConditions {
+        errorMessage = true
     }
 })
