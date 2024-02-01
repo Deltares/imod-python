@@ -196,16 +196,16 @@ def flow_transport_simulation():
         print_option="summary",
         csv_output=False,
         no_ptc=True,
-        outer_dvclose=1.0e-4,
+        outer_dvclose=1.0e-6,
         outer_maximum=500,
         under_relaxation=None,
-        inner_dvclose=1.0e-4,
-        inner_rclose=0.001,
-        inner_maximum=100,
+        inner_dvclose=1.0e-6,
+        inner_rclose=0.0001,
+        inner_maximum=200,
         linear_acceleration="bicgstab",
         scaling_method=None,
         reordering_method=None,
-        relaxation_factor=0.97,
+        relaxation_factor=0.9,
     )
 
     duration = pd.to_timedelta("2000d")

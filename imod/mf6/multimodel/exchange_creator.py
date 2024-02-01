@@ -255,7 +255,7 @@ class ExchangeCreator(abc.ABC):
                 exchanges.append(
                     GWTGWT(
                         f"{transport_model_name}_{model_id1}",
-                        f"{transport_model_name}_{model_id2}",                        
+                        f"{transport_model_name}_{model_id2}",
                         f"{flow_model_name}_{model_id1}",
                         f"{flow_model_name}_{model_id2}",
                         **connected_cells_dataset,

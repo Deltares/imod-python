@@ -929,14 +929,16 @@ class Modflow6Simulation(collections.UserDict):
         exchanges = []
         flow_models = self.get_models_of_type("gwf6")
         if len(flow_models) != 1:
-            raise ValueError("splitting of simulations with more (or less) than 1 flow model currently not supported")
+            raise ValueError(
+                "splitting of simulations with more (or less) than 1 flow model currently not supported"
+            )
         flow_model_name = list(flow_models.keys())[0]
         flow_model = self[flow_model_name]
         exchanges += exchange_creator.create_gwfgwf_exchanges(
             flow_model_name, flow_model.domain.layer
         )
-        transport_models =  self.get_models_of_type("gwt6")
-        if len(transport_models)  >  0:
+        transport_models = self.get_models_of_type("gwt6")
+        if len(transport_models) > 0:
             for tpt_model_name in transport_models:
                 exchanges += exchange_creator.create_gwtgwt_exchanges(
                     tpt_model_name, flow_model_name, model.domain.layer
@@ -999,12 +1001,11 @@ class Modflow6Simulation(collections.UserDict):
     def _set_exchange_options(self):
         # collect some options that we will auto-set
         for exchange in self["split_exchanges"]:
-
             if isinstance(exchange, GWFGWT):
                 continue
             if isinstance(exchange, GWFGWF):
                 model_name_1 = exchange.dataset["model_name_1"].values[()]
-                model_1 = self[model_name_1]            
+                model_1 = self[model_name_1]
                 if isinstance(model_1, GroundwaterFlowModel):
                     exchange.set_options(
                         save_flows=model_1["oc"].is_budget_output,
@@ -1015,7 +1016,6 @@ class Modflow6Simulation(collections.UserDict):
                     )
             if isinstance(exchange, GWTGWT):
                 continue
-
 
     def _filter_inactive_cells_from_exchanges(self) -> None:
         for ex in self["split_exchanges"]:

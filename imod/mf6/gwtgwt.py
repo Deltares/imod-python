@@ -23,8 +23,8 @@ class GWTGWT(ExchangeBase):
 
     def __init__(
         self,
-        transport_model_id1: str, 
-        transport_model_id2: str,              
+        transport_model_id1: str,
+        transport_model_id2: str,
         flow_model_id1: str,
         flow_model_id2: str,
         cell_id1: xr.DataArray,
@@ -41,7 +41,7 @@ class GWTGWT(ExchangeBase):
         self.dataset["cell_id2"] = cell_id2
         self.dataset["layer"] = layer
         self.dataset["model_name_1"] = transport_model_id1
-        self.dataset["model_name_2"] = transport_model_id2        
+        self.dataset["model_name_2"] = transport_model_id2
         self.dataset["flow_model_name_1"] = flow_model_id1
         self.dataset["flow_model_name_2"] = flow_model_id2
         self.dataset["ihc"] = xr.DataArray(np.ones_like(cl1, dtype=int))
