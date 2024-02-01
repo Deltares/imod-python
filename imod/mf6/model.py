@@ -6,12 +6,11 @@ import inspect
 import pathlib
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict, Optional, Tuple, Union
+from typing import Optional, Tuple, Union
 
 import cftime
 import jinja2
 import numpy as np
-import numpy.typing as npt
 import tomli
 import tomli_w
 import xarray as xr
@@ -23,7 +22,6 @@ from imod.mf6.package import Package
 from imod.mf6.regridding_utils import RegridderInstancesCollection, RegridderType
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.validation import pkg_errors_to_status_info
-from imod.mf6.wel import Well
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray
@@ -222,20 +220,6 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         return model_status_info
 
-    def __write_well(
-        self,
-        wellpackage: Well,
-        pkg_name: str,
-        globaltimes: npt.NDArray[np.datetime64],
-        write_context: WriteContext,
-        validate: bool = True,
-    ):
-        top, bottom, idomain = self.__get_domain_geometry()
-        k = self.__get_k()
-        wellpackage.write(
-            pkg_name, globaltimes, validate, write_context, idomain, top, bottom, k
-        )
-
     def write(
         self, modelname, globaltimes, validate: bool, write_context: WriteContext
     ) -> StatusInfoBase:
@@ -265,13 +249,28 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         for pkg_name, pkg in self.items():
             try:
                 if isinstance(pkg, imod.mf6.Well):
-                    self.__write_well(
-                        pkg, pkg_name, globaltimes, pkg_write_context, validate
-                    )
-                elif isinstance(pkg, imod.mf6.HorizontalFlowBarrierBase):
                     top, bottom, idomain = self.__get_domain_geometry()
                     k = self.__get_k()
-                    mf6_pkg = pkg.to_mf6_pkg(idomain, top, bottom, k)
+                    mf6_pkg = pkg.to_mf6_pkg(
+                        idomain,
+                        top,
+                        bottom,
+                        k,
+                        validate,
+                        pkg_write_context.is_partitioned,
+                    )
+
+                    mf6_pkg.write(
+                        pkgname=pkg_name,
+                        globaltimes=globaltimes,
+                        write_context=pkg_write_context,
+                    )
+                elif isinstance(
+                    pkg, imod.mf6.HorizontalFlowBarrierBase | imod.mf6.Well
+                ):
+                    top, bottom, idomain = self.__get_domain_geometry()
+                    k = self.__get_k()
+                    mf6_pkg = pkg.to_mf6_pkg(idomain, top, bottom, k, validate)
                     mf6_pkg.write(
                         pkgname=pkg_name,
                         globaltimes=globaltimes,
@@ -298,7 +297,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             if statusinfo.has_errors():
                 raise ValidationError(statusinfo.to_string())
 
-        toml_content: Dict = collections.defaultdict(dict)
+        toml_content: dict = collections.defaultdict(dict)
         for pkgname, pkg in self.items():
             pkg_path = f"{pkgname}.nc"
             toml_content[type(pkg).__name__][pkgname] = pkg_path
@@ -533,7 +532,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
     def _get_regridding_domain(
         self,
         target_grid: GridDataArray,
-        methods: Dict[RegridderType, str],
+        methods: dict[RegridderType, str],
     ) -> GridDataArray:
         """
         This method computes the output-domain for a regridding operation by regridding idomain with
@@ -583,3 +582,6 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
     def is_use_newton(self):
         return False
+
+    def _get_unique_regridder_types(self):
+        raise NotImplementedError(f"Regridding not supported for {self}")

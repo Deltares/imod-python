@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, Optional, Tuple, Union
 
 import cftime
 import numpy as np
@@ -11,7 +11,6 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-from imod.mf6.auxiliary_variables import expand_transient_auxiliary_variables
 from imod.mf6.boundary_condition import (
     BoundaryCondition,
     DisStructuredBoundaryCondition,
@@ -20,6 +19,7 @@ from imod.mf6.boundary_condition import (
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
+from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.utilities.grid import create_layered_top
@@ -148,18 +148,18 @@ class Well(BoundaryCondition, IPointDataPackage):
         "x": [AllNoDataSchema()],
     }
 
-    _regrid_method = {}
+    _regrid_method: dict[str, Tuple[RegridderType, str]] = {}
 
     def __init__(
         self,
-        x: List[float],
-        y: List[float],
-        screen_top: List[float],
-        screen_bottom: List[float],
-        rate: List[float],
-        concentration: Optional[List[float] | xr.DataArray] = None,
+        x: list[float],
+        y: list[float],
+        screen_top: list[float],
+        screen_bottom: list[float],
+        rate: list[float],
+        concentration: Optional[list[float] | xr.DataArray] = None,
         concentration_boundary_type="aux",
-        id: Optional[List[int]] = None,
+        id: Optional[list[int]] = None,
         minimum_k: float = 0.1,
         minimum_thickness: float = 1.0,
         print_input: bool = False,
@@ -169,27 +169,27 @@ class Well(BoundaryCondition, IPointDataPackage):
         validate: bool = True,
         repeat_stress: Optional[xr.DataArray] = None,
     ):
-        super().__init__()
-        self.dataset["screen_top"] = _assign_dims(screen_top)
-        self.dataset["screen_bottom"] = _assign_dims(screen_bottom)
-        self.dataset["y"] = _assign_dims(y)
-        self.dataset["x"] = _assign_dims(x)
-        self.dataset["rate"] = _assign_dims(rate)
         if id is None:
-            id = np.arange(self.dataset["x"].size).astype(str)
-        self.dataset["id"] = _assign_dims(id)
-        self.dataset["minimum_k"] = minimum_k
-        self.dataset["minimum_thickness"] = minimum_thickness
+            id = np.arange(len(x)).astype(str)
 
-        self.dataset["print_input"] = print_input
-        self.dataset["print_flows"] = print_flows
-        self.dataset["save_flows"] = save_flows
-        self.dataset["observations"] = observations
-        self.dataset["repeat_stress"] = repeat_stress
-        if concentration is not None:
-            self.dataset["concentration"] = concentration
-            self.dataset["concentration_boundary_type"] = concentration_boundary_type
-
+        dict_dataset = {
+            "screen_top": _assign_dims(screen_top),
+            "screen_bottom": _assign_dims(screen_bottom),
+            "y": _assign_dims(y),
+            "x": _assign_dims(x),
+            "rate": _assign_dims(rate),
+            "id": _assign_dims(id),
+            "minimum_k": minimum_k,
+            "minimum_thickness": minimum_thickness,
+            "print_input": print_input,
+            "print_flows": print_flows,
+            "save_flows": save_flows,
+            "observations": observations,
+            "repeat_stress": repeat_stress,
+            "concentration": concentration,
+            "concentration_boundary_type": concentration_boundary_type,
+        }
+        super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
     @classmethod
@@ -285,7 +285,7 @@ class Well(BoundaryCondition, IPointDataPackage):
 
     @staticmethod
     def _find_well_value_at_layer(
-        well_dataset: xr.Dataset, grid: GridDataArray, layer: int
+        well_dataset: xr.Dataset, grid: GridDataArray, layer: Optional[int]
     ):
         value = None if layer is None else grid.isel(layer=layer)
 
@@ -303,22 +303,12 @@ class Well(BoundaryCondition, IPointDataPackage):
     def write(
         self,
         pkgname: str,
-        globaltimes: npt.NDArray[np.datetime64],
-        validate: bool,
+        globaltimes: Union[list[np.datetime64], np.ndarray],
         write_context: WriteContext,
-        idomain: Union[xr.DataArray, xu.UgridDataArray],
-        top: Union[xr.DataArray, xu.UgridDataArray],
-        bottom: Union[xr.DataArray, xu.UgridDataArray],
-        k: Union[xr.DataArray, xu.UgridDataArray],
-    ) -> None:
-        if validate:
-            self._validate(self._write_schemata)
-        mf6_package = self.to_mf6_pkg(
-            idomain, top, bottom, k, write_context.is_partitioned
+    ):
+        raise NotImplementedError(
+            "To write a wel package first convert it to a MF6 well using to_mf6_pkg."
         )
-        # TODO: make options like "save_flows" configurable. Issue github #623
-        mf6_package.dataset["save_flows"] = True
-        mf6_package.write(pkgname, globaltimes, write_context)
 
     def __create_wells_df(self) -> pd.DataFrame:
         wells_df = self.dataset.to_dataframe()
@@ -403,9 +393,9 @@ class Well(BoundaryCondition, IPointDataPackage):
     @staticmethod
     def __derive_cellid_from_points(
         dst_grid: GridDataArray,
-        x: List,
-        y: List,
-        layer: List,
+        x: list,
+        y: list,
+        layer: list,
     ) -> GridDataArray:
         """
         Create DataArray with Modflow6 cell identifiers based on x, y coordinates
@@ -481,10 +471,11 @@ class Well(BoundaryCondition, IPointDataPackage):
 
     def to_mf6_pkg(
         self,
-        active: Union[xr.DataArray, xu.UgridDataArray],
-        top: Union[xr.DataArray, xu.UgridDataArray],
-        bottom: Union[xr.DataArray, xu.UgridDataArray],
-        k: Union[xr.DataArray, xu.UgridDataArray],
+        active: GridDataArray,
+        top: GridDataArray,
+        bottom: GridDataArray,
+        k: GridDataArray,
+        validate: bool = False,
         is_partitioned: bool = False,
     ) -> Mf6Wel:
         """
@@ -504,6 +495,9 @@ class Well(BoundaryCondition, IPointDataPackage):
 
         Parameters
         ----------
+        is_partitioned: bool
+        validate: bool
+            Run validation before converting
         active: {xarry.DataArray, xugrid.UgridDataArray}
             Grid with active cells.
         top: {xarry.DataArray, xugrid.UgridDataArray}
@@ -517,6 +511,8 @@ class Well(BoundaryCondition, IPointDataPackage):
         Mf6Wel
             Object with wells as list based input.
         """
+        if validate:
+            self._validate(self._write_schemata)
 
         minimum_k = self.dataset["minimum_k"].item()
         minimum_thickness = self.dataset["minimum_thickness"].item()
@@ -546,6 +542,9 @@ class Well(BoundaryCondition, IPointDataPackage):
         ds = ds.assign(**dict(ds_vars.items()))
 
         ds = remove_inactive(ds, active)
+
+        # TODO: make options like "save_flows" configurable. Issue github #623
+        ds["save_flows"] = True
 
         return Mf6Wel(**ds)
 
@@ -664,22 +663,20 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         validate: bool = True,
         repeat_stress=None,
     ):
-        super().__init__()
-        self.dataset["layer"] = _assign_dims(layer)
-        self.dataset["row"] = _assign_dims(row)
-        self.dataset["column"] = _assign_dims(column)
-        self.dataset["rate"] = _assign_dims(rate)
-        self.dataset["print_input"] = print_input
-        self.dataset["print_flows"] = print_flows
-        self.dataset["save_flows"] = save_flows
-        self.dataset["observations"] = observations
-        self.dataset["repeat_stress"] = repeat_stress
-
-        if concentration is not None:
-            self.dataset["concentration"] = concentration
-            self.dataset["concentration_boundary_type"] = concentration_boundary_type
-            expand_transient_auxiliary_variables(self)
-
+        dict_dataset = {
+            "layer": _assign_dims(layer),
+            "row": _assign_dims(row),
+            "column": _assign_dims(column),
+            "rate": _assign_dims(rate),
+            "print_input": print_input,
+            "print_flows": print_flows,
+            "save_flows": save_flows,
+            "observations": observations,
+            "repeat_stress": repeat_stress,
+            "concentration": concentration,
+            "concentration_boundary_type": concentration_boundary_type,
+        }
+        super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
         warnings.warn(
@@ -823,20 +820,18 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         observations=None,
         validate: bool = True,
     ):
-        super().__init__()
-        self.dataset["layer"] = _assign_dims(layer)
-        self.dataset["cell2d"] = _assign_dims(cell2d)
-        self.dataset["rate"] = _assign_dims(rate)
-        self.dataset["print_input"] = print_input
-        self.dataset["print_flows"] = print_flows
-        self.dataset["save_flows"] = save_flows
-        self.dataset["observations"] = observations
-
-        if concentration is not None:
-            self.dataset["concentration"] = concentration
-            self.dataset["concentration_boundary_type"] = concentration_boundary_type
-            expand_transient_auxiliary_variables(self)
-
+        dict_dataset = {
+            "layer": _assign_dims(layer),
+            "cell2d": _assign_dims(cell2d),
+            "rate": _assign_dims(rate),
+            "print_input": print_input,
+            "print_flows": print_flows,
+            "save_flows": save_flows,
+            "observations": observations,
+            "concentration": concentration,
+            "concentration_boundary_type": concentration_boundary_type,
+        }
+        super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
         warnings.warn(

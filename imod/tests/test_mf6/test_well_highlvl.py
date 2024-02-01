@@ -75,7 +75,10 @@ def test_write_well(tmp_path: Path, grid_data, grid_data_layered, reference_outp
     top = ones_like(active.sel(layer=1), dtype=np.float64)
     bottom = grid_data_layered(np.float64, -2.0, 10)
     write_context = WriteContext(tmp_path)
-    well.write("packagename", globaltimes, False, write_context, active, top, bottom, k)
+    mf6_pkg = well.to_mf6_pkg(
+        active, top, bottom, k, False, write_context.is_partitioned
+    )
+    mf6_pkg.write("packagename", globaltimes, write_context)
     assert pathlib.Path.exists(tmp_path / "packagename.wel")
     assert pathlib.Path.exists(tmp_path / "packagename" / "wel.dat")
     df = pd.read_csv(

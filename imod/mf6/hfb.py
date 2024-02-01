@@ -18,6 +18,7 @@ from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
+from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.grid import broadcast_to_full_domain
 from imod.schemata import EmptyIndexesSchema
@@ -123,7 +124,7 @@ def to_connected_cells_dataset(
     idomain: GridDataArray,
     grid: xu.Ugrid2d,
     edge_index: np.ndarray,
-    edge_values: typing.Dict,
+    edge_values: dict,
 ) -> xr.Dataset:
     """
     Converts a cell edge grid with values defined on the edges to a dataset with the cell ids of the connected cells,
@@ -138,7 +139,7 @@ def to_connected_cells_dataset(
         unstructured grid containing the edge to cell array
     edge_index: np.ndarray
         indices of the edges for which the edge values will be converted to values in the connected cells
-    edge_values: typing.Dict
+    edge_values: dict
         dictionary containing the value name and the edge values that are applied on the edges identified by the
         edge_index
 
@@ -273,15 +274,15 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
     _init_schemata = {}
     _write_schemata = {"geometry": [EmptyIndexesSchema()]}
 
-    _regrid_method = {}
+    _regrid_method: dict[str, Tuple[RegridderType, str]] = {}
 
     def __init__(
         self,
         geometry: gpd.GeoDataFrame,
         print_input: bool = False,
     ) -> None:
-        super().__init__(locals())
-        self.dataset["print_input"] = print_input
+        dict_dataset = {"print_input": print_input}
+        super().__init__(dict_dataset)
 
         self.line_data = geometry
 
@@ -333,6 +334,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         top: GridDataArray,
         bottom: GridDataArray,
         k: GridDataArray,
+        validate: bool = False,
     ) -> Mf6HorizontalFlowBarrier:
         """
         Write package to Modflow 6 package.
@@ -351,11 +353,16 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             Grid with bottom of model layers.
         k: GridDataArray
             Grid with hydraulic conductivities.
+        validate: bool
+            Run validation before converting
 
         Returns
         -------
 
         """
+        if validate:
+            self._validate(self._write_schemata)
+
         top, bottom = broadcast_to_full_domain(idomain, top, bottom)
         k = idomain * k
         unstructured_grid, top, bottom, k = (
@@ -405,7 +412,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         return Mf6HorizontalFlowBarrier(**barrier_dataset)
 
     def is_empty(self) -> bool:
-        if super(__class__, self).is_empty():
+        if super().is_empty():
             return True
 
         linestrings = self.dataset["geometry"]

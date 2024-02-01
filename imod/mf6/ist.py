@@ -1,4 +1,7 @@
+from typing import Optional
+
 import numpy as np
+import xarray as xr
 
 from imod.mf6.package import Package
 from imod.mf6.validation import PKG_DIMS_SCHEMA
@@ -191,11 +194,11 @@ class ImmobileStorageTransfer(Package):
         mobile_immobile_mass_transfer_rate,
         decay=None,
         decay_sorbed=None,
-        bulk_density=None,
+        bulk_density: Optional[xr.DataArray] = None,
         distribution_coefficient=None,
-        save_flows: bool = None,
-        budgetbinfile: str = None,
-        budgetcsvfile: str = None,
+        save_flows: Optional[bool] = None,
+        budgetbinfile: Optional[str] = None,
+        budgetcsvfile: Optional[str] = None,
         sorption: bool = False,
         first_order_decay: bool = False,
         zero_order_decay: bool = False,
@@ -227,25 +230,25 @@ class ImmobileStorageTransfer(Package):
                         "provided.",
                     )
 
-        super().__init__(locals())
-        self.dataset["initial_immobile_concentration"] = initial_immobile_concentration
-        self.dataset[
-            "mobile_immobile_mass_transfer_rate"
-        ] = mobile_immobile_mass_transfer_rate
-        self.dataset["immobile_porosity"] = immobile_porosity
-        self.dataset["decay"] = decay
-        self.dataset["decay_sorbed"] = decay_sorbed
-        self.dataset["bulk_density"] = bulk_density
-        self.dataset["distribution_coefficient"] = distribution_coefficient
-        self.dataset["save_flows"] = save_flows
-        self.dataset["budgetfile"] = budgetbinfile
-        self.dataset["budgetcsvfile"] = budgetcsvfile
-        self.dataset["sorption"] = sorption
-        self.dataset["first_order_decay"] = first_order_decay
-        self.dataset["zero_order_decay"] = zero_order_decay
-        self.dataset["cimfile"] = cimfile
-        self.dataset["columns "] = columns
-        self.dataset["width"] = width
-        self.dataset["digits"] = digits
-        self.dataset["format"] = format
+        dict_dataset = {
+            "initial_immobile_concentration": initial_immobile_concentration,
+            "mobile_immobile_mass_transfer_rate": mobile_immobile_mass_transfer_rate,
+            "immobile_porosity": immobile_porosity,
+            "decay": decay,
+            "decay_sorbed": decay_sorbed,
+            "bulk_density": bulk_density,
+            "distribution_coefficient": distribution_coefficient,
+            "save_flows": save_flows,
+            "budgetfile": budgetbinfile,
+            "budgetcsvfile": budgetcsvfile,
+            "sorption": sorption,
+            "first_order_decay": first_order_decay,
+            "zero_order_decay": zero_order_decay,
+            "cimfile": cimfile,
+            "columns ": columns,
+            "width": width,
+            "digits": digits,
+            "format": format,
+        }
+        super().__init__(dict_dataset)
         self._validate_init_schemata(validate)

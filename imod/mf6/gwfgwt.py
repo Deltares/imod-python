@@ -14,9 +14,12 @@ class GWFGWT(ExchangeBase):
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, model_id1: str, model_id2: str):
-        super().__init__(locals())
-        self.dataset["model_name_1"] = model_id1
-        self.dataset["model_name_2"] = model_id2
+        dict_dataset = {
+            "model_name_1": model_id1,
+            "model_name_2": model_id2,
+        }
+
+        super().__init__(dict_dataset)
 
     def clip_box(
         self,

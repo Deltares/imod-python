@@ -9,11 +9,13 @@ class DummyExchange(ExchangeBase):
     _pkg_id = "gwfgwt"
 
     def __init__(self, model_id1: str = None, model_id2: str = None):
-        super().__init__()
+        variables_to_merge = {}
         if model_id1:
-            self.dataset["model_name_1"] = model_id1
+            variables_to_merge["model_name_1"] = model_id1
         if model_id2:
-            self.dataset["model_name_2"] = model_id2
+            variables_to_merge["model_name_2"] = model_id2
+
+        super().__init__(variables_to_merge)
 
 
 def test_package_name_construct_name():
