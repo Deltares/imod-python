@@ -146,7 +146,7 @@ class SourceSinkMixing(BoundaryCondition):
                 aux_var_names.append(species)
 
         if len(names) == 0:
-            raise ValueError("flow model does not contain boundary conditions")
+            return
 
         return SourceSinkMixing(
             names,

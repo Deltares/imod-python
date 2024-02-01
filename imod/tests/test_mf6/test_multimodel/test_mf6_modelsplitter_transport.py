@@ -89,7 +89,10 @@ def test_split_flow_and_transport_model_evaluate_output(
     # create label array
     submodel_labels = zeros_like(active)
     submodel_labels = submodel_labels.drop_vars("layer")
-    submodel_labels.values[:, :, 30:] = 1
+    submodel_labels.values[:, :, 3:] = 1
+    submodel_labels.values[:, :, 6:] = 2   
+    submodel_labels.values[:, :, 9:] = 3       
+    submodel_labels.values[:, :, 12:] = 4          
     submodel_labels = submodel_labels.sel(layer=0, drop=True)
 
     # for reference run the original model and load the results
