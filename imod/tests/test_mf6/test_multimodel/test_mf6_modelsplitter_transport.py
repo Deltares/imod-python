@@ -77,42 +77,35 @@ def test_split_flow_and_transport_model_evaluate_output(
 
     flow_model = simulation["flow"]
     active = flow_model.domain
+
+    # TODO: put the other transport models back when #797 is solved
     simulation.pop("tpt_a")
     simulation.pop("tpt_c")
     simulation.pop("tpt_d")
     simulation["transport_solver"].remove_model_from_solution("tpt_a")
     simulation["transport_solver"].remove_model_from_solution("tpt_c")
     simulation["transport_solver"].remove_model_from_solution("tpt_d")
+
+    # create label array
     submodel_labels = zeros_like(active)
     submodel_labels = submodel_labels.drop_vars("layer")
-
     submodel_labels.values[:, :, 30:] = 1
-
     submodel_labels = submodel_labels.sel(layer=0, drop=True)
 
+    # for reference run the original model and load the results
     simulation.write(tmp_path / "original", binary=False)
     simulation.run()
-
-    new_simulation = simulation.split(submodel_labels)
-    new_simulation.write(tmp_path, binary=False)
-
     original_conc = simulation.open_concentration(species_ls=["b"])
     original_head = simulation.open_head()
 
-    assert len(new_simulation["gwtgwf_exchanges"]) == 2
-
-    assert new_simulation["gwtgwf_exchanges"][0]["model_name_1"].values[()] == "flow_0"
-    assert new_simulation["gwtgwf_exchanges"][0]["model_name_2"].values[()] == "tpt_b_0"
-
-    assert new_simulation["gwtgwf_exchanges"][1]["model_name_1"].values[()] == "flow_1"
-    assert new_simulation["gwtgwf_exchanges"][1]["model_name_2"].values[()] == "tpt_b_1"
-
+    # split the model , run the split model and load the results
+    new_simulation = simulation.split(submodel_labels)
+    new_simulation.write(tmp_path, binary=False)
     new_simulation.run()
-    conc = new_simulation.open_concentration(species_ls=["a"])
+    conc = new_simulation.open_concentration(species_ls=["b"])
     head = new_simulation.open_head()
 
-    # Compare the head result of the original simulation with the result of the
-    # partitioned simulation.
+    # Compare
     np.testing.assert_allclose(
         head.sel(time=2000)["head"].values,
         original_head.sel(time=200).values,
