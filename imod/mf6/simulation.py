@@ -38,6 +38,7 @@ from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
 from imod.typing.grid import concat, is_unstructured, merge, merge_partitions, nan_like
+from imod.mf6.ssm import SourceSinkMixing
 
 OUTPUT_FUNC_MAPPING: dict[str, Callable] = {
     "head": open_hds,
@@ -949,6 +950,7 @@ class Modflow6Simulation(collections.UserDict):
 
         new_simulation._add_modelsplit_exchanges(exchanges)
         new_simulation._set_exchange_options()
+        new_simulation._update_ssm_packages()
 
         new_simulation._filter_inactive_cells_from_exchanges()
         return new_simulation
@@ -1088,3 +1090,25 @@ class Modflow6Simulation(collections.UserDict):
                     exchanges.append(GWFGWT(flow_model_name, transport_model_name))
 
         return exchanges
+
+    def _update_ssm_packages(self) -> None:
+        flow_models = self.get_models_of_type("gwf6")
+        transport_models = self.get_models_of_type("gwt6")
+
+        for flow_model_name in flow_models:
+            tpt_models_of_flow_model = []
+            flow_model = self[flow_model_name]
+            for tpt_model_name in transport_models:
+                tpt_model = self[tpt_model_name]
+                if tpt_model.domain.equals(flow_model.domain):
+                    tpt_models_of_flow_model.append(tpt_model_name)
+            for tpt_model_name in tpt_models_of_flow_model:
+                tpt_model = self[tpt_model_name]
+                ssm_key = tpt_model._get_pkgkey("ssm")
+                if ssm_key is not None:
+                    old_ssm_package = tpt_model.pop(ssm_key)
+                    state_variable_name = old_ssm_package.dataset["auxiliary_variable_name"].values[0]
+                    tpt_model[ssm_key] = SourceSinkMixing.from_flow_model(flow_model, state_variable_name)
+
+
+
