@@ -957,7 +957,6 @@ class Modflow6Simulation(collections.UserDict):
                 exchanges += exchange_creator.create_gwtgwt_exchanges(
                     tpt_model_name, flow_model_name, model.domain.layer
                 )
-
         new_simulation._add_modelsplit_exchanges(exchanges)
         new_simulation._set_exchange_options()
 

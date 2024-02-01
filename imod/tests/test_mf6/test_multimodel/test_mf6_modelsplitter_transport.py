@@ -65,8 +65,9 @@ def test_split_flow_and_transport_model(tmp_path, flow_transport_simulation):
     assert new_simulation["gwtgwf_exchanges"][6]["model_name_2"].values[()] == "tpt_c_1"
 
     assert new_simulation["gwtgwf_exchanges"][7]["model_name_1"].values[()] == "flow_1"
-    assert new_simulation["gwtgwf_exchanges"][7]["model_name_2"].values[()] == "tpt_d_1"    
-    assert_simulation_can_run( new_simulation, "dis", tmp_path)
+    assert new_simulation["gwtgwf_exchanges"][7]["model_name_2"].values[()] == "tpt_d_1"
+    assert_simulation_can_run(new_simulation, "dis", tmp_path)
+
 
 @pytest.mark.usefixtures("flow_transport_simulation")
 def test_split_flow_and_transport_model_evaluate_output(
