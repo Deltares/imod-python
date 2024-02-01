@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 
 from imod.mf6.multimodel.modelsplitter import create_partition_info, slice_model
@@ -65,5 +66,55 @@ def test_split_flow_and_transport_model(tmp_path, flow_transport_simulation):
 
     assert new_simulation["gwtgwf_exchanges"][7]["model_name_1"].values[()] == "flow_1"
     assert new_simulation["gwtgwf_exchanges"][7]["model_name_2"].values[()] == "tpt_d_1"
-
     assert_simulation_can_run(new_simulation, "dis", tmp_path)
+
+
+@pytest.mark.usefixtures("flow_transport_simulation")
+def test_split_flow_and_transport_model_evaluate_output(
+    tmp_path, flow_transport_simulation
+):
+    simulation = flow_transport_simulation
+
+    flow_model = simulation["flow"]
+    active = flow_model.domain
+
+    # TODO: put the other transport models back when #797 is solved
+    simulation.pop("tpt_a")
+    simulation.pop("tpt_c")
+    simulation.pop("tpt_d")
+    simulation["transport_solver"].remove_model_from_solution("tpt_a")
+    simulation["transport_solver"].remove_model_from_solution("tpt_c")
+    simulation["transport_solver"].remove_model_from_solution("tpt_d")
+
+    # create label array
+    submodel_labels = zeros_like(active)
+    submodel_labels = submodel_labels.drop_vars("layer")
+    submodel_labels.values[:, :, 30:] = 1
+    submodel_labels = submodel_labels.sel(layer=0, drop=True)
+
+    # for reference run the original model and load the results
+    simulation.write(tmp_path / "original", binary=False)
+    simulation.run()
+    original_conc = simulation.open_concentration(species_ls=["b"])
+    original_head = simulation.open_head()
+
+    # split the model , run the split model and load the results
+    new_simulation = simulation.split(submodel_labels)
+    new_simulation.write(tmp_path, binary=False)
+    new_simulation.run()
+    conc = new_simulation.open_concentration(species_ls=["b"])
+    head = new_simulation.open_head()
+
+    # Compare
+    np.testing.assert_allclose(
+        head.sel(time=2000)["head"].values,
+        original_head.sel(time=200).values,
+        rtol=1e-4,
+        atol=1e-4,
+    )
+    np.testing.assert_allclose(
+        conc.sel(time=2000)["concentration"].values,
+        original_conc.sel(time=200).values,
+        rtol=1e-4,
+        atol=0.011,
+    )
