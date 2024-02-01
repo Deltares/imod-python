@@ -4,7 +4,7 @@ import numpy as np
 
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.regridding_utils import RegridderType
-from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
+from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
     AllNoDataSchema,
@@ -128,6 +128,17 @@ class Evapotranspiration(BoundaryCondition):
             CoordsSchema(("layer",)),
             SEGMENT_BOUNDARY_DIMS_SCHEMA,
         ],
+        "concentration": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(
+                (
+                    "species",
+                    "layer",
+                )
+            ),
+            CONC_DIMS_SCHEMA,
+        ],
         "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
         "save_flows": [DTypeSchema(np.bool_), DimsSchema()],
     }
@@ -145,6 +156,7 @@ class Evapotranspiration(BoundaryCondition):
             AllValueSchema(">=", 0.0),
             AllValueSchema("<=", 1.0),
         ],
+        "concentration": [IdentityNoDataSchema("surface"), AllValueSchema(">=", 0.0)],
     }
 
     _period_data = ("surface", "rate", "depth", "proportion_depth", "proportion_rate")
