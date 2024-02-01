@@ -23,9 +23,10 @@ from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.utilities.grid import create_layered_top
+from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
-from imod.schemata import AnyNoDataSchema, DTypeSchema
+from imod.schemata import AnyNoDataSchema, DTypeSchema, ValidationError
 from imod.select.points import points_indices, points_values
 from imod.typing import GridDataArray
 from imod.typing.grid import is_spatial_2D, ones_like
@@ -516,7 +517,10 @@ class Well(BoundaryCondition, IPointDataPackage):
             Object with wells as list based input.
         """
         if validate:
-            self._validate(self._write_schemata)
+            errors = self._validate(self._write_schemata)
+            if len(errors) > 0:
+                message = validation_pkg_error_message(errors)
+                raise ValidationError(message)
 
         minimum_k = self.dataset["minimum_k"].item()
         minimum_thickness = self.dataset["minimum_thickness"].item()
