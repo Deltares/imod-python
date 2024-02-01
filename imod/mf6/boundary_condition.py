@@ -1,15 +1,19 @@
 import abc
 import pathlib
 from copy import copy, deepcopy
-from typing import Dict, List
+from typing import Mapping, Optional, Union
 
 import numpy as np
 import xarray as xr
 import xugrid as xu
 
-from imod.mf6.auxiliary_variables import get_variable_names
+from imod.mf6.auxiliary_variables import (
+    expand_transient_auxiliary_variables,
+    get_variable_names,
+)
 from imod.mf6.package import Package
 from imod.mf6.write_context import WriteContext
+from imod.typing.grid import GridDataArray
 
 
 def _dis_recarr(arrdict, layer, notnull):
@@ -63,6 +67,15 @@ class BoundaryCondition(Package, abc.ABC):
     <https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=19>`_,
     not the array input which is used in :class:`Package`.
     """
+
+    def __init__(self, allargs: Mapping[str, GridDataArray | float | int | bool | str]):
+        super().__init__(allargs)
+        if "concentration" in allargs.keys() and allargs["concentration"] is None:
+            # Remove vars inplace
+            del self.dataset["concentration"]
+            del self.dataset["concentration_boundary_type"]
+        else:
+            expand_transient_auxiliary_variables(self)
 
     def _max_active_n(self):
         """
@@ -172,7 +185,9 @@ class BoundaryCondition(Package, abc.ABC):
 
         return periods
 
-    def _get_options(self, predefined_options: Dict, not_options: List = None):
+    def _get_options(
+        self, predefined_options: dict, not_options: Optional[list] = None
+    ):
         options = copy(predefined_options)
 
         if not_options is None:
@@ -230,7 +245,12 @@ class BoundaryCondition(Package, abc.ABC):
             path = directory / pkgname / f"{self._pkg_id}.{ext}"
             self._write_datafile(path, bin_ds, binary=binary)
 
-    def write(self, pkgname: str, globaltimes: np.ndarray, write_context: WriteContext):
+    def write(
+        self,
+        pkgname: str,
+        globaltimes: Union[list[np.datetime64], np.ndarray],
+        write_context: WriteContext,
+    ):
         """
         writes the blockfile and binary data
 
@@ -297,7 +317,12 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
         package_data = self._package_data_to_sparse()
         self._write_file(outpath, package_data)
 
-    def write(self, pkgname: str, globaltimes: np.ndarray, write_context: WriteContext):
+    def write(
+        self,
+        pkgname: str,
+        globaltimes: Union[list[np.datetime64], np.ndarray],
+        write_context: WriteContext,
+    ):
         boundary_condition_write_context = deepcopy(write_context)
         boundary_condition_write_context.use_binary = False
 

@@ -67,7 +67,6 @@ class InitialConditions(Package):
     }
 
     def __init__(self, start=None, head=None, validate: bool = True):
-        super().__init__(locals())
         if start is None:
             start = head
             warnings.warn(
@@ -80,7 +79,8 @@ class InitialConditions(Package):
             if head is not None:
                 raise ValueError("start and head arguments cannot both be defined")
 
-        self.dataset["start"] = start
+        dict_dataset = {"start": start}
+        super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):

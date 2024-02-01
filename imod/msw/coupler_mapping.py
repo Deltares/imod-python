@@ -2,7 +2,8 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from imod import mf6
+from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.wel import WellDisStructured
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 
@@ -37,8 +38,8 @@ class CouplerMapping(MetaSwapPackage):
 
     def __init__(
         self,
-        modflow_dis: mf6.StructuredDiscretization,
-        well: mf6.WellDisStructured = None,
+        modflow_dis: StructuredDiscretization,
+        well: WellDisStructured = None,
     ):
         super().__init__()
 

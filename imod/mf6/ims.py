@@ -393,38 +393,39 @@ class Solution(Package):
         no_ptc=False,
         validate: bool = True,
     ):
-        super().__init__()
-        self.dataset = xr.Dataset()
+        dict_dataset = {
+            "outer_dvclose": outer_dvclose,
+            "outer_maximum": outer_maximum,
+            "under_relaxation": under_relaxation,
+            "under_relaxation_theta": under_relaxation_theta,
+            "under_relaxation_kappa": under_relaxation_kappa,
+            "under_relaxation_gamma": under_relaxation_gamma,
+            "under_relaxation_momentum": under_relaxation_momentum,
+            "backtracking_number": backtracking_number,
+            "backtracking_tolerance": backtracking_tolerance,
+            "backtracking_reduction_factor": backtracking_reduction_factor,
+            "backtracking_residual_limit": backtracking_residual_limit,
+            "inner_maximum": inner_maximum,
+            "inner_dvclose": inner_dvclose,
+            "inner_rclose": inner_rclose,
+            "rclose_option": rclose_option,
+            "linear_acceleration": linear_acceleration,
+            "relaxation_factor": relaxation_factor,
+            "preconditioner_levels": preconditioner_levels,
+            "preconditioner_drop_tolerance": preconditioner_drop_tolerance,
+            "number_orthogonalizations": number_orthogonalizations,
+            "scaling_method": scaling_method,
+            "reordering_method": reordering_method,
+            "print_option": print_option,
+            "csv_output": csv_output,
+            "no_ptc": no_ptc,
+        }
         # Make sure the modelnames are set as a variable rather than dimension:
         if isinstance(modelnames, xr.DataArray):
-            self.dataset["modelnames"] = modelnames
+            dict_dataset["modelnames"] = modelnames
         else:
-            self.dataset["modelnames"] = ("model", modelnames)
-        self.dataset["outer_dvclose"] = outer_dvclose
-        self.dataset["outer_maximum"] = outer_maximum
-        self.dataset["under_relaxation"] = under_relaxation
-        self.dataset["under_relaxation_theta"] = under_relaxation_theta
-        self.dataset["under_relaxation_kappa"] = under_relaxation_kappa
-        self.dataset["under_relaxation_gamma"] = under_relaxation_gamma
-        self.dataset["under_relaxation_momentum"] = under_relaxation_momentum
-        self.dataset["backtracking_number"] = backtracking_number
-        self.dataset["backtracking_tolerance"] = backtracking_tolerance
-        self.dataset["backtracking_reduction_factor"] = backtracking_reduction_factor
-        self.dataset["backtracking_residual_limit"] = backtracking_residual_limit
-        self.dataset["inner_maximum"] = inner_maximum
-        self.dataset["inner_dvclose"] = inner_dvclose
-        self.dataset["inner_rclose"] = inner_rclose
-        self.dataset["rclose_option"] = rclose_option
-        self.dataset["linear_acceleration"] = linear_acceleration
-        self.dataset["relaxation_factor"] = relaxation_factor
-        self.dataset["preconditioner_levels"] = preconditioner_levels
-        self.dataset["preconditioner_drop_tolerance"] = preconditioner_drop_tolerance
-        self.dataset["number_orthogonalizations"] = number_orthogonalizations
-        self.dataset["scaling_method"] = scaling_method
-        self.dataset["reordering_method"] = reordering_method
-        self.dataset["print_option"] = print_option
-        self.dataset["csv_output"] = csv_output
-        self.dataset["no_ptc"] = no_ptc
+            dict_dataset["modelnames"] = ("model", modelnames)
+        super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
     def remove_model_from_solution(self, modelname: str) -> None:

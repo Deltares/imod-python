@@ -6,7 +6,7 @@ import pathlib
 import subprocess
 import warnings
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Callable, DefaultDict, Optional, Union
 
 import cftime
 import jinja2
@@ -39,19 +39,28 @@ from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
 from imod.typing.grid import concat, is_unstructured, merge, merge_partitions, nan_like
 
-OUTPUT_FUNC_MAPPING = {
-    "head": (open_hds, GroundwaterFlowModel),
-    "concentration": (open_conc, GroundwaterTransportModel),
-    "budget-flow": (open_cbc, GroundwaterFlowModel),
-    "budget-transport": (open_cbc, GroundwaterTransportModel),
+OUTPUT_FUNC_MAPPING: dict[str, Callable] = {
+    "head": open_hds,
+    "concentration": open_conc,
+    "budget-flow": open_cbc,
+    "budget-transport": open_cbc,
+}
+
+OUTPUT_MODEL_MAPPING: dict[
+    str, type[GroundwaterFlowModel] | type[GroundwaterTransportModel]
+] = {
+    "head": GroundwaterFlowModel,
+    "concentration": GroundwaterTransportModel,
+    "budget-flow": GroundwaterFlowModel,
+    "budget-transport": GroundwaterTransportModel,
 }
 
 
-def get_models(simulation: Modflow6Simulation) -> Dict[str, Modflow6Model]:
+def get_models(simulation: Modflow6Simulation) -> dict[str, Modflow6Model]:
     return {k: v for k, v in simulation.items() if isinstance(v, Modflow6Model)}
 
 
-def get_packages(simulation: Modflow6Simulation) -> Dict[str, Package]:
+def get_packages(simulation: Modflow6Simulation) -> dict[str, Package]:
     return {
         pkg_name: pkg
         for pkg_name, pkg in simulation.items()
@@ -170,7 +179,7 @@ class Modflow6Simulation(collections.UserDict):
 
     def render(self, write_context: WriteContext):
         """Renders simulation namefile"""
-        d: Dict[str, Any] = {}
+        d: dict[str, Any] = {}
         models = []
         solutiongroups = []
         for key, value in self.items():
@@ -383,7 +392,7 @@ class Modflow6Simulation(collections.UserDict):
 
     def open_transport_budget(
         self,
-        species_ls: list[str] = None,
+        species_ls: Optional[list[str]] = None,
         simulation_start_time: Optional[np.datetime64] = None,
         time_unit: Optional[str] = "d",
     ) -> dict[str, GridDataArray]:
@@ -488,7 +497,7 @@ class Modflow6Simulation(collections.UserDict):
 
     def open_concentration(
         self,
-        species_ls: list[str] = None,
+        species_ls: Optional[list[str]] = None,
         dry_nan: bool = False,
         simulation_start_time: Optional[np.datetime64] = None,
         time_unit: Optional[str] = "d",
@@ -547,7 +556,7 @@ class Modflow6Simulation(collections.UserDict):
             Extra settings that need to be passed through to the respective
             output function.
         """
-        _, modeltype = OUTPUT_FUNC_MAPPING[output]
+        modeltype = OUTPUT_MODEL_MAPPING[output]
         modelnames = self.get_models_of_type(modeltype._model_id).keys()
         # Pop species_ls, set to modelnames in case not found
         species_ls = settings.pop("species_ls", modelnames)
@@ -643,6 +652,10 @@ class Modflow6Simulation(collections.UserDict):
         concentrations = []
         for modelname, species in zip(modelnames, species_ls):
             conc = self._open_output_single_model(modelname, output, **settings)
+            if not isinstance(conc, GridDataArray):
+                raise RuntimeError(
+                    f"Type error. Expected GridDataArray but got {type(conc)}"
+                )
             conc = conc.assign_coords(species=species)
             concentrations.append(conc)
         return concat(concentrations, dim="species")
@@ -678,7 +691,8 @@ class Modflow6Simulation(collections.UserDict):
             Extra settings that need to be passed through to the respective
             output function.
         """
-        open_func, expected_modeltype = OUTPUT_FUNC_MAPPING[output]
+        open_func = OUTPUT_FUNC_MAPPING[output]
+        expected_modeltype = OUTPUT_MODEL_MAPPING[output]
 
         if self.directory is None:
             raise RuntimeError(f"Simulation {self.name} has not been written yet.")
@@ -754,7 +768,7 @@ class Modflow6Simulation(collections.UserDict):
         directory = pathlib.Path(directory)
         directory.mkdir(parents=True, exist_ok=True)
 
-        toml_content = collections.defaultdict(dict)
+        toml_content: DefaultDict[str, dict] = collections.defaultdict(dict)
         for key, value in self.items():
             cls_name = type(value).__name__
             if isinstance(value, Modflow6Model):
@@ -982,7 +996,7 @@ class Modflow6Simulation(collections.UserDict):
 
         return result
 
-    def _add_modelsplit_exchanges(self, exchanges_list: List[GWFGWF]) -> None:
+    def _add_modelsplit_exchanges(self, exchanges_list: list[GWFGWF]) -> None:
         if not is_split(self):
             self["split_exchanges"] = []
         self["split_exchanges"].extend(exchanges_list)

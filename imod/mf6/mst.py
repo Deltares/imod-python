@@ -113,15 +113,17 @@ class MobileStorageTransfer(Package):
             raise ValueError(
                 "zero_order_decay and first_order_decay may not both be True"
             )
-        super().__init__(locals())
-        self.dataset["porosity"] = porosity
-        self.dataset["decay"] = decay
-        self.dataset["decay_sorbed"] = decay_sorbed
-        self.dataset["bulk_density"] = bulk_density
-        self.dataset["distcoef"] = distcoef
-        self.dataset["sp2"] = sp2
-        self.dataset["save_flows"] = save_flows
-        self.dataset["sorption"] = sorption
-        self.dataset["zero_order_decay"] = zero_order_decay
-        self.dataset["first_order_decay"] = first_order_decay
+        dict_dataset = {
+            "porosity": porosity,
+            "decay": decay,
+            "decay_sorbed": decay_sorbed,
+            "bulk_density": bulk_density,
+            "distcoef": distcoef,
+            "sp2": sp2,
+            "save_flows": save_flows,
+            "sorption": sorption,
+            "zero_order_decay": zero_order_decay,
+            "first_order_decay": first_order_decay,
+        }
+        super().__init__(dict_dataset)
         self._validate_init_schemata(validate)

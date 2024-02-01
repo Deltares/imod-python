@@ -1,4 +1,6 @@
-from typing import Callable, Sequence
+import pickle
+import textwrap
+from typing import Callable, Mapping, Sequence
 
 import numpy as np
 import xarray as xr
@@ -93,6 +95,50 @@ def _type_dispatch_functions_on_grid_sequence(
     )
 
 
+# Typedispatching doesn't work based on types of dict elements, therefore resort
+# to manual type testing
+def _type_dispatch_functions_on_dict(
+    dict_of_objects: Mapping[str, GridDataArray | float | bool | int],
+    unstructured_func: Callable,
+    structured_func: Callable,
+    *args,
+    **kwargs,
+):
+    """
+    Typedispatch function on grid and scalar variables provided in dictionary.
+    Types do not need to be homogeneous as scalars and grids can be mixed. No
+    mixing of structured and unstructured grids is allowed. Also allows running
+    function on dictionary with purely scalars, in which case it will call to
+    the xarray function.
+    """
+
+    error_msg = textwrap.dedent(
+        """
+        Received both structured grid (xr.DataArray) and xu.UgridDataArray. This
+        means structured grids as well as unstructured grids were provided.
+        """
+    )
+
+    if dict_of_objects is None:
+        return xr.Dataset()
+
+    types = [type(arg) for arg in dict_of_objects.values()]
+    has_unstructured = xu.UgridDataArray in types
+    # Test structured if xr.DataArray and spatial.
+    has_structured_grid = any(
+        [
+            isinstance(arg, xr.DataArray) and is_spatial_2D(arg)
+            for arg in dict_of_objects.values()
+        ]
+    )
+    if has_structured_grid and has_unstructured:
+        raise TypeError(error_msg)
+    if has_unstructured:
+        return unstructured_func([dict_of_objects], *args, **kwargs)
+
+    return structured_func([dict_of_objects], *args, **kwargs)
+
+
 def merge(
     objects: Sequence[GridDataArray | GridDataset], *args, **kwargs
 ) -> GridDataset:
@@ -114,6 +160,67 @@ def concat(
 ) -> GridDataArray | GridDataset:
     return _type_dispatch_functions_on_grid_sequence(
         objects, xu.concat, xr.concat, *args, **kwargs
+    )
+
+
+def merge_unstructured_dataset(variables_to_merge: list[dict], *args, **kwargs):
+    """
+    Work around xugrid issue https://github.com/Deltares/xugrid/issues/179
+
+    Expects only one dictionary in list. List is used to have same API as
+    xr.merge().
+
+    Merges unstructured grids first, then manually assigns scalar variables.
+    """
+    if len(variables_to_merge) > 1:
+        raise ValueError(
+            f"Only one dict of variables expected, got {len(variables_to_merge)}"
+        )
+
+    variables_to_merge_dict = variables_to_merge[0]
+
+    if not isinstance(variables_to_merge_dict, dict):
+        raise TypeError(f"Expected dict, got {type(variables_to_merge_dict)}")
+
+    # Separate variables into list of grids and dict of scalar variables
+    grids_ls = []
+    scalar_dict = {}
+    for name, variable in variables_to_merge_dict.items():
+        if isinstance(variable, xu.UgridDataArray):
+            grids_ls.append(variable.rename(name))
+        else:
+            scalar_dict[name] = variable
+
+    # Merge grids
+    dataset = xu.merge(grids_ls, *args, **kwargs)
+
+    # Temporarily work around this xugrid issue, until fixed:
+    # https://github.com/Deltares/xugrid/issues/206
+    grid_hashes = [hash(pickle.dumps(grid)) for grid in dataset.ugrid.grids]
+    unique_grid_hashes = np.unique(grid_hashes)
+    if unique_grid_hashes.size > 1:
+        raise ValueError(
+            "Multiple grids provided, please provide data on one unique grid"
+        )
+    else:
+        # Possibly won't work anymore if this ever gets implemented:
+        # https://github.com/Deltares/xugrid/issues/195
+        dataset._grids = [dataset.grids[0]]
+
+    # Assign scalar variables manually
+    for name, variable in scalar_dict.items():
+        dataset[name] = variable
+
+    return dataset
+
+
+def merge_with_dictionary(
+    variables_to_merge: Mapping[str, GridDataArray | float | bool | int],
+    *args,
+    **kwargs,
+):
+    return _type_dispatch_functions_on_dict(
+        variables_to_merge, merge_unstructured_dataset, xr.merge, *args, **kwargs
     )
 
 
@@ -156,3 +263,8 @@ def is_spatial_2D(array: xu.UgridDataArray) -> bool:
     has_spatial_coords = face_dim in coords
     has_spatial_dims = face_dim in dims
     return has_spatial_dims & has_spatial_coords
+
+
+@typedispatch
+def is_spatial_2D(_: object) -> bool:
+    return False

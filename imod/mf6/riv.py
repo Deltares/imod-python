@@ -1,6 +1,5 @@
 import numpy as np
 
-from imod.mf6.auxiliary_variables import expand_transient_auxiliary_variables
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
@@ -144,19 +143,20 @@ class River(BoundaryCondition):
         validate: bool = True,
         repeat_stress=None,
     ):
-        super().__init__(locals())
-        self.dataset["stage"] = stage
-        self.dataset["conductance"] = conductance
-        self.dataset["bottom_elevation"] = bottom_elevation
-        if concentration is not None:
-            self.dataset["concentration"] = concentration
-            self.dataset["concentration_boundary_type"] = concentration_boundary_type
-            expand_transient_auxiliary_variables(self)
-        self.dataset["print_input"] = print_input
-        self.dataset["print_flows"] = print_flows
-        self.dataset["save_flows"] = save_flows
-        self.dataset["observations"] = observations
-        self.dataset["repeat_stress"] = repeat_stress
+        dict_dataset = {
+            "stage": stage,
+            "conductance": conductance,
+            "bottom_elevation": bottom_elevation,
+            "concentration": concentration,
+            "concentration_boundary_type": concentration_boundary_type,
+            "print_input": print_input,
+            "print_flows": print_flows,
+            "save_flows": save_flows,
+            "observations": observations,
+            "repeat_stress": repeat_stress,
+        }
+        super().__init__(dict_dataset)
+
         self._validate_init_schemata(validate)
 
     def _validate(self, schemata, **kwargs):
