@@ -49,6 +49,32 @@ def transient_drainage():
     return drn
 
 
+@pytest.fixture(scope="function")
+def transient_concentration_drainage():
+    layer = np.arange(1, 4)
+    y = np.arange(4.5, 0.0, -1.0)
+    x = np.arange(0.5, 5.0, 1.0)
+    elevation = xr.DataArray(
+        np.full((3, 5, 5), 1.0),
+        coords={"layer": layer, "y": y, "x": x, "dx": 1.0, "dy": -1.0},
+        dims=("layer", "y", "x"),
+    )
+    time_multiplier = xr.DataArray(
+        data=np.arange(1.0, 7.0, 1.0),
+        coords={"time": pd.date_range("2000-01-01", "2005-01-01", freq="YS")},
+        dims=("time",),
+    )
+    species_multiplier = xr.DataArray(
+        data=[35.0, 1.0],
+        coords={"species": ["salinity", "temperature"]},
+        dims=("species",),
+    )
+    conductance = time_multiplier * elevation
+    concentration = species_multiplier * conductance
+
+    drn = dict(elevation=elevation, conductance=conductance, concentration=concentration)
+    return drn
+
 def test_write(drainage, tmp_path):
     drn = imod.mf6.Drainage(**drainage)
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
@@ -95,16 +121,40 @@ def test_check_conductance_zero(drainage):
     top = 1.0
     bottom = top - idomain.coords["layer"]
 
-    dis = imod.mf6.StructuredDiscretization(top=1.0, bottom=bottom, idomain=idomain)
-
+    dis = imod.mf6.StructuredDiscretization(top=top, bottom=bottom, idomain=idomain)
     drn = imod.mf6.Drainage(**drainage)
-
     errors = drn._validate(drn._write_schemata, **dis.dataset)
-
     assert len(errors) == 1
-
     for var, error in errors.items():
         assert var == "conductance"
+
+
+def test_validate_concentration(transient_concentration_drainage):
+    idomain = transient_concentration_drainage["elevation"].astype(np.int16)
+    top = 1.0
+    bottom = top - idomain.coords["layer"]
+
+    dis = imod.mf6.StructuredDiscretization(top=top, bottom=bottom, idomain=idomain)
+    drn = imod.mf6.Drainage(**transient_concentration_drainage)
+
+    # No errors at start
+    errors = drn._validate(drn._write_schemata, **dis.dataset)
+    assert len(errors) == 0
+
+    # Error with incongruent data
+    drn.dataset["concentration"] = idomain.where(False) # Set all concentrations to NaN
+    errors = drn._validate(drn._write_schemata, **dis.dataset)
+    assert len(errors) == 1   
+    for var, error in errors.items():
+        assert var == "concentration"
+    
+    # Error with smaller than zero
+    drn.dataset["concentration"] = idomain.where(False, -200.0) # Set concentrations negative
+    errors = drn._validate(drn._write_schemata, **dis.dataset)
+    assert len(errors) == 1   
+    for var, error in errors.items():
+        assert var == "concentration"
+    
 
 
 def test_discontinuous_layer(drainage):
