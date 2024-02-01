@@ -1,5 +1,5 @@
 import abc
-from typing import Dict, List
+from typing import Dict
 
 import numpy as np
 import pandas as pd
@@ -85,7 +85,7 @@ class ExchangeCreator(abc.ABC):
     @classmethod
     @abc.abstractmethod
     def _create_global_to_local_idx(
-        cls, partition_info: List[PartitionInfo], global_cell_indices: GridDataArray
+        cls, partition_info: list[PartitionInfo], global_cell_indices: GridDataArray
     ) -> Dict[int, pd.DataFrame]:
         """
         abstract method that creates for each partition a mapping from global cell indices to local cells in that
@@ -94,7 +94,7 @@ class ExchangeCreator(abc.ABC):
         raise NotImplementedError
 
     def __init__(
-        self, submodel_labels: GridDataArray, partition_info: List[PartitionInfo]
+        self, submodel_labels: GridDataArray, partition_info: list[PartitionInfo]
     ):
         self._submodel_labels = submodel_labels
 
@@ -110,7 +110,9 @@ class ExchangeCreator(abc.ABC):
 
         self._geometric_information = self._compute_geometric_information()
 
-    def create_exchanges(self, model_name: str, layers: GridDataArray) -> List[GWFGWF]:
+    def create_gwfgwf_exchanges(
+        self, model_name: str, layers: GridDataArray
+    ) -> list[GWFGWF]:
         """
         Create GroundWaterFlow-GroundWaterFlow exchanges based on the submodel_labels array provided in the class
         constructor. The layer parameter is used to extrude the cell connection through all the layers. An exchange
@@ -193,7 +195,7 @@ class ExchangeCreator(abc.ABC):
         return exchanges
 
     def _create_global_cellidx_to_local_cellid_mapping(
-        self, partition_info: List[PartitionInfo]
+        self, partition_info: list[PartitionInfo]
     ) -> Dict[int, pd.DataFrame]:
         global_to_local_idx = self._create_global_to_local_idx(
             partition_info, self._global_cell_indices
