@@ -25,7 +25,7 @@ from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.utilities.grid import create_layered_top
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
-from imod.schemata import AllNoDataSchema, DTypeSchema
+from imod.schemata import AnyNoDataSchema, DTypeSchema
 from imod.select.points import points_indices, points_values
 from imod.typing import GridDataArray
 from imod.typing.grid import is_spatial_2D, ones_like
@@ -144,8 +144,12 @@ class Well(BoundaryCondition, IPointDataPackage):
         "concentration": [DTypeSchema(np.floating)],
     }
     _write_schemata = {
-        "y": [AllNoDataSchema()],
-        "x": [AllNoDataSchema()],
+        "screen_top": [AnyNoDataSchema()],
+        "screen_bottom": [AnyNoDataSchema()],
+        "y": [AnyNoDataSchema()],
+        "x": [AnyNoDataSchema()],
+        "rate": [AnyNoDataSchema()],
+        "concentration": [AnyNoDataSchema()],
     }
 
     _regrid_method: dict[str, Tuple[RegridderType, str]] = {}
