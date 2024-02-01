@@ -448,17 +448,6 @@ object UpdateDependencies : BuildType({
 
     steps {
         powerShell {
-            name = "Download Github CLI"
-            id = "Download_Github_CLI"
-            formatStderrAsError = true
-            scriptMode = script {
-                content = """
-                    Invoke-WebRequest -Uri  https://github.com/cli/cli/releases/download/v2.42.1/gh_2.42.1_windows_amd64.zip -OutFile gh.zip
-                    Expand-Archive gh.zip -DestinationPath gh
-                """.trimIndent()
-            }
-        }
-        powerShell {
             name = "Update dependencies"
             id = "Update_dependencies"
             workingDir = "imod-python"
@@ -482,7 +471,7 @@ object UpdateDependencies : BuildType({
                     {
                       git commit -m "Update pixi.lock"
                       git push -u origin pixi_update_%build.counter%
-                      gh pr create --title "[TEAMCITY] Update project dependencies" --body "Teamcity automatically updated the dependencies defined the pixi.toml file. Please verify that all tests succeed before merging" --reviewer JoerivanEngelen,luitjansl
+                      pixi run gh pr create --title "[TEAMCITY] Update project dependencies" --body "Teamcity automatically updated the dependencies defined the pixi.toml file. Please verify that all tests succeed before merging" --reviewer JoerivanEngelen,luitjansl
                       echo "Changes pushed and PR created"
                     }
                     else
