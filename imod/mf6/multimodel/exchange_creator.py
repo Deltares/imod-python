@@ -145,45 +145,11 @@ class ExchangeCreator(abc.ABC):
             for model_id2, connected_domain_pair in grouped_connected_models.groupby(
                 "cell_label2"
             ):
-                model_id1 = int(model_id1)
-                model_id2 = int(model_id2)
-                mapping1 = (
-                    self._global_to_local_mapping[model_id1]
-                    .drop(columns=["local_idx"])
-                    .rename(
-                        columns={"global_idx": "cell_idx1", "local_cell_id": "cell_id1"}
+                connected_cells_dataset = (
+                    self._collect_geometric_constants_connected_cells(
+                        model_id1, model_id2, connected_domain_pair, layers
                     )
                 )
-
-                mapping2 = (
-                    self._global_to_local_mapping[model_id2]
-                    .drop(columns=["local_idx"])
-                    .rename(
-                        columns={"global_idx": "cell_idx2", "local_cell_id": "cell_id2"}
-                    )
-                )
-
-                connected_cells = (
-                    connected_domain_pair.merge(mapping1)
-                    .merge(mapping2)
-                    .filter(
-                        [
-                            "cell_id1",
-                            "cell_id2",
-                            "cl1",
-                            "cl2",
-                            "hwva",
-                            "angldegx",
-                            "cdist",
-                        ]
-                    )
-                )
-
-                connected_cells = pd.merge(layers, connected_cells, how="cross")
-
-                connected_cells_dataset = self._to_xarray(connected_cells)
-
-                _adjust_gridblock_indexing(connected_cells_dataset)
 
                 exchanges.append(
                     GWFGWF(
@@ -194,6 +160,45 @@ class ExchangeCreator(abc.ABC):
                 )
 
         return exchanges
+
+    def _collect_geometric_constants_connected_cells(
+        self, model_id1: int, model_id2: int, connected_domain_pair: pd.DataFrame, layers: GridDataArray
+    ):
+        mapping1 = (
+            self._global_to_local_mapping[model_id1]
+            .drop(columns=["local_idx"])
+            .rename(columns={"global_idx": "cell_idx1", "local_cell_id": "cell_id1"})
+        )
+
+        mapping2 = (
+            self._global_to_local_mapping[model_id2]
+            .drop(columns=["local_idx"])
+            .rename(columns={"global_idx": "cell_idx2", "local_cell_id": "cell_id2"})
+        )
+
+        connected_cells = (
+            connected_domain_pair.merge(mapping1)
+            .merge(mapping2)
+            .filter(
+                [
+                    "cell_id1",
+                    "cell_id2",
+                    "cl1",
+                    "cl2",
+                    "hwva",
+                    "angldegx",
+                    "cdist",
+                ]
+            )
+        )
+
+        connected_cells = pd.merge(layers, connected_cells, how="cross")
+
+        connected_cells_dataset = self._to_xarray(connected_cells)
+
+        _adjust_gridblock_indexing(connected_cells_dataset)
+
+        return connected_cells_dataset
 
     def create_gwtgwt_exchanges(
         self, transport_model_name: str, flow_model_name: str, layers: GridDataArray
@@ -212,46 +217,11 @@ class ExchangeCreator(abc.ABC):
             for model_id2, connected_domain_pair in grouped_connected_models.groupby(
                 "cell_label2"
             ):
-                model_id1 = int(model_id1)
-                model_id2 = int(model_id2)
-                mapping1 = (
-                    self._global_to_local_mapping[model_id1]
-                    .drop(columns=["local_idx"])
-                    .rename(
-                        columns={"global_idx": "cell_idx1", "local_cell_id": "cell_id1"}
+                connected_cells_dataset = (
+                    self._collect_geometric_constants_connected_cells(
+                        model_id1, model_id2, connected_domain_pair, layers
                     )
                 )
-
-                mapping2 = (
-                    self._global_to_local_mapping[model_id2]
-                    .drop(columns=["local_idx"])
-                    .rename(
-                        columns={"global_idx": "cell_idx2", "local_cell_id": "cell_id2"}
-                    )
-                )
-
-                connected_cells = (
-                    connected_domain_pair.merge(mapping1)
-                    .merge(mapping2)
-                    .filter(
-                        [
-                            "cell_id1",
-                            "cell_id2",
-                            "cl1",
-                            "cl2",
-                            "hwva",
-                            "angldegx",
-                            "cdist",
-                        ]
-                    )
-                )
-
-                connected_cells = pd.merge(layers, connected_cells, how="cross")
-
-                connected_cells_dataset = self._to_xarray(connected_cells)
-
-                _adjust_gridblock_indexing(connected_cells_dataset)
-
                 exchanges.append(
                     GWTGWT(
                         f"{transport_model_name}_{model_id1}",
