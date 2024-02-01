@@ -197,7 +197,7 @@ class ExchangeCreator(abc.ABC):
 
     def create_gwtgwt_exchanges(
         self, transport_model_name: str, flow_model_name: str, layers: GridDataArray
-    ) -> List[GWTGWT]:
+    ) -> list[GWTGWT]:
         layers = layers.to_dataframe().filter(["layer"])
 
         connected_cells_with_geometric_info = pd.merge(
