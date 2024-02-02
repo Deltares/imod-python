@@ -48,7 +48,9 @@ class PackageGroup(collections.UserDict, abc.ABC):
         d["n_systems"] = len(self.keys())
         d["n_max_active"] = sum(
             [
-                v._max_active_n(self._cellcount_varname, nlayer, nrow, ncol)  # pylint:disable=no-member
+                v._max_active_n(
+                    self._cellcount_varname, nlayer, nrow, ncol
+                )  # pylint:disable=no-member
                 for v in self.values()
             ]
         )
