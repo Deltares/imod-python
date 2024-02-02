@@ -2,6 +2,7 @@ import os
 import re
 import sys
 import textwrap
+from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
 from unittest import mock
@@ -16,9 +17,9 @@ import imod
 from imod.mf6.model import Modflow6Model
 from imod.mf6.model_gwf import GroundwaterFlowModel
 from imod.mf6.multimodel.modelsplitter import PartitionInfo
-from imod.mf6.simulation import get_models, get_packages
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo
 from imod.schemata import ValidationError
+from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
 from imod.typing.grid import zeros_like
 
 
@@ -274,138 +275,48 @@ class TestModflow6Simulation:
         submodel_labels = xu.zeros_like(active).where(active.grid.face_y > 0.0, 1)
 
         # Act.
-        new_simulation = simulation.split(submodel_labels)
+        with pytest.raises(ValueError):
+            _ = simulation.split(submodel_labels)
 
-        # Assert.
-        assert len(get_models(new_simulation)) == 0
-        assert len(get_packages(new_simulation)) == 3
-        assert new_simulation["solver"] is simulation["solver"]
+    def test_split_multiple_models(self, tmp_path, circle_model):
+        # Arrange.
+        oc2 = deepcopy(circle_model["GWF_1"]["oc"])
+        npf2 = deepcopy(circle_model["GWF_1"]["npf"])
+        disv2 = deepcopy(circle_model["GWF_1"]["disv"])
+        sto2 = deepcopy(circle_model["GWF_1"]["sto"])
+        chd2 = deepcopy(circle_model["GWF_1"]["chd"])
+        rch2 = deepcopy(circle_model["GWF_1"]["rch"])
+        ic2 = deepcopy(circle_model["GWF_1"]["ic"])
+        gwf_2 = GroundwaterFlowModel()
+        gwf_2["oc"] = oc2
+        gwf_2["npf"] = npf2
+        gwf_2["disv"] = disv2
+        gwf_2["sto"] = sto2
+        gwf_2["chd"] = chd2
+        gwf_2["rch"] = rch2
+        gwf_2["ic"] = ic2
+        circle_model["GWF_2"] = gwf_2
+        circle_model["solver"].add_model_to_solution("GWF_2")
+
+        active = circle_model["GWF_1"].domain.sel(layer=1)
+        submodel_labels = xu.zeros_like(active)
+        submodel_labels.values[90:] = 1
+
+        new_simulation = circle_model.split(submodel_labels)
+
         assert (
-            new_simulation["time_discretization"] is simulation["time_discretization"]
+            new_simulation["split_exchanges"][0]["model_name_1"].values[()] == "GWF_1_0"
         )
-        assert new_simulation["disv"] is simulation["disv"]
-
-    @mock.patch("imod.mf6.simulation.slice_model", autospec=True)
-    @mock.patch("imod.mf6.simulation.ExchangeCreator_Unstructured")
-    def test_split_multiple_models(
-        self,
-        exchange_creator_unstructured_mock,
-        slice_model_mock,
-        circle_dis,
-        setup_simulation,
-    ):
-        # Arrange.
-        idomain, _, _ = circle_dis
-
-        simulation = setup_simulation
-
-        model_mock1 = MagicMock(spec_set=GroundwaterFlowModel)
-        model_mock1._model_id = "test_model_id1"
-
-        model_mock2 = MagicMock(spec_set=GroundwaterFlowModel)
-        model_mock2._model_id = "test_model_id2"
-
-        simulation["test_model1"] = model_mock1
-        simulation["test_model2"] = model_mock2
-
-        simulation["solver"].dataset = xr.Dataset(
-            {"modelnames": ["test_model1", "test_model2"]}
+        assert (
+            new_simulation["split_exchanges"][0]["model_name_2"].values[()] == "GWF_1_1"
         )
-
-        slice_model_mock.return_value = MagicMock(spec_set=GroundwaterFlowModel)
-
-        active = idomain.sel(layer=1)
-        submodel_labels = xu.zeros_like(active).where(active.grid.face_y > 0.0, 1)
-
-        # Act.
-        new_simulation = simulation.split(submodel_labels)
-
-        # Assert.
-        new_models = get_models(new_simulation)
-        assert slice_model_mock.call_count == 4
-        assert len(new_models) == 4
-
-        # fmt: off
-        assert len([model_name for model_name in new_models.keys() if "test_model1" in model_name]) == 2
-        assert len([model_name for model_name in new_models.keys() if "test_model2" in model_name]) == 2
-
-        active_domain1 = submodel_labels.where(submodel_labels == 0, 0).where(submodel_labels != 0, 1)
-        active_domain2 = submodel_labels.where(submodel_labels == 1, 0).where(submodel_labels != 1, 1)
-        # fmt: on
-
-        expected_slice_model_calls = [
-            (PartitionInfo(id=0, active_domain=active_domain1), model_mock1),
-            (PartitionInfo(id=0, active_domain=active_domain1), model_mock2),
-            (PartitionInfo(id=1, active_domain=active_domain2), model_mock1),
-            (PartitionInfo(id=1, active_domain=active_domain2), model_mock2),
-        ]
-
-        for expected_call in expected_slice_model_calls:
-            assert any(
-                compare_submodel_partition_info(expected_call[0], call_args[0][0])
-                and (expected_call[1] is call_args[0][1])
-                for call_args in slice_model_mock.call_args_list
-            )
-
-    @mock.patch("imod.mf6.simulation.slice_model", autospec=True)
-    @mock.patch("imod.mf6.simulation.ExchangeCreator_Structured", autospec=True)
-    @mock.patch("imod.mf6.simulation.create_partition_info")
-    def test_split_multiple_models_creates_expected_number_of_exchanges(
-        self,
-        create_partition_info_mock,
-        exchange_creator_mock,
-        slice_model_mock,
-        basic_dis,
-        setup_simulation,
-    ):
-        # Arrange.
-        idomain, top, bottom = basic_dis
-
-        simulation = setup_simulation
-
-        model_mock1 = MagicMock(spec_set=GroundwaterFlowModel)
-        model_mock1._model_id = "test_model_id1"
-        model_mock1.domain = idomain
-
-        model_mock2 = MagicMock(spec_set=GroundwaterFlowModel)
-        model_mock2._model_id = "test_model_id2"
-        model_mock2.domain = idomain
-
-        simulation["test_model1"] = model_mock1
-        simulation["test_model2"] = model_mock2
-
-        simulation["solver"].dataset = xr.Dataset(
-            {"modelnames": ["test_model1", "test_model2"]}
+        assert (
+            new_simulation["split_exchanges"][1]["model_name_1"].values[()] == "GWF_2_0"
         )
-
-        slice_model_mock.return_value = MagicMock(spec_set=GroundwaterFlowModel)
-
-        active = idomain.sel(layer=1)
-        submodel_labels = xr.zeros_like(active).where(active.y > 50, 1)
-
-        create_partition_info_mock.return_value = [
-            PartitionInfo(id=0, active_domain=xr.DataArray(0)),
-            PartitionInfo(id=1, active_domain=xr.DataArray(1)),
-        ]
-        # Act.
-        _ = simulation.split(submodel_labels)
-
-        # Assert.
-        exchange_creator_mock.assert_called_with(
-            submodel_labels, create_partition_info_mock()
+        assert (
+            new_simulation["split_exchanges"][1]["model_name_2"].values[()] == "GWF_2_1"
         )
-
-        # fmt: off
-        assert exchange_creator_mock.return_value.create_gwfgwf_exchanges.call_count == 2  # noqa: E501
-        call1 = exchange_creator_mock.return_value.create_gwfgwf_exchanges.call_args_list[0][0]  # noqa: E501
-        call2 = exchange_creator_mock.return_value.create_gwfgwf_exchanges.call_args_list[1][0]  # noqa: E501
-        # fmt: on
-
-        assert call1[0] == "test_model1"
-        xr.testing.assert_equal(call1[1], idomain.layer)
-
-        assert call2[0] == "test_model2"
-        xr.testing.assert_equal(call2[1], idomain.layer)
+        assert_simulation_can_run(new_simulation, "disv", tmp_path)
 
     @pytest.mark.usefixtures("transient_twri_model")
     def test_exchanges_in_simulation_file(self, transient_twri_model, tmp_path):
