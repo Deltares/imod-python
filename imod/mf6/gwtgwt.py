@@ -43,14 +43,14 @@ class GWTGWT(ExchangeBase):
             "layer": layer,
             "model_name_1": transport_model_id1,
             "model_name_2": transport_model_id2,
-            "flow_model_name_1" : flow_model_id1,
-            "flow_model_name_2" : flow_model_id2,            
+            "flow_model_name_1": flow_model_id1,
+            "flow_model_name_2": flow_model_id2,
             "ihc": xr.DataArray(np.ones_like(cl1, dtype=int)),
             "cl1": cl1,
             "cl2": cl2,
             "hwva": hwva,
         }
-        super().__init__(dict_dataset)        
+        super().__init__(dict_dataset)
 
         auxiliary_variables = [var for var in [angldegx, cdist] if var is not None]
         if auxiliary_variables:

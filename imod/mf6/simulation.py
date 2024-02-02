@@ -952,7 +952,7 @@ class Modflow6Simulation(collections.UserDict):
             flow_model_name, flow_model.domain.layer
         )
         transport_models = self.get_models_of_type("gwt6")
-        if len(transport_models) > 0:
+        if any(transport_models):
             for tpt_model_name in transport_models:
                 exchanges += exchange_creator.create_gwtgwt_exchanges(
                     tpt_model_name, flow_model_name, model.domain.layer
