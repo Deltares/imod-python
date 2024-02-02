@@ -11,6 +11,7 @@ Hence:
 * Tests whether writing and saving results in the same object state (as Python
   None is turned into numpy NaN).
 """
+
 import inspect
 
 import numpy as np
