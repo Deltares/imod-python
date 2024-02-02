@@ -54,7 +54,7 @@ def test_to_mf6_pkg__high_lvl_stationary(basic_dis, well_high_lvl_test_data_stat
     np.testing.assert_equal(mf6_ds["rate"].values, rate_expected)
 
 
-def test_to_mf6_pkg__validate(basic_dis, well_high_lvl_test_data_stationary):
+def test_to_mf6_pkg__validate(well_high_lvl_test_data_stationary):
     # Arrange
     wel = imod.mf6.Well(*well_high_lvl_test_data_stationary)
 
