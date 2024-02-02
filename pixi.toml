@@ -56,7 +56,7 @@ bottleneck = "*"
 cftime = ">=1"
 contextily = ">=1"
 cytoolz = "*"
-dask = "<2024.1.0" # Newer version incompatible with raterio
+dask = "<2024.1.0" # Newer version incompatible with rasterio
 fastcore = "*"
 flopy = "*"
 geopandas = "*"
