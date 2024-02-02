@@ -7,6 +7,7 @@ import jetbrains.buildServer.configs.kotlin.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.projectFeatures.ProjectReportTab
 import jetbrains.buildServer.configs.kotlin.projectFeatures.projectReportTab
 import jetbrains.buildServer.configs.kotlin.triggers.finishBuildTrigger
+import jetbrains.buildServer.configs.kotlin.triggers.schedule
 import jetbrains.buildServer.configs.kotlin.triggers.vcs
 
 /*
@@ -66,6 +67,7 @@ project {
     }
 
     subProject(Nightly)
+    subProject(Pixi)
 }
 
 object GitHubIntegrationTemplate : Template({
@@ -421,5 +423,76 @@ object NightlyTests : BuildType({
                 artifactRules = "+:coverage.zip => ."
             }
         }
+    }
+})
+
+object Pixi : Project({
+    name = "Pixi"
+
+    buildType(UpdateDependencies)
+})
+
+object UpdateDependencies : BuildType({
+    name = "Update Dependencies"
+
+    params {
+        param("GH_USER", "deltares-service-account")
+        text("env.GH_TOKEN", "%github_deltares-service-account_access_token%")
+    }
+
+    vcs {
+        root(AbsoluteId("iMOD6_IMODPython_ImodPython"), "+:. => imod-python")
+
+        cleanCheckout = true
+    }
+
+    steps {
+        powerShell {
+            name = "Update dependencies"
+            id = "Update_dependencies"
+            workingDir = "imod-python"
+            scriptMode = script {
+                content = """
+                    echo "Create update branch"
+                    git remote set-url origin https://%GH_USER%:%env.GH_TOKEN%@github.com/Deltares/imod-python.git
+                    git checkout -b pixi_update_%build.counter%
+                    
+                    echo "Update dependencies" 
+                    del pixi.lock
+                    pixi install
+                    
+                    echo "Add any changes" 
+                    git add pixi.lock
+                    
+                    if (git status -suno) 
+                    {
+                      git commit -m "Update pixi.lock"
+                      git push -u origin pixi_update_%build.counter%
+                      pixi run gh pr create --title "[TEAMCITY] Update project dependencies" --body "Teamcity automatically updated the dependencies defined the pixi.toml file. Please verify that all tests succeed before merging" --reviewer JoerivanEngelen,luitjansl
+                      echo "Changes pushed and PR created"
+                    }
+                    else
+                    {
+                      echo "No changes found"
+                    }
+                """.trimIndent()
+            }
+            noProfile = false
+        }
+    }
+
+    triggers {
+        schedule {
+            schedulingPolicy = weekly {
+                hour = 15
+            }
+            branchFilter = "+:<default>"
+            triggerBuild = always()
+            withPendingChangesOnly = false
+        }
+    }
+
+    failureConditions {
+        errorMessage = true
     }
 })

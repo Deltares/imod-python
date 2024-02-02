@@ -60,6 +60,7 @@ dask = "<2024.1.0" # Newer version incompatible with rasterio
 fastcore = "*"
 flopy = "*"
 geopandas = "*"
+gh = "*"
 graphviz = "*"
 hypothesis = "*"
 jinja2 = "*"
