@@ -1014,9 +1014,6 @@ class Modflow6Simulation(collections.UserDict):
     def _set_exchange_options(self):
         # collect some options that we will auto-set
         for exchange in self["split_exchanges"]:
-            if isinstance(exchange, GWFGWT):
-                # that package does not have options
-                continue
             if isinstance(exchange, GWFGWF):
                 model_name_1 = exchange.dataset["model_name_1"].values[()]
                 model_1 = self[model_name_1]
