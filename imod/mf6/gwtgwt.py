@@ -15,7 +15,8 @@ class GWTGWT(ExchangeBase):
     This package is for writing an exchange file, used for splitting up a model
     into different submodels (that can be solved in parallel). It (usually)
     is not instantiated by users, but created by the "split" method of the
-    simulation class."""
+    simulation class.
+    """
 
     _auxiliary_data = {"auxiliary_data": "variable"}
     _pkg_id = "gwtgwt"
