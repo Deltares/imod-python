@@ -1,6 +1,7 @@
 """
 Functions to load sample data.
 """
+
 import importlib
 from pathlib import Path
 from typing import Union

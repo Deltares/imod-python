@@ -27,6 +27,7 @@ These data consist of values for every single cell. Xarray provides many
 conveniences for such data, such as plotting or selecting. To demonstrate,
 we'll get some sample data provided with the imod package.
 """
+
 import xarray as xr
 
 # %%

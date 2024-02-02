@@ -547,9 +547,9 @@ class Package(PackageBase, IPackage, abc.ABC):
                     if is_scalar(da.values[()]):
                         masked[var] = da.values[()]  # For scalars, such as options
                     else:
-                        masked[
-                            var
-                        ] = da  # For example for arrays with only a layer dimension
+                        masked[var] = (
+                            da  # For example for arrays with only a layer dimension
+                        )
                 else:
                     masked[var] = None
 
