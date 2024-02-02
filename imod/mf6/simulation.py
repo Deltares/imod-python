@@ -1024,7 +1024,7 @@ class Modflow6Simulation(collections.UserDict):
                     xt3d=model_1["npf"].get_xt3d_option(),
                     newton=model_1.is_use_newton(),
                 )
-            if isinstance(exchange, GWTGWT):
+            elif isinstance(exchange, GWTGWT):
                 # TODO: issue #747
                 continue
 
