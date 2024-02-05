@@ -1,7 +1,10 @@
 import numpy as np
 import pytest
 
+from imod.mf6.adv import Advection
+from imod.mf6.dsp import Dispersion
 from imod.mf6.multimodel.modelsplitter import create_partition_info, slice_model
+from imod.mf6.simulation import Modflow6Simulation
 from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
 from imod.typing.grid import zeros_like
 
@@ -69,6 +72,17 @@ def test_split_flow_and_transport_model(tmp_path, flow_transport_simulation):
     assert_simulation_can_run(new_simulation, "dis", tmp_path)
 
 
+def _edit_fixture(simulation: Modflow6Simulation) -> Modflow6Simulation:
+    # TODO: put the other transport models back when #797 is solved
+    simulation.pop("tpt_a")
+    simulation.pop("tpt_c")
+    simulation.pop("tpt_d")
+    simulation["transport_solver"].remove_model_from_solution("tpt_a")
+    simulation["transport_solver"].remove_model_from_solution("tpt_c")
+    simulation["transport_solver"].remove_model_from_solution("tpt_d")
+    return simulation
+
+
 @pytest.mark.usefixtures("flow_transport_simulation")
 def test_split_flow_and_transport_model_evaluate_output(
     tmp_path, flow_transport_simulation
@@ -78,13 +92,7 @@ def test_split_flow_and_transport_model_evaluate_output(
     flow_model = simulation["flow"]
     active = flow_model.domain
 
-    # TODO: put the other transport models back when #797 is solved
-    simulation.pop("tpt_a")
-    simulation.pop("tpt_c")
-    simulation.pop("tpt_d")
-    simulation["transport_solver"].remove_model_from_solution("tpt_a")
-    simulation["transport_solver"].remove_model_from_solution("tpt_c")
-    simulation["transport_solver"].remove_model_from_solution("tpt_d")
+    simulation = _edit_fixture(simulation)
 
     # create label array
     submodel_labels = zeros_like(active)
@@ -117,4 +125,45 @@ def test_split_flow_and_transport_model_evaluate_output(
         original_conc.sel(time=200).values,
         rtol=1e-4,
         atol=0.011,
+    )
+
+
+@pytest.mark.usefixtures("flow_transport_simulation")
+@pytest.mark.parametrize("advection_scheme", ["TVD", "upstream", "central"])
+@pytest.mark.parametrize("dsp_xt3d", [True, False])
+def test_split_flow_and_transport_settings(
+    tmp_path, flow_transport_simulation, advection_scheme, dsp_xt3d
+):
+    simulation = flow_transport_simulation
+
+    flow_model = simulation["flow"]
+    active = flow_model.domain
+
+    simulation = _edit_fixture(simulation)
+    simulation["tpt_b"]["dsp"] = Dispersion(
+        diffusion_coefficient=1e-2,
+        longitudinal_horizontal=20.0,
+        transversal_horizontal1=2.0,
+        xt3d_off=dsp_xt3d,
+        xt3d_rhs=dsp_xt3d,
+    )
+    simulation["tpt_b"]["adv"] = Advection(scheme=advection_scheme)
+    # create label array
+    submodel_labels = zeros_like(active)
+    submodel_labels = submodel_labels.drop_vars("layer")
+    submodel_labels.values[:, :, 30:] = 1
+    submodel_labels = submodel_labels.sel(layer=0, drop=True)
+
+    new_simulation = simulation.split(submodel_labels)
+    assert (
+        new_simulation["split_exchanges"][1].dataset["adv_scheme"].values[()]
+        == advection_scheme
+    )
+    assert (
+        new_simulation["split_exchanges"][1].dataset["dsp_xt3d_off"].values[()]
+        == dsp_xt3d
+    )
+    assert (
+        new_simulation["split_exchanges"][1].dataset["dsp_xt3d_rhs"].values[()]
+        == dsp_xt3d
     )

@@ -1016,7 +1016,7 @@ class Modflow6Simulation(collections.UserDict):
             self["split_exchanges"] = []
         self["split_exchanges"].extend(exchanges_list)
 
-    def _set_flow_exchange_options(self)-> None:
+    def _set_flow_exchange_options(self) -> None:
         # collect some options that we will auto-set
         for exchange in self["split_exchanges"]:
             if isinstance(exchange, GWFGWF):
@@ -1030,31 +1030,28 @@ class Modflow6Simulation(collections.UserDict):
                     newton=model_1.is_use_newton(),
                 )
 
-    def _set_transport_exchange_options(self) -> None:      
+    def _set_transport_exchange_options(self) -> None:
         for exchange in self["split_exchanges"]:
             if isinstance(exchange, GWTGWT):
                 model_name_1 = exchange.dataset["model_name_1"].values[()]
-                model_name_2 = exchange.dataset["model_name_2"].values[()]                
                 model_1 = self[model_name_1]
-                model_2 = self[model_name_2]                
                 advection_key = model_1._get_pkgkey("adv")
                 dispersion_key = model_1._get_pkgkey("dsp")
-                
+
                 scheme = None
                 xt3d_off = None
                 xt3d_rhs = None
                 if advection_key is not None:
-                    scheme  = model_1[advection_key].dataset["scheme"].values[()]
+                    scheme = model_1[advection_key].dataset["scheme"].values[()]
                 if dispersion_key is not None:
-                    xt3d_off  = model_1[dispersion_key].dataset["xt3d_off"].values[()]
-                    xt3d_rhs  = model_1[dispersion_key].dataset["xt3d_rhs"].values[()]                
+                    xt3d_off = model_1[dispersion_key].dataset["xt3d_off"].values[()]
+                    xt3d_rhs = model_1[dispersion_key].dataset["xt3d_rhs"].values[()]
                 exchange.set_options(
-                    save_flows = model_1["oc"].is_budget_output,
-                    adv_scheme = scheme,
-                    dsp_xt3d_off = xt3d_off,
-                    dsp_xt3d_rhs = xt3d_rhs,           
+                    save_flows=model_1["oc"].is_budget_output,
+                    adv_scheme=scheme,
+                    dsp_xt3d_off=xt3d_off,
+                    dsp_xt3d_rhs=xt3d_rhs,
                 )
-
 
     def _filter_inactive_cells_from_exchanges(self) -> None:
         for ex in self["split_exchanges"]:
