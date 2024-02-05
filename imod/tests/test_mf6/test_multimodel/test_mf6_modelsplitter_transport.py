@@ -39,7 +39,7 @@ def test_split_flow_and_transport_model(tmp_path, flow_transport_simulation):
 
     submodel_labels = zeros_like(active)
     submodel_labels = submodel_labels.drop_vars("layer")
-    submodel_labels.values[:, :, 50:] = 1
+    submodel_labels.values[:, :, 15:] = 1
     submodel_labels = submodel_labels.sel(layer=0, drop=True)
 
     new_simulation = simulation.split(submodel_labels)
@@ -69,6 +69,18 @@ def test_split_flow_and_transport_model(tmp_path, flow_transport_simulation):
 
     assert new_simulation["gwtgwf_exchanges"][7]["model_name_1"].values[()] == "flow_1"
     assert new_simulation["gwtgwf_exchanges"][7]["model_name_2"].values[()] == "tpt_d_1"
+    for species_name in ["a", "b", "c", "d"]:
+        assert list(
+            new_simulation[f"tpt_{species_name}_0"]["ssm"]
+            .dataset["package_names"]
+            .values
+        ) == ["chd", "well"]
+        assert list(
+            new_simulation[f"tpt_{species_name}_1"]["ssm"]
+            .dataset["package_names"]
+            .values
+        ) == ["chd", "rch", "well"]
+
     assert_simulation_can_run(new_simulation, "dis", tmp_path)
 
 

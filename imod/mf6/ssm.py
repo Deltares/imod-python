@@ -1,5 +1,6 @@
 import numpy as np
 
+from imod.logging import logger
 from imod.mf6 import GroundwaterFlowModel
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.schemata import DTypeSchema
@@ -83,6 +84,7 @@ class SourceSinkMixing(BoundaryCondition):
         print_flows: bool = False,
         save_flows: bool = False,
         validate: bool = True,
+        is_split: bool = False,
     ):
         """
         Derive a Source and Sink Mixing package from a Groundwater Flow model's
@@ -113,13 +115,14 @@ class SourceSinkMixing(BoundaryCondition):
             Flag to indicate whether the package should be validated upon
             initialization. This raises a ValidationError if package input is
             provided in the wrong manner. Defaults to True.
+        is_split:  ({True, False}, optional)
+            Flag to indicate if the simulation has been split into partitions.
         """
         if not isinstance(model, GroundwaterFlowModel):
             raise TypeError(
                 "model must be a GroundwaterFlowModel, received instead: "
                 f"{type(model).__name__}"
             )
-
         names = []
         boundary_types = []
         aux_var_names = []
@@ -146,7 +149,12 @@ class SourceSinkMixing(BoundaryCondition):
                 aux_var_names.append(species)
 
         if len(names) == 0:
-            raise ValueError("flow model does not contain boundary conditions")
+            msg = "flow model does not contain boundary conditions"
+            if is_split:
+                logger.info(f"{msg}, returning None instead of SourceSinkMixing")
+                return
+            else:
+                raise ValueError(msg)
 
         return SourceSinkMixing(
             names,
