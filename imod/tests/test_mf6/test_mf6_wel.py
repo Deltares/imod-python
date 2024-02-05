@@ -156,6 +156,17 @@ def test_to_mf6_pkg__high_lvl_transient(basic_dis, well_high_lvl_test_data_trans
     np.testing.assert_equal(mf6_ds["rate"].values, rate_expected)
 
 
+def test_is_empty(well_high_lvl_test_data_transient):
+    # Arrange
+    wel = imod.mf6.Well(*well_high_lvl_test_data_transient)
+    empty_wel_args = ([] for i in range(len(well_high_lvl_test_data_transient)))
+    wel_empty = imod.mf6.Well(*empty_wel_args, validate=False)
+
+    # Act/Assert
+    assert not wel.is_empty()
+    assert wel_empty.is_empty()
+
+
 class ClipBoxCases:
     @staticmethod
     def case_clip_xy(parameterizable_basic_dis):
