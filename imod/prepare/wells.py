@@ -1,6 +1,7 @@
 """
 Assign wells to layers.
 """
+
 from typing import Optional, Union
 
 import numpy as np

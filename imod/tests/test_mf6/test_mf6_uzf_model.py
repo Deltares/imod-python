@@ -111,9 +111,9 @@ def uzf_model():
     )
     uds["extinction_depth"] = ones_shape_time * -10.0
 
-    uds[
-        "simulate_groundwater_seepage"
-    ] = False  # Model doesn't converge if set to True....
+    uds["simulate_groundwater_seepage"] = (
+        False  # Model doesn't converge if set to True....
+    )
 
     gwf_model["uzf"] = imod.mf6.UnsaturatedZoneFlow(**uds)
 
