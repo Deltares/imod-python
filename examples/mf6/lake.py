@@ -17,6 +17,7 @@ In overview, we'll set the following steps:
     * Visualize the results.
 
 """
+
 # %%
 # We'll start with the usual imports. As this is an simple (synthetic)
 # structured model, we can make due with few packages.

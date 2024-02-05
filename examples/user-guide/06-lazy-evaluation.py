@@ -20,6 +20,7 @@ has to be visualized or when the data has to be saved to disk.
 
 We will explain these concepts with a number of examples.
 """
+
 # %%
 import dask.array
 import numpy as np

@@ -23,6 +23,7 @@ domain has a concentration of one:
   shape of the front of the solute plume.
 
 """
+
 # %%
 
 import numpy as np

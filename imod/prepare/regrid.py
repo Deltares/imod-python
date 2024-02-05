@@ -24,6 +24,7 @@ and weights that have been gathered by _weights_1d, these methods fetch the
 values from the source array (src), and pass it on to the aggregation method.
 The single aggregated value is then filled into the destination array (dst).
 """
+
 from collections import namedtuple
 
 import dask

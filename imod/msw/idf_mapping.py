@@ -18,8 +18,8 @@ class IdfMapping(MetaSwapPackage):
         "svat": VariableMetaData(10, 1, 9999999, int),
         "rows": VariableMetaData(10, 1, 9999999, int),
         "columns": VariableMetaData(10, 1, 9999999, int),
-        "y_grid": VariableMetaData(15, 0.0, 9999999.0, float),
-        "x_grid": VariableMetaData(15, 0.0, 9999999.0, float),
+        "y_grid": VariableMetaData(15, -9999999.0, 9999999.0, float),
+        "x_grid": VariableMetaData(15, -9999999.0, 9999999.0, float),
     }
 
     _with_subunit = ()
