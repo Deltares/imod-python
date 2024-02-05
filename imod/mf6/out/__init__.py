@@ -37,6 +37,7 @@ def open_cbc(
 (These could be implemented via Reader classes, but why bother with mutable
 state or a class with exclusively staticmethods?)
 """
+
 from typing import Any, Callable, Dict, Optional, Union
 
 import numpy as np

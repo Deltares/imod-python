@@ -302,9 +302,9 @@ def test_to_mf6_remove_invalid_edges(
 ):
     # Arrange.
     idomain, top, bottom = parameterizable_basic_dis
-    idomain.loc[
-        {"x": idomain.coords["x"][-1]}
-    ] = inactivity_marker  # make cells inactive
+    idomain.loc[{"x": idomain.coords["x"][-1]}] = (
+        inactivity_marker  # make cells inactive
+    )
     k = ones_like(top)
 
     barrier_y = [0.0, 2.0]
