@@ -1,6 +1,7 @@
 """
 Utilities for parsing a project file.
 """
+
 import shlex
 from collections import defaultdict
 from datetime import datetime

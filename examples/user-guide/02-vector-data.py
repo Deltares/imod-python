@@ -35,6 +35,7 @@ In Python, such data can be represented by a
 DataFrame to store tabular data (the attribute table), and adds a geometry
 column to store the geospatial coordinates.
 """
+
 # %%
 import geopandas as gpd
 import numpy as np

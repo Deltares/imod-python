@@ -73,8 +73,10 @@ def grid_data_unstructured_layered(
 
 
 def _make_model(
-    grid_data_function: Callable[[type, Union[int, float], float], xr.DataArray]
-    | Callable[[type, Union[int, float], float], xu.UgridDataArray],
+    grid_data_function: (
+        Callable[[type, Union[int, float], float], xr.DataArray]
+        | Callable[[type, Union[int, float], float], xu.UgridDataArray]
+    ),
     cellsize: float,
 ) -> imod.mf6.GroundwaterFlowModel:
     gwf_model = imod.mf6.GroundwaterFlowModel()

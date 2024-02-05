@@ -7,6 +7,7 @@ examples that are not focused on building a simulation, but on doing something
 with it (such as regridding).
 
 """
+
 import numpy as np
 import scipy.ndimage
 import xarray as xr

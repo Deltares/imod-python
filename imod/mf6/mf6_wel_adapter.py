@@ -11,6 +11,7 @@ The high-level class contains grids with x, y, z coordinates, closely linked to
 GIS systems. The low-level classes contain a dataset based on cellid,
 consisting of layer, row, and column, closely resembling input for Modflow6.
 """
+
 from typing import Optional
 
 import numpy as np
