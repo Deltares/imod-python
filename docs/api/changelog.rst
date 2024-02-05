@@ -20,6 +20,10 @@ Fixed
 - Improved performance for merging structured multimodel Modflow 6 output
 - Bug where :func:`imod.formats.idf.open_subdomains` did not properly support custom
   patterns
+- Added missing validation for ``concentration`` for :class:`imod.mf6.Drainage` and
+  :class:`imod.mf6.EvapoTranspiration` package
+- Added validation :class:`imod.mf6.Well` package, no ``np.nan`` values are
+  allowed
 
 Changed
 ~~~~~~~

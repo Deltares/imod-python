@@ -2,7 +2,7 @@ import numpy as np
 
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.regridding_utils import RegridderType
-from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
+from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
     AllNoDataSchema,
@@ -78,6 +78,17 @@ class Drainage(BoundaryCondition):
             CoordsSchema(("layer",)),
             BOUNDARY_DIMS_SCHEMA,
         ],
+        "concentration": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(
+                (
+                    "species",
+                    "layer",
+                )
+            ),
+            CONC_DIMS_SCHEMA,
+        ],
         "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
         "save_flows": [DTypeSchema(np.bool_), DimsSchema()],
     }
@@ -88,6 +99,7 @@ class Drainage(BoundaryCondition):
             AllInsideNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ],
         "conductance": [IdentityNoDataSchema("elevation"), AllValueSchema(">", 0.0)],
+        "concentration": [IdentityNoDataSchema("elevation"), AllValueSchema(">=", 0.0)],
     }
 
     _period_data = ("elevation", "conductance")
