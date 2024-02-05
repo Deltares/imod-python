@@ -195,6 +195,9 @@ class Well(BoundaryCondition, IPointDataPackage):
             "concentration_boundary_type": concentration_boundary_type,
         }
         super().__init__(dict_dataset)
+        # Set index as coordinate
+        index_coord = np.arange(self.dataset.dims["index"])
+        self.dataset = self.dataset.assign_coords(index = index_coord)
         self._validate_init_schemata(validate)
 
     @classmethod
