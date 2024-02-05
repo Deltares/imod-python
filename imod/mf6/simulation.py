@@ -913,6 +913,16 @@ class Modflow6Simulation(collections.UserDict):
                 "Unable to split simulation. Splitting can only be done on simulations that haven't been split."
             )
 
+        flow_models = self.get_models_of_type("gwf6")
+        transport_models = self.get_models_of_type("gwt6")
+        if any(transport_models) and len(flow_models) != 1:
+            raise ValueError(
+                "splitting of simulations with more (or less) than 1 flow model currently not supported, if a transport model is present"
+            )
+
+        if not any(flow_models) and not any(transport_models):
+            raise ValueError("a simulation without any models cannot be split.")
+
         original_models = get_models(self)
         original_packages = get_packages(self)
 
@@ -942,20 +952,20 @@ class Modflow6Simulation(collections.UserDict):
                 new_simulation[solution_name].add_model_to_solution(new_model_name)
 
         exchanges = []
-        flow_models = self.get_models_of_type("gwf6")
-        if len(flow_models) != 1:
+
+        for flow_model_name, flow_model in flow_models.items():
             raise ValueError(
                 "splitting of simulations with more (or less) than 1 flow model currently not supported"
             )
         flow_model_name = list(flow_models.keys())[0]
         flow_model = self[flow_model_name]
-        exchanges += exchange_creator.create_gwfgwf_exchanges(
-            flow_model_name, flow_model.domain.layer
-        )
-        transport_models = self.get_models_of_type("gwt6")
-        if len(transport_models) > 0:
+            exchanges += exchange_creator.create_gwfgwf_exchanges(
+                flow_model_name, flow_model.domain.layer
+            )
+        if any(transport_models):
             for tpt_model_name in transport_models:
                 exchanges += exchange_creator.create_gwtgwt_exchanges(
+                    tpt_model_name, flow_model_name, model.domain.layer
                     tpt_model_name, flow_model_name, model.domain.layer
                 )
         new_simulation._add_modelsplit_exchanges(exchanges)
@@ -1029,7 +1039,7 @@ class Modflow6Simulation(collections.UserDict):
                     xt3d=model_1["npf"].get_xt3d_option(),
                     newton=model_1.is_use_newton(),
                 )
-            if isinstance(exchange, GWTGWT):
+            elif isinstance(exchange, GWTGWT):
                 # TODO: issue #747
                 continue
 

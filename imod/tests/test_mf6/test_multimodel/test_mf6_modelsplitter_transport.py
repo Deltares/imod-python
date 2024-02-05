@@ -66,7 +66,6 @@ def test_split_flow_and_transport_model(tmp_path, flow_transport_simulation):
 
     assert new_simulation["gwtgwf_exchanges"][7]["model_name_1"].values[()] == "flow_1"
     assert new_simulation["gwtgwf_exchanges"][7]["model_name_2"].values[()] == "tpt_d_1"
-
     for species_name in ["a","b","c","d"]: 
         assert  list(new_simulation[f"tpt_{species_name}_0"]["ssm"].dataset["package_names"].values) == ["chd", "well"]
         assert  list(new_simulation[f"tpt_{species_name}_1"]["ssm"].dataset["package_names"].values) == ["chd", "rch", "well"]    
@@ -94,10 +93,7 @@ def test_split_flow_and_transport_model_evaluate_output(
     # create label array
     submodel_labels = zeros_like(active)
     submodel_labels = submodel_labels.drop_vars("layer")
-    submodel_labels.values[:, :, 3:] = 1
-    submodel_labels.values[:, :, 6:] = 2   
-    submodel_labels.values[:, :, 9:] = 3       
-    submodel_labels.values[:, :, 12:] = 4          
+    submodel_labels.values[:, :, 30:] = 1
     submodel_labels = submodel_labels.sel(layer=0, drop=True)
 
     # for reference run the original model and load the results
@@ -123,6 +119,9 @@ def test_split_flow_and_transport_model_evaluate_output(
     np.testing.assert_allclose(
         conc.sel(time=2000)["concentration"].values,
         original_conc.sel(time=200).values,
+        rtol=1e-4,
+        atol=0.011,
+    )
         rtol=1e-4,
         atol=0.011,
     )

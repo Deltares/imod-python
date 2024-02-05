@@ -15,7 +15,8 @@ class GWTGWT(ExchangeBase):
     This package is for writing an exchange file, used for splitting up a model
     into different submodels (that can be solved in parallel). It (usually)
     is not instantiated by users, but created by the "split" method of the
-    simulation class."""
+    simulation class.
+    """
 
     _auxiliary_data = {"auxiliary_data": "variable"}
     _pkg_id = "gwtgwt"
@@ -36,18 +37,20 @@ class GWTGWT(ExchangeBase):
         angldegx: Optional[xr.DataArray] = None,
         cdist: Optional[xr.DataArray] = None,
     ):
-        super().__init__(locals())
-        self.dataset["cell_id1"] = cell_id1
-        self.dataset["cell_id2"] = cell_id2
-        self.dataset["layer"] = layer
-        self.dataset["model_name_1"] = transport_model_id1
-        self.dataset["model_name_2"] = transport_model_id2
-        self.dataset["flow_model_name_1"] = flow_model_id1
-        self.dataset["flow_model_name_2"] = flow_model_id2
-        self.dataset["ihc"] = xr.DataArray(np.ones_like(cl1, dtype=int))
-        self.dataset["cl1"] = cl1
-        self.dataset["cl2"] = cl2
-        self.dataset["hwva"] = hwva
+        dict_dataset = {
+            "cell_id1": cell_id1,
+            "cell_id2": cell_id2,
+            "layer": layer,
+            "model_name_1": transport_model_id1,
+            "model_name_2": transport_model_id2,
+            "flow_model_name_1": flow_model_id1,
+            "flow_model_name_2": flow_model_id2,
+            "ihc": xr.DataArray(np.ones_like(cl1, dtype=int)),
+            "cl1": cl1,
+            "cl2": cl2,
+            "hwva": hwva,
+        }
+        super().__init__(dict_dataset)
 
         auxiliary_variables = [var for var in [angldegx, cdist] if var is not None]
         if auxiliary_variables:
