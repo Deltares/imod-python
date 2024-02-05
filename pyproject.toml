@@ -40,8 +40,8 @@ dependencies = [
     "tomli_w",
     "toolz",
     "tqdm",
-    "xarray >=0.15",
-    "xugrid >=0.3.0",
+    "xarray >=2023.04.0",
+    "xugrid >=0.6.4",
 ]
 
 [project.urls]
