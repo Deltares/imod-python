@@ -304,7 +304,7 @@ class TestModflow6Simulation:
 
         # Act
         new_simulation = circle_model.split(submodel_labels)
- 
+
         # Assert
         assert (
             new_simulation["split_exchanges"][0]["model_name_1"].values[()] == "GWF_1_0"
