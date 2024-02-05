@@ -1128,7 +1128,7 @@ class Modflow6Simulation(collections.UserDict):
                         "auxiliary_variable_name"
                     ].values[0]
                     ssm_package = SourceSinkMixing.from_flow_model(
-                        flow_model, state_variable_name, is_split= is_split( self)
+                        flow_model, state_variable_name, is_split=is_split(self)
                     )
                     if ssm_package is not None:
                         tpt_model[ssm_key] = ssm_package

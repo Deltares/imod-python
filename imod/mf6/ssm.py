@@ -1,9 +1,10 @@
 import numpy as np
 
+from imod.logging import logger
 from imod.mf6 import GroundwaterFlowModel
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.schemata import DTypeSchema
-from imod.logging import logger
+
 
 def with_index_dim(array_like):
     # At least1d will also extract the values if array_like is a DataArray.
@@ -83,7 +84,7 @@ class SourceSinkMixing(BoundaryCondition):
         print_flows: bool = False,
         save_flows: bool = False,
         validate: bool = True,
-        is_split: bool = False
+        is_split: bool = False,
     ):
         """
         Derive a Source and Sink Mixing package from a Groundwater Flow model's
@@ -149,7 +150,7 @@ class SourceSinkMixing(BoundaryCondition):
 
         if len(names) == 0:
             if is_split:
-                logger.info('generating ssm package without exchanges')
+                logger.info("generating ssm package without exchanges")
             else:
                 raise ValueError("flow model does not contain boundary conditions")
 
