@@ -26,7 +26,12 @@ from imod.mf6.utilities.grid import create_layered_top
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
-from imod.schemata import AnyNoDataSchema, DTypeSchema, ValidationError
+from imod.schemata import (
+    AnyNoDataSchema,
+    DTypeSchema,
+    EmptyIndexesSchema,
+    ValidationError,
+)
 from imod.select.points import points_indices, points_values
 from imod.typing import GridDataArray
 from imod.typing.grid import is_spatial_2D, ones_like
@@ -145,12 +150,12 @@ class Well(BoundaryCondition, IPointDataPackage):
         "concentration": [DTypeSchema(np.floating)],
     }
     _write_schemata = {
-        "screen_top": [AnyNoDataSchema()],
-        "screen_bottom": [AnyNoDataSchema()],
-        "y": [AnyNoDataSchema()],
-        "x": [AnyNoDataSchema()],
-        "rate": [AnyNoDataSchema()],
-        "concentration": [AnyNoDataSchema()],
+        "screen_top": [AnyNoDataSchema(), EmptyIndexesSchema()],
+        "screen_bottom": [AnyNoDataSchema(), EmptyIndexesSchema()],
+        "y": [AnyNoDataSchema(), EmptyIndexesSchema()],
+        "x": [AnyNoDataSchema(), EmptyIndexesSchema()],
+        "rate": [AnyNoDataSchema(), EmptyIndexesSchema()],
+        "concentration": [AnyNoDataSchema(), EmptyIndexesSchema()],
     }
 
     _regrid_method: dict[str, Tuple[RegridderType, str]] = {}
@@ -197,7 +202,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         super().__init__(dict_dataset)
         # Set index as coordinate
         index_coord = np.arange(self.dataset.dims["index"])
-        self.dataset = self.dataset.assign_coords(index = index_coord)
+        self.dataset = self.dataset.assign_coords(index=index_coord)
         self._validate_init_schemata(validate)
 
     @classmethod
