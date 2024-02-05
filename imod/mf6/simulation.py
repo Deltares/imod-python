@@ -34,12 +34,12 @@ from imod.mf6.multimodel.modelsplitter import create_partition_info, slice_model
 from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
 from imod.mf6.pkgbase import PackageBase
+from imod.mf6.ssm import SourceSinkMixing
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
 from imod.typing.grid import concat, is_unstructured, merge, merge_partitions, nan_like
-from imod.mf6.ssm import SourceSinkMixing
 
 OUTPUT_FUNC_MAPPING: dict[str, Callable] = {
     "head": open_hds,
@@ -957,11 +957,10 @@ class Modflow6Simulation(collections.UserDict):
             exchanges += exchange_creator.create_gwfgwf_exchanges(
                 flow_model_name, flow_model.domain.layer
             )
-            
+
         if any(transport_models):
             for tpt_model_name in transport_models:
                 exchanges += exchange_creator.create_gwtgwt_exchanges(
-                    tpt_model_name, flow_model_name, model.domain.layer
                     tpt_model_name, flow_model_name, model.domain.layer
                 )
         new_simulation._add_modelsplit_exchanges(exchanges)
@@ -1106,12 +1105,12 @@ class Modflow6Simulation(collections.UserDict):
                 tpt_model = self[tpt_model_name]
                 if tpt_model.domain.equals(flow_model.domain):
                     tpt_models_of_flow_model.append(tpt_model_name)
-            result [flow_model_name] = tpt_models_of_flow_model 
+            result[flow_model_name] = tpt_models_of_flow_model
         return result
 
     def _generate_gwfgwt_exchanges(self) -> list[GWFGWT]:
         exchanges = []
-        flow_transport_mapping =self._get_transport_models_per_flow_model   ()  
+        flow_transport_mapping = self._get_transport_models_per_flow_model()
         for flow_name, tpt_models_of_flow_model in flow_transport_mapping.items():
             if len(tpt_models_of_flow_model) > 0:
                 for transport_model_name in tpt_models_of_flow_model:
@@ -1120,7 +1119,7 @@ class Modflow6Simulation(collections.UserDict):
         return exchanges
 
     def _update_ssm_packages(self) -> None:
-        flow_transport_mapping =self._get_transport_models_per_flow_model   ()  
+        flow_transport_mapping = self._get_transport_models_per_flow_model()
         for flow_name, tpt_models_of_flow_model in flow_transport_mapping.items():
             flow_model = self[flow_name]
             for tpt_model_name in tpt_models_of_flow_model:
@@ -1128,10 +1127,11 @@ class Modflow6Simulation(collections.UserDict):
                 ssm_key = tpt_model._get_pkgkey("ssm")
                 if ssm_key is not None:
                     old_ssm_package = tpt_model.pop(ssm_key)
-                    state_variable_name = old_ssm_package.dataset["auxiliary_variable_name"].values[0]
-                    ssm_package =  SourceSinkMixing.from_flow_model(flow_model, state_variable_name)
+                    state_variable_name = old_ssm_package.dataset[
+                        "auxiliary_variable_name"
+                    ].values[0]
+                    ssm_package = SourceSinkMixing.from_flow_model(
+                        flow_model, state_variable_name
+                    )
                     if ssm_package is not None:
                         tpt_model[ssm_key] = ssm_package
-
-
-
