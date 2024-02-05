@@ -151,7 +151,7 @@ class SourceSinkMixing(BoundaryCondition):
         if len(names) == 0:
             msg = "flow model does not contain boundary conditions"
             if is_split:
-                logger.info(f"{msg}, returning None instead of {type(self}")
+                logger.info(f"{msg}, returning None instead of SourceSinkMixing")
                 return
             else:
                 raise ValueError(msg)
