@@ -21,6 +21,7 @@ import imod.logging
 import imod.mf6.exchangebase
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwfgwt import GWFGWT
+from imod.mf6.gwtgwt import GWTGWT
 from imod.mf6.ims import Solution
 from imod.mf6.model import Modflow6Model
 from imod.mf6.model_gwf import GroundwaterFlowModel
@@ -822,7 +823,6 @@ class Modflow6Simulation(collections.UserDict):
         if is_split(self):
             for exchange in self["split_exchanges"]:
                 result.append(exchange.get_specification())
-
         return result
 
     def get_models_of_type(self, modeltype):
@@ -912,6 +912,16 @@ class Modflow6Simulation(collections.UserDict):
                 "Unable to split simulation. Splitting can only be done on simulations that haven't been split."
             )
 
+        flow_models = self.get_models_of_type("gwf6")
+        transport_models = self.get_models_of_type("gwt6")
+        if any(transport_models) and len(flow_models) != 1:
+            raise ValueError(
+                "splitting of simulations with more (or less) than 1 flow model currently not supported, if a transport model is present"
+            )
+
+        if not any(flow_models) and not any(transport_models):
+            raise ValueError("a simulation without any models cannot be split.")
+
         original_models = get_models(self)
         original_packages = get_packages(self)
 
@@ -941,12 +951,16 @@ class Modflow6Simulation(collections.UserDict):
                 new_simulation[solution_name].add_model_to_solution(new_model_name)
 
         exchanges = []
-        for model_name, model in original_models.items():
-            if isinstance(model, GroundwaterFlowModel):
-                exchanges += exchange_creator.create_gwfgwf_exchanges(
-                    model_name, model.domain.layer
-                )
 
+        for flow_model_name, flow_model in flow_models.items():
+            exchanges += exchange_creator.create_gwfgwf_exchanges(
+                flow_model_name, flow_model.domain.layer
+            )
+        if any(transport_models):
+            for tpt_model_name in transport_models:
+                exchanges += exchange_creator.create_gwtgwt_exchanges(
+                    tpt_model_name, flow_model_name, model.domain.layer
+                )
         new_simulation._add_modelsplit_exchanges(exchanges)
         new_simulation._set_exchange_options()
 
@@ -1014,6 +1028,9 @@ class Modflow6Simulation(collections.UserDict):
                     xt3d=model_1["npf"].get_xt3d_option(),
                     newton=model_1.is_use_newton(),
                 )
+            elif isinstance(exchange, GWTGWT):
+                # TODO: issue #747
+                continue
 
     def _filter_inactive_cells_from_exchanges(self) -> None:
         for ex in self["split_exchanges"]:
