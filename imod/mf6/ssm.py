@@ -3,7 +3,7 @@ import numpy as np
 from imod.mf6 import GroundwaterFlowModel
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.schemata import DTypeSchema
-
+from imod.logging import logger
 
 def with_index_dim(array_like):
     # At least1d will also extract the values if array_like is a DataArray.
@@ -83,6 +83,7 @@ class SourceSinkMixing(BoundaryCondition):
         print_flows: bool = False,
         save_flows: bool = False,
         validate: bool = True,
+        is_split: bool = False
     ):
         """
         Derive a Source and Sink Mixing package from a Groundwater Flow model's
@@ -113,13 +114,14 @@ class SourceSinkMixing(BoundaryCondition):
             Flag to indicate whether the package should be validated upon
             initialization. This raises a ValidationError if package input is
             provided in the wrong manner. Defaults to True.
+        is_split:  ({True, False}, optional)
+            Flag to indicate if the simulation has been split into partitions.
         """
         if not isinstance(model, GroundwaterFlowModel):
             raise TypeError(
                 "model must be a GroundwaterFlowModel, received instead: "
                 f"{type(model).__name__}"
             )
-
         names = []
         boundary_types = []
         aux_var_names = []
@@ -146,7 +148,10 @@ class SourceSinkMixing(BoundaryCondition):
                 aux_var_names.append(species)
 
         if len(names) == 0:
-            return
+            if is_split:
+                logger.info('generating ssm package without exchanges')
+            else:
+                raise ValueError("flow model does not contain boundary conditions")
 
         return SourceSinkMixing(
             names,
