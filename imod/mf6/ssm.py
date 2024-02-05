@@ -150,9 +150,10 @@ class SourceSinkMixing(BoundaryCondition):
 
         if len(names) == 0:
             if is_split:
-                logger.info("generating ssm package without exchanges")
+                msg = "flow model does not contain boundary conditions"
+                logger.info(f"{msg}, returning None instead of {type(self}")
             else:
-                raise ValueError("flow model does not contain boundary conditions")
+                raise ValueError(msg)
 
         return SourceSinkMixing(
             names,
