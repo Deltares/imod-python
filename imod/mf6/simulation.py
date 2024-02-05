@@ -954,14 +954,10 @@ class Modflow6Simulation(collections.UserDict):
         exchanges = []
 
         for flow_model_name, flow_model in flow_models.items():
-            raise ValueError(
-                "splitting of simulations with more (or less) than 1 flow model currently not supported"
-            )
-        flow_model_name = list(flow_models.keys())[0]
-        flow_model = self[flow_model_name]
             exchanges += exchange_creator.create_gwfgwf_exchanges(
                 flow_model_name, flow_model.domain.layer
             )
+            
         if any(transport_models):
             for tpt_model_name in transport_models:
                 exchanges += exchange_creator.create_gwtgwt_exchanges(
