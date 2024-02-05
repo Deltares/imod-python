@@ -61,15 +61,11 @@ class GWTGWT(ExchangeBase):
 
     def set_options(
         self,
-        print_input: Optional[bool] = None,
-        print_flows: Optional[bool] = None,
         save_flows: Optional[bool] = None,
         adv_scheme: Optional[str] = None,
         dsp_xt3d_off: Optional[bool] = None,
         dsp_xt3d_rhs: Optional[bool] = None,
     ):
-        self.dataset["print_input"] = print_input
-        self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["adv_scheme"] = adv_scheme
         self.dataset["dsp_xt3d_off"] = dsp_xt3d_off
