@@ -64,21 +64,6 @@ all = [
     "tomli >= 1.1.0 ; python_version < '3.11'",
     "zarr",
 ]
-dev = [
-    "imod[all]",
-    "black",
-    "ruff",
-    "flopy",
-    "hatchling",
-    "hypothesis",
-    "mypy",
-    "pydata-sphinx-theme",
-    "pytest",
-    "pytest-cov",
-    "pytest-benchmark",
-    "sphinx",
-    "sphinx-gallery",
-]
 
 [tool.coverage.report]
 exclude_lines = [
