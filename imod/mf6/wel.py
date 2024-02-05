@@ -26,49 +26,28 @@ from imod.mf6.utilities.grid import create_layered_top
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
-from imod.schemata import (
-    AnyNoDataSchema,
-    DTypeSchema,
-    EmptyIndexesSchema,
-    ValidationError,
-)
+from imod.schemata import AnyNoDataSchema, DTypeSchema, ValidationError
 from imod.select.points import points_indices, points_values
 from imod.typing import GridDataArray
 from imod.typing.grid import is_spatial_2D, ones_like
 from imod.util import values_within_range
 
 
-def _is_transient_da(arg):
-    is_da = isinstance(arg, xr.DataArray)
-    return is_da and "time" in arg.coords
-
-
-def _get_index(arg):
-    if _is_transient_da(arg):
-        return np.arange(len(arg.isel(time=0)))
-    else:
-        return np.arange(len(arg))
-
-
 def _assign_dims(arg: Any) -> Tuple | xr.DataArray:
     is_da = isinstance(arg, xr.DataArray)
-    index = _get_index(arg)
-
-    if _is_transient_da(arg):
+    if is_da and "time" in arg.coords:
         if arg.ndim != 2:
             raise ValueError("time varying variable: must be 2d")
         if arg.dims[0] != "time":
             arg = arg.transpose()
         da = xr.DataArray(
-            data=arg.values,
-            coords={"time": arg.coords["time"], "index": index},
-            dims=["time", "index"],
+            data=arg.values, coords={"time": arg["time"]}, dims=["time", "index"]
         )
         return da
     elif is_da:
-        return arg.assign_coords(index=index)
+        return "index", arg.values
     else:
-        return xr.DataArray(data=arg, coords={"index": index}, dims=["index"])
+        return "index", arg
 
 
 def mask_2D(package: Well, domain_2d: GridDataArray) -> Well:
@@ -166,12 +145,12 @@ class Well(BoundaryCondition, IPointDataPackage):
         "concentration": [DTypeSchema(np.floating)],
     }
     _write_schemata = {
-        "screen_top": [AnyNoDataSchema(), EmptyIndexesSchema()],
-        "screen_bottom": [AnyNoDataSchema(), EmptyIndexesSchema()],
-        "y": [AnyNoDataSchema(), EmptyIndexesSchema()],
-        "x": [AnyNoDataSchema(), EmptyIndexesSchema()],
-        "rate": [AnyNoDataSchema(), EmptyIndexesSchema()],
-        "concentration": [AnyNoDataSchema(), EmptyIndexesSchema()],
+        "screen_top": [AnyNoDataSchema()],
+        "screen_bottom": [AnyNoDataSchema()],
+        "y": [AnyNoDataSchema()],
+        "x": [AnyNoDataSchema()],
+        "rate": [AnyNoDataSchema()],
+        "concentration": [AnyNoDataSchema()],
     }
 
     _regrid_method: dict[str, Tuple[RegridderType, str]] = {}
