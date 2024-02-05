@@ -36,13 +36,15 @@ version = "2023.11"
 
 project {
 
+    buildType(Lint)
+    buildType(MyPy)
     buildType(UnitTests)
     buildType(Examples)
-    buildType(Lint)
     buildType(Tests)
 
     template(GitHubIntegrationTemplate)
     template(LintTemplate)
+    template(MyPyTemplate)
     template(UnitTestsTemplate)
     template(ExamplesTemplate)
 
@@ -115,6 +117,42 @@ object LintTemplate : Template({
                     pixi run --frozen lint
                 """.trimIndent()
                 formatStderrAsError = true
+        }
+    }
+
+    requirements {
+        equals("env.OS", "Windows_NT")
+    }
+})
+
+object MyPyTemplate : Template({
+    name = "MyPyTemplate"
+
+    detectHangingBuilds = false
+
+    vcs {
+        root(DslContext.settingsRoot, "+:. => imod-python")
+
+        cleanCheckout = true
+    }
+
+    steps {
+        script {
+                name = "MyPy analysis"
+                id = "MyPy_analysis"
+                workingDir = "imod-python"
+                scriptContent = """
+                    pixi run --frozen mypy_report
+                    pixi run --frozen mypy
+                """.trimIndent()
+                formatStderrAsError = true
+        }
+    }
+
+    features {
+        xmlReport {
+            reportType = XmlReport.XmlReportType.JUNIT
+            rules = "imod-python/*.xml"
         }
     }
 
@@ -225,6 +263,12 @@ object Lint : BuildType({
     templates(LintTemplate, GitHubIntegrationTemplate)
 })
 
+object MyPy : BuildType({
+    name = "MyPy"
+
+    templates(MyPyTemplate, GitHubIntegrationTemplate)
+})
+
 object UnitTests : BuildType({
     name = "UnitTests"
 
@@ -241,6 +285,9 @@ object UnitTests : BuildType({
             }
         }
         snapshot(Lint) {
+            onDependencyFailure = FailureAction.FAIL_TO_START
+        }
+        snapshot(MyPy) {
             onDependencyFailure = FailureAction.FAIL_TO_START
         }
     }
@@ -262,6 +309,9 @@ object Examples : BuildType({
             }
         }
         snapshot(Lint) {
+            onDependencyFailure = FailureAction.FAIL_TO_START
+        }
+        snapshot(MyPy) {
             onDependencyFailure = FailureAction.FAIL_TO_START
         }
     }
@@ -320,6 +370,7 @@ object Nightly : Project({
     name = "Nightly"
 
     buildType(NightlyLint)
+    buildType(NightlyMyPy)
     buildType(NightlyUnitTests)
     buildType(NightlyExamples)
     buildType(NightlyTests)
@@ -331,6 +382,12 @@ object NightlyLint : BuildType({
     templates(LintTemplate)
 })
 
+object NightlyMyPy : BuildType({
+    name = "MyPy"
+
+    templates(MyPyTemplate)
+})
+
 object NightlyUnitTests : BuildType({
     name = "UnitTests"
 
@@ -338,6 +395,9 @@ object NightlyUnitTests : BuildType({
 
     dependencies {
         snapshot(NightlyLint) {
+            onDependencyFailure = FailureAction.FAIL_TO_START
+        }
+        snapshot(NightlyMyPy) {
             onDependencyFailure = FailureAction.FAIL_TO_START
         }
         dependency(AbsoluteId("iMOD6_Modflow6buildWin64")) {
@@ -359,6 +419,9 @@ object NightlyExamples : BuildType({
 
     dependencies {
         snapshot(NightlyLint) {
+            onDependencyFailure = FailureAction.FAIL_TO_START
+        }
+        snapshot(NightlyMyPy) {
             onDependencyFailure = FailureAction.FAIL_TO_START
         }
         dependency(AbsoluteId("iMOD6_Modflow6buildWin64")) {
