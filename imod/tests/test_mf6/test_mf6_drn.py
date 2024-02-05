@@ -145,7 +145,7 @@ def test_validate_concentration(transient_concentration_drainage):
     assert len(errors) == 0
 
     # Error with incongruent data
-    drn.dataset["concentration"] = idomain.where(False)  # Set all concentrations to NaN
+    drn.dataset["concentration"][0, 2, 2] = np.nan  # Rivers are located everywhere in the grid.
     errors = drn._validate(drn._write_schemata, **dis.dataset)
     assert len(errors) == 1
     for var, error in errors.items():
