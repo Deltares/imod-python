@@ -100,9 +100,9 @@ class MetaSwapModel(Model):
         super().__init__()
 
         self.simulation_settings = copy(DEFAULT_SETTINGS)
-        self.simulation_settings["unsa_svat_path"] = (
-            self._render_unsaturated_database_path(unsaturated_database)
-        )
+        self.simulation_settings[
+            "unsa_svat_path"
+        ] = self._render_unsaturated_database_path(unsaturated_database)
 
     def _render_unsaturated_database_path(self, unsaturated_database):
         # Force to Path object
