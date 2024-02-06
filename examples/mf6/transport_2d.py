@@ -4,7 +4,7 @@ import xarray as xr
 
 import imod
 from imod.typing.grid import nan_like, zeros_like
-
+from imod.mf6.multimodel.partition_generator import get_label_array
 # Model parameters
 nlay = 1  # Number of layers
 nrow = 31  # Number of rows
@@ -144,21 +144,24 @@ start = pd.to_datetime("2002-01-01")
 simulation.create_time_discretization(additional_times=[start, start + duration])
 simulation["time_discretization"]["n_timesteps"] = 365
 
+
+
+label_array = get_label_array(simulation, 4)
 modeldir = imod.util.temporary_directory()
-
-label_array = zeros_like(idomain.sel(layer=1), dtype=int)
-label_array.values[:15, 23:] = 0
-label_array.values[15:, 23:] = 1
-
-label_array.values[:15, :23] = 2
-label_array.values[15:, :23] = 3
-
+simulation.write(modeldir, binary=False)
 split_simulation = simulation.split(label_array)
 
-simulation.write(modeldir, binary=False)
+
 simulation.run()
 hds = simulation.open_head()
 conc = simulation.open_concentration()
+
+split_modeldir = modeldir /"split"
+split_simulation.write(modeldir, binary=False)
+split_simulation.run()
+split_hds =  split_simulation.open_head()["head"]
+split_conc =  split_simulation.open_head()["concentration"]
+
 print(conc.sel(time=365.0, layer=1).values)
 a = conc.sel(time=365.0, layer=1)
 print(a.max().values)
