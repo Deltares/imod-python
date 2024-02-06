@@ -39,7 +39,13 @@ from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
-from imod.typing.grid import concat, is_unstructured, merge, merge_partitions, nan_like
+from imod.typing.grid import (
+    concat,
+    is_unstructured,
+    merge_partitions,
+    merge_with_dictionary,
+    nan_like,
+)
 
 OUTPUT_FUNC_MAPPING: dict[str, Callable] = {
     "head": open_hds,
@@ -621,19 +627,14 @@ class Modflow6Simulation(collections.UserDict):
 
         cbc_per_partition = []
         for modelname in modelnames:
-            partition_model = self[modelname]
-            partition_domain = partition_model.domain
             cbc_dict = self._open_output_single_model(modelname, output, **settings)
-            # Force list of dicts to list of DataArrays to work around:
-            # https://github.com/Deltares/xugrid/issues/179
-            cbc_list = [da.rename(key) for key, da in cbc_dict.items()]
-            cbc = merge(cbc_list)
+            cbc = merge_with_dictionary(cbc_dict)
             # Merge and assign exchange budgets to dataset
             # FUTURE: Refactor to insert these exchange budgets in horizontal
             # flows.
             cbc = self._merge_and_assign_exchange_budgets(cbc)
             if not is_unstructured(cbc):
-                cbc = cbc.where(partition_domain, other=np.nan)
+                cbc = cbc.where(self[modelname].domain, other=np.nan)
             cbc_per_partition.append(cbc)
 
         # Boundary conditions can be missing in certain partitions, as do their
@@ -668,10 +669,7 @@ class Modflow6Simulation(collections.UserDict):
         budgets = []
         for modelname, species in zip(modelnames, species_ls):
             budget_dict = self._open_output_single_model(modelname, output, **settings)
-            # Force list of dicts to list of DataArrays to work around:
-            # https://github.com/Deltares/xugrid/issues/179
-            budget_list = [da.rename(key) for key, da in budget_dict.items()]
-            budget = merge(budget_list)
+            budget = merge_with_dictionary(budget_dict)
             budget = budget.assign_coords(species=species)
             budgets.append(budget)
 
