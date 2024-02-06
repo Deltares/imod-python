@@ -577,18 +577,14 @@ class Modflow6Simulation(collections.UserDict):
             )
         elif len(modelnames) == 1:
             modelname = next(iter(modelnames))
-            return self._open_output_single_model(modelname, output, **settings)
+            return self._open_single_output_single_model(modelname, output, **settings)
         elif is_split(self):
             if "budget" in output:
                 return self._merge_budgets(modelnames, output, **settings)
             else:
                 return self._merge_states(modelnames, output, **settings)
-        elif output == "concentration":
-            return self._concat_concentrations(
-                modelnames, species_ls, output, **settings
-            )
-        elif output == "budget-transport":
-            return self._concat_transport_budgets(
+        elif output in ["concentration", "budget-transport"]:
+            return self._concat_species(
                 modelnames, species_ls, output, **settings
             )
         else:
@@ -602,7 +598,7 @@ class Modflow6Simulation(collections.UserDict):
         state_partitions = []
         for modelname in modelnames:
             state_partitions.append(
-                self._open_output_single_model(modelname, output, **settings)
+                self._open_single_output_single_model(modelname, output, **settings)
             )
         return merge_partitions(state_partitions)
 
@@ -629,7 +625,7 @@ class Modflow6Simulation(collections.UserDict):
 
         cbc_per_partition = []
         for modelname in modelnames:
-            cbc = self._open_output_single_model(modelname, output, **settings)
+            cbc = self._open_single_output_single_model(modelname, output, **settings)
             # Merge and assign exchange budgets to dataset
             # FUTURE: Refactor to insert these exchange budgets in horizontal
             # flows.
@@ -650,27 +646,17 @@ class Modflow6Simulation(collections.UserDict):
 
         return merge_partitions(cbc_per_partition)
 
-    def _concat_concentrations(
+    def _concat_species(
         self, modelnames: list[str], species_ls: list[str], output: str, **settings
     ) -> GridDataArray:
-        concentrations = []
+        outputs = []
         for modelname, species in zip(modelnames, species_ls):
-            conc = self._open_output_single_model(modelname, output, **settings)
-            conc = conc.assign_coords(species=species)
-            concentrations.append(conc)
-        return concat(concentrations, dim="species")
+            output_data = self._open_single_output_single_model(modelname, output, **settings)
+            output_data = output_data.assign_coords(species=species)
+            outputs.append(output_data)
+        return concat(outputs, dim="species")
 
-    def _concat_transport_budgets(
-        self, modelnames: list[str], species_ls: list[str], output: str, **settings
-    ) -> GridDataset:
-        budgets = []
-        for modelname, species in zip(modelnames, species_ls):
-            budget = self._open_output_single_model(modelname, output, **settings)
-            budget = budget.assign_coords(species=species)
-            budgets.append(budget)
-        return concat(budgets, dim="species")
-
-    def _open_output_single_model(
+    def _open_single_output_single_model(
         self, modelname: str, output: str, **settings
     ) -> GridDataArray | dict[str, GridDataArray]:
         """
