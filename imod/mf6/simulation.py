@@ -433,6 +433,7 @@ class Modflow6Simulation(collections.UserDict):
             species_ls=species_ls,
             simulation_start_time=simulation_start_time,
             time_unit=time_unit,
+            merge_to_dataset=True,
         )
 
     def open_flow_budget(
@@ -501,6 +502,7 @@ class Modflow6Simulation(collections.UserDict):
             flowja=flowja,
             simulation_start_time=simulation_start_time,
             time_unit=time_unit,
+            merge_to_dataset=True,
         )
 
     def open_concentration(
@@ -627,8 +629,7 @@ class Modflow6Simulation(collections.UserDict):
 
         cbc_per_partition = []
         for modelname in modelnames:
-            cbc_dict = self._open_output_single_model(modelname, output, **settings)
-            cbc = merge_with_dictionary(cbc_dict)
+            cbc = self._open_output_single_model(modelname, output, **settings)
             # Merge and assign exchange budgets to dataset
             # FUTURE: Refactor to insert these exchange budgets in horizontal
             # flows.
@@ -655,10 +656,6 @@ class Modflow6Simulation(collections.UserDict):
         concentrations = []
         for modelname, species in zip(modelnames, species_ls):
             conc = self._open_output_single_model(modelname, output, **settings)
-            if not isinstance(conc, GridDataArray):
-                raise RuntimeError(
-                    f"Type error. Expected GridDataArray but got {type(conc)}"
-                )
             conc = conc.assign_coords(species=species)
             concentrations.append(conc)
         return concat(concentrations, dim="species")
@@ -668,11 +665,9 @@ class Modflow6Simulation(collections.UserDict):
     ) -> GridDataset:
         budgets = []
         for modelname, species in zip(modelnames, species_ls):
-            budget_dict = self._open_output_single_model(modelname, output, **settings)
-            budget = merge_with_dictionary(budget_dict)
+            budget = self._open_output_single_model(modelname, output, **settings)
             budget = budget.assign_coords(species=species)
             budgets.append(budget)
-
         return concat(budgets, dim="species")
 
     def _open_output_single_model(
