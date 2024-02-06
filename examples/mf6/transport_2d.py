@@ -1,9 +1,9 @@
-import xarray as xr
 import numpy as np
+import pandas as pd
+import xarray as xr
 
-# Model units
-length_units = "meters"
-time_units = "days"
+import imod
+from imod.typing.grid import nan_like, zeros_like
 
 # Model parameters
 nlay = 1  # Number of layers
@@ -16,74 +16,150 @@ shape = (nlay, nrow, ncol)
 top = 10.0
 dims = ("layer", "y", "x")
 
-y = np.arange(delr*nrow, 0, -delr) 
-x = np.arange(0, delc*ncol, delc)
+y = np.arange(delr * nrow, 0, -delr)
+x = np.arange(0, delc * ncol, delc)
 coords = {"layer": [1], "y": y, "x": x, "dx": delc, "dy": -delr}
 idomain = xr.DataArray(np.ones(shape, dtype=int), coords=coords, dims=dims)
 
+bottom = xr.DataArray([0.0], {"layer": [1]}, ("layer",))
+gwf_model = imod.mf6.GroundwaterFlowModel()
+gwf_model["dis"] = imod.mf6.StructuredDiscretization(
+    top=10.0, bottom=bottom, idomain=idomain
+)
 
-top = 0.0  # Top of the model ($m$)
-prsity = 0.3  # Porosity
-perlen = 365  # Simulation time ($days$)
-k11 = 1.0  # Horizontal hydraulic conductivity ($m/d$)
-qwell = 1.0  # Volumetric injection rate ($m^3/d$)
-cwell = 1000.0  # Concentration of injected water ($mg/L$)
-al = 10.0  # Longitudinal dispersivity ($m$)
-trpt = 0.3  # Ratio of transverse to longitudinal dispersivity
-
-# Additional model input
-perlen = [1, 365.0]
-nper = len(perlen)
-nstp = [2, 730]
-tsmult = [1.0, 1.0]
-sconc = 0.0
-dt0 = 0.3
-ath1 = al * trpt
-dmcoef = 0.0
-
-botm = [top - delz]  # Model geometry
-
-k33 = k11  # Vertical hydraulic conductivity ($m/d$)
-icelltype = 0
-
-# Initial conditions
-Lx = (ncol - 1) * delr
+gwf_model["sto"] = imod.mf6.SpecificStorage(
+    specific_storage=0.0,
+    specific_yield=0.0,
+    transient=False,
+    convertible=0,
+)
+gwf_model["npf"] = imod.mf6.NodePropertyFlow(
+    icelltype=idomain,
+    k=1.0,
+    save_flows=True,
+)
+Lx = 460
 v = 1.0 / 3.0
 prsity = 0.3
 q = v * prsity
 h1 = q * Lx
-strt = np.zeros((nlay, nrow, ncol), dtype=float)
-strt[0, :, 0] = h1
+chd_field = nan_like(idomain)
+chd_field.values[0, :, 0] = h1
+chd_field.values[0, :, -1] = 0.1
+chd_concentration = nan_like(idomain)
+chd_concentration.values[0, :, 0] = 0.0
+chd_concentration.values[0, :, -1] = 0.0
+chd_concentration = chd_concentration.expand_dims(species=["Au"])
 
-ibound_mf2k5 = np.ones((nlay, nrow, ncol), dtype=int)
-ibound_mf2k5[0, :, 0] = -1
-ibound_mf2k5[0, :, -1] = -1
-idomain = np.ones((nlay, nrow, ncol), dtype=int)
-icbund = 1
-c0 = 0.0
-cncspd = [[(0, 0, 0), c0]]
-welspd = {0: [[0, 15, 15, qwell]]}  # Well pumping info for MF2K5
-spd = {0: [0, 15, 15, cwell, 2]}  # Well pupming info for MT3DMS
-#              (k,  i,  j),  flow, conc
-spd_mf6 = {0: [[(0, 15, 15), qwell, cwell]]}  # MF6 pumping information
 
-# Set solver parameter values (and related)
-nouter, ninner = 100, 300
-hclose, rclose, relax = 1e-6, 1e-6, 1.0
-ttsmult = 1.0
-percel = 1.0  # HMOC parameters in case they are invoked
-itrack = 3  # HMOC
-wd = 0.5  # HMOC
-dceps = 1.0e-5  # HMOC
-nplane = 1  # HMOC
-npl = 0  # HMOC
-nph = 16  # HMOC
-npmin = 4  # HMOC
-npmax = 32  # HMOC
-dchmoc = 1.0e-3  # HMOC
-nlsink = nplane  # HMOC
-npsink = nph  # HMOC
+gwf_model["chd"] = imod.mf6.ConstantHead(
+    chd_field,
+    concentration=chd_concentration,
+    print_input=True,
+    print_flows=True,
+    save_flows=True,
+)
+injection_concentration = xr.DataArray(
+    [[1000.0]],
+    coords={
+        "species": ["Au"],
+        "index": [0],
+    },
+    dims=("species", "index"),
+)
+gwf_model["wel"] = imod.mf6.Well(
+    x=[150.0],
+    y=[150.0],
+    screen_top=[10.0],
+    screen_bottom=[0.0],
+    rate=[1.0],
+    concentration=injection_concentration,
+    concentration_boundary_type="aux",
+)
+gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
+gwf_model["ic"] = imod.mf6.InitialConditions(start=10.0)
+simulation = imod.mf6.Modflow6Simulation("ex01-twri")
 
-# Time discretization
-tdis_rc = []
-tdis_rc.append((perlen, nstp, 1.0))
+
+tpt_model = imod.mf6.GroundwaterTransportModel()
+tpt_model["ssm"] = imod.mf6.SourceSinkMixing.from_flow_model(
+    gwf_model, species="Au", save_flows=True
+)
+tpt_model["adv"] = imod.mf6.AdvectionUpstream()
+tpt_model["dsp"] = imod.mf6.Dispersion(
+    diffusion_coefficient=0.0,
+    longitudinal_horizontal=10.0,
+    transversal_horizontal1=3.0,
+    xt3d_off=False,
+    xt3d_rhs=False,
+)
+tpt_model["mst"] = imod.mf6.MobileStorageTransfer(
+    porosity=0.3,
+)
+
+tpt_model["ic"] = imod.mf6.InitialConditions(start=0.0)
+tpt_model["oc"] = imod.mf6.OutputControl(save_concentration="all", save_budget="last")
+tpt_model["dis"] = gwf_model["dis"]
+
+simulation["GWF_1"] = gwf_model
+simulation["TPT_1"] = tpt_model
+
+
+simulation["flow_solver"] = imod.mf6.Solution(
+    modelnames=["GWF_1"],
+    print_option="summary",
+    csv_output=False,
+    no_ptc=True,
+    outer_dvclose=1.0e-4,
+    outer_maximum=500,
+    under_relaxation=None,
+    inner_dvclose=1.0e-4,
+    inner_rclose=0.001,
+    inner_maximum=100,
+    linear_acceleration="cg",
+    scaling_method=None,
+    reordering_method=None,
+    relaxation_factor=0.97,
+)
+simulation["transport_solver"] = imod.mf6.Solution(
+    modelnames=["TPT_1"],
+    print_option="summary",
+    csv_output=False,
+    no_ptc=True,
+    outer_dvclose=1.0e-4,
+    outer_maximum=500,
+    under_relaxation=None,
+    inner_dvclose=1.0e-4,
+    inner_rclose=0.001,
+    inner_maximum=100,
+    linear_acceleration="bicgstab",
+    scaling_method=None,
+    reordering_method=None,
+    relaxation_factor=0.97,
+)
+# Collect time discretization
+
+duration = pd.to_timedelta("365d")
+start = pd.to_datetime("2002-01-01")
+simulation.create_time_discretization(additional_times=[start, start + duration])
+simulation["time_discretization"]["n_timesteps"] = 365
+
+modeldir = imod.util.temporary_directory()
+
+label_array = zeros_like(idomain.sel(layer=1), dtype=int)
+label_array.values[:15, 23:] = 0
+label_array.values[15:, 23:] = 1
+
+label_array.values[:15, :23] = 2
+label_array.values[15:, :23] = 3
+
+split_simulation = simulation.split(label_array)
+
+simulation.write(modeldir, binary=False)
+simulation.run()
+hds = simulation.open_head()
+conc = simulation.open_concentration()
+print(conc.sel(time=365.0, layer=1).values)
+a = conc.sel(time=365.0, layer=1)
+print(a.max().values)
+perlen = 365  # Simulation time ($days$)
