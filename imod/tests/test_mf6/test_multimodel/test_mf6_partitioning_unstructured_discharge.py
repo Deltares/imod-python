@@ -139,8 +139,8 @@ def test_specific_discharge_results(
     head_diff = original_heads.isel(layer=0, time=-1) - split_head.isel(
         layer=0, time=-1
     )
-    veldif_x = original_balances_x_v2["data-spdis"] - split_balances_x_v2["npf-qx"]
-    veldif_y = original_balances_y_v2["data-spdis"] - split_balances_y_v2["npf-qy"]
+    veldif_x = original_balances_x_v2["npf-qx"] - split_balances_x_v2["npf-qx"]
+    veldif_y = original_balances_y_v2["npf-qy"] - split_balances_y_v2["npf-qy"]
 
     # Assert results are close for head and specific discharge
     assert np.abs(head_diff["head"].values).max() < 1e-5
