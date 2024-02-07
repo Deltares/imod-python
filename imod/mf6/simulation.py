@@ -586,9 +586,7 @@ class Modflow6Simulation(collections.UserDict):
         if output in ["head", "budget-flow"]:
             return self._open_single_output(modelnames, output, **settings)
         elif output in ["concentration", "budget-transport"]:
-            return self._concat_species(
-                output, **settings
-            )
+            return self._concat_species(output, **settings)
         else:
             raise RuntimeError(
                 f"Unexpected error when opening {output} for {modelnames}"
@@ -609,7 +607,7 @@ class Modflow6Simulation(collections.UserDict):
                 return self._merge_budgets(modelnames, output, **settings)
             else:
                 return self._merge_states(modelnames, output, **settings)
-            
+
     def _merge_states(
         self, modelnames: list[str], output: str, **settings
     ) -> GridDataArray:
@@ -664,12 +662,10 @@ class Modflow6Simulation(collections.UserDict):
 
         return merge_partitions(cbc_per_partition)
 
-    def _concat_species(
-        self, output: str, **settings
-    ) -> GridDataArray | GridDataset:
-        
+    def _concat_species(self, output: str, **settings) -> GridDataArray | GridDataset:
+
         # groupby flow model, to somewhat enforce consistent transport model
-        # ordening:        
+        # ordening:
         # F1Ta1 F1Tb1 F2Ta2 F2Tb2 -> F1: [Ta1, Tb1], F2: [Ta2, Tb2]
         # F1Ta1 F2Tb1 F1Ta1 F2Tb2 -> F1: [Ta1, Tb1], F2: [Ta2, Tb2]
         gb_flow_model = groupby_flow_model(self)
@@ -681,18 +677,20 @@ class Modflow6Simulation(collections.UserDict):
 
         if is_split(self):
             # [[Ta_1, Tb_1], [Ta_2, Tb_2]] -> [Ta, Tb]
-            unpartitioned_modelnames = [tpt_name.rpartition("_")[0] for tpt_name in all_tpt_names[0]]
+            unpartitioned_modelnames = [
+                tpt_name.rpartition("_")[0] for tpt_name in all_tpt_names[0]
+            ]
         else:
-            # [[Ta, Tb]] -> [Ta, Tb] 
+            # [[Ta, Tb]] -> [Ta, Tb]
             unpartitioned_modelnames = all_tpt_names[0]
-        
+
         species_ls = settings.pop("species_ls", unpartitioned_modelnames)
 
         if len(species_ls) != len(tpt_names_per_species):
             raise ValueError(
                 "species_ls does not equal the number of transport models, "
                 f"expected length {len(tpt_names_per_species)}, received {species_ls}"
-                )
+            )
 
         # Concatenate species
         outputs = []

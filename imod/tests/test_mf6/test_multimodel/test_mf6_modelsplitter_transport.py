@@ -83,6 +83,7 @@ def test_split_flow_and_transport_model(tmp_path, flow_transport_simulation):
 
     assert_simulation_can_run(new_simulation, "dis", tmp_path)
 
+
 @pytest.mark.usefixtures("flow_transport_simulation")
 def test_split_flow_and_transport_model_evaluate_output(
     tmp_path, flow_transport_simulation
@@ -163,6 +164,7 @@ def test_split_flow_and_transport_model_evaluate_output_with_species(
         rtol=1e-4,
         atol=1e-6,
     )
+
 
 @pytest.mark.usefixtures("flow_transport_simulation")
 @pytest.mark.parametrize("advection_scheme", ["TVD", "upstream", "central"])

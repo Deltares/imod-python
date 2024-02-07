@@ -117,7 +117,9 @@ def test_transport_balance_loading(tmp_path, flow_transport_simulation):
     assert balance_notime.coords["time"].dtype == float
 
     balance_time = flow_transport_simulation.open_transport_budget(
-        species_ls=["a", "b", "c", "d"], simulation_start_time="2000-01-31", time_unit="s"
+        species_ls=["a", "b", "c", "d"],
+        simulation_start_time="2000-01-31",
+        time_unit="s",
     )
     assert balance_time.coords["time"].dtype == np.dtype("datetime64[ns]")
 
@@ -126,6 +128,7 @@ def test_transport_balance_loading(tmp_path, flow_transport_simulation):
         == balance_time.sel(species="a")["ssm"].values
     )
 
+
 @pytest.mark.usefixtures("flow_transport_simulation")
 def test_transport_output_wrong_species(tmp_path, flow_transport_simulation):
     flow_transport_simulation.write(tmp_path)
@@ -133,12 +136,8 @@ def test_transport_output_wrong_species(tmp_path, flow_transport_simulation):
 
     with pytest.raises(ValueError):
         # Should be ["a", "b", "c", "d"]
-        flow_transport_simulation.open_transport_budget(
-            species_ls=["a", "b"]
-        )
+        flow_transport_simulation.open_transport_budget(species_ls=["a", "b"])
 
     with pytest.raises(ValueError):
         # Should be ["a", "b", "c", "d"]
-        flow_transport_simulation.open_concentration(
-            species_ls=["a", "b"]
-        )
+        flow_transport_simulation.open_concentration(species_ls=["a", "b"])
