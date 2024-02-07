@@ -592,7 +592,13 @@ class Modflow6Simulation(collections.UserDict):
                 f"Unexpected error when opening {output} for {modelnames}"
             )
 
-    def _open_single_output(self, modelnames, output, **settings):
+    def _open_single_output(
+        self, modelnames: list[str], output: str, **settings
+    ) -> GridDataArray | GridDataset:
+        """
+        Open single output, e.g. concentration of single species, or heads. This
+        can be output of partitioned models that need to be merged.
+        """
         if len(modelnames) == 0:
             modeltype = OUTPUT_MODEL_MAPPING[output]
             raise ValueError(
@@ -663,7 +669,6 @@ class Modflow6Simulation(collections.UserDict):
         return merge_partitions(cbc_per_partition)
 
     def _concat_species(self, output: str, **settings) -> GridDataArray | GridDataset:
-
         # groupby flow model, to somewhat enforce consistent transport model
         # ordening:
         # F1Ta1 F1Tb1 F2Ta2 F2Tb2 -> F1: [Ta1, Tb1], F2: [Ta2, Tb2]
@@ -702,9 +707,9 @@ class Modflow6Simulation(collections.UserDict):
 
     def _open_single_output_single_model(
         self, modelname: str, output: str, **settings
-    ) -> GridDataArray | dict[str, GridDataArray]:
+    ) -> GridDataArray | GridDataset:
         """
-        Opens output of single model
+        Opens single output of single model
 
         Parameters
         ----------
