@@ -39,6 +39,11 @@ Added
 - Added support for coupling a GroundwaterFlowModel and Transport Model i.c.w.
   the 6.4.3 release of MODFLOW. Using an older version of iMOD Python
   with this version of MODFLOW will result in an error.
+- :meth:`imod.mf6.Modflow6Simulation.split` supports splitting transport models,
+  including multi-species simulations.
+- :meth:`imod.mf6.Modflow6Simulation.open_concentration` and
+  :meth:`imod.mf6.Modflow6Simulation.open_transport_budget` support opening
+  split multi-species simulations.
 
 [0.15.1] - 2023-12-22
 ---------------------
