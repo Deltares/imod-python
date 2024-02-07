@@ -83,18 +83,6 @@ def test_split_flow_and_transport_model(tmp_path, flow_transport_simulation):
 
     assert_simulation_can_run(new_simulation, "dis", tmp_path)
 
-
-def _edit_fixture(simulation: Modflow6Simulation) -> Modflow6Simulation:
-    # TODO: put the other transport models back when #797 is solved
-    simulation.pop("tpt_a")
-    simulation.pop("tpt_c")
-    simulation.pop("tpt_d")
-    simulation["transport_solver"].remove_model_from_solution("tpt_a")
-    simulation["transport_solver"].remove_model_from_solution("tpt_c")
-    simulation["transport_solver"].remove_model_from_solution("tpt_d")
-    return simulation
-
-
 @pytest.mark.usefixtures("flow_transport_simulation")
 def test_split_flow_and_transport_model_evaluate_output(
     tmp_path, flow_transport_simulation
@@ -103,8 +91,6 @@ def test_split_flow_and_transport_model_evaluate_output(
 
     flow_model = simulation["flow"]
     active = flow_model.domain
-
-    simulation = _edit_fixture(simulation)
 
     # create label array
     submodel_labels = zeros_like(active)
@@ -115,14 +101,14 @@ def test_split_flow_and_transport_model_evaluate_output(
     # for reference run the original model and load the results
     simulation.write(tmp_path / "original", binary=False)
     simulation.run()
-    original_conc = simulation.open_concentration(species_ls=["b"])
+    original_conc = simulation.open_concentration()
     original_head = simulation.open_head()
 
     # split the model , run the split model and load the results
     new_simulation = simulation.split(submodel_labels)
     new_simulation.write(tmp_path, binary=False)
     new_simulation.run()
-    conc = new_simulation.open_concentration(species_ls=["b"])
+    conc = new_simulation.open_concentration()
     head = new_simulation.open_head()
 
     # Compare
@@ -141,6 +127,44 @@ def test_split_flow_and_transport_model_evaluate_output(
 
 
 @pytest.mark.usefixtures("flow_transport_simulation")
+def test_split_flow_and_transport_model_evaluate_output_with_species(
+    tmp_path, flow_transport_simulation
+):
+    simulation = flow_transport_simulation
+
+    flow_model = simulation["flow"]
+    active = flow_model.domain
+
+    # create label array
+    submodel_labels = zeros_like(active)
+    submodel_labels = submodel_labels.drop_vars("layer")
+    submodel_labels.values[:, :, 30:] = 1
+    submodel_labels = submodel_labels.sel(layer=0, drop=True)
+
+    # for reference run the original model and load the results
+    simulation.write(tmp_path / "original", binary=False)
+    simulation.run()
+    original_conc = simulation.open_concentration(species_ls=["a", "b", "c", "d"])
+
+    # split the model , run the split model and load the results
+    new_simulation = simulation.split(submodel_labels)
+    new_simulation.write(tmp_path, binary=False)
+    new_simulation.run()
+    conc = new_simulation.open_concentration(species_ls=["a", "b", "c", "d"])
+
+    # Assert species coordinates
+    assert all(original_conc.coords["species"] == ["a", "b", "c", "d"])
+    assert all(conc.coords["species"] == ["a", "b", "c", "d"])
+
+    # Compare
+    np.testing.assert_allclose(
+        conc.sel(time=2000)["concentration"].values,
+        original_conc.sel(time=2000).values,
+        rtol=1e-4,
+        atol=1e-6,
+    )
+
+@pytest.mark.usefixtures("flow_transport_simulation")
 @pytest.mark.parametrize("advection_scheme", ["TVD", "upstream", "central"])
 @pytest.mark.parametrize("dsp_xt3d", [True, False])
 def test_split_flow_and_transport_settings(
@@ -151,7 +175,6 @@ def test_split_flow_and_transport_settings(
     flow_model = simulation["flow"]
     active = flow_model.domain
 
-    simulation = _edit_fixture(simulation)
     simulation["tpt_b"]["dsp"] = Dispersion(
         diffusion_coefficient=1e-2,
         longitudinal_horizontal=20.0,
