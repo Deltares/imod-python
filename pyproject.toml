@@ -40,8 +40,8 @@ dependencies = [
     "tomli_w",
     "toolz",
     "tqdm",
-    "xarray >=0.15",
-    "xugrid >=0.3.0",
+    "xarray >=2023.04.0",
+    "xugrid >=0.6.4",
 ]
 
 [project.urls]
@@ -63,21 +63,6 @@ all = [
     "shapely >=1.8",
     "tomli >= 1.1.0 ; python_version < '3.11'",
     "zarr",
-]
-dev = [
-    "imod[all]",
-    "black",
-    "ruff",
-    "flopy",
-    "hatchling",
-    "hypothesis",
-    "mypy",
-    "pydata-sphinx-theme",
-    "pytest",
-    "pytest-cov",
-    "pytest-benchmark",
-    "sphinx",
-    "sphinx-gallery",
 ]
 
 [tool.coverage.report]

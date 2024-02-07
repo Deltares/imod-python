@@ -15,8 +15,8 @@ repository = "https://github.com/Deltares/imod-python.git"
 [tasks]
 docs =  { cmd = "make html", depends_on = ["install"], cwd = "docs" }
 install = "python -m pip install --no-deps --editable ."
-format = { depends_on = ["sort_format", "black_format", "ruff_format"] }
-lint = { depends_on = ["sort_lint", "black_lint", "ruff_lint"] }
+format = { depends_on = ["sort_format", "ruff_format"] }
+lint = { depends_on = ["sort_lint", "ruff_lint"] }
 tests = { depends_on = ["unittests", "examples"] }
 unittests = { cmd = [
     "NUMBA_DISABLE_JIT=1",
@@ -40,8 +40,6 @@ examples = { cmd = [
 ], depends_on = ["install"], cwd = "imod/tests" }
 pypi-publish = { cmd = "rm --recursive --force dist && python -m build && twine check dist/* && twine upload dist/*" }
 
-black_lint = "black --check ."
-black_format = "black ."
 sort_lint = "ruff check --select I ."
 sort_format = "ruff check --select I --fix ."
 mypy_lint = { cmd ="mypy", depends_on = ["install"]}
@@ -62,6 +60,7 @@ flopy = "*"
 geopandas = "*"
 gh = "*"
 graphviz = "*"
+hatchling = "*"
 hypothesis = "*"
 jinja2 = "*"
 loguru = "*"

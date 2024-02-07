@@ -54,6 +54,20 @@ def test_to_mf6_pkg__high_lvl_stationary(basic_dis, well_high_lvl_test_data_stat
     np.testing.assert_equal(mf6_ds["rate"].values, rate_expected)
 
 
+def test_to_mf6_pkg__validate(well_high_lvl_test_data_stationary):
+    # Arrange
+    wel = imod.mf6.Well(*well_high_lvl_test_data_stationary)
+
+    # Act
+    errors = wel._validate(wel._write_schemata)
+    assert len(errors) == 0
+
+    # Set rates with index exceeding 3 to NaN.
+    wel.dataset["rate"] = wel.dataset["rate"].where(wel.dataset.coords["index"] < 3)
+    errors = wel._validate(wel._write_schemata)
+    assert len(errors) == 1
+
+
 def test_to_mf6_pkg__high_lvl_multilevel(basic_dis, well_high_lvl_test_data_stationary):
     """
     Test with stationary wells where the first 4 well screens extend over 2 layers.
@@ -140,6 +154,17 @@ def test_to_mf6_pkg__high_lvl_transient(basic_dis, well_high_lvl_test_data_trans
     np.testing.assert_equal(mf6_ds.coords["nmax_cellid"].values, nmax_cellid_expected)
     np.testing.assert_equal(mf6_ds["cellid"].values, cellid_expected)
     np.testing.assert_equal(mf6_ds["rate"].values, rate_expected)
+
+
+def test_is_empty(well_high_lvl_test_data_transient):
+    # Arrange
+    wel = imod.mf6.Well(*well_high_lvl_test_data_transient)
+    empty_wel_args = ([] for i in range(len(well_high_lvl_test_data_transient)))
+    wel_empty = imod.mf6.Well(*empty_wel_args, validate=False)
+
+    # Act/Assert
+    assert not wel.is_empty()
+    assert wel_empty.is_empty()
 
 
 class ClipBoxCases:

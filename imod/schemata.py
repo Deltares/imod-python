@@ -471,6 +471,17 @@ class AllNoDataSchema(NoDataSchema):
             raise ValidationError("all nodata")
 
 
+class AnyNoDataSchema(NoDataSchema):
+    """
+    Fails when any data is NoData.
+    """
+
+    def validate(self, obj: Union[xr.DataArray, xu.UgridDataArray], **kwargs):
+        valid = self.is_notnull(obj)
+        if ~valid.all():
+            raise ValidationError("found a nodata value")
+
+
 class NoDataComparisonSchema(BaseSchema):
     """
     Base class for IdentityNoDataSchema and AllInsideNoDataSchema.

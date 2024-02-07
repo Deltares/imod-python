@@ -160,12 +160,12 @@ class LanduseOptions(MetaSwapPackage):
         self.dataset["start_sprinkling_season"] = start_sprinkling_season
         self.dataset["end_sprinkling_season"] = end_sprinkling_season
         self.dataset["interception_option"] = interception_option
-        self.dataset["interception_capacity_per_LAI_Rutter"] = (
-            interception_capacity_per_LAI
-        )
-        self.dataset["interception_capacity_per_LAI_VonHoyningen"] = (
-            interception_capacity_per_LAI
-        )
+        self.dataset[
+            "interception_capacity_per_LAI_Rutter"
+        ] = interception_capacity_per_LAI
+        self.dataset[
+            "interception_capacity_per_LAI_VonHoyningen"
+        ] = interception_capacity_per_LAI
         self.dataset["interception_intercept"] = interception_intercept
 
         self._pkgcheck()
