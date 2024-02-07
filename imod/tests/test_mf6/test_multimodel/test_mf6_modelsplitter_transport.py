@@ -192,14 +192,14 @@ def test_split_flow_and_transport_settings(
 
     new_simulation = simulation.split(submodel_labels)
     assert (
-        new_simulation["split_exchanges"][1].dataset["adv_scheme"].values[()]
+        new_simulation["split_exchanges"][2].dataset["adv_scheme"].values[()]
         == advection_scheme
     )
     assert (
-        new_simulation["split_exchanges"][1].dataset["dsp_xt3d_off"].values[()]
+        new_simulation["split_exchanges"][2].dataset["dsp_xt3d_off"].values[()]
         == dsp_xt3d
     )
     assert (
-        new_simulation["split_exchanges"][1].dataset["dsp_xt3d_rhs"].values[()]
+        new_simulation["split_exchanges"][2].dataset["dsp_xt3d_rhs"].values[()]
         == dsp_xt3d
     )
