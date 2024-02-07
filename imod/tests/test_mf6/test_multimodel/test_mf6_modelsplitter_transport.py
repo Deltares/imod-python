@@ -4,7 +4,6 @@ import pytest
 from imod.mf6.adv import Advection
 from imod.mf6.dsp import Dispersion
 from imod.mf6.multimodel.modelsplitter import create_partition_info, slice_model
-from imod.mf6.simulation import Modflow6Simulation
 from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
 from imod.typing.grid import zeros_like
 
