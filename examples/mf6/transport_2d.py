@@ -5,7 +5,26 @@ import xarray as xr
 import imod
 from imod.typing.grid import nan_like, zeros_like
 from imod.mf6.multimodel.partition_generator import get_label_array
-# Model parameters
+
+'''
+The simulation shown here comes from the  1999 MT3DMS report, p 138:
+Two-Dimensional Transport in a Uniform Flow of solute injected
+continuously from a point source in a steady-state uniform flow field.
+
+In this example, we build up the model, and the we run the model as is.
+Next, we split the model in 4 partitions and run that as well.
+Finally we show that the ddifference in outcome for the partitioned and unpartitioned models
+is small. 
+
+MT3DMS: A Modular Three-Dimensional
+Multispecies Transport Model for Simulation
+of Advection, Dispersion, and Chemical
+Reactions of Contaminants in Groundwater
+Systems; Documentation and User's Guide
+'''
+
+# %%
+# Set some grid dimensions
 nlay = 1  # Number of layers
 nrow = 31  # Number of rows
 ncol = 46  # Number of columns
@@ -16,6 +35,8 @@ shape = (nlay, nrow, ncol)
 top = 10.0
 dims = ("layer", "y", "x")
 
+# %%
+# build up the "idomain" array, and then the discretization package which represents the model grid.  
 y = np.arange(delr * nrow, 0, -delr)
 x = np.arange(0, delc * ncol, delc)
 coords = {"layer": [1], "y": y, "x": x, "dx": delc, "dy": -delr}
@@ -27,6 +48,10 @@ gwf_model["dis"] = imod.mf6.StructuredDiscretization(
     top=10.0, bottom=bottom, idomain=idomain
 )
 
+
+# %%
+# build up the other flow packages. Flow is steady state in this simulation.
+# 
 gwf_model["sto"] = imod.mf6.SpecificStorage(
     specific_storage=0.0,
     specific_yield=0.0,
@@ -38,6 +63,13 @@ gwf_model["npf"] = imod.mf6.NodePropertyFlow(
     k=1.0,
     save_flows=True,
 )
+gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
+gwf_model["ic"] = imod.mf6.InitialConditions(start=10.0)
+
+# %%
+# build up the boundary conditions. We have: 2 constant head boundaries at 
+# the left and right, chosen so that the velocity is 1/3 m/day
+# and a well that injects 1 m3 per day, with a concentration of 1000
 Lx = 460
 v = 1.0 / 3.0
 prsity = 0.3
@@ -76,11 +108,13 @@ gwf_model["wel"] = imod.mf6.Well(
     concentration=injection_concentration,
     concentration_boundary_type="aux",
 )
-gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
-gwf_model["ic"] = imod.mf6.InitialConditions(start=10.0)
-simulation = imod.mf6.Modflow6Simulation("ex01-twri")
 
 
+# %%
+# Now build up the transport simulation. The flow boundaries 
+# already have inflow concentration data associated, so the transport
+# boundaries can be imported using the ssm package, and the rest of the 
+# transport model definition is straightforward.
 tpt_model = imod.mf6.GroundwaterTransportModel()
 tpt_model["ssm"] = imod.mf6.SourceSinkMixing.from_flow_model(
     gwf_model, species="Au", save_flows=True
@@ -101,6 +135,11 @@ tpt_model["ic"] = imod.mf6.InitialConditions(start=0.0)
 tpt_model["oc"] = imod.mf6.OutputControl(save_concentration="all", save_budget="last")
 tpt_model["dis"] = gwf_model["dis"]
 
+# %%
+# Create a simulation and add the flow and transport models to it.
+# Then define some ims packages: 1 for every type of model.
+# Finally create 365 time steps of 1 day each. 
+simulation = imod.mf6.Modflow6Simulation("ex01-twri")
 simulation["GWF_1"] = gwf_model
 simulation["TPT_1"] = tpt_model
 
@@ -143,26 +182,33 @@ duration = pd.to_timedelta("365d")
 start = pd.to_datetime("2002-01-01")
 simulation.create_time_discretization(additional_times=[start, start + duration])
 simulation["time_discretization"]["n_timesteps"] = 365
+simulation.write(modeldir, binary=False)
 
-
+# %%
+# to split the model in 4 partitions, we must create a label array.
+# we use the utility function  ``get_label_array'' for that.
 
 label_array = get_label_array(simulation, 4)
 modeldir = imod.util.temporary_directory()
-simulation.write(modeldir, binary=False)
 split_simulation = simulation.split(label_array)
-
-
+# %%
+# Run the unsplit model and load the simulation results.
 simulation.run()
 hds = simulation.open_head()
 conc = simulation.open_concentration()
 
+# %%
+# Run the split model and load the simulation results.
 split_modeldir = modeldir /"split"
 split_simulation.write(modeldir, binary=False)
 split_simulation.run()
 split_hds =  split_simulation.open_head()["head"]
-split_conc =  split_simulation.open_head()["concentration"]
+split_conc =  split_simulation.open_concentration()["concentration"]
+split_conc.to_netcdf(modeldir / "data.nc")
 
-print(conc.sel(time=365.0, layer=1).values)
-a = conc.sel(time=365.0, layer=1)
-print(a.max().values)
-perlen = 365  # Simulation time ($days$)
+# %%
+# compute the difference between the split and unsplit simulation results for transport at the 
+# end of the simulation, and print them
+diff = abs(conc -split_conc)
+
+print(f"maximum difference (absolute): {diff.max().values}")
