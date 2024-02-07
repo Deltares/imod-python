@@ -128,15 +128,15 @@ def test_split_flow_and_transport_model_evaluate_output(
     # Compare
     np.testing.assert_allclose(
         head.sel(time=2000)["head"].values,
-        original_head.sel(time=200).values,
+        original_head.sel(time=2000).values,
         rtol=1e-4,
-        atol=1e-4,
+        atol=1e-6,
     )
     np.testing.assert_allclose(
         conc.sel(time=2000)["concentration"].values,
-        original_conc.sel(time=200).values,
+        original_conc.sel(time=2000).values,
         rtol=1e-4,
-        atol=0.011,
+        atol=1e-6,
     )
 
 
