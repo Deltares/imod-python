@@ -701,8 +701,10 @@ class Modflow6Simulation(collections.UserDict):
             )
 
         if len(species_ls) == 1:
-            return self._open_single_output(tpt_names_per_species[0], output, **settings)
-        
+            return self._open_single_output(
+                tpt_names_per_species[0], output, **settings
+            )
+
         # Concatenate species
         outputs = []
         for species, tpt_names in zip(species_ls, tpt_names_per_species):
