@@ -33,6 +33,9 @@ Changed
   development install are adviced to run ``pip uninstall imod`` and ``pip
   install -e .`` again. This does not affect users who installed with ``pip
   install imod``, ``mamba install imod`` or ``conda install imod``.
+- :meth:`imod.mf6.Modflow6Simulation.open_concentration` and
+  :meth:`imod.mf6.Modflow6Simulation.open_transport_budget` raise a
+  ``ValueError`` if ``species_ls`` is provided with incorrect length.
 
 Added
 ~~~~~
