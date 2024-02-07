@@ -576,6 +576,12 @@ class Modflow6Simulation(collections.UserDict):
         """
         modeltype = OUTPUT_MODEL_MAPPING[output]
         modelnames = self.get_models_of_type(modeltype._model_id).keys()
+        if len(modelnames) == 0:
+            modeltype = OUTPUT_MODEL_MAPPING[output]
+            raise ValueError(
+                f"Could not find any models of appropriate type for {output}, "
+                f"make sure a model of type {modeltype} is assigned to simulation."
+            )
 
         if output in ["head", "budget-flow"]:
             return self._open_single_output(modelnames, output, **settings)
@@ -660,7 +666,8 @@ class Modflow6Simulation(collections.UserDict):
 
     def _concat_species(
         self, output: str, **settings
-    ) -> GridDataArray:
+    ) -> GridDataArray | GridDataset:
+        
         # groupby flow model, to somewhat enforce consistent transport model
         # ordening:        
         # F1Ta1 F1Tb1 F2Ta2 F2Tb2 -> F1: [Ta1, Tb1], F2: [Ta2, Tb2]
