@@ -668,7 +668,9 @@ class Modflow6Simulation(collections.UserDict):
 
         return merge_partitions(cbc_per_partition)
 
-    def _concat_species(self, output: str, **settings) -> GridDataArray | GridDataset:
+    def _concat_species(
+        self, output: str, species_ls: Optional[list[str]] = None, **settings
+    ) -> GridDataArray | GridDataset:
         # groupby flow model, to somewhat enforce consistent transport model
         # ordening:
         # F1Ta1 F1Tb1 F2Ta2 F2Tb2 -> F1: [Ta1, Tb1], F2: [Ta2, Tb2]
@@ -689,7 +691,8 @@ class Modflow6Simulation(collections.UserDict):
             # [[Ta, Tb]] -> [Ta, Tb]
             unpartitioned_modelnames = all_tpt_names[0]
 
-        species_ls = settings.pop("species_ls", unpartitioned_modelnames)
+        if not species_ls:
+            species_ls = unpartitioned_modelnames
 
         if len(species_ls) != len(tpt_names_per_species):
             raise ValueError(
