@@ -43,7 +43,6 @@ from imod.typing.grid import (
     concat,
     is_unstructured,
     merge_partitions,
-    merge_with_dictionary,
     nan_like,
 )
 
@@ -78,6 +77,15 @@ def get_packages(simulation: Modflow6Simulation) -> dict[str, Package]:
 
 def is_split(simulation: Modflow6Simulation) -> bool:
     return "split_exchanges" in simulation.keys()
+
+
+def groupby_flow_model(simulation: Modflow6Simulation) -> dict[str, str]:
+    gb = collections.defaultdict(list)
+    for gwfgwt in simulation["gwtgwf_exchanges"]:
+        flow_model_name = gwfgwt["model_name_1"].values[()]
+        tpt_model = gwfgwt["model_name_2"].values[()]
+        gb[flow_model_name].append(tpt_model)
+    return gb
 
 
 class Modflow6Simulation(collections.UserDict):
@@ -568,9 +576,21 @@ class Modflow6Simulation(collections.UserDict):
         """
         modeltype = OUTPUT_MODEL_MAPPING[output]
         modelnames = self.get_models_of_type(modeltype._model_id).keys()
-        # Pop species_ls, set to modelnames in case not found
-        species_ls = settings.pop("species_ls", modelnames)
+
+        if output in ["head", "budget-flow"]:
+            return self._open_single_output(modelnames, output, **settings)
+        elif output in ["concentration", "budget-transport"]:
+            return self._concat_species(
+                output, **settings
+            )
+        else:
+            raise RuntimeError(
+                f"Unexpected error when opening {output} for {modelnames}"
+            )
+
+    def _open_single_output(self, modelnames, output, **settings):
         if len(modelnames) == 0:
+            modeltype = OUTPUT_MODEL_MAPPING[output]
             raise ValueError(
                 f"Could not find any models of appropriate type for {output}, "
                 f"make sure a model of type {modeltype} is assigned to simulation."
@@ -583,15 +603,7 @@ class Modflow6Simulation(collections.UserDict):
                 return self._merge_budgets(modelnames, output, **settings)
             else:
                 return self._merge_states(modelnames, output, **settings)
-        elif output in ["concentration", "budget-transport"]:
-            return self._concat_species(
-                modelnames, species_ls, output, **settings
-            )
-        else:
-            raise RuntimeError(
-                f"Unexpected error when opening {output} for {modelnames}"
-            )
-
+            
     def _merge_states(
         self, modelnames: list[str], output: str, **settings
     ) -> GridDataArray:
@@ -647,11 +659,23 @@ class Modflow6Simulation(collections.UserDict):
         return merge_partitions(cbc_per_partition)
 
     def _concat_species(
-        self, modelnames: list[str], species_ls: list[str], output: str, **settings
+        self, output: str, **settings
     ) -> GridDataArray:
         outputs = []
-        for modelname, species in zip(modelnames, species_ls):
-            output_data = self._open_single_output_single_model(modelname, output, **settings)
+        species_ls = settings.pop("species_ls")
+        gb_flow_model = groupby_flow_model(self)
+        
+        if is_split(self):
+            tpt_names_iterator = list(zip(*gb_flow_model.values()))
+            unpartitioned_modelnames = [tpt_name.rpartition("_")[0] for tpt_name in next(iter(gb_flow_model.values()))]
+        else:
+            tpt_names_iterator = [[modelname] for modelnames in gb_flow_model.values() for modelname in modelnames]
+            unpartitioned_modelnames = list(gb_flow_model.values())[0]
+        
+        species_ls = settings.pop("species_ls", unpartitioned_modelnames)
+
+        for species, tpt_names in zip(species_ls, tpt_names_iterator):
+            output_data = self._open_single_output(tpt_names, output, **settings)
             output_data = output_data.assign_coords(species=species)
             outputs.append(output_data)
         return concat(outputs, dim="species")
