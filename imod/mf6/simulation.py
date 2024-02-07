@@ -661,20 +661,35 @@ class Modflow6Simulation(collections.UserDict):
     def _concat_species(
         self, output: str, **settings
     ) -> GridDataArray:
-        outputs = []
-        species_ls = settings.pop("species_ls")
+        # groupby flow model, to somewhat enforce consistent transport model
+        # ordening:        
+        # F1Ta1 F1Tb1 F2Ta2 F2Tb2 -> F1: [Ta1, Tb1], F2: [Ta2, Tb2]
+        # F1Ta1 F2Tb1 F1Ta1 F2Tb2 -> F1: [Ta1, Tb1], F2: [Ta2, Tb2]
         gb_flow_model = groupby_flow_model(self)
-        
+        all_tpt_names = list(gb_flow_model.values())
+
+        # [[Ta_1, Tb_1], [Ta_2, Tb_2]] -> [[Ta_1, Ta_2], [Tb_1, Tb_2]]
+        # [[Ta, Tb]] -> [[Ta], [Tb]]
+        tpt_names_per_species = list(zip(*all_tpt_names))
+
         if is_split(self):
-            tpt_names_iterator = list(zip(*gb_flow_model.values()))
-            unpartitioned_modelnames = [tpt_name.rpartition("_")[0] for tpt_name in next(iter(gb_flow_model.values()))]
+            # [[Ta_1, Tb_1], [Ta_2, Tb_2]] -> [Ta, Tb]
+            unpartitioned_modelnames = [tpt_name.rpartition("_")[0] for tpt_name in all_tpt_names[0]]
         else:
-            tpt_names_iterator = [[modelname] for modelnames in gb_flow_model.values() for modelname in modelnames]
-            unpartitioned_modelnames = list(gb_flow_model.values())[0]
+            # [[Ta, Tb]] -> [Ta, Tb] 
+            unpartitioned_modelnames = all_tpt_names[0]
         
         species_ls = settings.pop("species_ls", unpartitioned_modelnames)
 
-        for species, tpt_names in zip(species_ls, tpt_names_iterator):
+        if len(species_ls) != len(tpt_names_per_species):
+            raise ValueError(
+                "species_ls does not equal the number of transport models, "
+                f"expected length {len(tpt_names_per_species)}, received {species_ls}"
+                )
+
+        # Concatenate species
+        outputs = []
+        for species, tpt_names in zip(species_ls, tpt_names_per_species):
             output_data = self._open_single_output(tpt_names, output, **settings)
             output_data = output_data.assign_coords(species=species)
             outputs.append(output_data)
