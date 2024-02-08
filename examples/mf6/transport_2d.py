@@ -1,10 +1,11 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import xarray as xr
 
 import imod
 from imod.mf6.multimodel.partition_generator import get_label_array
-from imod.typing.grid import nan_like
+from imod.typing.grid import nan_like, zeros_like
 
 '''
 The simulation shown here comes from the  1999 MT3DMS report, p 138:
@@ -59,7 +60,7 @@ gwf_model["sto"] = imod.mf6.SpecificStorage(
     convertible=0,
 )
 gwf_model["npf"] = imod.mf6.NodePropertyFlow(
-    icelltype=idomain,
+    icelltype=zeros_like(idomain),
     k=1.0,
     save_flows=True,
     save_specific_discharge=True
@@ -191,27 +192,29 @@ simulation.write(modeldir, binary=False)
 # we use the utility function  ``get_label_array'' for that.
 
 label_array = get_label_array(simulation, 4)
+fig, ax = plt.subplots()
+label_array.plot(ax = ax)
 
 split_simulation = simulation.split(label_array)
 # %%
 # Run the unsplit model and load the simulation results.
 simulation.run()
-hds = simulation.open_head()
 conc = simulation.open_concentration()
-budget = simulation.open_flow_budget()
 
 # %%
 # Run the split model and load the simulation results.
 split_modeldir = modeldir /"split"
 split_simulation.write(modeldir, binary=False)
 split_simulation.run()
-split_hds =  split_simulation.open_head()["head"]
 split_conc =  split_simulation.open_concentration()["concentration"]
-split_conc.to_netcdf(modeldir / "data.nc")
+fig, ax = plt.subplots()
+split_conc.isel(layer=0, time = 364).plot.contourf(ax = ax, levels=[0.1, 1, 10])
 
 # %%
 # compute the difference between the split and unsplit simulation results for transport at the 
 # end of the simulation, and print them
 diff = abs(conc -split_conc)
+fig, ax = plt.subplots()
+diff.isel(layer=0, time = 364).plot.contourf(ax=ax)
 
-print(f"maximum difference (absolute): {diff.max().values}")
+
