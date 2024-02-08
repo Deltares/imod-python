@@ -3,8 +3,8 @@ import pandas as pd
 import xarray as xr
 
 import imod
-from imod.typing.grid import nan_like, zeros_like
 from imod.mf6.multimodel.partition_generator import get_label_array
+from imod.typing.grid import nan_like
 
 '''
 The simulation shown here comes from the  1999 MT3DMS report, p 138:
@@ -62,6 +62,7 @@ gwf_model["npf"] = imod.mf6.NodePropertyFlow(
     icelltype=idomain,
     k=1.0,
     save_flows=True,
+    save_specific_discharge=True
 )
 gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
 gwf_model["ic"] = imod.mf6.InitialConditions(start=10.0)
@@ -77,7 +78,7 @@ q = v * prsity
 h1 = q * Lx
 chd_field = nan_like(idomain)
 chd_field.values[0, :, 0] = h1
-chd_field.values[0, :, -1] = 0.1
+chd_field.values[0, :, -1] = 0.0
 chd_concentration = nan_like(idomain)
 chd_concentration.values[0, :, 0] = 0.0
 chd_concentration.values[0, :, -1] = 0.0
@@ -182,6 +183,7 @@ duration = pd.to_timedelta("365d")
 start = pd.to_datetime("2002-01-01")
 simulation.create_time_discretization(additional_times=[start, start + duration])
 simulation["time_discretization"]["n_timesteps"] = 365
+modeldir = imod.util.temporary_directory()
 simulation.write(modeldir, binary=False)
 
 # %%
@@ -189,13 +191,14 @@ simulation.write(modeldir, binary=False)
 # we use the utility function  ``get_label_array'' for that.
 
 label_array = get_label_array(simulation, 4)
-modeldir = imod.util.temporary_directory()
+
 split_simulation = simulation.split(label_array)
 # %%
 # Run the unsplit model and load the simulation results.
 simulation.run()
 hds = simulation.open_head()
 conc = simulation.open_concentration()
+budget = simulation.open_flow_budget()
 
 # %%
 # Run the split model and load the simulation results.
