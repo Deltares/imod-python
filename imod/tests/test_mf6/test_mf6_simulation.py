@@ -116,7 +116,7 @@ def test_simulation_open_flow_budget(circle_model, tmp_path):
 
     budget = simulation.open_flow_budget()
 
-    assert isinstance(budget, dict)
+    assert isinstance(budget, xu.UgridDataset)
     assert sorted(budget.keys()) == [
         "chd",
         "flow-horizontal-face",

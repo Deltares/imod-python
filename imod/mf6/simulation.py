@@ -434,6 +434,7 @@ class Modflow6Simulation(collections.UserDict):
             species_ls=species_ls,
             simulation_start_time=simulation_start_time,
             time_unit=time_unit,
+            merge_to_dataset=True,
         )
 
     def open_flow_budget(
@@ -502,6 +503,7 @@ class Modflow6Simulation(collections.UserDict):
             flowja=flowja,
             simulation_start_time=simulation_start_time,
             time_unit=time_unit,
+            merge_to_dataset=True,
         )
 
     def open_concentration(
@@ -567,33 +569,43 @@ class Modflow6Simulation(collections.UserDict):
         """
         modeltype = OUTPUT_MODEL_MAPPING[output]
         modelnames = self.get_models_of_type(modeltype._model_id).keys()
-        # Pop species_ls, set to modelnames in case not found
-        species_ls = settings.pop("species_ls", modelnames)
         if len(modelnames) == 0:
+            modeltype = OUTPUT_MODEL_MAPPING[output]
+            raise ValueError(
+                f"Could not find any models of appropriate type for {output}, "
+                f"make sure a model of type {modeltype} is assigned to simulation."
+            )
+
+        if output in ["head", "budget-flow"]:
+            return self._open_single_output(modelnames, output, **settings)
+        elif output in ["concentration", "budget-transport"]:
+            return self._concat_species(output, **settings)
+        else:
+            raise RuntimeError(
+                f"Unexpected error when opening {output} for {modelnames}"
+            )
+
+    def _open_single_output(
+        self, modelnames: list[str], output: str, **settings
+    ) -> GridDataArray | GridDataset:
+        """
+        Open single output, e.g. concentration of single species, or heads. This
+        can be output of partitioned models that need to be merged.
+        """
+        if len(modelnames) == 0:
+            modeltype = OUTPUT_MODEL_MAPPING[output]
             raise ValueError(
                 f"Could not find any models of appropriate type for {output}, "
                 f"make sure a model of type {modeltype} is assigned to simulation."
             )
         elif len(modelnames) == 1:
             modelname = next(iter(modelnames))
-            return self._open_output_single_model(modelname, output, **settings)
+            return self._open_single_output_single_model(modelname, output, **settings)
         elif is_split(self):
             if "budget" in output:
                 return self._merge_budgets(modelnames, output, **settings)
             else:
                 return self._merge_states(modelnames, output, **settings)
-        elif output == "concentration":
-            return self._concat_concentrations(
-                modelnames, species_ls, output, **settings
-            )
-        elif output == "budget-transport":
-            return self._concat_transport_budgets(
-                modelnames, species_ls, output, **settings
-            )
-        else:
-            raise RuntimeError(
-                f"Unexpected error when opening {output} for {modelnames}"
-            )
 
     def _merge_states(
         self, modelnames: list[str], output: str, **settings
@@ -601,7 +613,7 @@ class Modflow6Simulation(collections.UserDict):
         state_partitions = []
         for modelname in modelnames:
             state_partitions.append(
-                self._open_output_single_model(modelname, output, **settings)
+                self._open_single_output_single_model(modelname, output, **settings)
             )
         return merge_partitions(state_partitions)
 
@@ -628,19 +640,13 @@ class Modflow6Simulation(collections.UserDict):
 
         cbc_per_partition = []
         for modelname in modelnames:
-            partition_model = self[modelname]
-            partition_domain = partition_model.domain
-            cbc_dict = self._open_output_single_model(modelname, output, **settings)
-            # Force list of dicts to list of DataArrays to work around:
-            # https://github.com/Deltares/xugrid/issues/179
-            cbc_list = [da.rename(key) for key, da in cbc_dict.items()]
-            cbc = merge(cbc_list)
+            cbc = self._open_single_output_single_model(modelname, output, **settings)
             # Merge and assign exchange budgets to dataset
             # FUTURE: Refactor to insert these exchange budgets in horizontal
             # flows.
             cbc = self._merge_and_assign_exchange_budgets(cbc)
             if not is_unstructured(cbc):
-                cbc = cbc.where(partition_domain, other=np.nan)
+                cbc = cbc.where(self[modelname].domain, other=np.nan)
             cbc_per_partition.append(cbc)
 
         # Boundary conditions can be missing in certain partitions, as do their
@@ -655,40 +661,60 @@ class Modflow6Simulation(collections.UserDict):
 
         return merge_partitions(cbc_per_partition)
 
-    def _concat_concentrations(
-        self, modelnames: list[str], species_ls: list[str], output: str, **settings
-    ) -> GridDataArray:
-        concentrations = []
-        for modelname, species in zip(modelnames, species_ls):
-            conc = self._open_output_single_model(modelname, output, **settings)
-            if not isinstance(conc, GridDataArray):
-                raise RuntimeError(
-                    f"Type error. Expected GridDataArray but got {type(conc)}"
-                )
-            conc = conc.assign_coords(species=species)
-            concentrations.append(conc)
-        return concat(concentrations, dim="species")
+    def _concat_species(
+        self, output: str, species_ls: Optional[list[str]] = None, **settings
+    ) -> GridDataArray | GridDataset:
+        # groupby flow model, to somewhat enforce consistent transport model
+        # ordening. Say:
+        # F = Flow model, T = Transport model
+        # a = species "a", b = species "b"
+        # 1 = partition 1, 2 = partition 2
+        # then this:
+        # F1Ta1 F1Tb1 F2Ta2 F2Tb2 -> F1: [Ta1, Tb1], F2: [Ta2, Tb2]
+        # F1Ta1 F2Tb1 F1Ta1 F2Tb2 -> F1: [Ta1, Tb1], F2: [Ta2, Tb2]
+        tpt_models_per_flow_model = self._get_transport_models_per_flow_model()
+        all_tpt_names = list(tpt_models_per_flow_model.values())
 
-    def _concat_transport_budgets(
-        self, modelnames: list[str], species_ls: list[str], output: str, **settings
-    ) -> GridDataset:
-        budgets = []
-        for modelname, species in zip(modelnames, species_ls):
-            budget_dict = self._open_output_single_model(modelname, output, **settings)
-            # Force list of dicts to list of DataArrays to work around:
-            # https://github.com/Deltares/xugrid/issues/179
-            budget_list = [da.rename(key) for key, da in budget_dict.items()]
-            budget = merge(budget_list)
-            budget = budget.assign_coords(species=species)
-            budgets.append(budget)
+        # [[Ta_1, Tb_1], [Ta_2, Tb_2]] -> [[Ta_1, Ta_2], [Tb_1, Tb_2]]
+        # [[Ta, Tb]] -> [[Ta], [Tb]]
+        tpt_names_per_species = list(zip(*all_tpt_names))
 
-        return concat(budgets, dim="species")
+        if is_split(self):
+            # [[Ta_1, Tb_1], [Ta_2, Tb_2]] -> [Ta, Tb]
+            unpartitioned_modelnames = [
+                tpt_name.rpartition("_")[0] for tpt_name in all_tpt_names[0]
+            ]
+        else:
+            # [[Ta, Tb]] -> [Ta, Tb]
+            unpartitioned_modelnames = all_tpt_names[0]
 
-    def _open_output_single_model(
+        if not species_ls:
+            species_ls = unpartitioned_modelnames
+
+        if len(species_ls) != len(tpt_names_per_species):
+            raise ValueError(
+                "species_ls does not equal the number of transport models, "
+                f"expected length {len(tpt_names_per_species)}, received {species_ls}"
+            )
+
+        if len(species_ls) == 1:
+            return self._open_single_output(
+                tpt_names_per_species[0], output, **settings
+            )
+
+        # Concatenate species
+        outputs = []
+        for species, tpt_names in zip(species_ls, tpt_names_per_species):
+            output_data = self._open_single_output(tpt_names, output, **settings)
+            output_data = output_data.assign_coords(species=species)
+            outputs.append(output_data)
+        return concat(outputs, dim="species")
+
+    def _open_single_output_single_model(
         self, modelname: str, output: str, **settings
-    ) -> GridDataArray | dict[str, GridDataArray]:
+    ) -> GridDataArray | GridDataset:
         """
-        Opens output of single model
+        Opens single output of single model
 
         Parameters
         ----------
@@ -1118,20 +1144,18 @@ class Modflow6Simulation(collections.UserDict):
             content = attrs + ["){}"]
         return "\n".join(content)
 
-    def _get_transport_models_per_flow_model(self) -> dict[str, list(str)]:
+    def _get_transport_models_per_flow_model(self) -> dict[str, list[str]]:
         flow_models = self.get_models_of_type("gwf6")
         transport_models = self.get_models_of_type("gwt6")
         # exchange for flow and transport
-        result = {}
+        result = collections.defaultdict(list)
 
         for flow_model_name in flow_models:
-            tpt_models_of_flow_model = []
             flow_model = self[flow_model_name]
             for tpt_model_name in transport_models:
                 tpt_model = self[tpt_model_name]
                 if is_equal(tpt_model.domain, flow_model.domain):
-                    tpt_models_of_flow_model.append(tpt_model_name)
-            result[flow_model_name] = tpt_models_of_flow_model
+                    result[flow_model_name].append(tpt_model_name)
         return result
 
     def _generate_gwfgwt_exchanges(self) -> list[GWFGWT]:
