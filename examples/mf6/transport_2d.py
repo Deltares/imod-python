@@ -37,7 +37,7 @@ top = 10.0
 dims = ("layer", "y", "x")
 
 # %%
-# construct the "idomain" array, and then the discretization package which represents the model grid.  
+# Construct the "idomain" array, and then the discretization package which represents the model grid.  
 y = np.arange(delr * nrow, 0, -delr)
 x = np.arange(0, delc * ncol, delc)
 coords = {"layer": [1], "y": y, "x": x, "dx": delc, "dy": -delr}
@@ -190,7 +190,7 @@ simulation.write(modeldir, binary=False)
 
 # %%
 # To split the model in 4 partitions, we must create a label array.
-# we use the utility function  ``get_label_array'' for that.
+# We use the utility function  ``get_label_array'' for that.
 
 label_array = get_label_array(simulation, 4)
 fig, ax = plt.subplots()
@@ -205,14 +205,14 @@ conc = simulation.open_concentration()
 # %%
 # Run the split model and load the simulation results.
 split_modeldir = modeldir /"split"
-split_simulation.write(modeldir, binary=False)
+split_simulation.write(split_modeldir, binary=False)
 split_simulation.run()
 split_conc =  split_simulation.open_concentration()["concentration"]
 fig, ax = plt.subplots()
 split_conc.isel(layer=0, time = 364).plot.contourf(ax = ax, levels=[0.1, 1, 10])
 
 # %%
-# compute the difference between the split and unsplit simulation results for transport at the 
+# Compute the difference between the split and unsplit simulation results for transport at the 
 # end of the simulation, and print them
 diff = abs(conc -split_conc)
 fig, ax = plt.subplots()
