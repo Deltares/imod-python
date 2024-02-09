@@ -37,7 +37,7 @@ top = 10.0
 dims = ("layer", "y", "x")
 
 # %%
-# build up the "idomain" array, and then the discretization package which represents the model grid.  
+# construct the "idomain" array, and then the discretization package which represents the model grid.  
 y = np.arange(delr * nrow, 0, -delr)
 x = np.arange(0, delc * ncol, delc)
 coords = {"layer": [1], "y": y, "x": x, "dx": delc, "dy": -delr}
