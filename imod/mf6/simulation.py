@@ -79,15 +79,6 @@ def is_split(simulation: Modflow6Simulation) -> bool:
     return "split_exchanges" in simulation.keys()
 
 
-def groupby_flow_model(simulation: Modflow6Simulation) -> dict[str, str]:
-    gb = collections.defaultdict(list)
-    for gwfgwt in simulation["gwtgwf_exchanges"]:
-        flow_model_name = gwfgwt["model_name_1"].values[()]
-        tpt_model = gwfgwt["model_name_2"].values[()]
-        gb[flow_model_name].append(tpt_model)
-    return gb
-
-
 class Modflow6Simulation(collections.UserDict):
     def _initialize_template(self):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
@@ -672,11 +663,15 @@ class Modflow6Simulation(collections.UserDict):
         self, output: str, species_ls: Optional[list[str]] = None, **settings
     ) -> GridDataArray | GridDataset:
         # groupby flow model, to somewhat enforce consistent transport model
-        # ordening:
+        # ordening. Say:
+        # F = Flow model, T = Transport model
+        # a = species "a", b = species "b"
+        # 1 = partition 1, 2 = partition 2
+        # then this:
         # F1Ta1 F1Tb1 F2Ta2 F2Tb2 -> F1: [Ta1, Tb1], F2: [Ta2, Tb2]
         # F1Ta1 F2Tb1 F1Ta1 F2Tb2 -> F1: [Ta1, Tb1], F2: [Ta2, Tb2]
-        gb_flow_model = groupby_flow_model(self)
-        all_tpt_names = list(gb_flow_model.values())
+        tpt_models_per_flow_model = self._get_transport_models_per_flow_model()
+        all_tpt_names = list(tpt_models_per_flow_model.values())
 
         # [[Ta_1, Tb_1], [Ta_2, Tb_2]] -> [[Ta_1, Ta_2], [Tb_1, Tb_2]]
         # [[Ta, Tb]] -> [[Ta], [Tb]]
@@ -1146,20 +1141,18 @@ class Modflow6Simulation(collections.UserDict):
             content = attrs + ["){}"]
         return "\n".join(content)
 
-    def _get_transport_models_per_flow_model(self) -> dict[str, list(str)]:
+    def _get_transport_models_per_flow_model(self) -> dict[str, list[str]]:
         flow_models = self.get_models_of_type("gwf6")
         transport_models = self.get_models_of_type("gwt6")
         # exchange for flow and transport
-        result = {}
+        result = collections.defaultdict(list)
 
         for flow_model_name in flow_models:
-            tpt_models_of_flow_model = []
             flow_model = self[flow_model_name]
             for tpt_model_name in transport_models:
                 tpt_model = self[tpt_model_name]
                 if tpt_model.domain.equals(flow_model.domain):
-                    tpt_models_of_flow_model.append(tpt_model_name)
-            result[flow_model_name] = tpt_models_of_flow_model
+                    result[flow_model_name].append(tpt_model_name)
         return result
 
     def _generate_gwfgwt_exchanges(self) -> list[GWFGWT]:
