@@ -189,7 +189,7 @@ modeldir = imod.util.temporary_directory()
 simulation.write(modeldir, binary=False)
 
 # %%
-# to split the model in 4 partitions, we must create a label array.
+# To split the model in 4 partitions, we must create a label array.
 # we use the utility function  ``get_label_array'' for that.
 
 label_array = get_label_array(simulation, 4)
