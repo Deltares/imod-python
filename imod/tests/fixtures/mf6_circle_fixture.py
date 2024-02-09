@@ -29,6 +29,79 @@ def make_circle_model():
     k = xu.full_like(idomain, 1.0, dtype=np.float64)
     k33 = k.copy()
     rch_rate = xu.full_like(k.sel(layer=1), 0.001, dtype=float)
+
+    bottom = k * xr.DataArray([5.0, 0.0], dims=["layer"])
+    chd_location = xu.zeros_like(k.sel(layer=2), dtype=bool).ugrid.binary_dilation(
+        border_value=True
+    )
+    constant_head = xu.full_like(k.sel(layer=2), 1.0).where(chd_location)
+
+    gwf_model = imod.mf6.GroundwaterFlowModel()
+    gwf_model["disv"] = imod.mf6.VerticesDiscretization(
+        top=10.0, bottom=bottom, idomain=idomain
+    )
+    gwf_model["chd"] = imod.mf6.ConstantHead(
+        constant_head,print_input=True, print_flows=True, save_flows=True
+    )
+    gwf_model["ic"] = imod.mf6.InitialConditions(start=0.0)
+    gwf_model["npf"] = imod.mf6.NodePropertyFlow(
+        icelltype=icelltype,
+        k=k,
+        k33=k33,
+        save_flows=True,
+    )
+    gwf_model["sto"] = imod.mf6.SpecificStorage(
+        specific_storage=1.0e-5,
+        specific_yield=0.15,
+        transient=False,
+        convertible=0,
+        save_flows=False,
+    )
+    gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
+    gwf_model["rch"] = imod.mf6.Recharge(rch_rate)
+
+    simulation = imod.mf6.Modflow6Simulation("circle")
+    simulation["GWF_1"] = gwf_model
+    simulation["solver"] = imod.mf6.Solution(
+        modelnames=["GWF_1"],
+        print_option="summary",
+        csv_output=False,
+        no_ptc=True,
+        outer_dvclose=1.0e-4,
+        outer_maximum=500,
+        under_relaxation=None,
+        inner_dvclose=1.0e-4,
+        inner_rclose=0.001,
+        inner_maximum=100,
+        linear_acceleration="cg",
+        scaling_method=None,
+        reordering_method=None,
+        relaxation_factor=0.97,
+    )
+    simulation.create_time_discretization(additional_times=["2000-01-01", "2000-01-02"])
+    return simulation
+
+
+def make_circle_model_flow_with_transport_data():
+    grid = imod.data.circle()
+    max_concentration = 35.0
+    min_concentration = 0.0
+    nface = grid.n_face
+
+    nlayer = 2
+
+    idomain = xu.UgridDataArray(
+        xr.DataArray(
+            np.ones((nlayer, nface), dtype=np.int32),
+            coords={"layer": [1, 2]},
+            dims=["layer", grid.face_dimension],
+        ),
+        grid=grid,
+    )
+    icelltype = xu.full_like(idomain, 0)
+    k = xu.full_like(idomain, 1.0, dtype=np.float64)
+    k33 = k.copy()
+    rch_rate = xu.full_like(k.sel(layer=1), 0.001, dtype=float)
     rch_concentration = xu.full_like(rch_rate, min_concentration)
     rch_concentration = rch_concentration.expand_dims(species=["salinity"])
     bottom = k * xr.DataArray([5.0, 0.0], dims=["layer"])
@@ -87,7 +160,6 @@ def make_circle_model():
     )
     simulation.create_time_discretization(additional_times=["2000-01-01", "2000-01-02"])
     return simulation
-
 
 @pytest.fixture(scope="function")
 def circle_model():
@@ -204,7 +276,7 @@ def circle_model_transport():
     max_density = 1025.0
     min_density = 1000.0    
 
-    simulation = make_circle_model()
+    simulation = make_circle_model_flow_with_transport_data()
     gwf_model = simulation["GWF_1"]
 
 
