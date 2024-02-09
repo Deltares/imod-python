@@ -11,8 +11,6 @@ import imod
 
 def make_circle_model():
     grid = imod.data.circle()
-    max_concentration = 35.0
-    min_concentration = 0.0
     nface = grid.n_face
 
     nlayer = 2
