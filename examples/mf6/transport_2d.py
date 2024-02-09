@@ -51,7 +51,8 @@ gwf_model["dis"] = imod.mf6.StructuredDiscretization(
 
 
 # %%
-# build up the other flow packages. Flow is steady state in this simulation.
+# Construct the other flow packages. Flow is steady-state in this simulation, 
+# meaning specific storage is set to zero.
 # 
 gwf_model["sto"] = imod.mf6.SpecificStorage(
     specific_storage=0.0,
