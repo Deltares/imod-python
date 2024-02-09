@@ -114,7 +114,7 @@ gwf_model["wel"] = imod.mf6.Well(
 
 
 # %%
-# Now build up the transport simulation. The flow boundaries 
+# Now construct the transport simulation. The flow boundaries 
 # already have inflow concentration data associated, so the transport
 # boundaries can be imported using the ssm package, and the rest of the 
 # transport model definition is straightforward.
