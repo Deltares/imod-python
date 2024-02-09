@@ -70,7 +70,7 @@ gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
 gwf_model["ic"] = imod.mf6.InitialConditions(start=10.0)
 
 # %%
-# build up the boundary conditions. We have: 2 constant head boundaries at 
+# Set up the boundary conditions. We have: 2 constant head boundaries at 
 # the left and right, chosen so that the velocity is 1/3 m/day
 # and a well that injects 1 m3 per day, with a concentration of 1000
 Lx = 460
