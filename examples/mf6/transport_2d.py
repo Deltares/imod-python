@@ -14,7 +14,7 @@ continuously from a point source in a steady-state uniform flow field.
 
 In this example, we build up the model, and the we run the model as is.
 Next, we split the model in 4 partitions and run that as well.
-Finally we show that the ddifference in outcome for the partitioned and unpartitioned models
+Finally we show that the difference in outcome for the partitioned and unpartitioned models
 is small. 
 
 MT3DMS: A Modular Three-Dimensional
