@@ -147,3 +147,12 @@ class Buoyancy(Package):
                 d[varname] = value
 
         return self._template.render(d)
+
+    def update_transport_models(self, new_modelname: Sequence[str]):
+        transport_model_names = self.get_transport_model_names()
+        if not len(transport_model_names) == len(new_modelname):
+            raise ValueError("the number of transport models cannot be changed.")
+        self.dataset["modelname"] = assign_index(new_modelname)
+
+    def get_transport_model_names(self )->list[str]: 
+        return  list(self.dataset["modelname"].values)     

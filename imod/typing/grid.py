@@ -268,3 +268,27 @@ def is_spatial_2D(array: xu.UgridDataArray) -> bool:
 @typedispatch
 def is_spatial_2D(_: object) -> bool:
     return False
+
+
+@typedispatch
+def is_equal(array1: xu.UgridDataArray, array2: xu.UgridDataArray)->bool:
+    if not array1.shape == array2.shape:
+        return False
+    if not (array1.values == array2.values).all():
+        return False
+
+    grid_dataset_1 = array1.ugrid.grid.to_dataset()
+    grid_dataset_2 = array2.ugrid.grid.to_dataset()       
+    return grid_dataset_1.equals(grid_dataset_2)
+
+@typedispatch
+def is_equal(array1: xr.DataArray, array2: xr.DataArray)->bool:
+    if not array1.shape == array2.shape:
+        return False    
+    if not(array1.values == array2.values):
+        return False
+    return array1.coords== array2.coords
+
+@typedispatch
+def is_equal(array1: object, array2:object)->bool:
+    return False

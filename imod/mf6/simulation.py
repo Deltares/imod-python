@@ -39,7 +39,14 @@ from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
-from imod.typing.grid import concat, is_unstructured, merge, merge_partitions, nan_like
+from imod.typing.grid import (
+    concat,
+    is_equal,
+    is_unstructured,
+    merge,
+    merge_partitions,
+    nan_like,
+)
 
 OUTPUT_FUNC_MAPPING: dict[str, Callable] = {
     "head": open_hds,
@@ -964,6 +971,7 @@ class Modflow6Simulation(collections.UserDict):
                     tpt_model_name, flow_model_name, model.domain.layer
                 )
         new_simulation._add_modelsplit_exchanges(exchanges)
+        new_simulation._update_buoyancy_packages()
         new_simulation._set_flow_exchange_options()
         new_simulation._set_transport_exchange_options()
         new_simulation._update_ssm_packages()
@@ -1121,7 +1129,7 @@ class Modflow6Simulation(collections.UserDict):
             flow_model = self[flow_model_name]
             for tpt_model_name in transport_models:
                 tpt_model = self[tpt_model_name]
-                if tpt_model.domain.equals(flow_model.domain):
+                if is_equal(tpt_model.domain, flow_model.domain):
                     tpt_models_of_flow_model.append(tpt_model_name)
             result[flow_model_name] = tpt_models_of_flow_model
         return result
@@ -1153,3 +1161,9 @@ class Modflow6Simulation(collections.UserDict):
                     )
                     if ssm_package is not None:
                         tpt_model[ssm_key] = ssm_package
+
+    def _update_buoyancy_packages(self)->None:
+        flow_transport_mapping = self._get_transport_models_per_flow_model()
+        for flow_name, tpt_models_of_flow_model in flow_transport_mapping.items():
+            flow_model = self[flow_name]
+            flow_model.update_buoyancy_package(tpt_models_of_flow_model)
