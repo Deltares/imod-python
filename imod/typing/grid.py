@@ -268,3 +268,33 @@ def is_spatial_2D(array: xu.UgridDataArray) -> bool:
 @typedispatch
 def is_spatial_2D(_: object) -> bool:
     return False
+
+
+@typedispatch
+def is_equal(array1: xu.UgridDataArray, array2: xu.UgridDataArray)->bool:
+    # TODO: use .equals function of xugrid once new release has been made
+    if not array1.shape == array2.shape:
+        return False
+    if not (array1.values == array2.values).all():
+        return False
+
+    grid_dataset_1 = array1.ugrid.grid.to_dataset()
+    grid_dataset_2 = array2.ugrid.grid.to_dataset()       
+    return grid_dataset_1.equals(grid_dataset_2)
+
+@typedispatch
+def is_equal(array1: xr.DataArray, array2: xr.DataArray)->bool:
+    if not array1.shape == array2.shape:
+        return False    
+    if not list(array1.coords.keys())  == list(array2.coords.keys()) :
+        return False
+    for k in list(array1.coords.keys()):
+        if not np.all(array1[k].values == array2[k].values):
+            return False
+    if not np.all(array1.values == array2.values):
+        return False            
+    return True
+
+@typedispatch
+def is_equal(array1: object, array2:object)->bool:
+    return False

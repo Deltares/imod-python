@@ -41,6 +41,7 @@ from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
 from imod.typing.grid import (
     concat,
+    is_equal,
     is_unstructured,
     merge_partitions,
     nan_like,
@@ -582,6 +583,7 @@ class Modflow6Simulation(collections.UserDict):
             raise RuntimeError(
                 f"Unexpected error when opening {output} for {modelnames}"
             )
+        return
 
     def _open_single_output(
         self, modelnames: list[str], output: str, **settings
@@ -604,6 +606,9 @@ class Modflow6Simulation(collections.UserDict):
                 return self._merge_budgets(modelnames, output, **settings)
             else:
                 return self._merge_states(modelnames, output, **settings)
+        raise ValueError(
+            "error in _open_single_output"
+        )
 
     def _merge_states(
         self, modelnames: list[str], output: str, **settings
@@ -697,13 +702,13 @@ class Modflow6Simulation(collections.UserDict):
 
         if len(species_ls) == 1:
             return self._open_single_output(
-                tpt_names_per_species[0], output, **settings
+                list(tpt_names_per_species[0]), output, **settings
             )
 
         # Concatenate species
         outputs = []
         for species, tpt_names in zip(species_ls, tpt_names_per_species):
-            output_data = self._open_single_output(tpt_names, output, **settings)
+            output_data = self._open_single_output(list(tpt_names), output, **settings)
             output_data = output_data.assign_coords(species=species)
             outputs.append(output_data)
         return concat(outputs, dim="species")
@@ -995,6 +1000,7 @@ class Modflow6Simulation(collections.UserDict):
                     tpt_model_name, flow_model_name, model.domain.layer
                 )
         new_simulation._add_modelsplit_exchanges(exchanges)
+        new_simulation._update_buoyancy_packages()
         new_simulation._set_flow_exchange_options()
         new_simulation._set_transport_exchange_options()
         new_simulation._update_ssm_packages()
@@ -1115,7 +1121,7 @@ class Modflow6Simulation(collections.UserDict):
         active_exchange_domain = active_exchange_domain.dropna("index")
         ex.dataset = ex.dataset.sel(index=active_exchange_domain["index"])
 
-    def get_solution_name(self, model_name: str) -> str:
+    def get_solution_name(self, model_name: str) -> Optional[str]:
         for k, v in self.items():
             if isinstance(v, Solution):
                 if model_name in v.dataset["modelnames"]:
@@ -1151,7 +1157,7 @@ class Modflow6Simulation(collections.UserDict):
             flow_model = self[flow_model_name]
             for tpt_model_name in transport_models:
                 tpt_model = self[tpt_model_name]
-                if tpt_model.domain.equals(flow_model.domain):
+                if is_equal(tpt_model.domain, flow_model.domain):
                     result[flow_model_name].append(tpt_model_name)
         return result
 
@@ -1182,3 +1188,9 @@ class Modflow6Simulation(collections.UserDict):
                     )
                     if ssm_package is not None:
                         tpt_model[ssm_key] = ssm_package
+
+    def _update_buoyancy_packages(self)->None:
+        flow_transport_mapping = self._get_transport_models_per_flow_model()
+        for flow_name, tpt_models_of_flow_model in flow_transport_mapping.items():
+            flow_model = self[flow_name]
+            flow_model.update_buoyancy_package(tpt_models_of_flow_model)

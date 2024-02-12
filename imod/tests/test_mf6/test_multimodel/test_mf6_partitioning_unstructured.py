@@ -405,3 +405,23 @@ def test_partitioning_unstructured_with_well(
     # np.testing.assert_allclose(
     #     cbc["chd"].values, original_cbc["chd"].values, rtol=1e-5, atol=1e-3
     # )
+
+
+@pytest.mark.usefixtures("circle_model_transport")
+@parametrize_with_cases("partition_array", cases=PartitionArrayCases)
+def test_partition_transport(    tmp_path: Path,
+    circle_model_transport: Modflow6Simulation,partition_array: xu.UgridDataArray):
+
+    circle_model_transport.write(tmp_path)
+    new_circle_model = circle_model_transport.split(partition_array)
+
+
+    circle_model_transport.run()
+    new_circle_model.write(tmp_path/"split", binary=False)
+    new_circle_model.run()       
+    concentration = circle_model_transport.open_concentration()
+    new_concentration = new_circle_model.open_concentration()
+
+    np.testing.assert_allclose(
+        concentration.values, new_concentration["concentration"].values, rtol=1e-5, atol=1e-3
+    )
