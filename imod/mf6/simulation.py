@@ -606,8 +606,10 @@ class Modflow6Simulation(collections.UserDict):
                 return self._merge_budgets(modelnames, output, **settings)
             else:
                 return self._merge_states(modelnames, output, **settings)
-        return
-        
+        raise ValueError(
+            f"error in _open_single_output"
+        )
+
     def _merge_states(
         self, modelnames: list[str], output: str, **settings
     ) -> GridDataArray:
