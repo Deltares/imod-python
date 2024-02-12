@@ -6,7 +6,7 @@ import inspect
 import pathlib
 from copy import deepcopy
 from pathlib import Path
-from typing import Optional, Tuple, Union, cast
+from typing import Optional, Tuple, Union
 
 import cftime
 import jinja2
@@ -251,7 +251,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 if isinstance(pkg, imod.mf6.Well):
                     top, bottom, idomain = self.__get_domain_geometry()
                     k = self.__get_k()
-                    mf6_pkg = pkg.to_mf6_pkg(
+                    mf6_well_pkg = pkg.to_mf6_pkg(
                         idomain,
                         top,
                         bottom,
@@ -260,20 +260,16 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                         pkg_write_context.is_partitioned,
                     )
 
-                    mf6_pkg.write(
+                    mf6_well_pkg.write(
                         pkgname=pkg_name,
                         globaltimes=globaltimes,
                         write_context=pkg_write_context,
                     )
-                elif isinstance(
-                    pkg, imod.mf6.HorizontalFlowBarrierBase | imod.mf6.Well
-                ):
+                elif isinstance(pkg, imod.mf6.HorizontalFlowBarrierBase):
                     top, bottom, idomain = self.__get_domain_geometry()
                     k = self.__get_k()
-                    mf6_pkg = cast(
-                        imod.mf6.HorizontalFlowBarrierBase | imod.mf6.Well, pkg
-                    ).to_mf6_pkg(idomain, top, bottom, k, validate)
-                    mf6_pkg.write(
+                    mf6_hfb_pkg = pkg.to_mf6_pkg(idomain, top, bottom, k, validate)
+                    mf6_hfb_pkg.write(
                         pkgname=pkg_name,
                         globaltimes=globaltimes,
                         write_context=pkg_write_context,

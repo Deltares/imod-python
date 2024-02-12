@@ -131,11 +131,11 @@ class Well(BoundaryCondition, IPointDataPackage):
     """
 
     @property
-    def x(self) -> npt.NDArray[float]:
+    def x(self) -> npt.NDArray[np.float64]:
         return self.dataset["x"].values
 
     @property
-    def y(self) -> npt.NDArray[float]:
+    def y(self) -> npt.NDArray[np.float64]:
         return self.dataset["y"].values
 
     _pkg_id = "wel"
@@ -180,7 +180,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         repeat_stress: Optional[xr.DataArray] = None,
     ):
         if id is None:
-            id = np.arange(len(x)).astype(str)
+            id = list(np.arange(len(x)).astype(str))
 
         dict_dataset = {
             "screen_top": _assign_dims(screen_top),
@@ -555,7 +555,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         ds["cellid"] = self.__create_cellid(wells_assigned, active)
 
         ds_vars = self.__create_dataset_vars(wells_assigned, wells_df, ds["cellid"])
-        ds = ds.assign(**dict(ds_vars.items()))
+        ds = ds.assign(**ds_vars.to_dict())
 
         ds = remove_inactive(ds, active)
 

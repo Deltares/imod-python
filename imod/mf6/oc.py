@@ -137,6 +137,10 @@ class OutputControl(Package):
         if filepath is None:
             filepath = directory / f"{modelname}.{ext}"
         else:
+            if not isinstance(filepath, str | Path):
+                raise ValueError(
+                    f"{varname} should be of type str or Path. However it is of type {type(filepath)}"
+                )
             filepath = Path(filepath)
 
         if filepath.is_absolute():
@@ -191,6 +195,10 @@ class OutputControl(Package):
         for datavar in ("head_file", "concentration_file", "budget_file"):
             path = self.dataset[datavar].values[()]
             if path is not None:
+                if not isinstance(path, str):
+                    raise ValueError(
+                        f"{path} should be of type str. However it is of type {type(path)}"
+                    )
                 filepath = Path(path)
                 filepath.parent.mkdir(parents=True, exist_ok=True)
         return
