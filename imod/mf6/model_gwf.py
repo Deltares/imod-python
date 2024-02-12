@@ -134,6 +134,10 @@ class GroundwaterFlowModel(Modflow6Model):
         self._options["newton"] = is_newton
 
     def update_buoyancy_package(self, tpt_models_per_flow_model)->None:
+        '''
+        If the simulation is partitioned, then the buoyancy package, if present, 
+        must be updated for the renamed transport models.
+        '''
         buoyancy_key = self._get_pkgkey("buy")
         if buoyancy_key is None:
             return
