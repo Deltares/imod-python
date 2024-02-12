@@ -43,7 +43,6 @@ from imod.typing.grid import (
     concat,
     is_equal,
     is_unstructured,
-    merge,
     merge_partitions,
     nan_like,
 )
