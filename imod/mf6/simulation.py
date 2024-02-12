@@ -607,7 +607,7 @@ class Modflow6Simulation(collections.UserDict):
             else:
                 return self._merge_states(modelnames, output, **settings)
         raise ValueError(
-            f"error in _open_single_output"
+            "error in _open_single_output"
         )
 
     def _merge_states(
