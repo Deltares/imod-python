@@ -583,6 +583,7 @@ class Modflow6Simulation(collections.UserDict):
             raise RuntimeError(
                 f"Unexpected error when opening {output} for {modelnames}"
             )
+            return
 
     def _open_single_output(
         self, modelnames: list[str], output: str, **settings
@@ -698,7 +699,7 @@ class Modflow6Simulation(collections.UserDict):
 
         if len(species_ls) == 1:
             return self._open_single_output(
-                tpt_names_per_species[0], output, **settings
+                list(tpt_names_per_species[0]), output, **settings
             )
 
         # Concatenate species
@@ -1117,7 +1118,7 @@ class Modflow6Simulation(collections.UserDict):
         active_exchange_domain = active_exchange_domain.dropna("index")
         ex.dataset = ex.dataset.sel(index=active_exchange_domain["index"])
 
-    def get_solution_name(self, model_name: str) -> str:
+    def get_solution_name(self, model_name: str) -> Optional[str]:
         for k, v in self.items():
             if isinstance(v, Solution):
                 if model_name in v.dataset["modelnames"]:
