@@ -15,7 +15,7 @@ from imod.tests.fixtures.mf6_small_models_fixture import (
     grid_data_unstructured_layered,
 )
 from imod.typing.grid import ones_like
-
+import xarray as xr
 
 @pytest.fixture(scope="function")
 def twri_simulation(transient_twri_model):
@@ -110,6 +110,34 @@ def test_write_well_from_model(
     assert pathlib.Path.exists(tmp_path / "GWF_1" / "well" / "wel.dat")
     assert twri_simulation.run() is None
 
+
+def test_write_well_from_model_transient_rate(
+    tmp_path: Path, twri_simulation: imod.mf6.Modflow6Simulation
+):
+    times = twri_simulation["time_discretization"]["time"]
+    rate = xr.DataArray(dims=("index", "time"), coords={"index": [0,1], "time":times})
+    rate.sel(index=0).values[:] = 5.0
+    rate.sel(index=1).values[:] = 4.0
+    twri_simulation["GWF_1"]["well"] = imod.mf6.Well(
+        x=[1.0, 6002.0],
+        y=[3.0, 5004.0],
+        screen_top=[0.0, 0.0],
+        screen_bottom=[-10.0, -10.0],
+        rate=rate,
+        print_flows=True,
+        validate=True,
+    )
+
+    # for this test, we increase the hydraulic conductivities a bit, because otherwise the wells will be filtered out as belonging to too impermeable layers
+    twri_simulation["GWF_1"]["npf"]["k"] *= 20000
+    twri_simulation["GWF_1"]["npf"]["k33"] *= 20000
+
+    twri_simulation.write(tmp_path, binary=False)
+    assert pathlib.Path.exists(tmp_path / "GWF_1" / "well.wel")
+    for i in range(0, len(times)):
+        file = Path(f"{tmp_path}/GWF_1/well/wel-{i}.dat")
+        assert pathlib.Path.exists(file)
+    assert twri_simulation.run() is None
 
 def test_write_all_wells_filtered_out(
     tmp_path: Path, twri_simulation: imod.mf6.Modflow6Simulation

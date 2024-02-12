@@ -166,7 +166,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         y: list[float],
         screen_top: list[float],
         screen_bottom: list[float],
-        rate: list[float],
+        rate: list[float]| xr.DataArray,
         concentration: Optional[list[float] | xr.DataArray] = None,
         concentration_boundary_type="aux",
         id: Optional[list[int]] = None,
