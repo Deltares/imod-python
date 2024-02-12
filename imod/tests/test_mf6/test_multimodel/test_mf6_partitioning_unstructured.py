@@ -425,3 +425,28 @@ def test_partition_transport(    tmp_path: Path,
     np.testing.assert_allclose(
         concentration.values, new_concentration["concentration"].values, rtol=1e-5, atol=1e-3
     )
+
+
+
+@pytest.mark.usefixtures("circle_model_transport_multispecies")
+@parametrize_with_cases("partition_array", cases=PartitionArrayCases)
+def test_partition_transport_multispecies(    tmp_path: Path,
+    circle_model_transport_multispecies: Modflow6Simulation,partition_array: xu.UgridDataArray):
+    
+    
+    circle_model_transport_multispecies.write(tmp_path/"original")
+    new_circle_model = circle_model_transport_multispecies.split(partition_array)
+
+    circle_model_transport_multispecies.run()
+    new_circle_model.write(tmp_path/"split")
+    new_circle_model.run()
+
+    conc = circle_model_transport_multispecies.open_concentration(species_ls=["sali", "tempi"])
+    head = circle_model_transport_multispecies.open_head()
+    flow_budget = circle_model_transport_multispecies.open_flow_budget()
+    tpt_budget = circle_model_transport_multispecies.open_transport_budget()    
+
+    conc_new = new_circle_model.open_concentration()
+    head_new = new_circle_model.open_head()
+    flow_budget_new = new_circle_model.open_flow_budget()
+    tpt_budget_new = new_circle_model.open_transport_budget()        

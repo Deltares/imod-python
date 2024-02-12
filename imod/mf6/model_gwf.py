@@ -143,7 +143,7 @@ class GroundwaterFlowModel(Modflow6Model):
             return
         buoyancy_package = self[buoyancy_key]
         tpt_models_old = buoyancy_package.get_transport_model_names()
-        if len(tpt_models_old) == len(tpt_models_per_flow_model) == 1:
+        if len(tpt_models_old) == len(tpt_models_per_flow_model):
             buoyancy_package.update_transport_models(tpt_models_per_flow_model)
         
 
