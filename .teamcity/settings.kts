@@ -4,6 +4,8 @@ import jetbrains.buildServer.configs.kotlin.CustomChart.SeriesKey
 import jetbrains.buildServer.configs.kotlin.buildFeatures.*
 import jetbrains.buildServer.configs.kotlin.buildSteps.powerShell
 import jetbrains.buildServer.configs.kotlin.buildSteps.script
+import jetbrains.buildServer.configs.kotlin.failureConditions.BuildFailureOnMetric
+import jetbrains.buildServer.configs.kotlin.failureConditions.failOnMetricChange
 import jetbrains.buildServer.configs.kotlin.projectFeatures.ProjectReportTab
 import jetbrains.buildServer.configs.kotlin.projectFeatures.projectReportTab
 import jetbrains.buildServer.configs.kotlin.triggers.finishBuildTrigger
@@ -267,6 +269,18 @@ object MyPy : BuildType({
     name = "MyPy"
 
     templates(MyPyTemplate, GitHubIntegrationTemplate)
+
+    failureConditions {
+        nonZeroExitCode = false
+        testFailure = false
+        failOnMetricChange {
+            metric = BuildFailureOnMetric.MetricType.TEST_FAILED_COUNT
+            threshold = 26
+            units = BuildFailureOnMetric.MetricUnit.DEFAULT_UNIT
+            comparison = BuildFailureOnMetric.MetricComparison.MORE
+            compareTo = value()
+        }
+    }
 })
 
 object UnitTests : BuildType({
