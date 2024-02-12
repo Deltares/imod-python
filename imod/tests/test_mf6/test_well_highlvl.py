@@ -4,6 +4,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
+import xarray as xr
 from pytest_cases import parametrize_with_cases
 
 import imod
@@ -15,7 +16,7 @@ from imod.tests.fixtures.mf6_small_models_fixture import (
     grid_data_unstructured_layered,
 )
 from imod.typing.grid import ones_like
-import xarray as xr
+
 
 @pytest.fixture(scope="function")
 def twri_simulation(transient_twri_model):
