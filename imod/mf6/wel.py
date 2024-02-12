@@ -265,7 +265,8 @@ class Well(BoundaryCondition, IPointDataPackage):
             )
 
         if top is not None:
-            if not isinstance(top, GridDataArray) or "layer" not in top.coords:
+            # Bug in mypy when using unions in isInstance
+            if not isinstance(top, GridDataArray) or "layer" not in top.coords:  # type: ignore
                 top = create_layered_top(bottom, top)
 
         # The super method will select in the time dimension without issues.
@@ -562,7 +563,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         # TODO: make options like "save_flows" configurable. Issue github #623
         ds["save_flows"] = True
 
-        return Mf6Wel(**ds)
+        return Mf6Wel(**ds.to_dict())
 
     def regrid_like(self, target_grid: GridDataArray, *_) -> Well:
         """
