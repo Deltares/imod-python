@@ -34,7 +34,7 @@ validation xarray library becomes.
 import abc
 import operator
 from functools import partial
-from typing import Any, Callable, Dict, Optional, Tuple, TypeVar, Union
+from typing import Any, Callable, Dict, Optional, Tuple, TypeAlias, Union
 
 import numpy as np
 import scipy
@@ -42,7 +42,9 @@ import xarray as xr
 import xugrid as xu
 from numpy.typing import DTypeLike  # noqa: F401
 
-DimsT = Tuple[Union[str, None]]
+from imod.typing import GridDataArray
+
+DimsT = Union[str, None]
 ShapeT = Tuple[Union[int, None]]
 ChunksT = Union[bool, Dict[str, Union[int, None]]]
 
@@ -81,7 +83,7 @@ class ValidationError(Exception):
 
 class BaseSchema(abc.ABC):
     @abc.abstractmethod
-    def validate(self):
+    def validate(self, obj: GridDataArray, **kwargs) -> None:
         pass
 
     def __or__(self, other):
@@ -95,7 +97,8 @@ class BaseSchema(abc.ABC):
         return SchemaUnion(self, other)
 
 
-SchemaType = TypeVar("SchemaType", bound=BaseSchema)
+# SchemaType = TypeVar("SchemaType", bound=BaseSchema)
+SchemaType: TypeAlias = BaseSchema
 
 
 class SchemaUnion:
@@ -140,7 +143,7 @@ class DTypeSchema(BaseSchema):
         else:
             self.dtype = np.dtype(dtype)
 
-    def validate(self, obj: xr.DataArray, **kwargs) -> None:
+    def validate(self, obj: GridDataArray, **kwargs) -> None:
         """
         Validate dtype
 
@@ -181,7 +184,7 @@ class DimsSchema(BaseSchema):
         else:
             return self.dims
 
-    def validate(self, obj: Union[xr.DataArray, xu.UgridDataArray], **kwargs) -> None:
+    def validate(self, obj: GridDataArray, **kwargs) -> None:
         """Validate dimensions
         Parameters
         ----------
@@ -217,7 +220,7 @@ class EmptyIndexesSchema(BaseSchema):
             ]
         return dims_to_validate
 
-    def validate(self, obj: Union[xr.DataArray, xu.UgridDataArray], **kwargs) -> None:
+    def validate(self, obj: GridDataArray, **kwargs) -> None:
         dims_to_validate = self.get_dims_to_validate(obj)
 
         for dim in dims_to_validate:
@@ -234,7 +237,7 @@ class IndexesSchema(EmptyIndexesSchema):
     def __init__(self) -> None:
         pass
 
-    def validate(self, obj: Union[xr.DataArray, xu.UgridDataArray], **kwargs) -> None:
+    def validate(self, obj: GridDataArray, **kwargs) -> None:
         # Test if indexes all empty
         super().validate(obj)
 
@@ -266,7 +269,7 @@ class ShapeSchema(BaseSchema):
         """
         self.shape = shape
 
-    def validate(self, obj: xr.DataArray, **kwargs) -> None:
+    def validate(self, obj: GridDataArray, **kwargs) -> None:
         if len(self.shape) != len(obj.shape):
             raise ValidationError(
                 f"number of dimensions in shape ({len(obj.shape)}) o!= da.ndim ({len(self.shape)})"
@@ -291,7 +294,7 @@ class CoordsSchema(BaseSchema):
 
     def __init__(
         self,
-        coords: Tuple[str],
+        coords: Tuple[str, ...],
         require_all_keys: bool = True,
         allow_extra_keys: bool = True,
     ) -> None:
@@ -299,7 +302,7 @@ class CoordsSchema(BaseSchema):
         self.require_all_keys = require_all_keys
         self.allow_extra_keys = allow_extra_keys
 
-    def validate(self, obj: xr.DataArray, **kwargs) -> None:
+    def validate(self, obj: GridDataArray, **kwargs) -> None:
         coords = list(obj.coords.keys())
 
         if self.require_all_keys:
@@ -332,7 +335,7 @@ class OtherCoordsSchema(BaseSchema):
         self.require_all_keys = require_all_keys
         self.allow_extra_keys = allow_extra_keys
 
-    def validate(self, obj: Union[xr.DataArray, xu.UgridDataArray], **kwargs):
+    def validate(self, obj: GridDataArray, **kwargs) -> None:
         other_obj = kwargs[self.other]
         other_coords = list(other_obj.coords.keys())
         return CoordsSchema(
@@ -383,7 +386,7 @@ class AllValueSchema(ValueSchema):
     assert (values > threshold).all()
     """
 
-    def validate(self, obj: Union[xr.DataArray, xu.UgridDataArray], **kwargs):
+    def validate(self, obj: GridDataArray, **kwargs) -> None:
         if isinstance(self.other, str):
             other_obj = kwargs[self.other]
         else:
@@ -415,7 +418,7 @@ class AnyValueSchema(ValueSchema):
     assert (values > threshold).any()
     """
 
-    def validate(self, obj: Union[xr.DataArray, xu.UgridDataArray], **kwargs):
+    def validate(self, obj: GridDataArray, **kwargs) -> None:
         if isinstance(self.other, str):
             other_obj = kwargs[self.other]
         else:
@@ -465,7 +468,7 @@ class AllNoDataSchema(NoDataSchema):
     Fails when all data is NoData.
     """
 
-    def validate(self, obj: Union[xr.DataArray, xu.UgridDataArray], **kwargs):
+    def validate(self, obj: GridDataArray, **kwargs) -> None:
         valid = self.is_notnull(obj)
         if ~valid.any():
             raise ValidationError("all nodata")
@@ -476,7 +479,7 @@ class AnyNoDataSchema(NoDataSchema):
     Fails when any data is NoData.
     """
 
-    def validate(self, obj: Union[xr.DataArray, xu.UgridDataArray], **kwargs):
+    def validate(self, obj: GridDataArray, **kwargs) -> None:
         valid = self.is_notnull(obj)
         if ~valid.all():
             raise ValidationError("found a nodata value")
@@ -517,7 +520,7 @@ class IdentityNoDataSchema(NoDataComparisonSchema):
     "idomain" `{layer, y, x}`
     """
 
-    def validate(self, obj: Union[xr.DataArray, xu.UgridDataArray], **kwargs):
+    def validate(self, obj: GridDataArray, **kwargs) -> None:
         other_obj = kwargs[self.other]
 
         # Only test if object has all dimensions in other object.
@@ -535,7 +538,7 @@ class AllInsideNoDataSchema(NoDataComparisonSchema):
     Checks that all notnull values all occur within the notnull values of other.
     """
 
-    def validate(self, obj: Union[xr.DataArray, xu.UgridDataArray], **kwargs):
+    def validate(self, obj: GridDataArray, **kwargs) -> None:
         other_obj = kwargs[self.other]
         valid = self.is_notnull(obj)
         other_valid = self.is_other_notnull(other_obj)
@@ -565,7 +568,7 @@ class ActiveCellsConnectedSchema(BaseSchema):
         else:
             self.is_notnull = is_notnull
 
-    def validate(self, obj: xr.DataArray, **kwargs):
+    def validate(self, obj: GridDataArray, **kwargs) -> None:
         if isinstance(obj, xu.UgridDataArray):
             # TODO: https://deltares.github.io/xugrid/api/xugrid.UgridDataArrayAccessor.connected_components.html
             raise NotImplementedError(

@@ -6,7 +6,7 @@ import inspect
 import pathlib
 from copy import deepcopy
 from pathlib import Path
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, cast
 
 import cftime
 import jinja2
@@ -270,7 +270,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 ):
                     top, bottom, idomain = self.__get_domain_geometry()
                     k = self.__get_k()
-                    mf6_pkg = pkg.to_mf6_pkg(idomain, top, bottom, k, validate)
+                    mf6_pkg = cast(
+                        imod.mf6.HorizontalFlowBarrierBase | imod.mf6.Well, pkg
+                    ).to_mf6_pkg(idomain, top, bottom, k, validate)
                     mf6_pkg.write(
                         pkgname=pkg_name,
                         globaltimes=globaltimes,
