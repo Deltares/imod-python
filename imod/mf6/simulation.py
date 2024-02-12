@@ -583,7 +583,7 @@ class Modflow6Simulation(collections.UserDict):
             raise RuntimeError(
                 f"Unexpected error when opening {output} for {modelnames}"
             )
-            return
+        return
 
     def _open_single_output(
         self, modelnames: list[str], output: str, **settings
@@ -705,7 +705,7 @@ class Modflow6Simulation(collections.UserDict):
         # Concatenate species
         outputs = []
         for species, tpt_names in zip(species_ls, tpt_names_per_species):
-            output_data = self._open_single_output(tpt_names, output, **settings)
+            output_data = self._open_single_output(list(tpt_names), output, **settings)
             output_data = output_data.assign_coords(species=species)
             outputs.append(output_data)
         return concat(outputs, dim="species")
