@@ -362,7 +362,7 @@ def circle_model_transport_multispecies():
 
         transport_model = imod.mf6.GroundwaterTransportModel()
         transport_model["ssm"] = imod.mf6.SourceSinkMixing.from_flow_model(
-            gwf_model, specie
+            gwf_model, specie, save_flows=True
         )
         transport_model["disv"] = gwf_model["disv"]
 
@@ -382,7 +382,7 @@ def circle_model_transport_multispecies():
             xt3d_rhs=False,
         )
         transport_model["adv"] = imod.mf6.AdvectionUpstream()
-        transport_model["mst"] = imod.mf6.MobileStorageTransfer(porosity)
+        transport_model["mst"] = imod.mf6.MobileStorageTransfer(porosity, save_flows=True)
 
         # %%
         # Now we define initial conditions (0.0) and output options for the transport
