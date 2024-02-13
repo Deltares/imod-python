@@ -6,7 +6,7 @@ import pathlib
 import subprocess
 import warnings
 from pathlib import Path
-from typing import Any, Callable, DefaultDict, Optional, Union, cast
+from typing import Any, Callable, DefaultDict, Iterable, Optional, Union, cast
 
 import cftime
 import jinja2
@@ -393,7 +393,7 @@ class Modflow6Simulation(collections.UserDict):
         species_ls: Optional[list[str]] = None,
         simulation_start_time: Optional[np.datetime64] = None,
         time_unit: Optional[str] = "d",
-    ) -> dict[str, GridDataArray]:
+    ) -> GridDataArray | GridDataset:
         """
         Open transport budgets of finished simulation, requires that the ``run``
         method has been called.
@@ -430,7 +430,7 @@ class Modflow6Simulation(collections.UserDict):
         flowja: bool = False,
         simulation_start_time: Optional[np.datetime64] = None,
         time_unit: Optional[str] = "d",
-    ) -> dict[str, GridDataArray]:
+    ) -> GridDataArray | GridDataset:
         """
         Open flow budgets of finished simulation, requires that the ``run``
         method has been called.
@@ -600,9 +600,9 @@ class Modflow6Simulation(collections.UserDict):
         cbc[[gwf-gwf_1, gwf-gwf_3]] to cbc[gwf-gwf]
         """
         exchange_names = [
-            cast(str, key)
-            for key in cbc.keys()
-            if ("gwf-gwf" in key) or ("gwt-gwt" in key)
+            key
+            for key in cast(Iterable[str], cbc.keys())
+            if (("gwf-gwf" in key) or ("gwt-gwt" in key))
         ]
         exchange_budgets = cbc[exchange_names].to_array().sum(dim="variable")
         cbc = cbc.drop_vars(exchange_names)
@@ -657,7 +657,7 @@ class Modflow6Simulation(collections.UserDict):
                 raise RuntimeError(
                     f"Type error. Expected GridDataArray but got {type(conc)}"
                 )
-            conc = conc.assign_coords(species=species)
+            conc = cast(GridDataArray, conc).assign_coords(species=species)
             concentrations.append(conc)
         return concat(concentrations, dim="species")
 
@@ -918,6 +918,7 @@ class Modflow6Simulation(collections.UserDict):
 
         partition_info = create_partition_info(submodel_labels)
 
+        exchange_creator: ExchangeCreator_Unstructured | ExchangeCreator_Structured
         if is_unstructured(submodel_labels):
             exchange_creator = ExchangeCreator_Unstructured(
                 submodel_labels, partition_info
