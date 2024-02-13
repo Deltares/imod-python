@@ -124,6 +124,7 @@ def test_write_well_from_model_transient_rate(
         y=[3.0, 5004.0],
         screen_top=[0.0, 0.0],
         screen_bottom=[-10.0, -10.0],
+        id=[103, -101],
         rate=rate,
         print_flows=True,
         validate=True,
@@ -242,3 +243,22 @@ def test_constraints_are_configurable(
 
     with pytest.raises(ValueError):
         twri_simulation.write(tmp_path, binary=False)
+
+def test_non_unique_ids(
+   twri_simulation: imod.mf6.Modflow6Simulation
+):
+    times = twri_simulation["time_discretization"]["time"]
+    rate = xr.DataArray(dims=("index", "time"), coords={"index": [0,1], "time":times})
+    rate.sel(index=0).values[:] = 5.0
+    rate.sel(index=1).values[:] = 4.0
+    with pytest.raises(ValueError):
+        twri_simulation["GWF_1"]["well"] = imod.mf6.Well(
+            x=[1.0, 6002.0],
+            y=[3.0, 5004.0],
+            screen_top=[0.0, 0.0],
+            screen_bottom=[-10.0, -10.0],
+            id=[103, 103],
+            rate=rate,
+            print_flows=True,
+            validate=True,
+        )

@@ -78,23 +78,30 @@ class Well(BoundaryCondition, IPointDataPackage):
     Parameters
     ----------
 
-    screen_top: float or list of floats
-        is the top of the well screen.
-    screen_bottom: float or list of floats
-        is the bottom of the well screen.
     y: float or list of floats
         is the y location of the well.
     x: float or list of floats
         is the x location of the well.
-    rate: float or list of floats
+    screen_top: float or list of floats
+        is the top of the well screen.
+    screen_bottom: float or list of floats
+        is the bottom of the well screen.
+    rate: float, list of floats or xr.DataArray
         is the volumetric well rate. A positive value indicates well
         (injection) and a negative value indicates discharge (extraction) (q).
+        If provided as DataArray, an ``"index"`` dimension is required and an
+        optional ``"time"`` dimension and coordinate specify transient input. 
+        In the latter case, it is important that dimensions are in the order:
+        ``("time", "index")``
     concentration: array of floats (xr.DataArray, optional)
         if this flow package is used in simulations also involving transport, then this array is used
         as the  concentration for inflow over this boundary.
     concentration_boundary_type: ({"AUX", "AUXMIXED"}, optional)
         if this flow package is used in simulations also involving transport, then this keyword specifies
         how outflow over this boundary is computed.
+    id: list of int, optional
+        assign an integer identidfier code to each well. if not provided, one will be generated 
+        Must be unique entries.  
     minimum_k: float, optional
         on creating point wells, no point wells will be placed in cells with a lower horizontal conductivity than this
     minimum_thickness: float, optional
@@ -128,6 +135,26 @@ class Well(BoundaryCondition, IPointDataPackage):
         value is the "value". For the "key" datetime, the data of the "value"
         datetime will be used. Can also be set with a dictionary using the
         ``set_repeat_stress`` method.
+
+    Examples
+    ---------
+
+    >>> screen_top = [0.0, 0.0]
+    >>> screen_bottom = [-2.0, -2.0]
+    >>> y = [83.0, 77.0]
+    >>> x = [81.0, 82.0]
+    >>> rate = [1.0, 1.0]
+
+    >>> imod.mf6.Well(x, y, screen_top, screen_bottom, rate)
+
+    For a transient well:
+    
+    >>> weltimes = pd.date_range("2000-01-01", "2000-01-03")
+
+    >>> rate_factor_time = xr.DataArray([0.5, 1.0], coords={"time": weltimes}, dims=("time",))
+    >>> rate_transient = rate_factor_time * xr.DataArray(rate, dims=("index",))
+
+    >>> imod.mf6.Well(x, y, screen_top, screen_bottom, rate_transient)        
     """
 
     @property
@@ -181,7 +208,10 @@ class Well(BoundaryCondition, IPointDataPackage):
     ):
         if id is None:
             id = np.arange(len(x)).astype(str)
-
+        else:
+            set_id = set(id)
+            if len(id) != len(set_id):
+                raise ValueError("id's must be unique")
         dict_dataset = {
             "screen_top": _assign_dims(screen_top),
             "screen_bottom": _assign_dims(screen_bottom),
