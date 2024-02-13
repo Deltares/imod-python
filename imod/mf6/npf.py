@@ -18,7 +18,7 @@ def _dataarray_to_bool(griddataarray: GridDataArray) -> bool:
     if griddataarray is None or griddataarray.values is None:
         return False
 
-    if griddataarray.values.size == 1:
+    if griddataarray.values.size != 1:
         raise ValueError("Dataarray is not a single value. Unable to convert to boolean")
     return griddataarray.values.item()
 

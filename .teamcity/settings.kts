@@ -275,7 +275,7 @@ object MyPy : BuildType({
         testFailure = false
         failOnMetricChange {
             metric = BuildFailureOnMetric.MetricType.TEST_FAILED_COUNT
-            threshold = 26
+            threshold = 7
             units = BuildFailureOnMetric.MetricUnit.DEFAULT_UNIT
             comparison = BuildFailureOnMetric.MetricComparison.MORE
             compareTo = value()
