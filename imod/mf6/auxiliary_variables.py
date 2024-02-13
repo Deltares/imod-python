@@ -37,8 +37,8 @@ def expand_transient_auxiliary_variables(package: IPackage) -> None:
     be split in several dataarrays- one for each species.
     """
 
-    if len(package.auxiliary_data_fields()) > 0:
-        for aux_var_name, aux_var_dimensions in package.auxiliary_data_fields().items():
+    if len(package.auxiliary_data_fields) > 0:
+        for aux_var_name, aux_var_dimensions in package.auxiliary_data_fields.items():
             if aux_var_name in list(package.dataset.keys()):
                 aux_coords = (
                     package.dataset[aux_var_name].coords[aux_var_dimensions].values
@@ -54,7 +54,7 @@ def remove_expanded_auxiliary_variables_from_dataset(package: IPackage) -> None:
     Removes the data arrays created by :meth:expand_transient_auxiliary_variables(...) but does not
     remove the auxiliary dataarray used as source for :meth:expand_transient_auxiliary_variables(...)
     """
-    for aux_var_name, aux_var_dimensions in package.auxiliary_data_fields().items():
+    for aux_var_name, aux_var_dimensions in package.auxiliary_data_fields.items():
         if aux_var_dimensions in package.dataset.coords:
             for species in package.dataset.coords[aux_var_dimensions].values:
                 if species in list(package.dataset.keys()):
