@@ -601,7 +601,7 @@ class Modflow6Simulation(collections.UserDict):
         """
         exchange_names = [
             cast(str, key)
-            for key in cbc.items()
+            for key in cbc.keys()
             if ("gwf-gwf" in key) or ("gwt-gwt" in key)
         ]
         exchange_budgets = cbc[exchange_names].to_array().sum(dim="variable")

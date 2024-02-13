@@ -556,14 +556,14 @@ class Well(BoundaryCondition, IPointDataPackage):
         ds["cellid"] = self.__create_cellid(wells_assigned, active)
 
         ds_vars = self.__create_dataset_vars(wells_assigned, wells_df, ds["cellid"])
-        ds = ds.assign(**ds_vars.to_dict())
+        ds = ds.assign(**ds_vars)
 
         ds = remove_inactive(ds, active)
 
         # TODO: make options like "save_flows" configurable. Issue github #623
         ds["save_flows"] = True
 
-        return Mf6Wel(**ds.to_dict())
+        return Mf6Wel(**ds)
 
     def regrid_like(self, target_grid: GridDataArray, *_) -> Well:
         """
