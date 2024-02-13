@@ -16,6 +16,7 @@ from .fixtures.flow_transport_simulation_fixture import flow_transport_simulatio
 from .fixtures.mf6_circle_fixture import (
     circle_model,
     circle_model_evt,
+    circle_model_transport,
     circle_partitioned,
     circle_result,
     circle_result_evt,
