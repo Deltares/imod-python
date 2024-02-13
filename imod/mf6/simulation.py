@@ -434,6 +434,7 @@ class Modflow6Simulation(collections.UserDict):
             simulation_start_time=simulation_start_time,
             time_unit=time_unit,
             merge_to_dataset=True,
+            flowja=False,
         )
 
     def open_flow_budget(

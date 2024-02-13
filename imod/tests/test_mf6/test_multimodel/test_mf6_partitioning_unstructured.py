@@ -33,6 +33,12 @@ class PartitionArrayCases:
         return three_parts
 
 
+    def case_concentric(self, idomain_top) -> xu.UgridDataArray:
+        three_parts = zeros_like(idomain_top)
+        three_parts.values[72:144] = 1
+        three_parts.values[144:] = 2
+        return three_parts
+
 class WellCases:
     def case_one_well(self):
         return imod.mf6.Well(
@@ -441,12 +447,15 @@ def test_partition_transport_multispecies(    tmp_path: Path,
     new_circle_model.write(tmp_path/"split")
     new_circle_model.run()
 
-    conc = circle_model_transport_multispecies.open_concentration(species_ls=["sali", "tempi"])
+    conc = circle_model_transport_multispecies.open_concentration()
     head = circle_model_transport_multispecies.open_head()
-    flow_budget = circle_model_transport_multispecies.open_flow_budget()
-    tpt_budget = circle_model_transport_multispecies.open_transport_budget()    
 
     conc_new = new_circle_model.open_concentration()
     head_new = new_circle_model.open_head()
-    flow_budget_new = new_circle_model.open_flow_budget()
-    tpt_budget_new = new_circle_model.open_transport_budget()        
+    
+    np.testing.assert_allclose(conc.values, conc_new["concentration"].values, rtol=1e-5, atol=1e-3)
+    np.testing.assert_allclose(head.values, head_new["head"].values, rtol=1e-5, atol=1e-3)
+
+    #TODO: also compare budget results. For now just open them. 
+    _ = new_circle_model.open_flow_budget()
+    _ = new_circle_model.open_transport_budget()     

@@ -389,7 +389,7 @@ def circle_model_transport_multispecies():
         # simulation, and assign the transport model to the simulation as well.
         transport_model["ic"] = imod.mf6.InitialConditions(start=max_concentration)
         transport_model["oc"] = imod.mf6.OutputControl(
-            save_concentration="last", save_budget="last"
+            save_concentration="all", save_budget="all"
         )
 
         simulation[f"tpt_{specie}"] = transport_model
