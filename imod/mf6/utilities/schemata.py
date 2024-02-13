@@ -1,8 +1,11 @@
+from typing import Tuple
+
 from imod.schemata import BaseSchema
 
 
 def filter_schemata_dict(
-    schemata_dict: dict[str, list[BaseSchema]], schema_types: tuple[type[BaseSchema]]
+    schemata_dict: dict[str, list[BaseSchema] | Tuple[BaseSchema, ...]],
+    schema_types: tuple[type[BaseSchema], ...],
 ) -> dict[str, list[BaseSchema]]:
     """
     Filter schemata dict with a tuple of schema types. Keys which do not have

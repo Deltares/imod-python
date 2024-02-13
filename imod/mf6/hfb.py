@@ -409,7 +409,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
         barrier_dataset["print_input"] = self.dataset["print_input"]
 
-        return Mf6HorizontalFlowBarrier(**barrier_dataset)
+        return Mf6HorizontalFlowBarrier(**barrier_dataset.data_vars)
 
     def is_empty(self) -> bool:
         if super().is_empty():
