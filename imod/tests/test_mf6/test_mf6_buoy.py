@@ -2,9 +2,10 @@ import pathlib
 import textwrap
 
 import numpy as np
+import pytest
 
 import imod
-import pytest
+
 
 def test_buoyancy_package_simple():
     buy = imod.mf6.Buoyancy(
@@ -105,8 +106,6 @@ def test_buoyancy_package_update_transport_names( ):
 
 
 def test_buoyancy_package_update_transport_names_check( ):    
-    directory = pathlib.Path("mymodel")
-    globaltimes = [np.datetime64("2000-01-01")]  
     buy = imod.mf6.Buoyancy(
         reference_density=1000.0,
         reference_concentration=[4.0, 25.0],

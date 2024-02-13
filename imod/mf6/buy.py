@@ -159,7 +159,7 @@ class Buoyancy(Package):
             raise ValueError("the number of transport models cannot be changed.")
         for i in range (0, len(transport_model_names)):
             if not transport_model_names[i] in new_modelnames[i]:
-                raise ValueError("new transport model names do not match the old ones. The new names can have a _X suffix only.")
+                raise ValueError("new transport model names do not match the old ones. The new names should be equal to the old ones, with a suffix.")
         self.dataset["modelname"] = assign_index(new_modelnames)
 
     def get_transport_model_names(self )->list[str]: 
