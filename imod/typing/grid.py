@@ -284,16 +284,7 @@ def is_equal(array1: xu.UgridDataArray, array2: xu.UgridDataArray)->bool:
 
 @typedispatch
 def is_equal(array1: xr.DataArray, array2: xr.DataArray)->bool:
-    if not array1.shape == array2.shape:
-        return False    
-    if not list(array1.coords.keys())  == list(array2.coords.keys()) :
-        return False
-    for k in list(array1.coords.keys()):
-        if not np.all(array1[k].values == array2[k].values):
-            return False
-    if not np.all(array1.values == array2.values):
-        return False            
-    return True
+    return array1.equals(array2)
 
 @typedispatch
 def is_equal(array1: object, array2:object)->bool:
