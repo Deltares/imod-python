@@ -217,6 +217,20 @@ def test_partitioning_structured(
         head["head"].values, original_head.values, rtol=1e-4, atol=1e-4
     )
 
+@pytest.mark.usefixtures("transient_twri_model")
+@parametrize_with_cases("partition_array", cases=PartitionArrayCases)
+def test_partitioning_structured_split_dump(
+    tmp_path: Path,
+    transient_twri_model: Modflow6Simulation,
+    partition_array: xr.DataArray,
+):
+    simulation = transient_twri_model
+
+    # Partition the simulation, run it, and save the (merged) results
+    split_simulation = simulation.split(partition_array)
+
+    split_simulation.dump(tmp_path)
+    split_simulation.run()
 
 @pytest.mark.usefixtures("transient_twri_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
