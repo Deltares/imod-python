@@ -10,8 +10,9 @@ from pytest_cases import case, parametrize_with_cases
 import imod
 from imod.mf6 import Modflow6Simulation
 from imod.mf6.wel import Well
-from imod.typing.grid import zeros_like
 from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
+from imod.typing.grid import zeros_like
+
 
 @pytest.mark.usefixtures("transient_twri_model")
 @pytest.fixture(scope="function")

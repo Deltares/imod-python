@@ -1,13 +1,15 @@
+from pathlib import Path
+
 import numpy as np
 import pytest
 
 from imod.mf6.adv import Advection
 from imod.mf6.dsp import Dispersion
 from imod.mf6.multimodel.modelsplitter import create_partition_info, slice_model
+from imod.mf6.simulation import Modflow6Simulation
 from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
 from imod.typing.grid import zeros_like
-from pathlib import Path
-from imod.mf6.simulation import Modflow6Simulation
+
 
 def test_slice_model_structured(flow_transport_simulation: Modflow6Simulation):
     # Arrange.
@@ -43,7 +45,7 @@ def test_split_dump(
     submodel_labels = submodel_labels.sel(layer=0, drop=True)
 
     split_simulation = simulation.split(submodel_labels)
-    split_simulation.write(tmp_path/"split/trash")
+    split_simulation.write(tmp_path/"split/trash") # a write is necessary before the dump to generate the gwtgwf packages
     split_simulation.dump(tmp_path/"split")
     reloaded_split = Modflow6Simulation.from_file(tmp_path/"split/1d_tpt_benchmark_partioned.toml")
     assert_simulation_can_run(reloaded_split,  "dis", tmp_path/"reloaded")
