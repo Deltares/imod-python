@@ -814,7 +814,7 @@ class Modflow6Simulation(collections.UserDict):
                 toml_content[cls_name][key] = model_toml_path.relative_to(
                     directory
                 ).as_posix()
-            elif key == "split_exchanges":
+            elif key in ["gwtgwf_exchanges","split_exchanges"]:
                 toml_content[key] = {}
                 for exchange_package in self[key]:
                     exchange_type, filename, _, _ = exchange_package.get_specification()
@@ -857,7 +857,7 @@ class Modflow6Simulation(collections.UserDict):
         simulation = Modflow6Simulation(name=toml_path.stem)
         for key, entry in toml_content.items():
            
-            if key != "split_exchanges":
+            if not key in ["gwtgwf_exchanges", "split_exchanges"]:
                 item_cls = classes[key]
                 for name, filename in entry.items():
                     path = toml_path.parent / filename
