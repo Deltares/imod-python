@@ -158,11 +158,11 @@ class Well(BoundaryCondition, IPointDataPackage):
     """
 
     @property
-    def x(self) -> npt.NDArray[float]:
+    def x(self) -> npt.NDArray[np.float64]:
         return self.dataset["x"].values
 
     @property
-    def y(self) -> npt.NDArray[float]:
+    def y(self) -> npt.NDArray[np.float64]:
         return self.dataset["y"].values
 
     _pkg_id = "wel"
@@ -207,7 +207,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         repeat_stress: Optional[xr.DataArray] = None,
     ):
         if id is None:
-            id = np.arange(len(x)).astype(str)
+            id = list(np.arange(len(x)).astype(str))
         else:
             set_id = set(id)
             if len(id) != len(set_id):
@@ -295,7 +295,8 @@ class Well(BoundaryCondition, IPointDataPackage):
             )
 
         if top is not None:
-            if not isinstance(top, GridDataArray) or "layer" not in top.coords:
+            # Bug in mypy when using unions in isInstance
+            if not isinstance(top, GridDataArray) or "layer" not in top.coords:  # type: ignore
                 top = create_layered_top(bottom, top)
 
         # The super method will select in the time dimension without issues.
@@ -585,14 +586,14 @@ class Well(BoundaryCondition, IPointDataPackage):
         ds["cellid"] = self.__create_cellid(wells_assigned, active)
 
         ds_vars = self.__create_dataset_vars(wells_assigned, wells_df, ds["cellid"])
-        ds = ds.assign(**dict(ds_vars.items()))
+        ds = ds.assign(**ds_vars.data_vars)
 
         ds = remove_inactive(ds, active)
 
         # TODO: make options like "save_flows" configurable. Issue github #623
         ds["save_flows"] = True
 
-        return Mf6Wel(**ds)
+        return Mf6Wel(**ds.data_vars)
 
     def regrid_like(self, target_grid: GridDataArray, *_) -> Well:
         """
@@ -614,7 +615,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         # Drop layer coordinate if present, otherwise a layer coordinate is assigned
         # which causes conflicts downstream when assigning wells and deriving
         # cellids.
-        domain_2d = domain.isel(layer=0, drop=True, missing_dims="ignore").drop(
+        domain_2d = domain.isel(layer=0, drop=True, missing_dims="ignore").drop_vars(
             "layer", errors="ignore"
         )
         return mask_2D(self, domain_2d)

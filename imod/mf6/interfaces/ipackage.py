@@ -1,5 +1,4 @@
 import abc
-from typing import Dict
 
 from imod.mf6.interfaces.ipackagebase import IPackageBase
 
@@ -11,5 +10,5 @@ class IPackage(IPackageBase, metaclass=abc.ABCMeta):
 
     @property
     @abc.abstractmethod
-    def auxiliary_data_fields(self) -> Dict[str, str]:
+    def auxiliary_data_fields(self) -> dict[str, str]:
         raise NotImplementedError
