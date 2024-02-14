@@ -935,7 +935,7 @@ class Modflow6Simulation(collections.UserDict):
             )
         return clipped
 
-    def split(self, submodel_labels: xr.DataArray) -> Modflow6Simulation:
+    def split(self, submodel_labels: GridDataArray) -> Modflow6Simulation:
         """
         Split a simulation in different partitions using a submodel_labels array.
 
