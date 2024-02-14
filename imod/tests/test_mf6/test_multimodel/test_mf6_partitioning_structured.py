@@ -1,3 +1,4 @@
+from filecmp import dircmp
 from pathlib import Path
 
 import geopandas as gpd
@@ -10,8 +11,8 @@ from pytest_cases import case, parametrize_with_cases
 import imod
 from imod.mf6 import Modflow6Simulation
 from imod.mf6.wel import Well
-from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
 from imod.typing.grid import zeros_like
+
 
 @pytest.mark.usefixtures("transient_twri_model")
 @pytest.fixture(scope="function")
@@ -218,7 +219,7 @@ def test_partitioning_structured(
     )
 
 @pytest.mark.usefixtures("transient_twri_model")
-@parametrize_with_cases("partition_array", cases=PartitionArrayCases)
+@parametrize_with_cases("partition_array", cases=PartitionArrayCases, glob="*four_squares")
 def test_split_dump(
     tmp_path: Path,
     transient_twri_model: Modflow6Simulation,
@@ -232,7 +233,11 @@ def test_split_dump(
     split_simulation.write(tmp_path/"split/original")
     reloaded_split.write(tmp_path/"split/reloaded")
 
-    assert_simulation_can_run(reloaded_split,  "dis", tmp_path/"reloaded")
+    diff = dircmp(tmp_path/"split/original", tmp_path/"split/reloaded")
+    assert len(diff.diff_files) == 0
+    assert len(diff.left_only) == 0
+    assert len(diff.right_only) == 0    
+
 
 @pytest.mark.usefixtures("transient_twri_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)

@@ -1,3 +1,4 @@
+from filecmp import dircmp
 from pathlib import Path
 
 import numpy as np
@@ -45,10 +46,15 @@ def test_split_dump(
     submodel_labels = submodel_labels.sel(layer=0, drop=True)
 
     split_simulation = simulation.split(submodel_labels)
-    split_simulation.write(tmp_path/"split/trash") # a write is necessary before the dump to generate the gwtgwf packages
+    split_simulation.write(tmp_path/"split/original") # a write is necessary before the dump to generate the gwtgwf packages
     split_simulation.dump(tmp_path/"split")
     reloaded_split = Modflow6Simulation.from_file(tmp_path/"split/1d_tpt_benchmark_partioned.toml")
-    assert_simulation_can_run(reloaded_split,  "dis", tmp_path/"reloaded")
+    reloaded_split.write(tmp_path/"split/reloaded")
+    
+    diff = dircmp(tmp_path/"split/original", tmp_path/"split/reloaded")
+    assert len(diff.diff_files) == 0
+    assert len(diff.left_only) == 0
+    assert len(diff.right_only) == 0    
 
 @pytest.mark.usefixtures("flow_transport_simulation")
 def test_split_flow_and_transport_model(tmp_path: Path, flow_transport_simulation: Modflow6Simulation):
