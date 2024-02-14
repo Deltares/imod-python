@@ -11,7 +11,7 @@ import imod
 from imod.mf6 import Modflow6Simulation
 from imod.mf6.wel import Well
 from imod.typing.grid import zeros_like
-
+from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
 
 @pytest.mark.usefixtures("transient_twri_model")
 @pytest.fixture(scope="function")
@@ -219,18 +219,16 @@ def test_partitioning_structured(
 
 @pytest.mark.usefixtures("transient_twri_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
-def test_partitioning_structured_split_dump(
+def test_split_dump(
     tmp_path: Path,
     transient_twri_model: Modflow6Simulation,
     partition_array: xr.DataArray,
 ):
     simulation = transient_twri_model
-
-    # Partition the simulation, run it, and save the (merged) results
     split_simulation = simulation.split(partition_array)
-
-    split_simulation.dump(tmp_path)
-    split_simulation.run()
+    split_simulation.dump(tmp_path/"split")
+    reloaded_split = imod.mf6.Modflow6Simulation.from_file(tmp_path/"split/ex01-twri_partioned.toml")
+    assert_simulation_can_run(reloaded_split,  "dis", tmp_path/"reloaded")
 
 @pytest.mark.usefixtures("transient_twri_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)

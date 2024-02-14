@@ -814,6 +814,17 @@ class Modflow6Simulation(collections.UserDict):
                 toml_content[cls_name][key] = model_toml_path.relative_to(
                     directory
                 ).as_posix()
+            elif key == "split_exchanges":
+                toml_content[key] = {}
+                for exchange_package in self[key]:
+                    exchange_type, filename, _, _ = exchange_package.get_specification()
+                    exchange_class_short = type(exchange_package).__name__
+                    if not exchange_class_short in toml_content[key].keys():
+                         toml_content[key][exchange_class_short]=[]
+                    path = f"{filename}.nc"
+                    exchange_package.dataset.to_netcdf(directory / path)
+                    toml_content[key][exchange_class_short].append(path)
+
             else:
                 path = f"{key}.nc"
                 value.dataset.to_netcdf(directory / path)
@@ -833,6 +844,9 @@ class Modflow6Simulation(collections.UserDict):
                 GroundwaterTransportModel,
                 imod.mf6.TimeDiscretization,
                 imod.mf6.Solution,
+                imod.mf6.GWFGWF,
+                imod.mf6.GWFGWT,
+                imod.mf6.GWTGWT
             )
         }
 
@@ -842,10 +856,19 @@ class Modflow6Simulation(collections.UserDict):
 
         simulation = Modflow6Simulation(name=toml_path.stem)
         for key, entry in toml_content.items():
-            item_cls = classes[key]
-            for name, filename in entry.items():
-                path = toml_path.parent / filename
-                simulation[name] = item_cls.from_file(path)
+           
+            if key != "split_exchanges":
+                item_cls = classes[key]
+                for name, filename in entry.items():
+                    path = toml_path.parent / filename
+                    simulation[name] = item_cls.from_file(path)
+            else:
+                simulation[key] = []
+                for exchange_class, exchange_list in entry.items():
+                    item_cls = classes[exchange_class]
+                    for filename in exchange_list:
+                        path = toml_path.parent / filename
+                        simulation[key].append(item_cls.from_file(path))
 
         return simulation
 
