@@ -151,6 +151,18 @@ object MyPyTemplate : Template({
         }
     }
 
+    failureConditions {
+        nonZeroExitCode = false
+        testFailure = false
+        failOnMetricChange {
+            metric = BuildFailureOnMetric.MetricType.TEST_FAILED_COUNT
+            threshold = 2
+            units = BuildFailureOnMetric.MetricUnit.DEFAULT_UNIT
+            comparison = BuildFailureOnMetric.MetricComparison.MORE
+            compareTo = value()
+        }
+    }
+
     features {
         xmlReport {
             reportType = XmlReport.XmlReportType.JUNIT
