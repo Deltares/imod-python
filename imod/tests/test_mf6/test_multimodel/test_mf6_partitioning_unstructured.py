@@ -1,3 +1,4 @@
+import copy
 from pathlib import Path
 
 import geopandas as gpd
@@ -34,10 +35,11 @@ class PartitionArrayCases:
 
 
     def case_concentric(self, idomain_top) -> xu.UgridDataArray:
-        three_parts = zeros_like(idomain_top)
-        three_parts.values[72:144] = 1
-        three_parts.values[144:] = 2
-        return three_parts
+        centroids = idomain_top.ugrid.grid.centroids
+        dist = np.sqrt( centroids[:,0]* centroids[:,0] +  centroids[:,1]* centroids[:,1])
+        concentric = zeros_like(idomain_top)
+        concentric.values =  np.where(dist < 500, 0, 1)
+        return  concentric 
 
 class WellCases:
     def case_one_well(self):
