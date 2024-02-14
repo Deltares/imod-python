@@ -13,7 +13,6 @@ from imod.mf6.wel import Well
 from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
 from imod.typing.grid import zeros_like
 
-
 @pytest.mark.usefixtures("transient_twri_model")
 @pytest.fixture(scope="function")
 def idomain_top(transient_twri_model):
@@ -229,6 +228,10 @@ def test_split_dump(
     split_simulation = simulation.split(partition_array)
     split_simulation.dump(tmp_path/"split")
     reloaded_split = imod.mf6.Modflow6Simulation.from_file(tmp_path/"split/ex01-twri_partioned.toml")
+
+    split_simulation.write(tmp_path/"split/original")
+    reloaded_split.write(tmp_path/"split/reloaded")
+
     assert_simulation_can_run(reloaded_split,  "dis", tmp_path/"reloaded")
 
 @pytest.mark.usefixtures("transient_twri_model")
