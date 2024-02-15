@@ -207,11 +207,12 @@ class Well(BoundaryCondition, IPointDataPackage):
         repeat_stress: Optional[xr.DataArray] = None,
     ):
         if id is None:
-            id = list(np.arange(len(x)).astype(str))
+            id = [str(i) for i in range(len(x))]
         else:
             set_id = set(id)
             if len(id) != len(set_id):
                 raise ValueError("id's must be unique")
+            id = [ str(i) for i in id]                
         dict_dataset = {
             "screen_top": _assign_dims(screen_top),
             "screen_bottom": _assign_dims(screen_bottom),
