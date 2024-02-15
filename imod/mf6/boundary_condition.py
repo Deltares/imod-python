@@ -14,7 +14,8 @@ from imod.mf6.auxiliary_variables import (
 from imod.mf6.package import Package
 from imod.mf6.write_context import WriteContext
 from imod.typing.grid import GridDataArray
-
+from imod.wq.timeutil import to_datetime
+import warnings
 
 def _dis_recarr(arrdict, layer, notnull):
     # Define the numpy structured array dtype
@@ -86,11 +87,21 @@ class BoundaryCondition(Package, abc.ABC):
         times: Dict of datetime-like to datetime-like.
             The data of the value datetime is used for the key datetime.
         """
+        warnings.warn(
+            f"""{self.__class__.__name__}.set_repeat_stress(...) is deprecated.
+            In the future, add repeat stresses as constructor parameters. 
+            An object containing them can be created using 'get_repeat_stress', as follows:
+            repeat_stress = get_repeat_stress(repeat_periods) # args before provided to River.set_repeat_stress
+            riv = imod.mf6.River(..., repeat_stress=repeat_stress)
+            """,
+            DeprecationWarning,
+        )
+
         keys = [
-            imod.wq.timeutil.to_datetime(key, use_cftime=False) for key in times.keys()
+            to_datetime(key, use_cftime=False) for key in times.keys()
         ]
         values = [
-            imod.wq.timeutil.to_datetime(value, use_cftime=False)
+            to_datetime(value, use_cftime=False)
             for value in times.values()
         ]
         self.dataset["repeat_stress"] = xr.DataArray(
