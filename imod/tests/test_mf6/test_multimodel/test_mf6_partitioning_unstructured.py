@@ -34,13 +34,6 @@ class PartitionArrayCases:
         return three_parts
 
 
-    def case_concentric(self, idomain_top) -> xu.UgridDataArray:
-        centroids = idomain_top.ugrid.grid.centroids
-        dist = np.sqrt( centroids[:,0]* centroids[:,0] +  centroids[:,1]* centroids[:,1])
-        concentric = zeros_like(idomain_top)
-        concentric.values =  np.where(dist < 500, 0, 1)
-        return  concentric 
-
 class WellCases:
     def case_one_well(self):
         return imod.mf6.Well(
