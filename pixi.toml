@@ -104,3 +104,11 @@ build = "*"
 
 [pypi-dependencies]
 mypy2junit = "*"
+
+[feature.debug.dependencies]
+ipykernel = "*"
+ipython = "*"
+jupyter = "*"
+
+[environments]
+debug = ["debug"]
