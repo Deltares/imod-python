@@ -77,6 +77,27 @@ class BoundaryCondition(Package, abc.ABC):
         else:
             expand_transient_auxiliary_variables(self)
 
+    def set_repeat_stress(self, times) -> None:
+        """
+        Set repeat stresses: re-use data of earlier periods.
+
+        Parameters
+        ----------
+        times: Dict of datetime-like to datetime-like.
+            The data of the value datetime is used for the key datetime.
+        """
+        keys = [
+            imod.wq.timeutil.to_datetime(key, use_cftime=False) for key in times.keys()
+        ]
+        values = [
+            imod.wq.timeutil.to_datetime(value, use_cftime=False)
+            for value in times.values()
+        ]
+        self.dataset["repeat_stress"] = xr.DataArray(
+            data=np.column_stack((keys, values)),
+            dims=("repeat", "repeat_items"),
+        )
+        
     def _max_active_n(self):
         """
         Determine the maximum active number of cells that are active
