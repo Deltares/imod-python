@@ -99,9 +99,9 @@ class Well(BoundaryCondition, IPointDataPackage):
     concentration_boundary_type: ({"AUX", "AUXMIXED"}, optional)
         if this flow package is used in simulations also involving transport, then this keyword specifies
         how outflow over this boundary is computed.
-    id: list of int, optional
-        assign an integer identidfier code to each well. if not provided, one will be generated 
-        Must be unique entries.  
+    id: list of Any, optional
+        assign an identifier code to each well. if not provided, one will be generated 
+        Must be convertible to string, and unique entries.  
     minimum_k: float, optional
         on creating point wells, no point wells will be placed in cells with a lower horizontal conductivity than this
     minimum_thickness: float, optional
@@ -196,7 +196,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         rate: list[float]| xr.DataArray,
         concentration: Optional[list[float] | xr.DataArray] = None,
         concentration_boundary_type="aux",
-        id: Optional[list[int]] = None,
+        id: Optional[list[Any]] = None,
         minimum_k: float = 0.1,
         minimum_thickness: float = 1.0,
         print_input: bool = False,
