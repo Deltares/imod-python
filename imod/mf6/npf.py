@@ -11,6 +11,24 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
 )
+from imod.typing import GridDataArray
+
+
+def _dataarray_to_bool(griddataarray: GridDataArray) -> bool:
+    if griddataarray is None or griddataarray.values is None:
+        return False
+
+    if griddataarray.values.size != 1:
+        raise ValueError(
+            "DataArray is not a single value"
+        )
+
+    if griddataarray.values.dtype != bool:
+        raise ValueError(
+            "DataArray is not a boolean"
+        )
+
+    return griddataarray.values.item()
 
 
 class NodePropertyFlow(Package):
@@ -400,7 +418,7 @@ class NodePropertyFlow(Package):
         """
         Returns the xt3d option value for this object.
         """
-        return self.dataset["xt3d_option"].values[()]
+        return _dataarray_to_bool(self.dataset["xt3d_option"])
 
     def set_xt3d_option(self, is_xt3d_used: bool, is_rhs: bool) -> None:
         """
@@ -414,11 +432,11 @@ class NodePropertyFlow(Package):
         """
         Returns the VariableCV option value for this object.
         """
-        return self.dataset["variable_vertical_conductance"].values[()]
+        return _dataarray_to_bool(self.dataset["variable_vertical_conductance"])
 
     @property
     def is_dewatered(self) -> bool:
         """
         Returns the "dewatered" option value for this object. Used only when variable_vertical_conductance is true
         """
-        return self.dataset["dewatered"].values[()]
+        return _dataarray_to_bool(self.dataset["dewatered"])

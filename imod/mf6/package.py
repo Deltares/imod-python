@@ -323,7 +323,7 @@ class Package(PackageBase, IPackage, abc.ABC):
 
     def copy(self) -> Any:
         # All state should be contained in the dataset.
-        return type(self)(**self.dataset.copy())
+        return type(self)(**self.dataset.copy().to_dict())
 
     @staticmethod
     def _clip_repeat_stress(
@@ -711,6 +711,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         typename = type(self).__name__
         return f"<div>{typename}</div>{self.dataset._repr_html_()}"
 
+    @property
     def auxiliary_data_fields(self) -> dict[str, str]:
         if hasattr(self, "_auxiliary_data"):
             return self._auxiliary_data
