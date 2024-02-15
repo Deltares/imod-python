@@ -2,11 +2,13 @@
 This module contains specific validation utilities for Modflow 6.
 """
 
+from typing import cast
+
 import numpy as np
-import xarray as xr
 
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.schemata import DimsSchema, NoDataComparisonSchema, ValidationError
+from imod.typing import GridDataArray
 
 PKG_DIMS_SCHEMA = (
     DimsSchema("layer", "y", "x")
@@ -46,7 +48,7 @@ class DisBottomSchema(NoDataComparisonSchema):
     because of how Modflow 6 computes cell thicknesses.
     """
 
-    def validate(self, obj: xr.DataArray, **kwargs):
+    def validate(self, obj: GridDataArray, **kwargs) -> None:
         other_obj = kwargs[self.other]
 
         active = self.is_other_notnull(other_obj)
@@ -62,7 +64,9 @@ class DisBottomSchema(NoDataComparisonSchema):
 
             # To compute thicknesses properly, Modflow 6 requires bottom data in the
             # layer above the active cell in question.
-            overlaying_top_inactive = np.isnan(bottom).shift(layer=1, fill_value=False)
+            overlaying_top_inactive = cast(GridDataArray, np.isnan(bottom)).shift(
+                layer=1, fill_value=False
+            )
             if (overlaying_top_inactive & active).any():
                 raise ValidationError("inactive bottom above active cell")
 

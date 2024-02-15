@@ -6,7 +6,7 @@ import pathlib
 import subprocess
 import warnings
 from pathlib import Path
-from typing import Any, Callable, DefaultDict, Optional, Union
+from typing import Any, Callable, DefaultDict, Iterable, Optional, Union, cast
 
 import cftime
 import jinja2
@@ -33,7 +33,6 @@ from imod.mf6.multimodel.exchange_creator_unstructured import (
 from imod.mf6.multimodel.modelsplitter import create_partition_info, slice_model
 from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
-from imod.mf6.pkgbase import PackageBase
 from imod.mf6.ssm import SourceSinkMixing
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.write_context import WriteContext
@@ -196,7 +195,7 @@ class Modflow6Simulation(collections.UserDict):
                     write_context.root_directory / pathlib.Path(f"{key}", f"{key}.nam")
                 ).as_posix()
                 models.append((value.model_id(), model_name_file, key))
-            elif isinstance(value, PackageBase):
+            elif isinstance(value, Package):
                 if value._pkg_id == "tdis":
                     d["tdis6"] = f"{key}.tdis"
                 elif value._pkg_id == "ims":
@@ -290,7 +289,7 @@ class Modflow6Simulation(collections.UserDict):
                         write_context=model_write_context,
                     )
                 )
-            elif isinstance(value, PackageBase):
+            elif isinstance(value, Package):
                 if value._pkg_id == "ims":
                     ims_write_context = write_context.copy_with_new_write_directory(
                         write_context.simulation_directory
@@ -403,7 +402,7 @@ class Modflow6Simulation(collections.UserDict):
         species_ls: Optional[list[str]] = None,
         simulation_start_time: Optional[np.datetime64] = None,
         time_unit: Optional[str] = "d",
-    ) -> dict[str, GridDataArray]:
+    ) -> GridDataArray | GridDataset:
         """
         Open transport budgets of finished simulation, requires that the ``run``
         method has been called.
@@ -442,7 +441,7 @@ class Modflow6Simulation(collections.UserDict):
         flowja: bool = False,
         simulation_start_time: Optional[np.datetime64] = None,
         time_unit: Optional[str] = "d",
-    ) -> dict[str, GridDataArray]:
+    ) -> GridDataArray | GridDataset:
         """
         Open flow budgets of finished simulation, requires that the ``run``
         method has been called.
@@ -627,7 +626,9 @@ class Modflow6Simulation(collections.UserDict):
         cbc[[gwf-gwf_1, gwf-gwf_3]] to cbc[gwf-gwf]
         """
         exchange_names = [
-            key for key in cbc.keys() if ("gwf-gwf" in key) or ("gwt-gwt" in key)
+            key
+            for key in cast(Iterable[str], cbc.keys())
+            if (("gwf-gwf" in key) or ("gwt-gwt" in key))
         ]
         exchange_budgets = cbc[exchange_names].to_array().sum(dim="variable")
         cbc = cbc.drop_vars(exchange_names)
@@ -965,6 +966,7 @@ class Modflow6Simulation(collections.UserDict):
 
         partition_info = create_partition_info(submodel_labels)
 
+        exchange_creator: ExchangeCreator_Unstructured | ExchangeCreator_Structured
         if is_unstructured(submodel_labels):
             exchange_creator = ExchangeCreator_Unstructured(
                 submodel_labels, partition_info

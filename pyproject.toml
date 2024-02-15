@@ -113,8 +113,13 @@ convention = "numpy"
 "test_examples.py" = ["F401"]
 
 [tool.mypy]
-files = "imod/mf6/**.py"
-follow_imports = "skip"
+files = ["imod/mf6/**.py"]
+follow_imports = "silent"
+warn_unused_configs = true
+
+[[tool.mypy.overrides]]
+module = 'mf6'
+follow_imports = "normal"
 
 [[tool.mypy.overrides]]
 module = [
