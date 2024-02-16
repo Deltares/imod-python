@@ -6,8 +6,8 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
-[Unreleased]
-------------
+[0.15.2] - 2024-02-16
+---------------------
 
 Fixed
 ~~~~~
@@ -24,6 +24,10 @@ Fixed
   :class:`imod.mf6.EvapoTranspiration` package
 - Added validation :class:`imod.mf6.Well` package, no ``np.nan`` values are
   allowed
+- Fix support for coupling a GroundwaterFlowModel and Transport Model i.c.w.
+  the 6.4.3 release of MODFLOW. Using an older version of iMOD Python
+  with this version of MODFLOW will result in an error.
+
 
 Changed
 ~~~~~~~
@@ -37,12 +41,9 @@ Changed
   development install are adviced to run ``pip uninstall imod`` and ``pip
   install -e .`` again. This does not affect users who installed with ``pip
   install imod``, ``mamba install imod`` or ``conda install imod``.
+- Decreased lower limit of MetaSWAP validation for x and y limits in the
+  ``IdfMapping`` from 0 to -9999999.0.
 
-Added
-~~~~~
-- Added support for coupling a GroundwaterFlowModel and Transport Model i.c.w.
-  the 6.4.3 release of MODFLOW. Using an older version of iMOD Python
-  with this version of MODFLOW will result in an error.
 
 [0.15.1] - 2023-12-22
 ---------------------
