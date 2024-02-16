@@ -14,6 +14,7 @@ from imod.mf6.evt import Evapotranspiration
 from imod.mf6.ghb import GeneralHeadBoundary
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwfgwt import GWFGWT
+from imod.mf6.gwtgwt import GWTGWT
 from imod.mf6.hfb import (
     HorizontalFlowBarrierBase,
     HorizontalFlowBarrierHydraulicCharacteristic,
