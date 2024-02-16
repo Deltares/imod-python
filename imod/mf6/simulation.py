@@ -815,12 +815,10 @@ class Modflow6Simulation(collections.UserDict):
                     directory
                 ).as_posix()
             elif key in ["gwtgwf_exchanges","split_exchanges"]:
-                toml_content[key] = {}
+                toml_content[key] = defaultdict(list)
                 for exchange_package in self[key]:
                     exchange_type, filename, _, _ = exchange_package.get_specification()
                     exchange_class_short = type(exchange_package).__name__
-                    if not exchange_class_short in toml_content[key].keys():
-                         toml_content[key][exchange_class_short]=[]
                     path = f"{filename}.nc"
                     exchange_package.dataset.to_netcdf(directory / path)
                     toml_content[key][exchange_class_short].append(path)
