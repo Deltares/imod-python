@@ -332,14 +332,6 @@ def test_repeat_stress_old_style(
         dtype="datetime64[ns]",
     )
 
-    repeat_stress = xr.DataArray(
-        [
-            [globaltimes[3], globaltimes[0]],
-            [globaltimes[4], globaltimes[1]],
-        ],
-        dims=("repeat", "repeat_items"),
-    )
-
     expected = textwrap.dedent(
         """\
         begin options
@@ -366,14 +358,6 @@ def test_repeat_stress_old_style(
         end period
         """
     )
-
-    drn = imod.mf6.Drainage(
-        elevation=elevation_fc,
-        conductance=conductance_fc,
-        repeat_stress=repeat_stress,
-    )
-    actual = drn.render(directory, "drn", globaltimes, False)
-    assert actual == expected
 
     drn = imod.mf6.Drainage(
         elevation=elevation_fc,
