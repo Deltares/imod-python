@@ -79,7 +79,7 @@ class BoundaryCondition(Package, abc.ABC):
         else:
             expand_transient_auxiliary_variables(self)
 
-    def set_repeat_stress(self, times) -> None:
+    def set_repeat_stress(self, times: dict[np.datetime64,np.datetime64]) -> None:
         """
         Set repeat stresses: re-use data of earlier periods.
 
