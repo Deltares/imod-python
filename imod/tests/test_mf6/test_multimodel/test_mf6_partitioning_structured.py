@@ -1,3 +1,4 @@
+from filecmp import dircmp
 from pathlib import Path
 
 import geopandas as gpd
@@ -216,6 +217,26 @@ def test_partitioning_structured(
     np.testing.assert_allclose(
         head["head"].values, original_head.values, rtol=1e-4, atol=1e-4
     )
+
+@pytest.mark.usefixtures("transient_twri_model")
+@parametrize_with_cases("partition_array", cases=PartitionArrayCases, glob="*four_squares")
+def test_split_dump(
+    tmp_path: Path,
+    transient_twri_model: Modflow6Simulation,
+    partition_array: xr.DataArray,
+):
+    simulation = transient_twri_model
+    split_simulation = simulation.split(partition_array)
+    split_simulation.dump(tmp_path/"split")
+    reloaded_split = imod.mf6.Modflow6Simulation.from_file(tmp_path/"split/ex01-twri_partioned.toml")
+
+    split_simulation.write(tmp_path/"split/original")
+    reloaded_split.write(tmp_path/"split/reloaded")
+
+    diff = dircmp(tmp_path/"split/original", tmp_path/"split/reloaded")
+    assert len(diff.diff_files) == 0
+    assert len(diff.left_only) == 0
+    assert len(diff.right_only) == 0    
 
 
 @pytest.mark.usefixtures("transient_twri_model")
