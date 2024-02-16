@@ -1,5 +1,6 @@
 import abc
 import pathlib
+import warnings
 from copy import copy, deepcopy
 from typing import Mapping, Optional, Union
 
@@ -12,10 +13,10 @@ from imod.mf6.auxiliary_variables import (
     get_variable_names,
 )
 from imod.mf6.package import Package
+from imod.mf6.utilities.package_utils import get_repeat_stress
 from imod.mf6.write_context import WriteContext
 from imod.typing.grid import GridDataArray
-from imod.wq.timeutil import to_datetime
-import warnings
+
 
 def _dis_recarr(arrdict, layer, notnull):
     # Define the numpy structured array dtype
@@ -97,17 +98,7 @@ class BoundaryCondition(Package, abc.ABC):
             DeprecationWarning,
         )
 
-        keys = [
-            to_datetime(key, use_cftime=False) for key in times.keys()
-        ]
-        values = [
-            to_datetime(value, use_cftime=False)
-            for value in times.values()
-        ]
-        self.dataset["repeat_stress"] = xr.DataArray(
-            data=np.column_stack((keys, values)),
-            dims=("repeat", "repeat_items"),
-        )
+        self.dataset["repeat_stress"] = get_repeat_stress(times)
         
     def _max_active_n(self):
         """
