@@ -1,8 +1,9 @@
+import numpy as np
+
 from imod.mf6.package import Package
 from imod.schemata import (
     DTypeSchema,
 )
-import numpy as np
 
 _init_schemata = {
     "maxbound": [DTypeSchema(np.integer)],

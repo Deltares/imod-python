@@ -1,6 +1,8 @@
-from pathlib import Path
-import imod
 import textwrap
+from pathlib import Path
+
+import imod
+
 
 def test_render(tmp_path: Path):
 

@@ -3,6 +3,7 @@ Create a Modflow 6 model.
 """
 
 from imod.mf6.adv import AdvectionCentral, AdvectionTVD, AdvectionUpstream
+from imod.mf6.api_package import ApiPackage
 from imod.mf6.buy import Buoyancy
 from imod.mf6.chd import ConstantHead
 from imod.mf6.cnc import ConstantConcentration
@@ -49,4 +50,3 @@ from imod.mf6.timedis import TimeDiscretization
 from imod.mf6.uzf import UnsaturatedZoneFlow
 from imod.mf6.wel import Well, WellDisStructured, WellDisVertices
 from imod.mf6.write_context import WriteContext
-from imod.mf6.api_package import ApiPackage

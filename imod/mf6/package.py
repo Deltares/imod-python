@@ -17,7 +17,12 @@ from xarray.core.utils import is_scalar
 import imod
 from imod.mf6.auxiliary_variables import get_variable_names
 from imod.mf6.interfaces.ipackage import IPackage
-from imod.mf6.pkgbase import EXCHANGE_PACKAGES, TRANSPORT_PACKAGES,API_PACKAGES, PackageBase
+from imod.mf6.pkgbase import (
+    API_PACKAGES,
+    EXCHANGE_PACKAGES,
+    TRANSPORT_PACKAGES,
+    PackageBase,
+)
 from imod.mf6.regridding_utils import (
     RegridderInstancesCollection,
     RegridderType,
