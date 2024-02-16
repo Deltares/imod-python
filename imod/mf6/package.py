@@ -120,7 +120,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         elif pkg_id in EXCHANGE_PACKAGES:
             fname = f"exg-{pkg_id}.j2"
         elif pkg_id in API_PACKAGES:
-            fname = f"{pkg_id}.j2"
+            fname = f"api-{pkg_id}.j2"
         else:
             fname = f"gwf-{pkg_id}.j2"
         return env.get_template(fname)
