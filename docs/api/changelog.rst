@@ -11,7 +11,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 Added
 ~~~~~
-- Developer install: Added pixi environment ``interactive`` to interactively
+- Developer environment: Added pixi environment ``interactive`` to interactively
   run code. Can be useful to plot data.
 
 [0.15.2] - 2024-02-16
