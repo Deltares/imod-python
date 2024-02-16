@@ -250,8 +250,8 @@ transport_model["dsp"] = imod.mf6.Dispersion(
 transport_model["adv"] = imod.mf6.AdvectionUpstream()
 transport_model["mst"] = imod.mf6.MobileStorageTransfer(porosity)
 
-# %% Define the maximum concentration as the initial conditions and output
-# options for the transport simulation, and assign the transport model to the
+# %% Define the maximum concentration as the initial conditions, also output
+# options for the transport model, and assign the transport model to the
 # simulation as well.
 
 transport_model["ic"] = imod.mf6.InitialConditions(start=max_concentration)
