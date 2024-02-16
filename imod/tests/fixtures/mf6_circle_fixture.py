@@ -399,7 +399,7 @@ def circle_model_transport_multispecies():
         reference_density=min_density,
         modelname=modelnames,
         reference_concentration=[min_concentration,min_concentration ],
-        density_concentration_slope=[slope/2, slope/2],
+        density_concentration_slope=[slope, slope],
         species=species,
     )        
     
