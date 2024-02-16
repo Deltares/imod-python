@@ -157,7 +157,8 @@ class Buoyancy(Package):
         transport_model_names = self.get_transport_model_names()
         if not len(transport_model_names) == len(new_modelnames):
             raise ValueError("the number of transport models cannot be changed.")
-        for i in range (0, len(transport_model_names)):
+        for modelname, new_modelname in zip(transport_model_names, new_modelnames):
+            if not modelname in new_modelname:
             if not transport_model_names[i] in new_modelnames[i]:
                 raise ValueError("new transport model names do not match the old ones. The new names should be equal to the old ones, with a suffix.")
         self.dataset["modelname"] = assign_index(new_modelnames)
