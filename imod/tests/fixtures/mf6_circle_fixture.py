@@ -310,9 +310,9 @@ def circle_model_transport():
     transport_model["adv"] = imod.mf6.AdvectionUpstream()
     transport_model["mst"] = imod.mf6.MobileStorageTransfer(porosity)
 
-    # %%
-    # Now we define initial conditions (0.0) and output options for the transport
-    # simulation, and assign the transport model to the simulation as well.
+    # %% Define the maximum concentration as the initial conditions and output
+    # options for the transport simulation, and assign the transport model to
+    # the simulation as well.
     max_concentration = 35.0
     min_concentration = 0.0
     transport_model["ic"] = imod.mf6.InitialConditions(start=max_concentration)
@@ -384,9 +384,9 @@ def circle_model_transport_multispecies():
         transport_model["adv"] = imod.mf6.AdvectionUpstream()
         transport_model["mst"] = imod.mf6.MobileStorageTransfer(porosity, save_flows=True)
 
-        # %%
-        # Now we define initial conditions (0.0) and output options for the transport
-        # simulation, and assign the transport model to the simulation as well.
+        # %% Define the maximum concentration as the initial conditions and
+        # output options for the transport simulation, and assign the transport
+        # model to the simulation as well.
         transport_model["ic"] = imod.mf6.InitialConditions(start=max_concentration)
         transport_model["oc"] = imod.mf6.OutputControl(
             save_concentration="all", save_budget="all"
