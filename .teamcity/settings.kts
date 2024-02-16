@@ -116,7 +116,7 @@ object LintTemplate : Template({
                 id = "Static_code_analysis"
                 workingDir = "imod-python"
                 scriptContent = """
-                    pixi run --frozen lint
+                    pixi run --frozen lint --environment default
                 """.trimIndent()
                 formatStderrAsError = true
         }
@@ -144,8 +144,8 @@ object MyPyTemplate : Template({
                 id = "MyPy_analysis"
                 workingDir = "imod-python"
                 scriptContent = """
-                    pixi run --frozen mypy_report
-                    pixi run --frozen mypy
+                    pixi run --frozen mypy_report --environment default
+                    pixi run --frozen mypy --environment default
                 """.trimIndent()
                 formatStderrAsError = true
         }
@@ -197,7 +197,7 @@ object UnitTestsTemplate : Template({
             workingDir = "imod-python"
             scriptContent = """
                 set Path=%system.teamcity.build.checkoutDir%\modflow6;%env.Path% 
-                pixi run --frozen unittests
+                pixi run --frozen unittests --environment default
             """.trimIndent()
             formatStderrAsError = true
         }
@@ -207,7 +207,7 @@ object UnitTestsTemplate : Template({
             workingDir = "imod-python/imod/tests"
             scriptMode = script {
                 content = """
-                    ${'$'}REPORT = echo "coverage report" | pixi shell
+                    ${'$'}REPORT = echo "coverage report" | pixi shell --environment default
                     
                     ${'$'}TOTALS = ${'$'}REPORT | Select-String -Pattern 'TOTAL' -CaseSensitive -SimpleMatch
                     ${'$'}STATISTICS = ${'$'}TOTALS -split "\s+"
@@ -253,7 +253,7 @@ object ExamplesTemplate : Template({
             workingDir = "imod-python"
             scriptContent = """
                 set Path=%system.teamcity.build.checkoutDir%\modflow6;%env.Path% 
-                pixi run --frozen examples
+                pixi run --frozen examples --environment default
             """.trimIndent()
             formatStderrAsError = true
         }
@@ -548,7 +548,7 @@ object UpdateDependencies : BuildType({
                     
                     echo "Update dependencies" 
                     del pixi.lock
-                    pixi install
+                    pixi install --environment default
                     
                     echo "Add any changes" 
                     git add pixi.lock
@@ -557,7 +557,7 @@ object UpdateDependencies : BuildType({
                     {
                       git commit -m "Update pixi.lock"
                       git push -u origin pixi_update_%build.counter%
-                      pixi run gh pr create --title "[TEAMCITY] Update project dependencies" --body "Teamcity automatically updated the dependencies defined the pixi.toml file. Please verify that all tests succeed before merging" --reviewer JoerivanEngelen,luitjansl
+                      pixi run --environment default gh pr create --title "[TEAMCITY] Update project dependencies" --body "Teamcity automatically updated the dependencies defined the pixi.toml file. Please verify that all tests succeed before merging" --reviewer JoerivanEngelen,luitjansl
                       echo "Changes pushed and PR created"
                     }
                     else
