@@ -144,8 +144,8 @@ object MyPyTemplate : Template({
                 id = "MyPy_analysis"
                 workingDir = "imod-python"
                 scriptContent = """
-                    pixi run --frozen mypy_report --environment default
-                    pixi run --frozen mypy --environment default
+                    pixi run --environment default --frozen mypy_report
+                    pixi run --environment default --frozen mypy
                 """.trimIndent()
                 formatStderrAsError = true
         }
@@ -197,7 +197,7 @@ object UnitTestsTemplate : Template({
             workingDir = "imod-python"
             scriptContent = """
                 set Path=%system.teamcity.build.checkoutDir%\modflow6;%env.Path% 
-                pixi run --frozen unittests --environment default
+                pixi run --environment default --frozen unittests
             """.trimIndent()
             formatStderrAsError = true
         }
@@ -253,7 +253,7 @@ object ExamplesTemplate : Template({
             workingDir = "imod-python"
             scriptContent = """
                 set Path=%system.teamcity.build.checkoutDir%\modflow6;%env.Path% 
-                pixi run --frozen examples --environment default
+                pixi run --environment default --frozen examples
             """.trimIndent()
             formatStderrAsError = true
         }
