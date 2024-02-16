@@ -6,6 +6,14 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[Unreleased]
+------------
+
+Added
+~~~~~
+- Developer install: Added pixi environment ``interactive`` to interactively
+  run code. Can be useful to plot data.
+
 [0.15.2] - 2024-02-16
 ---------------------
 
