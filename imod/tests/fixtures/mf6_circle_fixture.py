@@ -352,7 +352,7 @@ def circle_model_transport_multispecies():
     min_concentration = 0.0
     max_density = 1025.0
     min_density = 1000.0
-    species = ["sali", "tempe"]
+    species = ["salt", "temp"]
 
     simulation = make_circle_model_flow_with_transport_data(species)
     gwf_model = simulation["GWF_1"]
