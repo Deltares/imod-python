@@ -104,3 +104,11 @@ build = "*"
 
 [pypi-dependencies]
 mypy2junit = "*"
+
+[feature.interactive.dependencies]
+ipykernel = "*"
+ipython = "*"
+jupyter = "*"
+
+[environments]
+interactive = ["interactive"]

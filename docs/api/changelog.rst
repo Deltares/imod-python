@@ -6,11 +6,13 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
-Unreleased
-----------
+[Unreleased]
+------------
 
 Added
 ~~~~~
+- Developer environment: Added pixi environment ``interactive`` to interactively
+  run code. Can be useful to plot data.
 - An API package was added. It can be added to both flow and transport models, and its 
 presence allows users to interact with libMF6.dll through its API.
 
