@@ -1,0 +1,12 @@
+begin options
+{% if print_input is defined %}  print_input
+{% endif %}
+{%- if print_flows is defined %}  print_flows
+{% endif %}
+{%- if save_flows is defined %}  save_flows
+{% endif -%}
+end options
+
+begin dimensions
+  maxbound {{maxbound}}
+end dimensions

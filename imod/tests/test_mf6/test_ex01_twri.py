@@ -367,6 +367,7 @@ def test_gwfmodel_render(twri_model, tmp_path):
               oc6 {path}/oc.oc oc
               rch6 {path}/rch.rch rch
               sto6 {path}/sto.sto sto
+              api6 {path}/api.api api
             end packages
             """
     )

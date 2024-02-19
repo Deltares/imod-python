@@ -13,6 +13,9 @@ Added
 ~~~~~
 - Developer environment: Added pixi environment ``interactive`` to interactively
   run code. Can be useful to plot data.
+- An API package was added. It can be added to both flow and transport models, and its 
+presence allows users to interact with libMF6.dll through its API.
+
 
 [0.15.2] - 2024-02-16
 ---------------------
