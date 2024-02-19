@@ -164,9 +164,16 @@ This will create a conda environment inside the imod folder. To activate the env
 This essentially temporarily updates your `PATH variable`_, which is the set
 of directories where executable programs are located. closing the command prompt,
 these directories are removed from PATH again so that the Python installation is
-properly isolated.
+properly isolated. Read more at the full `pixi docs`_.
 
-Read more at the full `pixi docs`_.
+Use the following command to have a pixi environment with ipython, ipykernel,
+and jupyter for interactive scripting (e.g. plotting data with matplotlib)::
+
+    pixi run --environment interactive install
+
+Then start the interactive environment::
+
+    pixi shell --environment interactive
 
 
 Installing a newer or old version
