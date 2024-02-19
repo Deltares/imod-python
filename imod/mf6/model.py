@@ -495,7 +495,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 raise ValidationError("\n" + status_info.to_string())
         return new_model
 
-    def _mask_all_packages(
+    def mask_all_packages(
         self,
         domain: GridDataArray,
     ):
@@ -506,6 +506,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         """
         for pkgname, pkg in self.items():
             self[pkgname] = pkg.mask(domain)
+        self.purge_empty_packages()
 
     def purge_empty_packages(self, model_name: Optional[str] = "") -> None:
         """

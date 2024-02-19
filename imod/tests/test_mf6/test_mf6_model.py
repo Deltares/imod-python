@@ -335,7 +335,7 @@ def test_masked_model_validation_inactive_cell_pillar(
     unstructured_flow_model["disv"]["idomain"] = mask
 
     # apply the mask to a model
-    unstructured_flow_model._mask_all_packages(mask)
+    unstructured_flow_model.mask_all_packages(mask)
 
     # test output validity
     errors = unstructured_flow_model._validate("model")
@@ -358,7 +358,7 @@ def test_masked_model_validation_one_inactive_cell(
     unstructured_flow_model["disv"]["idomain"] = mask
 
     # apply the mask to a model
-    unstructured_flow_model._mask_all_packages(mask)
+    unstructured_flow_model.mask_all_packages(mask)
 
     # test output validity
     errors = unstructured_flow_model._validate("model")
@@ -399,7 +399,7 @@ def test_masked_model_layered_and_scalar_package_input(
     )
 
     # Apply the mask to a model
-    unstructured_flow_model._mask_all_packages(mask)
+    unstructured_flow_model.mask_all_packages(mask)
 
     # Test output validity
     errors = unstructured_flow_model._validate("model")

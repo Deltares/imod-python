@@ -228,6 +228,9 @@ def test_partitioning_structured_with_inactive_cells(
     simulation = transient_twri_model
     idomain = simulation["GWF_1"].domain
     idomain.loc[{"x": 32500, "y": slice(67500, 7500)}] = 0
+    
+    simulation["GWF_1"].mask_all_packages(idomain)
+    '''
     for _, package in simulation["GWF_1"].items():
         if not isinstance(package, Well):
             for arrayname in package.dataset.keys():
@@ -240,6 +243,7 @@ def test_partitioning_structured_with_inactive_cells(
                         package[arrayname].loc[
                             {"x": 32500, "y": slice(67500, 7500)}
                         ] = 0
+    '''
     # Run the original example, so without partitioning, and save the simulation
     # results.
     original_dir = tmp_path / "original"
