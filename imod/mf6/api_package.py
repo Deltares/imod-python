@@ -11,6 +11,15 @@ _init_schemata = {
 
 class ApiPackage(Package):
     """
+    The API package can be used to interact with the dll-version of Modflow (libMF6.dll).
+    libMF6 implement the XMI api, which can be used among other things to get 
+    or set internal MF6 arrays mid-simulation. 
+    For more information, see:
+
+    https://doi.org/10.1016/j.envsoft.2021.105257
+    https://modflow6.readthedocs.io/en/stable/_mf6io/gwf-api.html    
+    https://modflow6.readthedocs.io/en/stable/_mf6io/gwt-api.html
+
     Parameters
     ----------    
     maxbound: int
