@@ -128,10 +128,10 @@ def test_specific_discharge_results(
 
     # Reindex the arrays that come from modflow output to match the indexing of unsplit results
     split_head = split_head.ugrid.reindex_like(original_heads)
-    split_balances_x_v2["npf-qx"] = split_balances_x_v2["npf-qx"].ugrid.reindex_like(
+    split_balances_x_v2 = split_balances_x_v2.ugrid.reindex_like(
         original_balances_x_v2
     )
-    split_balances_y_v2["npf-qy"] = split_balances_y_v2["npf-qy"].ugrid.reindex_like(
+    split_balances_y_v2 = split_balances_y_v2.ugrid.reindex_like(
         original_balances_y_v2
     )
 
