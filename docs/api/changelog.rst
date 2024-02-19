@@ -6,6 +6,15 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+Unreleased
+----------
+
+Added
+~~~~~
+- An API package was added. It can be added to both flow and transport models, and its 
+presence allows users to interact with libMF6.dll through its API.
+
+
 [0.15.2] - 2024-02-16
 ---------------------
 
@@ -44,10 +53,6 @@ Changed
 - Decreased lower limit of MetaSWAP validation for x and y limits in the
   ``IdfMapping`` from 0 to -9999999.0.
 
-Added
-~~~~~
-- An API package was added. It can be added to both flow and transport models, and its 
-presence allows users to interact with libMF6.dll through its API.
 
 [0.15.1] - 2023-12-22
 ---------------------
