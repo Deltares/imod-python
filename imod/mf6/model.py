@@ -486,7 +486,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         methods = self._get_unique_regridder_types()
         output_domain = self._get_regridding_domain(target_grid, methods)
         new_model[self._get_diskey()]["idomain"] = output_domain
-        new_model._mask_all_packages(output_domain)
+        new_model.mask_all_packages(output_domain)
         new_model.purge_empty_packages()
         if validate:
             status_info = NestedStatusInfo("Model validation status")
@@ -504,6 +504,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         be presented as an idomain-like integer array that has 0 or negative
         values in filtered cells and positive values in active cells
         """
+        if any([d not in ["x", "y", "layer", "mesh2d_nFaces"] for d in domain.coords]):
+            raise ValueError("unexpected coordinate dimension in masking domain")
+
         for pkgname, pkg in self.items():
             self[pkgname] = pkg.mask(domain)
         self.purge_empty_packages()

@@ -527,21 +527,33 @@ class Package(PackageBase, IPackage, abc.ABC):
         masked: Package
             The package with part masked.
         """
+
+        if any([d not in ["x", "y", "layer", "mesh2d_nFaces"] for d in domain.coords]):
+            raise ValueError("unexpected coordinate dimension in masking domain. At most, the mask array may have \"x\",\"y\",\"layer\" and/or  \"mesh2d_nFaces\" coordinates")
+
         horizontal_dims = ["x", "y", "mesh2d_nFaces"]
         vertical_dims = ["layer"]
 
         masked = {}
+
+
         for var in self.dataset.data_vars.keys():
+            array_domain = domain
             da = self.dataset[var]
-            if self.skip_masking_dataarray(var) | len(da.dims) == 0:
+            if self.skip_masking_dataarray(var) or len(da.coords) == 0 or  set(da.coords).issubset(vertical_dims):
                 masked[var] = da
                 continue
-            if set(da.dims).issubset(horizontal_dims) | set(da.dims).issubset(horizontal_dims + vertical_dims) :
+
+
+            if set(da.coords).issubset(horizontal_dims+vertical_dims):
+                if len(da.dims) < len(da.coords):
+                    if ("layer" in da.coords and "layer" not in da.dims):
+                        array_domain = domain.sel(layer = da.coords["layer"])
+
                 if issubclass(da.dtype.type, numbers.Integral):
-                    masked[var] = da.where(domain > 0, other=0)
+                    masked[var] = da.where(array_domain > 0, other=0)
                 elif issubclass(da.dtype.type, numbers.Real):
-                    masked[var] = da.where(domain > 0)
-                    
+                    masked[var] = da.where(array_domain > 0)
                 else:
                     raise TypeError(
                         f"Expected dtype float or integer. Received instead: {da.dtype}"

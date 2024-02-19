@@ -9,6 +9,7 @@ import numpy as np
 import pytest
 import shapely
 import xarray as xr
+import xugrid as xu
 from jinja2 import Template
 from xugrid.core.wrap import UgridDataArray
 
@@ -437,3 +438,46 @@ def test_purge_empty_package(
     unstructured_flow_model["hfb"] = imod.mf6.HorizontalFlowBarrierResistance(geometry)
     unstructured_flow_model.purge_empty_packages()
     assert original_nr_packages == len(unstructured_flow_model.items())
+
+@pytest.mark.parametrize("layer_mask", [[1,1,0], [0,1,1], [1,0,1]])
+def test_mask_with_layer_array(
+    tmp_path: Path,
+    unstructured_flow_model: GroundwaterFlowModel,
+    layer_mask: list[int]
+):  
+    nlayer = 3
+    layer = np.arange(nlayer, dtype=int) + 1
+    grid = unstructured_flow_model.domain.ugrid.grid
+    mask =  xu.UgridDataArray(
+        xr.DataArray(
+            coords={"layer": layer},
+            dims=["layer"],
+        ),
+        grid=grid,
+    )
+    mask.values = layer_mask
+
+    unstructured_flow_model.mask_all_packages(mask)
+
+    assert_model_can_run( unstructured_flow_model, "disv", tmp_path )
+
+def test_mask_with_time_coordinate(
+    tmp_path: Path,
+    unstructured_flow_model: GroundwaterFlowModel,
+):      
+
+    nlayer = 3
+    layer = np.arange(nlayer, dtype=int) + 1
+    grid = unstructured_flow_model.domain.ugrid.grid
+    mask =  xu.UgridDataArray(
+        xr.DataArray(
+            coords={"layer": layer, "time" : [1,2] },
+            dims=["layer", "time"],
+        ),
+        grid=grid,
+    )
+    mask.sel(time=1).values = np.array([1,1,0])
+    mask.sel(time=2).values = np.array([1,0,1])
+
+    with pytest.raises(ValueError):
+        unstructured_flow_model.mask_all_packages(mask)
