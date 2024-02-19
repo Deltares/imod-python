@@ -90,10 +90,17 @@ class BoundaryCondition(Package, abc.ABC):
         """
         warnings.warn(
             f"""{self.__class__.__name__}.set_repeat_stress(...) is deprecated.
-            In the future, add repeat stresses as constructor parameters. 
-            An object containing them can be created using 'get_repeat_stress', as follows:
+            In the future, add repeat stresses as constructor parameters. An
+            object containing them can be created using 'get_repeat_stress', as
+            follows:
+
+            from imod.mf6.utilities.package_utils import get_repeat_stress
+
             repeat_stress = get_repeat_stress(repeat_periods) # args before provided to River.set_repeat_stress
             riv = imod.mf6.River(..., repeat_stress=repeat_stress)
+
+            Note that the location of get_repeat_stress (imod.mf6.utilities.package_utils)
+            may change in the future
             """,
             DeprecationWarning,
         )
