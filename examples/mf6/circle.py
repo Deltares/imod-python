@@ -201,7 +201,8 @@ print(cbc.keys())
 #
 # We'll create a dataset for the horizontal flows for further analysis.
 
-ds = xu.UgridDataset(grids=grid)
+cbc_grid = cbc["flow-horizontal-face-x"].grid
+ds = xu.UgridDataset(grids=cbc_grid)
 ds["u"] = cbc["flow-horizontal-face-x"]
 ds["v"] = cbc["flow-horizontal-face-y"]
 
