@@ -504,7 +504,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         be presented as an idomain-like integer array that has 0 or negative
         values in filtered cells and positive values in active cells
         """
-        if any([d not in ["x", "y", "layer", "mesh2d_nFaces"] for d in domain.coords]):
+        if any([d not in ["x", "y", "layer", "mesh2d_nFaces", "dx", "dy"] for d in domain.coords]):
             raise ValueError("unexpected coordinate dimension in masking domain")
 
         for pkgname, pkg in self.items():
