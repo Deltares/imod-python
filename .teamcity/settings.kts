@@ -116,7 +116,7 @@ object LintTemplate : Template({
                 id = "Static_code_analysis"
                 workingDir = "imod-python"
                 scriptContent = """
-                    pixi run --frozen lint --environment default
+                    pixi run --environment default --frozen lint 
                 """.trimIndent()
                 formatStderrAsError = true
         }
