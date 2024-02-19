@@ -30,7 +30,8 @@ class ApiPackage(Package):
         Indicates that constant head flow terms will be written to the file
         specified with "BUDGET FILEOUT" in Output Control. Default is False.
     
-    Note: this package can be added to both flow and transport models.
+    .. note::
+       This package can be added to both flow and transport models.
     """
 
     _pkg_id = "api"
