@@ -426,6 +426,8 @@ Fixed
 - :meth:`imod.prepare.LayerRegridder.regrid` will now correctly skip values
   if ``top_source`` or ``bottom_source`` are NaN.
 - :func:`imod.gen.write` no longer errors on dataframes with empty columns.
+- :func:`imod.mf6.BoundaryCondition.set_repeat_stress` reinstated. This is  
+ a temporary measure, it gives a deprecation warning.
 
 Changed
 ~~~~~~~
