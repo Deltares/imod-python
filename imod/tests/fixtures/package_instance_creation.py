@@ -141,6 +141,9 @@ def create_instance_packages(is_unstructured):
         imod.mf6.StorageCoefficient(
             0.001, 0.1, True, get_grid_da(is_unstructured, np.int32)
         ),
+        imod.mf6.ApiPackage(
+                maxbound= 33, print_input=True, print_flows=True, save_flows=True
+        ),
     ]
 
 
