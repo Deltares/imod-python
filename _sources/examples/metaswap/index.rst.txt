@@ -14,7 +14,7 @@ Modflow 6 models.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates how to setup a simple MetaSWAP model coupled to a Modflow 6 model mode...">
+    <div class="sphx-glr-thumbcontainer" tooltip="The functionality to generate coupled models has been moved to the primod package.  You can fin...">
 
 .. only:: html
 

@@ -20,6 +20,7 @@
       ~UnsaturatedZoneFlow.from_file
       ~UnsaturatedZoneFlow.get_period_varnames
       ~UnsaturatedZoneFlow.get_regrid_methods
+      ~UnsaturatedZoneFlow.is_empty
       ~UnsaturatedZoneFlow.is_grid_agnostic_package
       ~UnsaturatedZoneFlow.is_regridding_supported
       ~UnsaturatedZoneFlow.isel
@@ -43,6 +44,7 @@
 
    .. autosummary::
    
+      ~UnsaturatedZoneFlow.auxiliary_data_fields
       ~UnsaturatedZoneFlow.dataset
    
    

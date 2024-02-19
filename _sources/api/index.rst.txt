@@ -12,6 +12,7 @@ This page provides an auto-generated summary of imod's API.
   evaluate
   visualize
   util
+  logging
 
   mf6
   wq

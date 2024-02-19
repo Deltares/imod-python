@@ -27,6 +27,7 @@
       ~GroundwaterTransportModel.model_id
       ~GroundwaterTransportModel.pop
       ~GroundwaterTransportModel.popitem
+      ~GroundwaterTransportModel.purge_empty_packages
       ~GroundwaterTransportModel.regrid_like
       ~GroundwaterTransportModel.render
       ~GroundwaterTransportModel.setdefault

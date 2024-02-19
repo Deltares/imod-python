@@ -18,6 +18,7 @@
       ~TimeDiscretization.copy
       ~TimeDiscretization.from_file
       ~TimeDiscretization.get_regrid_methods
+      ~TimeDiscretization.is_empty
       ~TimeDiscretization.is_grid_agnostic_package
       ~TimeDiscretization.is_regridding_supported
       ~TimeDiscretization.isel
@@ -40,6 +41,7 @@
 
    .. autosummary::
    
+      ~TimeDiscretization.auxiliary_data_fields
       ~TimeDiscretization.dataset
    
    

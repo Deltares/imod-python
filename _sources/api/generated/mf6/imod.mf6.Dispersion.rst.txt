@@ -18,6 +18,7 @@
       ~Dispersion.copy
       ~Dispersion.from_file
       ~Dispersion.get_regrid_methods
+      ~Dispersion.is_empty
       ~Dispersion.is_grid_agnostic_package
       ~Dispersion.is_regridding_supported
       ~Dispersion.isel
@@ -40,6 +41,7 @@
 
    .. autosummary::
    
+      ~Dispersion.auxiliary_data_fields
       ~Dispersion.dataset
    
    

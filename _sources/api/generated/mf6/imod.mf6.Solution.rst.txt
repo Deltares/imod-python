@@ -18,6 +18,7 @@
       ~Solution.copy
       ~Solution.from_file
       ~Solution.get_regrid_methods
+      ~Solution.is_empty
       ~Solution.is_grid_agnostic_package
       ~Solution.is_regridding_supported
       ~Solution.isel
@@ -40,6 +41,7 @@
 
    .. autosummary::
    
+      ~Solution.auxiliary_data_fields
       ~Solution.dataset
    
    

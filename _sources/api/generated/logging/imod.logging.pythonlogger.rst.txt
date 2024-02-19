@@ -1,0 +1,31 @@
+imod.logging.pythonlogger
+=========================
+
+.. automodule:: imod.logging.pythonlogger
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+      :template: custom-class-template.rst
+   
+      PythonLogger
+   
+   
+
+   
+   
+   
+
+
+

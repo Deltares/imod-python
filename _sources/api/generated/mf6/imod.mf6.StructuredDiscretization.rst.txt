@@ -18,6 +18,7 @@
       ~StructuredDiscretization.copy
       ~StructuredDiscretization.from_file
       ~StructuredDiscretization.get_regrid_methods
+      ~StructuredDiscretization.is_empty
       ~StructuredDiscretization.is_grid_agnostic_package
       ~StructuredDiscretization.is_regridding_supported
       ~StructuredDiscretization.isel
@@ -40,6 +41,7 @@
 
    .. autosummary::
    
+      ~StructuredDiscretization.auxiliary_data_fields
       ~StructuredDiscretization.dataset
    
    

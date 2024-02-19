@@ -19,6 +19,7 @@
       ~GeneralHeadBoundary.from_file
       ~GeneralHeadBoundary.get_period_varnames
       ~GeneralHeadBoundary.get_regrid_methods
+      ~GeneralHeadBoundary.is_empty
       ~GeneralHeadBoundary.is_grid_agnostic_package
       ~GeneralHeadBoundary.is_regridding_supported
       ~GeneralHeadBoundary.isel
@@ -41,6 +42,7 @@
 
    .. autosummary::
    
+      ~GeneralHeadBoundary.auxiliary_data_fields
       ~GeneralHeadBoundary.dataset
    
    

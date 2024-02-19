@@ -19,6 +19,7 @@
       ~HorizontalFlowBarrierMultiplier.from_file
       ~HorizontalFlowBarrierMultiplier.get_period_varnames
       ~HorizontalFlowBarrierMultiplier.get_regrid_methods
+      ~HorizontalFlowBarrierMultiplier.is_empty
       ~HorizontalFlowBarrierMultiplier.is_grid_agnostic_package
       ~HorizontalFlowBarrierMultiplier.is_regridding_supported
       ~HorizontalFlowBarrierMultiplier.isel
@@ -42,7 +43,8 @@
 
    .. autosummary::
    
+      ~HorizontalFlowBarrierMultiplier.auxiliary_data_fields
       ~HorizontalFlowBarrierMultiplier.dataset
-      ~HorizontalFlowBarrierMultiplier.geometry
+      ~HorizontalFlowBarrierMultiplier.line_data
    
    

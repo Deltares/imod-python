@@ -52,10 +52,10 @@ These examples demonstrate how to use imod to build iMOD-WQ models.
 
 .. only:: html
 
-  .. image:: /examples/imod-wq/images/thumb/sphx_glr_Henry_thumb.png
+  .. image:: /examples/imod-wq/images/thumb/sphx_glr_Henry-wq_thumb.png
     :alt:
 
-  :ref:`sphx_glr_examples_imod-wq_Henry.py`
+  :ref:`sphx_glr_examples_imod-wq_Henry-wq.py`
 
 .. raw:: html
 
@@ -124,7 +124,7 @@ These examples demonstrate how to use imod to build iMOD-WQ models.
 
    /examples/imod-wq/Elder
    /examples/imod-wq/FreshwaterLens
-   /examples/imod-wq/Henry
+   /examples/imod-wq/Henry-wq
    /examples/imod-wq/Hydrocoin
    /examples/imod-wq/SaltwaterPocket
    /examples/imod-wq/VerticalInterface

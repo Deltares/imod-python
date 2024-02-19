@@ -18,6 +18,7 @@
       ~VerticesDiscretization.copy
       ~VerticesDiscretization.from_file
       ~VerticesDiscretization.get_regrid_methods
+      ~VerticesDiscretization.is_empty
       ~VerticesDiscretization.is_grid_agnostic_package
       ~VerticesDiscretization.is_regridding_supported
       ~VerticesDiscretization.isel
@@ -40,6 +41,7 @@
 
    .. autosummary::
    
+      ~VerticesDiscretization.auxiliary_data_fields
       ~VerticesDiscretization.dataset
    
    

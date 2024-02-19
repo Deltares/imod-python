@@ -19,6 +19,7 @@
       ~Drainage.from_file
       ~Drainage.get_period_varnames
       ~Drainage.get_regrid_methods
+      ~Drainage.is_empty
       ~Drainage.is_grid_agnostic_package
       ~Drainage.is_regridding_supported
       ~Drainage.isel
@@ -41,6 +42,7 @@
 
    .. autosummary::
    
+      ~Drainage.auxiliary_data_fields
       ~Drainage.dataset
    
    

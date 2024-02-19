@@ -54,7 +54,7 @@ In Python, such data can be represented by a
 DataFrame to store tabular data (the attribute table), and adds a geometry
 column to store the geospatial coordinates.
 
-.. GENERATED FROM PYTHON SOURCE LINES 39-48
+.. GENERATED FROM PYTHON SOURCE LINES 40-49
 
 .. code-block:: Python
 
@@ -136,12 +136,12 @@ column to store the geospatial coordinates.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 49-51
+.. GENERATED FROM PYTHON SOURCE LINES 50-52
 
 This geodataframe contains all the data from the shapefile. Note the geometry
 column. The geometry can be plotted:
 
-.. GENERATED FROM PYTHON SOURCE LINES 51-54
+.. GENERATED FROM PYTHON SOURCE LINES 52-55
 
 .. code-block:: Python
 
@@ -166,12 +166,12 @@ column. The geometry can be plotted:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 55-57
+.. GENERATED FROM PYTHON SOURCE LINES 56-58
 
 A GeoDataFrame of points can also be easily generated from pairs of x and y
 coordinates.
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-66
+.. GENERATED FROM PYTHON SOURCE LINES 58-67
 
 .. code-block:: Python
 
@@ -202,11 +202,11 @@ coordinates.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 67-68
+.. GENERATED FROM PYTHON SOURCE LINES 68-69
 
 An important feature of every geometry is its geometry type:
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-71
+.. GENERATED FROM PYTHON SOURCE LINES 69-72
 
 .. code-block:: Python
 
@@ -237,11 +237,11 @@ An important feature of every geometry is its geometry type:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-73
+.. GENERATED FROM PYTHON SOURCE LINES 73-74
 
 As expected, the points are of the type ... Point:
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-76
+.. GENERATED FROM PYTHON SOURCE LINES 74-77
 
 .. code-block:: Python
 
@@ -291,7 +291,7 @@ As expected, the points are of the type ... Point:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-83
+.. GENERATED FROM PYTHON SOURCE LINES 78-84
 
 Input and output
 ----------------
@@ -300,7 +300,7 @@ Geopandas supports many vector file formats. It wraps `fiona`_, which in turns
 wraps `OGR`_, which is a part of `GDAL`_. For example, the lake polygons above
 are loaded from an ESRI Shapefile:
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-87
+.. GENERATED FROM PYTHON SOURCE LINES 84-88
 
 .. code-block:: Python
 
@@ -325,12 +325,12 @@ are loaded from an ESRI Shapefile:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-90
+.. GENERATED FROM PYTHON SOURCE LINES 89-91
 
 They can be easily stored into more modern formats as well, such as
 `GeoPackage`_:
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-95
+.. GENERATED FROM PYTHON SOURCE LINES 91-96
 
 .. code-block:: Python
 
@@ -353,11 +353,11 @@ They can be easily stored into more modern formats as well, such as
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 96-97
+.. GENERATED FROM PYTHON SOURCE LINES 97-98
 
 ... and back:
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-101
+.. GENERATED FROM PYTHON SOURCE LINES 98-102
 
 .. code-block:: Python
 
@@ -522,7 +522,7 @@ They can be easily stored into more modern formats as well, such as
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 102-117
+.. GENERATED FROM PYTHON SOURCE LINES 103-118
 
 Conversion to raster
 --------------------
@@ -543,7 +543,7 @@ intersections, spatial joins, or plotting.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.051 seconds)
+   **Total running time of the script:** (0 minutes 0.961 seconds)
 
 
 .. _sphx_glr_download_user-guide_02-vector-data.py:

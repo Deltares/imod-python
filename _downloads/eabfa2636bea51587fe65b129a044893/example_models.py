@@ -7,6 +7,7 @@ examples that are not focused on building a simulation, but on doing something
 with it (such as regridding).
 
 """
+
 import numpy as np
 import scipy.ndimage
 import xarray as xr
@@ -550,10 +551,7 @@ def create_circle_simulation():
     )
     gwf_model["ic"] = imod.mf6.InitialConditions(start=0.0)
     gwf_model["npf"] = imod.mf6.NodePropertyFlow(
-        icelltype=icelltype,
-        k=k,
-        k33=k33,
-        save_flows=True,
+        icelltype=icelltype, k=k, k33=k33, save_flows=True, save_specific_discharge=True
     )
     gwf_model["sto"] = imod.mf6.SpecificStorage(
         specific_storage=1.0e-5,

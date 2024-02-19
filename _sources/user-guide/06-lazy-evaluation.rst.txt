@@ -39,7 +39,7 @@ has to be visualized or when the data has to be saved to disk.
 
 We will explain these concepts with a number of examples.
 
-.. GENERATED FROM PYTHON SOURCE LINES 24-33
+.. GENERATED FROM PYTHON SOURCE LINES 25-34
 
 .. code-block:: Python
 
@@ -59,7 +59,7 @@ We will explain these concepts with a number of examples.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 34-42
+.. GENERATED FROM PYTHON SOURCE LINES 35-43
 
 When we run the lines above, we evaluate the expression ``lazy_result =
 lazy_da + 1``. In eager evaluation, this means a value of 1 is added to every
@@ -70,7 +70,7 @@ source Python library for (parallel) scheduling and computing.
 We can identify the DataArray as lazy, since its ``.data`` attribute shows a
 dask array rather than a numpy array.
 
-.. GENERATED FROM PYTHON SOURCE LINES 42-45
+.. GENERATED FROM PYTHON SOURCE LINES 43-46
 
 .. code-block:: Python
 
@@ -145,11 +145,11 @@ dask array rather than a numpy array.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 46-47
+.. GENERATED FROM PYTHON SOURCE LINES 47-48
 
 We can take a look at the graph of tasks as follows:
 
-.. GENERATED FROM PYTHON SOURCE LINES 47-50
+.. GENERATED FROM PYTHON SOURCE LINES 48-51
 
 .. code-block:: Python
 
@@ -163,7 +163,7 @@ We can take a look at the graph of tasks as follows:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 51-56
+.. GENERATED FROM PYTHON SOURCE LINES 52-57
 
 .. note::
 
@@ -171,7 +171,7 @@ We can take a look at the graph of tasks as follows:
   you're running the examples interactively, the line above will show you a
   picture of the graph, and defining and calling ``show()`` can be ommitted.
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-73
+.. GENERATED FROM PYTHON SOURCE LINES 57-74
 
 .. code-block:: Python
 
@@ -204,7 +204,7 @@ We can take a look at the graph of tasks as follows:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 74-81
+.. GENERATED FROM PYTHON SOURCE LINES 75-82
 
 We can see a very simple graph with two tasks:
 
@@ -214,7 +214,7 @@ We can see a very simple graph with two tasks:
 Let's constrast this with eager evaluation. Rather than creating the data
 as a dask array, we will create it as an ordinary numpy array.
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-86
+.. GENERATED FROM PYTHON SOURCE LINES 82-87
 
 .. code-block:: Python
 
@@ -236,7 +236,7 @@ as a dask array, we will create it as an ordinary numpy array.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 87-101
+.. GENERATED FROM PYTHON SOURCE LINES 88-102
 
 The data is an numpy array. Since the actual values of the elements of the
 array are in memory, we also get a preview of the element values.
@@ -253,7 +253,7 @@ will not load the data from the files into memory until they are needed.
 Let's grab some example results, store them in a temporarily directory, and
 open them:
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-106
+.. GENERATED FROM PYTHON SOURCE LINES 102-107
 
 .. code-block:: Python
 
@@ -269,12 +269,12 @@ open them:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 107-109
+.. GENERATED FROM PYTHON SOURCE LINES 108-110
 
 All time steps are available, but not loaded. Instead, a graph of tasks has
 been defined. Let's take a look at the tasks:
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-113
+.. GENERATED FROM PYTHON SOURCE LINES 110-114
 
 .. code-block:: Python
 
@@ -294,12 +294,12 @@ been defined. Let's take a look at the tasks:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 114-116
+.. GENERATED FROM PYTHON SOURCE LINES 115-117
 
 We might want to perform a computation for every time step. Let's assume we
 would want to compute the mean head for every time step:
 
-.. GENERATED FROM PYTHON SOURCE LINES 116-119
+.. GENERATED FROM PYTHON SOURCE LINES 117-120
 
 .. code-block:: Python
 
@@ -313,12 +313,12 @@ would want to compute the mean head for every time step:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-122
+.. GENERATED FROM PYTHON SOURCE LINES 121-123
 
 We can take a look at the graph, and see that the dask are fully independent
 of each other:
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-126
+.. GENERATED FROM PYTHON SOURCE LINES 123-127
 
 .. code-block:: Python
 
@@ -338,7 +338,7 @@ of each other:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 127-140
+.. GENERATED FROM PYTHON SOURCE LINES 128-141
 
 This means the computation is `embarrassingly parallel`_. Every task can be
 computed independently of the other by the individual CPUs of your computer.
@@ -354,7 +354,7 @@ Computer memory and data storage are best thought of a one-dimensional arrays
 of bits (even though the hardware might be actually `multi-dimensional`_
 behind the scenes).
 
-.. GENERATED FROM PYTHON SOURCE LINES 142-153
+.. GENERATED FROM PYTHON SOURCE LINES 143-154
 
 Pitfalls
 --------
@@ -368,7 +368,7 @@ data is chunked over the time dimension.
 Concretely, this means that the following code can be very slow for large
 datasets:
 
-.. GENERATED FROM PYTHON SOURCE LINES 153-160
+.. GENERATED FROM PYTHON SOURCE LINES 154-161
 
 .. code-block:: Python
 
@@ -391,14 +391,14 @@ datasets:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 161-165
+.. GENERATED FROM PYTHON SOURCE LINES 162-166
 
 The reason is that in the line above, a single x-y point is extracted at a
 time. To extract this single point, the entire dataset must be loaded into
 memory! Generally, the solution is to use a vectorized approach, selecting
 all the points "at once".
 
-.. GENERATED FROM PYTHON SOURCE LINES 165-170
+.. GENERATED FROM PYTHON SOURCE LINES 166-171
 
 .. code-block:: Python
 
@@ -414,7 +414,7 @@ all the points "at once".
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 171-176
+.. GENERATED FROM PYTHON SOURCE LINES 172-177
 
 In these lines, the chunk is loaded, all point values for a single time step are
 extracted and store; then the next chunk is loaded, etc. Because the call is
@@ -422,7 +422,7 @@ vectorized, dask can optimize the selection, and figure out that it should
 extract all values and load the chunks only once. We can verify this by taking
 a look at the task graph again:
 
-.. GENERATED FROM PYTHON SOURCE LINES 176-180
+.. GENERATED FROM PYTHON SOURCE LINES 177-181
 
 .. code-block:: Python
 
@@ -442,14 +442,14 @@ a look at the task graph again:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 181-185
+.. GENERATED FROM PYTHON SOURCE LINES 182-186
 
 There are cases where the data cannot be loaded in a vectorized manner, or
 cases where the scheduling goes haywire. In this case, a straightforward
 solution is to fallback to eager evaluation (with numpy arrays instead of
 dask arrays). This can be done at any time by simply calling ``.compute()``:
 
-.. GENERATED FROM PYTHON SOURCE LINES 185-188
+.. GENERATED FROM PYTHON SOURCE LINES 186-189
 
 .. code-block:: Python
 
@@ -463,14 +463,14 @@ dask arrays). This can be done at any time by simply calling ``.compute()``:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 189-193
+.. GENERATED FROM PYTHON SOURCE LINES 190-194
 
 This has the obvious downside that the entire dataset needs to fit in memory.
 
 However, the following lines are relatively fast again, since the entire
 dataset has already been loaded into memory this time around:
 
-.. GENERATED FROM PYTHON SOURCE LINES 193-197
+.. GENERATED FROM PYTHON SOURCE LINES 194-198
 
 .. code-block:: Python
 
@@ -485,7 +485,7 @@ dataset has already been loaded into memory this time around:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 198-209
+.. GENERATED FROM PYTHON SOURCE LINES 199-210
 
 Annoyingly, the VSCode interactive Python interpreter does not cooperate well
 with every `dask scheduler`_. If you're working in VSCode, and either
@@ -502,7 +502,7 @@ outside of VSCode.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.290 seconds)
+   **Total running time of the script:** (0 minutes 1.431 seconds)
 
 
 .. _sphx_glr_download_user-guide_06-lazy-evaluation.py:

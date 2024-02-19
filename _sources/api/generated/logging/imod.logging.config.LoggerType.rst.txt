@@ -1,0 +1,27 @@
+imod.logging.config.LoggerType
+==============================
+
+.. currentmodule:: imod.logging.config
+
+.. autoclass:: LoggerType
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+   
+   .. automethod:: __init__
+
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~LoggerType.PYTHON
+      ~LoggerType.LOGURU
+      ~LoggerType.NULL
+   
+   

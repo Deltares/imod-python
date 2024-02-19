@@ -19,6 +19,7 @@
       ~SpecificStorage.from_file
       ~SpecificStorage.get_options
       ~SpecificStorage.get_regrid_methods
+      ~SpecificStorage.is_empty
       ~SpecificStorage.is_grid_agnostic_package
       ~SpecificStorage.is_regridding_supported
       ~SpecificStorage.isel
@@ -41,6 +42,7 @@
 
    .. autosummary::
    
+      ~SpecificStorage.auxiliary_data_fields
       ~SpecificStorage.dataset
    
    

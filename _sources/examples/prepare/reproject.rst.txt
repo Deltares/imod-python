@@ -23,9 +23,10 @@ Reproject data
 
 In this example we will see how to reproject vector and raster datasets.
 
-.. GENERATED FROM PYTHON SOURCE LINES 8-11
+.. GENERATED FROM PYTHON SOURCE LINES 8-12
 
 .. code-block:: Python
+
 
     import matplotlib.pyplot as plt
     import pyproj
@@ -37,11 +38,11 @@ In this example we will see how to reproject vector and raster datasets.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 12-13
+.. GENERATED FROM PYTHON SOURCE LINES 13-14
 
 We'll start with the imports
 
-.. GENERATED FROM PYTHON SOURCE LINES 13-16
+.. GENERATED FROM PYTHON SOURCE LINES 14-17
 
 .. code-block:: Python
 
@@ -55,12 +56,12 @@ We'll start with the imports
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 18-20
+.. GENERATED FROM PYTHON SOURCE LINES 19-21
 
 Reproject points
 ----------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 20-29
+.. GENERATED FROM PYTHON SOURCE LINES 21-30
 
 .. code-block:: Python
 
@@ -81,14 +82,14 @@ Reproject points
 
  .. code-block:: none
 
-    D:\buildAgent\work\6818356b8b2759b2\imod-python\examples\prepare\reproject.py:25: FutureWarning: This function is deprecated. See: https://pyproj4.github.io/pyproj/stable/gotchas.html#upgrading-to-pyproj-2-from-pyproj-1
+    D:\buildAgent\work\b1e15a22da7c0d7f\imod-python\examples\prepare\reproject.py:26: FutureWarning: This function is deprecated. See: https://pyproj4.github.io/pyproj/stable/gotchas.html#upgrading-to-pyproj-2-from-pyproj-1
       x, y = pyproj.transform(wgs84, amersfoort, lat, lon)
     [132152.59039576206, 92645.5317909315, 177892.31256041114] [468151.410998257, 447126.74989173946, 467201.53865388624]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 30-36
+.. GENERATED FROM PYTHON SOURCE LINES 31-37
 
 Reproject vector dataset
 ------------------------
@@ -97,7 +98,7 @@ In this case, the shapefile is imported using geopandas, obtaining a
 GeoDataFrame. GeoPandas has the option geopandas.GeoSeries.to_crs to directly
 change the coordinate system of a geopandas GeoDataFrame.
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-45
+.. GENERATED FROM PYTHON SOURCE LINES 37-46
 
 .. code-block:: Python
 
@@ -124,7 +125,7 @@ change the coordinate system of a geopandas GeoDataFrame.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 46-58
+.. GENERATED FROM PYTHON SOURCE LINES 47-59
 
 Reproject raster dataset
 ------------------------
@@ -139,7 +140,7 @@ Use the same projection: provide only "like".
 
 Importing the original file, which has a cellsize of 100.0 m and its EPSG is 28992:
 
-.. GENERATED FROM PYTHON SOURCE LINES 58-64
+.. GENERATED FROM PYTHON SOURCE LINES 59-65
 
 .. code-block:: Python
 
@@ -163,16 +164,16 @@ Importing the original file, which has a cellsize of 100.0 m and its EPSG is 289
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x0000026457D87390>
+    <matplotlib.image.AxesImage object at 0x0000026927F29D90>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 65-67
+.. GENERATED FROM PYTHON SOURCE LINES 66-68
 
 We'll create our like grid Resampling DataArray to a new cellsize of 50.0 m,
 by creating a like DataArray first:
 
-.. GENERATED FROM PYTHON SOURCE LINES 67-77
+.. GENERATED FROM PYTHON SOURCE LINES 68-78
 
 .. code-block:: Python
 
@@ -193,12 +194,12 @@ by creating a like DataArray first:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-80
+.. GENERATED FROM PYTHON SOURCE LINES 79-81
 
 Apply the :py:func:`imod.prepare.reproject` function. The new dataset will
 have a 50 m resolution:
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-83
+.. GENERATED FROM PYTHON SOURCE LINES 81-84
 
 .. code-block:: Python
 
@@ -218,7 +219,7 @@ have a 50 m resolution:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-90
+.. GENERATED FROM PYTHON SOURCE LINES 85-91
 
 2. Only reproject
 ~~~~~~~~~~~~~~~~~
@@ -227,7 +228,7 @@ Only provide the source coordinate reference system (src_crs) and the target
 coordinate reference system (dst_crs). In this case, to reproject from
 EPSG:28992 to EPSG:32631:
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-94
+.. GENERATED FROM PYTHON SOURCE LINES 91-95
 
 .. code-block:: Python
 
@@ -248,12 +249,12 @@ EPSG:28992 to EPSG:32631:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-97
+.. GENERATED FROM PYTHON SOURCE LINES 96-98
 
 If we plot, notice that the grid is slightly "rotated". This is caused by the
 reprojection.
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-100
+.. GENERATED FROM PYTHON SOURCE LINES 98-101
 
 .. code-block:: Python
 
@@ -274,11 +275,11 @@ reprojection.
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x000002645A48F510>
+    <matplotlib.image.AxesImage object at 0x000002692803C2D0>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-107
+.. GENERATED FROM PYTHON SOURCE LINES 102-108
 
 3. Reproject and resample to a specific domain
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -287,7 +288,7 @@ Provide "src_crs", "dst_crs" and "like".
 The resulting dataset will have a cellsize of 50m and
 it's coordinate system will be EPSG:32631:
 
-.. GENERATED FROM PYTHON SOURCE LINES 107-113
+.. GENERATED FROM PYTHON SOURCE LINES 108-114
 
 .. code-block:: Python
 
@@ -314,7 +315,7 @@ it's coordinate system will be EPSG:32631:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.071 seconds)
+   **Total running time of the script:** (0 minutes 1.028 seconds)
 
 
 .. _sphx_glr_download_examples_prepare_reproject.py:

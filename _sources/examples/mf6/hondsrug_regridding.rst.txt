@@ -94,8 +94,12 @@ that you should look at if you are interested in the model building
 
  .. code-block:: none
 
+    D:\buildAgent\work\b1e15a22da7c0d7f\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\groupby.py:534: FutureWarning: 'A' is deprecated and will be removed in a future version, please use 'YE' instead.
+      index_grouper = pd.Grouper(
+    D:\buildAgent\work\b1e15a22da7c0d7f\imod-python\examples\mf6\example_models.py:375: UserWarning: Converting non-nanosecond precision datetime values to nanosecond precision. This behavior can eventually be relaxed in xarray, as it is an artifact from pandas which is now beginning to support non-nanosecond precision values. This warning is caused by passing non-nanosecond np.datetime64 or np.timedelta64 values to the DataArray or Variable constructor; it can be silenced by converting the values to nanosecond precision ahead of time.
+      rch_ss = rch_ss.assign_coords(time=starttime_steady)
 
-    <matplotlib.collections.QuadMesh object at 0x000002645741F190>
+    <matplotlib.collections.QuadMesh object at 0x000002692128E1D0>
 
 
 
@@ -536,7 +540,7 @@ Compare drain conductances.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (2 minutes 43.039 seconds)
+   **Total running time of the script:** (1 minutes 59.271 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_hondsrug_regridding.py:

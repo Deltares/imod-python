@@ -41,12 +41,12 @@ In overview, we'll set the following steps:
     * Open the results back into DataArrays.
     * Visualize the results.
 
-.. GENERATED FROM PYTHON SOURCE LINES 27-29
+.. GENERATED FROM PYTHON SOURCE LINES 28-30
 
 We'll start with the usual imports. As this is an simple (synthetic)
 structured model, we can make due with few packages.
 
-.. GENERATED FROM PYTHON SOURCE LINES 29-35
+.. GENERATED FROM PYTHON SOURCE LINES 30-36
 
 .. code-block:: Python
 
@@ -63,7 +63,7 @@ structured model, we can make due with few packages.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-41
+.. GENERATED FROM PYTHON SOURCE LINES 37-42
 
 Create grid coordinates
 -----------------------
@@ -71,7 +71,7 @@ Create grid coordinates
 The first steps consist of setting up the grid -- first the number of layer,
 rows, and columns. Cell sizes are constant throughout the model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-60
+.. GENERATED FROM PYTHON SOURCE LINES 42-61
 
 .. code-block:: Python
 
@@ -101,7 +101,7 @@ rows, and columns. Cell sizes are constant throughout the model.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-71
+.. GENERATED FROM PYTHON SOURCE LINES 62-72
 
 Create DataArrays
 -----------------
@@ -114,7 +114,7 @@ parameters. The model is characterized by:
 * uniform recharge on the top layer
 * a number of wells scattered throughout the model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-107
+.. GENERATED FROM PYTHON SOURCE LINES 72-108
 
 .. code-block:: Python
 
@@ -161,7 +161,7 @@ parameters. The model is characterized by:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-113
+.. GENERATED FROM PYTHON SOURCE LINES 109-114
 
 Write the model
 ---------------
@@ -169,7 +169,7 @@ Write the model
 The first step is to define an empty model, the parameters and boundary
 conditions are added in the form of the familiar MODFLOW packages.
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-181
+.. GENERATED FROM PYTHON SOURCE LINES 114-182
 
 .. code-block:: Python
 
@@ -245,14 +245,21 @@ conditions are added in the form of the familiar MODFLOW packages.
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    D:\buildAgent\work\b1e15a22da7c0d7f\imod-python\imod\mf6\wel.py:204: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
+      index_coord = np.arange(self.dataset.dims["index"])
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 182-183
+
+.. GENERATED FROM PYTHON SOURCE LINES 183-184
 
 We'll create a new directory in which we will write and run the model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 183-187
+.. GENERATED FROM PYTHON SOURCE LINES 184-188
 
 .. code-block:: Python
 
@@ -267,7 +274,7 @@ We'll create a new directory in which we will write and run the model.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 188-196
+.. GENERATED FROM PYTHON SOURCE LINES 189-197
 
 Run the model
 -------------
@@ -278,7 +285,7 @@ Run the model
   :ref:`The Modflow 6 examples introduction <mf6-introduction>` shortly
   describes how to add it to yours.
 
-.. GENERATED FROM PYTHON SOURCE LINES 196-199
+.. GENERATED FROM PYTHON SOURCE LINES 197-200
 
 .. code-block:: Python
 
@@ -292,14 +299,14 @@ Run the model
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 200-204
+.. GENERATED FROM PYTHON SOURCE LINES 201-205
 
 Open the results
 ----------------
 
 We'll open the heads (.hds) file.
 
-.. GENERATED FROM PYTHON SOURCE LINES 204-210
+.. GENERATED FROM PYTHON SOURCE LINES 205-211
 
 .. code-block:: Python
 
@@ -316,12 +323,12 @@ We'll open the heads (.hds) file.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 211-213
+.. GENERATED FROM PYTHON SOURCE LINES 212-214
 
 Visualize the results
 ---------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 213-217
+.. GENERATED FROM PYTHON SOURCE LINES 214-218
 
 .. code-block:: Python
 
@@ -343,11 +350,11 @@ Visualize the results
  .. code-block:: none
 
 
-    <matplotlib.contour.QuadContourSet object at 0x00000264559B40D0>
+    <matplotlib.contour.QuadContourSet object at 0x00000269280DD090>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 218-226
+.. GENERATED FROM PYTHON SOURCE LINES 219-227
 
 .. _MODFLOW6 example problems: https://github.com/MODFLOW-USGS/modflow6-examples
 .. _description: https://modflow6-examples.readthedocs.io/en/master/_examples/ex-gwf-twri.html
@@ -361,7 +368,7 @@ Visualize the results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.603 seconds)
+   **Total running time of the script:** (0 minutes 0.568 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_ex01_twri.py:

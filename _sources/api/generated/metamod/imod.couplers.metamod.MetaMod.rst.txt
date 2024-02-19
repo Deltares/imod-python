@@ -14,9 +14,6 @@
    .. autosummary::
    
       ~MetaMod.__init__
-      ~MetaMod.write
-      ~MetaMod.write_exchanges
-      ~MetaMod.write_toml
    
    
 

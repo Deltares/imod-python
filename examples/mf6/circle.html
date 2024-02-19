@@ -7,9 +7,9 @@
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Circle &#8212; iMOD Python 0.15.0 documentation</title>
+    <title>Circle &#8212; iMOD Python 0.15.2 documentation</title>
   
   
   
@@ -19,15 +19,15 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
   
-  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
@@ -37,20 +37,19 @@
     <link rel="stylesheet" type="text/css" href="../../_static/theme-deltares.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
-  <script src="../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/sphinx_highlight.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/mf6/circle';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="&lt;no title&gt;" href="circle_partitioned.html" />
+    <link rel="next" title="Circle partitioned" href="circle_partitioned.html" />
     <link rel="prev" title="Henry" href="Henry.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -61,10 +60,9 @@
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>
@@ -105,7 +103,7 @@
 </form></div>
   </div>
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
   <label class="sidebar-toggle primary-toggle" for="__primary">
     <span class="fa-solid fa-bars"></span>
@@ -127,8 +125,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.0 documentation - Home"/>
-    <script>document.write(`<img src="../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.0 documentation - Home"/>`);</script>
+    <img src="../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -141,12 +139,6 @@
       
         <div class="navbar-item">
 <nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
@@ -286,10 +278,13 @@ document.write(`
   
 </div>
 
-    </nav>
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
+      
+      
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -302,12 +297,6 @@ document.write(`
         
           <div class="navbar-item">
 <nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
@@ -420,7 +409,9 @@ document.write(`
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">MODFLOW6</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="Henry.html">Henry</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Circle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="circle_partitioned.html">Circle partitioned</a></li>
 <li class="toctree-l2"><a class="reference internal" href="circle_transport.html">Freshwater lens (circle)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="different_ways_to_regrid_models.html">Diffferent ways to regrid models</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ex01_twri.html">TWRI</a></li>
 <li class="toctree-l2"><a class="reference internal" href="example_1d_transport.html">1D Solute Transport Benchmarks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="example_models.html">Example models</a></li>
@@ -441,7 +432,6 @@ document.write(`
 
 
 <li class="toctree-l2"><a class="reference internal" href="lake.html">Lake package example</a></li>
-<li class="toctree-l2"><a class="reference internal" href="twri_regridding.html">TWRI regridding</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../imodflow/index.html">iMODFLOW</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -451,7 +441,7 @@ document.write(`
 <li class="toctree-l1 has-children"><a class="reference internal" href="../imod-wq/index.html">iMOD-WQ</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../imod-wq/Elder.html">Elder</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../imod-wq/FreshwaterLens.html">Freshwater Lens</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../imod-wq/Henry.html">Henry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../imod-wq/Henry-wq.html">Henry</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../imod-wq/Hydrocoin.html">Hydrocoin</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../imod-wq/SaltwaterPocket.html">Saltwater Pocket</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../imod-wq/VerticalInterface.html">Vertical Interface</a></li>
@@ -532,7 +522,7 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
@@ -1093,7 +1083,7 @@ dask.array&lt;stack, shape=(1, 2, 216), dtype=float64, chunksize=(1, 2, 216), ch
 Coordinates:
   * layer          (layer) int32 1 2
   * time           (time) float64 1.0
-  * mesh2d_nFaces  (mesh2d_nFaces) int64 0 1 2 3 4 5 ... 210 211 212 213 214 215</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'head'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>time</span>: 1</li><li><span class='xr-has-index'>layer</span>: 2</li><li><span class='xr-has-index'>mesh2d_nFaces</span>: 216</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-4353b0c1-155a-4871-8dbc-fba641db9fc1' class='xr-array-in' type='checkbox' checked><label for='section-4353b0c1-155a-4871-8dbc-fba641db9fc1' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>dask.array&lt;chunksize=(1, 2, 216), meta=np.ndarray&gt;</span></div><div class='xr-array-data'><table>
+  * mesh2d_nFaces  (mesh2d_nFaces) int64 0 1 2 3 4 5 ... 210 211 212 213 214 215</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'head'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>time</span>: 1</li><li><span class='xr-has-index'>layer</span>: 2</li><li><span class='xr-has-index'>mesh2d_nFaces</span>: 216</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-570fcc2a-2376-4e0f-855d-edaa788f2ec6' class='xr-array-in' type='checkbox' checked><label for='section-570fcc2a-2376-4e0f-855d-edaa788f2ec6' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>dask.array&lt;chunksize=(1, 2, 216), meta=np.ndarray&gt;</span></div><div class='xr-array-data'><table>
     <tr>
         <td>
             <table style="border-collapse: collapse;">
@@ -1171,7 +1161,7 @@ Coordinates:
 </svg>
         </td>
     </tr>
-</table></div></div></li><li class='xr-section-item'><input id='section-3e5485c2-24e8-4130-b87d-69b36e7c4d8a' class='xr-section-summary-in' type='checkbox'  checked><label for='section-3e5485c2-24e8-4130-b87d-69b36e7c4d8a' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int32</div><div class='xr-var-preview xr-preview'>1 2</div><input id='attrs-611c743c-a0b1-4662-96a8-3b41d94cff12' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-611c743c-a0b1-4662-96a8-3b41d94cff12' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-4b8162b6-86e0-40d5-9c0c-bed85c66b2f6' class='xr-var-data-in' type='checkbox'><label for='data-4b8162b6-86e0-40d5-9c0c-bed85c66b2f6' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 2])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>time</span></div><div class='xr-var-dims'>(time)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.0</div><input id='attrs-27d0cdc8-7693-4aee-adf6-dfc366a74097' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-27d0cdc8-7693-4aee-adf6-dfc366a74097' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-8c68e0b9-c801-4c87-b94b-41ebf03b3268' class='xr-var-data-in' type='checkbox'><label for='data-8c68e0b9-c801-4c87-b94b-41ebf03b3268' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 ... 211 212 213 214 215</div><input id='attrs-1a9a5604-e4f3-4535-aad2-5d80402b36ce' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-1a9a5604-e4f3-4535-aad2-5d80402b36ce' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-dddc6cb4-40dd-4901-94f1-131b03ca54cf' class='xr-var-data-in' type='checkbox'><label for='data-dddc6cb4-40dd-4901-94f1-131b03ca54cf' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  0,   1,   2, ..., 213, 214, 215], dtype=int64)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-21a7d030-e12d-4cfe-b5e9-da7edbf4bf16' class='xr-section-summary-in' type='checkbox'  ><label for='section-21a7d030-e12d-4cfe-b5e9-da7edbf4bf16' class='xr-section-summary' >Indexes: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>layer</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-5d649ad6-4eff-444c-bce0-cc328169ca8c' class='xr-index-data-in' type='checkbox'/><label for='index-5d649ad6-4eff-444c-bce0-cc328169ca8c' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Int64Index([1, 2], dtype=&#x27;int64&#x27;, name=&#x27;layer&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>time</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-ab24a581-db92-435c-a527-604979ba3032' class='xr-index-data-in' type='checkbox'/><label for='index-ab24a581-db92-435c-a527-604979ba3032' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Float64Index([1.0], dtype=&#x27;float64&#x27;, name=&#x27;time&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-c1d58eb6-3ca2-4fdf-a493-5995e258a184' class='xr-index-data-in' type='checkbox'/><label for='index-c1d58eb6-3ca2-4fdf-a493-5995e258a184' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=216, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-7fdbdd6a-5e05-4462-9ae9-a8c9579c8d5d' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-7fdbdd6a-5e05-4462-9ae9-a8c9579c8d5d' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+</table></div></div></li><li class='xr-section-item'><input id='section-d5f200fb-cd28-4a1b-a29b-fc819b2fcbef' class='xr-section-summary-in' type='checkbox'  checked><label for='section-d5f200fb-cd28-4a1b-a29b-fc819b2fcbef' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int32</div><div class='xr-var-preview xr-preview'>1 2</div><input id='attrs-2b5082b1-6523-4e7e-a684-1ef0e8924b56' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2b5082b1-6523-4e7e-a684-1ef0e8924b56' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-d5351e63-1873-4328-8c09-a0958558cc77' class='xr-var-data-in' type='checkbox'><label for='data-d5351e63-1873-4328-8c09-a0958558cc77' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 2])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>time</span></div><div class='xr-var-dims'>(time)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.0</div><input id='attrs-a2cf8807-82e1-410c-a621-5bea0a3caaad' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-a2cf8807-82e1-410c-a621-5bea0a3caaad' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-07d98e43-2a95-4c6a-b813-f8d6d1a3828d' class='xr-var-data-in' type='checkbox'><label for='data-07d98e43-2a95-4c6a-b813-f8d6d1a3828d' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 ... 211 212 213 214 215</div><input id='attrs-2a140b60-682e-42f3-8446-4ba71dcf95c7' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2a140b60-682e-42f3-8446-4ba71dcf95c7' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b47dd70c-ff48-41cb-84b4-624770127574' class='xr-var-data-in' type='checkbox'><label for='data-b47dd70c-ff48-41cb-84b4-624770127574' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  0,   1,   2, ..., 213, 214, 215], dtype=int64)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-7cba0309-0e58-45e3-800a-d90c205dfe68' class='xr-section-summary-in' type='checkbox'  ><label for='section-7cba0309-0e58-45e3-800a-d90c205dfe68' class='xr-section-summary' >Indexes: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>layer</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-5016da49-9fb8-4396-b4fe-34ba78d47f85' class='xr-index-data-in' type='checkbox'/><label for='index-5016da49-9fb8-4396-b4fe-34ba78d47f85' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([1, 2], dtype=&#x27;int32&#x27;, name=&#x27;layer&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>time</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-17e874d0-8412-4b04-8006-ef9e85290063' class='xr-index-data-in' type='checkbox'/><label for='index-17e874d0-8412-4b04-8006-ef9e85290063' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([1.0], dtype=&#x27;float64&#x27;, name=&#x27;time&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-f92c1469-0147-43f1-b511-96f315ec2334' class='xr-index-data-in' type='checkbox'/><label for='index-f92c1469-0147-43f1-b511-96f315ec2334' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=216, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-ac269ab8-6c8e-4072-bf6c-f352f60deacf' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-ac269ab8-6c8e-4072-bf6c-f352f60deacf' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
 </div>
 <br />
 <br /><p>For a DISV MODFLOW6 model, the heads are returned as a UgridDataArray.  While
@@ -1261,7 +1251,7 @@ computed full domain simulation as the clipped boundary values</p>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_circle_005.png" srcset="../../_images/sphx_glr_circle_005.png" alt="layer = 1, time = 1.0" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 2.815 seconds)</p>
+<img src="../../_images/sphx_glr_circle_005.png" srcset="../../_images/sphx_glr_circle_005.png" alt="layer = 1, time = 1.0" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 2.854 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-circle-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/da54a35e0f5ea1b64348acc4b0a1abde/circle.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">circle.ipynb</span></code></a></p>
@@ -1298,7 +1288,7 @@ computed full domain simulation as the clipped boundary values</p>
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">&lt;no title&gt;</p>
+        <p class="prev-next-title">Circle partitioned</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -1311,12 +1301,14 @@ computed full domain simulation as the clipped boundary values</p>
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
-  <div class="sidebar-secondary-item">
 
-  <div class="page-toc tocsection onthispage">
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> On this page
   </div>
-  <nav class="bd-toc-nav page-toc">
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#create-a-mesh">Create a mesh</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#create-ugriddataarray">Create UgridDataArray</a></li>
@@ -1350,8 +1342,8 @@ computed full domain simulation as the clipped boundary values</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+  <script src="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1371,7 +1363,7 @@ computed full domain simulation as the clipped boundary values</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.0.
     <br/>
   </p>
 </div>
@@ -1384,7 +1376,7 @@ computed full domain simulation as the clipped boundary values</p>
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
 </p></div>
       
     </div>

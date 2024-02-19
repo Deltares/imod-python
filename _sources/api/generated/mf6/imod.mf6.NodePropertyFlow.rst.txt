@@ -19,6 +19,7 @@
       ~NodePropertyFlow.from_file
       ~NodePropertyFlow.get_regrid_methods
       ~NodePropertyFlow.get_xt3d_option
+      ~NodePropertyFlow.is_empty
       ~NodePropertyFlow.is_grid_agnostic_package
       ~NodePropertyFlow.is_regridding_supported
       ~NodePropertyFlow.isel
@@ -42,6 +43,7 @@
 
    .. autosummary::
    
+      ~NodePropertyFlow.auxiliary_data_fields
       ~NodePropertyFlow.dataset
       ~NodePropertyFlow.is_dewatered
       ~NodePropertyFlow.is_variable_vertical_conductance

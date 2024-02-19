@@ -19,6 +19,7 @@
       ~ConstantHead.from_file
       ~ConstantHead.get_period_varnames
       ~ConstantHead.get_regrid_methods
+      ~ConstantHead.is_empty
       ~ConstantHead.is_grid_agnostic_package
       ~ConstantHead.is_regridding_supported
       ~ConstantHead.isel
@@ -41,6 +42,7 @@
 
    .. autosummary::
    
+      ~ConstantHead.auxiliary_data_fields
       ~ConstantHead.dataset
    
    

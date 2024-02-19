@@ -18,6 +18,7 @@
       ~MobileStorageTransfer.copy
       ~MobileStorageTransfer.from_file
       ~MobileStorageTransfer.get_regrid_methods
+      ~MobileStorageTransfer.is_empty
       ~MobileStorageTransfer.is_grid_agnostic_package
       ~MobileStorageTransfer.is_regridding_supported
       ~MobileStorageTransfer.isel
@@ -40,6 +41,7 @@
 
    .. autosummary::
    
+      ~MobileStorageTransfer.auxiliary_data_fields
       ~MobileStorageTransfer.dataset
    
    

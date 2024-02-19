@@ -19,6 +19,7 @@
       ~Well.from_file
       ~Well.get_period_varnames
       ~Well.get_regrid_methods
+      ~Well.is_empty
       ~Well.is_grid_agnostic_package
       ~Well.is_regridding_supported
       ~Well.isel
@@ -42,6 +43,7 @@
 
    .. autosummary::
    
+      ~Well.auxiliary_data_fields
       ~Well.dataset
       ~Well.x
       ~Well.y

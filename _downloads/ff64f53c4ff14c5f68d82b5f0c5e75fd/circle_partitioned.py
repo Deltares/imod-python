@@ -1,9 +1,13 @@
 """
+Circle partitioned
+==================
+
 This example illustrates a circular model that is split into 3 submodels.
 The split method returns a simulation object that can be run as is. In this
 case the 3 submodels are roughly equal sized partitions that have the shape
 of pie pieces.
 """
+
 import matplotlib.pyplot as plt
 from example_models import create_circle_simulation
 

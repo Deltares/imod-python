@@ -19,6 +19,7 @@
       ~MassSourceLoading.from_file
       ~MassSourceLoading.get_period_varnames
       ~MassSourceLoading.get_regrid_methods
+      ~MassSourceLoading.is_empty
       ~MassSourceLoading.is_grid_agnostic_package
       ~MassSourceLoading.is_regridding_supported
       ~MassSourceLoading.isel
@@ -41,6 +42,7 @@
 
    .. autosummary::
    
+      ~MassSourceLoading.auxiliary_data_fields
       ~MassSourceLoading.dataset
    
    

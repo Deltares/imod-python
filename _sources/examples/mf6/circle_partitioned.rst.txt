@@ -18,14 +18,18 @@
 .. _sphx_glr_examples_mf6_circle_partitioned.py:
 
 
+Circle partitioned
+==================
+
 This example illustrates a circular model that is split into 3 submodels.
 The split method returns a simulation object that can be run as is. In this
 case the 3 submodels are roughly equal sized partitions that have the shape
 of pie pieces.
 
-.. GENERATED FROM PYTHON SOURCE LINES 7-24
+.. GENERATED FROM PYTHON SOURCE LINES 10-28
 
 .. code-block:: Python
+
 
     import matplotlib.pyplot as plt
     from example_models import create_circle_simulation
@@ -51,11 +55,11 @@ of pie pieces.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-26
+.. GENERATED FROM PYTHON SOURCE LINES 29-30
 
 Write the simulation input files for the new simulation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 26-30
+.. GENERATED FROM PYTHON SOURCE LINES 30-34
 
 .. code-block:: Python
 
@@ -70,11 +74,11 @@ Write the simulation input files for the new simulation.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 31-32
+.. GENERATED FROM PYTHON SOURCE LINES 35-36
 
 Visualize the computed heads in the top layer.
 
-.. GENERATED FROM PYTHON SOURCE LINES 32-36
+.. GENERATED FROM PYTHON SOURCE LINES 36-40
 
 .. code-block:: Python
 
@@ -96,15 +100,15 @@ Visualize the computed heads in the top layer.
  .. code-block:: none
 
 
-    <matplotlib.tri._tricontour.TriContourSet object at 0x0000026453730D90>
+    <matplotlib.tri._tricontour.TriContourSet object at 0x0000026922F66FD0>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 37-38
+.. GENERATED FROM PYTHON SOURCE LINES 41-42
 
 Visualize the flow-horizontal-face-x componenty of the balances.
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-44
+.. GENERATED FROM PYTHON SOURCE LINES 42-48
 
 .. code-block:: Python
 
@@ -129,7 +133,7 @@ Visualize the flow-horizontal-face-x componenty of the balances.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.083 seconds)
+   **Total running time of the script:** (0 minutes 3.183 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_circle_partitioned.py:

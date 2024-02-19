@@ -90,13 +90,6 @@ reference head value in each point.
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    D:\buildAgent\work\6818356b8b2759b2\imod-python\examples\prepare\point_interpolation.py:37: FutureWarning: The default value of numeric_only in DataFrameGroupBy.mean is deprecated. In a future version, numeric_only will default to False. Either specify numeric_only or select only columns which should be valid for the function.
-      mean_heads = heads.groupby("id").mean()  # Calculating mean values by id
-
 
 .. raw:: html
 
@@ -121,6 +114,7 @@ reference head value in each point.
           <th></th>
           <th>Unnamed: 0</th>
           <th>Filternummer</th>
+          <th>time</th>
           <th>head</th>
           <th>filt_top</th>
           <th>filt_bot</th>
@@ -138,6 +132,7 @@ reference head value in each point.
           <th></th>
           <th></th>
           <th></th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -145,6 +140,7 @@ reference head value in each point.
           <th>B12A1745001</th>
           <td>390.717647</td>
           <td>1.0</td>
+          <td>2012-02-12 01:58:35.294117632</td>
           <td>8.806310</td>
           <td>9.29</td>
           <td>8.29</td>
@@ -156,6 +152,7 @@ reference head value in each point.
           <th>B12A1745002</th>
           <td>473.572368</td>
           <td>2.0</td>
+          <td>2011-11-19 12:18:56.842105344</td>
           <td>6.731060</td>
           <td>6.77</td>
           <td>5.77</td>
@@ -167,6 +164,7 @@ reference head value in each point.
           <th>B12A1747001</th>
           <td>511.247525</td>
           <td>1.0</td>
+          <td>2008-07-30 00:00:00.000000000</td>
           <td>6.211782</td>
           <td>5.64</td>
           <td>4.64</td>
@@ -178,6 +176,7 @@ reference head value in each point.
           <th>B12A1747002</th>
           <td>269.728261</td>
           <td>2.0</td>
+          <td>2007-11-15 09:07:49.565217280</td>
           <td>6.187935</td>
           <td>2.28</td>
           <td>1.28</td>
@@ -189,6 +188,7 @@ reference head value in each point.
           <th>B12A1748001</th>
           <td>342.303704</td>
           <td>1.0</td>
+          <td>2007-12-25 16:10:40.000000000</td>
           <td>5.590000</td>
           <td>2.09</td>
           <td>1.09</td>
@@ -278,6 +278,7 @@ outside the domain.
           <th></th>
           <th>Unnamed: 0</th>
           <th>Filternummer</th>
+          <th>time</th>
           <th>head</th>
           <th>filt_top</th>
           <th>filt_bot</th>
@@ -295,6 +296,7 @@ outside the domain.
           <th></th>
           <th></th>
           <th></th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -302,6 +304,7 @@ outside the domain.
           <th>B12A1745001</th>
           <td>390.717647</td>
           <td>1.0</td>
+          <td>2012-02-12 01:58:35.294117632</td>
           <td>8.806310</td>
           <td>9.29</td>
           <td>8.29</td>
@@ -313,6 +316,7 @@ outside the domain.
           <th>B12A1745002</th>
           <td>473.572368</td>
           <td>2.0</td>
+          <td>2011-11-19 12:18:56.842105344</td>
           <td>6.731060</td>
           <td>6.77</td>
           <td>5.77</td>
@@ -324,6 +328,7 @@ outside the domain.
           <th>B12A1805001</th>
           <td>0.000000</td>
           <td>1.0</td>
+          <td>2012-07-20 00:00:00.000000000</td>
           <td>NaN</td>
           <td>9.06</td>
           <td>8.56</td>
@@ -335,6 +340,7 @@ outside the domain.
           <th>B12A1805002</th>
           <td>670.838150</td>
           <td>2.0</td>
+          <td>2014-07-16 13:19:04.508670464</td>
           <td>6.472890</td>
           <td>5.77</td>
           <td>4.77</td>
@@ -346,6 +352,7 @@ outside the domain.
           <th>B12A1806001</th>
           <td>1359.800000</td>
           <td>1.0</td>
+          <td>2016-05-24 22:24:00.000000000</td>
           <td>9.542414</td>
           <td>9.76</td>
           <td>9.26</td>
@@ -402,7 +409,7 @@ heads.
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x0000026456F510D0>
+    <matplotlib.image.AxesImage object at 0x0000026920A7D5D0>
 
 
 
@@ -442,7 +449,7 @@ and the closing criteria.
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x0000026457F45B90>
+    <matplotlib.image.AxesImage object at 0x0000026921235BD0>
 
 
 
@@ -489,14 +496,14 @@ values as well, which allows us to set transparency per cell.
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x000002645357FBD0>
+    <matplotlib.image.AxesImage object at 0x0000026925E1E750>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.448 seconds)
+   **Total running time of the script:** (0 minutes 3.646 seconds)
 
 
 .. _sphx_glr_download_examples_prepare_point_interpolation.py:

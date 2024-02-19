@@ -19,6 +19,7 @@
       ~Evapotranspiration.from_file
       ~Evapotranspiration.get_period_varnames
       ~Evapotranspiration.get_regrid_methods
+      ~Evapotranspiration.is_empty
       ~Evapotranspiration.is_grid_agnostic_package
       ~Evapotranspiration.is_regridding_supported
       ~Evapotranspiration.isel
@@ -41,6 +42,7 @@
 
    .. autosummary::
    
+      ~Evapotranspiration.auxiliary_data_fields
       ~Evapotranspiration.dataset
    
    

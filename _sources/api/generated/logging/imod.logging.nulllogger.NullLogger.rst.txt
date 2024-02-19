@@ -1,0 +1,30 @@
+imod.logging.nulllogger.NullLogger
+==================================
+
+.. currentmodule:: imod.logging.nulllogger
+
+.. autoclass:: NullLogger
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~NullLogger.__init__
+      ~NullLogger.critical
+      ~NullLogger.debug
+      ~NullLogger.error
+      ~NullLogger.info
+      ~NullLogger.warning
+   
+   
+
+   
+   
+   

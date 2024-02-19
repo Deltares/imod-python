@@ -1,0 +1,29 @@
+imod.logging.loglevel.LogLevel
+==============================
+
+.. currentmodule:: imod.logging.loglevel
+
+.. autoclass:: LogLevel
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+   
+   .. automethod:: __init__
+
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~LogLevel.DEBUG
+      ~LogLevel.INFO
+      ~LogLevel.WARNING
+      ~LogLevel.ERROR
+      ~LogLevel.CRITICAL
+   
+   

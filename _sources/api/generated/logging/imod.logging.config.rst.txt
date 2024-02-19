@@ -1,0 +1,38 @@
+imod.logging.config
+===================
+
+.. automodule:: imod.logging.config
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      configure
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+      :template: custom-class-template.rst
+   
+      LoggerType
+   
+   
+
+   
+   
+   
+
+
+

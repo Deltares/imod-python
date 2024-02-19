@@ -19,6 +19,7 @@
       ~WellDisVertices.from_file
       ~WellDisVertices.get_period_varnames
       ~WellDisVertices.get_regrid_methods
+      ~WellDisVertices.is_empty
       ~WellDisVertices.is_grid_agnostic_package
       ~WellDisVertices.is_regridding_supported
       ~WellDisVertices.isel
@@ -41,6 +42,7 @@
 
    .. autosummary::
    
+      ~WellDisVertices.auxiliary_data_fields
       ~WellDisVertices.dataset
    
    

@@ -27,6 +27,7 @@
       ~GroundwaterFlowModel.model_id
       ~GroundwaterFlowModel.pop
       ~GroundwaterFlowModel.popitem
+      ~GroundwaterFlowModel.purge_empty_packages
       ~GroundwaterFlowModel.regrid_like
       ~GroundwaterFlowModel.render
       ~GroundwaterFlowModel.set_newton

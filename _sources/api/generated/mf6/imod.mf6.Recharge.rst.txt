@@ -19,6 +19,7 @@
       ~Recharge.from_file
       ~Recharge.get_period_varnames
       ~Recharge.get_regrid_methods
+      ~Recharge.is_empty
       ~Recharge.is_grid_agnostic_package
       ~Recharge.is_regridding_supported
       ~Recharge.isel
@@ -41,6 +42,7 @@
 
    .. autosummary::
    
+      ~Recharge.auxiliary_data_fields
       ~Recharge.dataset
    
    

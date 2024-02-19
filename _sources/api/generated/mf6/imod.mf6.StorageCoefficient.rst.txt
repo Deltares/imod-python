@@ -19,6 +19,7 @@
       ~StorageCoefficient.from_file
       ~StorageCoefficient.get_options
       ~StorageCoefficient.get_regrid_methods
+      ~StorageCoefficient.is_empty
       ~StorageCoefficient.is_grid_agnostic_package
       ~StorageCoefficient.is_regridding_supported
       ~StorageCoefficient.isel
@@ -41,6 +42,7 @@
 
    .. autosummary::
    
+      ~StorageCoefficient.auxiliary_data_fields
       ~StorageCoefficient.dataset
    
    

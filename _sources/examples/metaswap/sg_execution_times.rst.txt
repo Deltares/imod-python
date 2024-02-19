@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:01.010** total execution time for 2 files **from examples\metaswap**:
+**00:00.242** total execution time for 2 files **from examples\metaswap**:
 
 .. container::
 
@@ -32,9 +32,9 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_examples_metaswap_metaswap_example.py` (``metaswap_example.py``)
-     - 00:00.792
-     - 0.0
    * - :ref:`sphx_glr_examples_metaswap_read_metaswap_file.py` (``read_metaswap_file.py``)
-     - 00:00.218
+     - 00:00.242
+     - 0.0
+   * - :ref:`sphx_glr_examples_metaswap_metaswap_example.py` (``metaswap_example.py``)
+     - 00:00.000
      - 0.0

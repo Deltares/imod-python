@@ -25,7 +25,7 @@ This source file contains functions that create a simulation that can be used in
 examples that are not focused on building a simulation, but on doing something
 with it (such as regridding).
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-589
+.. GENERATED FROM PYTHON SOURCE LINES 10-587
 
 
 
@@ -34,6 +34,7 @@ with it (such as regridding).
 
 
 .. code-block:: Python
+
 
     import numpy as np
     import scipy.ndimage
@@ -578,10 +579,7 @@ with it (such as regridding).
         )
         gwf_model["ic"] = imod.mf6.InitialConditions(start=0.0)
         gwf_model["npf"] = imod.mf6.NodePropertyFlow(
-            icelltype=icelltype,
-            k=k,
-            k33=k33,
-            save_flows=True,
+            icelltype=icelltype, k=k, k33=k33, save_flows=True, save_specific_discharge=True
         )
         gwf_model["sto"] = imod.mf6.SpecificStorage(
             specific_storage=1.0e-5,

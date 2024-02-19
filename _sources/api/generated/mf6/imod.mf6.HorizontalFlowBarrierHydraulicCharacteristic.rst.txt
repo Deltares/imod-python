@@ -19,6 +19,7 @@
       ~HorizontalFlowBarrierHydraulicCharacteristic.from_file
       ~HorizontalFlowBarrierHydraulicCharacteristic.get_period_varnames
       ~HorizontalFlowBarrierHydraulicCharacteristic.get_regrid_methods
+      ~HorizontalFlowBarrierHydraulicCharacteristic.is_empty
       ~HorizontalFlowBarrierHydraulicCharacteristic.is_grid_agnostic_package
       ~HorizontalFlowBarrierHydraulicCharacteristic.is_regridding_supported
       ~HorizontalFlowBarrierHydraulicCharacteristic.isel
@@ -42,7 +43,8 @@
 
    .. autosummary::
    
+      ~HorizontalFlowBarrierHydraulicCharacteristic.auxiliary_data_fields
       ~HorizontalFlowBarrierHydraulicCharacteristic.dataset
-      ~HorizontalFlowBarrierHydraulicCharacteristic.geometry
+      ~HorizontalFlowBarrierHydraulicCharacteristic.line_data
    
    

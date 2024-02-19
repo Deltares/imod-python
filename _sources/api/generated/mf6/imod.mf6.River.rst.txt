@@ -19,6 +19,7 @@
       ~River.from_file
       ~River.get_period_varnames
       ~River.get_regrid_methods
+      ~River.is_empty
       ~River.is_grid_agnostic_package
       ~River.is_regridding_supported
       ~River.isel
@@ -41,6 +42,7 @@
 
    .. autosummary::
    
+      ~River.auxiliary_data_fields
       ~River.dataset
    
    

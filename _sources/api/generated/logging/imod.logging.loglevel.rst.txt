@@ -1,0 +1,31 @@
+imod.logging.loglevel
+=====================
+
+.. automodule:: imod.logging.loglevel
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+      :template: custom-class-template.rst
+   
+      LogLevel
+   
+   
+
+   
+   
+   
+
+
+

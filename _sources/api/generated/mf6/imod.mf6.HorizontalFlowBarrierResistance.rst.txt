@@ -19,6 +19,7 @@
       ~HorizontalFlowBarrierResistance.from_file
       ~HorizontalFlowBarrierResistance.get_period_varnames
       ~HorizontalFlowBarrierResistance.get_regrid_methods
+      ~HorizontalFlowBarrierResistance.is_empty
       ~HorizontalFlowBarrierResistance.is_grid_agnostic_package
       ~HorizontalFlowBarrierResistance.is_regridding_supported
       ~HorizontalFlowBarrierResistance.isel
@@ -42,7 +43,8 @@
 
    .. autosummary::
    
+      ~HorizontalFlowBarrierResistance.auxiliary_data_fields
       ~HorizontalFlowBarrierResistance.dataset
-      ~HorizontalFlowBarrierResistance.geometry
+      ~HorizontalFlowBarrierResistance.line_data
    
    

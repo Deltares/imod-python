@@ -20,6 +20,7 @@
       ~SourceSinkMixing.from_flow_model
       ~SourceSinkMixing.get_period_varnames
       ~SourceSinkMixing.get_regrid_methods
+      ~SourceSinkMixing.is_empty
       ~SourceSinkMixing.is_grid_agnostic_package
       ~SourceSinkMixing.is_regridding_supported
       ~SourceSinkMixing.isel
@@ -42,6 +43,7 @@
 
    .. autosummary::
    
+      ~SourceSinkMixing.auxiliary_data_fields
       ~SourceSinkMixing.dataset
    
    

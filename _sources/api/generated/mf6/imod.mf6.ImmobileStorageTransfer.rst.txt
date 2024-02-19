@@ -18,6 +18,7 @@
       ~ImmobileStorageTransfer.copy
       ~ImmobileStorageTransfer.from_file
       ~ImmobileStorageTransfer.get_regrid_methods
+      ~ImmobileStorageTransfer.is_empty
       ~ImmobileStorageTransfer.is_grid_agnostic_package
       ~ImmobileStorageTransfer.is_regridding_supported
       ~ImmobileStorageTransfer.isel
@@ -40,6 +41,7 @@
 
    .. autosummary::
    
+      ~ImmobileStorageTransfer.auxiliary_data_fields
       ~ImmobileStorageTransfer.dataset
    
    

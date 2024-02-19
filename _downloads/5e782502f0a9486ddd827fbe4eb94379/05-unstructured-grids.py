@@ -8,6 +8,7 @@ cells is not constant; for structured grids, every cell has 4 neighbors (in
 2D), or 6 neighbors (in 3D).
 
 """
+
 # %%
 
 

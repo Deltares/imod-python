@@ -18,6 +18,7 @@
       ~InitialConditions.copy
       ~InitialConditions.from_file
       ~InitialConditions.get_regrid_methods
+      ~InitialConditions.is_empty
       ~InitialConditions.is_grid_agnostic_package
       ~InitialConditions.is_regridding_supported
       ~InitialConditions.isel
@@ -40,6 +41,7 @@
 
    .. autosummary::
    
+      ~InitialConditions.auxiliary_data_fields
       ~InitialConditions.dataset
    
    

@@ -3,7 +3,7 @@ iMOD Python: make massive MODFLOW models
 
 .. image:: https://img.shields.io/badge/lifecycle-maturing-blue
    :target: https://www.tidyverse.org/lifecycle/
-.. image:: https://dpcbuild.deltares.nl/app/rest/builds/buildType:id:iMOD6_IMODPython_Windows_Build/statusIcon.svg
+.. image:: https://dpcbuild.deltares.nl/app/rest/builds/buildType:id:iMOD6_IMODPython_Windows_Tests/statusIcon.svg
    :target: https://github.com/Deltares/imod-python/commits/master/
 .. image:: https://img.shields.io/pypi/l/imod
    :target: https://choosealicense.com/licenses/mit/

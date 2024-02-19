@@ -171,7 +171,7 @@ that is: ``bnd[index] = -1```
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x0000026458C33450>
+    <matplotlib.collections.QuadMesh object at 0x000002692362E910>
 
 
 
@@ -208,7 +208,7 @@ Define the recharge rates
  .. code-block:: none
 
 
-    [<matplotlib.lines.Line2D object at 0x00000264538F7090>]
+    [<matplotlib.lines.Line2D object at 0x0000026927C2FA50>]
 
 
 
@@ -274,7 +274,7 @@ Defining the starting concentrations
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x0000026457BDDF10>
+    <matplotlib.collections.QuadMesh object at 0x0000026927C25050>
 
 
 
@@ -337,6 +337,17 @@ Now we write the model, including runfile:
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    D:\buildAgent\work\b1e15a22da7c0d7f\imod-python\imod\formats\array_io\writing.py:37: UserWarning: The `squeeze` kwarg to GroupBy is being removed.Pass .groupby(..., squeeze=False) to disable squeezing, which is the new default, and to silence this warning.
+      for coordvals, a_yx in list(stacked.groupby("idf")):
+    D:\buildAgent\work\b1e15a22da7c0d7f\imod-python\imod\formats\array_io\writing.py:37: UserWarning: The `squeeze` kwarg to GroupBy is being removed.Pass .groupby(..., squeeze=False) to disable squeezing, which is the new default, and to silence this warning.
+      for coordvals, a_yx in list(stacked.groupby("idf")):
+    D:\buildAgent\work\b1e15a22da7c0d7f\imod-python\imod\formats\array_io\writing.py:37: UserWarning: The `squeeze` kwarg to GroupBy is being removed.Pass .groupby(..., squeeze=False) to disable squeezing, which is the new default, and to silence this warning.
+      for coordvals, a_yx in list(stacked.groupby("idf")):
+
 
 
 
@@ -385,7 +396,7 @@ plot results as follows:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.522 seconds)
+   **Total running time of the script:** (0 minutes 0.904 seconds)
 
 
 .. _sphx_glr_download_examples_imod-wq_FreshwaterLens.py:

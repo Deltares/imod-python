@@ -18,6 +18,7 @@
       ~OutputControl.copy
       ~OutputControl.from_file
       ~OutputControl.get_regrid_methods
+      ~OutputControl.is_empty
       ~OutputControl.is_grid_agnostic_package
       ~OutputControl.is_regridding_supported
       ~OutputControl.isel
@@ -40,6 +41,7 @@
 
    .. autosummary::
    
+      ~OutputControl.auxiliary_data_fields
       ~OutputControl.dataset
       ~OutputControl.is_budget_output
    

@@ -18,6 +18,7 @@
       ~Buoyancy.copy
       ~Buoyancy.from_file
       ~Buoyancy.get_regrid_methods
+      ~Buoyancy.is_empty
       ~Buoyancy.is_grid_agnostic_package
       ~Buoyancy.is_regridding_supported
       ~Buoyancy.isel
@@ -40,6 +41,7 @@
 
    .. autosummary::
    
+      ~Buoyancy.auxiliary_data_fields
       ~Buoyancy.dataset
    
    

@@ -1,0 +1,6 @@
+imod.logging.config.configure
+=============================
+
+.. currentmodule:: imod.logging.config
+
+.. autofunction:: configure

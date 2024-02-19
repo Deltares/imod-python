@@ -35,12 +35,12 @@ In overview, we'll set the following steps:
     * Open the results back into DataArrays.
     * Visualize the results.
 
-.. GENERATED FROM PYTHON SOURCE LINES 21-23
+.. GENERATED FROM PYTHON SOURCE LINES 22-24
 
 We'll start with the usual imports. As this is an simple (synthetic)
 structured model, we can make due with few packages.
 
-.. GENERATED FROM PYTHON SOURCE LINES 23-50
+.. GENERATED FROM PYTHON SOURCE LINES 24-51
 
 .. code-block:: Python
 
@@ -78,7 +78,7 @@ structured model, we can make due with few packages.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 51-57
+.. GENERATED FROM PYTHON SOURCE LINES 52-58
 
 .. code-block:: Python
 
@@ -102,11 +102,11 @@ structured model, we can make due with few packages.
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x00000264590ABB10>
+    <matplotlib.image.AxesImage object at 0x000002692314CB10>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 58-100
+.. GENERATED FROM PYTHON SOURCE LINES 59-101
 
 .. code-block:: Python
 
@@ -156,10 +156,17 @@ structured model, we can make due with few packages.
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    D:\buildAgent\work\b1e15a22da7c0d7f\imod-python\examples\mf6\lake.py:74: UserWarning: Converting non-nanosecond precision datetime values to nanosecond precision. This behavior can eventually be relaxed in xarray, as it is an artifact from pandas which is now beginning to support non-nanosecond precision values. This warning is caused by passing non-nanosecond np.datetime64 or np.timedelta64 values to the DataArray or Variable constructor; it can be silenced by converting the values to nanosecond precision ahead of time.
+      rainfall = xr.DataArray(
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-106
+
+.. GENERATED FROM PYTHON SOURCE LINES 102-107
 
 Create grid coordinates
 -----------------------
@@ -167,11 +174,11 @@ Create grid coordinates
 The first steps consist of setting up the grid -- first the number of layer,
 rows, and columns. Cell sizes are constant throughout the model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-110
+.. GENERATED FROM PYTHON SOURCE LINES 110-111
 
 We'll create a new directory in which we will write and run the model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 110-112
+.. GENERATED FROM PYTHON SOURCE LINES 111-113
 
 .. code-block:: Python
 
@@ -184,7 +191,7 @@ We'll create a new directory in which we will write and run the model.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-122
+.. GENERATED FROM PYTHON SOURCE LINES 114-123
 
 Create DataArrays
 -----------------
@@ -196,7 +203,7 @@ parameters. The model is characterized by:
 * a single drain in the center left of the model
 * uniform recharge on the top layer
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-199
+.. GENERATED FROM PYTHON SOURCE LINES 123-200
 
 .. code-block:: Python
 
@@ -281,10 +288,17 @@ parameters. The model is characterized by:
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    D:\buildAgent\work\b1e15a22da7c0d7f\imod-python\imod\mf6\lak.py:1043: UserWarning: The `squeeze` kwarg to GroupBy is being removed.Pass .groupby(..., squeeze=False) to disable squeezing, which is the new default, and to silence this warning.
+      for iperiod, (_, period_data) in zip(
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 200-208
+
+.. GENERATED FROM PYTHON SOURCE LINES 201-209
 
 Run the model
 -------------
@@ -295,7 +309,7 @@ Run the model
   :ref:`The Modflow 6 examples introduction <mf6-introduction>` shortly
   describes how to add it to yours.
 
-.. GENERATED FROM PYTHON SOURCE LINES 208-210
+.. GENERATED FROM PYTHON SOURCE LINES 209-211
 
 .. code-block:: Python
 
@@ -308,14 +322,14 @@ Run the model
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 211-215
+.. GENERATED FROM PYTHON SOURCE LINES 212-216
 
 Open the results
 ----------------
 
 We'll open the heads (.hds) file.
 
-.. GENERATED FROM PYTHON SOURCE LINES 215-221
+.. GENERATED FROM PYTHON SOURCE LINES 216-222
 
 .. code-block:: Python
 
@@ -332,12 +346,12 @@ We'll open the heads (.hds) file.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 222-224
+.. GENERATED FROM PYTHON SOURCE LINES 223-225
 
 Visualize the results
 ---------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 224-226
+.. GENERATED FROM PYTHON SOURCE LINES 225-227
 
 .. code-block:: Python
 
@@ -357,14 +371,14 @@ Visualize the results
  .. code-block:: none
 
 
-    <matplotlib.contour.QuadContourSet object at 0x0000026457F08E90>
+    <matplotlib.contour.QuadContourSet object at 0x0000026923D46310>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.757 seconds)
+   **Total running time of the script:** (0 minutes 0.711 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_lake.py:

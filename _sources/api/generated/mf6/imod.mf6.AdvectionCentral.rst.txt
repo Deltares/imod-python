@@ -18,6 +18,7 @@
       ~AdvectionCentral.copy
       ~AdvectionCentral.from_file
       ~AdvectionCentral.get_regrid_methods
+      ~AdvectionCentral.is_empty
       ~AdvectionCentral.is_grid_agnostic_package
       ~AdvectionCentral.is_regridding_supported
       ~AdvectionCentral.isel
@@ -40,6 +41,7 @@
 
    .. autosummary::
    
+      ~AdvectionCentral.auxiliary_data_fields
       ~AdvectionCentral.dataset
    
    

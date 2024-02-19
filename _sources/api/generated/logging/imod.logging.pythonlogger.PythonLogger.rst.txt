@@ -1,0 +1,30 @@
+imod.logging.pythonlogger.PythonLogger
+======================================
+
+.. currentmodule:: imod.logging.pythonlogger
+
+.. autoclass:: PythonLogger
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~PythonLogger.__init__
+      ~PythonLogger.critical
+      ~PythonLogger.debug
+      ~PythonLogger.error
+      ~PythonLogger.info
+      ~PythonLogger.warning
+   
+   
+
+   
+   
+   

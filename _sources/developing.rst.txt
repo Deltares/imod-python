@@ -81,28 +81,26 @@ To follow these steps, you need to be one of the maintainers for imod on both
 `PyPI <https://pypi.org/project/imod/>`_ and `conda-forge
 <https://github.com/conda-forge/imod-feedstock>`_.
 
-1. Update the :doc:`../api/changelog`.
+1. Update the :doc:`../api/changelog` and the ``__version__`` in ``imod/__init__.py``,
+   and the version entry in the ``pixi.toml`` for complenetess.
 
-2. Tag in GitHub UI. `Old tags are here
+2. Create a tag on your local machine and push it GitHub. `Old tags are here
    <https://github.com/Deltares/imod-python/tags>`_. `Old releases are
-   here <https://github.com/Deltares/imod-python/releases>`_. To make a
-   tag show up under releases, fill in the release notes in the UI. Since we
-   keep changes in the :doc:`../api/changelog` only, just put ``See
-   https://deltares.github.io/imod-python/api/changelog.html`` in both the
-   ``Message`` and ``Release notes`` box. The tag name should be ``vx.y.z``,
+   here <https://github.com/Deltares/imod-python/releases>`_. The tag name should be ``vx.y.z``,
    where x, y and z are version numbers according to `Semantic Versioning
    <https://semver.org/>`_.
 
-3. Locally, ``git fetch --tags`` and ``git pull``, verify you are on the commit
+3. Create a Release on `GitHub <https://github.com/Deltares/imod-python/releases>`_.
+   Choose the tag you want to release. For the release title use the tag number.
+   For the release description use ``See
+   https://deltares.github.io/imod-python/api/changelog.html``
+
+4. Locally, ``git fetch --tags`` and ``git pull``, verify you are on the commit
    you want to release, and that it is clean.
+   
+5. Run ``pixi run pypi-publish`` to build the package and upload to PyPI.
 
-4. Remove the ``build``,  ``dist``, ``imod.egg-info`` folders if present.
-
-5. Create a source distribution under ``dist/`` with ``python -m build --sdist``
-
-6. Upload the files from step 5 and 6 to PyPI with ``twine upload dist/*``
-
-7. For `conda-forge <https://github.com/conda-forge/imod-feedstock>`_, a PR
+6. For `conda-forge <https://github.com/conda-forge/imod-feedstock>`_, a PR
    will be created automatically. If the requirements are up to date in
    `meta.yaml
    <https://github.com/conda-forge/imod-feedstock/blob/master/recipe/meta.yaml>`_
