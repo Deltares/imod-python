@@ -18,7 +18,6 @@ import imod
 from imod.mf6.auxiliary_variables import get_variable_names
 from imod.mf6.interfaces.ipackage import IPackage
 from imod.mf6.pkgbase import (
-    API_PACKAGES,
     EXCHANGE_PACKAGES,
     TRANSPORT_PACKAGES,
     PackageBase,
@@ -119,8 +118,8 @@ class Package(PackageBase, IPackage, abc.ABC):
             fname = f"gwt-{pkg_id}.j2"
         elif pkg_id in EXCHANGE_PACKAGES:
             fname = f"exg-{pkg_id}.j2"
-        elif pkg_id in API_PACKAGES:
-            fname = f"api-{pkg_id}.j2"
+        elif pkg_id == "api":
+            fname = f"{pkg_id}.j2"
         else:
             fname = f"gwf-{pkg_id}.j2"
         return env.get_template(fname)

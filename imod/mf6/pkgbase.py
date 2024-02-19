@@ -13,7 +13,6 @@ from imod.typing.grid import GridDataArray, GridDataset, merge_with_dictionary
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 EXCHANGE_PACKAGES = ("gwfgwf", "gwfgwt")
-API_PACKAGES = ("api")
 
 
 class PackageBase(IPackageBase, abc.ABC):
