@@ -566,7 +566,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         return hasattr(self, "_regrid_method")
 
     def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        if self.is_regridding_supported():
+        if hasattr(self, "_regrid_method"):
             return self._regrid_method
         return None
 
