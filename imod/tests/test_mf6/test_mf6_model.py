@@ -445,6 +445,10 @@ def test_mask_with_layer_array(
     unstructured_flow_model: GroundwaterFlowModel,
     layer_mask: list[int]
 ):  
+    """
+    Specifying a mask as a dataset with only a layer coordinate is not necessarily something we want
+    to maintain forever, so we should discourage external users from using this. 
+    """
     nlayer = 3
     layer = np.arange(nlayer, dtype=int) + 1
     grid = unstructured_flow_model.domain.ugrid.grid
@@ -460,6 +464,29 @@ def test_mask_with_layer_array(
     unstructured_flow_model.mask_all_packages(mask)
 
     assert_model_can_run( unstructured_flow_model, "disv", tmp_path )
+
+@pytest.mark.parametrize("mask_cells",[ [(0, 2,1)], [(1, 1,2)], [(2, 1,3)]])
+def test_mask_structured(tmp_path: Path, structured_flow_model: GroundwaterFlowModel, mask_cells: list[tuple[int, int, int]]):
+
+    # add a well to the model
+    well = imod.mf6.Well(
+        x=[1.0, 3.0, 6.0],
+        y=[3.0, 3.0, 3.0],
+        screen_top=[0.0, 0.0, 0.0],
+        screen_bottom=[-1, -3.0, -5.0],
+        rate=[1.0, 3.0, 5.0],
+        print_flows=True,
+        validate=True,
+    )
+    structured_flow_model["well"] = well
+    
+    mask = deepcopy(structured_flow_model.domain)
+    for cell in mask_cells:
+        mask.values[cell[0],cell[1],cell[2] ] = 0
+
+    structured_flow_model.mask_all_packages( mask)
+
+    assert_model_can_run( structured_flow_model, "dis", tmp_path )
 
 def test_mask_with_time_coordinate(
     tmp_path: Path,
