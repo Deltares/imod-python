@@ -310,7 +310,8 @@ def circle_model_transport():
     transport_model["adv"] = imod.mf6.AdvectionUpstream()
     transport_model["mst"] = imod.mf6.MobileStorageTransfer(porosity)
 
-    # %% Define the maximum concentration as the initial conditions, also output
+    # %% 
+    # Define the maximum concentration as the initial conditions, also output
     # options for the transport model, and assign the transport model to the
     # simulation as well.
     max_concentration = 35.0
