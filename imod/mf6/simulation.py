@@ -21,6 +21,8 @@ import imod.logging
 import imod.mf6.exchangebase
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwfgwt import GWFGWT
+from imod.mf6.gwtgwt import GWTGWT
+from imod.mf6.ims import Solution
 from imod.mf6.model import Modflow6Model
 from imod.mf6.model_gwf import GroundwaterFlowModel
 from imod.mf6.model_gwt import GroundwaterTransportModel
@@ -31,11 +33,18 @@ from imod.mf6.multimodel.exchange_creator_unstructured import (
 from imod.mf6.multimodel.modelsplitter import create_partition_info, slice_model
 from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
+from imod.mf6.ssm import SourceSinkMixing
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
-from imod.typing.grid import concat, is_unstructured, merge, merge_partitions, nan_like
+from imod.typing.grid import (
+    concat,
+    is_equal,
+    is_unstructured,
+    merge_partitions,
+    nan_like,
+)
 
 OUTPUT_FUNC_MAPPING: dict[str, Callable] = {
     "head": open_hds,
@@ -423,6 +432,7 @@ class Modflow6Simulation(collections.UserDict):
             species_ls=species_ls,
             simulation_start_time=simulation_start_time,
             time_unit=time_unit,
+            merge_to_dataset=True,
         )
 
     def open_flow_budget(
@@ -491,6 +501,7 @@ class Modflow6Simulation(collections.UserDict):
             flowja=flowja,
             simulation_start_time=simulation_start_time,
             time_unit=time_unit,
+            merge_to_dataset=True,
         )
 
     def open_concentration(
@@ -556,33 +567,47 @@ class Modflow6Simulation(collections.UserDict):
         """
         modeltype = OUTPUT_MODEL_MAPPING[output]
         modelnames = self.get_models_of_type(modeltype._model_id).keys()
-        # Pop species_ls, set to modelnames in case not found
-        species_ls = settings.pop("species_ls", modelnames)
         if len(modelnames) == 0:
+            modeltype = OUTPUT_MODEL_MAPPING[output]
+            raise ValueError(
+                f"Could not find any models of appropriate type for {output}, "
+                f"make sure a model of type {modeltype} is assigned to simulation."
+            )
+
+        if output in ["head", "budget-flow"]:
+            return self._open_single_output(modelnames, output, **settings)
+        elif output in ["concentration", "budget-transport"]:
+            return self._concat_species(output, **settings)
+        else:
+            raise RuntimeError(
+                f"Unexpected error when opening {output} for {modelnames}"
+            )
+        return
+
+    def _open_single_output(
+        self, modelnames: list[str], output: str, **settings
+    ) -> GridDataArray | GridDataset:
+        """
+        Open single output, e.g. concentration of single species, or heads. This
+        can be output of partitioned models that need to be merged.
+        """
+        if len(modelnames) == 0:
+            modeltype = OUTPUT_MODEL_MAPPING[output]
             raise ValueError(
                 f"Could not find any models of appropriate type for {output}, "
                 f"make sure a model of type {modeltype} is assigned to simulation."
             )
         elif len(modelnames) == 1:
             modelname = next(iter(modelnames))
-            return self._open_output_single_model(modelname, output, **settings)
+            return self._open_single_output_single_model(modelname, output, **settings)
         elif is_split(self):
             if "budget" in output:
                 return self._merge_budgets(modelnames, output, **settings)
             else:
                 return self._merge_states(modelnames, output, **settings)
-        elif output == "concentration":
-            return self._concat_concentrations(
-                modelnames, species_ls, output, **settings
-            )
-        elif output == "budget-transport":
-            return self._concat_transport_budgets(
-                modelnames, species_ls, output, **settings
-            )
-        else:
-            raise RuntimeError(
-                f"Unexpected error when opening {output} for {modelnames}"
-            )
+        raise ValueError(
+            "error in _open_single_output"
+        )
 
     def _merge_states(
         self, modelnames: list[str], output: str, **settings
@@ -590,7 +615,7 @@ class Modflow6Simulation(collections.UserDict):
         state_partitions = []
         for modelname in modelnames:
             state_partitions.append(
-                self._open_output_single_model(modelname, output, **settings)
+                self._open_single_output_single_model(modelname, output, **settings)
             )
         return merge_partitions(state_partitions)
 
@@ -619,19 +644,13 @@ class Modflow6Simulation(collections.UserDict):
 
         cbc_per_partition = []
         for modelname in modelnames:
-            partition_model = self[modelname]
-            partition_domain = partition_model.domain
-            cbc_dict = self._open_output_single_model(modelname, output, **settings)
-            # Force list of dicts to list of DataArrays to work around:
-            # https://github.com/Deltares/xugrid/issues/179
-            cbc_list = [da.rename(key) for key, da in cbc_dict.items()]
-            cbc = merge(cbc_list)
+            cbc = self._open_single_output_single_model(modelname, output, **settings)
             # Merge and assign exchange budgets to dataset
             # FUTURE: Refactor to insert these exchange budgets in horizontal
             # flows.
             cbc = self._merge_and_assign_exchange_budgets(cbc)
             if not is_unstructured(cbc):
-                cbc = cbc.where(partition_domain, other=np.nan)
+                cbc = cbc.where(self[modelname].domain, other=np.nan)
             cbc_per_partition.append(cbc)
 
         # Boundary conditions can be missing in certain partitions, as do their
@@ -646,41 +665,60 @@ class Modflow6Simulation(collections.UserDict):
 
         return merge_partitions(cbc_per_partition)
 
-    def _concat_concentrations(
-        self, modelnames: list[str], species_ls: list[str], output: str, **settings
-    ) -> GridDataArray:
-        concentrations = []
-        for modelname, species in zip(modelnames, species_ls):
-            conc = self._open_output_single_model(modelname, output, **settings)
-            # Bug in mypy when using unions in isInstance
-            if not isinstance(conc, GridDataArray):  # type: ignore
-                raise RuntimeError(
-                    f"Type error. Expected GridDataArray but got {type(conc)}"
-                )
-            conc = cast(GridDataArray, conc).assign_coords(species=species)
-            concentrations.append(conc)
-        return concat(concentrations, dim="species")
+    def _concat_species(
+        self, output: str, species_ls: Optional[list[str]] = None, **settings
+    ) -> GridDataArray | GridDataset:
+        # groupby flow model, to somewhat enforce consistent transport model
+        # ordening. Say:
+        # F = Flow model, T = Transport model
+        # a = species "a", b = species "b"
+        # 1 = partition 1, 2 = partition 2
+        # then this:
+        # F1Ta1 F1Tb1 F2Ta2 F2Tb2 -> F1: [Ta1, Tb1], F2: [Ta2, Tb2]
+        # F1Ta1 F2Tb1 F1Ta1 F2Tb2 -> F1: [Ta1, Tb1], F2: [Ta2, Tb2]
+        tpt_models_per_flow_model = self._get_transport_models_per_flow_model()
+        all_tpt_names = list(tpt_models_per_flow_model.values())
 
-    def _concat_transport_budgets(
-        self, modelnames: list[str], species_ls: list[str], output: str, **settings
-    ) -> GridDataset:
-        budgets = []
-        for modelname, species in zip(modelnames, species_ls):
-            budget_dict = self._open_output_single_model(modelname, output, **settings)
-            # Force list of dicts to list of DataArrays to work around:
-            # https://github.com/Deltares/xugrid/issues/179
-            budget_list = [da.rename(key) for key, da in budget_dict.items()]
-            budget = merge(budget_list)
-            budget = budget.assign_coords(species=species)
-            budgets.append(budget)
+        # [[Ta_1, Tb_1], [Ta_2, Tb_2]] -> [[Ta_1, Ta_2], [Tb_1, Tb_2]]
+        # [[Ta, Tb]] -> [[Ta], [Tb]]
+        tpt_names_per_species = list(zip(*all_tpt_names))
 
-        return concat(budgets, dim="species")
+        if is_split(self):
+            # [[Ta_1, Tb_1], [Ta_2, Tb_2]] -> [Ta, Tb]
+            unpartitioned_modelnames = [
+                tpt_name.rpartition("_")[0] for tpt_name in all_tpt_names[0]
+            ]
+        else:
+            # [[Ta, Tb]] -> [Ta, Tb]
+            unpartitioned_modelnames = all_tpt_names[0]
 
-    def _open_output_single_model(
+        if not species_ls:
+            species_ls = unpartitioned_modelnames
+
+        if len(species_ls) != len(tpt_names_per_species):
+            raise ValueError(
+                "species_ls does not equal the number of transport models, "
+                f"expected length {len(tpt_names_per_species)}, received {species_ls}"
+            )
+
+        if len(species_ls) == 1:
+            return self._open_single_output(
+                list(tpt_names_per_species[0]), output, **settings
+            )
+
+        # Concatenate species
+        outputs = []
+        for species, tpt_names in zip(species_ls, tpt_names_per_species):
+            output_data = self._open_single_output(list(tpt_names), output, **settings)
+            output_data = output_data.assign_coords(species=species)
+            outputs.append(output_data)
+        return concat(outputs, dim="species")
+
+    def _open_single_output_single_model(
         self, modelname: str, output: str, **settings
-    ) -> GridDataArray | dict[str, GridDataArray]:
+    ) -> GridDataArray | GridDataset:
         """
-        Opens output of single model
+        Opens single output of single model
 
         Parameters
         ----------
@@ -777,6 +815,15 @@ class Modflow6Simulation(collections.UserDict):
                 toml_content[cls_name][key] = model_toml_path.relative_to(
                     directory
                 ).as_posix()
+            elif key in ["gwtgwf_exchanges","split_exchanges"]:
+                toml_content[key] = collections.defaultdict(list)
+                for exchange_package in self[key]:
+                    exchange_type, filename, _, _ = exchange_package.get_specification()
+                    exchange_class_short = type(exchange_package).__name__
+                    path = f"{filename}.nc"
+                    exchange_package.dataset.to_netcdf(directory / path)
+                    toml_content[key][exchange_class_short].append(path)
+
             else:
                 path = f"{key}.nc"
                 value.dataset.to_netcdf(directory / path)
@@ -796,6 +843,9 @@ class Modflow6Simulation(collections.UserDict):
                 GroundwaterTransportModel,
                 imod.mf6.TimeDiscretization,
                 imod.mf6.Solution,
+                imod.mf6.GWFGWF,
+                imod.mf6.GWFGWT,
+                imod.mf6.GWTGWT
             )
         }
 
@@ -805,10 +855,19 @@ class Modflow6Simulation(collections.UserDict):
 
         simulation = Modflow6Simulation(name=toml_path.stem)
         for key, entry in toml_content.items():
-            item_cls = classes[key]
-            for name, filename in entry.items():
-                path = toml_path.parent / filename
-                simulation[name] = item_cls.from_file(path)
+           
+            if not key in ["gwtgwf_exchanges", "split_exchanges"]:
+                item_cls = classes[key]
+                for name, filename in entry.items():
+                    path = toml_path.parent / filename
+                    simulation[name] = item_cls.from_file(path)
+            else:
+                simulation[key] = []
+                for exchange_class, exchange_list in entry.items():
+                    item_cls = classes[exchange_class]
+                    for filename in exchange_list:
+                        path = toml_path.parent / filename
+                        simulation[key].append(item_cls.from_file(path))
 
         return simulation
 
@@ -823,7 +882,6 @@ class Modflow6Simulation(collections.UserDict):
         if is_split(self):
             for exchange in self["split_exchanges"]:
                 result.append(exchange.get_specification())
-
         return result
 
     def get_models_of_type(self, modeltype):
@@ -913,6 +971,16 @@ class Modflow6Simulation(collections.UserDict):
                 "Unable to split simulation. Splitting can only be done on simulations that haven't been split."
             )
 
+        flow_models = self.get_models_of_type("gwf6")
+        transport_models = self.get_models_of_type("gwt6")
+        if any(transport_models) and len(flow_models) != 1:
+            raise ValueError(
+                "splitting of simulations with more (or less) than 1 flow model currently not supported, if a transport model is present"
+            )
+
+        if not any(flow_models) and not any(transport_models):
+            raise ValueError("a simulation without any models cannot be split.")
+
         original_models = get_models(self)
         original_packages = get_packages(self)
 
@@ -933,24 +1001,32 @@ class Modflow6Simulation(collections.UserDict):
             new_simulation[package_name] = package
 
         for model_name, model in original_models.items():
+            solution_name = self.get_solution_name(model_name)
+            new_simulation[solution_name].remove_model_from_solution(model_name)
             for submodel_partition_info in partition_info:
                 new_model_name = f"{model_name}_{submodel_partition_info.id}"
                 new_simulation[new_model_name] = slice_model(
                     submodel_partition_info, model
                 )
+                new_simulation[solution_name].add_model_to_solution(new_model_name)
 
         exchanges = []
-        for model_name, model in original_models.items():
-            exchanges += exchange_creator.create_exchanges(
-                model_name, model.domain.layer
+
+        for flow_model_name, flow_model in flow_models.items():
+            exchanges += exchange_creator.create_gwfgwf_exchanges(
+                flow_model_name, flow_model.domain.layer
             )
 
-        new_simulation["solver"]["modelnames"] = xr.DataArray(
-            list(get_models(new_simulation).keys())
-        )
-
+        if any(transport_models):
+            for tpt_model_name in transport_models:
+                exchanges += exchange_creator.create_gwtgwt_exchanges(
+                    tpt_model_name, flow_model_name, model.domain.layer
+                )
         new_simulation._add_modelsplit_exchanges(exchanges)
-        new_simulation._set_exchange_options()
+        new_simulation._update_buoyancy_packages()
+        new_simulation._set_flow_exchange_options()
+        new_simulation._set_transport_exchange_options()
+        new_simulation._update_ssm_packages()
 
         new_simulation._filter_inactive_cells_from_exchanges()
         return new_simulation
@@ -1003,18 +1079,42 @@ class Modflow6Simulation(collections.UserDict):
             self["split_exchanges"] = []
         self["split_exchanges"].extend(exchanges_list)
 
-    def _set_exchange_options(self):
+    def _set_flow_exchange_options(self) -> None:
         # collect some options that we will auto-set
         for exchange in self["split_exchanges"]:
-            model_name_1 = exchange.dataset["model_name_1"].values[()]
-            model_1 = self[model_name_1]
-            exchange.set_options(
-                save_flows=model_1["oc"].is_budget_output,
-                dewatered=model_1["npf"].is_dewatered,
-                variablecv=model_1["npf"].is_variable_vertical_conductance,
-                xt3d=model_1["npf"].get_xt3d_option(),
-                newton=model_1.is_use_newton(),
-            )
+            if isinstance(exchange, GWFGWF):
+                model_name_1 = exchange.dataset["model_name_1"].values[()]
+                model_1 = self[model_name_1]
+                exchange.set_options(
+                    save_flows=model_1["oc"].is_budget_output,
+                    dewatered=model_1["npf"].is_dewatered,
+                    variablecv=model_1["npf"].is_variable_vertical_conductance,
+                    xt3d=model_1["npf"].get_xt3d_option(),
+                    newton=model_1.is_use_newton(),
+                )
+
+    def _set_transport_exchange_options(self) -> None:
+        for exchange in self["split_exchanges"]:
+            if isinstance(exchange, GWTGWT):
+                model_name_1 = exchange.dataset["model_name_1"].values[()]
+                model_1 = self[model_name_1]
+                advection_key = model_1._get_pkgkey("adv")
+                dispersion_key = model_1._get_pkgkey("dsp")
+
+                scheme = None
+                xt3d_off = None
+                xt3d_rhs = None
+                if advection_key is not None:
+                    scheme = model_1[advection_key].dataset["scheme"].values[()]
+                if dispersion_key is not None:
+                    xt3d_off = model_1[dispersion_key].dataset["xt3d_off"].values[()]
+                    xt3d_rhs = model_1[dispersion_key].dataset["xt3d_rhs"].values[()]
+                exchange.set_options(
+                    save_flows=model_1["oc"].is_budget_output,
+                    adv_scheme=scheme,
+                    dsp_xt3d_off=xt3d_off,
+                    dsp_xt3d_rhs=xt3d_rhs,
+                )
 
     def _filter_inactive_cells_from_exchanges(self) -> None:
         for ex in self["split_exchanges"]:
@@ -1044,6 +1144,13 @@ class Modflow6Simulation(collections.UserDict):
         active_exchange_domain = active_exchange_domain.dropna("index")
         ex.dataset = ex.dataset.sel(index=active_exchange_domain["index"])
 
+    def get_solution_name(self, model_name: str) -> Optional[str]:
+        for k, v in self.items():
+            if isinstance(v, Solution):
+                if model_name in v.dataset["modelnames"]:
+                    return k
+        return None
+
     def __repr__(self) -> str:
         typename = type(self).__name__
         INDENT = "    "
@@ -1063,15 +1170,50 @@ class Modflow6Simulation(collections.UserDict):
             content = attrs + ["){}"]
         return "\n".join(content)
 
-    def _generate_gwfgwt_exchanges(self):
+    def _get_transport_models_per_flow_model(self) -> dict[str, list[str]]:
         flow_models = self.get_models_of_type("gwf6")
         transport_models = self.get_models_of_type("gwt6")
-
         # exchange for flow and transport
+        result = collections.defaultdict(list)
+
+        for flow_model_name in flow_models:
+            flow_model = self[flow_model_name]
+            for tpt_model_name in transport_models:
+                tpt_model = self[tpt_model_name]
+                if is_equal(tpt_model.domain, flow_model.domain):
+                    result[flow_model_name].append(tpt_model_name)
+        return result
+
+    def _generate_gwfgwt_exchanges(self) -> list[GWFGWT]:
         exchanges = []
-        if len(flow_models) == 1 and len(transport_models) > 0:
-            flow_model_name = list(flow_models.keys())[0]
-            for transport_model_name in transport_models.keys():
-                exchanges.append(GWFGWT(flow_model_name, transport_model_name))
+        flow_transport_mapping = self._get_transport_models_per_flow_model()
+        for flow_name, tpt_models_of_flow_model in flow_transport_mapping.items():
+            if len(tpt_models_of_flow_model) > 0:
+                for transport_model_name in tpt_models_of_flow_model:
+                    exchanges.append(GWFGWT(flow_name, transport_model_name))
 
         return exchanges
+
+    def _update_ssm_packages(self) -> None:
+        flow_transport_mapping = self._get_transport_models_per_flow_model()
+        for flow_name, tpt_models_of_flow_model in flow_transport_mapping.items():
+            flow_model = self[flow_name]
+            for tpt_model_name in tpt_models_of_flow_model:
+                tpt_model = self[tpt_model_name]
+                ssm_key = tpt_model._get_pkgkey("ssm")
+                if ssm_key is not None:
+                    old_ssm_package = tpt_model.pop(ssm_key)
+                    state_variable_name = old_ssm_package.dataset[
+                        "auxiliary_variable_name"
+                    ].values[0]
+                    ssm_package = SourceSinkMixing.from_flow_model(
+                        flow_model, state_variable_name, is_split=is_split(self)
+                    )
+                    if ssm_package is not None:
+                        tpt_model[ssm_key] = ssm_package
+
+    def _update_buoyancy_packages(self)->None:
+        flow_transport_mapping = self._get_transport_models_per_flow_model()
+        for flow_name, tpt_models_of_flow_model in flow_transport_mapping.items():
+            flow_model = self[flow_name]
+            flow_model.update_buoyancy_package(tpt_models_of_flow_model)

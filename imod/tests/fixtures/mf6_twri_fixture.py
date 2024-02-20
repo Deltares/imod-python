@@ -179,6 +179,12 @@ def make_twri_model():
         transient=False,
     )
 
+    #The mere presence of the api package should not impact results. It
+    #should not prevent model execution, splitting or partitioning. 
+    gwf_model["api"] = imod.mf6.ApiPackage(
+        maxbound = 20
+    )
+
     # Attach it to a simulation
     simulation = imod.mf6.Modflow6Simulation("ex01-twri")
     simulation["GWF_1"] = gwf_model

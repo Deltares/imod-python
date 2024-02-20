@@ -3,6 +3,7 @@ Create a Modflow 6 model.
 """
 
 from imod.mf6.adv import AdvectionCentral, AdvectionTVD, AdvectionUpstream
+from imod.mf6.api_package import ApiPackage
 from imod.mf6.buy import Buoyancy
 from imod.mf6.chd import ConstantHead
 from imod.mf6.cnc import ConstantConcentration
@@ -14,6 +15,7 @@ from imod.mf6.evt import Evapotranspiration
 from imod.mf6.ghb import GeneralHeadBoundary
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwfgwt import GWFGWT
+from imod.mf6.gwtgwt import GWTGWT
 from imod.mf6.hfb import (
     HorizontalFlowBarrierBase,
     HorizontalFlowBarrierHydraulicCharacteristic,
