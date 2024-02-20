@@ -1,6 +1,6 @@
 [project]
 name = "imod-python"
-version = "0.15.1"
+version = "0.15.2"
 description = "Make massive MODFLOW models"
 authors = ["Deltares <huite.bootsma@deltares.nl>", ]
 channels = ["conda-forge", ]
@@ -104,3 +104,11 @@ build = "*"
 
 [pypi-dependencies]
 mypy2junit = "*"
+
+[feature.interactive.dependencies]
+ipykernel = "*"
+ipython = "*"
+jupyter = "*"
+
+[environments]
+interactive = ["interactive"]

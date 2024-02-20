@@ -9,6 +9,30 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Changed
+~~~~~~~
+- :meth:`imod.mf6.Modflow6Simulation.open_concentration` and
+  :meth:`imod.mf6.Modflow6Simulation.open_transport_budget` raise a
+  ``ValueError`` if ``species_ls`` is provided with incorrect length.
+
+Added
+~~~~~
+- Developer environment: Added pixi environment ``interactive`` to interactively
+  run code. Can be useful to plot data.
+- An API package was added. It can be added to both flow and transport models, and its 
+  presence allows users to interact with libMF6.dll through its API.
+- Added support for coupling a GroundwaterFlowModel and Transport Model i.c.w.
+  the 6.4.3 release of MODFLOW. Using an older version of iMOD Python
+  with this version of MODFLOW will result in an error.
+- :meth:`imod.mf6.Modflow6Simulation.split` supports splitting transport models,
+  including multi-species simulations.
+- :meth:`imod.mf6.Modflow6Simulation.open_concentration` and
+  :meth:`imod.mf6.Modflow6Simulation.open_transport_budget` support opening
+  split multi-species simulations.
+
+[0.15.2] - 2024-02-16
+---------------------
+
 Fixed
 ~~~~~
 - iMOD Python now supports versions of pandas >= 2
@@ -24,6 +48,10 @@ Fixed
   :class:`imod.mf6.EvapoTranspiration` package
 - Added validation :class:`imod.mf6.Well` package, no ``np.nan`` values are
   allowed
+- Fix support for coupling a GroundwaterFlowModel and Transport Model i.c.w.
+  the 6.4.3 release of MODFLOW. Using an older version of iMOD Python
+  with this version of MODFLOW will result in an error.
+
 
 Changed
 ~~~~~~~
@@ -37,20 +65,9 @@ Changed
   development install are adviced to run ``pip uninstall imod`` and ``pip
   install -e .`` again. This does not affect users who installed with ``pip
   install imod``, ``mamba install imod`` or ``conda install imod``.
-- :meth:`imod.mf6.Modflow6Simulation.open_concentration` and
-  :meth:`imod.mf6.Modflow6Simulation.open_transport_budget` raise a
-  ``ValueError`` if ``species_ls`` is provided with incorrect length.
+- Decreased lower limit of MetaSWAP validation for x and y limits in the
+  ``IdfMapping`` from 0 to -9999999.0.
 
-Added
-~~~~~
-- Added support for coupling a GroundwaterFlowModel and Transport Model i.c.w.
-  the 6.4.3 release of MODFLOW. Using an older version of iMOD Python
-  with this version of MODFLOW will result in an error.
-- :meth:`imod.mf6.Modflow6Simulation.split` supports splitting transport models,
-  including multi-species simulations.
-- :meth:`imod.mf6.Modflow6Simulation.open_concentration` and
-  :meth:`imod.mf6.Modflow6Simulation.open_transport_budget` support opening
-  split multi-species simulations.
 
 [0.15.1] - 2023-12-22
 ---------------------
@@ -425,6 +442,8 @@ Fixed
 - :meth:`imod.prepare.LayerRegridder.regrid` will now correctly skip values
   if ``top_source`` or ``bottom_source`` are NaN.
 - :func:`imod.gen.write` no longer errors on dataframes with empty columns.
+- :func:`imod.mf6.BoundaryCondition.set_repeat_stress` reinstated. This is  
+ a temporary measure, it gives a deprecation warning.
 
 Changed
 ~~~~~~~
