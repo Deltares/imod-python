@@ -433,6 +433,7 @@ class Modflow6Simulation(collections.UserDict):
             simulation_start_time=simulation_start_time,
             time_unit=time_unit,
             merge_to_dataset=True,
+            flowja=False,
         )
 
     def open_flow_budget(
@@ -956,7 +957,7 @@ class Modflow6Simulation(collections.UserDict):
             )
         return clipped
 
-    def split(self, submodel_labels: xr.DataArray) -> Modflow6Simulation:
+    def split(self, submodel_labels: GridDataArray) -> Modflow6Simulation:
         """
         Split a simulation in different partitions using a submodel_labels array.
 
@@ -1010,7 +1011,7 @@ class Modflow6Simulation(collections.UserDict):
                 )
                 new_simulation[solution_name].add_model_to_solution(new_model_name)
 
-        exchanges = []
+        exchanges: list[Any] = []
 
         for flow_model_name, flow_model in flow_models.items():
             exchanges += exchange_creator.create_gwfgwf_exchanges(

@@ -80,7 +80,7 @@ def make_circle_model():
     return simulation
 
 
-def make_circle_model_flow_with_transport_data():
+def make_circle_model_flow_with_transport_data(species: list[str]):
     grid = imod.data.circle()
     max_concentration = 35.0
     min_concentration = 0.0
@@ -101,7 +101,7 @@ def make_circle_model_flow_with_transport_data():
     k33 = k.copy()
     rch_rate = xu.full_like(k.sel(layer=1), 0.001, dtype=float)
     rch_concentration = xu.full_like(rch_rate, min_concentration)
-    rch_concentration = rch_concentration.expand_dims(species=["salinity"])
+    rch_concentration = rch_concentration.expand_dims(species=species)
     bottom = k * xr.DataArray([5.0, 0.0], dims=["layer"])
     chd_location = xu.zeros_like(k.sel(layer=2), dtype=bool).ugrid.binary_dilation(
         border_value=True
@@ -110,7 +110,7 @@ def make_circle_model_flow_with_transport_data():
     constant_concentration = xu.full_like(constant_head, max_concentration).where(
         chd_location
     )
-    constant_concentration = constant_concentration.expand_dims(species=["salinity"])
+    constant_concentration = constant_concentration.expand_dims(species=species)
 
 
 
@@ -274,7 +274,7 @@ def circle_model_transport():
     max_density = 1025.0
     min_density = 1000.0    
 
-    simulation = make_circle_model_flow_with_transport_data()
+    simulation = make_circle_model_flow_with_transport_data(["salinity"])
     gwf_model = simulation["GWF_1"]
 
 
@@ -310,9 +310,10 @@ def circle_model_transport():
     transport_model["adv"] = imod.mf6.AdvectionUpstream()
     transport_model["mst"] = imod.mf6.MobileStorageTransfer(porosity)
 
-    # %%
-    # Now we define initial conditions (0.0) and output options for the transport
-    # simulation, and assign the transport model to the simulation as well.
+    # %% 
+    # Define the maximum concentration as the initial conditions, also output
+    # options for the transport model, and assign the transport model to the
+    # simulation as well.
     max_concentration = 35.0
     min_concentration = 0.0
     transport_model["ic"] = imod.mf6.InitialConditions(start=max_concentration)
@@ -323,6 +324,88 @@ def circle_model_transport():
     simulation["transport"] = transport_model
     simulation["transport_solver"] = imod.mf6.Solution(
         modelnames=["transport"],
+        print_option="summary",
+        csv_output=False,
+        no_ptc=True,
+        outer_dvclose=1.0e-4,
+        outer_maximum=500,
+        under_relaxation=None,
+        inner_dvclose=1.0e-4,
+        inner_rclose=0.001,
+        inner_maximum=100,
+        linear_acceleration="bicgstab",
+        scaling_method=None,
+        reordering_method=None,
+        relaxation_factor=0.97,
+    )
+    simtimes = pd.date_range(start="2000-01-01", end="2001-01-01", freq="W")
+    simulation.create_time_discretization(additional_times=simtimes)
+    return simulation
+
+
+
+@pytest.fixture(scope="function")
+def circle_model_transport_multispecies():
+
+    al = 0.001
+    porosity = 0.3
+    max_concentration = 35.0
+    min_concentration = 0.0
+    max_density = 1025.0
+    min_density = 1000.0
+    species = ["salt", "temp"]
+
+    simulation = make_circle_model_flow_with_transport_data(species)
+    gwf_model = simulation["GWF_1"]
+
+
+    for specie in species:
+
+        transport_model = imod.mf6.GroundwaterTransportModel()
+        transport_model["ssm"] = imod.mf6.SourceSinkMixing.from_flow_model(
+            gwf_model, specie, save_flows=True
+        )
+        transport_model["disv"] = gwf_model["disv"]
+
+        # %%
+        # Now we define some transport packages for simulating the physical processes
+        # of advection, mechanical dispersion, and molecular diffusion dispersion. This
+        # example is transient, and the volume available for storage is the porosity,
+        # in this case 0.10.
+
+
+        transport_model["dsp"] = imod.mf6.Dispersion(
+            diffusion_coefficient=1e-4,
+            longitudinal_horizontal=al,
+            transversal_horizontal1=al * 0.1,
+            transversal_vertical=al * 0.01,
+            xt3d_off=False,
+            xt3d_rhs=False,
+        )
+        transport_model["adv"] = imod.mf6.AdvectionUpstream()
+        transport_model["mst"] = imod.mf6.MobileStorageTransfer(porosity, save_flows=True)
+
+        # %% Define the maximum concentration as the initial conditions, also
+        # output options for the transport model, and assign the transport model
+        # to the simulation as well.
+        transport_model["ic"] = imod.mf6.InitialConditions(start=max_concentration)
+        transport_model["oc"] = imod.mf6.OutputControl(
+            save_concentration="all", save_budget="all"
+        )
+
+        simulation[f"tpt_{specie}"] = transport_model
+    slope = (max_density - min_density) / (max_concentration - min_concentration)    
+    modelnames = [f"tpt_{specie}" for specie in species]    
+    gwf_model["buoyancy"] = imod.mf6.Buoyancy(
+        reference_density=min_density,
+        modelname=modelnames,
+        reference_concentration=[min_concentration,min_concentration ],
+        density_concentration_slope=[slope, slope],
+        species=species,
+    )        
+    
+    simulation["transport_solver"] = imod.mf6.Solution(
+        modelnames=modelnames,
         print_option="summary",
         csv_output=False,
         no_ptc=True,
