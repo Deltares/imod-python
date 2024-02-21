@@ -554,8 +554,10 @@ class Package(PackageBase, IPackage, abc.ABC):
 
             if set(da.coords).issubset(horizontal_dims+vertical_dims+time_dims):
                 if len(da.dims) < len(da.coords):
-                    if ("layer" in da.coords and "layer" not in da.dims):
+                    if "layer" in da.coords and "layer" not in da.dims:
                         array_domain = domain.sel(layer = da.coords["layer"])
+                    if "layer" not in da.coords and "layer"  in array_domain.coords:
+                        array_domain = domain.isel(layer = 0)
 
                 if issubclass(da.dtype.type, numbers.Integral):
                     if var == "idomain":
