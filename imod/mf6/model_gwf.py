@@ -11,6 +11,7 @@ from imod.mf6.model import Modflow6Model, initialize_template
 from imod.mf6.regridding_utils import RegridderType
 from imod.typing import GridDataArray
 
+from collections import defaultdict
 
 class GroundwaterFlowModel(Modflow6Model):
     _mandatory_packages = ("npf", "ic", "oc", "sto")
@@ -36,14 +37,14 @@ class GroundwaterFlowModel(Modflow6Model):
         }
         self._template = initialize_template("gwf-nam.j2")
 
-    def _get_unique_regridder_types(self) -> dict[RegridderType, str]:
+    def _get_unique_regridder_types(self) -> defaultdict[RegridderType, list[str]]:
         """
         This function loops over the packages and  collects all regridder-types that are in use.
         Differences in associated functions are ignored. It focusses only on the types. So if a
         model uses both Overlap(mean) and Overlap(harmonic_mean), this function will return just one
         Overlap regridder:  the first one found, in this case Overlap(mean)
         """
-        methods: dict[RegridderType, str] = {}
+        methods= defaultdict(list)
         for pkg_name, pkg in self.items():
             if pkg.is_regridding_supported():
                 pkg_methods = pkg.get_regrid_methods()
@@ -53,9 +54,9 @@ class GroundwaterFlowModel(Modflow6Model):
                         and pkg.dataset[variable].values[()] is not None
                     ):
                         regriddertype = pkg_methods[variable][0]
-                        if regriddertype not in methods.keys():
-                            functiontype = pkg_methods[variable][1]
-                            methods[regriddertype] = functiontype
+                        functiontype = pkg_methods[variable][1]
+                        if functiontype not in  methods[regriddertype]:
+                            methods[regriddertype].append(functiontype)
             else:
                 raise NotImplementedError(
                     f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"

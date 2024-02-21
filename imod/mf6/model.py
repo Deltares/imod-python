@@ -537,7 +537,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
     def _get_regridding_domain(
         self,
         target_grid: GridDataArray,
-        methods: dict[RegridderType, str],
+        methods: defaultdictdict[RegridderType, list[str]],
     ) -> GridDataArray:
         """
         This method computes the output-domain for a regridding operation by regridding idomain with
@@ -549,16 +549,17 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             idomain, target_grid=target_grid
         )
         included_in_all = None
-        for regriddertype, function in methods.items():
-            regridder = regridder_collection.get_regridder(
-                regriddertype,
-                function,
-            )
-            regridded_idomain = regridder.regrid(idomain)
-            if included_in_all is None:
-                included_in_all = regridded_idomain
-            else:
-                included_in_all = included_in_all.where(regridded_idomain > 0)
+        for regriddertype, functionlist in methods.items():
+            for function in functionlist:
+                regridder = regridder_collection.get_regridder(
+                    regriddertype,
+                    function,
+                )
+                regridded_idomain = regridder.regrid(idomain)
+                if included_in_all is None:
+                    included_in_all = regridded_idomain
+                else:
+                    included_in_all = included_in_all.where(regridded_idomain > 0)
 
         if included_in_all is None:
             raise ValueError("No regridder is able to regrid the domain")
