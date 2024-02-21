@@ -560,7 +560,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                     included_in_all = regridded_idomain
                 else:
                     included_in_all = included_in_all.where(regridded_idomain.notnull())
-
+                    included_in_all = regridded_idomain.where(regridded_idomain <=0, other = included_in_all)
         if included_in_all is None:
             raise ValueError("No regridder is able to regrid the domain")
 
