@@ -617,7 +617,7 @@ modeldir = imod.util.temporary_directory()
 mask = deepcopy(simulation["GWF_1"].domain.isel(layer=6))
 mask = mask.drop_vars("layer")
 mask.values[2:8,2:8] = 0
-#simulation["GWF_1"].mask_all_packages(mask)
+simulation["GWF_1"].mask_all_packages(mask)
 simulation.write(modeldir, binary=False)
 simulation.run()
 
