@@ -91,6 +91,10 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         keyword to indicate that UZF flow terms will be written to the file specified with "BUDGET
         FILEOUT" in Output Control.
         Default is False.
+    budget_fileout: ({"str"}, optional)
+        path to output cbc-file for UZF budgets
+    budgetcsv_fileout: ({"str"}, optional)
+        path to output csv-file for summed budgets
     observations: [Not yet supported.]
         Default is None.
     water_mover: [Not yet supported.]
@@ -224,6 +228,8 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         print_input=False,
         print_flows=False,
         save_flows=False,
+        budget_fileout = None,
+        budgetcsv_fileout = None,
         observations=None,
         water_mover=None,
         timeseries=None,
@@ -258,6 +264,8 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
             "print_input": print_input,
             "print_flows": print_flows,
             "save_flows": save_flows,
+            "budget_fileout": budget_fileout,
+            "budgetcsv_fileout": budgetcsv_fileout,
             "observations": observations,
             "water_mover": water_mover,
             "timeseries": timeseries,
@@ -350,7 +358,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         return uzf_number.shift(layer=-1, fill_value=0)
 
     def _package_data_to_sparse(self):
-        notnull = self.dataset["landflag"].values == 1
+        notnull = np.isfinite(self.dataset["landflag"].values)
         iuzno = self.dataset["iuzno"].values[notnull]
         landflag = self.dataset["landflag"].values[notnull]
         ivertcon = self.dataset["ivertcon"].values[notnull]
@@ -376,7 +384,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         recarr_new[field_names] = recarr
 
         return recarr_new
-
+    
     def render(self, directory, pkgname, globaltimes, binary):
         """Render fills in the template only, doesn't write binary data"""
         d = {}
@@ -390,7 +398,8 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         d = self._get_options(d, not_options=not_options)
         path = directory / pkgname / f"{self._pkg_id}-pkgdata.dat"
         d["packagedata"] = path.as_posix()
-        d["nuzfcells"] = self._max_active_n()
+        # max uzf-cells for which time period data will be supplied
+        d["nuzfcells"] =  np.count_nonzero(np.isfinite(d['landflag'])) 
         return self._template.render(d)
 
     def _to_struct_array(self, arrdict, layer):
