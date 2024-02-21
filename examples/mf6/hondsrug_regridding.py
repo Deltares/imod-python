@@ -69,7 +69,7 @@ regridded_simulation = gwf_simulation.regrid_like(
 )
 
 regridded_modeldir = original_modeldir / ".." / "regridded"
-regridded_simulation.write(regridded_modeldir, validate=False)
+regridded_simulation.write(regridded_modeldir, binary=False, validate=False)
 
 regridded_simulation.run()
 
