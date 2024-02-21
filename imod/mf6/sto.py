@@ -163,6 +163,8 @@ class SpecificStorage(StorageBase):
 
     _template = Package._initialize_template(_pkg_id)
 
+    _skip_mask_arrays = ["transient"]
+
     def __init__(
         self,
         specific_storage,
@@ -296,6 +298,8 @@ class StorageCoefficient(StorageBase):
     }
 
     _template = Package._initialize_template(_pkg_id)
+
+    _skip_mask_arrays = ["transient"]
 
     def __init__(
         self,

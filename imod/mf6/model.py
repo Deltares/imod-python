@@ -25,6 +25,7 @@ from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray
+from imod.typing.grid import is_equal
 
 
 def initialize_template(name: str) -> Template:
@@ -497,18 +498,22 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
     def mask_all_packages(
         self,
-        domain: GridDataArray,
+        mask: GridDataArray,
     ):
         """
         This function applies a mask to all packages in a model. The mask must
         be presented as an idomain-like integer array that has 0 or negative
         values in filtered cells and positive values in active cells
         """
-        if any([d not in ["x", "y", "layer", "mesh2d_nFaces", "dx", "dy"] for d in domain.coords]):
+        if any([d not in ["x", "y", "layer", "mesh2d_nFaces", "dx", "dy"] for d in mask.coords]):
             raise ValueError("unexpected coordinate dimension in masking domain")
+        
+        if not np.any(mask.values > 0):
+            raise ValueError("That mask would deactivate the whole grid.")
+
 
         for pkgname, pkg in self.items():
-            self[pkgname] = pkg.mask(domain)
+            self[pkgname] = pkg.mask(mask)
         self.purge_empty_packages()
 
     def purge_empty_packages(self, model_name: Optional[str] = "") -> None:

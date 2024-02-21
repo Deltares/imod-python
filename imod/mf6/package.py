@@ -539,6 +539,7 @@ class Package(PackageBase, IPackage, abc.ABC):
 
         horizontal_dims = ["x", "y", "mesh2d_nFaces", "dx", "dy"]
         vertical_dims = ["layer"]
+        time_dims = ["time"]        
 
         masked = {}
 
@@ -551,7 +552,7 @@ class Package(PackageBase, IPackage, abc.ABC):
                 continue
 
 
-            if set(da.coords).issubset(horizontal_dims+vertical_dims):
+            if set(da.coords).issubset(horizontal_dims+vertical_dims+time_dims):
                 if len(da.dims) < len(da.coords):
                     if ("layer" in da.coords and "layer" not in da.dims):
                         array_domain = domain.sel(layer = da.coords["layer"])
