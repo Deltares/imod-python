@@ -25,7 +25,6 @@ from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray
-from imod.typing.grid import is_equal
 
 
 def initialize_template(name: str) -> Template:
