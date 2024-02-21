@@ -408,12 +408,13 @@ def open_cbc(
     flowja: bool = False,
     simulation_start_time: Optional[np.datetime64] = None,
     time_unit: Optional[str] = "d",
+    uzf: bool = False,
 ) -> Dict[str, xr.DataArray]:
-    headers = cbc.read_cbc_headers(cbc_path)
+    headers = cbc.read_cbc_headers(cbc_path, uzf)
     cbc_content = {}
     for key, header_list in headers.items():
         # TODO: validate homogeneity of header_list, ndat consistent, nlist consistent etc.
-        if key == "flow-ja-face":
+        if key == "flow-ja-face" and not uzf:
             if flowja:
                 flowja, nm = cbc.open_face_budgets_as_flowja(
                     cbc_path, header_list, grb_content
