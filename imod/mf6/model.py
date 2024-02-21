@@ -485,7 +485,6 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         methods = self._get_unique_regridder_types()
         output_domain = self._get_regridding_domain(target_grid, methods)
-        new_model[self._get_diskey()]["idomain"] = output_domain
         new_model.mask_all_packages(output_domain)
         new_model.purge_empty_packages()
         if validate:
