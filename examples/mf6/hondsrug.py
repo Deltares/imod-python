@@ -614,9 +614,6 @@ simulation.create_time_discretization(
 #   describes how to add it to yours.
 
 modeldir = imod.util.temporary_directory()
-mask = deepcopy(simulation["GWF_1"].domain)
-mask.values[0,:,:] = 0
-simulation["GWF_1"].mask_all_packages(mask)
 simulation.write(modeldir, binary=False)
 simulation.run()
 
