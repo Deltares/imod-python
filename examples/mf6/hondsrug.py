@@ -21,8 +21,6 @@ In overview, the model features:
 # %% Import packages
 # We'll start with the usual imports, and an import from scipy.
 
-from copy import deepcopy
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd

@@ -4,6 +4,7 @@ import abc
 import collections
 import inspect
 import pathlib
+from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
 from typing import Optional, Tuple, Union
@@ -537,7 +538,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
     def _get_regridding_domain(
         self,
         target_grid: GridDataArray,
-        methods: defaultdictdict[RegridderType, list[str]],
+        methods: defaultdict[RegridderType, list[str]],
     ) -> GridDataArray:
         """
         This method computes the output-domain for a regridding operation by regridding idomain with

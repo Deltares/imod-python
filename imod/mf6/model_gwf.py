@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import defaultdict
 from typing import Optional
 
 import cftime
@@ -11,7 +12,6 @@ from imod.mf6.model import Modflow6Model, initialize_template
 from imod.mf6.regridding_utils import RegridderType
 from imod.typing import GridDataArray
 
-from collections import defaultdict
 
 class GroundwaterFlowModel(Modflow6Model):
     _mandatory_packages = ("npf", "ic", "oc", "sto")
