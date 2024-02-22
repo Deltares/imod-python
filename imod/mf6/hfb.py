@@ -4,7 +4,7 @@ import textwrap
 import typing
 from copy import deepcopy
 from enum import Enum
-from typing import Optional, Tuple
+from typing import TYPE_CHECKING, Optional, Tuple
 
 import cftime
 import numpy as np
@@ -23,10 +23,13 @@ from imod.schemata import EmptyIndexesSchema
 from imod.typing import GridDataArray
 from imod.util import MissingOptionalModule
 
-try:
+if TYPE_CHECKING:
     import geopandas as gpd
-except ImportError:
-    gpd = MissingOptionalModule("geopandas")
+else:
+    try:
+        import geopandas as gpd
+    except ImportError:
+        gpd = MissingOptionalModule("geopandas")
 
 try:
     import shapely
