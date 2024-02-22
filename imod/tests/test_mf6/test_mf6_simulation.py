@@ -2,6 +2,7 @@ import os
 import re
 import sys
 import textwrap
+from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
 from unittest import mock
@@ -19,7 +20,7 @@ from imod.mf6.simulation import get_models, get_packages
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo
 from imod.schemata import ValidationError
 from imod.typing.grid import zeros_like
-from copy import deepcopy
+
 
 def roundtrip(simulation, tmpdir_factory, name):
     # TODO: look at the values?

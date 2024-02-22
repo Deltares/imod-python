@@ -27,8 +27,6 @@ from imod.schemata import ValidationError
 from imod.typing import GridDataArray
 
 
-
-
 class Modflow6Model(collections.UserDict, abc.ABC):
     _mandatory_packages: Tuple[str, ...] = ()
     _model_id: Optional[str] = None
