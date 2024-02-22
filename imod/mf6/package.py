@@ -533,17 +533,39 @@ class Package(PackageBase, IPackage, abc.ABC):
         masked: Package
             The package with part masked.
         """
+
+        if any([d not in ["x", "y", "layer", "mesh2d_nFaces", "dx", "dy"] for d in domain.coords]):
+            raise ValueError("unexpected coordinate dimension in masking domain. At most, the mask array may have \"x\",\"y\",\"layer\" and/or  \"mesh2d_nFaces\" coordinates")
+
+        horizontal_dims = ["x", "y", "mesh2d_nFaces", "dx", "dy"]
+        vertical_dims = ["layer"]
+     
+
         masked = {}
+
+
         for var in self.dataset.data_vars.keys():
+            array_domain = domain
             da = self.dataset[var]
-            if self.skip_masking_dataarray(var):
+            if self.skip_masking_dataarray(var) or len(da.dims) == 0 or  set(da.coords).issubset(vertical_dims):
                 masked[var] = da
                 continue
-            if set(domain.dims).issubset(da.dims):
+
+
+            if any ([d in (horizontal_dims+vertical_dims) for d in da.coords]):
+                if len(da.dims) < len(da.coords):
+                    if "layer" in da.coords and "layer" not in da.dims:
+                        array_domain = domain.sel(layer = da.coords["layer"])
+                    if "layer" not in da.coords and "layer"  in array_domain.coords:
+                        array_domain = domain.isel(layer = 0)
+
                 if issubclass(da.dtype.type, numbers.Integral):
-                    masked[var] = da.where(domain > 0, other=0)
+                    if var == "idomain":
+                        masked[var] = da.where(array_domain > 0, other=array_domain)
+                    else:
+                        masked[var] = da.where(array_domain > 0, other=0)
                 elif issubclass(da.dtype.type, numbers.Real):
-                    masked[var] = da.where(domain > 0)
+                    masked[var] = da.where(array_domain > 0)
                 else:
                     raise TypeError(
                         f"Expected dtype float or integer. Received instead: {da.dtype}"
