@@ -42,7 +42,7 @@ examples = { cmd = [
 test_import = { cmd = [
     "python",
     "-c",
-    "'import imod'"
+    "import imod"
 ], depends_on = ["install_with_deps"]}
 pypi-publish = { cmd = "rm --recursive --force dist && python -m build && twine check dist/* && twine upload dist/*" }
 
