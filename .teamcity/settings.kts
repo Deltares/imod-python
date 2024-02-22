@@ -413,6 +413,9 @@ object Tests : BuildType({
     }
 
     dependencies {
+        snapshot(PipPython310) {
+            onDependencyFailure = FailureAction.FAIL_TO_START
+        }
         snapshot(Examples) {
             onDependencyFailure = FailureAction.FAIL_TO_START
         }
