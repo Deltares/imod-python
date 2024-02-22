@@ -40,9 +40,6 @@ class GroundwaterFlowModel(Modflow6Model):
     def _get_unique_regridder_types(self) -> defaultdict[RegridderType, list[str]]:
         """
         This function loops over the packages and  collects all regridder-types that are in use.
-        Differences in associated functions are ignored. It focusses only on the types. So if a
-        model uses both Overlap(mean) and Overlap(harmonic_mean), this function will return just one
-        Overlap regridder:  the first one found, in this case Overlap(mean)
         """
         methods: defaultdict = defaultdict(list)
         for pkg_name, pkg in self.items():
