@@ -38,7 +38,7 @@ dependencies = [
     "pandas",
     "pooch",
     "scipy",
-    "tomli >= 1.1.0 ; python_version < '3.11'",
+    "tomli >= 1.1.0",
     "tomli_w",
     "toolz",
     "tqdm",
