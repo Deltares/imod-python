@@ -545,7 +545,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         for var in self.dataset.data_vars.keys():
             array_domain = domain
             da = self.dataset[var]
-            if self.skip_masking_dataarray(var) or len(da.dims) == 0 or  set(da.coords).issubset(vertical_dims):
+            if self.skip_masking_dataarray(var) or len(da.dims) == 0 or  set(da.coords).issubset(["layer"]):
                 masked[var] = da
                 continue
 
