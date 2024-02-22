@@ -43,12 +43,14 @@ project {
     buildType(UnitTests)
     buildType(Examples)
     buildType(Tests)
+    buildType(PipPython310)
 
     template(GitHubIntegrationTemplate)
     template(LintTemplate)
     template(MyPyTemplate)
     template(UnitTestsTemplate)
     template(ExamplesTemplate)
+    template(PipPython310Template)
 
     features {
         buildTypeCustomChart {
@@ -117,6 +119,34 @@ object LintTemplate : Template({
                 workingDir = "imod-python"
                 scriptContent = """
                     pixi run --environment default --frozen lint 
+                """.trimIndent()
+                formatStderrAsError = true
+        }
+    }
+
+    requirements {
+        equals("env.OS", "Windows_NT")
+    }
+})
+
+object PipPython310Template : Template({
+    name = "PipPython310Template"
+
+    detectHangingBuilds = false
+
+    vcs {
+        root(DslContext.settingsRoot, "+:. => imod-python")
+
+        cleanCheckout = true
+    }
+
+    steps {
+        script {
+                name = "Pip install python 3.10"
+                id = "pip_install_py310"
+                workingDir = "imod-python"
+                scriptContent = """
+                    pixi run --environment py310 --frozen test_import
                 """.trimIndent()
                 formatStderrAsError = true
         }
@@ -275,6 +305,12 @@ object Lint : BuildType({
     name = "Lint"
 
     templates(LintTemplate, GitHubIntegrationTemplate)
+})
+
+object PipPython310 : BuildType({
+    name = "PipPython310"
+
+    templates(PipPython310Template, GitHubIntegrationTemplate)
 })
 
 object MyPy : BuildType({
