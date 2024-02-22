@@ -19,7 +19,7 @@ from imod.mf6.simulation import get_models, get_packages
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo
 from imod.schemata import ValidationError
 from imod.typing.grid import zeros_like
-
+from copy import deepcopy
 
 def roundtrip(simulation, tmpdir_factory, name):
     # TODO: look at the values?
@@ -474,6 +474,12 @@ class TestModflow6Simulation:
         # Act/Assert
         with pytest.raises(RuntimeError):
             _ = split_simulation.clip_box()
+
+    def test_deepcopy(
+        split_transient_twri_model
+    ):
+        # test  making a deepcopy will not crash 
+        _ = deepcopy( split_transient_twri_model)           
 
     @pytest.mark.usefixtures("split_transient_twri_model")
     def test_prevent_regrid_like_after_split(

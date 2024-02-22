@@ -15,7 +15,7 @@ from imod.typing import GridDataArray
 class GroundwaterFlowModel(Modflow6Model):
     _mandatory_packages = ("npf", "ic", "oc", "sto")
     _model_id = "gwf6"
-    _template = Modflow6Model._initialize_template("gwt-nam.j2")
+    _template = Modflow6Model._initialize_template("gwf-nam.j2")
 
     def __init__(
         self,

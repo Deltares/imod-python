@@ -441,10 +441,7 @@ def test_purge_empty_package(
 
 
 def test_deepcopy(
-    tmp_path: Path,
     unstructured_flow_model: GroundwaterFlowModel,
 ):
-    # test that purging leaves the non-empty packages in place
-    
-    npfcopy = deepcopy(unstructured_flow_model["npf"])
-    copy = deepcopy(unstructured_flow_model)
+    # test  making a deepcopy will not crash 
+    _ = deepcopy(unstructured_flow_model)

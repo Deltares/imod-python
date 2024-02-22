@@ -47,7 +47,6 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             self[k] = v
 
         self._options = {}
-        self._template = None
 
     def __setitem__(self, key, value):
         if len(key) > 16:
