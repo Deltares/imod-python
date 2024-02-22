@@ -12,7 +12,7 @@ import imod
 from imod.mf6 import Modflow6Simulation
 from imod.mf6.wel import Well
 from imod.typing.grid import zeros_like
-from  filecmp import dircmp
+
 
 @pytest.mark.usefixtures("transient_twri_model")
 @pytest.fixture(scope="function")

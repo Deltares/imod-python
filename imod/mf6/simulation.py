@@ -5,6 +5,7 @@ import copy
 import pathlib
 import subprocess
 import warnings
+from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable, DefaultDict, Iterable, Optional, Union, cast
 
@@ -15,7 +16,6 @@ import tomli
 import tomli_w
 import xarray as xr
 import xugrid as xu
-from copy import deepcopy
 
 import imod
 import imod.logging

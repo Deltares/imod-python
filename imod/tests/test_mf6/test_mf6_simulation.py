@@ -4,6 +4,7 @@ import sys
 import textwrap
 from copy import deepcopy
 from datetime import datetime
+from filecmp import dircmp
 from pathlib import Path
 from unittest import mock
 from unittest.mock import MagicMock
@@ -21,7 +22,7 @@ from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo
 from imod.schemata import ValidationError
 from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
 from imod.typing.grid import zeros_like
-from  filecmp import dircmp
+
 
 def roundtrip(simulation, tmpdir_factory, name):
     # TODO: look at the values?
