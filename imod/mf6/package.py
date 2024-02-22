@@ -537,9 +537,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         if any([d not in ["x", "y", "layer", "mesh2d_nFaces", "dx", "dy"] for d in domain.coords]):
             raise ValueError("unexpected coordinate dimension in masking domain. At most, the mask array may have \"x\",\"y\",\"layer\" and/or  \"mesh2d_nFaces\" coordinates")
 
-        horizontal_dims = ["x", "y", "mesh2d_nFaces"]
-        vertical_dims = ["layer"]
-     
+        spatial_dims = ["x", "y", "mesh2d_nFaces", "layer"]
 
         masked = {}
 
@@ -552,7 +550,7 @@ class Package(PackageBase, IPackage, abc.ABC):
                 continue
 
 
-            if any ([d in (horizontal_dims+vertical_dims) for d in da.coords]):
+            if any ([d in (spatial_dims) for d in da.coords]):
                 if len(da.dims) < len(da.coords):
                     if "layer" in da.coords and "layer" not in da.dims:
                         array_domain = domain.sel(layer = da.coords["layer"])
