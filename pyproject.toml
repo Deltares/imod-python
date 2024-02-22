@@ -38,6 +38,7 @@ dependencies = [
     "pandas",
     "pooch",
     "scipy",
+    "tomli >= 1.1.0 ; python_version < '3.11'",
     "tomli_w",
     "toolz",
     "tqdm",
@@ -62,7 +63,6 @@ all = [
     "rasterio >=1",
     "rioxarray",
     "shapely >=1.8",
-    "tomli >= 1.1.0 ; python_version < '3.11'",
     "zarr",
 ]
 
