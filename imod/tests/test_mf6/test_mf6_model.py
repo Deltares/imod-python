@@ -437,3 +437,14 @@ def test_purge_empty_package(
     unstructured_flow_model["hfb"] = imod.mf6.HorizontalFlowBarrierResistance(geometry)
     unstructured_flow_model.purge_empty_packages()
     assert original_nr_packages == len(unstructured_flow_model.items())
+
+
+
+def test_deepcopy(
+    tmp_path: Path,
+    unstructured_flow_model: GroundwaterFlowModel,
+):
+    # test that purging leaves the non-empty packages in place
+    
+    npfcopy = deepcopy(unstructured_flow_model["npf"])
+    copy = deepcopy(unstructured_flow_model)
