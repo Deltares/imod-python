@@ -146,6 +146,7 @@ object PipPython310Template : Template({
                 id = "pip_install_py310"
                 workingDir = "imod-python"
                 scriptContent = """
+                    pixi info
                     pixi run --environment py310 --frozen test_import
                 """.trimIndent()
                 formatStderrAsError = true
