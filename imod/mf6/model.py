@@ -32,7 +32,7 @@ from imod.typing import GridDataArray
 class Modflow6Model(collections.UserDict, abc.ABC):
     _mandatory_packages: Tuple[str, ...] = ()
     _model_id: Optional[str] = None
-
+    _template: Template
 
     @staticmethod
     def _initialize_template(name: str) -> Template:
