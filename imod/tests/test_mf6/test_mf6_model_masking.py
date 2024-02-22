@@ -5,6 +5,7 @@ from typing import Tuple
 import numpy as np
 import pytest
 import xarray as xr
+import xugrid as xu
 
 import imod
 from imod.mf6.model_gwf import GroundwaterFlowModel
@@ -16,7 +17,7 @@ def test_masked_model_validation_inactive_cell_pillar(
 ):
     # create mask from idomain. Deactivate the same cell in all layers
     mask = deepcopy(unstructured_flow_model.domain)
-    mask.loc[{"layer": 1, "mesh2d_nFaces": 23}] = 0
+    mask.loc[{"layer": 1, "mesh2d_nFaces": 23}] = -1
     mask.loc[{"layer": 2, "mesh2d_nFaces": 23}] = 0
     mask.loc[{"layer": 3, "mesh2d_nFaces": 23}] = 0
 
@@ -273,13 +274,3 @@ def test_mask_structured(tmp_path: Path, structured_flow_model: GroundwaterFlowM
     assert counts[0] == len(mask_cells)
     assert counts[1] == cell_count - len(mask_cells)
     assert_model_can_run( structured_flow_model, "dis", tmp_path )
-
-def test_mask_everything(
-    tmp_path: Path,
-    unstructured_flow_model: GroundwaterFlowModel,
-):      
-    mask = deepcopy(unstructured_flow_model.domain)
-    mask.values[:,:] = -1
-
-    with pytest.raises(ValueError):
-        unstructured_flow_model.mask_all_packages(mask)    

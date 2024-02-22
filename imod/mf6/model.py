@@ -506,10 +506,6 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         """
         if any([d not in ["x", "y", "layer", "mesh2d_nFaces", "dx", "dy"] for d in mask.coords]):
             raise ValueError("unexpected coordinate dimension in masking domain")
-        
-        if not np.any(mask.values > 0):
-            raise ValueError("That mask would deactivate the whole grid.")
-
 
         for pkgname, pkg in self.items():
             self[pkgname] = pkg.mask(mask)

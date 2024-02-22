@@ -1,6 +1,4 @@
-from copy import deepcopy
 from pathlib import Path
-from typing import Tuple
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -19,7 +17,6 @@ from imod.mf6.model_gwf import GroundwaterFlowModel
 from imod.mf6.package import Package
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
-from imod.tests.fixtures.mf6_modelrun_fixture import assert_model_can_run
 
 
 # Duplicate from test_mf6_dis.py
