@@ -44,7 +44,7 @@ class GroundwaterFlowModel(Modflow6Model):
         model uses both Overlap(mean) and Overlap(harmonic_mean), this function will return just one
         Overlap regridder:  the first one found, in this case Overlap(mean)
         """
-        methods= defaultdict(list)
+        methods: defaultdict = defaultdict(list)
         for pkg_name, pkg in self.items():
             if pkg.is_regridding_supported():
                 pkg_methods = pkg.get_regrid_methods()
