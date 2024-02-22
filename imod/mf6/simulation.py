@@ -15,6 +15,7 @@ import tomli
 import tomli_w
 import xarray as xr
 import xugrid as xu
+from copy import deepcopy
 
 import imod
 import imod.logging
@@ -999,7 +1000,7 @@ class Modflow6Simulation(collections.UserDict):
 
         new_simulation = imod.mf6.Modflow6Simulation(f"{self.name}_partioned")
         for package_name, package in {**original_packages}.items():
-            new_simulation[package_name] = package
+            new_simulation[package_name] = deepcopy(package)
 
         for model_name, model in original_models.items():
             solution_name = self.get_solution_name(model_name)

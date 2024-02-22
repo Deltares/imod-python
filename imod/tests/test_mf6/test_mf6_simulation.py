@@ -21,7 +21,7 @@ from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo
 from imod.schemata import ValidationError
 from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
 from imod.typing.grid import zeros_like
-
+from  filecmp import dircmp
 
 def roundtrip(simulation, tmpdir_factory, name):
     # TODO: look at the values?
@@ -126,6 +126,19 @@ def test_simulation_open_flow_budget(circle_model, tmp_path):
     ]
     assert isinstance(budget["chd"], xu.UgridDataArray)
 
+def test_write_circle_model_twice(circle_model, tmp_path):  
+    
+    simulation = circle_model
+
+    # write simulation, then write the simulation a second time
+    simulation.write(tmp_path/ "first_time", binary=False)
+    simulation.write(tmp_path/ "second_time", binary=False)
+
+    #check that text output is the same
+    diff = dircmp(tmp_path/"first_time", tmp_path/"second_time")
+    assert len(diff.diff_files) == 0
+    assert len(diff.left_only) == 0
+    assert len(diff.right_only) == 0    
 
 @pytest.mark.usefixtures("circle_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
