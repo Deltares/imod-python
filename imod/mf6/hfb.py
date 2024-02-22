@@ -7,9 +7,7 @@ from enum import Enum
 from typing import Optional, Tuple
 
 import cftime
-import geopandas as gpd
 import numpy as np
-import shapely.wkt
 import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
@@ -23,7 +21,17 @@ from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.grid import broadcast_to_full_domain
 from imod.schemata import EmptyIndexesSchema
 from imod.typing import GridDataArray
+from imod.util import MissingOptionalModule
 
+try:
+    import geopandas as gpd
+except ImportError:
+    gpd = MissingOptionalModule("geopandas")
+
+try:
+    import shapely
+except ImportError:
+    shapely = MissingOptionalModule("shapely")
 
 @typedispatch  # type: ignore[no-redef]
 def _derive_connected_cell_ids(
@@ -278,7 +286,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
     def __init__(
         self,
-        geometry: gpd.GeoDataFrame,
+        geometry: "gpd.GeoDataFrame",
         print_input: bool = False,
     ) -> None:
         dict_dataset = {"print_input": print_input}
@@ -293,7 +301,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         ] + self._get_vertical_variables()
 
     @property
-    def line_data(self) -> gpd.GeoDataFrame:
+    def line_data(self) -> "gpd.GeoDataFrame":
         variables_for_gdf = self._get_variable_names_for_gdf()
         return gpd.GeoDataFrame(
             self.dataset[variables_for_gdf].to_dataframe(),
@@ -301,7 +309,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         )
 
     @line_data.setter
-    def line_data(self, value: gpd.GeoDataFrame) -> None:
+    def line_data(self, value: "gpd.GeoDataFrame") -> None:
         variables_for_gdf = self._get_variable_names_for_gdf()
         self.dataset = self.dataset.merge(
             value.to_xarray(), overwrite_vars=variables_for_gdf, join="right"
@@ -721,7 +729,7 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
 
     def __init__(
         self,
-        geometry: gpd.GeoDataFrame,
+        geometry: "gpd.GeoDataFrame",
         print_input=False,
     ):
         super().__init__(geometry, print_input)
@@ -781,7 +789,7 @@ class LayeredHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierB
 
     def __init__(
         self,
-        geometry: gpd.GeoDataFrame,
+        geometry: "gpd.GeoDataFrame",
         print_input=False,
     ):
         super().__init__(geometry, print_input)
@@ -847,7 +855,7 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
 
     def __init__(
         self,
-        geometry: gpd.GeoDataFrame,
+        geometry: "gpd.GeoDataFrame",
         print_input=False,
     ):
         super().__init__(geometry, print_input)
@@ -912,7 +920,7 @@ class LayeredHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
 
     def __init__(
         self,
-        geometry: gpd.GeoDataFrame,
+        geometry: "gpd.GeoDataFrame",
         print_input=False,
     ):
         super().__init__(geometry, print_input)
@@ -997,7 +1005,7 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
 
     def __init__(
         self,
-        geometry: gpd.GeoDataFrame,
+        geometry: "gpd.GeoDataFrame",
         print_input=False,
     ):
         super().__init__(geometry, print_input)
@@ -1058,7 +1066,7 @@ class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
 
     def __init__(
         self,
-        geometry: gpd.GeoDataFrame,
+        geometry: "gpd.GeoDataFrame",
         print_input=False,
     ):
         super().__init__(geometry, print_input)
