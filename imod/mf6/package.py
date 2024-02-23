@@ -534,7 +534,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             The package with part masked.
         """
 
-        if any([d not in ["x", "y", "layer", "mesh2d_nFaces", "dx", "dy"] for d in domain.coords]):
+        if any([coord not in ["x", "y", "layer", "mesh2d_nFaces", "dx", "dy"] for coord in domain.coords]):
             raise ValueError("unexpected coordinate dimension in masking domain. At most, the mask array may have \"x\",\"y\",\"layer\" and/or  \"mesh2d_nFaces\" coordinates")
 
         spatial_dims = ["x", "y", "mesh2d_nFaces", "layer"]
