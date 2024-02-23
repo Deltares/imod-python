@@ -26,6 +26,7 @@ from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray
+from imod.typing.grid import ones_like
 
 
 def initialize_template(name: str) -> Template:
@@ -552,21 +553,12 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         regridder_collection = RegridderInstancesCollection(
             idomain, target_grid=target_grid
         )
-        included_in_all = None
-        for regriddertype, functionlist in methods.items():
-            for function in functionlist:
-                regridder = regridder_collection.get_regridder(
-                    regriddertype,
-                    function,
-                )
-                regridded_idomain = regridder.regrid(idomain)
-                if included_in_all is None:
-                    included_in_all = regridded_idomain
-                else:
-                    included_in_all = included_in_all.where(regridded_idomain.notnull())
-                    included_in_all = regridded_idomain.where(regridded_idomain <=0, other = included_in_all)
-        if included_in_all is None:
-            raise ValueError("No regridder is able to regrid the domain")
+        included_in_all = ones_like(target_grid)
+        regridders =[regridder_collection.get_regridder( regriddertype,function) for regriddertype, functionlist in methods.items() for function in functionlist]
+        for regridder in regridders:
+            regridded_idomain = regridder.regrid(idomain)
+            included_in_all = included_in_all.where(regridded_idomain.notnull())            
+            included_in_all = regridded_idomain.where(regridded_idomain <=0, other = included_in_all)
 
         new_idomain = included_in_all.where(included_in_all.notnull(), other=0)
         new_idomain = new_idomain.astype(int)
