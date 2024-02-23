@@ -43,6 +43,8 @@ project {
     buildType(UnitTests)
     buildType(Examples)
     buildType(PipPython310)
+    buildType(PipPython311)
+    buildType(PipPython312)
     buildType(Tests)
 
     template(GitHubIntegrationTemplate)
@@ -51,6 +53,8 @@ project {
     template(UnitTestsTemplate)
     template(ExamplesTemplate)
     template(PipPython310Template)
+    template(PipPython311Template)
+    template(PipPython312Template)
 
     features {
         buildTypeCustomChart {
@@ -326,6 +330,64 @@ object PipPython310Template : Template({
     }
 })
 
+object PipPython311Template : Template({
+    name = "PipPython311Template"
+
+    detectHangingBuilds = false
+
+    vcs {
+        root(DslContext.settingsRoot, "+:. => imod-python")
+
+        cleanCheckout = true
+    }
+
+    steps {
+        script {
+            name = "Pip install python 3.11"
+            id = "pip_install_py311"
+            workingDir = "imod-python"
+            scriptContent = """
+                    pixi info
+                    pixi run --environment py311 --frozen test_import
+                """.trimIndent()
+            formatStderrAsError = true
+        }
+    }
+
+    requirements {
+        equals("env.OS", "Windows_NT")
+    }
+})
+
+object PipPython312Template : Template({
+    name = "PipPython312Template"
+
+    detectHangingBuilds = false
+
+    vcs {
+        root(DslContext.settingsRoot, "+:. => imod-python")
+
+        cleanCheckout = true
+    }
+
+    steps {
+        script {
+            name = "Pip install python 3.12"
+            id = "pip_install_py312"
+            workingDir = "imod-python"
+            scriptContent = """
+                    pixi info
+                    pixi run --environment py312 --frozen test_import
+                """.trimIndent()
+            formatStderrAsError = true
+        }
+    }
+
+    requirements {
+        equals("env.OS", "Windows_NT")
+    }
+})
+
 object UnitTests : BuildType({
     name = "UnitTests"
 
@@ -380,6 +442,18 @@ object PipPython310 : BuildType({
     templates(PipPython310Template, GitHubIntegrationTemplate)
 })
 
+object PipPython311 : BuildType({
+    name = "PipPython311"
+
+    templates(PipPython311Template, GitHubIntegrationTemplate)
+})
+
+object PipPython312 : BuildType({
+    name = "PipPython312"
+
+    templates(PipPython312Template, GitHubIntegrationTemplate)
+})
+
 object Tests : BuildType({
     name = "Tests"
 
@@ -417,6 +491,12 @@ object Tests : BuildType({
         snapshot(PipPython310) {
             onDependencyFailure = FailureAction.FAIL_TO_START
         }
+        snapshot(PipPython311) {
+            onDependencyFailure = FailureAction.FAIL_TO_START
+        }
+        snapshot(PipPython312) {
+            onDependencyFailure = FailureAction.FAIL_TO_START
+        }
         snapshot(Examples) {
             onDependencyFailure = FailureAction.FAIL_TO_START
         }
@@ -440,12 +520,33 @@ object Nightly : Project({
     buildType(NightlyUnitTests)
     buildType(NightlyExamples)
     buildType(NightlyTests)
+    buildType(NightlyPipPython310)
+    buildType(NightlyPipPython311)
+    buildType(NightlyPipPython312)
 })
 
 object NightlyLint : BuildType({
     name = "Lint"
 
     templates(LintTemplate)
+})
+
+object NightlyPipPython310 : BuildType({
+    name = "PipPython310"
+
+    templates(PipPython310Template)
+})
+
+object NightlyPipPython311 : BuildType({
+    name = "PipPython311"
+
+    templates(PipPython311Template)
+})
+
+object NightlyPipPython312 : BuildType({
+    name = "PipPython312"
+
+    templates(PipPython312Template)
 })
 
 object NightlyMyPy : BuildType({
