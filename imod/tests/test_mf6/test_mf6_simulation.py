@@ -2,6 +2,7 @@ import os
 import re
 import sys
 import textwrap
+from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
 from unittest import mock
@@ -474,6 +475,12 @@ class TestModflow6Simulation:
         # Act/Assert
         with pytest.raises(RuntimeError):
             _ = split_simulation.clip_box()
+
+    def test_deepcopy(
+        split_transient_twri_model
+    ):
+        # test  making a deepcopy will not crash 
+        _ = deepcopy( split_transient_twri_model)           
 
     @pytest.mark.usefixtures("split_transient_twri_model")
     def test_prevent_regrid_like_after_split(
