@@ -503,6 +503,12 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         This function applies a mask to all packages in a model. The mask must
         be presented as an idomain-like integer array that has 0 or negative
         values in filtered cells and positive values in active cells
+        
+        Parameters
+        ----------
+        mask: xr.DataArray, xu.UgridDataArray of ints
+            idomain-like integer array. 1 sets cells to active, 0 sets cells to inactive, 
+            -1 sets cells to vertical passthrough
         """
         if any([coord not in ["x", "y", "layer", "mesh2d_nFaces", "dx", "dy"] for coord in mask.coords]):
             raise ValueError("unexpected coordinate dimension in masking domain")
