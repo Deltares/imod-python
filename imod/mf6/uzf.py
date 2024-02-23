@@ -358,7 +358,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         return uzf_number.shift(layer=-1, fill_value=0)
 
     def _package_data_to_sparse(self):
-        notnull = np.isfinite(self.dataset["landflag"].values)
+        notnull = self.dataset["landflag"].notnull().to_numpy()
         iuzno = self.dataset["iuzno"].values[notnull]
         landflag = self.dataset["landflag"].values[notnull]
         ivertcon = self.dataset["ivertcon"].values[notnull]
