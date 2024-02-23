@@ -516,7 +516,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         new.dataset = selection
         return new
 
-    def mask(self, domain: GridDataArray) -> Any:
+    def mask(self, mask: GridDataArray) -> Any:
         """
         Mask values outside of domain.
 
@@ -526,7 +526,7 @@ class Package(PackageBase, IPackage, abc.ABC):
 
         Parameters
         ----------
-        domain: xr.DataArray, xu.UgridDataArray of ints
+        mask: xr.DataArray, xu.UgridDataArray of ints
             idomain-like integer array. 1 sets cells to active, 0 sets cells to inactive, 
             -1 sets cells to vertical passthrough
 
@@ -536,50 +536,45 @@ class Package(PackageBase, IPackage, abc.ABC):
             The package with part masked.
         """
 
-        if any([coord not in ["x", "y", "layer", "mesh2d_nFaces", "dx", "dy"] for coord in domain.coords]):
-            raise ValueError("unexpected coordinate dimension in masking domain. At most, the mask array may have \"x\",\"y\",\"layer\" and/or  \"mesh2d_nFaces\" coordinates")
-
-        spatial_dims = ["x", "y", "mesh2d_nFaces", "layer"]
-
         masked = {}
-
-
         for var in self.dataset.data_vars.keys():
-            array_domain = domain
-            da = self.dataset[var]
-            if self.skip_masking_dataarray(var) or len(da.dims) == 0 or  set(da.coords).issubset(["layer"]):
-                masked[var] = da
-                continue
-
-
-            if any ([d in (spatial_dims) for d in da.coords]):
-                if len(da.dims) < len(da.coords):
-                    if "layer" in da.coords and "layer" not in da.dims:
-                        array_domain = domain.sel(layer = da.coords["layer"])
-                    if "layer" not in da.coords and "layer"  in array_domain.coords:
-                        array_domain = domain.isel(layer = 0)
-
-                if issubclass(da.dtype.type, numbers.Integral):
-                    if var == "idomain":
-                        masked[var] = da.where(array_domain > 0, other=array_domain)
-                    else:
-                        masked[var] = da.where(array_domain > 0, other=0)
-                elif issubclass(da.dtype.type, numbers.Real):
-                    masked[var] = da.where(array_domain > 0)
-                else:
-                    raise TypeError(
-                        f"Expected dtype float or integer. Received instead: {da.dtype}"
-                    )
+            if self._copy_variable_on_masking(var, self.dataset[var]):
+                masked[var] = self.dataset[var]
             else:
-                if da.values[()] is not None:
-                    if is_scalar(da.values[()]):
-                        masked[var] = da.values[()]  # For scalars, such as options
-                    else:  # For example for arrays with only a layer dimension
-                        masked[var] = da
-                else:
-                    masked[var] = None
+                masked[var] = self._mask_spatial_var(var, mask)
 
         return type(self)(**masked)
+
+    def _copy_variable_on_masking(self, var, da)->Any: 
+        if self.skip_masking_dataarray(var) or len(da.dims) == 0 or set(da.coords).issubset(["layer"]):
+            return True
+        if is_scalar(da.values[()]):
+            return True
+        spatial_dims = ["x", "y", "mesh2d_nFaces", "layer"]
+        if not np.any( [coord in spatial_dims for coord in da.coords]):
+            return True
+        return False
+
+    def _mask_spatial_var(self, var, domain):
+        da = self.dataset[var]
+        array_domain = domain
+        if len(da.dims) < len(da.coords):
+            if "layer" in da.coords and "layer" not in da.dims:
+                array_domain = domain.sel(layer=da.coords["layer"])
+            if "layer" not in da.coords and "layer" in array_domain.coords:
+                array_domain = domain.isel(layer=0)
+
+        if issubclass(da.dtype.type, numbers.Integral):
+            if var == "idomain":
+                return da.where(array_domain > 0, other=array_domain)
+            else:
+                return da.where(array_domain > 0, other=0)
+        elif issubclass(da.dtype.type, numbers.Real):
+            return da.where(array_domain > 0)
+        else:
+            raise TypeError(
+                f"Expected dtype float or integer. Received instead: {da.dtype}"
+            )
 
     def is_regridding_supported(self) -> bool:
         """
