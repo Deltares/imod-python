@@ -150,7 +150,7 @@ def test_mask_structured_xy_masks_across_all_layers(tmp_path: Path, structured_f
     mask = mask.drop_vars("layer")
     mask.values[*mask_cells] = 0
 
-    cell_count = len(structured_flow_model.domain.x)*len(structured_flow_model.domain.y)*len(structured_flow_model.domain.layer)
+    cell_count = structured_flow_model.domain.size
     
     # Act    
     structured_flow_model.mask_all_packages( mask)
