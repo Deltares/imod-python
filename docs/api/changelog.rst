@@ -14,6 +14,9 @@ Fixed
 - Add missing required dependencies for installing with ``pip``: loguru and tomli.
 - Ensure geopandas and shapely are optional dependencies again when
   installing with ``pip``, and no import errors are thrown.
+- Fixed bug where calling ``copy.deepcopy`` on
+  :class:`imod.mf6.Modflow6Simulation`, :class:`imod.mf6.GroundwaterFlowModel`
+  and :class:`imod.mf6.GroundwaterTransportModel` objects threw an error.
 
 Added
 ~~~~~
