@@ -30,6 +30,10 @@ Added
   :meth:`imod.mf6.Modflow6Simulation.open_transport_budget` support opening
   split multi-species simulations.
 
+Fixed
+~~~~~
+- :meth'`imod.mf6.Modflow6Simulation.write` failed after splitting the simulation. This has been fixed. 
+
 [0.15.2] - 2024-02-16
 ---------------------
 
