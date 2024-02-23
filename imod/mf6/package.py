@@ -526,7 +526,9 @@ class Package(PackageBase, IPackage, abc.ABC):
 
         Parameters
         ----------
-        domain: xr.DataArray of integers. Preservers values where domain is larger than 0.
+        domain: xr.DataArray, xu.UgridDataArray of ints
+            idomain-like integer array. 1 sets cells to active, 0 sets cells to inactive, 
+            -1 sets cells to vertical passthrough
 
         Returns
         -------
