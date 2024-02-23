@@ -238,7 +238,28 @@ def test_split_dump(
     assert len(diff.left_only) == 0
     assert len(diff.right_only) == 0    
 
+@pytest.mark.usefixtures("transient_twri_model")
+@parametrize_with_cases("partition_array", cases=PartitionArrayCases.case_four_squares)
+def test_partitioning_write_after_split(
+    tmp_path: Path,
+    transient_twri_model: Modflow6Simulation,
+    partition_array: xr.DataArray,
+):
+    simulation = transient_twri_model
 
+    # write simulation before splitting, then split simulation, then write the simulation a second time
+    simulation.write(tmp_path/ "first_time", binary=False)
+
+    _ = simulation.split(partition_array)
+
+    simulation.write(tmp_path/ "second_time", binary=False)
+
+    #check that text output was not affected by splitting
+    diff = dircmp(tmp_path/"first_time", tmp_path/"second_time")
+    assert len(diff.diff_files) == 0
+    assert len(diff.left_only) == 0
+    assert len(diff.right_only) == 0    
+    
 @pytest.mark.usefixtures("transient_twri_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partitioning_structured_with_inactive_cells(

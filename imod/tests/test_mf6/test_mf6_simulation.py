@@ -4,6 +4,7 @@ import sys
 import textwrap
 from copy import deepcopy
 from datetime import datetime
+from filecmp import dircmp
 from pathlib import Path
 from unittest import mock
 from unittest.mock import MagicMock
@@ -126,6 +127,19 @@ def test_simulation_open_flow_budget(circle_model, tmp_path):
     ]
     assert isinstance(budget["chd"], xu.UgridDataArray)
 
+def test_write_circle_model_twice(circle_model, tmp_path):  
+    
+    simulation = circle_model
+
+    # write simulation, then write the simulation a second time
+    simulation.write(tmp_path/ "first_time", binary=False)
+    simulation.write(tmp_path/ "second_time", binary=False)
+
+    #check that text output is the same
+    diff = dircmp(tmp_path/"first_time", tmp_path/"second_time")
+    assert len(diff.diff_files) == 0
+    assert len(diff.left_only) == 0
+    assert len(diff.right_only) == 0    
 
 @pytest.mark.usefixtures("circle_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
