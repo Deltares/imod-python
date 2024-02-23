@@ -42,8 +42,8 @@ project {
     buildType(MyPy)
     buildType(UnitTests)
     buildType(Examples)
-    buildType(Tests)
     buildType(PipPython310)
+    buildType(Tests)
 
     template(GitHubIntegrationTemplate)
     template(LintTemplate)
@@ -119,35 +119,6 @@ object LintTemplate : Template({
                 workingDir = "imod-python"
                 scriptContent = """
                     pixi run --environment default --frozen lint 
-                """.trimIndent()
-                formatStderrAsError = true
-        }
-    }
-
-    requirements {
-        equals("env.OS", "Windows_NT")
-    }
-})
-
-object PipPython310Template : Template({
-    name = "PipPython310Template"
-
-    detectHangingBuilds = false
-
-    vcs {
-        root(DslContext.settingsRoot, "+:. => imod-python")
-
-        cleanCheckout = true
-    }
-
-    steps {
-        script {
-                name = "Pip install python 3.10"
-                id = "pip_install_py310"
-                workingDir = "imod-python"
-                scriptContent = """
-                    pixi info
-                    pixi run --environment py310 --frozen test_import
                 """.trimIndent()
                 formatStderrAsError = true
         }
@@ -308,12 +279,6 @@ object Lint : BuildType({
     templates(LintTemplate, GitHubIntegrationTemplate)
 })
 
-object PipPython310 : BuildType({
-    name = "PipPython310"
-
-    templates(PipPython310Template, GitHubIntegrationTemplate)
-})
-
 object MyPy : BuildType({
     name = "MyPy"
 
@@ -329,6 +294,35 @@ object MyPy : BuildType({
             comparison = BuildFailureOnMetric.MetricComparison.MORE
             compareTo = value()
         }
+    }
+})
+
+object PipPython310Template : Template({
+    name = "PipPython310Template"
+
+    detectHangingBuilds = false
+
+    vcs {
+        root(DslContext.settingsRoot, "+:. => imod-python")
+
+        cleanCheckout = true
+    }
+
+    steps {
+        script {
+            name = "Pip install python 3.10"
+            id = "pip_install_py310"
+            workingDir = "imod-python"
+            scriptContent = """
+                    pixi info
+                    pixi run --environment py310 --frozen test_import
+                """.trimIndent()
+            formatStderrAsError = true
+        }
+    }
+
+    requirements {
+        equals("env.OS", "Windows_NT")
     }
 })
 
@@ -378,6 +372,12 @@ object Examples : BuildType({
             onDependencyFailure = FailureAction.FAIL_TO_START
         }
     }
+})
+
+object PipPython310 : BuildType({
+    name = "PipPython310"
+
+    templates(PipPython310Template, GitHubIntegrationTemplate)
 })
 
 object Tests : BuildType({
