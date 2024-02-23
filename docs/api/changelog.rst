@@ -16,7 +16,7 @@ Added
 - An API package was added. It can be added to both flow and transport models, and its 
 presence allows users to interact with libMF6.dll through its API.
 - The :func:`imod.mf6.model.mask_all_packages` now also masks the idomain array
-  of the model discretizaion, and can be used with a mask array without a layer
+  of the model discretization, and can be used with a mask array without a layer
   dimension, to mask all layers the same way
 
 [0.15.2] - 2024-02-16
