@@ -259,7 +259,7 @@ def test_mask_structured(tmp_path: Path, structured_flow_model: GroundwaterFlowM
         validate=True,
     )
     structured_flow_model["well"] = well
-    cell_count = len(structured_flow_model.domain.x)*len(structured_flow_model.domain.y)*len(structured_flow_model.domain.layer)
+    cell_count = structured_flow_model.domain.size
 
     mask = deepcopy(structured_flow_model.domain)
     for cell in mask_cells:
