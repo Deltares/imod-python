@@ -227,7 +227,6 @@ def open_cbc(
     flowja: bool = False,
     simulation_start_time: Optional[np.datetime64] = None,
     time_unit: Optional[str] = "d",
-    uzf: bool = False,
 ) -> Dict[str, Union[xr.DataArray, xu.UgridDataArray]]:
     """
     Open modflow6 cell-by-cell (.cbc) file.

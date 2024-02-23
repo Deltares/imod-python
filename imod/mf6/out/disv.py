@@ -243,6 +243,8 @@ def open_imeth6_budgets(
     cbc_path: str, pathlib.Path
     grb_content: dict
     header_list: List[Imeth1Header]
+    return_variable: str
+    return_id: np.ndarray | None
 
     Returns
     -------
@@ -464,13 +466,12 @@ def open_cbc(
     flowja: bool = False,
     simulation_start_time: Optional[np.datetime64] = None,
     time_unit: Optional[str] = "d",
-    advanced_package: bool = False,
 ) -> Dict[str, xu.UgridDataArray]:
-    headers = cbc.read_cbc_headers(cbc_path, advanced_package)
-    # For advanced packages the id2 column of variable gwf contains the MF6 id's.
-    # Get id's eager from first stress period.
+    headers = cbc.read_cbc_headers(cbc_path)
     return_id = None
-    if advanced_package:
+    if 'gwf' in headers.keys():
+        # For advanced packages the id2 column of variable gwf contains the MF6 id's.
+        # Get id's eager from first stress period.
         header = headers['gwf'][0]
         dtype = np.dtype(
             [("id1", np.int32), ("id2", np.int32), ("budget", np.float64)]
@@ -480,7 +481,7 @@ def open_cbc(
         return_id = table["id2"] - 1  # Convert to 0 based index
     cbc_content = {}
     for key, header_list in headers.items():
-        if key == "flow-ja-face" and not advanced_package:
+        if key == "flow-ja-face" and isinstance(header_list[0], cbc.Imeth1Header):
             if flowja:
                 flowja, ij = cbc.open_face_budgets_as_flowja(
                     cbc_path, header_list, grb_content
