@@ -538,14 +538,14 @@ class Package(PackageBase, IPackage, abc.ABC):
 
         masked = {}
         for var in self.dataset.data_vars.keys():
-            if self._copy_variable_on_masking(var, self.dataset[var]):
+            if self._is_copy_variable_on_masking(var, self.dataset[var]):
                 masked[var] = self.dataset[var]
             else:
                 masked[var] = self._mask_spatial_var(var, mask)
 
         return type(self)(**masked)
 
-    def _copy_variable_on_masking(self, var, da)->Any: 
+    def _is_copy_variable_on_masking(self, var: str, da: GridDataArray)->bool: 
         if self.skip_masking_dataarray(var) or len(da.dims) == 0 or set(da.coords).issubset(["layer"]):
             return True
         if is_scalar(da.values[()]):
@@ -555,22 +555,22 @@ class Package(PackageBase, IPackage, abc.ABC):
             return True
         return False
 
-    def _mask_spatial_var(self, var, domain):
+    def _mask_spatial_var(self, var: str, mask: GridDataArray)->GridDataArray:
         da = self.dataset[var]
-        array_domain = domain
+        array_mask = mask
         if len(da.dims) < len(da.coords):
             if "layer" in da.coords and "layer" not in da.dims:
-                array_domain = domain.sel(layer=da.coords["layer"])
-            if "layer" not in da.coords and "layer" in array_domain.coords:
-                array_domain = domain.isel(layer=0)
+                array_mask = mask.sel(layer=da.coords["layer"])
+            if "layer" not in da.coords and "layer" in array_mask.coords:
+                array_mask = mask.isel(layer=0)
 
         if issubclass(da.dtype.type, numbers.Integral):
             if var == "idomain":
-                return da.where(array_domain > 0, other=array_domain)
+                return da.where(array_mask > 0, other=array_mask)
             else:
-                return da.where(array_domain > 0, other=0)
+                return da.where(array_mask > 0, other=0)
         elif issubclass(da.dtype.type, numbers.Real):
-            return da.where(array_domain > 0)
+            return da.where(array_mask > 0)
         else:
             raise TypeError(
                 f"Expected dtype float or integer. Received instead: {da.dtype}"
