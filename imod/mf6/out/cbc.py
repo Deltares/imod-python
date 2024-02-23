@@ -269,6 +269,7 @@ def read_imeth6_budgets_dense(
     size: int,
     shape: tuple,
     return_variable: str,
+    return_id: np.ndarray | None
 ) -> FloatArray:
     """
     Read the data for an imeth==6 budget section.
@@ -296,8 +297,9 @@ def read_imeth6_budgets_dense(
     Three-dimensional array of floats
     """
     # Allocates a dense array for the entire domain
-    out = np.zeros(size, dtype=np.float64)
+    out = np.full(size, np.nan, dtype=np.float64)
     table = read_imeth6_budgets(cbc_path, count, dtype, pos)
-    id1 = table["id1"] - 1  # Convert to 0 based index
-    out[id1] = table[return_variable]
+    if return_id is None:
+        return_id = table["id1"] - 1  # Convert to 0 based index
+    out[return_id] = table[return_variable]
     return out.reshape(shape)
