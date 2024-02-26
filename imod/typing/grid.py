@@ -272,7 +272,7 @@ def is_spatial_2D(_: object) -> bool:
 
 @typedispatch
 def is_equal(array1: xu.UgridDataArray, array2: xu.UgridDataArray)->bool:
-    return array1.equals(array2) and array2.ugrid.grid.equals(array1.ugrid.grid)
+    return array1.equals(array2) and array1.ugrid.grid.equals(array2.ugrid.grid)
 
 @typedispatch
 def is_equal(array1: xr.DataArray, array2: xr.DataArray)->bool:
