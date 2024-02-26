@@ -1,6 +1,6 @@
 from __future__ import annotations
-from filecmp import dircmp
 
+from filecmp import dircmp
 from pathlib import Path
 
 import geopandas as gpd
