@@ -32,6 +32,12 @@ class PartitionArrayCases:
         three_parts.values[144:] = 2
         return three_parts
 
+    def case_concentric(self, idomain_top) -> xu.UgridDataArray:
+        centroids = idomain_top.ugrid.grid.centroids
+        dist = np.sqrt( centroids[:,0]* centroids[:,0] +  centroids[:,1]* centroids[:,1])
+        concentric = zeros_like(idomain_top)
+        concentric.values =  np.where(dist < 500, 0, 1)
+        return  concentric 
 
 class WellCases:
     def case_one_well(self):
@@ -131,6 +137,7 @@ class HorizontalFlowBarrierCases:
 def test_partitioning_unstructured(
     tmp_path: Path, circle_model: Modflow6Simulation, partition_array: xu.UgridDataArray
 ):
+    # %%
     simulation = circle_model
     # Increase the recharge to make the head gradient more pronounced.
     simulation["GWF_1"]["rch"]["rate"] *= 100
@@ -157,11 +164,13 @@ def test_partitioning_unstructured(
 
     # Partition the simulation, run it, and save the (merged) results.
     split_simulation = simulation.split(partition_array)
+    partition_array.to_netcdf("label_array.nc")
 
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()
-
+    # %%
     head = split_simulation.open_head(simulation_start_time="01-01-1999", time_unit="d")
+    head = head.reindex_like(original_head, "nearest", 1e-5)
     assert head.coords["time"].dtype == np.dtype("datetime64[ns]")
 
     cbc = split_simulation.open_flow_budget(
