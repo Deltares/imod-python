@@ -538,14 +538,14 @@ class Package(PackageBase, IPackage, abc.ABC):
 
         masked = {}
         for var in self.dataset.data_vars.keys():
-            if self._is_copy_variable_on_masking(var, self.dataset[var]):
+            if self.is_eligible_for_copying(var, self.dataset[var]):
                 masked[var] = self.dataset[var]
             else:
                 masked[var] = self._mask_spatial_var(var, mask)
 
         return type(self)(**masked)
 
-    def _is_copy_variable_on_masking(self, var: str, da: GridDataArray)->bool: 
+    def is_eligible_for_copying(self, var: str, da: GridDataArray)->bool: 
         if self.skip_masking_dataarray(var) or len(da.dims) == 0 or set(da.coords).issubset(["layer"]):
             return True
         if is_scalar(da.values[()]):
@@ -557,12 +557,7 @@ class Package(PackageBase, IPackage, abc.ABC):
 
     def _mask_spatial_var(self, var: str, mask: GridDataArray)->GridDataArray:
         da = self.dataset[var]
-        array_mask = mask
-        if len(da.dims) < len(da.coords):
-            if "layer" in da.coords and "layer" not in da.dims:
-                array_mask = mask.sel(layer=da.coords["layer"])
-            if "layer" not in da.coords and "layer" in array_mask.coords:
-                array_mask = mask.isel(layer=0)
+        array_mask = self._adjust_mask_for_unlayered_data(da, mask)
 
         if issubclass(da.dtype.type, numbers.Integral):
             if var == "idomain":
@@ -575,6 +570,17 @@ class Package(PackageBase, IPackage, abc.ABC):
             raise TypeError(
                 f"Expected dtype float or integer. Received instead: {da.dtype}"
             )
+
+    def _adjust_mask_for_unlayered_data(self, da: GridDataArray, mask: GridDataArray)->GridDataArray:
+        '''
+        some arrays are not layered while the mask is layered (for example the top array in dis or disv packaged)
+        In that case we use the top layer of the mask to perform the masking. 
+        '''
+        array_mask  = mask
+        if "layer" not in da.coords and "layer" in array_mask.coords:
+            array_mask = mask.isel(layer=0)
+
+        return array_mask              
 
     def is_regridding_supported(self) -> bool:
         """
