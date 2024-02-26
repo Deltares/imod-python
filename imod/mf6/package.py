@@ -573,7 +573,7 @@ class Package(PackageBase, IPackage, abc.ABC):
 
     def _adjust_mask_for_unlayered_data(self, da: GridDataArray, mask: GridDataArray)->GridDataArray:
         '''
-        some arrays are not layered while the mask is layered (for example the top array in dis or disv packaged)
+        Some arrays are not layered while the mask is layered (for example the top array in dis or disv packaged).
         In that case we use the top layer of the mask to perform the masking. 
         '''
         array_mask  = mask
