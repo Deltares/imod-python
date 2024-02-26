@@ -573,10 +573,15 @@ class Package(PackageBase, IPackage, abc.ABC):
 
     def _adjust_mask_for_unlayered_data(self, da: GridDataArray, mask: GridDataArray)->GridDataArray:
         '''
-        Some arrays are not layered while the mask is layered (for example the top array in dis or disv packaged).
-        In that case we use the top layer of the mask to perform the masking. 
+        Some arrays are not layered while the mask is layered (for example the
+        top array in dis or disv packaged). In that case we use the top layer of
+        the mask to perform the masking. If layer is not a dataset dimension,
+        but still a dataset coordinate, we limit the mask to the relevant layer
+        coordinate(s). 
         '''
         array_mask  = mask
+        if "layer" in da.coords and "layer" not in da.dims:
+            array_mask = mask.sel(layer=da.coords["layer"])        
         if "layer" not in da.coords and "layer" in array_mask.coords:
             array_mask = mask.isel(layer=0)
 
