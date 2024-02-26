@@ -3,7 +3,6 @@ from __future__ import annotations
 from copy import deepcopy
 
 import numpy as np
-import shapely
 import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
@@ -14,6 +13,12 @@ from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.utilities.grid import get_active_domain_slice
 from imod.typing import GridDataArray
 from imod.typing.grid import bounding_polygon, is_spatial_2D
+from imod.util import MissingOptionalModule
+
+try:
+    import shapely
+except ImportError:
+    shapely = MissingOptionalModule("shapely")
 
 
 @typedispatch

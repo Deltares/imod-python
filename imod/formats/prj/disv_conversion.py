@@ -2,6 +2,7 @@
 Most of the functionality here attempts to replicate what iMOD does with
 project files.
 """
+from __future__ import annotations
 
 import itertools
 import pickle
@@ -24,11 +25,6 @@ try:
     import geopandas as gpd
 except ImportError:
     gpd = imod.util.MissingOptionalModule("geopandas")
-
-try:
-    import shapely
-except ImportError:
-    shapely = imod.util.MissingOptionalModule("shapely")
 
 
 def hash_xy(da: xr.DataArray) -> Tuple[int]:

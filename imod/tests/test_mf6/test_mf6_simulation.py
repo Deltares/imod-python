@@ -409,6 +409,12 @@ class TestModflow6Simulation:
         with pytest.raises(RuntimeError):
             _ = split_simulation.clip_box()
 
+    def test_deepcopy(
+        split_transient_twri_model
+    ):
+        # test  making a deepcopy will not crash 
+        _ = deepcopy( split_transient_twri_model)           
+
     @pytest.mark.usefixtures("split_transient_twri_model")
     def test_prevent_regrid_like_after_split(
         self,

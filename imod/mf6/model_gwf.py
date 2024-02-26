@@ -7,7 +7,7 @@ import numpy as np
 
 from imod.mf6 import ConstantHead
 from imod.mf6.clipped_boundary_condition_creator import create_clipped_boundary
-from imod.mf6.model import Modflow6Model, initialize_template
+from imod.mf6.model import Modflow6Model
 from imod.mf6.regridding_utils import RegridderType
 from imod.typing import GridDataArray
 
@@ -15,6 +15,7 @@ from imod.typing import GridDataArray
 class GroundwaterFlowModel(Modflow6Model):
     _mandatory_packages = ("npf", "ic", "oc", "sto")
     _model_id = "gwf6"
+    _template = Modflow6Model._initialize_template("gwf-nam.j2")
 
     def __init__(
         self,
@@ -34,7 +35,7 @@ class GroundwaterFlowModel(Modflow6Model):
             "newton": newton,
             "under_relaxation": under_relaxation,
         }
-        self._template = initialize_template("gwf-nam.j2")
+
 
     def _get_unique_regridder_types(self) -> dict[RegridderType, str]:
         """

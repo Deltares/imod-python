@@ -6,8 +6,17 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
-[Unreleased]
-------------
+[0.15.3] - 2024-02-22
+---------------------
+
+Fixed
+~~~~~
+- Add missing required dependencies for installing with ``pip``: loguru and tomli.
+- Ensure geopandas and shapely are optional dependencies again when
+  installing with ``pip``, and no import errors are thrown.
+- Fixed bug where calling ``copy.deepcopy`` on
+  :class:`imod.mf6.Modflow6Simulation`, :class:`imod.mf6.GroundwaterFlowModel`
+  and :class:`imod.mf6.GroundwaterTransportModel` objects threw an error.
 
 Changed
 ~~~~~~~
@@ -21,6 +30,8 @@ Added
   run code. Can be useful to plot data.
 - An API package was added. It can be added to both flow and transport models, and its 
   presence allows users to interact with libMF6.dll through its API.
+- Developer environment: Empty python 3.10, 3.11, 3.12 environments where pip
+  install and import imod can be tested. 
 - Added support for coupling a GroundwaterFlowModel and Transport Model i.c.w.
   the 6.4.3 release of MODFLOW. Using an older version of iMOD Python
   with this version of MODFLOW will result in an error.
