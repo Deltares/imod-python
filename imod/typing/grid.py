@@ -279,8 +279,13 @@ def is_equal(array1: xu.UgridDataArray, array2: xu.UgridDataArray)->bool:
         return False
 
     grid_dataset_1 = array1.ugrid.grid.to_dataset()
-    grid_dataset_2 = array2.ugrid.grid.to_dataset()       
-    return grid_dataset_1.equals(grid_dataset_2)
+    grid_dataset_2 = array2.ugrid.grid.to_dataset()   
+
+    old = grid_dataset_1.equals(grid_dataset_2)
+    other = array1.equals(array2)
+    if other != old:
+        return old
+    return old
 
 @typedispatch
 def is_equal(array1: xr.DataArray, array2: xr.DataArray)->bool:
