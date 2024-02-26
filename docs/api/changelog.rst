@@ -8,16 +8,33 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 [Unreleased]
 ------------
+Added
+~~~~~
+- The :func:`imod.mf6.model.mask_all_packages` now also masks the idomain array
+  of the model discretization, and can be used with a mask array without a layer
+  dimension, to mask all layers the same way
+
+
+[0.15.3] - 2024-02-22
+---------------------
+
+Fixed
+~~~~~
+- Add missing required dependencies for installing with ``pip``: loguru and tomli.
+- Ensure geopandas and shapely are optional dependencies again when
+  installing with ``pip``, and no import errors are thrown.
+- Fixed bug where calling ``copy.deepcopy`` on
+  :class:`imod.mf6.Modflow6Simulation`, :class:`imod.mf6.GroundwaterFlowModel`
+  and :class:`imod.mf6.GroundwaterTransportModel` objects threw an error.
 
 Added
 ~~~~~
 - Developer environment: Added pixi environment ``interactive`` to interactively
   run code. Can be useful to plot data.
 - An API package was added. It can be added to both flow and transport models, and its 
-presence allows users to interact with libMF6.dll through its API.
-- The :func:`imod.mf6.model.mask_all_packages` now also masks the idomain array
-  of the model discretization, and can be used with a mask array without a layer
-  dimension, to mask all layers the same way
+  presence allows users to interact with libMF6.dll through its API.
+- Developer environment: Empty python 3.10, 3.11, 3.12 environments where pip
+  install and import imod can be tested.
 
 [0.15.2] - 2024-02-16
 ---------------------

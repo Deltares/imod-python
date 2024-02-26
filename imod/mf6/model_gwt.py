@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from imod.mf6.model import Modflow6Model, initialize_template
+from imod.mf6.model import Modflow6Model
 
 
 class GroundwaterTransportModel(Modflow6Model):
@@ -13,6 +13,7 @@ class GroundwaterTransportModel(Modflow6Model):
 
     _mandatory_packages = ("mst", "dsp", "oc", "ic")
     _model_id = "gwt6"
+    _template = Modflow6Model._initialize_template("gwt-nam.j2")
 
     def __init__(
         self,
@@ -29,4 +30,3 @@ class GroundwaterTransportModel(Modflow6Model):
             "save_flows": save_flows,
         }
 
-        self._template = initialize_template("gwt-nam.j2")

@@ -29,15 +29,17 @@ from imod.typing import GridDataArray
 from imod.typing.grid import ones_like
 
 
-def initialize_template(name: str) -> Template:
-    loader = jinja2.PackageLoader("imod", "templates/mf6")
-    env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
-    return env.get_template(name)
-
-
 class Modflow6Model(collections.UserDict, abc.ABC):
     _mandatory_packages: Tuple[str, ...] = ()
     _model_id: Optional[str] = None
+    _template: Template
+
+    @staticmethod
+    def _initialize_template(name: str) -> Template:
+        loader = jinja2.PackageLoader("imod", "templates/mf6")
+        env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
+        return env.get_template(name)
+
 
     def __init__(self, **kwargs):
         collections.UserDict.__init__(self)
@@ -45,7 +47,6 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             self[k] = v
 
         self._options = {}
-        self._template = None
 
     def __setitem__(self, key, value):
         if len(key) > 16:
