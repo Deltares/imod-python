@@ -6,6 +6,15 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[Unreleased]
+------------
+
+Fixed
+~~~~~
+- Incorrect validation error ``data values found at nodata values of
+  idomain`` where boundary condition packages with a scalar coordinate, which is
+  not set as dimension. 
+
 [0.15.3] - 2024-02-22
 ---------------------
 
