@@ -538,14 +538,14 @@ class Package(PackageBase, IPackage, abc.ABC):
 
         masked = {}
         for var in self.dataset.data_vars.keys():
-            if self.is_eligible_for_copying(var, self.dataset[var]):
+            if self.is_does_not_need_masking(var, self.dataset[var]):
                 masked[var] = self.dataset[var]
             else:
                 masked[var] = self._mask_spatial_var(var, mask)
 
         return type(self)(**masked)
 
-    def is_eligible_for_copying(self, var: str, da: GridDataArray)->bool: 
+    def is_does_not_need_masking(self, var: str, da: GridDataArray)->bool: 
         if self.skip_masking_dataarray(var) or len(da.dims) == 0 or set(da.coords).issubset(["layer"]):
             return True
         if is_scalar(da.values[()]):
