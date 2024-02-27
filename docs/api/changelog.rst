@@ -6,6 +6,15 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[Unreleased]
+------------
+Added
+~~~~~
+- The :func:`imod.mf6.model.mask_all_packages` now also masks the idomain array
+  of the model discretization, and can be used with a mask array without a layer
+  dimension, to mask all layers the same way
+
+
 [0.15.3] - 2024-02-22
 ---------------------
 
@@ -25,8 +34,7 @@ Added
 - An API package was added. It can be added to both flow and transport models, and its 
   presence allows users to interact with libMF6.dll through its API.
 - Developer environment: Empty python 3.10, 3.11, 3.12 environments where pip
-  install and import imod can be tested. 
-
+  install and import imod can be tested.
 
 [0.15.2] - 2024-02-16
 ---------------------

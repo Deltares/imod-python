@@ -516,7 +516,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         new.dataset = selection
         return new
 
-    def mask(self, domain: GridDataArray) -> Any:
+    def mask(self, mask: GridDataArray) -> Any:
         """
         Mask values outside of domain.
 
@@ -526,38 +526,66 @@ class Package(PackageBase, IPackage, abc.ABC):
 
         Parameters
         ----------
-        domain: xr.DataArray of integers. Preservers values where domain is larger than 0.
+        mask: xr.DataArray, xu.UgridDataArray of ints
+            idomain-like integer array. 1 sets cells to active, 0 sets cells to inactive, 
+            -1 sets cells to vertical passthrough
 
         Returns
         -------
         masked: Package
             The package with part masked.
         """
+
         masked = {}
         for var in self.dataset.data_vars.keys():
-            da = self.dataset[var]
-            if self.skip_masking_dataarray(var):
-                masked[var] = da
-                continue
-            if set(domain.dims).issubset(da.dims):
-                if issubclass(da.dtype.type, numbers.Integral):
-                    masked[var] = da.where(domain > 0, other=0)
-                elif issubclass(da.dtype.type, numbers.Real):
-                    masked[var] = da.where(domain > 0)
-                else:
-                    raise TypeError(
-                        f"Expected dtype float or integer. Received instead: {da.dtype}"
-                    )
+            if self._skip_masking_variable(var, self.dataset[var]):
+                masked[var] = self.dataset[var]
             else:
-                if da.values[()] is not None:
-                    if is_scalar(da.values[()]):
-                        masked[var] = da.values[()]  # For scalars, such as options
-                    else:  # For example for arrays with only a layer dimension
-                        masked[var] = da
-                else:
-                    masked[var] = None
+                masked[var] = self._mask_spatial_var(var, mask)
 
         return type(self)(**masked)
+
+    def _skip_masking_variable(self, var: str, da: GridDataArray)->bool: 
+        if self._skip_masking_dataarray(var) or len(da.dims) == 0 or set(da.coords).issubset(["layer"]):
+            return True
+        if is_scalar(da.values[()]):
+            return True
+        spatial_dims = ["x", "y", "mesh2d_nFaces", "layer"]
+        if not np.any( [coord in spatial_dims for coord in da.coords]):
+            return True
+        return False
+
+    def _mask_spatial_var(self, var: str, mask: GridDataArray)->GridDataArray:
+        da = self.dataset[var]
+        array_mask = self._adjust_mask_for_unlayered_data(da, mask)
+
+        if issubclass(da.dtype.type, numbers.Integral):
+            if var == "idomain":
+                return da.where(array_mask > 0, other=array_mask)
+            else:
+                return da.where(array_mask > 0, other=0)
+        elif issubclass(da.dtype.type, numbers.Real):
+            return da.where(array_mask > 0)
+        else:
+            raise TypeError(
+                f"Expected dtype float or integer. Received instead: {da.dtype}"
+            )
+
+    def _adjust_mask_for_unlayered_data(self, da: GridDataArray, mask: GridDataArray)->GridDataArray:
+        '''
+        Some arrays are not layered while the mask is layered (for example the
+        top array in dis or disv packaged). In that case we use the top layer of
+        the mask to perform the masking. If layer is not a dataset dimension,
+        but still a dataset coordinate, we limit the mask to the relevant layer
+        coordinate(s). 
+        '''
+        array_mask  = mask
+        if "layer" in da.coords and "layer" not in da.dims:
+            array_mask = mask.sel(layer=da.coords["layer"])        
+        if "layer" not in da.coords and "layer" in array_mask.coords:
+            array_mask = mask.isel(layer=0)
+
+        return array_mask              
 
     def is_regridding_supported(self) -> bool:
         """
@@ -700,7 +728,7 @@ class Package(PackageBase, IPackage, abc.ABC):
 
         return self.__class__(**new_package_data)
 
-    def skip_masking_dataarray(self, array_name: str) -> bool:
+    def _skip_masking_dataarray(self, array_name: str) -> bool:
         if hasattr(self, "_skip_mask_arrays"):
             return array_name in self._skip_mask_arrays
         return False
