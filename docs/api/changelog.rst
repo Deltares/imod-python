@@ -8,6 +8,15 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 [Unreleased]
 ------------
+Fixed
+~~~~~
+- Fix issue where :func:`imod.idf.open_subdomains` and
+  :func:`imod.mf6.Modflow6Simulation.open_head` (for split simulations) would
+  return arrays with incorrect ``dx`` and ``dy`` coordinates for equidistant
+  data.
+- Fix issue where :func:`imod.idf.open_subdomains` returned a flipped ``dy``
+  coordinate for nonequidistant data.
+
 Added
 ~~~~~
 - The :func:`imod.mf6.model.mask_all_packages` now also masks the idomain array

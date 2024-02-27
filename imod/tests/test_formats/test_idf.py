@@ -158,6 +158,8 @@ def test_open_subdomains(subdomains, expected, equidistant, tmp_path):
 
     assert np.all(da["y"].values == expected_coords["y"])
     assert np.all(da["x"].values == expected_coords["x"])
+    assert np.all(da["dx"].values == dx)
+    assert np.all(da["dy"].values == dy)
 
     assert da.values.dtype == np.float32
 
@@ -200,6 +202,8 @@ def test_open_subdomains_species(subdomains, expected, equidistant, tmp_path):
 
     assert np.all(da["y"].values == expected_coords["y"])
     assert np.all(da["x"].values == expected_coords["x"])
+    assert np.all(da["dx"].values == dx)
+    assert np.all(da["dy"].values == dy)
 
     assert da.values.dtype == np.float32
 
