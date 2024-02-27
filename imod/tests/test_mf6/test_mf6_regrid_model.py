@@ -102,11 +102,11 @@ def test_regrid_unstructured_model_with_inactive_cells(
     inactivity_marker = 0  -> inactive cell
     inactivity_marker = -1 -> vertical passthrough cell
     """
-    inactive_cells = unstructured_flow_model.domain
+    inactive_cells = deepcopy(unstructured_flow_model.domain)
     inactive_cells.loc[{"layer": 1, "mesh2d_nFaces": 23}] = inactivity_marker
     inactive_cells.loc[{"layer": 3, "mesh2d_nFaces": 23}] = inactivity_marker
 
-    unstructured_flow_model["disv"]["idomain"] = inactive_cells
+    unstructured_flow_model.mask_all_packages( inactive_cells)
 
     finer_idomain = grid_data_unstructured(np.int32, 1, 0.4)
 

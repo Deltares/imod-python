@@ -69,7 +69,7 @@ class VerticesDiscretization(Package):
         "idomain": (RegridderType.OVERLAP, "mode"),
     }
 
-    _skip_mask_arrays = ["bottom", "idomain"]
+    _skip_mask_arrays = ["bottom"]
 
     def __init__(self, top, bottom, idomain, validate: bool = True):
         dict_dataset = {
