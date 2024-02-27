@@ -87,6 +87,9 @@ def align_other_obj_with_coords(obj: GridDataArray, other_obj: GridDataArray) ->
     for coordname in obj.coords.keys():
         if (coordname in other_obj.dims) and not (coordname in obj.dims):
             obj = obj.expand_dims(coordname)
+    # Note: 
+    # xr.align forces xu.UgridDataArray to xr.DataArray. Keep that in mind
+    # in further data processing.
     return xr.align(obj, other_obj, join="left")
 
 class ValidationError(Exception):
