@@ -318,7 +318,6 @@ object PipPython310Template : Template({
             id = "pip_install_py310"
             workingDir = "imod-python"
             scriptContent = """
-                    pixi info
                     pixi run --environment py310 --frozen test_import
                 """.trimIndent()
             formatStderrAsError = true
@@ -347,7 +346,6 @@ object PipPython311Template : Template({
             id = "pip_install_py311"
             workingDir = "imod-python"
             scriptContent = """
-                    pixi info
                     pixi run --environment py311 --frozen test_import
                 """.trimIndent()
             formatStderrAsError = true
@@ -376,7 +374,6 @@ object PipPython312Template : Template({
             id = "pip_install_py312"
             workingDir = "imod-python"
             scriptContent = """
-                    pixi info
                     pixi run --environment py312 --frozen test_import
                 """.trimIndent()
             formatStderrAsError = true
