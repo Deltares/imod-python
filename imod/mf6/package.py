@@ -538,15 +538,15 @@ class Package(PackageBase, IPackage, abc.ABC):
 
         masked = {}
         for var in self.dataset.data_vars.keys():
-            if self.is_does_not_need_masking(var, self.dataset[var]):
+            if self._skip_masking_variable(var, self.dataset[var]):
                 masked[var] = self.dataset[var]
             else:
                 masked[var] = self._mask_spatial_var(var, mask)
 
         return type(self)(**masked)
 
-    def is_does_not_need_masking(self, var: str, da: GridDataArray)->bool: 
-        if self.skip_masking_dataarray(var) or len(da.dims) == 0 or set(da.coords).issubset(["layer"]):
+    def _skip_masking_variable(self, var: str, da: GridDataArray)->bool: 
+        if self._skip_masking_dataarray(var) or len(da.dims) == 0 or set(da.coords).issubset(["layer"]):
             return True
         if is_scalar(da.values[()]):
             return True
@@ -728,7 +728,7 @@ class Package(PackageBase, IPackage, abc.ABC):
 
         return self.__class__(**new_package_data)
 
-    def skip_masking_dataarray(self, array_name: str) -> bool:
+    def _skip_masking_dataarray(self, array_name: str) -> bool:
         if hasattr(self, "_skip_mask_arrays"):
             return array_name in self._skip_mask_arrays
         return False
