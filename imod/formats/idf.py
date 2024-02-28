@@ -28,7 +28,7 @@ f_open = open
 
 def header(path, pattern):
     """Read the IDF header information into a dictionary"""
-    attrs = util.decompose(path, pattern)
+    attrs = util.path.decompose(path, pattern)
     with f_open(path, "rb") as f:
         reclen_id = struct.unpack("i", f.read(4))[0]  # Lahey RecordLength Ident.
         if reclen_id == 1271:
@@ -291,7 +291,7 @@ def open_subdomains(
         if not has_species:
             pattern = "{name}_{time}_l{layer}_p{subdomain}"
 
-    parsed = [util.decompose(path, pattern) for path in paths]
+    parsed = [util.path.decompose(path, pattern) for path in paths]
     grouped = defaultdict(list)
     for match, path in zip(parsed, paths):
         try:
@@ -367,7 +367,7 @@ def open_dataset(globpath, use_cftime=False, pattern=None):
         raise FileNotFoundError("Could not find any files matching {}".format(globpath))
     # group the DataArrays together using their name
     # note that directory names are ignored, and in case of duplicates, the last one wins
-    names = [util.decompose(path, pattern)["name"] for path in paths]
+    names = [util.path.decompose(path, pattern)["name"] for path in paths]
     unique_names = list(np.unique(names))
     d = {}
     for n in unique_names:
@@ -557,7 +557,7 @@ def save(path, a, nodata=1.0e20, pattern=None, dtype=np.float32):
     written, like the ``imod.idf.write`` function. This function is more general
     and also supports ``time`` and ``layer`` dimensions. It will split these up,
     give them their own filename according to the conventions in
-    ``imod.util.compose``, and write them each.
+    ``imod.util.path.compose``, and write them each.
 
     Parameters
     ----------

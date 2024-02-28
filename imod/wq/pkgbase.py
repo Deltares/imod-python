@@ -147,7 +147,7 @@ class Package(abc.ABC):
     def _compose_path(self, d, pattern=None):
         # d : dict
         # pattern : string or re.pattern
-        return util.compose(d, pattern).as_posix()
+        return util.path.compose(d, pattern).as_posix()
 
     def _compress_idflayers(self, values, range_path):
         """
@@ -270,13 +270,13 @@ class Package(abc.ABC):
             if idf and da["layer"].size == nlayer:
                 # Compose does not accept non-integers, so use 0, then replace
                 d["layer"] = 0
-                token_path = util.compose(d, pattern=pattern).as_posix()
+                token_path = util.path.compose(d, pattern=pattern).as_posix()
                 token_path = token_path.replace("_l0", "_l$")
                 values = {"$": token_path}
             elif idf and compress:
                 # Compose does not accept non-integers, so use 0, then replace
                 d["layer"] = 0
-                range_path = util.compose(d, pattern=pattern).as_posix()
+                range_path = util.path.compose(d, pattern=pattern).as_posix()
                 range_path = range_path.replace("_l0", "_l:")
                 values = self._compress_idflayers(values, range_path)
             elif compress:

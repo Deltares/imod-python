@@ -342,7 +342,7 @@ def read(path, kwargs={}, assoc_kwargs={}):
     else:
         dfs = []
         for p in paths:
-            layer = util.decompose(p).get("layer")
+            layer = util.path.decompose(p).get("layer")
             try:
                 df = _read(p, kwargs, assoc_kwargs)
             except Exception as e:
@@ -697,8 +697,8 @@ def save(path, df, itype=None, assoc_ext="txt", nodata=1.0e20, assoc_columns=Non
 
         for layer, group in df.groupby("layer"):
             d["layer"] = layer
-            fn = util.compose(d)
+            fn = util.path.compose(d)
             _compose_ipf(fn, group, itype, assoc_ext, nodata, assoc_columns)
     else:
-        fn = util.compose(d)
+        fn = util.path.compose(d)
         _compose_ipf(fn, df, itype, assoc_ext, nodata, assoc_columns)

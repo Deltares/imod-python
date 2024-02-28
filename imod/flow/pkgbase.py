@@ -206,7 +206,7 @@ class Package(
             Absolute path.
 
         """
-        return str(util.compose(d, pattern).resolve())
+        return str(util.path.compose(d, pattern).resolve())
 
     def _compose_values_layer(self, varname, directory, nlayer, time=None):
         """
