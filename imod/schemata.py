@@ -77,6 +77,21 @@ def scalar_None(obj):
         return (len(obj.shape) == 0) & (~obj.notnull()).all()
 
 
+def align_other_obj_with_coords(obj: GridDataArray, other_obj: GridDataArray) -> Tuple[xr.DataArray, xr.DataArray]:
+    """
+    Align other_obj with obj if coordname in obj but not in its dims.
+    Avoid issues like:
+    https://github.com/Deltares/imod-python/issues/830
+
+    """
+    for coordname in obj.coords.keys():
+        if (coordname in other_obj.dims) and not (coordname in obj.dims):
+            obj = obj.expand_dims(coordname)
+    # Note: 
+    # xr.align forces xu.UgridDataArray to xr.DataArray. Keep that in mind
+    # in further data processing.
+    return xr.align(obj, other_obj, join="left")
+
 class ValidationError(Exception):
     pass
 
@@ -560,6 +575,8 @@ class AllInsideNoDataSchema(NoDataComparisonSchema):
         other_obj = kwargs[self.other]
         valid = self.is_notnull(obj)
         other_valid = self.is_other_notnull(other_obj)
+
+        valid, other_valid = align_other_obj_with_coords(valid, other_obj)
 
         if (valid & ~other_valid).any():
             raise ValidationError(f"data values found at nodata values of {self.other}")
