@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any, Callable, DefaultDict, Iterable, Optional, Union, cast
 
 import cftime
+import dask
 import jinja2
 import numpy as np
 import tomli
@@ -44,9 +45,7 @@ from imod.typing.grid import (
     is_equal,
     is_unstructured,
     merge_partitions,
-    nan_like,
 )
-import dask
 
 OUTPUT_FUNC_MAPPING: dict[str, Callable] = {
     "head": open_hds,
