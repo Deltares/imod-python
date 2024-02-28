@@ -7,11 +7,11 @@ from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
+    CompatibleSettingsSchema,
+    DimsSchema,
     DTypeSchema,
     IdentityNoDataSchema,
     IndexesSchema,
-    CompatibleSettingsSchema,
-    DimsSchema
 )
 from imod.typing import GridDataArray
 

@@ -2,7 +2,13 @@ import numpy as np
 
 from imod.mf6.package import Package
 from imod.mf6.validation import PKG_DIMS_SCHEMA
-from imod.schemata import DTypeSchema, IdentityNoDataSchema, IndexesSchema, CompatibleSettingsSchema, DimsSchema
+from imod.schemata import (
+    CompatibleSettingsSchema,
+    DimsSchema,
+    DTypeSchema,
+    IdentityNoDataSchema,
+    IndexesSchema,
+)
 
 
 class Dispersion(Package):
