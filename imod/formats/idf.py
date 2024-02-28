@@ -18,7 +18,7 @@ from typing import Any
 import numpy as np
 import xarray as xr
 
-from imod import util
+import imod
 from imod.formats import array_io
 from imod.typing.structured import merge_partitions
 
@@ -286,7 +286,7 @@ def open_subdomains(
     if pattern is None:
         # If no pattern provided test if
         pattern = "{name}_c{species}_{time}_l{layer}_p{subdomain}"
-        re_pattern_species = util._custom_pattern_to_regex_pattern(pattern)
+        re_pattern_species = imod.util.path._custom_pattern_to_regex_pattern(pattern)
         has_species = re_pattern_species.search(paths[0])
         if not has_species:
             pattern = "{name}_{time}_l{layer}_p{subdomain}"
@@ -458,7 +458,7 @@ def write(path, a, nodata=1.0e20, dtype=np.float32):
         f.write(struct.pack(intformat, ncol))
         f.write(struct.pack(intformat, nrow))
 
-        dx, xmin, xmax, dy, ymin, ymax = util.spatial.spatial_reference(a)
+        dx, xmin, xmax, dy, ymin, ymax = imod.util.spatial.spatial_reference(a)
 
         f.write(struct.pack(floatformat, xmin))
         f.write(struct.pack(floatformat, xmax))
@@ -529,7 +529,7 @@ def _as_voxeldata(a):
 
             # It'll raise an Error if it cannot infer dz
             if "dz" not in a.coords:
-                dz, _, _ = util.spatial.coord_reference(a["z"])
+                dz, _, _ = imod.util.spatial.coord_reference(a["z"])
                 if isinstance(dz, float):
                     a = a.assign_coords(dz=dz)
                 else:
@@ -541,7 +541,7 @@ def _as_voxeldata(a):
                 if tuple(a["z"].indexes.keys()) == ("layer",):
                     if "dz" not in a.coords:
                         # It'll raise an Error if it cannot infer dz
-                        dz, _, _ = util.spatial.coord_reference(a["z"])
+                        dz, _, _ = imod.util.spatial.coord_reference(a["z"])
                         if isinstance(dz, float):
                             a = a.assign_coords(dz=dz)
                         else:

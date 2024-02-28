@@ -13,6 +13,7 @@ from typing import Dict
 import numpy as np
 import pandas as pd
 
+import imod
 from imod.util.imports import MissingOptionalModule
 from imod.formats import array_io
 
@@ -431,7 +432,7 @@ def write(path, da, driver=None, nodata=np.nan, dtype=None):
     if extradims:
         raise ValueError(f"Only x and y dimensions supported, found {da.dims}")
     # transform will be affine object in next xarray
-    profile["transform"] = util.spatial.transform(da)
+    profile["transform"] = imod.util.spatial.transform(da)
     profile["driver"] = driver
     profile["height"] = da.y.size
     profile["width"] = da.x.size

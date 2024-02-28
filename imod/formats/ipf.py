@@ -16,7 +16,7 @@ from typing import Tuple
 import numpy as np
 import pandas as pd
 
-from imod import util
+import imod
 
 
 def _infer_delimwhitespace(line, ncol):
