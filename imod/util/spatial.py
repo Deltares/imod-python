@@ -7,7 +7,7 @@ used internally, but are not private since they may be useful to users as well.
 
 import collections
 import re
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, Sequence, Tuple, Union
 
 import affine
 import numpy as np
