@@ -14,8 +14,8 @@ import numpy as np
 import pandas as pd
 
 import imod
-from imod.util.imports import MissingOptionalModule
 from imod.formats import array_io
+from imod.util.imports import MissingOptionalModule
 
 # since rasterio is a big dependency that is sometimes hard to install
 # and not always required, we made this an optional dependency

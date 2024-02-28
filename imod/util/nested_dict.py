@@ -2,6 +2,7 @@ import collections
 import functools
 from typing import Any, Dict, List
 
+
 def initialize_nested_dict(depth: int) -> collections.defaultdict:
     """
     Initialize a nested dict with a fixed depth

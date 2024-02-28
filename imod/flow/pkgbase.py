@@ -7,8 +7,8 @@ import numpy as np
 import xarray as xr
 
 import imod
-from imod.util.nested_dict import initialize_nested_dict, set_nested
 from imod.flow import timeutil
+from imod.util.nested_dict import initialize_nested_dict, set_nested
 
 
 class Package(

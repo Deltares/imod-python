@@ -45,8 +45,8 @@ import scipy.ndimage
 import tqdm
 import xarray as xr
 
-from imod.util.imports import MissingOptionalModule
 from imod.select import points_values
+from imod.util.imports import MissingOptionalModule
 
 try:
     import pyvista as pv

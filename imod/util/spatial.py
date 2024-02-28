@@ -6,16 +6,17 @@ used internally, but are not private since they may be useful to users as well.
 """
 
 import collections
-
+import re
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
-import numpy as np
+
 import affine
+import numpy as np
+import pandas as pd
 import xarray as xr
 import xugrid as xu
-import pandas as pd
-import re
 
-from imod.typing import FloatArray, IntArray, GridDataset
+from imod.typing import FloatArray, GridDataset, IntArray
+
 
 def _xycoords(bounds, cellsizes) -> Dict[str, Any]:
     """Based on bounds and cellsizes, construct coords with spatial information"""

@@ -1,8 +1,8 @@
 import datetime
-import dateutil
-import cftime
 import warnings
 
+import cftime
+import dateutil
 import numpy as np
 
 DATETIME_FORMATS = {

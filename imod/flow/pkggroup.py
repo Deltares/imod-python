@@ -4,7 +4,8 @@ import enum
 
 import imod.util as util
 from imod.flow.timeutil import insert_unique_package_times
-from imod.util.nested_dict import initialize_nested_dict, append_nested_dict
+from imod.util.nested_dict import append_nested_dict, initialize_nested_dict
+
 
 class PackageGroup(collections.UserDict, abc.ABC):
     """

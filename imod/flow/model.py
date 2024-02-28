@@ -11,11 +11,11 @@ import pandas as pd
 import xarray as xr
 
 import imod
-from imod.util.nested_dict import initialize_nested_dict, append_nested_dict
-from imod.util.time import _compose_timestring
 from imod.flow.pkgbase import BoundaryCondition
 from imod.flow.pkggroup import PackageGroups
 from imod.flow.timeutil import insert_unique_package_times
+from imod.util.nested_dict import append_nested_dict, initialize_nested_dict
+from imod.util.time import _compose_timestring
 
 # TODO: Merge time utilities, this is becoming a mess
 from imod.wq import timeutil

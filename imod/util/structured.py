@@ -4,7 +4,6 @@ import numpy as np
 import xarray as xr
 
 
-
 def where(condition, if_true, if_false, keep_nan: bool = True) -> xr.DataArray:
     """
     Wrapped version of xarray's ``.where``.

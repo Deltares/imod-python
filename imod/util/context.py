@@ -4,6 +4,7 @@ import pathlib
 import warnings
 from typing import Union
 
+
 @contextlib.contextmanager
 def ignore_warnings():
     """
