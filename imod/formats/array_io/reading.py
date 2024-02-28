@@ -152,7 +152,7 @@ def _initialize_groupby(ndims):
     -------
         groupby : Defaultdicts, ndims - 1 times nested
     """
-    return util.initialize_nested_dict(ndims - 1)
+    return util.nested_dict.initialize_nested_dict(ndims - 1)
 
 
 def _ndconcat(arrays, ndim):
@@ -180,7 +180,7 @@ def _ndconcat(arrays, ndim):
 
 def _dims_coordinates(header_coords, bounds, cellsizes, tops, bots, use_cftime):
     # create coordinates
-    coords = util._xycoords(bounds[0], cellsizes[0])
+    coords = util.spatial._xycoords(bounds[0], cellsizes[0])
     dims = ["y", "x"]
     # Time and layer have to be special cased.
     # Time due to the multitude of datetimes possible
@@ -196,7 +196,7 @@ def _dims_coordinates(header_coords, bounds, cellsizes, tops, bots, use_cftime):
             )
         elif dim == "time":
             hastime = True
-            times, use_cftime = util._convert_datetimes(
+            times, use_cftime = util.time._convert_datetimes(
                 header_coords["time"], use_cftime
             )
             if use_cftime:
@@ -315,8 +315,8 @@ def _load(paths, use_cftime, _read, headers):
         for path, attrs in zip(paths, headers):
             da, _ = _dask(path, attrs=attrs, _read=_read)
             groupbykeys = [attrs[k] for k in groupbydims]
-            util.set_nested(groupby, groupbykeys, da)
-        dask_arrays = util.sorted_nested_dict(groupby)
+            util.nested_dict.set_nested(groupby, groupbykeys, da)
+        dask_arrays = util.nested_dict.sorted_nested_dict(groupby)
         dask_array = _ndconcat(dask_arrays, ndim)
 
     out = xr.DataArray(dask_array, coords, dims, name=names[0])

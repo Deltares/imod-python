@@ -40,7 +40,7 @@ class IniFile(collections.UserDict, abc.ABC):
             if timekey in self.keys():
                 # If not string assume it is in some kind of datetime format
                 if type(self[timekey]) is not str:
-                    self[timekey] = util._compose_timestring(self[timekey])
+                    self[timekey] = util.path._compose_timestring(self[timekey])
 
     def render(self):
         self._format_datetimes()
@@ -311,7 +311,7 @@ class ImodflowModel(Model):
         )
         time_composed = dict(
             [
-                (timestep_nr, util._compose_timestring(time, time_format=time_format))
+                (timestep_nr, util.time._compose_timestring(time, time_format=time_format))
                 for timestep_nr, time in time_composed.items()
             ]
         )
@@ -333,7 +333,7 @@ class ImodflowModel(Model):
         time_format = "%d-%m-%Y %H:%M:%S"
         periods_composed = dict(
             [
-                (value, util._compose_timestring(time, time_format=time_format))
+                (value, util.time._compose_timestring(time, time_format=time_format))
                 for time, value in periods.items()
             ]
         )
@@ -352,7 +352,7 @@ class ImodflowModel(Model):
         bndkey = self._get_pkgkey("bnd")
         nlayer = self[bndkey]["layer"].size
 
-        composition = util.initialize_nested_dict(5)
+        composition = util.nested_dict.initialize_nested_dict(5)
 
         group_packages = self._group()
 
@@ -365,7 +365,7 @@ class ImodflowModel(Model):
                 globaltimes,
                 nlayer,
             )
-            util.append_nested_dict(composition, group_composition)
+            util.nested_dict.append_nested_dict(composition, group_composition)
 
         for key, package in self.items():
             if package._pkg_id not in group_pkg_ids:
@@ -374,7 +374,7 @@ class ImodflowModel(Model):
                     globaltimes,
                     nlayer,
                 )
-                util.append_nested_dict(composition, package_composition)
+                util.nested_dict.append_nested_dict(composition, package_composition)
 
         return composition
 

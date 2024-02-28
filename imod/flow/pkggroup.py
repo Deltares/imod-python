@@ -44,7 +44,7 @@ class PackageGroup(collections.UserDict, abc.ABC):
             # specified for different systems. This is uncommon practice.
             pkggroup_times = None
 
-        composition = util.initialize_nested_dict(5)
+        composition = util.nested_dict.initialize_nested_dict(5)
 
         for i, (key, pkg) in enumerate(self.items()):
             system_index = i + 1
@@ -55,7 +55,7 @@ class PackageGroup(collections.UserDict, abc.ABC):
                 system_index=system_index,
                 pkggroup_time=pkggroup_times,
             )
-            util.append_nested_dict(composition, composed_pkg)
+            util.nested_dict.append_nested_dict(composition, composed_pkg)
 
         return composition
 
