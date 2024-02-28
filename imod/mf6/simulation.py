@@ -46,6 +46,7 @@ from imod.typing.grid import (
     merge_partitions,
     nan_like,
 )
+import dask
 
 OUTPUT_FUNC_MAPPING: dict[str, Callable] = {
     "head": open_hds,
@@ -660,9 +661,6 @@ class Modflow6Simulation(collections.UserDict):
         unique_keys = set([key for cbc in cbc_per_partition for key in cbc.keys()])
         for cbc in cbc_per_partition:
             missing_keys = unique_keys - set(cbc.keys())
-            present_keys = unique_keys & set(cbc.keys())
-            first_present_key = next(iter(present_keys))
-
 
             for missing in missing_keys:
                 for cbc_search in cbc_per_partition:
@@ -673,8 +671,12 @@ class Modflow6Simulation(collections.UserDict):
                 for dim in dims:
                     current_partition_coords[dim] =  cbc.coords[dim]
                 
-                if cbc is xr.DataArray:
-                    cbc[missing] = xr.DataArray(dims = dims, coords= current_partition_coords)
+                if isinstance(cbc, xr.DataArray)  | isinstance(cbc, xr.Dataset) :
+                    shape = tuple([len(c) for  _, c in current_partition_coords.items()])
+                    values = dask.array.full(shape, np.nan)
+                    chunksize = tuple([1]) +  shape[1:]
+                    values = values.rechunk(chunksize)
+                    cbc[missing] = xr.DataArray(values, dims = dims, coords= current_partition_coords)
                 else:
                     cbc[missing] = xu.UgridDataArray(xr.DataArray(dims = dims, coords= current_partition_coords), grid=cbc.ugrid.grid,)
         return merge_partitions(cbc_per_partition)
