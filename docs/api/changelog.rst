@@ -26,6 +26,8 @@ Added
 - The :func:`imod.mf6.model.mask_all_packages` now also masks the idomain array
   of the model discretization, and can be used with a mask array without a layer
   dimension, to mask all layers the same way
+- Validation for incompatible settings in the :class:`imod.mf6.NodePropertyFlow`
+  and :class:`imod.mf6.Dispersion` packages.
 
 
 [0.15.3] - 2024-02-22
