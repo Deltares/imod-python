@@ -540,7 +540,7 @@ class BoundaryCondition(Package, abc.ABC):
                 pkggroup_times=pkggroup_time,
             )
             for keys, value in zip(keys_ls, values):
-                util.set_nested(composition, keys, value)
+                util.nested_dict.set_nested(composition, keys, value)
 
         return composition
 
