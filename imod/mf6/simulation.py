@@ -673,7 +673,7 @@ class Modflow6Simulation(collections.UserDict):
                 if isinstance(cbc, xr.DataArray)  | isinstance(cbc, xr.Dataset) :
                     shape = tuple([len(c) for  _, c in current_partition_coords.items()])
                     values = dask.array.full(shape, np.nan)
-                    chunksize = tuple([1]) +  shape[1:]
+                    chunksize = (1,) +  shape[1:]
                     values = values.rechunk(chunksize)
                     cbc[missing] = xr.DataArray(values, dims = dims, coords= current_partition_coords)
                 else:

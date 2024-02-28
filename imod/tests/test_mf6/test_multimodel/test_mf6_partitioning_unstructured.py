@@ -9,7 +9,6 @@ from pytest_cases import parametrize_with_cases
 
 import imod
 from imod.mf6 import Modflow6Simulation
-from imod.mf6.wel import Well
 from imod.typing.grid import zeros_like
 
 
