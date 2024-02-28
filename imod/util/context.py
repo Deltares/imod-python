@@ -12,7 +12,7 @@ def ignore_warnings():
 
     Examples
     --------
-    >>> with imod.util.ignore_warnings():
+    >>> with imod.util.context.ignore_warnings():
             function_that_throws_warnings()
 
     """
@@ -27,7 +27,7 @@ def cd(path: Union[str, pathlib.Path]):
 
     Examples
     --------
-    >>> with imod.util.cd("docs"):
+    >>> with imod.util.context.cd("docs"):
             do_something_in_docs()
 
     """
