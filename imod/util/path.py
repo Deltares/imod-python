@@ -6,13 +6,13 @@ automatically in :func:`imod.idf`.
 import pathlib
 import re
 import tempfile
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict
 import numpy as np
 
 import cftime
 import datetime
 
-from imod.util.time import to_datetime, _convert_datetimes, _compose_timestring
+from imod.util.time import to_datetime, _compose_timestring
 
 Pattern = re.Pattern
 
