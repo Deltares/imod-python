@@ -459,7 +459,7 @@ def save(path, a, driver=None, nodata=np.nan, pattern=None, dtype=None):
     written, like the ``imod.rasterio.write`` function. This function is more general
     and also supports ``time`` and ``layer`` and other dimensions. It will split these up,
     give them their own filename according to the conventions in
-    ``imod.imod.util.path.compose``, and write them each.
+    ``imod.util.path.compose``, and write them each.
 
     Parameters
     ----------

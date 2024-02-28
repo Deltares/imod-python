@@ -557,7 +557,7 @@ def save(path, a, nodata=1.0e20, pattern=None, dtype=np.float32):
     written, like the ``imod.idf.write`` function. This function is more general
     and also supports ``time`` and ``layer`` dimensions. It will split these up,
     give them their own filename according to the conventions in
-    ``imod.imod.util.path.compose``, and write them each.
+    ``imod.util.path.compose``, and write them each.
 
     Parameters
     ----------

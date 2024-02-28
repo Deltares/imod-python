@@ -1,6 +1,6 @@
 """
 Conventional IDF filenames can be understood and constructed using
-:func:`imod.imod.util.path.decompose` and :func:`imod.imod.util.path.compose`. These are used
+:func:`imod.util.path.decompose` and :func:`imod.util.path.compose`. These are used
 automatically in :func:`imod.idf`.
 """
 import pathlib
