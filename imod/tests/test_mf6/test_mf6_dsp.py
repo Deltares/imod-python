@@ -1,10 +1,13 @@
 import pathlib
+import re
 import textwrap
 
 import numpy as np
+import pytest
 import xarray as xr
 
 import imod
+from imod.schemata import ValidationError
 
 
 def test_dispersion_default():
@@ -34,13 +37,12 @@ def test_dispersion_default():
 def test_dispersion_options():
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
-    disp = imod.mf6.Dispersion(1e-4, 1.0, 10.0, 1.0, 2.0, 3.0, True, True)
+    disp = imod.mf6.Dispersion(1e-4, 1.0, 10.0, 1.0, 2.0, 3.0, True, False)
     actual = disp.render(directory, "dsp", globaltimes, True)
     expected = textwrap.dedent(
         """\
       begin options
         xt3d_off
-        xt3d_rhs
       end options
 
       begin griddata
@@ -62,6 +64,42 @@ def test_dispersion_options():
     assert actual == expected
 
 
+    disp = imod.mf6.Dispersion(1e-4, 1.0, 10.0, 1.0, 2.0, 3.0, False, True)
+    actual = disp.render(directory, "dsp", globaltimes, True)
+    expected = textwrap.dedent(
+        """\
+      begin options
+        xt3d_rhs
+      end options
+
+      begin griddata
+        diffc
+          constant 0.0001
+        alh
+          constant 1.0
+        ath1
+          constant 10.0
+        alv
+          constant 1.0
+        ath2
+          constant 2.0
+        atv
+          constant 3.0
+      end griddata"""
+    )
+
+    assert actual == expected
+
+def test_dispersion_erronous_options():
+    message = textwrap.dedent(
+        """
+        * xt3d_rhs
+        \t- Incompatible setting: xt3d_off should be False"""
+    )
+
+    with pytest.raises(ValidationError, match=re.escape(message)):
+      imod.mf6.Dispersion(1e-4, 1.0, 10.0, 1.0, 2.0, 3.0, xt3d_off=True, xt3d_rhs=True)
+
 def test_dispersion_layered():
     def layered(data):
         return xr.DataArray(data, {"layer": [1, 2, 3]}, ("layer",))
@@ -77,6 +115,7 @@ def test_dispersion_layered():
         transversal_vertical=layered([16.0, 17.0, 18.0]),
         xt3d_off=True,
         xt3d_rhs=True,
+        validate=False
     )
 
     actual = disp.render(directory, "dsp", globaltimes, True)
