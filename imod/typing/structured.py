@@ -140,6 +140,10 @@ def _unique_coords(das: List[xr.DataArray], dim: str) -> xr.DataArray:
     return np.unique(np.concatenate([da.coords[dim].values for da in das]))
 
 
+def _is_nonequidistant_coord(da: xr.DataArray, dim: str) -> bool:
+    return (dim in da.coords) and (da.coords[dim].size != 1)
+
+
 def _merge_nonequidistant_coords(
     das: List[xr.DataArray], coordname: str, indices: List[np.ndarray], nsize: int
 ):
@@ -174,10 +178,10 @@ def _merge_partitions(das: List[xr.DataArray]) -> xr.DataArray:
     coords = dict(first.coords)
     coords["x"] = x
     coords["y"] = y[::-1]
-    if "dx" in first.coords:
+    if _is_nonequidistant_coord(first, "dx"):
         coords["dx"] = ("x", _merge_nonequidistant_coords(das, "dx", ixs, ncol))
-    if "dy" in first.coords:
-        coords["dy"] = ("y", _merge_nonequidistant_coords(das, "dy", iys, nrow)[::-1])
+    if _is_nonequidistant_coord(first, "dy"):
+        coords["dy"] = ("y", _merge_nonequidistant_coords(das, "dy", iys, nrow))
 
     arrays = [da.data for da in das]
     if first.chunks is None:

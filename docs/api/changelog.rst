@@ -12,8 +12,14 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Fixed
 ~~~~~
 - Incorrect validation error ``data values found at nodata values of
-  idomain`` where boundary condition packages with a scalar coordinate, which is
+  idomain`` for boundary condition packages with a scalar coordinate
   not set as dimension.
+- Fix issue where :func:`imod.idf.open_subdomains` and
+  :func:`imod.mf6.Modflow6Simulation.open_head` (for split simulations) would
+  return arrays with incorrect ``dx`` and ``dy`` coordinates for equidistant
+  data.
+- Fix issue where :func:`imod.idf.open_subdomains` returned a flipped ``dy``
+  coordinate for nonequidistant data.
 
 Added
 ~~~~~
