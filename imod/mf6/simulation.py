@@ -662,9 +662,21 @@ class Modflow6Simulation(collections.UserDict):
             missing_keys = unique_keys - set(cbc.keys())
             present_keys = unique_keys & set(cbc.keys())
             first_present_key = next(iter(present_keys))
-            for missing in missing_keys:
-                cbc[missing] = nan_like(cbc[first_present_key], dtype=np.float64)
 
+
+            for missing in missing_keys:
+                for cbc_search in cbc_per_partition:
+                    if missing in cbc_search.keys():   
+                        dims = cbc_search[missing].dims
+                        break
+                current_partition_coords = {}
+                for dim in dims:
+                    current_partition_coords[dim] =  cbc.coords[dim]
+                
+                if cbc is xr.DataArray:
+                    cbc[missing] = xr.DataArray(dims = dims, coords= current_partition_coords)
+                else:
+                    cbc[missing] = xu.UgridDataArray(xr.DataArray(dims = dims, coords= current_partition_coords), grid=cbc.ugrid.grid,)
         return merge_partitions(cbc_per_partition)
 
     def _concat_species(
