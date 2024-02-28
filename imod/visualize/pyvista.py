@@ -45,7 +45,7 @@ import scipy.ndimage
 import tqdm
 import xarray as xr
 
-from imod import util
+from imod.util.imports import MissingOptionalModule
 from imod.select import points_values
 
 try:
@@ -55,8 +55,8 @@ try:
     if vtk.vtkVersion().GetVTKMajorVersion() < 9:
         raise ImportError("VTK version of 9.0 or higher required")
 except ImportError:
-    pv = util.MissingOptionalModule("pyvista")
-    vtk = util.MissingOptionalModule("vtk")
+    pv = MissingOptionalModule("pyvista")
+    vtk = MissingOptionalModule("vtk")
 
 
 def exterior(da, n):

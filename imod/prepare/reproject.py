@@ -3,7 +3,7 @@ import numpy as np
 import xarray as xr
 
 import imod
-from imod.util import MissingOptionalModule
+from imod.util.imports import MissingOptionalModule
 
 # since rasterio is a big dependency that is sometimes hard to install
 # and not always required, we made this an optional dependency

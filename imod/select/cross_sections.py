@@ -3,7 +3,7 @@ import numpy as np
 import xarray as xr
 
 import imod
-from imod.util import MissingOptionalModule
+from imod.util.imports import MissingOptionalModule
 
 try:
     import shapely.geometry as sg

@@ -16,6 +16,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.util.imports import MissingOptionalModule
 from imod.mf6.model import Modflow6Model
 from imod.mf6.utilities.package_utils import get_repeat_stress
 from imod.prepare.layer import get_upper_active_grid_cells
@@ -24,7 +25,7 @@ from imod.typing import GridDataArray
 try:
     import geopandas as gpd
 except ImportError:
-    gpd = imod.util.MissingOptionalModule("geopandas")
+    gpd = MissingOptionalModule("geopandas")
 
 
 def hash_xy(da: xr.DataArray) -> Tuple[int]:

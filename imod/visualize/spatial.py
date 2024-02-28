@@ -7,7 +7,7 @@ import pandas as pd
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import imod
-from imod.util import MissingOptionalModule
+from imod.util.imports import MissingOptionalModule
 from imod.visualize import common
 
 try:

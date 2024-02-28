@@ -13,7 +13,7 @@ from typing import Dict
 import numpy as np
 import pandas as pd
 
-from imod import util
+from imod.util.imports import MissingOptionalModule
 from imod.formats import array_io
 
 # since rasterio is a big dependency that is sometimes hard to install
@@ -21,7 +21,7 @@ from imod.formats import array_io
 try:
     import rasterio
 except ImportError:
-    rasterio = util.MissingOptionalModule("rasterio")
+    rasterio = MissingOptionalModule("rasterio")
 
 f_open = open
 
@@ -441,7 +441,7 @@ def write(path, da, driver=None, nodata=np.nan, dtype=None):
 
     # Allow writing ASCII grids even if rasterio isn't installed. This is
     # useful for e.g. MetaSWAP input.
-    if isinstance(rasterio, util.MissingOptionalModule) and driver == "AAIGrid":
+    if isinstance(rasterio, MissingOptionalModule) and driver == "AAIGrid":
         write_aaigrid(path, da.values, profile)
     else:
         with rasterio.Env():

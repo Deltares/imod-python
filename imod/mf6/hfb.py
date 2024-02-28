@@ -21,7 +21,7 @@ from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.grid import broadcast_to_full_domain
 from imod.schemata import EmptyIndexesSchema
 from imod.typing import GridDataArray
-from imod.util import MissingOptionalModule
+from imod.util.imports import MissingOptionalModule
 
 if TYPE_CHECKING:
     import geopandas as gpd
