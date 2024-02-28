@@ -35,7 +35,7 @@ from imod.schemata import (
 from imod.select.points import points_indices, points_values
 from imod.typing import GridDataArray
 from imod.typing.grid import is_spatial_2D, ones_like
-from imod.util import values_within_range
+from imod.util.structured import values_within_range
 
 
 def _assign_dims(arg: Any) -> Tuple | xr.DataArray:
