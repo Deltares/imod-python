@@ -2,7 +2,7 @@ import pathlib
 
 import xarray as xr
 
-from imod import util
+import imod
 
 
 def _write_chunks(a, pattern, d, nodata, dtype, write):
@@ -40,10 +40,10 @@ def _write_chunks(a, pattern, d, nodata, dtype, write):
                     a_yx = a_yx.squeeze("idf")
                 # set the right layer/timestep/etc in the dict to make the filename
                 d.update(dict(zip(extradims, coordvals)))
-                fn = util.path.compose(d, pattern)
+                fn = imod.util.path.compose(d, pattern)
                 write(fn, a_yx, nodata, dtype)
         else:
-            fn = util.path.compose(d, pattern)
+            fn = imod.util.path.compose(d, pattern)
             write(fn, a, nodata, dtype)
     else:  # recursive case
         for dim, chunksizes in zip(a.dims, a.chunks):
@@ -66,7 +66,7 @@ def _save(path, a, nodata, pattern, dtype, write):
     written, like the ``imod.idf.write`` function. This function is more general
     and also supports ``time`` and ``layer`` dimensions. It will split these up,
     give them their own filename according to the conventions in
-    ``imod.util.path.compose``, and write them each.
+    ``imod.imod.util.path.compose``, and write them each.
 
     Parameters
     ----------

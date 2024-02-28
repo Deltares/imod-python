@@ -149,11 +149,11 @@ class Well(BoundaryCondition):
             # Compose does not accept non-integers, so use 0, then replace
             d["layer"] = 0
             if np.unique(self.dataset["layer"].values).size == nlayer:
-                token_path = imod.util.path.compose(d).as_posix()
+                token_path = imod.imod.util.path.compose(d).as_posix()
                 token_path = token_path.replace("_l0", "_l$")
                 values = {"$": token_path}
             elif compress:
-                range_path = imod.util.path.compose(d).as_posix()
+                range_path = imod.imod.util.path.compose(d).as_posix()
                 range_path = range_path.replace("_l0", "_l:")
                 # TODO: temporarily disable until imod-wq is fixed
                 values = self._compress_idflayers(values, range_path)

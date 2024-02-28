@@ -4,7 +4,7 @@ import enum
 
 import imod.util as util
 from imod.flow.timeutil import insert_unique_package_times
-
+from imod.util.nested_dict import initialize_nested_dict, append_nested_dict
 
 class PackageGroup(collections.UserDict, abc.ABC):
     """
@@ -44,7 +44,7 @@ class PackageGroup(collections.UserDict, abc.ABC):
             # specified for different systems. This is uncommon practice.
             pkggroup_times = None
 
-        composition = util.nested_dict.initialize_nested_dict(5)
+        composition = initialize_nested_dict(5)
 
         for i, (key, pkg) in enumerate(self.items()):
             system_index = i + 1
@@ -55,7 +55,7 @@ class PackageGroup(collections.UserDict, abc.ABC):
                 system_index=system_index,
                 pkggroup_time=pkggroup_times,
             )
-            util.nested_dict.append_nested_dict(composition, composed_pkg)
+            append_nested_dict(composition, composed_pkg)
 
         return composition
 

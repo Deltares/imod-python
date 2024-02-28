@@ -60,28 +60,28 @@ def test_compose():
         "time": datetime.datetime(2018, 2, 22, 9, 6, 57),
         "species": 6,
     }
-    path = util.path.compose(d)
+    path = imod.util.path.compose(d)
     targetpath = pathlib.Path(d["directory"], "head_c6_20180222090657_l5.idf")
     assert path == targetpath
 
     d.pop("species")
-    path = util.path.compose(d)
+    path = imod.util.path.compose(d)
     targetpath = pathlib.Path(d["directory"], "head_20180222090657_l5.idf")
     assert path == targetpath
 
     d.pop("layer")
-    path = util.path.compose(d)
+    path = imod.util.path.compose(d)
     targetpath = pathlib.Path(d["directory"], "head_20180222090657.idf")
     assert path == targetpath
 
     d.pop("time")
     d["layer"] = 1
-    path = util.path.compose(d)
+    path = imod.util.path.compose(d)
     targetpath = pathlib.Path(d["directory"], "head_l1.idf")
     assert path == targetpath
 
     d["species"] = 6
-    path = util.path.compose(d)
+    path = imod.util.path.compose(d)
     targetpath = pathlib.Path(d["directory"], "head_c6_l1.idf")
     assert path == targetpath
 
@@ -96,26 +96,26 @@ def test_compose__pattern():
     targetpath = pathlib.Path(d["directory"], "head_2018-02-22_l05.foo")
 
     d["time"] = datetime.datetime(2018, 2, 22, 9, 6, 57)
-    path = util.path.compose(d, pattern="{name}_{time:%Y-%m-%d}_l{layer:02d}{extension}")
+    path = imod.util.path.compose(d, pattern="{name}_{time:%Y-%m-%d}_l{layer:02d}{extension}")
     assert path == targetpath
 
     d["time"] = cftime.DatetimeProlepticGregorian(2018, 2, 22, 9, 6, 57)
-    path = util.path.compose(d, pattern="{name}_{time:%Y-%m-%d}_l{layer:02d}{extension}")
+    path = imod.util.path.compose(d, pattern="{name}_{time:%Y-%m-%d}_l{layer:02d}{extension}")
     assert path == targetpath
 
     d["time"] = np.datetime64("2018-02-22 09:06:57")
-    path = util.path.compose(d, pattern="{name}_{time:%Y-%m-%d}_l{layer:02d}{extension}")
+    path = imod.util.path.compose(d, pattern="{name}_{time:%Y-%m-%d}_l{layer:02d}{extension}")
     assert path == targetpath
 
     targetpath = pathlib.Path(d["directory"], ".foo_makes_head_no_layer5_sense_day22")
-    path = util.path.compose(
+    path = imod.util.path.compose(
         d, pattern="{extension}_makes_{name}_no_layer{layer:d}_sense_day{time:%d}"
     )
     assert path == targetpath
 
 
 def test_decompose():
-    d = util.path.decompose("path/to/head_20180222090657_l5.idf")
+    d = imod.util.path.decompose("path/to/head_20180222090657_l5.idf")
     refd = {
         "extension": ".idf",
         "directory": pathlib.Path("path", "to"),
@@ -129,7 +129,7 @@ def test_decompose():
 
 
 def test_decompose_species():
-    d = util.path.decompose("path/to/conc_c3_20180222090657_l5.idf")
+    d = imod.util.path.decompose("path/to/conc_c3_20180222090657_l5.idf")
     refd = {
         "extension": ".idf",
         "species": 3,
@@ -144,7 +144,7 @@ def test_decompose_species():
 
 
 def test_decompose_short_date():
-    d = util.path.decompose("path/to/head_20180222_l5.idf")
+    d = imod.util.path.decompose("path/to/head_20180222_l5.idf")
     refd = {
         "extension": ".idf",
         "directory": pathlib.Path("path", "to"),
@@ -158,7 +158,7 @@ def test_decompose_short_date():
 
 
 def test_decompose_nonstandard_date():
-    d = util.path.decompose("path/to/head_2018-02-22_l5.idf")
+    d = imod.util.path.decompose("path/to/head_2018-02-22_l5.idf")
     refd = {
         "extension": ".idf",
         "directory": pathlib.Path("path", "to"),
@@ -172,7 +172,7 @@ def test_decompose_nonstandard_date():
 
 
 def test_decompose_only_year():
-    d = util.path.decompose("path/to/head_2018_l5.idf", pattern="{name}_{time}_l{layer}")
+    d = imod.util.path.decompose("path/to/head_2018_l5.idf", pattern="{name}_{time}_l{layer}")
     refd = {
         "extension": ".idf",
         "directory": pathlib.Path("path", "to"),
@@ -186,7 +186,7 @@ def test_decompose_only_year():
 
 
 def test_decompose_underscore():
-    d = util.path.decompose("path/to/starting_head_20180222090657_l5.idf")
+    d = imod.util.path.decompose("path/to/starting_head_20180222090657_l5.idf")
     refd = {
         "extension": ".idf",
         "directory": pathlib.Path("path", "to"),
@@ -200,7 +200,7 @@ def test_decompose_underscore():
 
 
 def test_decompose_dash():
-    d = util.path.decompose("path/to/starting-head_20180222090657_l5.idf")
+    d = imod.util.path.decompose("path/to/starting-head_20180222090657_l5.idf")
     refd = {
         "extension": ".idf",
         "directory": pathlib.Path("path", "to"),
@@ -214,7 +214,7 @@ def test_decompose_dash():
 
 
 def test_decompose_steady_state():
-    d = util.path.decompose("path/to/head_steady-state_l64.idf")
+    d = imod.util.path.decompose("path/to/head_steady-state_l64.idf")
     refd = {
         "extension": ".idf",
         "directory": pathlib.Path("path", "to"),
@@ -228,7 +228,7 @@ def test_decompose_steady_state():
 
 
 def test_decompose_underscore_in_name():
-    d = util.path.decompose("path/to/some_name.idf")
+    d = imod.util.path.decompose("path/to/some_name.idf")
     refd = {
         "extension": ".idf",
         "directory": pathlib.Path("path", "to"),
@@ -240,7 +240,7 @@ def test_decompose_underscore_in_name():
 
 
 def test_decompose_pattern_underscore():
-    d = util.path.decompose(
+    d = imod.util.path.decompose(
         "path/to/starting_head_20180222090657_l5.idf", pattern="{name}_{time}_l{layer}"
     )
     refd = {
@@ -256,7 +256,7 @@ def test_decompose_pattern_underscore():
 
 
 def test_decompose_pattern_dash():
-    d = util.path.decompose(
+    d = imod.util.path.decompose(
         "path/to/starting-head_20180222090657_l5.idf", pattern="{name}_{time}_l{layer}"
     )
     refd = {
@@ -273,7 +273,7 @@ def test_decompose_pattern_dash():
 
 def test_decompose_regexpattern():
     pattern = re.compile(r"(?P<name>[\w]+)L(?P<layer>[\d+]*)", re.IGNORECASE)
-    d = util.path.decompose("headL11.idf", pattern=pattern)
+    d = imod.util.path.decompose("headL11.idf", pattern=pattern)
     refd = {
         "extension": ".idf",
         "directory": pathlib.Path("."),
@@ -286,7 +286,7 @@ def test_decompose_regexpattern():
 
 
 def test_decompose_nodate():
-    d = util.path.decompose("dem_10m.idf")
+    d = imod.util.path.decompose("dem_10m.idf")
     refd = {
         "extension": ".idf",
         "directory": pathlib.Path("."),
@@ -298,7 +298,7 @@ def test_decompose_nodate():
 
 
 def test_decompose_dateonly():
-    d = util.path.decompose("20180222090657.idf", pattern="{time}")
+    d = imod.util.path.decompose("20180222090657.idf", pattern="{time}")
     refd = {
         "extension": ".idf",
         "directory": pathlib.Path("."),
@@ -311,7 +311,7 @@ def test_decompose_dateonly():
 
 
 def test_decompose_datelayeronly():
-    d = util.path.decompose("20180222090657_l7.idf", pattern="{time}_l{layer}")
+    d = imod.util.path.decompose("20180222090657_l7.idf", pattern="{time}_l{layer}")
     refd = {
         "extension": ".idf",
         "directory": pathlib.Path("."),
@@ -325,7 +325,7 @@ def test_decompose_datelayeronly():
 
 
 def test_decompose_z_float():
-    d = util.path.decompose("test_0.25.idf", pattern="{name}_{z}")
+    d = imod.util.path.decompose("test_0.25.idf", pattern="{name}_{z}")
     refd = {
         "extension": ".idf",
         "directory": pathlib.Path("."),
@@ -346,13 +346,13 @@ def test_compose_year9999():
         "time": datetime.datetime(9999, 2, 22, 9, 6, 57),
         "dims": ["time"],
     }
-    path = util.path.compose(d)
+    path = imod.util.path.compose(d)
     targetpath = pathlib.Path(d["directory"], "head_99990222090657_l5.idf")
     assert path == targetpath
 
 
 def test_decompose_dateonly_year9999():
-    d = util.path.decompose("99990222090657.idf", pattern="{time}")
+    d = imod.util.path.decompose("99990222090657.idf", pattern="{time}")
     refd = {
         "extension": ".idf",
         "directory": pathlib.Path("."),
