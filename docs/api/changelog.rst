@@ -6,6 +6,28 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[Unreleased]
+------------
+
+Fixed
+~~~~~
+- Incorrect validation error ``data values found at nodata values of
+  idomain`` for boundary condition packages with a scalar coordinate
+  not set as dimension.
+- Fix issue where :func:`imod.idf.open_subdomains` and
+  :func:`imod.mf6.Modflow6Simulation.open_head` (for split simulations) would
+  return arrays with incorrect ``dx`` and ``dy`` coordinates for equidistant
+  data.
+- Fix issue where :func:`imod.idf.open_subdomains` returned a flipped ``dy``
+  coordinate for nonequidistant data.
+
+Added
+~~~~~
+- The :func:`imod.mf6.model.mask_all_packages` now also masks the idomain array
+  of the model discretization, and can be used with a mask array without a layer
+  dimension, to mask all layers the same way
+
+
 [0.15.3] - 2024-02-22
 ---------------------
 
@@ -31,7 +53,7 @@ Added
 - An API package was added. It can be added to both flow and transport models, and its 
   presence allows users to interact with libMF6.dll through its API.
 - Developer environment: Empty python 3.10, 3.11, 3.12 environments where pip
-  install and import imod can be tested. 
+  install and import imod can be tested.
 - Added support for coupling a GroundwaterFlowModel and Transport Model i.c.w.
   the 6.4.3 release of MODFLOW. Using an older version of iMOD Python
   with this version of MODFLOW will result in an error.
@@ -40,7 +62,6 @@ Added
 - :meth:`imod.mf6.Modflow6Simulation.open_concentration` and
   :meth:`imod.mf6.Modflow6Simulation.open_transport_budget` support opening
   split multi-species simulations.
-
 Fixed
 ~~~~~
 - :meth'`imod.mf6.Modflow6Simulation.write` failed after splitting the simulation. This has been fixed. 
