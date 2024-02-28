@@ -431,7 +431,7 @@ def write(path, da, driver=None, nodata=np.nan, dtype=None):
     if extradims:
         raise ValueError(f"Only x and y dimensions supported, found {da.dims}")
     # transform will be affine object in next xarray
-    profile["transform"] = util.transform(da)
+    profile["transform"] = util.spatial.transform(da)
     profile["driver"] = driver
     profile["height"] = da.y.size
     profile["width"] = da.x.size

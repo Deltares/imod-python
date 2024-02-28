@@ -39,7 +39,7 @@ def test_basic_resample__nearest(write_tif, tmp_path):
     write_tif(tmp_path / "basic.tif", epsg=28992)
 
     with rioxarray.open_rasterio(tmp_path / "basic.tif").squeeze("band") as da:
-        dx, xmin, xmax, dy, ymin, ymax = imod.util.spatial_reference(da)
+        dx, xmin, xmax, dy, ymin, ymax = imod.util.spatial.spatial_reference(da)
         data = np.empty((10, 16))
         coords = {
             "y": np.linspace(ymax + 0.25 * dy, ymin - 0.25 * dy, 10),
@@ -79,7 +79,7 @@ def test_basic_resample__bilinear(write_tif, tmp_path):
     write_tif(tmp_path / "basic.tif", epsg=28992)
 
     with rioxarray.open_rasterio(tmp_path / "basic.tif").squeeze("band") as da:
-        dx, xmin, xmax, dy, ymin, ymax = imod.util.spatial_reference(da)
+        dx, xmin, xmax, dy, ymin, ymax = imod.util.spatial.spatial_reference(da)
         data = np.empty((10, 16))
         coords = {
             "y": np.linspace(ymax + 0.25 * dy, ymin - 0.25 * dy, 10),

@@ -306,7 +306,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             if isinstance(dataset, xu.UgridDataset):
                 if mdal_compliant:
                     dataset = pkg.dataset.ugrid.to_dataset()
-                    mdal_dataset = imod.util.mdal_compliant_ugrid2d(dataset)
+                    mdal_dataset = imod.util.spatial.mdal_compliant_ugrid2d(dataset)
                     mdal_dataset.to_netcdf(modeldirectory / pkg_path)
                 else:
                     pkg.dataset.ugrid.to_netcdf(modeldirectory / pkg_path)

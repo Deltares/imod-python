@@ -42,7 +42,7 @@ def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> Dict[str, Any]:
     icelltype_np = np.reshape(np.fromfile(f, np.int32, ncells), (nlayer, nrow, ncol))
 
     bounds = (xorigin, xorigin + delr.sum(), yorigin, yorigin + delc.sum())
-    coords = imod.util._xycoords(bounds, (delr, -delc))
+    coords = imod.util.spatial._xycoords(bounds, (delr, -delc))
     top = xr.DataArray(top_np, coords, ("y", "x"), name="top")
     coords["layer"] = np.arange(1, nlayer + 1)
     dims = ("layer", "y", "x")

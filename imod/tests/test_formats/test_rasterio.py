@@ -14,7 +14,7 @@ def test_da():
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = imod.util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = imod.util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     kwargs = {"name": "test", "coords": coords, "dims": ("y", "x")}
     data = np.ones((nrow, ncol), dtype=np.float32)
     da = xr.DataArray(data, **kwargs)
@@ -108,7 +108,7 @@ def test_rasterio_ascii(test_da, tmp_path, value, nodata, dtype, precision, digi
 
     da = xr.full_like(test_da, value)
     profile = {
-        "transform": imod.util.transform(da),
+        "transform": imod.util.spatial.transform(da),
         "driver": "AAIGrid",
         "height": da.y.size,
         "width": da.x.size,

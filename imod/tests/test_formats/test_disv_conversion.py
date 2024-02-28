@@ -16,7 +16,7 @@ def create_quadgrid(ibound):
 def create_trigrid(ibound):
     import matplotlib
 
-    dx, xmin, xmax, dy, ymin, ymax = imod.util.spatial_reference(ibound)
+    dx, xmin, xmax, dy, ymin, ymax = imod.util.spatial.spatial_reference(ibound)
     x = np.arange(xmin, xmax + dx, dx)
     y = np.arange(ymin, ymax + abs(dy), abs(dy))
     node_y, node_x = [a.ravel() for a in np.meshgrid(x, y, indexing="ij")]

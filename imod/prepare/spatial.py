@@ -245,7 +245,7 @@ def rasterize(geodataframe, like, column=None, fill=np.nan, **kwargs):
         shapes,
         out_shape=like.shape,
         fill=fill,
-        transform=imod.util.transform(like),
+        transform=imod.util.spatial.transform(like),
         **kwargs,
     )
 
@@ -274,7 +274,7 @@ def polygonize(da):
     if values.dtype == np.float64:
         values = values.astype(np.float32)
 
-    transform = imod.util.transform(da)
+    transform = imod.util.spatial.transform(da)
     shapes = rasterio.features.shapes(values, transform=transform)
 
     geometries = []
@@ -421,7 +421,7 @@ def gdal_rasterize(
 
     # Get spatial data from template
     if like is not None:
-        dx, xmin, _, dy, _, ymax = imod.util.spatial_reference(like)
+        dx, xmin, _, dy, _, ymax = imod.util.spatial.spatial_reference(like)
         nrow, ncol = like.shape
     else:
         cellsizes = spatial_reference["cellsizes"]
@@ -429,7 +429,7 @@ def gdal_rasterize(
         dx, dy = cellsizes
         if not isinstance(dx, (int, float)) or not isinstance(dy, (int, float)):
             raise ValueError("Cannot rasterize to a non-equidistant grid")
-        coords = imod.util._xycoords(bounds, cellsizes)
+        coords = imod.util.spatial._xycoords(bounds, cellsizes)
         xmin, _, _, ymax = bounds
         nrow = coords["y"].size
         ncol = coords["x"].size
@@ -588,7 +588,7 @@ def _celltable(path, column, resolution, like, rowstart=0, colstart=0):
     """
     # Avoid side-effects
     like = like.copy(deep=False)
-    _, xmin, xmax, _, ymin, ymax = imod.util.spatial_reference(like)
+    _, xmin, xmax, _, ymin, ymax = imod.util.spatial.spatial_reference(like)
     dx = resolution
     dy = -dx
     nodata = -1
@@ -651,7 +651,7 @@ def _create_chunks(like, resolution, chunksize):
     chunks : list of xr.DataArray
     """
 
-    _, xmin, xmax, _, ymin, ymax = imod.util.spatial_reference(like)
+    _, xmin, xmax, _, ymin, ymax = imod.util.spatial.spatial_reference(like)
     # Compute how many rows and columns are necessary for fine resolution
     nrow = int((ymax - ymin) / resolution)
     ncol = int((xmax - xmin) / resolution)
@@ -786,10 +786,10 @@ def celltable(path, column, resolution, like, chunksize=1e4):
         )
 
     """
-    dx, _, _, dy, _, _ = imod.util.spatial_reference(like)
-    if not imod.util.is_divisor(dx, resolution):
+    dx, _, _, dy, _, _ = imod.util.spatial.spatial_reference(like)
+    if not imod.util.spatial.is_divisor(dx, resolution):
         raise ValueError("resolution is not an (integer) divisor of dx")
-    if not imod.util.is_divisor(dy, resolution):
+    if not imod.util.spatial.is_divisor(dy, resolution):
         raise ValueError("resolution is not an (integer) divisor of dy")
 
     like_chunks, rowstarts, colstarts = _create_chunks(like, resolution, chunksize)
@@ -862,7 +862,7 @@ def _zonal_aggregate_raster(
     * Sample the raster at the rasterized polygon cells
     * Store both in a dataframe, groupby and aggregate according to `method`
     """
-    data_dx, xmin, xmax, data_dy, ymin, ymax = imod.util.spatial_reference(raster)
+    data_dx, xmin, xmax, data_dy, ymin, ymax = imod.util.spatial.spatial_reference(raster)
     dx = resolution
     dy = -dx
     nodata = -1
@@ -919,7 +919,7 @@ def _zonal_aggregate_polygons(
     * Rasterize a, rasterize b for the same domain
     * Store both in a dataframe, groupby and aggregate according to `method`
     """
-    _, xmin, xmax, _, ymin, ymax = imod.util.spatial_reference(like)
+    _, xmin, xmax, _, ymin, ymax = imod.util.spatial.spatial_reference(like)
     dx = resolution
     dy = -dx
     nodata = -1
@@ -1017,10 +1017,10 @@ def zonal_aggregate_raster(
     >>>    method=pd.Series.mode,
     >>> )
     """
-    dx, _, _, dy, _, _ = imod.util.spatial_reference(raster)
-    if not imod.util.is_divisor(dx, resolution):
+    dx, _, _, dy, _, _ = imod.util.spatial.spatial_reference(raster)
+    if not imod.util.spatial.is_divisor(dx, resolution):
         raise ValueError("resolution is not an (integer) divisor of dx")
-    if not imod.util.is_divisor(dy, resolution):
+    if not imod.util.spatial.is_divisor(dy, resolution):
         raise ValueError("resolution is not an (integer) divisor of dy")
 
     without_chunks = (raster.chunks is None) or (
@@ -1078,10 +1078,10 @@ def zonal_aggregate_polygons(
     -------
     zonal_aggregates: pandas.DataFrame
     """
-    dx, _, _, dy, _, _ = imod.util.spatial_reference(like)
-    if not imod.util.is_divisor(dx, resolution):
+    dx, _, _, dy, _, _ = imod.util.spatial.spatial_reference(like)
+    if not imod.util.spatial.is_divisor(dx, resolution):
         raise ValueError("resolution is not an (integer) divisor of dx")
-    if not imod.util.is_divisor(dy, resolution):
+    if not imod.util.spatial.is_divisor(dy, resolution):
         raise ValueError("resolution is not an (integer) divisor of dy")
 
     like_chunks, _, _ = _create_chunks(like, resolution, chunksize)

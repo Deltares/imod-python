@@ -58,7 +58,7 @@ def test_laplace_interpolate():
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = imod.util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = imod.util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     kwargs = {"name": "test", "coords": coords, "dims": ("y", "x")}
     data = np.ones((nrow, ncol), dtype=np.float32)
     da = xr.DataArray(data, **kwargs)
@@ -106,7 +106,7 @@ def test_polygonize():
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 2.0
     ymin, ymax = 0.0, 2.0
-    coords = imod.util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = imod.util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     kwargs = {"name": "test", "coords": coords, "dims": ("y", "x")}
     data = np.ones((nrow, ncol), dtype=np.float32)
     data[0, 1] = 2.0

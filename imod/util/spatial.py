@@ -1,6 +1,6 @@
 """
 Utility functions for dealing with the spatial
-location of rasters: :func:`imod.util.coord_reference`,
+location of rasters: :func:`imod.util.spatial.coord_reference`,
 :func:`imod.util.spatial_reference` and :func:`imod.util.transform`. These are
 used internally, but are not private since they may be useful to users as well.
 """

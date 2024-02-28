@@ -458,7 +458,7 @@ def write(path, a, nodata=1.0e20, dtype=np.float32):
         f.write(struct.pack(intformat, ncol))
         f.write(struct.pack(intformat, nrow))
 
-        dx, xmin, xmax, dy, ymin, ymax = util.spatial_reference(a)
+        dx, xmin, xmax, dy, ymin, ymax = util.spatial.spatial_reference(a)
 
         f.write(struct.pack(floatformat, xmin))
         f.write(struct.pack(floatformat, xmax))
@@ -529,7 +529,7 @@ def _as_voxeldata(a):
 
             # It'll raise an Error if it cannot infer dz
             if "dz" not in a.coords:
-                dz, _, _ = util.coord_reference(a["z"])
+                dz, _, _ = util.spatial.coord_reference(a["z"])
                 if isinstance(dz, float):
                     a = a.assign_coords(dz=dz)
                 else:
@@ -541,7 +541,7 @@ def _as_voxeldata(a):
                 if tuple(a["z"].indexes.keys()) == ("layer",):
                     if "dz" not in a.coords:
                         # It'll raise an Error if it cannot infer dz
-                        dz, _, _ = util.coord_reference(a["z"])
+                        dz, _, _ = util.spatial.coord_reference(a["z"])
                         if isinstance(dz, float):
                             a = a.assign_coords(dz=dz)
                         else:

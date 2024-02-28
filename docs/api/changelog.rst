@@ -330,8 +330,8 @@ Added
 - :class:`imod.mf6.OutputControl` now takes parameters ``head_file``,
   ``concentration_file``, and ``budget_file`` to specify where to store
   MODFLOW6 output files.
-- :func:`imod.util.from_mdal_compliant_ugrid2d` to "restack" the variables that
-  have have been "unstacked" in :func:`imod.util.mdal_compliant_ugrid2d`.
+- :func:`imod.util.spatial.from_mdal_compliant_ugrid2d` to "restack" the variables that
+  have have been "unstacked" in :func:`imod.util.spatial.mdal_compliant_ugrid2d`.
 - Added support for the Modflow6 Lake package
 - :func:`imod.select.points_in_bounds`, :func:`imod.select.points_indices`,
   :func:`imod.select.points_values` now support unstructured grids.
@@ -736,7 +736,7 @@ Fixed
    which a coordinate other than ``x`` or ``y`` is descending.
 -  :func:`imod.visualize.plot_map` enforces decreasing ``y``, which ensures maps are not plotted
    upside down.
--  :func:`imod.util.coord_reference` now returns a scalar cellsize if coordinate is equidistant.
+-  :func:`imod.util.spatial.coord_reference` now returns a scalar cellsize if coordinate is equidistant.
 -  :meth:`imod.prepare.Regridder.regrid` returns cellsizes as scalar when coordinates are
    equidistant.
 -  Raise proper ValueError in :meth:`imod.prepare.Regridder.regrid` consistenly when the number

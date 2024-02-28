@@ -9,7 +9,7 @@ import xugrid as xu
 import imod
 from imod.typing import GridDataArray
 from imod.typing.grid import zeros_like
-from imod.util import spatial_reference
+from imod.util.spatial import spatial_reference
 
 DomainSlice = Dict[str, slice | np.ndarray]
 
@@ -71,8 +71,8 @@ def to_cell_idx(idomain: xr.DataArray) -> xr.DataArray:
 
 
 def create_geometric_grid_info(active: xr.DataArray) -> pd.DataFrame:
-    dx = np.abs(imod.util.coord_reference(active.x)[0])
-    dy = np.abs(imod.util.coord_reference(active.y)[0])
+    dx = np.abs(imod.util.spatial.coord_reference(active.x)[0])
+    dy = np.abs(imod.util.spatial.coord_reference(active.y)[0])
 
     global_cell_indices = to_cell_idx(active)
     num_y, num_x = active.shape

@@ -398,7 +398,7 @@ def test_transform():
     coords = {"x": [0.5, 1.5, 2.5], "y": [1.5, 0.5]}
     dims = ("y", "x")
     da = xr.DataArray(data, coords, dims)
-    actual = util.transform(da)
+    actual = util.spatial.transform(da)
     expected = affine.Affine(1.0, 0.0, 0.0, 0.0, -1.0, 2.0)
     assert actual == expected
 
@@ -411,7 +411,7 @@ def test_transform():
     }
     dims = ("y", "x")
     da = xr.DataArray(data, coords, dims)
-    actual = util.transform(da)
+    actual = util.spatial.transform(da)
     assert actual == expected
 
     # explicit dx dy, non-equidistant
@@ -424,21 +424,21 @@ def test_transform():
     dims = ("y", "x")
     da = xr.DataArray(data, coords, dims)
     with pytest.raises(ValueError):
-        util.transform(da)
+        util.spatial.transform(da)
 
 
 def test_is_divisor():
     a = np.array([1.0, 0.5, 0.1])
     b = 0.05
-    assert util.is_divisor(a, b)
-    assert util.is_divisor(-a, b)
-    assert util.is_divisor(a, -b)
-    assert util.is_divisor(-a, -b)
+    assert util.spatial.is_divisor(a, b)
+    assert util.spatial.is_divisor(-a, b)
+    assert util.spatial.is_divisor(a, -b)
+    assert util.spatial.is_divisor(-a, -b)
     b = 0.07
-    assert not util.is_divisor(a, b)
-    assert not util.is_divisor(-a, b)
-    assert not util.is_divisor(a, -b)
-    assert not util.is_divisor(-a, -b)
+    assert not util.spatial.is_divisor(a, b)
+    assert not util.spatial.is_divisor(-a, b)
+    assert not util.spatial.is_divisor(a, -b)
+    assert not util.spatial.is_divisor(-a, -b)
 
 
 def test_empty():
@@ -497,7 +497,7 @@ def test_where():
 
 
 def test_compliant_ugrid2d(ugrid_ds, write=False):
-    uds = util.mdal_compliant_ugrid2d(ugrid_ds)
+    uds = util.spatial.mdal_compliant_ugrid2d(ugrid_ds)
 
     assert isinstance(uds, xr.Dataset)
     for i in range(1, 4):
@@ -520,10 +520,10 @@ def test_compliant_ugrid2d(ugrid_ds, write=False):
 
 
 def test_mdal_compliant_roundtrip(ugrid_ds):
-    uds = xu.UgridDataset(util.mdal_compliant_ugrid2d(ugrid_ds))
+    uds = xu.UgridDataset(util.spatial.mdal_compliant_ugrid2d(ugrid_ds))
     uds["b"] = (("time", "layer"), np.random.rand(5, 3))
     uds["c"] = (("layer", "mesh2d_nFaces"), np.random.rand(3, 4))
-    back = util.from_mdal_compliant_ugrid2d(uds)
+    back = util.spatial.from_mdal_compliant_ugrid2d(uds)
 
     assert isinstance(back, xu.UgridDataset)
     assert back["a"].dims == ("time", "layer", "mesh2d_nFaces")

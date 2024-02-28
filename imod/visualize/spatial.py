@@ -175,7 +175,7 @@ def plot_map(
     cmap, norm = common._cmapnorm_from_colorslevels(colors, levels)
 
     # Get extent
-    _, xmin, xmax, _, ymin, ymax = imod.util.spatial_reference(raster)
+    _, xmin, xmax, _, ymin, ymax = imod.util.spatial.spatial_reference(raster)
 
     # raster kwargs
     settings_raster = {"interpolation": "nearest", "extent": [xmin, xmax, ymin, ymax]}
@@ -383,7 +383,7 @@ def imshow_topview(
     if "x" not in da.dims or "y" not in da.dims:
         raise ValueError("DataArray must have dims x and y.")
     directory = pathlib.Path(directory)
-    _, xmin, xmax, _, ymin, ymax = imod.util.spatial_reference(da)
+    _, xmin, xmax, _, ymin, ymax = imod.util.spatial.spatial_reference(da)
     settings = {"interpolation": "nearest", "extent": [xmin, xmax, ymin, ymax]}
     extradims = [dim for dim in da.dims if dim not in ("x", "y")]
 
