@@ -686,7 +686,7 @@ object UpdateDependencies : BuildType({
                     
                     echo "Update dependencies" 
                     del pixi.lock
-                    pixi install --environment default
+                    pixi install
                     
                     echo "Add any changes" 
                     git add pixi.lock
