@@ -20,6 +20,9 @@ Fixed
   data.
 - Fix issue where :func:`imod.idf.open_subdomains` returned a flipped ``dy``
   coordinate for nonequidistant data.
+- Made :func:`imod.util.round_extent` available again, as it was moved without
+  notice. Function now throws a DeprecationWarning to use
+  :func:`imod.prepare.spatial.round_extent` instead.
 
 Added
 ~~~~~
