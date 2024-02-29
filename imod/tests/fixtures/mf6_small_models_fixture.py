@@ -1,10 +1,10 @@
+from copy import deepcopy
 from typing import Callable, Union
 
 import numpy as np
 import pytest
 import xarray as xr
 import xugrid as xu
-from copy import deepcopy
 
 import imod
 
