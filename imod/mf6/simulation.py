@@ -975,9 +975,9 @@ class Modflow6Simulation(collections.UserDict):
 
         flow_models = self.get_models_of_type("gwf6")
         transport_models = self.get_models_of_type("gwt6")
-        if any(transport_models) and len(flow_models) != 1:
+        if len(flow_models) != 1:
             raise ValueError(
-                "splitting of simulations with more (or less) than 1 flow model currently not supported, if a transport model is present"
+                "splitting of simulations with more (or less) than 1 flow model currently not supported."
             )
 
         if not any(flow_models) and not any(transport_models):
@@ -1062,7 +1062,11 @@ class Modflow6Simulation(collections.UserDict):
             raise RuntimeError(
                 "Unable to regrid simulation. Regridding can only be done on simulations that haven't been split."
             )
-
+        flow_models = self.get_models_of_type("gwf6")
+        if len(flow_models) != 1:
+            raise ValueError(
+                "Unable to regrid simulation. Regridding can only be done on simulations that have a single flow model."
+            )
         result = self.__class__(regridded_simulation_name)
         for key, item in self.items():
             if isinstance(item, GroundwaterFlowModel):

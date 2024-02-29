@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 import xarray as xr
 import xugrid as xu
+from copy import deepcopy
 
 import imod
 
@@ -190,6 +191,15 @@ def structured_flow_simulation(
         additional_times=["2000-01-01T00:00", "2020-01-02T00:00", "2020-01-03T00:00"]
     )
     return simulation
+
+@pytest.fixture(scope="function")
+def structured_flow_simulation_2_flow_models(structured_flow_simulation: imod.mf6.Modflow6Simulation)-> imod.mf6.Modflow6Simulation:
+    """Returns transient confined model."""
+    other_flow_model = deepcopy(structured_flow_simulation["flow"])
+    structured_flow_simulation["flow_copy"] = other_flow_model
+    structured_flow_simulation["solution"].add_model_to_solution("flow_copy")   
+
+    return structured_flow_simulation
 
 
 @pytest.fixture(scope="function")

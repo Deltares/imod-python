@@ -51,6 +51,7 @@ from .fixtures.mf6_small_models_fixture import (
     structured_flow_simulation,
     unstructured_flow_model,
     unstructured_flow_simulation,
+    structured_flow_simulation_2_flow_models,
 )
 from .fixtures.mf6_twri_disv_fixture import twri_disv_model
 from .fixtures.mf6_twri_fixture import (

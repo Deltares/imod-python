@@ -16,14 +16,13 @@ import xugrid as xu
 
 import imod
 from imod.mf6.model import Modflow6Model
-from imod.mf6.model_gwf import GroundwaterFlowModel
 from imod.mf6.multimodel.modelsplitter import PartitionInfo
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo
 from imod.schemata import ValidationError
-from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
 from imod.typing.grid import zeros_like
-
-
+from imod.tests.fixtures.mf6_small_models_fixture import (
+    grid_data_structured,
+)
 def roundtrip(simulation, tmpdir_factory, name):
     # TODO: look at the values?
     tmp_path = tmpdir_factory.mktemp(name)
@@ -292,47 +291,42 @@ class TestModflow6Simulation:
         with pytest.raises(ValueError):
             _ = simulation.split(submodel_labels)
 
-    def test_split_multiple_models(self, tmp_path, circle_model):
+    def test_split_multiple_flow_models(self, structured_flow_simulation_2_flow_models):
         # Arrange.
-        oc2 = deepcopy(circle_model["GWF_1"]["oc"])
-        npf2 = deepcopy(circle_model["GWF_1"]["npf"])
-        disv2 = deepcopy(circle_model["GWF_1"]["disv"])
-        sto2 = deepcopy(circle_model["GWF_1"]["sto"])
-        chd2 = deepcopy(circle_model["GWF_1"]["chd"])
-        rch2 = deepcopy(circle_model["GWF_1"]["rch"])
-        ic2 = deepcopy(circle_model["GWF_1"]["ic"])
-        gwf_2 = GroundwaterFlowModel()
-        gwf_2["oc"] = oc2
-        gwf_2["npf"] = npf2
-        gwf_2["disv"] = disv2
-        gwf_2["sto"] = sto2
-        gwf_2["chd"] = chd2
-        gwf_2["rch"] = rch2
-        gwf_2["ic"] = ic2
-        circle_model["GWF_2"] = gwf_2
-        circle_model["solver"].add_model_to_solution("GWF_2")
-
-        active = circle_model["GWF_1"].domain.sel(layer=1)
-        submodel_labels = xu.zeros_like(active)
-        submodel_labels.values[90:] = 1
+        active = structured_flow_simulation_2_flow_models["flow"].domain.sel(layer=1)
+        submodel_labels = xr.zeros_like(active)
+        submodel_labels.values[:,3:] = 1
 
         # Act
-        new_simulation = circle_model.split(submodel_labels)
+        with pytest.raises(ValueError):
+            _ = structured_flow_simulation_2_flow_models.split(submodel_labels)
 
-        # Assert
-        assert (
-            new_simulation["split_exchanges"][0]["model_name_1"].values[()] == "GWF_1_0"
-        )
-        assert (
-            new_simulation["split_exchanges"][0]["model_name_2"].values[()] == "GWF_1_1"
-        )
-        assert (
-            new_simulation["split_exchanges"][1]["model_name_1"].values[()] == "GWF_2_0"
-        )
-        assert (
-            new_simulation["split_exchanges"][1]["model_name_2"].values[()] == "GWF_2_1"
-        )
-        assert_simulation_can_run(new_simulation, "disv", tmp_path)
+    def test_regrid_multiple_flow_models(self, structured_flow_simulation_2_flow_models):
+        # Arrange
+        finer_idomain = grid_data_structured(np.int32, 1, 0.4)
+
+        # Act
+        with pytest.raises(ValueError):
+            _ = structured_flow_simulation_2_flow_models.regrid_like("regridded_model", finer_idomain, False)
+
+    def test_mask_clipping_multiple_flow_models(self, structured_flow_simulation_2_flow_models):
+        # Arrange
+        active = structured_flow_simulation_2_flow_models["flow"].domain
+        grid_y_min = active.coords["y"][0]
+        grid_y_max = active.coords["y"][-1]
+        # Act/Assert
+        with pytest.raises(RuntimeError):
+            _ = structured_flow_simulation_2_flow_models.clip_box(
+                    y_min= grid_y_min,
+                    y_max = grid_y_max/2                
+                )
+
+
+
+        # Act
+        with pytest.raises(ValueError):
+            _ = transient_twri_simulation_2_flow_models.regrid_like(finer_idomain)            
+
 
     @pytest.mark.usefixtures("transient_twri_model")
     def test_exchanges_in_simulation_file(self, transient_twri_model, tmp_path):
@@ -405,9 +399,14 @@ class TestModflow6Simulation:
         # Arrange.
         split_simulation = split_transient_twri_model
 
+        grid_y_min = split_simulation["GWF_1"].domain.coords["y"][0]
+        grid_y_max = split_simulation["GWF_1"].domain.coords["y"][-1]
         # Act/Assert
         with pytest.raises(RuntimeError):
-            _ = split_simulation.clip_box()
+            _ = split_simulation.clip_box(
+                    y_min= grid_y_min,
+                    y_max = grid_y_max/2                
+                )
 
     def test_deepcopy(
         split_transient_twri_model
