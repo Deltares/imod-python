@@ -92,6 +92,53 @@ def test_validate_false():
     )
 
 
+def test_incompatible_setting():
+    layer = np.array([1, 2, 3])
+    icelltype = xr.DataArray([1, 0, 0], {"layer": layer}, ("layer",))
+    k = xr.DataArray([1.0e-3, 1.0e-4, 2.0e-4], {"layer": layer}, ("layer",))
+    k33 = xr.DataArray([2.0e-8, 2.0e-8, 2.0e-8], {"layer": layer}, ("layer",))
+
+    message = textwrap.dedent(
+        """
+        * rhs_option
+        \t- Incompatible setting: xt3d_option should be True"""
+    )
+
+    with pytest.raises(ValidationError, match=re.escape(message)):
+        imod.mf6.NodePropertyFlow(
+            icelltype=icelltype,
+            k=k,
+            k33=k33,
+            variable_vertical_conductance=True,
+            dewatered=True,
+            perched=True,
+            save_flows=True,
+            xt3d_option=False,
+            rhs_option=True,
+            alternative_cell_averaging="AMT-HMK",
+        )
+
+    message = textwrap.dedent(
+        """
+        * alternative_cell_averaging
+        \t- Incompatible setting: xt3d_option should be False"""
+    )
+
+    with pytest.raises(ValidationError, match=re.escape(message)):
+        imod.mf6.NodePropertyFlow(
+            icelltype=icelltype,
+            k=k,
+            k33=k33,
+            variable_vertical_conductance=True,
+            dewatered=True,
+            perched=True,
+            save_flows=True,
+            xt3d_option=True,
+            alternative_cell_averaging="AMT-HMK",
+        )
+
+
+
 def test_wrong_dim():
     layer = np.array([1, 2, 3])
     icelltype = xr.DataArray(
