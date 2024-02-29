@@ -42,7 +42,7 @@ import xarray as xr
 import xugrid as xu
 from numpy.typing import DTypeLike  # noqa: F401
 
-from imod.typing import GridDataArray, ScalarDataArray
+from imod.typing import GridDataArray, ScalarAsDataArray
 
 DimsT = Union[str, None]
 ShapeT = Tuple[Union[int, None]]
@@ -298,14 +298,14 @@ class ShapeSchema(BaseSchema):
 
 
 class CompatibleSettingsSchema(BaseSchema):
-    def __init__(self, other: ScalarDataArray, other_value: bool) -> None:
+    def __init__(self, other: ScalarAsDataArray, other_value: bool) -> None:
         """
         Validate if settings are compatible
         """
         self.other = other
         self.other_value = other_value
 
-    def validate(self, obj: ScalarDataArray, **kwargs) -> None:
+    def validate(self, obj: ScalarAsDataArray, **kwargs) -> None:
         other_obj = kwargs[self.other]
         if scalar_None(obj) or scalar_None(other_obj):
             return
