@@ -80,6 +80,10 @@ def is_split(simulation: Modflow6Simulation) -> bool:
     return "split_exchanges" in simulation.keys()
 
 
+def has_one_flow_model(simulation: Modflow6Simulation) -> bool:
+    flow_models = simulation.get_models_of_type("gwf6")
+    return  len(flow_models) == 1
+
 class Modflow6Simulation(collections.UserDict):
     def _initialize_template(self):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
@@ -936,8 +940,13 @@ class Modflow6Simulation(collections.UserDict):
 
         if is_split(self):
             raise RuntimeError(
-                "Unable to clip simulation. Clipping can only be done on simulations that haven't been split."
+                "Unable to clip simulation. Clipping can only be done on simulations that haven't been split."  +
+                "Therefore clipping should be done before splitting the simulation."
             )
+        if not has_one_flow_model(self):
+            raise ValueError(
+                "Unable to clip simulation. Clipping can only be done on simulations that have a single flow model ."
+            )        
 
         clipped = type(self)(name=self.name)
         for key, value in self.items():
@@ -973,13 +982,12 @@ class Modflow6Simulation(collections.UserDict):
                 "Unable to split simulation. Splitting can only be done on simulations that haven't been split."
             )
 
-        flow_models = self.get_models_of_type("gwf6")
-        transport_models = self.get_models_of_type("gwt6")
-        if len(flow_models) != 1:
+        if not has_one_flow_model(self):
             raise ValueError(
                 "splitting of simulations with more (or less) than 1 flow model currently not supported."
             )
-
+        transport_models = self.get_models_of_type("gwt6")        
+        flow_models = self.get_models_of_type("gwf6")
         if not any(flow_models) and not any(transport_models):
             raise ValueError("a simulation without any models cannot be split.")
 
@@ -1060,10 +1068,10 @@ class Modflow6Simulation(collections.UserDict):
 
         if is_split(self):
             raise RuntimeError(
-                "Unable to regrid simulation. Regridding can only be done on simulations that haven't been split."
+                "Unable to regrid simulation. Regridding can only be done on simulations that haven't been split." +
+                " Therefore regridding should be done before splitting the simulation."
             )
-        flow_models = self.get_models_of_type("gwf6")
-        if len(flow_models) != 1:
+        if not has_one_flow_model(self) :
             raise ValueError(
                 "Unable to regrid simulation. Regridding can only be done on simulations that have a single flow model."
             )

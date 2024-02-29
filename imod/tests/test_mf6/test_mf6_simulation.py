@@ -19,10 +19,12 @@ from imod.mf6.model import Modflow6Model
 from imod.mf6.multimodel.modelsplitter import PartitionInfo
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo
 from imod.schemata import ValidationError
-from imod.typing.grid import zeros_like
 from imod.tests.fixtures.mf6_small_models_fixture import (
     grid_data_structured,
 )
+from imod.typing.grid import zeros_like
+
+
 def roundtrip(simulation, tmpdir_factory, name):
     # TODO: look at the values?
     tmp_path = tmpdir_factory.mktemp(name)
@@ -309,24 +311,18 @@ class TestModflow6Simulation:
         with pytest.raises(ValueError):
             _ = structured_flow_simulation_2_flow_models.regrid_like("regridded_model", finer_idomain, False)
 
-    def test_mask_clipping_multiple_flow_models(self, structured_flow_simulation_2_flow_models):
+    def test_clip_multiple_flow_models(self, structured_flow_simulation_2_flow_models):
         # Arrange
         active = structured_flow_simulation_2_flow_models["flow"].domain
-        grid_y_min = active.coords["y"][0]
-        grid_y_max = active.coords["y"][-1]
+        grid_y_min = active.coords["y"].values[-1]
+        grid_y_max = active.coords["y"].values[0]
+
         # Act/Assert
-        with pytest.raises(RuntimeError):
+        with pytest.raises(ValueError):
             _ = structured_flow_simulation_2_flow_models.clip_box(
                     y_min= grid_y_min,
                     y_max = grid_y_max/2                
                 )
-
-
-
-        # Act
-        with pytest.raises(ValueError):
-            _ = transient_twri_simulation_2_flow_models.regrid_like(finer_idomain)            
-
 
     @pytest.mark.usefixtures("transient_twri_model")
     def test_exchanges_in_simulation_file(self, transient_twri_model, tmp_path):
@@ -399,14 +395,9 @@ class TestModflow6Simulation:
         # Arrange.
         split_simulation = split_transient_twri_model
 
-        grid_y_min = split_simulation["GWF_1"].domain.coords["y"][0]
-        grid_y_max = split_simulation["GWF_1"].domain.coords["y"][-1]
         # Act/Assert
         with pytest.raises(RuntimeError):
-            _ = split_simulation.clip_box(
-                    y_min= grid_y_min,
-                    y_max = grid_y_max/2                
-                )
+            _ = split_simulation.clip_box()
 
     def test_deepcopy(
         split_transient_twri_model
