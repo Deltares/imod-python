@@ -638,6 +638,30 @@ class Modflow6Simulation(collections.UserDict):
         cbc[exchange_key] = exchange_budgets
         return cbc
 
+
+    def _pad_missing_variables(self, cbc_per_partition: list[GridDataset]) -> None:
+        """
+        Boundary conditions can be missing in certain partitions, as do their
+        budgets, in which case we manually assign an empty grid of nans.
+        """
+        dims_per_unique_key = {key: cbc[key].dims for cbc in cbc_per_partition for key in cbc.keys()}
+        for cbc in cbc_per_partition:
+            missing_keys = set(dims_per_unique_key.keys()) - set(cbc.keys())
+
+            for missing in missing_keys:
+                missing_dims = dims_per_unique_key[missing]
+                missing_coords = {dim: cbc.coords[dim] for dim in missing_dims}
+
+                shape = tuple([len(missing_coords[dim]) for dim in missing_dims])
+                chunks = (1,) +  shape[1:]
+                missing_data = dask.array.full(shape, np.nan, chunks=chunks)
+
+                missing_grid = xr.DataArray(missing_data, dims=missing_dims, coords=missing_coords)
+                if isinstance(cbc, xu.UgridDataset):
+                    missing_grid = xu.UgridDataArray(missing_grid, grid=cbc.ugrid.grid,)
+                cbc[missing] = missing_grid
+
+
     def _merge_budgets(
         self, modelnames: list[str], output: str, **settings
     ) -> GridDataset:
@@ -655,29 +679,8 @@ class Modflow6Simulation(collections.UserDict):
                 cbc = cbc.where(self[modelname].domain, other=np.nan)
             cbc_per_partition.append(cbc)
 
-        # Boundary conditions can be missing in certain partitions, as do their
-        # budgets, in which case we manually assign an empty grid of nans.
-        unique_keys = set([key for cbc in cbc_per_partition for key in cbc.keys()])
-        for cbc in cbc_per_partition:
-            missing_keys = unique_keys - set(cbc.keys())
+        self._pad_missing_variables(cbc_per_partition)
 
-            for missing in missing_keys:
-                for cbc_search in cbc_per_partition:
-                    if missing in cbc_search.keys():   
-                        dims = cbc_search[missing].dims
-                        break
-                current_partition_coords = {}
-                for dim in dims:
-                    current_partition_coords[dim] =  cbc.coords[dim]
-                
-                if isinstance(cbc, xr.DataArray)  | isinstance(cbc, xr.Dataset) :
-                    shape = tuple([len(c) for  _, c in current_partition_coords.items()])
-                    values = dask.array.full(shape, np.nan)
-                    chunksize = (1,) +  shape[1:]
-                    values = values.rechunk(chunksize)
-                    cbc[missing] = xr.DataArray(values, dims = dims, coords= current_partition_coords)
-                else:
-                    cbc[missing] = xu.UgridDataArray(xr.DataArray(dims = dims, coords= current_partition_coords), grid=cbc.ugrid.grid,)
         return merge_partitions(cbc_per_partition)
 
     def _concat_species(
