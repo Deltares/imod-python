@@ -45,8 +45,9 @@ import scipy.ndimage
 import tqdm
 import xarray as xr
 
-from imod import util
+import imod
 from imod.select import points_values
+from imod.util.imports import MissingOptionalModule
 
 try:
     import pyvista as pv
@@ -55,8 +56,8 @@ try:
     if vtk.vtkVersion().GetVTKMajorVersion() < 9:
         raise ImportError("VTK version of 9.0 or higher required")
 except ImportError:
-    pv = util.MissingOptionalModule("pyvista")
-    vtk = util.MissingOptionalModule("vtk")
+    pv = MissingOptionalModule("pyvista")
+    vtk = MissingOptionalModule("vtk")
 
 
 def exterior(da, n):
@@ -420,7 +421,7 @@ def grid_3d(
     https://docs.pyvista.org/index.html
     """
     # x and y dimension
-    dx, xmin, xmax, dy, ymin, ymax = util.spatial_reference(da)
+    dx, xmin, xmax, dy, ymin, ymax = imod.util.spatial.spatial_reference(da)
     nx = da.coords["x"].size
     ny = da.coords["y"].size
     x = vertices_coords(dx, xmin, xmax, nx)
@@ -462,7 +463,7 @@ def grid_3d(
         else:
             da = da.transpose("z", "y", "x", transpose_coords=True)
 
-        dz, zmin, zmax = util.coord_reference(da["z"])
+        dz, zmin, zmax = imod.util.spatial.coord_reference(da["z"])
         nz = da.coords["z"].size
         z = vertices_coords(dz, zmin, zmax, nz)
 

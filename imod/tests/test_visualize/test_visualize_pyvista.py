@@ -12,7 +12,7 @@ def test_da():
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     kwargs = {"name": "test", "coords": coords, "dims": ("y", "x")}
     data = np.ones((nrow, ncol))
     da = xr.DataArray(data, **kwargs)
@@ -25,7 +25,7 @@ def test_zda():
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     coords["z"] = np.arange(5.0) + 0.5
     kwargs = {"name": "z", "coords": coords, "dims": ("z", "y", "x")}
     data = np.ones((nlay, nrow, ncol), dtype=np.float32)
@@ -39,7 +39,7 @@ def test_3dzda():
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     coords["layer"] = np.arange(nlay) + 1
 
     ncell = nlay * nrow * ncol

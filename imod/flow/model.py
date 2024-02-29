@@ -11,10 +11,11 @@ import pandas as pd
 import xarray as xr
 
 import imod
-import imod.util as util
 from imod.flow.pkgbase import BoundaryCondition
 from imod.flow.pkggroup import PackageGroups
 from imod.flow.timeutil import insert_unique_package_times
+from imod.util.nested_dict import append_nested_dict, initialize_nested_dict
+from imod.util.time import _compose_timestring
 
 # TODO: Merge time utilities, this is becoming a mess
 from imod.wq import timeutil
@@ -40,7 +41,7 @@ class IniFile(collections.UserDict, abc.ABC):
             if timekey in self.keys():
                 # If not string assume it is in some kind of datetime format
                 if type(self[timekey]) is not str:
-                    self[timekey] = util._compose_timestring(self[timekey])
+                    self[timekey] = _compose_timestring(self[timekey])
 
     def render(self):
         self._format_datetimes()
@@ -311,7 +312,7 @@ class ImodflowModel(Model):
         )
         time_composed = dict(
             [
-                (timestep_nr, util._compose_timestring(time, time_format=time_format))
+                (timestep_nr, _compose_timestring(time, time_format=time_format))
                 for timestep_nr, time in time_composed.items()
             ]
         )
@@ -333,7 +334,7 @@ class ImodflowModel(Model):
         time_format = "%d-%m-%Y %H:%M:%S"
         periods_composed = dict(
             [
-                (value, util._compose_timestring(time, time_format=time_format))
+                (value, _compose_timestring(time, time_format=time_format))
                 for time, value in periods.items()
             ]
         )
@@ -352,7 +353,7 @@ class ImodflowModel(Model):
         bndkey = self._get_pkgkey("bnd")
         nlayer = self[bndkey]["layer"].size
 
-        composition = util.initialize_nested_dict(5)
+        composition = initialize_nested_dict(5)
 
         group_packages = self._group()
 
@@ -365,7 +366,7 @@ class ImodflowModel(Model):
                 globaltimes,
                 nlayer,
             )
-            util.append_nested_dict(composition, group_composition)
+            append_nested_dict(composition, group_composition)
 
         for key, package in self.items():
             if package._pkg_id not in group_pkg_ids:
@@ -374,7 +375,7 @@ class ImodflowModel(Model):
                     globaltimes,
                     nlayer,
                 )
-                util.append_nested_dict(composition, package_composition)
+                append_nested_dict(composition, package_composition)
 
         return composition
 

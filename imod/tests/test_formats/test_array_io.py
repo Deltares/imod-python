@@ -17,7 +17,7 @@ def test_da(request):
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     kwargs = {"name": "test", "coords": coords, "dims": ("y", "x")}
     data = np.ones((nrow, ncol), dtype=request.param)
     da = xr.DataArray(data, **kwargs)
@@ -43,7 +43,7 @@ def test_nptimeda(request):
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     coords["time"] = pd.date_range("2000-01-01", "2000-01-10", freq="D").values
     ntime = len(coords["time"])
     kwargs = {"name": "testnptime", "coords": coords, "dims": ("time", "y", "x")}
@@ -58,7 +58,7 @@ def test_cftimeda(request):
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     coords["time"] = [
         cftime.DatetimeProlepticGregorian(y, 1, 1) for y in range(1000, 10_000, 1000)
     ]
@@ -75,7 +75,7 @@ def test_layerda():
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     coords["layer"] = np.arange(nlay) + 1
     kwargs = {"name": "layer", "coords": coords, "dims": ("layer", "y", "x")}
     data = np.ones((nlay, nrow, ncol), dtype=np.float32)
@@ -89,7 +89,7 @@ def test_timelayerda():
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     coords["layer"] = np.arange(nlay) + 8
     coords["time"] = pd.date_range("2000-01-01", "2002-01-01", freq="YS").values
 
@@ -113,7 +113,7 @@ def test_speciestimelayerda():
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     coords["layer"] = np.arange(nlay) + 8
     coords["time"] = pd.date_range("2000-01-01", "2002-01-01", freq="YS").values
     coords["species"] = np.arange(nspecies) + 1

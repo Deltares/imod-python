@@ -143,8 +143,8 @@ class BasicFlow(Package):
         d["nlay"], d["nrow"], d["ncol"] = self["ibound"].shape
         # TODO: check dx > 0, dy < 0?
         if "dx" not in self.dataset or "dy" not in self.dataset:  # assume equidistant
-            dx, _, _ = util.coord_reference(self.dataset["x"])
-            dy, _, _ = util.coord_reference(self.dataset["y"])
+            dx, _, _ = util.spatial.coord_reference(self.dataset["x"])
+            dy, _, _ = util.spatial.coord_reference(self.dataset["y"])
         else:
             dx = self.dataset.coords["dx"]
             dy = self.dataset.coords["dy"]

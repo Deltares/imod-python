@@ -110,7 +110,7 @@ def points_in_bounds(da, **points):
 
     for key, x in points.items():
         da_x = da.coords[key]
-        _, xmin, xmax = imod.util.coord_reference(da_x)
+        _, xmin, xmax = imod.util.spatial.coord_reference(da_x)
         # Inplace bitwise operator
         in_bounds &= (x >= xmin) & (x < xmax)
 
@@ -140,7 +140,7 @@ def check_points_in_bounds(da, points, out_of_bounds):
 def _get_indices_1d(da, coordname, x):
     x = np.atleast_1d(x)
     x_decreasing = da.indexes[coordname].is_monotonic_decreasing
-    dx, xmin, _ = imod.util.coord_reference(da.coords[coordname])
+    dx, xmin, _ = imod.util.spatial.coord_reference(da.coords[coordname])
 
     ncell = da[coordname].size
     # Compute edges

@@ -116,8 +116,8 @@ class StructuredDiscretization(Package):
         d = {}
         x = self.dataset["idomain"].coords["x"]
         y = self.dataset["idomain"].coords["y"]
-        dx, xmin, _ = imod.util.coord_reference(x)
-        dy, ymin, _ = imod.util.coord_reference(y)
+        dx, xmin, _ = imod.util.spatial.coord_reference(x)
+        dy, ymin, _ = imod.util.spatial.coord_reference(y)
 
         d["xorigin"] = xmin
         d["yorigin"] = ymin

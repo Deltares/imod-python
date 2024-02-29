@@ -8,7 +8,7 @@ import pandas as pd
 from scipy.io import FortranFile, FortranFormattingError
 
 from imod.formats.ipf import _infer_delimwhitespace
-from imod.util import MissingOptionalModule
+from imod.util.imports import MissingOptionalModule
 
 try:
     import shapely

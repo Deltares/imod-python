@@ -13,7 +13,7 @@ from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.utilities.grid import get_active_domain_slice
 from imod.typing import GridDataArray
 from imod.typing.grid import bounding_polygon, is_spatial_2D
-from imod.util import MissingOptionalModule
+from imod.util.imports import MissingOptionalModule
 
 try:
     import shapely
