@@ -1,7 +1,8 @@
 """
 Miscellaneous Utilities.
 
-The utilies imported here are public API
+The utilies imported in this file are public API, and previously placed in
+imod/util.py. Therefore these should be available under the imod.util namespace.
 """
 
 from imod.util.context import cd, ignore_warnings
@@ -16,6 +17,7 @@ from imod.util.spatial import (
     spatial_reference,
     to_ugrid2d,
     transform,
+    ugrid2d_data,
 )
-from imod.util.structured import replace, where
+from imod.util.structured import replace, values_within_range, where
 from imod.util.time import to_datetime
