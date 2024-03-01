@@ -4,7 +4,7 @@ import pytest
 from xugrid import OverlapRegridder
 
 from imod.mf6 import Dispersion
-from imod.mf6.regridding_utils import RegridderInstancesCollection, RegridderType
+from imod.mf6.utilities.regrid import RegridderInstancesCollection, RegridderType
 
 
 def test_instance_collection_returns_same_instance_when_enum_and_method_match(
