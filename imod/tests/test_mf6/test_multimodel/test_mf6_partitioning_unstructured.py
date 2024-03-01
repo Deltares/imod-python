@@ -179,7 +179,7 @@ def test_partitioning_unstructured(
     )
     for key in ["flow-lower-face", "flow-horizontal-face"]:
         if partition_array["name"].values[()] == "concentric" and key in [ "flow-horizontal-face"]:
-            break
+            continue
         np.testing.assert_allclose(
             flow_cbc[key].values, original_flow_cbc[key].values, rtol=1e-5, atol=1e-3
         )
@@ -279,7 +279,7 @@ def test_partitioning_unstructured_hfb(
     np.testing.assert_allclose(head["head"].values, original_head.values, rtol=0.005)
     for key in ["flow-lower-face", "flow-horizontal-face"]:
         if partition_array["name"].values[()] == "concentric" and key in [ "flow-horizontal-face"]:
-            break
+            continue
         np.testing.assert_allclose(
             flow_cbc[key].values, original_flow_cbc[key].values, rtol=1., atol=31.66250038
         )
