@@ -85,7 +85,7 @@ def flow_transport_simulation():
     x = np.arange(xmin, xmax, dx) + 0.5 * dx
 
     grid_dims = ("layer", "y", "x")
-    grid_coords = {"layer": layer, "y": y, "x": x}
+    grid_coords = {"layer": layer, "y": y, "x": x, "dx": dx, "dy": 1.}
     grid_shape = (nlay, nrow, ncol)
     grid = xr.DataArray(
         np.ones(grid_shape, dtype=int), coords=grid_coords, dims=grid_dims
