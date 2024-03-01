@@ -28,7 +28,7 @@ def _create_submodel_labels_unstructured(idomain, number_partitions):
 def to_unstruct_domain(idomain):
     grid = xu.Ugrid2d.from_structured(idomain)
 
-    domain_data = imod.util.ugrid2d_data(idomain, grid.face_dimension)
+    domain_data = imod.util.spatial.ugrid2d_data(idomain, grid.face_dimension)
     return xu.UgridDataArray(domain_data, grid)
 
 

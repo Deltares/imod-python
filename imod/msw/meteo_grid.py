@@ -7,7 +7,6 @@ import pandas as pd
 import xarray as xr
 
 import imod
-from imod import util
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.timeutil import to_metaswap_timeformat
 
@@ -86,7 +85,7 @@ class MeteoGrid(MetaSwapPackage):
             Absolute path.
 
         """
-        return str(directory / util.compose(d, pattern))
+        return str(directory / imod.util.path.compose(d, pattern))
 
     def _is_grid(self, varname: str):
         coords = self.dataset[varname].coords

@@ -67,8 +67,8 @@ class TimeDiscretization(Package):
             "{% endfor %}\n"
         )
         times = self.dataset["time"].values
-        timestrings = [imod.util._compose_timestring(time) for time in times]
-        timestrings.append(imod.util._compose_timestring(self.endtime))
+        timestrings = [imod.util.time._compose_timestring(time) for time in times]
+        timestrings.append(imod.util.time._compose_timestring(self.endtime))
 
         d = dict(
             timestrings=timestrings,

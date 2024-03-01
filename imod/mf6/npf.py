@@ -7,6 +7,8 @@ from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
+    CompatibleSettingsSchema,
+    DimsSchema,
     DTypeSchema,
     IdentityNoDataSchema,
     IndexesSchema,
@@ -273,13 +275,14 @@ class NodePropertyFlow(Package):
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
         ],
-        "alternative_cell_averaging": [DTypeSchema(str)],
-        "save_flows": [DTypeSchema(np.bool_)],
+        "alternative_cell_averaging": [DTypeSchema(str), DimsSchema(), CompatibleSettingsSchema("xt3d_option", False)],
+        "rhs_option": [DTypeSchema(np.bool_), DimsSchema(), CompatibleSettingsSchema("xt3d_option", True)],
+        "save_flows": [DTypeSchema(np.bool_), DimsSchema()],
         "starting_head_as_confined_thickness": [DTypeSchema(np.bool_)],
         "variable_vertical_conductance": [DTypeSchema(np.bool_)],
         "dewatered": [DTypeSchema(np.bool_)],
         "perched": [DTypeSchema(np.bool_)],
-        "save_specific_discharge": [DTypeSchema(np.bool_)],
+        "save_specific_discharge": [DTypeSchema(np.bool_), DimsSchema()],
     }
 
     _write_schemata = {
@@ -440,3 +443,10 @@ class NodePropertyFlow(Package):
         Returns the "dewatered" option value for this object. Used only when variable_vertical_conductance is true
         """
         return _dataarray_to_bool(self.dataset["dewatered"])
+
+    def _validate(self, schemata, **kwargs):
+        # Insert additional kwargs
+        kwargs["xt3d_option"] = self["xt3d_option"]
+        errors = super()._validate(schemata, **kwargs)
+
+        return errors

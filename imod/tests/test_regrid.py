@@ -246,7 +246,7 @@ def test_regrid_coord():
     dy = np.array([-1.3, -0.7, -1.0])
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = imod.util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = imod.util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     # Flip around the y to be increasing
     # this is what happens in the regridding fuctions with the DataArrays
     coords["y"] = coords["y"][::-1]

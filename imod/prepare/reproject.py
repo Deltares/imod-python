@@ -3,7 +3,7 @@ import numpy as np
 import xarray as xr
 
 import imod
-from imod.util import MissingOptionalModule
+from imod.util.imports import MissingOptionalModule
 
 # since rasterio is a big dependency that is sometimes hard to install
 # and not always required, we made this an optional dependency
@@ -214,8 +214,8 @@ def reproject(
                 dims=("y", "x"),
             )
             src_crs = dst_crs = rasterio.crs.CRS.from_epsg(32630)
-        src_transform = imod.util.transform(source)
-        dst_transform = imod.util.transform(like)
+        src_transform = imod.util.spatial.transform(source)
+        dst_transform = imod.util.spatial.transform(like)
 
     elif src_crs and dst_crs:
         if use_src_attrs:
@@ -227,13 +227,13 @@ def reproject(
         elif "src_transform" in reproject_kwargs.keys():
             src_transform = reproject_kwargs.pop("src_transform")
         else:
-            src_transform = imod.util.transform(source)
+            src_transform = imod.util.spatial.transform(source)
 
         # If no like is provided, just reproject to different coordinate system
         if like is None:
             dst_transform, dst = _reproject_dst(source, src_crs, dst_crs, src_transform)
         else:
-            dst_transform = imod.util.transform(like)
+            dst_transform = imod.util.spatial.transform(like)
             dst = xr.DataArray(
                 data=np.zeros(like.shape, source.dtype),
                 coords={"y": like.y, "x": like.x},

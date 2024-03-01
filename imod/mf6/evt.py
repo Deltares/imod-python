@@ -16,7 +16,7 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
-from imod.util import unstack_dim_into_variable
+from imod.util.spatial import unstack_dim_into_variable
 
 SEGMENT_BOUNDARY_DIMS_SCHEMA = (
     BOUNDARY_DIMS_SCHEMA

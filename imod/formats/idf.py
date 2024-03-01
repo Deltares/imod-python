@@ -18,7 +18,7 @@ from typing import Any
 import numpy as np
 import xarray as xr
 
-from imod import util
+import imod
 from imod.formats import array_io
 from imod.typing.structured import merge_partitions
 
@@ -28,7 +28,7 @@ f_open = open
 
 def header(path, pattern):
     """Read the IDF header information into a dictionary"""
-    attrs = util.decompose(path, pattern)
+    attrs = imod.util.path.decompose(path, pattern)
     with f_open(path, "rb") as f:
         reclen_id = struct.unpack("i", f.read(4))[0]  # Lahey RecordLength Ident.
         if reclen_id == 1271:
@@ -286,12 +286,12 @@ def open_subdomains(
     if pattern is None:
         # If no pattern provided test if
         pattern = "{name}_c{species}_{time}_l{layer}_p{subdomain}"
-        re_pattern_species = util._custom_pattern_to_regex_pattern(pattern)
+        re_pattern_species = imod.util.path._custom_pattern_to_regex_pattern(pattern)
         has_species = re_pattern_species.search(paths[0])
         if not has_species:
             pattern = "{name}_{time}_l{layer}_p{subdomain}"
 
-    parsed = [util.decompose(path, pattern) for path in paths]
+    parsed = [imod.util.path.decompose(path, pattern) for path in paths]
     grouped = defaultdict(list)
     for match, path in zip(parsed, paths):
         try:
@@ -367,7 +367,7 @@ def open_dataset(globpath, use_cftime=False, pattern=None):
         raise FileNotFoundError("Could not find any files matching {}".format(globpath))
     # group the DataArrays together using their name
     # note that directory names are ignored, and in case of duplicates, the last one wins
-    names = [util.decompose(path, pattern)["name"] for path in paths]
+    names = [imod.util.path.decompose(path, pattern)["name"] for path in paths]
     unique_names = list(np.unique(names))
     d = {}
     for n in unique_names:
@@ -458,7 +458,7 @@ def write(path, a, nodata=1.0e20, dtype=np.float32):
         f.write(struct.pack(intformat, ncol))
         f.write(struct.pack(intformat, nrow))
 
-        dx, xmin, xmax, dy, ymin, ymax = util.spatial_reference(a)
+        dx, xmin, xmax, dy, ymin, ymax = imod.util.spatial.spatial_reference(a)
 
         f.write(struct.pack(floatformat, xmin))
         f.write(struct.pack(floatformat, xmax))
@@ -529,7 +529,7 @@ def _as_voxeldata(a):
 
             # It'll raise an Error if it cannot infer dz
             if "dz" not in a.coords:
-                dz, _, _ = util.coord_reference(a["z"])
+                dz, _, _ = imod.util.spatial.coord_reference(a["z"])
                 if isinstance(dz, float):
                     a = a.assign_coords(dz=dz)
                 else:
@@ -541,7 +541,7 @@ def _as_voxeldata(a):
                 if tuple(a["z"].indexes.keys()) == ("layer",):
                     if "dz" not in a.coords:
                         # It'll raise an Error if it cannot infer dz
-                        dz, _, _ = util.coord_reference(a["z"])
+                        dz, _, _ = imod.util.spatial.coord_reference(a["z"])
                         if isinstance(dz, float):
                             a = a.assign_coords(dz=dz)
                         else:
@@ -557,7 +557,7 @@ def save(path, a, nodata=1.0e20, pattern=None, dtype=np.float32):
     written, like the ``imod.idf.write`` function. This function is more general
     and also supports ``time`` and ``layer`` dimensions. It will split these up,
     give them their own filename according to the conventions in
-    ``imod.util.compose``, and write them each.
+    ``imod.util.path.compose``, and write them each.
 
     Parameters
     ----------

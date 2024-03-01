@@ -251,7 +251,7 @@ def _slice_src(src, like, extra_overlap):
     for dim in dims:
         # Generate vertices
         src_x = _coord(src, dim)
-        _, xmin, xmax = imod.util.coord_reference(like[dim])
+        _, xmin, xmax = imod.util.spatial.coord_reference(like[dim])
         i0, i1 = _selection_indices(src_x, xmin, xmax, extra_overlap)
         slices[dim] = slice(i0, i1)
     return src.isel(slices)
@@ -295,7 +295,7 @@ def _set_cellsizes(da, dims):
     for dim in dims:
         dx_string = f"d{dim}"
         if dx_string not in da.coords:
-            dx, _, _ = imod.util.coord_reference(da.coords[dim])
+            dx, _, _ = imod.util.spatial.coord_reference(da.coords[dim])
             if isinstance(dx, (int, float)):
                 dx = np.full(da.coords[dim].size, dx)
             da = da.assign_coords({dx_string: (dim, dx)})

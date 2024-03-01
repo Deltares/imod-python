@@ -13,7 +13,7 @@ def test_da():
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = imod.util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = imod.util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     kwargs = {"coords": coords, "dims": ("y", "x")}
     data = np.arange(nrow * ncol).reshape((nrow, ncol))
     return xr.DataArray(data, **kwargs)
@@ -26,7 +26,7 @@ def test_da_nonequidistant():
     dy = np.array([-1.5, -0.5, -1.0])
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = imod.util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = imod.util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     kwargs = {"coords": coords, "dims": ("y", "x")}
     data = np.arange(nrow * ncol).reshape((nrow, ncol))
     return xr.DataArray(data, **kwargs)

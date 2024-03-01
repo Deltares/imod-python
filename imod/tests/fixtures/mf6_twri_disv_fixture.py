@@ -79,7 +79,7 @@ def make_twri_disv_model():
     grid = xu.Ugrid2d.from_structured(idomain)
 
     def toface(da):
-        return imod.util.ugrid2d_data(da, grid.face_dimension)
+        return imod.util.spatial.ugrid2d_data(da, grid.face_dimension)
 
     idomain = xu.UgridDataArray(toface(idomain), grid)
     head = xu.UgridDataArray(toface(head), grid)

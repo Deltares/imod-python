@@ -14,7 +14,7 @@ import xarray as xr
 import xugrid as xu
 
 from imod.formats.prj import open_projectfile_data
-from imod.util import MissingOptionalModule
+from imod.util.imports import MissingOptionalModule
 
 try:
     import geopandas as gpd

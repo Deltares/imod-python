@@ -3,7 +3,7 @@ import numpy as np
 import xarray as xr
 
 import imod
-from imod.util import MissingOptionalModule
+from imod.util.imports import MissingOptionalModule
 
 try:
     import shapely.geometry as sg
@@ -251,7 +251,7 @@ def _bounding_box(xmin, xmax, ymin, ymax):
 
 
 def _cross_section(data, linecoords):
-    dx, xmin, xmax, dy, ymin, ymax = imod.util.spatial_reference(data)
+    dx, xmin, xmax, dy, ymin, ymax = imod.util.spatial.spatial_reference(data)
     if isinstance(dx, float):
         dx = np.full(data.x.size, dx)
     if isinstance(dy, float):
@@ -373,7 +373,7 @@ def cross_section_line(data, start, end):
         cross-section. The cellsizes along "s" are given in the "ds" coordinate.
     """
     # Check for intersection
-    _, xmin, xmax, _, ymin, ymax = imod.util.spatial_reference(data)
+    _, xmin, xmax, _, ymin, ymax = imod.util.spatial.spatial_reference(data)
     bounding_box = _bounding_box(xmin, xmax, ymin, ymax)
     if not sg.LineString([start, end]).intersects(bounding_box):
         raise ValueError("Line does not intersect data")

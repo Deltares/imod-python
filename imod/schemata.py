@@ -42,7 +42,7 @@ import xarray as xr
 import xugrid as xu
 from numpy.typing import DTypeLike  # noqa: F401
 
-from imod.typing import GridDataArray
+from imod.typing import GridDataArray, ScalarAsDataArray
 
 DimsT = Union[str, None]
 ShapeT = Tuple[Union[int, None]]
@@ -295,6 +295,24 @@ class ShapeSchema(BaseSchema):
                 raise ValidationError(
                     f"shape mismatch in axis {i}: {actual} != {expected}"
                 )
+
+
+class CompatibleSettingsSchema(BaseSchema):
+    def __init__(self, other: ScalarAsDataArray, other_value: bool) -> None:
+        """
+        Validate if settings are compatible
+        """
+        self.other = other
+        self.other_value = other_value
+
+    def validate(self, obj: ScalarAsDataArray, **kwargs) -> None:
+        other_obj = kwargs[self.other]
+        if scalar_None(obj) or scalar_None(other_obj):
+            return
+        expected = np.all(other_obj == self.other_value)
+
+        if obj and not expected:
+            raise ValidationError(f"Incompatible setting: {self.other} should be {self.other_value}")
 
 
 class CoordsSchema(BaseSchema):

@@ -25,12 +25,17 @@ Fixed
   data.
 - Fix issue where :func:`imod.idf.open_subdomains` returned a flipped ``dy``
   coordinate for nonequidistant data.
+- Made :func:`imod.util.round_extent` available again, as it was moved without
+  notice. Function now throws a DeprecationWarning to use
+  :func:`imod.prepare.spatial.round_extent` instead.
 
 Added
 ~~~~~
 - The :func:`imod.mf6.model.mask_all_packages` now also masks the idomain array
   of the model discretization, and can be used with a mask array without a layer
   dimension, to mask all layers the same way
+- Validation for incompatible settings in the :class:`imod.mf6.NodePropertyFlow`
+  and :class:`imod.mf6.Dispersion` packages.
 
 
 [0.15.3] - 2024-02-22
@@ -352,8 +357,8 @@ Added
 - :class:`imod.mf6.OutputControl` now takes parameters ``head_file``,
   ``concentration_file``, and ``budget_file`` to specify where to store
   MODFLOW6 output files.
-- :func:`imod.util.from_mdal_compliant_ugrid2d` to "restack" the variables that
-  have have been "unstacked" in :func:`imod.util.mdal_compliant_ugrid2d`.
+- :func:`imod.util.spatial.from_mdal_compliant_ugrid2d` to "restack" the variables that
+  have have been "unstacked" in :func:`imod.util.spatial.mdal_compliant_ugrid2d`.
 - Added support for the Modflow6 Lake package
 - :func:`imod.select.points_in_bounds`, :func:`imod.select.points_indices`,
   :func:`imod.select.points_values` now support unstructured grids.
@@ -758,7 +763,7 @@ Fixed
    which a coordinate other than ``x`` or ``y`` is descending.
 -  :func:`imod.visualize.plot_map` enforces decreasing ``y``, which ensures maps are not plotted
    upside down.
--  :func:`imod.util.coord_reference` now returns a scalar cellsize if coordinate is equidistant.
+-  :func:`imod.util.spatial.coord_reference` now returns a scalar cellsize if coordinate is equidistant.
 -  :meth:`imod.prepare.Regridder.regrid` returns cellsizes as scalar when coordinates are
    equidistant.
 -  Raise proper ValueError in :meth:`imod.prepare.Regridder.regrid` consistenly when the number
