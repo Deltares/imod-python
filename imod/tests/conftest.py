@@ -49,6 +49,7 @@ from .fixtures.mf6_small_models_fixture import (
     solution_settings,
     structured_flow_model,
     structured_flow_simulation,
+    structured_flow_simulation_2_flow_models,
     unstructured_flow_model,
     unstructured_flow_simulation,
 )

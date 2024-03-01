@@ -6,6 +6,11 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[Feature branch specific]
+-------------------------
+- Checks that only one flow model is present in a simulation when calling
+:func:`imod.mf6.Modflow6Simulation.regrid_like`, :func:`imod.mf6.Modflow6Simulation.clip_box` or  :func:`imod.mf6.Modflow6Simulation.split` 
+
 [Unreleased]
 ------------
 
