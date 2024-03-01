@@ -274,7 +274,7 @@ def test_partitioning_unstructured_hfb(
 
     # Compare the head result of the original simulation with the result of the
     # partitioned simulation. Criteria are a bit looser than in other tests
-    # because we are dealing with a problem with heads ranging roughly from 2000
+    # because we are dealing with a problem with heads ranging roughly from 20
     # m to 0 m, and the HFB adds extra complexity to this.
     np.testing.assert_allclose(head["head"].values, original_head.values, rtol=0.005)
     for key in ["flow-lower-face", "flow-horizontal-face"]:
@@ -375,7 +375,15 @@ def test_partition_transport_multispecies(    tmp_path: Path,
 
     
     np.testing.assert_allclose(conc.values, conc_new["concentration"].values, rtol=4e-4, atol=5e-3)
-    np.testing.assert_allclose(head.values, head_new["head"].values, rtol=0.008, atol=0.15)
+    rtol = 1e-5
+    atol = 1e-3
+    if partition_array["name"].values[()] == "concentric":
+        # this is a multispecies transport test. Without transport models in the simulation 
+        # we achieve tolerances rtol 1e-5 and atol 1e-3 for the concentric partition scheme as well.
+        # see test_partitioning_unstructured
+        rtol = 0.008
+        atol = 0.15
+    np.testing.assert_allclose(head.values, head_new["head"].values, rtol=rtol, atol=atol)
 
     #TODO: also compare budget results. For now just open them. 
     _ = new_circle_model.open_flow_budget()
