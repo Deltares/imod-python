@@ -13,7 +13,7 @@ from imod.mf6.auxiliary_variables import (
     get_variable_names,
 )
 from imod.mf6.package import Package
-from imod.mf6.utilities.package_utils import get_repeat_stress
+from imod.mf6.utilities.package import get_repeat_stress
 from imod.mf6.write_context import WriteContext
 from imod.typing.grid import GridDataArray
 
