@@ -68,7 +68,7 @@ class TestExchangeCreator_Structured:
         layer = idomain.layer
 
         # Act.
-        exchanges = exchange_creator.create_exchanges(model_name, layer)
+        exchanges = exchange_creator.create_gwfgwf_exchanges(model_name, layer)
 
         # Assert.
         num_exchanges_x_direction = y_number_partitions * (x_number_partitions - 1)
@@ -296,7 +296,7 @@ class TestExchangeCreator_Structured:
         layer = idomain.layer
 
         # Act.
-        exchanges = exchange_creator.create_exchanges(model_name, layer)
+        exchanges = exchange_creator.create_gwfgwf_exchanges(model_name, layer)
 
         # Assert.
         assert len(exchanges) == len(expected_exchanges)
@@ -337,7 +337,7 @@ class TestExchangeCreator_Structured:
         layer = idomain.layer
 
         # Act.
-        exchanges = exchange_creator.create_exchanges(model_name, layer)
+        exchanges = exchange_creator.create_gwfgwf_exchanges(model_name, layer)
 
         # Assert.
         assert len(exchanges) == len(expected_exchanges)

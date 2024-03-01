@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+
 [Unreleased]
 ------------
 
@@ -23,6 +24,7 @@ Fixed
 - Made :func:`imod.util.round_extent` available again, as it was moved without
   notice. Function now throws a DeprecationWarning to use
   :func:`imod.prepare.spatial.round_extent` instead.
+- :meth'`imod.mf6.Modflow6Simulation.write` failed after splitting the simulation. This has been fixed.
 
 Added
 ~~~~~
@@ -31,6 +33,22 @@ Added
   dimension, to mask all layers the same way
 - Validation for incompatible settings in the :class:`imod.mf6.NodePropertyFlow`
   and :class:`imod.mf6.Dispersion` packages.
+- Checks that only one flow model is present in a simulation when calling
+:func:`imod.mf6.Modflow6Simulation.regrid_like`, :func:`imod.mf6.Modflow6Simulation.clip_box` or  :func:`imod.mf6.Modflow6Simulation.split` 
+- Added support for coupling a GroundwaterFlowModel and Transport Model i.c.w.
+  the 6.4.3 release of MODFLOW. Using an older version of iMOD Python
+  with this version of MODFLOW will result in an error.
+- :meth:`imod.mf6.Modflow6Simulation.split` supports splitting transport models,
+  including multi-species simulations.
+- :meth:`imod.mf6.Modflow6Simulation.open_concentration` and
+  :meth:`imod.mf6.Modflow6Simulation.open_transport_budget` support opening
+  split multi-species simulations.
+
+Changed
+~~~~~~~
+- :meth:`imod.mf6.Modflow6Simulation.open_concentration` and
+  :meth:`imod.mf6.Modflow6Simulation.open_transport_budget` raise a
+  ``ValueError`` if ``species_ls`` is provided with incorrect length.
 
 
 [0.15.3] - 2024-02-22
@@ -45,6 +63,7 @@ Fixed
   :class:`imod.mf6.Modflow6Simulation`, :class:`imod.mf6.GroundwaterFlowModel`
   and :class:`imod.mf6.GroundwaterTransportModel` objects threw an error.
 
+
 Added
 ~~~~~
 - Developer environment: Added pixi environment ``interactive`` to interactively
@@ -53,6 +72,8 @@ Added
   presence allows users to interact with libMF6.dll through its API.
 - Developer environment: Empty python 3.10, 3.11, 3.12 environments where pip
   install and import imod can be tested.
+
+
 
 [0.15.2] - 2024-02-16
 ---------------------

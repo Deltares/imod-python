@@ -44,6 +44,9 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 
+from imod.typing import GridDataArray, GridDataset
+from imod.typing.grid import merge_with_dictionary
+
 from . import dis, disu, disv
 from .cbc import read_cbc_headers
 from .common import FilePath, _grb_text
@@ -106,7 +109,7 @@ def open_hds(
     dry_nan: bool = False,
     simulation_start_time: Optional[np.datetime64] = None,
     time_unit: Optional[str] = "d",
-) -> Union[xr.DataArray, xu.UgridDataArray]:
+) -> GridDataArray:
     """
     Open modflow6 heads (.hds) file.
 
@@ -156,7 +159,7 @@ def open_conc(
     dry_nan: bool = False,
     simulation_start_time: Optional[np.datetime64] = None,
     time_unit: Optional[str] = "d",
-) -> Union[xr.DataArray, xu.UgridDataArray]:
+) -> GridDataArray:
     """
     Open Modflow6 "Unformatted Concentration" (.ucn) file.
 
@@ -171,6 +174,22 @@ def open_conc(
     grb_path: Union[str, pathlib.Path]
     dry_nan: bool, default value: False.
         Whether to convert dry values to NaN.
+    simulation_start_time : Optional datetime
+        The time and date correpsonding to the beginning of the simulation.
+        Use this to convert the time coordinates of the output array to
+        calendar time/dates. time_unit must also be present if this argument is present.
+    time_unit: Optional str
+        The time unit MF6 is working in, in string representation.
+        Only used if simulation_start_time was provided.
+        Admissible values are:
+        ns -> nanosecond
+        ms -> microsecond
+        s -> second
+        m -> minute
+        h -> hour
+        d -> day
+        w -> week
+        Units "month" or "year" are not supported, as they do not represent unambiguous timedelta values durations.
 
     Returns
     -------
@@ -187,7 +206,7 @@ def open_hds_like(
     path: FilePath,
     like: Union[xr.DataArray, xu.UgridDataArray],
     dry_nan: bool = False,
-) -> Union[xr.DataArray, xu.UgridDataArray]:
+) -> GridDataArray:
     """
     Open modflow6 heads (.hds) file.
 
@@ -227,7 +246,8 @@ def open_cbc(
     flowja: bool = False,
     simulation_start_time: Optional[np.datetime64] = None,
     time_unit: Optional[str] = "d",
-) -> Dict[str, Union[xr.DataArray, xu.UgridDataArray]]:
+    merge_to_dataset: bool = False,
+) -> GridDataset | Dict[str, GridDataArray]:
     """
     Open modflow6 cell-by-cell (.cbc) file.
 
@@ -259,10 +279,28 @@ def open_cbc(
     flowja: bool, default value: False
         Whether to return the flow-ja-face values "as is" (``True``) or in a
         grid form (``False``).
+    simulation_start_time : Optional datetime
+        The time and date correpsonding to the beginning of the simulation.
+        Use this to convert the time coordinates of the output array to
+        calendar time/dates. time_unit must also be present if this argument is present.
+    time_unit: Optional str
+        The time unit MF6 is working in, in string representation.
+        Only used if simulation_start_time was provided.
+        Admissible values are:
+        ns -> nanosecond
+        ms -> microsecond
+        s -> second
+        m -> minute
+        h -> hour
+        d -> day
+        w -> week
+        Units "month" or "year" are not supported, as they do not represent unambiguous timedelta values durations.
+    merge_to_dataset: bool, default value: False
+        Merge output to dataset.
 
     Returns
     -------
-    cbc_content: Dict[str, xr.DataArray]
+    cbc_content: xr.Dataset | Dict[str, xr.DataArray]
         DataArray contains float64 data of the budgets, with dimensions ("time",
         "layer", "y", "x").
 
@@ -287,4 +325,7 @@ def open_cbc(
     grb_content = read_grb(grb_path)
     distype = grb_content["distype"]
     _open = _get_function(_OPEN_CBC, distype)
-    return _open(cbc_path, grb_content, flowja, simulation_start_time, time_unit)
+    cbc = _open(cbc_path, grb_content, flowja, simulation_start_time, time_unit)
+    if merge_to_dataset:
+        return merge_with_dictionary(cbc)
+    return cbc
