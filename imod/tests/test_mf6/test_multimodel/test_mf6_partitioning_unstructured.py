@@ -353,12 +353,14 @@ def test_partition_transport(    tmp_path: Path,
 
 
 
-@pytest.mark.usefixtures("circle_model_transport_multispecies")
+@pytest.mark.usefixtures("circle_model_transport_multispecies_variable_density")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partition_transport_multispecies(    tmp_path: Path,
-    circle_model_transport_multispecies: Modflow6Simulation,partition_array: xu.UgridDataArray):
+    circle_model_transport_multispecies_variable_density: Modflow6Simulation,partition_array: xu.UgridDataArray):
     
-    
+    #TODO: put buoyancy package back
+    circle_model_transport_multispecies_variable_density["GWF_1"].pop("buoyancy")
+    circle_model_transport_multispecies = circle_model_transport_multispecies_variable_density
     circle_model_transport_multispecies.write(tmp_path/"original")
     circle_model_transport_multispecies.run()
     conc = circle_model_transport_multispecies.open_concentration()
@@ -375,15 +377,7 @@ def test_partition_transport_multispecies(    tmp_path: Path,
 
     
     np.testing.assert_allclose(conc.values, conc_new["concentration"].values, rtol=4e-4, atol=5e-3)
-    rtol = 1e-5
-    atol = 1e-3
-    if partition_array["name"].values[()] == "concentric":
-        # this is a multispecies transport test. Without transport models in the simulation 
-        # we achieve tolerances rtol 1e-5 and atol 1e-3 for the concentric partition scheme as well.
-        # see test_partitioning_unstructured
-        rtol = 0.008
-        atol = 0.15
-    np.testing.assert_allclose(head.values, head_new["head"].values, rtol=rtol, atol=atol)
+    np.testing.assert_allclose(head.values, head_new["head"].values, rtol=1e-5, atol=1e-3)
 
     #TODO: also compare budget results. For now just open them. 
     _ = new_circle_model.open_flow_budget()

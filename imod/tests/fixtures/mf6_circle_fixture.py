@@ -345,7 +345,7 @@ def circle_model_transport():
 
 
 @pytest.fixture(scope="function")
-def circle_model_transport_multispecies():
+def circle_model_transport_multispecies_variable_density():
 
     al = 0.001
     porosity = 0.3
