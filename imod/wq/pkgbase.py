@@ -7,7 +7,7 @@ import numpy as np
 import xarray as xr
 
 import imod
-from imod.wq import timeutil
+from imod.util.time import forcing_starts_ends, to_datetime_internal
 
 
 class Package(abc.ABC):
@@ -321,7 +321,7 @@ class Package(abc.ABC):
         if "time" in da.coords:
             package_times = da.coords["time"].values
 
-            starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
+            starts_ends = forcing_starts_ends(package_times, globaltimes)
             for itime, start_end in enumerate(starts_ends):
                 # TODO: this now fails on a non-dim time too
                 # solution roughly the same as for layer above?
@@ -437,7 +437,7 @@ class BoundaryCondition(Package, abc.ABC):
 
             # Replace both key and value by the right datetime type
             d = {
-                timeutil.to_datetime(k, use_cftime): timeutil.to_datetime(v, use_cftime)
+                to_datetime_internal(k, use_cftime): to_datetime_internal(v, use_cftime)
                 for k, v in value.items()
             }
             self.dataset[varname].attrs["stress_repeats"] = d
@@ -497,7 +497,7 @@ class BoundaryCondition(Package, abc.ABC):
             else:
                 runfile_times = package_times = da_times
 
-            starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
+            starts_ends = forcing_starts_ends(package_times, globaltimes)
 
             for time, start_end in zip(runfile_times, starts_ends):
                 # Check whether any range occurs in the input.

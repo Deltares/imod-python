@@ -4,33 +4,33 @@ import pytest
 import xarray as xr
 
 from imod.flow import TimeDiscretization
-from imod.wq import timeutil
+from imod.util.time import timestep_duration, to_datetime_internal
 
 
 @pytest.fixture(scope="module")
 def time_discretization(three_days):
     times = three_days
-    duration = timeutil.timestep_duration(times, False)
+    duration = timestep_duration(times, False)
 
-    timestep_duration = xr.DataArray(
+    da_duration = xr.DataArray(
         duration, coords={"time": np.array(times)[:-1]}, dims=("time",)
     )
 
-    return TimeDiscretization(timestep_duration=timestep_duration, endtime=times[-1])
+    return TimeDiscretization(timestep_duration=da_duration, endtime=times[-1])
 
 
 @pytest.fixture(scope="module")
 def time_discretization_cftime(three_days):
     times = three_days
     use_cftime = True
-    times = [timeutil.to_datetime(time, use_cftime) for time in times]
-    duration = timeutil.timestep_duration(times, use_cftime)
+    times = [to_datetime_internal(time, use_cftime) for time in times]
+    duration = timestep_duration(times, use_cftime)
 
-    timestep_duration = xr.DataArray(
+    da_duration = xr.DataArray(
         duration, coords={"time": np.array(times)[:-1]}, dims=("time",)
     )
 
-    return TimeDiscretization(timestep_duration=timestep_duration, endtime=times[-1])
+    return TimeDiscretization(timestep_duration=da_duration, endtime=times[-1])
 
 
 def test_create_time_discretization(time_discretization):

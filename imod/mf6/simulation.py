@@ -169,7 +169,7 @@ class Modflow6Simulation(collections.UserDict):
         )
 
         times = [
-            imod.wq.timeutil.to_datetime(time, self.use_cftime)
+            imod.util.time.to_datetime_internal(time, self.use_cftime)
             for time in additional_times
         ]
         for model in self.values():
@@ -179,7 +179,7 @@ class Modflow6Simulation(collections.UserDict):
         # np.unique also sorts
         times = np.unique(np.hstack(times))
 
-        duration = imod.wq.timeutil.timestep_duration(times, self.use_cftime)
+        duration = imod.util.time.timestep_duration(times, self.use_cftime)
         # Generate time discretization, just rely on default arguments
         # Probably won't be used that much anyway?
         timestep_duration = xr.DataArray(
