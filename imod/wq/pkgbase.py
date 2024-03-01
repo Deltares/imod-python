@@ -321,7 +321,7 @@ class Package(abc.ABC):
         if "time" in da.coords:
             package_times = da.coords["time"].values
 
-            starts_ends = to_datetime_internal(package_times, globaltimes)
+            starts_ends = forcing_starts_ends(package_times, globaltimes)
             for itime, start_end in enumerate(starts_ends):
                 # TODO: this now fails on a non-dim time too
                 # solution roughly the same as for layer above?
