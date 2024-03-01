@@ -161,8 +161,9 @@ def _convert_datetimes(times: np.array, use_cftime: bool):
         ]
     else:
         for time in times:
-            year = time.year
-            if year < 1678 or year > 2261:
+            try: 
+                _check_year(time.year)
+            except ValueError:
                 out_of_bounds = True
                 break
 
