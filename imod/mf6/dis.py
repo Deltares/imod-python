@@ -4,7 +4,7 @@ import numpy as np
 
 import imod
 from imod.mf6.package import Package
-from imod.mf6.regridding_utils import RegridderType
+from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import DisBottomSchema
 from imod.schemata import (
     ActiveCellsConnectedSchema,

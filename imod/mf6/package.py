@@ -22,7 +22,7 @@ from imod.mf6.pkgbase import (
     TRANSPORT_PACKAGES,
     PackageBase,
 )
-from imod.mf6.regridding_utils import (
+from imod.mf6.utilities.regrid import (
     RegridderInstancesCollection,
     RegridderType,
     assign_coord_if_present,

@@ -7,7 +7,7 @@ import pytest
 import xarray as xr
 
 import imod
-from imod.mf6.utilities.package_utils import get_repeat_stress
+from imod.mf6.utilities.package import get_repeat_stress
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 

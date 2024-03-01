@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 from imod.mf6.package import Package
-from imod.mf6.regridding_utils import RegridderType
+from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import DisBottomSchema
 from imod.mf6.write_context import WriteContext
 from imod.schemata import (

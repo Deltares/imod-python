@@ -25,7 +25,7 @@ import numpy as np
 import xarray as xr
 from example_models import create_twri_simulation
 
-from imod.mf6.regridding_utils import RegridderType
+from imod.mf6.utilities.regrid import RegridderType
 
 # %%
 # Now we create the twri simulation itself. It yields a simulation of a flow problem, with a grid of 3 layers and 15 cells in both x and y directions.
