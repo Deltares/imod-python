@@ -162,7 +162,7 @@ object MyPyTemplate : Template({
         testFailure = false
         failOnMetricChange {
             metric = BuildFailureOnMetric.MetricType.TEST_FAILED_COUNT
-            threshold = 2
+            threshold = 0
             units = BuildFailureOnMetric.MetricUnit.DEFAULT_UNIT
             comparison = BuildFailureOnMetric.MetricComparison.MORE
             compareTo = value()
@@ -293,7 +293,7 @@ object MyPy : BuildType({
         testFailure = false
         failOnMetricChange {
             metric = BuildFailureOnMetric.MetricType.TEST_FAILED_COUNT
-            threshold = 2
+            threshold = 0
             units = BuildFailureOnMetric.MetricUnit.DEFAULT_UNIT
             comparison = BuildFailureOnMetric.MetricComparison.MORE
             compareTo = value()

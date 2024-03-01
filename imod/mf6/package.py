@@ -22,7 +22,7 @@ from imod.mf6.pkgbase import (
     TRANSPORT_PACKAGES,
     PackageBase,
 )
-from imod.mf6.regridding_utils import (
+from imod.mf6.utilities.regrid import (
     RegridderInstancesCollection,
     RegridderType,
     assign_coord_if_present,
@@ -594,7 +594,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         return hasattr(self, "_regrid_method")
 
     def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        if self.is_regridding_supported():
+        if hasattr(self, "_regrid_method"):
             return self._regrid_method
         return None
 
@@ -685,7 +685,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         a package with the same options as this package, and with all the data-arrays regridded to another discretization,
         similar to the one used in input argument "target_grid"
         """
-        if not self.is_regridding_supported():
+        if not hasattr(self, "_regrid_method"):
             raise NotImplementedError(
                 f"Package {type(self).__name__} does not support regridding"
             )

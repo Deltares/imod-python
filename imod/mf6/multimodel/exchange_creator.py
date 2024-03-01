@@ -1,11 +1,12 @@
 import abc
-from typing import Dict, List
+from typing import Dict
 
 import numpy as np
 import pandas as pd
 import xarray as xr
 
 from imod.mf6.gwfgwf import GWFGWF
+from imod.mf6.gwtgwt import GWTGWT
 from imod.mf6.multimodel.modelsplitter import PartitionInfo
 from imod.mf6.utilities.grid import get_active_domain_slice, to_cell_idx
 from imod.typing import GridDataArray
@@ -85,7 +86,7 @@ class ExchangeCreator(abc.ABC):
     @classmethod
     @abc.abstractmethod
     def _create_global_to_local_idx(
-        cls, partition_info: List[PartitionInfo], global_cell_indices: GridDataArray
+        cls, partition_info: list[PartitionInfo], global_cell_indices: GridDataArray
     ) -> Dict[int, pd.DataFrame]:
         """
         abstract method that creates for each partition a mapping from global cell indices to local cells in that
@@ -94,7 +95,7 @@ class ExchangeCreator(abc.ABC):
         raise NotImplementedError
 
     def __init__(
-        self, submodel_labels: GridDataArray, partition_info: List[PartitionInfo]
+        self, submodel_labels: GridDataArray, partition_info: list[PartitionInfo]
     ):
         self._submodel_labels = submodel_labels
 
@@ -110,7 +111,9 @@ class ExchangeCreator(abc.ABC):
 
         self._geometric_information = self._compute_geometric_information()
 
-    def create_exchanges(self, model_name: str, layers: GridDataArray) -> List[GWFGWF]:
+    def create_gwfgwf_exchanges(
+        self, model_name: str, layers: GridDataArray
+    ) -> list[GWFGWF]:
         """
         Create GroundWaterFlow-GroundWaterFlow exchanges based on the submodel_labels array provided in the class
         constructor. The layer parameter is used to extrude the cell connection through all the layers. An exchange
@@ -142,45 +145,11 @@ class ExchangeCreator(abc.ABC):
             for model_id2, connected_domain_pair in grouped_connected_models.groupby(
                 "cell_label2"
             ):
-                model_id1 = int(model_id1)
-                model_id2 = int(model_id2)
-                mapping1 = (
-                    self._global_to_local_mapping[model_id1]
-                    .drop(columns=["local_idx"])
-                    .rename(
-                        columns={"global_idx": "cell_idx1", "local_cell_id": "cell_id1"}
+                connected_cells_dataset = (
+                    self._collect_geometric_constants_connected_cells(
+                        model_id1, model_id2, connected_domain_pair, layers
                     )
                 )
-
-                mapping2 = (
-                    self._global_to_local_mapping[model_id2]
-                    .drop(columns=["local_idx"])
-                    .rename(
-                        columns={"global_idx": "cell_idx2", "local_cell_id": "cell_id2"}
-                    )
-                )
-
-                connected_cells = (
-                    connected_domain_pair.merge(mapping1)
-                    .merge(mapping2)
-                    .filter(
-                        [
-                            "cell_id1",
-                            "cell_id2",
-                            "cl1",
-                            "cl2",
-                            "hwva",
-                            "angldegx",
-                            "cdist",
-                        ]
-                    )
-                )
-
-                connected_cells = pd.merge(layers, connected_cells, how="cross")
-
-                connected_cells_dataset = self._to_xarray(connected_cells)
-
-                _adjust_gridblock_indexing(connected_cells_dataset)
 
                 exchanges.append(
                     GWFGWF(
@@ -192,8 +161,85 @@ class ExchangeCreator(abc.ABC):
 
         return exchanges
 
+    def _collect_geometric_constants_connected_cells(
+        self,
+        model_id1: int,
+        model_id2: int,
+        connected_domain_pair: pd.DataFrame,
+        layers: GridDataArray,
+    ) -> xr.Dataset:
+        mapping1 = (
+            self._global_to_local_mapping[model_id1]
+            .drop(columns=["local_idx"])
+            .rename(columns={"global_idx": "cell_idx1", "local_cell_id": "cell_id1"})
+        )
+
+        mapping2 = (
+            self._global_to_local_mapping[model_id2]
+            .drop(columns=["local_idx"])
+            .rename(columns={"global_idx": "cell_idx2", "local_cell_id": "cell_id2"})
+        )
+
+        connected_cells = (
+            connected_domain_pair.merge(mapping1)
+            .merge(mapping2)
+            .filter(
+                [
+                    "cell_id1",
+                    "cell_id2",
+                    "cl1",
+                    "cl2",
+                    "hwva",
+                    "angldegx",
+                    "cdist",
+                ]
+            )
+        )
+
+        connected_cells = pd.merge(layers, connected_cells, how="cross")
+
+        connected_cells_dataset = self._to_xarray(connected_cells)
+
+        _adjust_gridblock_indexing(connected_cells_dataset)
+
+        return connected_cells_dataset
+
+    def create_gwtgwt_exchanges(
+        self, transport_model_name: str, flow_model_name: str, layers: GridDataArray
+    ) -> list[GWTGWT]:
+        layers = layers.to_dataframe().filter(["layer"])
+
+        connected_cells_with_geometric_info = pd.merge(
+            self._connected_cells, self._geometric_information
+        )
+
+        exchanges = []
+        for (
+            model_id1,
+            grouped_connected_models,
+        ) in connected_cells_with_geometric_info.groupby("cell_label1"):
+            for model_id2, connected_domain_pair in grouped_connected_models.groupby(
+                "cell_label2"
+            ):
+                connected_cells_dataset = (
+                    self._collect_geometric_constants_connected_cells(
+                        model_id1, model_id2, connected_domain_pair, layers
+                    )
+                )
+                exchanges.append(
+                    GWTGWT(
+                        f"{transport_model_name}_{model_id1}",
+                        f"{transport_model_name}_{model_id2}",
+                        f"{flow_model_name}_{model_id1}",
+                        f"{flow_model_name}_{model_id2}",
+                        **connected_cells_dataset,
+                    )
+                )
+
+        return exchanges
+
     def _create_global_cellidx_to_local_cellid_mapping(
-        self, partition_info: List[PartitionInfo]
+        self, partition_info: list[PartitionInfo]
     ) -> Dict[int, pd.DataFrame]:
         global_to_local_idx = self._create_global_to_local_idx(
             partition_info, self._global_cell_indices
