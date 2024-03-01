@@ -16,6 +16,8 @@ from .fixtures.flow_transport_simulation_fixture import flow_transport_simulatio
 from .fixtures.mf6_circle_fixture import (
     circle_model,
     circle_model_evt,
+    circle_model_transport,
+    circle_model_transport_multispecies_variable_density,
     circle_partitioned,
     circle_result,
     circle_result_evt,
@@ -47,6 +49,7 @@ from .fixtures.mf6_small_models_fixture import (
     solution_settings,
     structured_flow_model,
     structured_flow_simulation,
+    structured_flow_simulation_2_flow_models,
     unstructured_flow_model,
     unstructured_flow_simulation,
 )

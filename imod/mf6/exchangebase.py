@@ -2,7 +2,7 @@ from typing import Tuple
 
 from imod.mf6.package import Package
 
-_pkg_id_to_type = {"gwfgwf": "GWF6-GWF6", "gwfgwt": "GWF6-GWT6"}
+_pkg_id_to_type = {"gwfgwf": "GWF6-GWF6", "gwfgwt": "GWF6-GWT6", "gwtgwt": "GWT6-GWT6"}
 
 
 class ExchangeBase(Package):

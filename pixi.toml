@@ -108,7 +108,7 @@ tqdm = "*"
 twine = "*"
 vtk = { version = ">=9.0", build = "*qt*", channel = "conda-forge" }
 xarray = ">=2023.04.0"
-xugrid = ">=0.6.4"
+xugrid = ">=0.9.0"
 zarr = "*"
 build = "*"
 
