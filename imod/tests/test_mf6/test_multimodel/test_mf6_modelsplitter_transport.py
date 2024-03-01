@@ -194,9 +194,9 @@ def test_split_flow_and_transport_model_evaluate_output_with_species(
 
 @pytest.mark.usefixtures("flow_transport_simulation")
 @pytest.mark.parametrize("advection_scheme", ["TVD", "upstream", "central"])
-@pytest.mark.parametrize("dsp_xt3d", [True, False])
+@pytest.mark.parametrize("dsp_xt3d_off", [True, False])
 def test_split_flow_and_transport_settings(
-    tmp_path: Path, flow_transport_simulation: Modflow6Simulation, advection_scheme: str, dsp_xt3d: bool
+    tmp_path: Path, flow_transport_simulation: Modflow6Simulation, advection_scheme: str, dsp_xt3d_off: bool
 ):
     simulation = flow_transport_simulation
 
@@ -207,8 +207,8 @@ def test_split_flow_and_transport_settings(
         diffusion_coefficient=1e-2,
         longitudinal_horizontal=20.0,
         transversal_horizontal1=2.0,
-        xt3d_off=dsp_xt3d,
-        xt3d_rhs=dsp_xt3d,
+        xt3d_off=dsp_xt3d_off,
+        xt3d_rhs=not dsp_xt3d_off,
     )
     simulation["tpt_b"]["adv"] = Advection(scheme=advection_scheme)
     # create label array
@@ -224,9 +224,9 @@ def test_split_flow_and_transport_settings(
     )
     assert (
         new_simulation["split_exchanges"][2].dataset["dsp_xt3d_off"].values[()]
-        == dsp_xt3d
+        == dsp_xt3d_off
     )
     assert (
         new_simulation["split_exchanges"][2].dataset["dsp_xt3d_rhs"].values[()]
-        == dsp_xt3d
+        == (not dsp_xt3d_off)
     )
