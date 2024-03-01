@@ -15,10 +15,7 @@ from imod.flow.pkgbase import BoundaryCondition
 from imod.flow.pkggroup import PackageGroups
 from imod.flow.timeutil import insert_unique_package_times
 from imod.util.nested_dict import append_nested_dict, initialize_nested_dict
-from imod.util.time import _compose_timestring
-
-# TODO: Merge time utilities, this is becoming a mess
-from imod.wq import timeutil
+from imod.util.time import _compose_timestring, timestep_duration, to_datetime_internal
 
 
 class IniFile(collections.UserDict, abc.ABC):
@@ -260,7 +257,7 @@ class ImodflowModel(Model):
             self.use_cftime = False
 
         times = [
-            timeutil.to_datetime(time, self.use_cftime) for time in additional_times
+            to_datetime_internal(time, self.use_cftime) for time in additional_times
         ]
         times, first_times = insert_unique_package_times(self.items(), times)
 
@@ -275,15 +272,15 @@ class ImodflowModel(Model):
                     "time."
                 )
 
-        duration = timeutil.timestep_duration(times, self.use_cftime)
+        duration = timestep_duration(times, self.use_cftime)
         # Generate time discretization, just rely on default arguments
         # Probably won't be used that much anyway?
         times = np.array(times)
-        timestep_duration = xr.DataArray(
+        timestep_duration_da = xr.DataArray(
             duration, coords={"time": times[:-1]}, dims=("time",)
         )
         self["time_discretization"] = imod.flow.TimeDiscretization(
-            timestep_duration=timestep_duration, endtime=times[-1]
+            timestep_duration=timestep_duration_da, endtime=times[-1]
         )
 
     def _calc_n_entry(self, composed_package, is_boundary_condition):

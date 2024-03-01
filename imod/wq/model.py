@@ -11,7 +11,7 @@ import xarray as xr
 from scipy.ndimage import binary_dilation
 
 import imod
-from imod.wq import timeutil
+from imod.util.time import timestep_duration, to_datetime_internal
 from imod.wq.pkggroup import PackageGroups
 
 
@@ -358,7 +358,7 @@ class SeawatModel(Model):
             self.use_cftime = False
 
         times = [
-            timeutil.to_datetime(time, self.use_cftime) for time in additional_times
+            to_datetime_internal(time, self.use_cftime) for time in additional_times
         ]
         first_times = {}  # first time per package
         for key, pkg in self.items():
@@ -387,14 +387,14 @@ class SeawatModel(Model):
                     "time."
                 )
 
-        duration = timeutil.timestep_duration(times, self.use_cftime)
+        duration = timestep_duration(times, self.use_cftime)
         # Generate time discretization, just rely on default arguments
         # Probably won't be used that much anyway?
-        timestep_duration = xr.DataArray(
+        timestep_duration_da = xr.DataArray(
             duration, coords={"time": np.array(times)[:-1]}, dims=("time",)
         )
         self["time_discretization"] = imod.wq.TimeDiscretization(
-            timestep_duration=timestep_duration
+            timestep_duration=timestep_duration_da
         )
 
     def _render_gen(self, modelname, globaltimes, writehelp, result_dir):

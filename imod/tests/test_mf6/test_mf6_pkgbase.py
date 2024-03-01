@@ -50,8 +50,8 @@ def create_expected(index, time):
 
 def test_clip_time_indexer__full(dataset):
     time = dataset["time"].values
-    time_start = imod.wq.timeutil.to_datetime("2000-01-01", False)
-    time_end = imod.wq.timeutil.to_datetime("2000-12-01", False)
+    time_start = imod.util.time.to_datetime_internal("2000-01-01", False)
+    time_end = imod.util.time.to_datetime_internal("2000-12-01", False)
     indexer = Package._clip_time_indexer(
         time=time,
         time_start=time_start,
@@ -63,8 +63,8 @@ def test_clip_time_indexer__full(dataset):
 
 def test_clip_time_indexer__after(dataset):
     time = dataset["time"].values
-    time_start = imod.wq.timeutil.to_datetime("2001-01-01", False)
-    time_end = imod.wq.timeutil.to_datetime("2001-12-01", False)
+    time_start = imod.util.time.to_datetime_internal("2001-01-01", False)
+    time_end = imod.util.time.to_datetime_internal("2001-12-01", False)
     indexer = Package._clip_time_indexer(
         time=time,
         time_start=time_start,
@@ -76,8 +76,8 @@ def test_clip_time_indexer__after(dataset):
 
 def test_clip_time_indexer__before(dataset):
     time = dataset["time"].values
-    time_start = imod.wq.timeutil.to_datetime("1999-01-01", False)
-    time_end = imod.wq.timeutil.to_datetime("1999-12-01", False)
+    time_start = imod.util.time.to_datetime_internal("1999-01-01", False)
+    time_end = imod.util.time.to_datetime_internal("1999-12-01", False)
     indexer = Package._clip_time_indexer(
         time=time,
         time_start=time_start,
@@ -89,8 +89,8 @@ def test_clip_time_indexer__before(dataset):
 
 def test_clip_time_indexer__within(dataset):
     time = dataset["time"].values
-    time_start = imod.wq.timeutil.to_datetime("2000-01-15", False)
-    time_end = imod.wq.timeutil.to_datetime("2000-03-01", False)
+    time_start = imod.util.time.to_datetime_internal("2000-01-15", False)
+    time_end = imod.util.time.to_datetime_internal("2000-03-01", False)
     indexer = Package._clip_time_indexer(
         time=time,
         time_start=time_start,
@@ -110,8 +110,8 @@ def test_clip_repeat_stress__all_repeats(dataset):
     )
 
     time = dataset["time"].values
-    time_start = imod.wq.timeutil.to_datetime("2005-01-01", False)
-    time_end = imod.wq.timeutil.to_datetime("2008-12-01", False)
+    time_start = imod.util.time.to_datetime_internal("2005-01-01", False)
+    time_end = imod.util.time.to_datetime_internal("2008-12-01", False)
 
     indexer = Package._clip_time_indexer(
         time=dataset["time"].values,
@@ -145,8 +145,8 @@ def test_clip_repeat_stress__some_repeats(dataset2):
     )
 
     time = dataset["time"].values
-    time_start = imod.wq.timeutil.to_datetime("2005-01-01", False)
-    time_end = imod.wq.timeutil.to_datetime("2008-12-01", False)
+    time_start = imod.util.time.to_datetime_internal("2005-01-01", False)
+    time_end = imod.util.time.to_datetime_internal("2008-12-01", False)
 
     indexer = Package._clip_time_indexer(
         time=dataset["time"].values,

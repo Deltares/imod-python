@@ -415,7 +415,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         if time is None:
             return time
         else:
-            return imod.wq.timeutil.to_datetime(time, use_cftime)
+            return imod.util.time.to_datetime_internal(time, use_cftime)
 
     def clip_box(
         self,
