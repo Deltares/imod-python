@@ -2,7 +2,13 @@ import numpy as np
 
 from imod.mf6.package import Package
 from imod.mf6.validation import PKG_DIMS_SCHEMA
-from imod.schemata import DTypeSchema, IdentityNoDataSchema, IndexesSchema
+from imod.schemata import (
+    CompatibleSettingsSchema,
+    DimsSchema,
+    DTypeSchema,
+    IdentityNoDataSchema,
+    IndexesSchema,
+)
 
 
 class Dispersion(Package):
@@ -108,8 +114,8 @@ class Dispersion(Package):
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
         ],
-        "xt3d_off": [DTypeSchema(np.bool_)],
-        "xt3d_rhs": [DTypeSchema(np.bool_)],
+        "xt3d_off": [DTypeSchema(np.bool_), DimsSchema()],
+        "xt3d_rhs": [DTypeSchema(np.bool_), DimsSchema(), CompatibleSettingsSchema(other="xt3d_off", other_value=False)],
     }
 
     _write_schemata = {
@@ -157,3 +163,10 @@ class Dispersion(Package):
         }
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
+
+    def _validate(self, schemata, **kwargs):
+        # Insert additional kwargs
+        kwargs["xt3d_off"] = self["xt3d_off"]
+        errors = super()._validate(schemata, **kwargs)
+
+        return errors

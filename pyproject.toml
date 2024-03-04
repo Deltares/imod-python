@@ -31,17 +31,19 @@ dependencies = [
     "dask",
     "fastcore",
     "Jinja2",
+    "loguru",
     "matplotlib",
     "numba",
     "numpy",
     "pandas",
     "pooch",
     "scipy",
+    "tomli >= 1.1.0",
     "tomli_w",
     "toolz",
     "tqdm",
     "xarray >=2023.04.0",
-    "xugrid >=0.6.4",
+    "xugrid >=0.9.0",
 ]
 
 [project.urls]
@@ -61,7 +63,6 @@ all = [
     "rasterio >=1",
     "rioxarray",
     "shapely >=1.8",
-    "tomli >= 1.1.0 ; python_version < '3.11'",
     "zarr",
 ]
 

@@ -13,7 +13,7 @@ def test_da(request):
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     kwargs = {"name": "test", "coords": coords, "dims": ("y", "x")}
     data = np.ones((nrow, ncol), dtype=request.param)
     da = xr.DataArray(data, **kwargs)
@@ -27,7 +27,7 @@ def test_da_nonequidistant():
     dy = np.array([-1.3, -0.7, -1.0])
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     kwargs = {"name": "nonequidistant", "coords": coords, "dims": ("y", "x")}
     data = np.ones((nrow, ncol), dtype=np.float32)
     return xr.DataArray(data, **kwargs)
@@ -39,7 +39,7 @@ def test_layerda():
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     coords["layer"] = np.arange(nlay) + 1
     kwargs = {"name": "layer", "coords": coords, "dims": ("layer", "y", "x")}
     data = np.ones((nlay, nrow, ncol), dtype=np.float32)
@@ -81,7 +81,7 @@ class SubdomainCases:
 
         das = []
         for i, subd_extent in enumerate(zip(xmin, xmax, ymin, ymax)):
-            kwargs["coords"] = util._xycoords(subd_extent, (dx, dy))
+            kwargs["coords"] = util.spatial._xycoords(subd_extent, (dx, dy))
             kwargs["coords"]["layer"] = layer
             kwargs["coords"]["species"] = species
             da_data = data + i * subdomain_factor
@@ -148,7 +148,7 @@ def test_open_subdomains(subdomains, expected, equidistant, tmp_path):
     da = idf.open_subdomains(tmp_path / "subdomains_*.idf").load()
 
     dx, dy = dxdy_full(equidistant)
-    expected_coords = util._xycoords((0.0, 8.0, 0.0, 6.0), (dx, dy))
+    expected_coords = util.spatial._xycoords((0.0, 8.0, 0.0, 6.0), (dx, dy))
 
     assert da.dims == ("time", "layer", "y", "x")
 
@@ -158,6 +158,8 @@ def test_open_subdomains(subdomains, expected, equidistant, tmp_path):
 
     assert np.all(da["y"].values == expected_coords["y"])
     assert np.all(da["x"].values == expected_coords["x"])
+    assert np.all(da["dx"].values == dx)
+    assert np.all(da["dy"].values == dy)
 
     assert da.values.dtype == np.float32
 
@@ -190,7 +192,7 @@ def test_open_subdomains_species(subdomains, expected, equidistant, tmp_path):
     da = idf.open_subdomains(tmp_path / "subdomains_*.idf", pattern=pattern).load()
 
     dx, dy = dxdy_full(equidistant)
-    expected_coords = util._xycoords((0.0, 8.0, 0.0, 6.0), (dx, dy))
+    expected_coords = util.spatial._xycoords((0.0, 8.0, 0.0, 6.0), (dx, dy))
 
     assert da.dims == ("species", "time", "layer", "y", "x")
 
@@ -200,6 +202,8 @@ def test_open_subdomains_species(subdomains, expected, equidistant, tmp_path):
 
     assert np.all(da["y"].values == expected_coords["y"])
     assert np.all(da["x"].values == expected_coords["x"])
+    assert np.all(da["dx"].values == dx)
+    assert np.all(da["dy"].values == dy)
 
     assert da.values.dtype == np.float32
 
@@ -238,7 +242,7 @@ def test_xycoords_equidistant():
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     assert np.allclose(coords["x"], np.arange(xmin + dx / 2.0, xmax, dx))
     assert np.allclose(coords["y"], np.arange(ymax + dy / 2.0, ymin, dy))
     assert coords["dx"] == dx
@@ -250,7 +254,7 @@ def test_xycoords_nonequidistant():
     dy = np.array([-1.3, -0.7, -1.0])
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     assert np.allclose(coords["x"], np.array([0.45, 1.45, 2.4, 3.4]))
     assert np.allclose(coords["y"], np.array([2.35, 1.35, 0.5]))
     assert coords["dx"][0] == "x"
@@ -264,7 +268,7 @@ def test_xycoords_equidistant_array():
     dy = np.array([-0.5, -0.500001, -0.5])
     xmin, xmax = 0.0, 8.0
     ymin, ymax = 0.0, 1.5
-    coords = util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = util.spatial._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     assert np.allclose(coords["x"], np.arange(xmin + 1.0, xmax, 2.0))
     assert np.allclose(coords["y"], np.arange(ymax - 0.25, ymin, -0.5))
     assert coords["dx"] == approx(2.0)

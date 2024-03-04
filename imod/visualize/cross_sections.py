@@ -37,7 +37,7 @@ def _meshcoords(da, continuous=True):
     da = da.transpose(*dims, transpose_coords=True)
     data = da.values
     xcoord = da.dims[1]
-    dx, xmin, xmax = imod.util.coord_reference(da[xcoord])
+    dx, xmin, xmax = imod.util.spatial.coord_reference(da[xcoord])
     if isinstance(dx, (int, float)):
         if dx < 0.0:
             dx = abs(dx)

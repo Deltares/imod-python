@@ -1,8 +1,11 @@
 from abc import abstractmethod
-
-import geopandas as gpd
+from typing import TYPE_CHECKING
 
 from imod.mf6.interfaces.ipackagebase import IPackageBase
+
+if TYPE_CHECKING:
+    import geopandas as gpd
+
 
 
 class ILineDataPackage(IPackageBase):
@@ -12,10 +15,10 @@ class ILineDataPackage(IPackageBase):
 
     @property
     @abstractmethod
-    def line_data(self) -> gpd.GeoDataFrame:
+    def line_data(self) -> "gpd.GeoDataFrame":
         raise NotImplementedError
 
     @line_data.setter
     @abstractmethod
-    def line_data(self, value: gpd.GeoDataFrame) -> None:
+    def line_data(self, value: "gpd.GeoDataFrame") -> None:
         raise NotImplementedError

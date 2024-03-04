@@ -1,10 +1,37 @@
+import datetime
+import warnings
+
 import cftime
-import dateutil  # is a dependency of pandas
+import dateutil
 import numpy as np
 import pandas as pd
 
+DATETIME_FORMATS = {
+    14: "%Y%m%d%H%M%S",
+    12: "%Y%m%d%H%M",
+    10: "%Y%m%d%H",
+    8: "%Y%m%d",
+    4: "%Y",
+}
 
-def _check_year(year):
+
+def to_datetime(s: str) -> datetime.datetime:
+    """
+    Convert string to datetime. Part of the public API for backwards
+    compatibility reasons. 
+    
+    Fast performance is important, as this function is used to parse IDF names,
+    so it being called 100,000 times is a common usecase. Function stored
+    previously under imod.util.to_datetime. 
+    """
+    try:
+        time = datetime.datetime.strptime(s, DATETIME_FORMATS[len(s)])
+    except (ValueError, KeyError):  # Try fullblown dateutil date parser
+        time = dateutil.parser.parse(s)
+    return time
+
+
+def _check_year(year: int) -> None:
     """Check whether year is out of bounds for np.datetime64[ns]"""
     if year < 1678 or year > 2261:
         raise ValueError(
@@ -16,12 +43,15 @@ def _check_year(year):
         )
 
 
-def to_datetime(time, use_cftime):
+def to_datetime_internal(
+        time: cftime.datetime | np.datetime64 | str, use_cftime: bool
+    ) -> np.datetime64 | cftime.datetime:
     """
     Check whether time is cftime object, else convert to datetime64 series.
 
-    cftime currently has no pd.to_datetime equivalent:
-    a method that accepts a lot of different input types.
+    cftime currently has no pd.to_datetime equivalent: a method that accepts a
+    lot of different input types. Function stored previously under
+    imod.wq.timeutil.to_datetime. 
 
     Parameters
     ----------
@@ -43,7 +73,7 @@ def to_datetime(time, use_cftime):
         # Force to nanoseconds, concurrent with xarray and pandas.
         return time.astype(dtype="datetime64[ns]")
     elif isinstance(time, str):
-        time = dateutil.parser.parse(time)
+        time = to_datetime(time)
         if not use_cftime:
             _check_year(time.year)
 
@@ -53,7 +83,7 @@ def to_datetime(time, use_cftime):
         return np.datetime64(time, "ns")
 
 
-def timestep_duration(times, use_cftime):
+def timestep_duration(times: np.array, use_cftime: bool):
     """
     Generates dictionary containing stress period time discretization data.
 
@@ -78,7 +108,7 @@ def timestep_duration(times, use_cftime):
     return np.array(timestep_duration)
 
 
-def forcing_starts_ends(package_times, globaltimes):
+def forcing_starts_ends(package_times: np.array, globaltimes: np.array):
     """
     Determines the stress period numbers for start and end for a forcing defined
     at a starting time, until the next starting time.
@@ -110,3 +140,61 @@ def forcing_starts_ends(package_times, globaltimes):
         for (start, end) in zip(starts, ends)
     ]
     return starts_ends
+
+
+def _convert_datetimes(times: np.array, use_cftime: bool):
+    """
+    Return times as np.datetime64[ns] or cftime.DatetimeProlepticGregorian
+    depending on whether the dates fall within the inclusive bounds of
+    np.datetime64[ns]: [1678-01-01 AD, 2261-12-31 AD].
+
+    Alternatively, always returns as cftime.DatetimeProlepticGregorian if
+    ``use_cf_time`` is True.
+    """
+    if all(time == "steady-state" for time in times):
+        return times, False
+
+    out_of_bounds = False
+    if use_cftime:
+        converted = [
+            cftime.DatetimeProlepticGregorian(*time.timetuple()[:6]) for time in times
+        ]
+    else:
+        for time in times:
+            try: 
+                _check_year(time.year)
+            except ValueError:
+                out_of_bounds = True
+                break
+
+        if out_of_bounds:
+            use_cftime = True
+            msg = "Dates are outside of np.datetime64[ns] timespan. Converting to cftime.DatetimeProlepticGregorian."
+            warnings.warn(msg)
+            converted = [
+                cftime.DatetimeProlepticGregorian(*time.timetuple()[:6])
+                for time in times
+            ]
+        else:
+            converted = [np.datetime64(time, "ns") for time in times]
+
+    return converted, use_cftime
+
+
+def _compose_timestring(
+        time: np.datetime64 | cftime.datetime, time_format: str="%Y%m%d%H%M%S"
+    ) -> str:
+    """
+    Compose timestring from time. Function takes care of different
+    types of available time objects.
+    """
+    if time == "steady-state":
+        return time
+    else:
+        if isinstance(time, np.datetime64):
+            # The following line is because numpy.datetime64[ns] does not
+            # support converting to datetime, but returns an integer instead.
+            # This solution is 20 times faster than using pd.to_datetime()
+            return time.astype("datetime64[us]").item().strftime(time_format)
+        else:
+            return time.strftime(time_format)

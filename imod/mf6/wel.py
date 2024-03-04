@@ -19,10 +19,10 @@ from imod.mf6.boundary_condition import (
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
-from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.utilities.grid import create_layered_top
+from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
@@ -35,7 +35,7 @@ from imod.schemata import (
 from imod.select.points import points_indices, points_values
 from imod.typing import GridDataArray
 from imod.typing.grid import is_spatial_2D, ones_like
-from imod.util import values_within_range
+from imod.util.structured import values_within_range
 
 
 def _assign_dims(arg: Any) -> Tuple | xr.DataArray:

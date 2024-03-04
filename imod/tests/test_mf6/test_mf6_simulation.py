@@ -2,7 +2,9 @@ import os
 import re
 import sys
 import textwrap
+from copy import deepcopy
 from datetime import datetime
+from filecmp import dircmp
 from pathlib import Path
 from unittest import mock
 from unittest.mock import MagicMock
@@ -15,9 +17,11 @@ import xugrid as xu
 import imod
 from imod.mf6.model import Modflow6Model
 from imod.mf6.multimodel.modelsplitter import PartitionInfo
-from imod.mf6.simulation import get_models, get_packages
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo
 from imod.schemata import ValidationError
+from imod.tests.fixtures.mf6_small_models_fixture import (
+    grid_data_structured,
+)
 from imod.typing.grid import zeros_like
 
 
@@ -114,7 +118,7 @@ def test_simulation_open_flow_budget(circle_model, tmp_path):
 
     budget = simulation.open_flow_budget()
 
-    assert isinstance(budget, dict)
+    assert isinstance(budget, xu.UgridDataset)
     assert sorted(budget.keys()) == [
         "chd",
         "flow-horizontal-face",
@@ -124,6 +128,19 @@ def test_simulation_open_flow_budget(circle_model, tmp_path):
     ]
     assert isinstance(budget["chd"], xu.UgridDataArray)
 
+def test_write_circle_model_twice(circle_model, tmp_path):  
+    
+    simulation = circle_model
+
+    # write simulation, then write the simulation a second time
+    simulation.write(tmp_path/ "first_time", binary=False)
+    simulation.write(tmp_path/ "second_time", binary=False)
+
+    #check that text output is the same
+    diff = dircmp(tmp_path/"first_time", tmp_path/"second_time")
+    assert len(diff.diff_files) == 0
+    assert len(diff.left_only) == 0
+    assert len(diff.right_only) == 0    
 
 @pytest.mark.usefixtures("circle_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
@@ -273,132 +290,39 @@ class TestModflow6Simulation:
         submodel_labels = xu.zeros_like(active).where(active.grid.face_y > 0.0, 1)
 
         # Act.
-        new_simulation = simulation.split(submodel_labels)
+        with pytest.raises(ValueError):
+            _ = simulation.split(submodel_labels)
 
-        # Assert.
-        assert len(get_models(new_simulation)) == 0
-        assert len(get_packages(new_simulation)) == 3
-        assert new_simulation["solver"] is simulation["solver"]
-        assert (
-            new_simulation["time_discretization"] is simulation["time_discretization"]
-        )
-        assert new_simulation["disv"] is simulation["disv"]
-
-    @mock.patch("imod.mf6.simulation.slice_model", autospec=True)
-    @mock.patch("imod.mf6.simulation.ExchangeCreator_Unstructured")
-    def test_split_multiple_models(
-        self,
-        exchange_creator_unstructured_mock,
-        slice_model_mock,
-        circle_dis,
-        setup_simulation,
-    ):
+    def test_split_multiple_flow_models(self, structured_flow_simulation_2_flow_models):
         # Arrange.
-        idomain, _, _ = circle_dis
+        active = structured_flow_simulation_2_flow_models["flow"].domain.sel(layer=1)
+        submodel_labels = xr.zeros_like(active)
+        submodel_labels.values[:,3:] = 1
 
-        simulation = setup_simulation
+        # Act
+        with pytest.raises(ValueError):
+            _ = structured_flow_simulation_2_flow_models.split(submodel_labels)
 
-        model_mock1 = MagicMock(spec_set=Modflow6Model)
-        model_mock1._model_id = "test_model_id1"
+    def test_regrid_multiple_flow_models(self, structured_flow_simulation_2_flow_models):
+        # Arrange
+        finer_idomain = grid_data_structured(np.int32, 1, 0.4)
 
-        model_mock2 = MagicMock(spec_set=Modflow6Model)
-        model_mock2._model_id = "test_model_id2"
+        # Act
+        with pytest.raises(ValueError):
+            _ = structured_flow_simulation_2_flow_models.regrid_like("regridded_model", finer_idomain, False)
 
-        simulation["test_model1"] = model_mock1
-        simulation["test_model2"] = model_mock2
+    def test_clip_multiple_flow_models(self, structured_flow_simulation_2_flow_models):
+        # Arrange
+        active = structured_flow_simulation_2_flow_models["flow"].domain
+        grid_y_min = active.coords["y"].values[-1]
+        grid_y_max = active.coords["y"].values[0]
 
-        simulation["solver"]["modelnames"] = ["test_model1", "test_model2"]
-
-        slice_model_mock.return_value = MagicMock(spec_set=Modflow6Model)
-
-        active = idomain.sel(layer=1)
-        submodel_labels = xu.zeros_like(active).where(active.grid.face_y > 0.0, 1)
-
-        # Act.
-        new_simulation = simulation.split(submodel_labels)
-
-        # Assert.
-        new_models = get_models(new_simulation)
-        assert slice_model_mock.call_count == 4
-        assert len(new_models) == 4
-
-        # fmt: off
-        assert len([model_name for model_name in new_models.keys() if "test_model1" in model_name]) == 2
-        assert len([model_name for model_name in new_models.keys() if "test_model2" in model_name]) == 2
-
-        active_domain1 = submodel_labels.where(submodel_labels == 0, 0).where(submodel_labels != 0, 1)
-        active_domain2 = submodel_labels.where(submodel_labels == 1, 0).where(submodel_labels != 1, 1)
-        # fmt: on
-
-        expected_slice_model_calls = [
-            (PartitionInfo(id=0, active_domain=active_domain1), model_mock1),
-            (PartitionInfo(id=0, active_domain=active_domain1), model_mock2),
-            (PartitionInfo(id=1, active_domain=active_domain2), model_mock1),
-            (PartitionInfo(id=1, active_domain=active_domain2), model_mock2),
-        ]
-
-        for expected_call in expected_slice_model_calls:
-            assert any(
-                compare_submodel_partition_info(expected_call[0], call_args[0][0])
-                and (expected_call[1] is call_args[0][1])
-                for call_args in slice_model_mock.call_args_list
-            )
-
-    @mock.patch("imod.mf6.simulation.slice_model", autospec=True)
-    @mock.patch("imod.mf6.simulation.ExchangeCreator_Structured", autospec=True)
-    @mock.patch("imod.mf6.simulation.create_partition_info")
-    def test_split_multiple_models_creates_expected_number_of_exchanges(
-        self,
-        create_partition_info_mock,
-        exchange_creator_mock,
-        slice_model_mock,
-        basic_dis,
-        setup_simulation,
-    ):
-        # Arrange.
-        idomain, top, bottom = basic_dis
-
-        simulation = setup_simulation
-
-        model_mock1 = MagicMock(spec_set=Modflow6Model)
-        model_mock1._model_id = "test_model_id1"
-        model_mock1.domain = idomain
-
-        model_mock2 = MagicMock(spec_set=Modflow6Model)
-        model_mock2._model_id = "test_model_id2"
-        model_mock2.domain = idomain
-
-        simulation["test_model1"] = model_mock1
-        simulation["test_model2"] = model_mock2
-
-        simulation["solver"]["modelnames"] = ["test_model1", "test_model2"]
-
-        slice_model_mock.return_value = MagicMock(spec_set=Modflow6Model)
-
-        active = idomain.sel(layer=1)
-        submodel_labels = xr.zeros_like(active).where(active.y > 50, 1)
-
-        create_partition_info_mock.return_value = [
-            PartitionInfo(id=0, active_domain=xr.DataArray(0)),
-            PartitionInfo(id=1, active_domain=xr.DataArray(1)),
-        ]
-        # Act.
-        _ = simulation.split(submodel_labels)
-
-        # Assert.
-        exchange_creator_mock.assert_called_with(
-            submodel_labels, create_partition_info_mock()
-        )
-
-        assert exchange_creator_mock.return_value.create_exchanges.call_count == 2
-        call1 = exchange_creator_mock.return_value.create_exchanges.call_args_list[0][0]
-        call2 = exchange_creator_mock.return_value.create_exchanges.call_args_list[1][0]
-
-        assert call1[0] == "test_model1"
-        xr.testing.assert_equal(call1[1], idomain.layer)
-
-        assert call2[0] == "test_model2"
-        xr.testing.assert_equal(call2[1], idomain.layer)
+        # Act/Assert
+        with pytest.raises(ValueError):
+            _ = structured_flow_simulation_2_flow_models.clip_box(
+                    y_min= grid_y_min,
+                    y_max = grid_y_max/2                
+                )
 
     @pytest.mark.usefixtures("transient_twri_model")
     def test_exchanges_in_simulation_file(self, transient_twri_model, tmp_path):
@@ -474,6 +398,12 @@ class TestModflow6Simulation:
         # Act/Assert
         with pytest.raises(RuntimeError):
             _ = split_simulation.clip_box()
+
+    def test_deepcopy(
+        split_transient_twri_model
+    ):
+        # test  making a deepcopy will not crash 
+        _ = deepcopy( split_transient_twri_model)           
 
     @pytest.mark.usefixtures("split_transient_twri_model")
     def test_prevent_regrid_like_after_split(

@@ -42,7 +42,7 @@ import xarray as xr
 import xugrid as xu
 from numpy.typing import DTypeLike  # noqa: F401
 
-from imod.typing import GridDataArray
+from imod.typing import GridDataArray, ScalarAsDataArray
 
 DimsT = Union[str, None]
 ShapeT = Tuple[Union[int, None]]
@@ -76,6 +76,21 @@ def scalar_None(obj):
     else:
         return (len(obj.shape) == 0) & (~obj.notnull()).all()
 
+
+def align_other_obj_with_coords(obj: GridDataArray, other_obj: GridDataArray) -> Tuple[xr.DataArray, xr.DataArray]:
+    """
+    Align other_obj with obj if coordname in obj but not in its dims.
+    Avoid issues like:
+    https://github.com/Deltares/imod-python/issues/830
+
+    """
+    for coordname in obj.coords.keys():
+        if (coordname in other_obj.dims) and not (coordname in obj.dims):
+            obj = obj.expand_dims(coordname)
+    # Note: 
+    # xr.align forces xu.UgridDataArray to xr.DataArray. Keep that in mind
+    # in further data processing.
+    return xr.align(obj, other_obj, join="left")
 
 class ValidationError(Exception):
     pass
@@ -280,6 +295,24 @@ class ShapeSchema(BaseSchema):
                 raise ValidationError(
                     f"shape mismatch in axis {i}: {actual} != {expected}"
                 )
+
+
+class CompatibleSettingsSchema(BaseSchema):
+    def __init__(self, other: ScalarAsDataArray, other_value: bool) -> None:
+        """
+        Validate if settings are compatible
+        """
+        self.other = other
+        self.other_value = other_value
+
+    def validate(self, obj: ScalarAsDataArray, **kwargs) -> None:
+        other_obj = kwargs[self.other]
+        if scalar_None(obj) or scalar_None(other_obj):
+            return
+        expected = np.all(other_obj == self.other_value)
+
+        if obj and not expected:
+            raise ValidationError(f"Incompatible setting: {self.other} should be {self.other_value}")
 
 
 class CoordsSchema(BaseSchema):
@@ -542,6 +575,8 @@ class AllInsideNoDataSchema(NoDataComparisonSchema):
         other_obj = kwargs[self.other]
         valid = self.is_notnull(obj)
         other_valid = self.is_other_notnull(other_obj)
+
+        valid, other_valid = align_other_obj_with_coords(valid, other_obj)
 
         if (valid & ~other_valid).any():
             raise ValidationError(f"data values found at nodata values of {self.other}")

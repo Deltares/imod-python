@@ -69,7 +69,7 @@ def forcing_starts(package_times, globaltimes):
 
     Note
     ----
-    This is and adapted version from imod.wq.timeutil.forcings_starts_ends
+    This is and adapted version from imod.util.time.forcings_starts_ends
 
     Parameters
     ----------

@@ -8,7 +8,7 @@ from imod.mf6.multimodel.exchange_creator_structured import ExchangeCreator_Stru
 from imod.mf6.multimodel.modelsplitter import create_partition_info
 from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
 from imod.typing.grid import zeros_like
-from imod.util import spatial_reference
+from imod.util.spatial import spatial_reference
 
 ExpectedExchanges = namedtuple("ExpectedExchanges", "cell_id1 cell_id2 cl1 cl2 hwva")
 
@@ -68,7 +68,7 @@ class TestExchangeCreator_Structured:
         layer = idomain.layer
 
         # Act.
-        exchanges = exchange_creator.create_exchanges(model_name, layer)
+        exchanges = exchange_creator.create_gwfgwf_exchanges(model_name, layer)
 
         # Assert.
         num_exchanges_x_direction = y_number_partitions * (x_number_partitions - 1)
@@ -296,7 +296,7 @@ class TestExchangeCreator_Structured:
         layer = idomain.layer
 
         # Act.
-        exchanges = exchange_creator.create_exchanges(model_name, layer)
+        exchanges = exchange_creator.create_gwfgwf_exchanges(model_name, layer)
 
         # Assert.
         assert len(exchanges) == len(expected_exchanges)
@@ -337,7 +337,7 @@ class TestExchangeCreator_Structured:
         layer = idomain.layer
 
         # Act.
-        exchanges = exchange_creator.create_exchanges(model_name, layer)
+        exchanges = exchange_creator.create_gwfgwf_exchanges(model_name, layer)
 
         # Assert.
         assert len(exchanges) == len(expected_exchanges)

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import defaultdict
 from typing import Optional
 
 import cftime
@@ -7,14 +8,15 @@ import numpy as np
 
 from imod.mf6 import ConstantHead
 from imod.mf6.clipped_boundary_condition_creator import create_clipped_boundary
-from imod.mf6.model import Modflow6Model, initialize_template
-from imod.mf6.regridding_utils import RegridderType
+from imod.mf6.model import Modflow6Model
+from imod.mf6.utilities.regrid import RegridderType
 from imod.typing import GridDataArray
 
 
 class GroundwaterFlowModel(Modflow6Model):
     _mandatory_packages = ("npf", "ic", "oc", "sto")
     _model_id = "gwf6"
+    _template = Modflow6Model._initialize_template("gwf-nam.j2")
 
     def __init__(
         self,
@@ -34,16 +36,13 @@ class GroundwaterFlowModel(Modflow6Model):
             "newton": newton,
             "under_relaxation": under_relaxation,
         }
-        self._template = initialize_template("gwf-nam.j2")
 
-    def _get_unique_regridder_types(self) -> dict[RegridderType, str]:
+
+    def _get_unique_regridder_types(self) -> defaultdict[RegridderType, list[str]]:
         """
         This function loops over the packages and  collects all regridder-types that are in use.
-        Differences in associated functions are ignored. It focusses only on the types. So if a
-        model uses both Overlap(mean) and Overlap(harmonic_mean), this function will return just one
-        Overlap regridder:  the first one found, in this case Overlap(mean)
         """
-        methods: dict[RegridderType, str] = {}
+        methods: defaultdict = defaultdict(list)
         for pkg_name, pkg in self.items():
             if pkg.is_regridding_supported():
                 pkg_methods = pkg.get_regrid_methods()
@@ -53,9 +52,9 @@ class GroundwaterFlowModel(Modflow6Model):
                         and pkg.dataset[variable].values[()] is not None
                     ):
                         regriddertype = pkg_methods[variable][0]
-                        if regriddertype not in methods.keys():
-                            functiontype = pkg_methods[variable][1]
-                            methods[regriddertype] = functiontype
+                        functiontype = pkg_methods[variable][1]
+                        if functiontype not in  methods[regriddertype]:
+                            methods[regriddertype].append(functiontype)
             else:
                 raise NotImplementedError(
                     f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
@@ -132,3 +131,20 @@ class GroundwaterFlowModel(Modflow6Model):
 
     def set_newton(self, is_newton: bool) -> None:
         self._options["newton"] = is_newton
+
+    def update_buoyancy_package(self, transport_models_per_flow_model)->None:
+        '''
+        If the simulation is partitioned, then the buoyancy package, if present, 
+        must be updated for the renamed transport models.
+        '''
+        buoyancy_key = self._get_pkgkey("buy")
+        if buoyancy_key is None:
+            return
+        buoyancy_package = self[buoyancy_key]
+        transport_models_old = buoyancy_package.get_transport_model_names()
+        if len(transport_models_old) == len(transport_models_per_flow_model):
+            buoyancy_package.update_transport_models(transport_models_per_flow_model)
+        
+
+
+            

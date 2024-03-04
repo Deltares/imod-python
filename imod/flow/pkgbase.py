@@ -7,8 +7,8 @@ import numpy as np
 import xarray as xr
 
 import imod
-from imod import util
 from imod.flow import timeutil
+from imod.util.nested_dict import initialize_nested_dict, set_nested
 
 
 class Package(
@@ -179,7 +179,7 @@ class Package(
             Contains keyword arguments unused for packages
         """
 
-        composition = util.initialize_nested_dict(3)
+        composition = initialize_nested_dict(3)
 
         for varname in self._variable_order:
             composition[self._pkg_id][varname] = self._compose_values_layer(
@@ -206,7 +206,7 @@ class Package(
             Absolute path.
 
         """
-        return str(util.compose(d, pattern).resolve())
+        return str(imod.util.path.compose(d, pattern).resolve())
 
     def _compose_values_layer(self, varname, directory, nlayer, time=None):
         """
@@ -234,7 +234,7 @@ class Package(
         """
         pattern = "{name}"
 
-        values = util.initialize_nested_dict(1)
+        values = initialize_nested_dict(1)
         da = self[varname]
 
         d = {"directory": directory, "name": varname, "extension": ".idf"}
@@ -396,9 +396,9 @@ class BoundaryCondition(Package, abc.ABC):
 
             # Replace both key and value by the right datetime type
             d = {
-                imod.wq.timeutil.to_datetime(
+                imod.util.time.to_datetime_internal(
                     k, use_cftime
-                ): imod.wq.timeutil.to_datetime(v, use_cftime)
+                ): imod.util.time.to_datetime_internal(v, use_cftime)
                 for k, v in value.items()
             }
             self[varname].attrs["stress_repeats"] = d
@@ -453,7 +453,7 @@ class BoundaryCondition(Package, abc.ABC):
             )
 
         # Replace both key and value by the right datetime type
-        d = {imod.wq.timeutil.to_datetime(k, use_cftime): v for k, v in periods.items()}
+        d = {imod.util.time.to_datetime_internal(k, use_cftime): v for k, v in periods.items()}
 
         for varname in self._variable_order:
             self.dataset[varname].attrs["stress_periodic"] = d
@@ -528,7 +528,7 @@ class BoundaryCondition(Package, abc.ABC):
             The stress period number may be the wildcard '?'.
         """
 
-        composition = util.initialize_nested_dict(5)
+        composition = initialize_nested_dict(5)
 
         for data_var in self._variable_order:
             keys_ls, values = self._compose_values_timelayer(
@@ -540,7 +540,7 @@ class BoundaryCondition(Package, abc.ABC):
                 pkggroup_times=pkggroup_time,
             )
             for keys, value in zip(keys_ls, values):
-                util.set_nested(composition, keys, value)
+                set_nested(composition, keys, value)
 
         return composition
 
@@ -669,7 +669,7 @@ class TopBoundaryCondition(BoundaryCondition, abc.ABC):
 
     def _select_first_layer_composition(self, composition):
         """Select first layer in an exisiting composition."""
-        composition_first_layer = util.initialize_nested_dict(5)
+        composition_first_layer = initialize_nested_dict(5)
 
         # Loop over nested dict, it is not pretty
         for a, aa in composition[self._pkg_id].items():

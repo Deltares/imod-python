@@ -28,7 +28,7 @@ def _create_submodel_labels_unstructured(idomain, number_partitions):
 def to_unstruct_domain(idomain):
     grid = xu.Ugrid2d.from_structured(idomain)
 
-    domain_data = imod.util.ugrid2d_data(idomain, grid.face_dimension)
+    domain_data = imod.util.spatial.ugrid2d_data(idomain, grid.face_dimension)
     return xu.UgridDataArray(domain_data, grid)
 
 
@@ -48,7 +48,7 @@ class TestExchangeCreator_Unstructured:
         exchange_creator = ExchangeCreator_Unstructured(submodel_labels, partition_info)
 
         # Act.
-        exchanges = exchange_creator.create_exchanges("flow", idomain.layer)
+        exchanges = exchange_creator.create_gwfgwf_exchanges("flow", idomain.layer)
 
         # Assert.
         assert len(exchanges) == number_partitions - 1
@@ -75,7 +75,7 @@ class TestExchangeCreator_Unstructured:
         exchange_creator = ExchangeCreator_Unstructured(submodel_labels, partition_info)
 
         # Act.
-        exchanges = exchange_creator.create_exchanges("flow", idomain.layer)
+        exchanges = exchange_creator.create_gwfgwf_exchanges("flow", idomain.layer)
 
         # Assert.
         nlayer = 3
@@ -118,7 +118,7 @@ class TestExchangeCreator_Unstructured:
         exchange_creator = ExchangeCreator_Unstructured(submodel_labels, partition_info)
 
         # Act.
-        exchanges = exchange_creator.create_exchanges("flow", idomain.layer)
+        exchanges = exchange_creator.create_gwfgwf_exchanges("flow", idomain.layer)
 
         # Assert.
         assert np.allclose(exchanges[0].dataset["cl1"], expected_cl1)
@@ -159,7 +159,7 @@ class TestExchangeCreator_Unstructured:
         exchange_creator = ExchangeCreator_Unstructured(submodel_labels, partition_info)
 
         # Act.
-        _ = exchange_creator.create_exchanges("flow", idomain.layer)
+        _ = exchange_creator.create_gwfgwf_exchanges("flow", idomain.layer)
         """
         exchanges = exchange_creator.create_exchanges("flow", idomain.layer)
         """

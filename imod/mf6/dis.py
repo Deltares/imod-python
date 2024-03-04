@@ -4,7 +4,7 @@ import numpy as np
 
 import imod
 from imod.mf6.package import Package
-from imod.mf6.regridding_utils import RegridderType
+from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import DisBottomSchema
 from imod.schemata import (
     ActiveCellsConnectedSchema,
@@ -88,7 +88,7 @@ class StructuredDiscretization(Package):
         "idomain": (RegridderType.OVERLAP, "mode"),
     }
 
-    _skip_mask_arrays = ["bottom", "idomain"]
+    _skip_mask_arrays = ["bottom"]
 
     def __init__(self, top, bottom, idomain, validate: bool = True):
         dict_dataset = {
@@ -116,8 +116,8 @@ class StructuredDiscretization(Package):
         d = {}
         x = self.dataset["idomain"].coords["x"]
         y = self.dataset["idomain"].coords["y"]
-        dx, xmin, _ = imod.util.coord_reference(x)
-        dy, ymin, _ = imod.util.coord_reference(y)
+        dx, xmin, _ = imod.util.spatial.coord_reference(x)
+        dy, ymin, _ = imod.util.spatial.coord_reference(y)
 
         d["xorigin"] = xmin
         d["yorigin"] = ymin

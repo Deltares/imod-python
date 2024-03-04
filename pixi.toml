@@ -1,6 +1,6 @@
 [project]
 name = "imod-python"
-version = "0.15.2"
+version = "0.15.3"
 description = "Make massive MODFLOW models"
 authors = ["Deltares <huite.bootsma@deltares.nl>", ]
 channels = ["conda-forge", ]
@@ -15,6 +15,7 @@ repository = "https://github.com/Deltares/imod-python.git"
 [tasks]
 docs =  { cmd = "make html", depends_on = ["install"], cwd = "docs" }
 install = "python -m pip install --no-deps --editable ."
+install_with_deps = "python -m pip install --editable ."
 format = { depends_on = ["sort_format", "ruff_format"] }
 lint = { depends_on = ["sort_lint", "ruff_lint"] }
 tests = { depends_on = ["unittests", "examples"] }
@@ -38,6 +39,11 @@ examples = { cmd = [
     "--verbose",
     "--junitxml=examples_report.xml",
 ], depends_on = ["install"], cwd = "imod/tests" }
+test_import = { cmd = [
+    "python",
+    "-c",
+    "import imod"
+], depends_on = ["install_with_deps"]}
 pypi-publish = { cmd = "rm --recursive --force dist && python -m build && twine check dist/* && twine upload dist/*" }
 
 sort_lint = "ruff check --select I ."
@@ -47,7 +53,11 @@ mypy_report = { cmd ="mypy | mypy2junit > mypy-report.xml", depends_on = ["insta
 ruff_lint = "ruff check ."
 ruff_format = "ruff format ."
 
+
 [dependencies]
+# Keep empty or undefined to create an empty default environment.
+
+[feature.base.dependencies]
 affine = "*"
 black = "*"
 bottleneck = "*"
@@ -98,11 +108,11 @@ tqdm = "*"
 twine = "*"
 vtk = { version = ">=9.0", build = "*qt*", channel = "conda-forge" }
 xarray = ">=2023.04.0"
-xugrid = ">=0.6.4"
+xugrid = ">=0.9.0"
 zarr = "*"
 build = "*"
 
-[pypi-dependencies]
+[feature.base.pypi-dependencies]
 mypy2junit = "*"
 
 [feature.interactive.dependencies]
@@ -110,5 +120,21 @@ ipykernel = "*"
 ipython = "*"
 jupyter = "*"
 
+[feature.py310.dependencies]
+python = "3.10.12"
+pip = "*"
+
+[feature.py311.dependencies]
+python = "3.11"
+pip = "*"
+
+[feature.py312.dependencies]
+python = "3.12"
+pip = "*"
+
 [environments]
-interactive = ["interactive"]
+default = {features = ["base"], solve-group = "conda-deps"}
+interactive = {features = ["interactive", "base"], solve-group = "conda-deps"}
+py310 = {features = ["py310"], solve-group = "py310"}
+py311 = {features = ["py311"], solve-group = "py311"}
+py312 = {features = ["py312"], solve-group = "py312"}

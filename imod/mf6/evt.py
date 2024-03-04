@@ -3,7 +3,7 @@ from typing import Optional
 import numpy as np
 
 from imod.mf6.boundary_condition import BoundaryCondition
-from imod.mf6.regridding_utils import RegridderType
+from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -16,7 +16,7 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
-from imod.util import unstack_dim_into_variable
+from imod.util.spatial import unstack_dim_into_variable
 
 SEGMENT_BOUNDARY_DIMS_SCHEMA = (
     BOUNDARY_DIMS_SCHEMA
