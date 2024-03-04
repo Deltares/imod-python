@@ -403,11 +403,6 @@ def dis_open_face_budgets(
     lower = dis_extract_face_budgets(budgets, lower_index)
     return right, front, lower
 
-def get_header_advanced_package(headers: Dict[str, List[Union[cbc.Imeth1Header, cbc.Imeth6Header]]]) -> cbc.Imeth6Header | None:
-    for key, header in headers.items():
-        if 'gwf_' in key:
-            return header[0]
-    return None
 
 # TODO: Currently assumes dis grb, can be checked & dispatched
 def open_cbc(
@@ -423,7 +418,6 @@ def open_cbc(
     if header_advanced_package is not None:
         # For advanced packages the id2 column of variable gwf contains the MF6 id's.
         # Get id's eager from first stress period.
-        header_advanced_package = headers['gwf'][0]
         dtype = np.dtype(
             [("id1", np.int32), ("id2", np.int32), ("budget", np.float64)]
             + [(name, np.float64) for name in header_advanced_package.auxtxt]
@@ -484,3 +478,9 @@ def grid_info(like: xr.DataArray) -> Dict[str, Any]:
             "x": like["x"],
         },
     }
+
+def get_header_advanced_package(headers: Dict[str, List[Union[cbc.Imeth1Header, cbc.Imeth6Header]]]) -> cbc.Imeth6Header | None:
+    for key, header in headers.items():
+        if 'gwf_' in key:
+            return header[0]
+    return None

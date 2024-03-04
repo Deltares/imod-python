@@ -1,7 +1,6 @@
 import os
 import struct
-from dis import get_header_advanced_package
-from typing import Any, BinaryIO, Dict, List, Optional, Tuple
+from typing import Any, BinaryIO, Dict, List, Optional, Tuple, Union
 
 import dask
 import numba
@@ -474,12 +473,11 @@ def open_cbc(
     if header_advanced_package is not None:
         # For advanced packages the id2 column of variable gwf contains the MF6 id's.
         # Get id's eager from first stress period.
-        header = headers['gwf'][0]
         dtype = np.dtype(
             [("id1", np.int32), ("id2", np.int32), ("budget", np.float64)]
-            + [(name, np.float64) for name in header.auxtxt]
+            + [(name, np.float64) for name in header_advanced_package.auxtxt]
         )
-        table = cbc.read_imeth6_budgets(cbc_path, header.nlist, dtype, header.pos)
+        table = cbc.read_imeth6_budgets(cbc_path, header_advanced_package.nlist, dtype, header_advanced_package.pos)
         indices = table["id2"] - 1  # Convert to 0 based index
     cbc_content = {}
     for key, header_list in headers.items():
@@ -533,3 +531,9 @@ def grid_info(like: xu.UgridDataArray) -> Dict[str, Any]:
             facedim: like[facedim],
         },
     }
+
+def get_header_advanced_package(headers: Dict[str, List[Union[cbc.Imeth1Header, cbc.Imeth6Header]]]) -> cbc.Imeth6Header | None:
+    for key, header in headers.items():
+        if 'gwf_' in key:
+            return header[0]
+    return None
