@@ -16,9 +16,9 @@ from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
-from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.grid import broadcast_to_full_domain
+from imod.mf6.utilities.regrid import RegridderType
 from imod.schemata import EmptyIndexesSchema
 from imod.typing import GridDataArray
 from imod.util.imports import MissingOptionalModule

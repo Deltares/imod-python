@@ -396,9 +396,9 @@ class BoundaryCondition(Package, abc.ABC):
 
             # Replace both key and value by the right datetime type
             d = {
-                imod.wq.timeutil.to_datetime(
+                imod.util.time.to_datetime_internal(
                     k, use_cftime
-                ): imod.wq.timeutil.to_datetime(v, use_cftime)
+                ): imod.util.time.to_datetime_internal(v, use_cftime)
                 for k, v in value.items()
             }
             self[varname].attrs["stress_repeats"] = d
@@ -453,7 +453,7 @@ class BoundaryCondition(Package, abc.ABC):
             )
 
         # Replace both key and value by the right datetime type
-        d = {imod.wq.timeutil.to_datetime(k, use_cftime): v for k, v in periods.items()}
+        d = {imod.util.time.to_datetime_internal(k, use_cftime): v for k, v in periods.items()}
 
         for varname in self._variable_order:
             self.dataset[varname].attrs["stress_periodic"] = d

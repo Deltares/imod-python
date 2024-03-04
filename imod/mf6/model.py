@@ -20,8 +20,8 @@ from jinja2 import Template
 
 import imod
 from imod.mf6.package import Package
-from imod.mf6.regridding_utils import RegridderInstancesCollection, RegridderType
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
+from imod.mf6.utilities.regrid import RegridderInstancesCollection, RegridderType
 from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
