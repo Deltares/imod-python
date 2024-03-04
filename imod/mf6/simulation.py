@@ -1101,6 +1101,8 @@ class Modflow6Simulation(collections.UserDict):
                 item, imod.mf6.TimeDiscretization
             ):
                 result[key] = copy.deepcopy(item)
+            elif key == "gwtgwf_exchanges":
+                pass
             else:
                 raise NotImplementedError(f"regridding not supported for {key}")
 

@@ -11,18 +11,21 @@ def test_regrid_transport(
     tmp_path: Path,
     flow_transport_simulation: imod.mf6.Modflow6Simulation,
 ):
+    assert_simulation_can_run(flow_transport_simulation, "dis", tmp_path/"original")
     domain = flow_transport_simulation["flow"].domain
-    x_min = domain.coords["x"].values[0]
-    x_max = domain.coords["x"].values[-1]
-    y_min = domain.coords["y"].values[-1]
-    y_max = domain.coords["y"].values[0]
+    dx = domain.coords["dx"].values[()]
+    dy = domain.coords["dy"].values[()]
+    x_min = domain.coords["x"].values[0] - dx/2
+    x_max = domain.coords["x"].values[-1] + dx/2
+    y_min = domain.coords["y"].values[-1] - dy/2
+    y_max = domain.coords["y"].values[0] + dy/2
     nlayer = domain.coords["layer"][-1]
 
-    cellsize_x = (x_max - x_min) / 3
-    cellsize_y = (y_max -y_min) / 200
+    cellsize_x = (x_max - x_min) / 200
+    cellsize_y = (y_max -y_min) / 3
 
-    x = np.arange(x_min, x_max, cellsize_x)
-    y = np.arange(y_max, y_min, -cellsize_y)
+    x = np.arange(x_min, x_max, cellsize_x) + cellsize_x/2
+    y = np.arange(y_max, y_min, -cellsize_y) - cellsize_y/2
 
     finer_idomain = xr.DataArray(dims=["layer", "y", "x"], coords={"layer": np.arange(nlayer)+1, "y": y, "x": x, "dx": cellsize_x, "dy": cellsize_y})
     finer_idomain.values[:,:,:] =1
@@ -34,4 +37,5 @@ def test_regrid_transport(
     )
 
     # Test that the newly regridded simulation can run
-    assert_simulation_can_run(new_simulation, "dis", tmp_path)
+    assert_simulation_can_run(new_simulation, "dis", tmp_path/"regridded")
+

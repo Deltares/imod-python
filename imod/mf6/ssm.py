@@ -5,7 +5,7 @@ import numpy as np
 from imod.logging import logger
 from imod.mf6 import GroundwaterFlowModel
 from imod.mf6.boundary_condition import BoundaryCondition
-from imod.mf6.regridding_utils import RegridderType
+from imod.mf6.utilities.regrid import RegridderType
 from imod.schemata import DTypeSchema
 
 
