@@ -1,9 +1,11 @@
 from pathlib import Path
-import imod
-from imod.tests.fixtures.flow_transport_simulation_fixture import flow_transport_simulation
-from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
+
 import numpy as np
 import xarray as xr
+
+import imod
+from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
+
 
 def test_regrid_transport(
     tmp_path: Path,
@@ -16,13 +18,13 @@ def test_regrid_transport(
     y_max = domain.coords["y"].values[0]
     nlayer = domain.coords["layer"][-1]
 
-    cellsize_x = (x_max - x_min) / 200
+    cellsize_x = (x_max - x_min) / 3
     cellsize_y = (y_max -y_min) / 200
 
     x = np.arange(x_min, x_max, cellsize_x)
     y = np.arange(y_max, y_min, -cellsize_y)
 
-    finer_idomain = xr.DataArray(dims=["layer", "y", "x"], coords={"layer": np.arange(nlayer), "y": y, "x": x, "dx": cellsize_x, "dy": cellsize_y})
+    finer_idomain = xr.DataArray(dims=["layer", "y", "x"], coords={"layer": np.arange(nlayer)+1, "y": y, "x": x, "dx": cellsize_x, "dy": cellsize_y})
     finer_idomain.values[:,:,:] =1
 
 
@@ -32,4 +34,4 @@ def test_regrid_transport(
     )
 
     # Test that the newly regridded simulation can run
-    assert_simulation_can_run(new_simulation, "disv", tmp_path)
+    assert_simulation_can_run(new_simulation, "dis", tmp_path)

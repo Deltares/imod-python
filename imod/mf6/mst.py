@@ -1,6 +1,7 @@
 import numpy as np
 
 from imod.mf6.package import Package
+from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
@@ -93,6 +94,19 @@ class MobileStorageTransfer(Package):
         ),
         "distcoef": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),
         "sp2": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),
+    }
+
+
+    _regrid_method = {
+        "porosity": (RegridderType.OVERLAP, "mean"),
+        "decay": (RegridderType.OVERLAP, "mean"),
+        "decay_sorbed": (
+            RegridderType.OVERLAP,
+            "mean",
+        ), 
+        "bulk_density": (RegridderType.OVERLAP, "mean"),
+        "distcoef": (RegridderType.OVERLAP, "mean"),
+        "sp2": (RegridderType.OVERLAP, "mean"),        
     }
 
     def __init__(

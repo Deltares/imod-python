@@ -1,6 +1,7 @@
 import numpy as np
 
 from imod.mf6.package import Package
+from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     CompatibleSettingsSchema,
@@ -138,6 +139,22 @@ class Dispersion(Package):
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),
     }
+
+    _regrid_method = {
+        "diffusion_coefficient": (RegridderType.OVERLAP, "mean"),
+        "longitudinal_horizontal": (RegridderType.OVERLAP, "mean"), 
+        "transversal_horizontal1": (
+            RegridderType.OVERLAP,
+            "mean",
+        ),
+        "longitudinal_vertical": (
+            RegridderType.OVERLAP,
+            "mean",
+        ),
+        "transversal_horizontal2": (RegridderType.OVERLAP, "mean"),
+        "transversal_vertical": (RegridderType.OVERLAP, "mean"),
+    }
+
 
     def __init__(
         self,

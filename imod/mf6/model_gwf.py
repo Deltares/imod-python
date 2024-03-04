@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections import defaultdict
 from typing import Optional
 
 import cftime
@@ -9,7 +8,6 @@ import numpy as np
 from imod.mf6 import ConstantHead
 from imod.mf6.clipped_boundary_condition_creator import create_clipped_boundary
 from imod.mf6.model import Modflow6Model
-from imod.mf6.regridding_utils import RegridderType
 from imod.typing import GridDataArray
 
 
@@ -37,29 +35,6 @@ class GroundwaterFlowModel(Modflow6Model):
             "under_relaxation": under_relaxation,
         }
 
-
-    def _get_unique_regridder_types(self) -> defaultdict[RegridderType, list[str]]:
-        """
-        This function loops over the packages and  collects all regridder-types that are in use.
-        """
-        methods: defaultdict = defaultdict(list)
-        for pkg_name, pkg in self.items():
-            if pkg.is_regridding_supported():
-                pkg_methods = pkg.get_regrid_methods()
-                for variable in pkg_methods:
-                    if (
-                        variable in pkg.dataset.data_vars
-                        and pkg.dataset[variable].values[()] is not None
-                    ):
-                        regriddertype = pkg_methods[variable][0]
-                        functiontype = pkg_methods[variable][1]
-                        if functiontype not in  methods[regriddertype]:
-                            methods[regriddertype].append(functiontype)
-            else:
-                raise NotImplementedError(
-                    f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
-                )
-        return methods
 
     def clip_box(
         self,

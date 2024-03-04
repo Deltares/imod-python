@@ -989,6 +989,8 @@ class Modflow6Simulation(collections.UserDict):
         for key, item in self.items():
             if isinstance(item, GroundwaterFlowModel):
                 result[key] = item.regrid_like(target_grid, validate)
+            elif isinstance(item, GroundwaterTransportModel):
+                result[key] = item.regrid_like(target_grid, validate)                
             elif isinstance(item, imod.mf6.Solution) or isinstance(
                 item, imod.mf6.TimeDiscretization
             ):
