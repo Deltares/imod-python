@@ -1,5 +1,6 @@
 import os
 import struct
+from dis import get_header_advanced_package
 from typing import Any, BinaryIO, Dict, List, Optional, Tuple
 
 import dask
@@ -468,8 +469,9 @@ def open_cbc(
     time_unit: Optional[str] = "d",
 ) -> Dict[str, xu.UgridDataArray]:
     headers = cbc.read_cbc_headers(cbc_path)
-    return_id = None
-    if 'gwf' in headers.keys():
+    indices = None
+    header_advanced_package = get_header_advanced_package(headers)
+    if header_advanced_package is not None:
         # For advanced packages the id2 column of variable gwf contains the MF6 id's.
         # Get id's eager from first stress period.
         header = headers['gwf'][0]
@@ -478,7 +480,7 @@ def open_cbc(
             + [(name, np.float64) for name in header.auxtxt]
         )
         table = cbc.read_imeth6_budgets(cbc_path, header.nlist, dtype, header.pos)
-        return_id = table["id2"] - 1  # Convert to 0 based index
+        indices = table["id2"] - 1  # Convert to 0 based index
     cbc_content = {}
     for key, header_list in headers.items():
         if key == "flow-ja-face" and isinstance(header_list[0], cbc.Imeth1Header):
@@ -504,11 +506,11 @@ def open_cbc(
                 for return_variable in header_list[0].auxtxt:
                     key_aux = header_list[0].txt2id1 + "-" + return_variable
                     cbc_content[key_aux] = open_imeth6_budgets(
-                        cbc_path, grb_content, header_list, return_variable = return_variable, return_id = return_id
+                        cbc_path, grb_content, header_list, return_variable = return_variable, return_id = indices
                     )
             else:
                 cbc_content[key] = open_imeth6_budgets(
-                    cbc_path, grb_content, header_list, return_id = return_id
+                    cbc_path, grb_content, header_list, return_id = indices
                 )
 
     if simulation_start_time is not None:

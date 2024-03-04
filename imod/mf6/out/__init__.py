@@ -287,4 +287,4 @@ def open_cbc(
     grb_content = read_grb(grb_path)
     distype = grb_content["distype"]
     _open = _get_function(_OPEN_CBC, distype)
-    return _open(cbc_path, grb_content, flowja, simulation_start_time, time_unit, uzf)
+    return _open(cbc_path, grb_content, flowja, simulation_start_time, time_unit)
