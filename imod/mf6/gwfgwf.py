@@ -2,13 +2,15 @@ from typing import Optional
 
 import cftime
 import numpy as np
+import pandas as pd
 import xarray as xr
 
 from imod.mf6.auxiliary_variables import expand_transient_auxiliary_variables
 from imod.mf6.exchangebase import ExchangeBase
 from imod.mf6.package import Package
 from imod.typing import GridDataArray
-import  pandas as pd
+from imod.typing.grid import ones_like
+
 
 class GWFGWF(ExchangeBase):
     """
@@ -40,7 +42,7 @@ class GWFGWF(ExchangeBase):
             "layer": layer,
             "model_name_1": model_id1,
             "model_name_2": model_id2,
-            "ihc": xr.DataArray(np.ones_like(cl1, dtype=int)),
+            "ihc": ones_like(cl1, dtype=int),
             "cl1": cl1,
             "cl2": cl2,
             "hwva": hwva,
@@ -92,27 +94,21 @@ class GWFGWF(ExchangeBase):
 
     def render(self, directory, pkgname, globaltimes, binary):
 
-        """
-        cell_id1: xr.DataArray,
-        cell_id2: xr.DataArray,
-        layer: xr.DataArray,
-        cl1: xr.DataArray,
-        cl2: xr.DataArray,
-        hwva: xr.DataArray,
-        angldegx: Optional[xr.DataArray] = None,
-        cdist: Optional[xr.DataArray] = None,
-        """
         d = Package._get_render_dictionary(self, directory, pkgname, globaltimes, binary)
+        is_structured = len(self.dataset["cell_id1"].shape) > 1
         datablock = pd.DataFrame()
-        datablock["layer1"] =  self.dataset["layer"].values[:]         
+        datablock["layer1"] =  self.dataset["layer"].values[:]                 
         datablock["cell_id1"] = self.dataset["cell_id1"].values[:,0]
+        if is_structured:
+             datablock["cell_id1_2"] = self.dataset["cell_id1"].values[:,1]
         datablock["layer2"] =  self.dataset["layer"].values[:]  
         datablock["cell_id2"] = self.dataset["cell_id2"].values[:,0]
-        datablock["ihc"] = self.dataset["ihc"].values[:]        
-        datablock["cl1"] =  self.dataset["cl1"].values[:]   
-        datablock["cl2"] =  self.dataset["cl2"].values[:]        
-        datablock["hwva"] =  self.dataset["hwva"].values[:]   
-        datablock["angldegx"] =  self.dataset["angldegx"].values[:]       
-        datablock["cdist"] =  self.dataset["cdist"].values[:]                                                 
+        if is_structured: 
+             datablock["cell_id1_2_2"] = self.dataset["cell_id2"].values[:,1]
+
+        for key in ["ihc", "cl1", "cl2", "hwva", "angldegx","cdist" ]:
+            if key in  self.dataset.keys():
+                  datablock[key] = self.dataset[key].values[:]      
+                                      
         d["datablock"] = datablock.to_string(index=False,  header=False )
         return self._template.render(d)
