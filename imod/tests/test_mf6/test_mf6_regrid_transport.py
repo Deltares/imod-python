@@ -1,18 +1,17 @@
 from pathlib import Path
 
 import numpy as np
-import xarray as xr
 
 import imod
 from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
+import pytest
+from typing import Tuple
+import xarray as xr
 
-
-def test_regrid_transport(
-    tmp_path: Path,
-    flow_transport_simulation: imod.mf6.Modflow6Simulation,
-):
-    assert_simulation_can_run(flow_transport_simulation, "dis", tmp_path/"original")
-    domain = flow_transport_simulation["flow"].domain
+def create_regridding_idomain(domain: xr.DataArray , ncol: int, nrow: int):
+    #Create an equidistant structured grid with the same horizontal and vertical
+    #extent as the input grid, and the same number of layer, but a different
+    #amount of rows and columns
     dx = domain.coords["dx"].values[()]
     dy = domain.coords["dy"].values[()]
     x_min = domain.coords["x"].values[0] - dx/2
@@ -21,21 +20,65 @@ def test_regrid_transport(
     y_max = domain.coords["y"].values[0] + dy/2
     nlayer = domain.coords["layer"][-1]
 
-    cellsize_x = (x_max - x_min) / 200
-    cellsize_y = (y_max -y_min) / 3
+    column_size = (x_max - x_min) / ncol
+    row_size = (y_max -y_min) / nrow
 
-    x = np.arange(x_min, x_max, cellsize_x) + cellsize_x/2
-    y = np.arange(y_max, y_min, -cellsize_y) - cellsize_y/2
+    x = np.arange(x_min, x_max, column_size) + column_size/2
+    y = np.arange(y_max, y_min, -row_size) - row_size/2
 
-    finer_idomain = xr.DataArray(dims=["layer", "y", "x"], coords={"layer": np.arange(nlayer)+1, "y": y, "x": x, "dx": cellsize_x, "dy": cellsize_y})
-    finer_idomain.values[:,:,:] =1
+    new_idomain = xr.DataArray(dims=["layer", "y", "x"], coords={"layer": np.arange(nlayer)+1, "y": y, "x": x, "dx": column_size, "dy": row_size})
+    new_idomain.values[:,:,:] =1
 
+    return new_idomain
 
+@pytest.mark.parametrize("col_row_dimension",[(101,4 ), (55,3 ), (155,4 )])
+def test_regrid_transport(
+    tmp_path: Path,
+    flow_transport_simulation: imod.mf6.Modflow6Simulation,
+    col_row_dimension: Tuple[int, int]
+):
+    # Run the original simulation
+    flow_transport_simulation.write( tmp_path/"original", binary=False)
+    flow_transport_simulation.run()
+
+    #Set up the regridded domain. The original domain is 101 columns * 2 rows * 1layer
+    # We'll regrid it to 101x 4 x 1
+    domain = flow_transport_simulation["flow"].domain
+    finer_idomain = create_regridding_idomain(domain, col_row_dimension[0], col_row_dimension[1])
 
     new_simulation = flow_transport_simulation.regrid_like(
         "regridded_simulation", finer_idomain
     )
 
     # Test that the newly regridded simulation can run
-    assert_simulation_can_run(new_simulation, "dis", tmp_path/"regridded")
+    new_simulation.write( tmp_path/"regridded", binary=False)
+    new_simulation.run()
+
+    # simulation results
+    conc = flow_transport_simulation.open_concentration(["species_a", "species_b", "species_c", "species_d"])
+    regridded_conc = new_simulation.open_concentration(["species_a", "species_b", "species_c", "species_d"])
+
+    dx = domain.coords["dx"].values[()]
+    dy = domain.coords["dy"].values[()]
+    cell_volume = dx * dy * 1
+
+    new_dx = finer_idomain.coords["dx"].values[()]
+    new_dy = finer_idomain.coords["dy"].values[()]
+    regridded_cell_volume = new_dx * new_dy
+
+    conc = conc.where(conc > -1e29, 0)
+    regridded_conc = regridded_conc.where(regridded_conc > -1e29, 0)
+
+    for species in ["species_a", "species_b", "species_c", "species_d"]: 
+        original_mass = np.sum(conc.sel(time=2000, species =species).values * cell_volume)
+        regridded_mass = np.sum(regridded_conc.sel(time=2000, species =species ).values * regridded_cell_volume)
+        assert abs((original_mass  - regridded_mass))/original_mass < 4e-2
+
+
+    # compute mass
+
+
+
+
+
 
