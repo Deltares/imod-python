@@ -186,7 +186,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             else:
                 np.savetxt(fname=f, X=da.values, fmt=fmt)
 
-    def _get_render_dictionary(self, directory, pkgname, globaltimes, binary):
+    def _get_render_dictionary(self, directory: pathlib.Path, pkgname: str, globaltimes: Union[list[np.datetime64], np.ndarray], binary: bool) ->dict[str,Any]:
         d = {}
         if directory is None:
             pkg_directory = pkgname

@@ -1,4 +1,8 @@
-from typing import Tuple
+from pathlib import Path
+from typing import Tuple, Union
+
+import numpy as np
+import pandas as pd
 
 from imod.mf6.package import Package
 
@@ -40,3 +44,24 @@ class ExchangeBase(Package):
             self.model_name1,
             self.model_name2,
         )
+    
+    def render_with_geometric_constants(self,  directory: Path, pkgname: str, globaltimes: Union[list[np.datetime64], np.ndarray], binary: bool) -> str:
+
+        d = Package._get_render_dictionary(self, directory, pkgname, globaltimes, binary)
+        is_structured = len(self.dataset["cell_id1"].shape) > 1
+        datablock = pd.DataFrame()
+        datablock["layer1"] =  self.dataset["layer"].values[:]                 
+        datablock["cell_id1"] = self.dataset["cell_id1"].values[:,0]
+        if is_structured:
+             datablock["cell_id1_2"] = self.dataset["cell_id1"].values[:,1]
+        datablock["layer2"] =  self.dataset["layer"].values[:]  
+        datablock["cell_id2"] = self.dataset["cell_id2"].values[:,0]
+        if is_structured: 
+             datablock["cell_id1_2_2"] = self.dataset["cell_id2"].values[:,1]
+
+        for key in ["ihc", "cl1", "cl2", "hwva", "angldegx","cdist" ]:
+            if key in  self.dataset.keys():
+                  datablock[key] = self.dataset[key].values[:]      
+                                      
+        d["datablock"] = datablock.to_string(index=False,  header=False )
+        return self._template.render(d)        
