@@ -108,6 +108,7 @@ class GWFGWF(ExchangeBase):
         datablock["cell_id1"] = self.dataset["cell_id1"].values[:,0]
         datablock["layer2"] =  self.dataset["layer"].values[:]  
         datablock["cell_id2"] = self.dataset["cell_id2"].values[:,0]
+        datablock["ihc"] = self.dataset["ihc"].values[:]        
         datablock["cl1"] =  self.dataset["cl1"].values[:]   
         datablock["cl2"] =  self.dataset["cl2"].values[:]        
         datablock["hwva"] =  self.dataset["hwva"].values[:]   
