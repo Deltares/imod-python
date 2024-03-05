@@ -1,12 +1,12 @@
 from pathlib import Path
+from typing import Tuple
 
 import numpy as np
+import pytest
+import xarray as xr
 
 import imod
-from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
-import pytest
-from typing import Tuple
-import xarray as xr
+
 
 def create_regridding_idomain(domain: xr.DataArray , ncol: int, nrow: int):
     #Create an equidistant structured grid with the same horizontal and vertical
@@ -69,13 +69,12 @@ def test_regrid_transport(
     conc = conc.where(conc > -1e29, 0)
     regridded_conc = regridded_conc.where(regridded_conc > -1e29, 0)
 
+    #Compute and compare the total mass of the original model and the regridded mode.
+    #Constants like porosity are not included. 
     for species in ["species_a", "species_b", "species_c", "species_d"]: 
         original_mass = np.sum(conc.sel(time=2000, species =species).values * cell_volume)
         regridded_mass = np.sum(regridded_conc.sel(time=2000, species =species ).values * regridded_cell_volume)
-        assert abs((original_mass  - regridded_mass))/original_mass < 4e-2
-
-
-    # compute mass
+        assert abs((original_mass  - regridded_mass))/original_mass < 3e-2
 
 
 

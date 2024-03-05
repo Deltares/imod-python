@@ -116,9 +116,6 @@ def flow_transport_simulation():
     gwf_model["npf"] = imod.mf6.NodePropertyFlow(
         icelltype=1,
         k=xr.full_like(grid, 1.0, dtype=float),
-        variable_vertical_conductance=True,
-        dewatered=True,
-        perched=True,
     )
     gwf_model["dis"] = imod.mf6.StructuredDiscretization(
         top=0.0,
@@ -138,7 +135,7 @@ def flow_transport_simulation():
         species=["species_a", "species_b", "species_c", "species_d"]
     )
     recharge_rate = xr.full_like(grid, np.nan, dtype=float)
-    recharge_rate[..., 20:60] = 0.001
+    recharge_rate[..., 20:60] = 0.0001
     gwf_model["rch"] = imod.mf6.Recharge(recharge_rate, recharge_conc, "AUX")
     # %%
     # Create the simulation.
@@ -157,7 +154,7 @@ def flow_transport_simulation():
         concentration_boundary_type="Aux",
         screen_top=[0.0, 0.0],
         screen_bottom=[-1.0, -1.0],
-        rate=[1.0, -2.0],
+        rate=[0.1, -0.2],
         minimum_k=0.0001,
         concentration=injection_concentration,
     )
