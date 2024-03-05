@@ -46,7 +46,12 @@ class ExchangeBase(Package):
         )
     
     def render_with_geometric_constants(self,  directory: Path, pkgname: str, globaltimes: Union[list[np.datetime64], np.ndarray], binary: bool) -> str:
-
+        
+        if hasattr(self, "_template"):
+            template = self._template
+        else:
+            raise RuntimeError("exchange file does not have a template")
+        
         d = Package._get_render_dictionary(self, directory, pkgname, globaltimes, binary)
         is_structured = len(self.dataset["cell_id1"].shape) > 1
         datablock = pd.DataFrame()
@@ -64,4 +69,4 @@ class ExchangeBase(Package):
                   datablock[key] = self.dataset[key].values[:]      
                                       
         d["datablock"] = datablock.to_string(index=False,  header=False )
-        return self._template.render(d)        
+        return template.render(d)        

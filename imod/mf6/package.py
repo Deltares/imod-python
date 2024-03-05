@@ -194,7 +194,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             pkg_directory = pathlib.Path(directory) / pkgname
 
         for varname in self.dataset.data_vars:
-            key = self._keyword_map.get(varname, varname)
+            key = self._keyword_map.get(str(varname), str(varname))
 
             if hasattr(self, "_grid_data") and varname in self._grid_data:
                 layered, value = self._compose_values(
