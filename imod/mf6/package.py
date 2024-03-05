@@ -186,7 +186,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             else:
                 np.savetxt(fname=f, X=da.values, fmt=fmt)
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _get_render_dictionary(self, directory, pkgname, globaltimes, binary):
         d = {}
         if directory is None:
             pkg_directory = pkgname
@@ -209,7 +209,10 @@ class Package(PackageBase, IPackage, abc.ABC):
 
         if (hasattr(self, "_auxiliary_data")) and (names := get_variable_names(self)):
             d["auxiliary"] = names
-
+        return d
+    
+    def render(self, directory, pkgname, globaltimes, binary):
+        d = self._get_render_dictionary( directory, pkgname, globaltimes, binary)
         return self._template.render(d)
 
     @staticmethod

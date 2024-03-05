@@ -8,7 +8,7 @@ from imod.mf6.auxiliary_variables import expand_transient_auxiliary_variables
 from imod.mf6.exchangebase import ExchangeBase
 from imod.mf6.package import Package
 from imod.typing import GridDataArray
-
+import  pandas as pd
 
 class GWFGWF(ExchangeBase):
     """
@@ -89,3 +89,29 @@ class GWFGWF(ExchangeBase):
         state_for_boundary: Optional[GridDataArray] = None,
     ) -> Package:
         raise NotImplementedError("this package cannot be clipped")
+
+    def render(self, directory, pkgname, globaltimes, binary):
+
+        """
+        cell_id1: xr.DataArray,
+        cell_id2: xr.DataArray,
+        layer: xr.DataArray,
+        cl1: xr.DataArray,
+        cl2: xr.DataArray,
+        hwva: xr.DataArray,
+        angldegx: Optional[xr.DataArray] = None,
+        cdist: Optional[xr.DataArray] = None,
+        """
+        d = Package._get_render_dictionary(self, directory, pkgname, globaltimes, binary)
+        datablock = pd.DataFrame()
+        datablock["layer1"] =  self.dataset["layer"].values[:]         
+        datablock["cell_id1"] = self.dataset["cell_id1"].values[:,0]
+        datablock["layer2"] =  self.dataset["layer"].values[:]  
+        datablock["cell_id2"] = self.dataset["cell_id2"].values[:,0]
+        datablock["cl1"] =  self.dataset["cl1"].values[:]   
+        datablock["cl2"] =  self.dataset["cl2"].values[:]        
+        datablock["hwva"] =  self.dataset["hwva"].values[:]   
+        datablock["angldegx"] =  self.dataset["angldegx"].values[:]       
+        datablock["cdist"] =  self.dataset["cdist"].values[:]                                                 
+        d["datablock"] = datablock.to_string(index=False,  header=False )
+        return self._template.render(d)
