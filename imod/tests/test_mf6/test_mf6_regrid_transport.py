@@ -41,13 +41,12 @@ def test_regrid_transport(
     flow_transport_simulation.write( tmp_path/"original", binary=False)
     flow_transport_simulation.run()
 
-    #Set up the regridded domain. The original domain is 101 columns * 2 rows * 1layer
-    # We'll regrid it to 101x 4 x 1
+    #Set up the regridded domain. The original domain is 101 columns * 2 rows * 1 layer
     domain = flow_transport_simulation["flow"].domain
-    finer_idomain = create_regridding_idomain(domain, col_row_dimension[0], col_row_dimension[1])
+    other_idomain = create_regridding_idomain(domain, col_row_dimension[0], col_row_dimension[1])
 
     new_simulation = flow_transport_simulation.regrid_like(
-        "regridded_simulation", finer_idomain
+        "regridded_simulation", other_idomain
     )
 
     # Test that the newly regridded simulation can run
@@ -62,8 +61,8 @@ def test_regrid_transport(
     dy = domain.coords["dy"].values[()]
     cell_volume = dx * dy * 1
 
-    new_dx = finer_idomain.coords["dx"].values[()]
-    new_dy = finer_idomain.coords["dy"].values[()]
+    new_dx = other_idomain.coords["dx"].values[()]
+    new_dy = other_idomain.coords["dy"].values[()]
     regridded_cell_volume = new_dx * new_dy
 
     conc = conc.where(conc > -1e29, 0)
