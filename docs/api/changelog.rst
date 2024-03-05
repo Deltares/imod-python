@@ -43,6 +43,7 @@ Added
 - :meth:`imod.mf6.Modflow6Simulation.open_concentration` and
   :meth:`imod.mf6.Modflow6Simulation.open_transport_budget` support opening
   split multi-species simulations.
+  :meth:`imod.mf6.Modflow6Simulation.regrid_like` can now regrid simulations that have 1 or more transport models.
 
 Changed
 ~~~~~~~
