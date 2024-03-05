@@ -21,12 +21,13 @@ data:
   
 We currently support the following MODFLOW-based models:
 
-* `USGS MODFLOW 6`_, structured (DIS) and discretization by
-  vertices (DISV) grids only, and not all advanced stress packages yet (LAK,
-  MAW, SFR, UZF)
+* `USGS MODFLOW 6`_, structured (DIS) and discretization by vertices (DISV)
+  grids only, and not all advanced stress packages (only LAK and UZF)
 * `iMOD-WQ`_, which integrates SEAWAT (density-dependent
   groundwater flow) and MT3DMS (multi-species reactive transport calculations)
 * `iMODFLOW`_
+
+Development currently focuses on supporting more Modflow 6 functionalities. 
 
 This Python package is developed primarily by the Groundwater Management Group
 at `Deltares`_. It is used together with a broader set of open source tools and
