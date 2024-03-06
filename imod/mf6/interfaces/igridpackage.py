@@ -9,3 +9,4 @@ class IGridPackage(IPackage, abc.ABC):
     def regrid_methods(self) -> Optional[dict[str, tuple[RegridderType, str]]]:
         if hasattr(self, "_regrid_method"):
             return self._regrid_method
+        return None

@@ -275,6 +275,7 @@ def _regrid_like(
 
         # regrid the variable
         new_package_data[varname] = _regrid_array(
+            package,
             varname,
             regridder_collection,
             regridder_name,
