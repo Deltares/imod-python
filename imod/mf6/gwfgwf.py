@@ -1,4 +1,5 @@
-from typing import Optional
+from pathlib import Path
+from typing import Optional, Union
 
 import cftime
 import numpy as np
@@ -8,6 +9,7 @@ from imod.mf6.auxiliary_variables import expand_transient_auxiliary_variables
 from imod.mf6.exchangebase import ExchangeBase
 from imod.mf6.package import Package
 from imod.typing import GridDataArray
+from imod.typing.grid import ones_like
 
 
 class GWFGWF(ExchangeBase):
@@ -40,7 +42,7 @@ class GWFGWF(ExchangeBase):
             "layer": layer,
             "model_name_1": model_id1,
             "model_name_2": model_id2,
-            "ihc": xr.DataArray(np.ones_like(cl1, dtype=int)),
+            "ihc": ones_like(cl1, dtype=int),
             "cl1": cl1,
             "cl2": cl2,
             "hwva": hwva,
@@ -89,3 +91,6 @@ class GWFGWF(ExchangeBase):
         state_for_boundary: Optional[GridDataArray] = None,
     ) -> Package:
         raise NotImplementedError("this package cannot be clipped")
+
+    def render(self, directory: Path, pkgname: str, globaltimes: Union[list[np.datetime64], np.ndarray], binary: bool) -> str:
+       return self.render_with_geometric_constants(directory, pkgname, globaltimes, binary)

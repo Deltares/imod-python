@@ -1,4 +1,5 @@
-from typing import Optional
+from pathlib import Path
+from typing import Optional, Union
 
 import cftime
 import numpy as np
@@ -86,3 +87,7 @@ class GWTGWT(ExchangeBase):
         state_for_boundary: Optional[GridDataArray] = None,
     ) -> Package:
         raise NotImplementedError("this package cannot be clipped")
+
+
+    def render(self, directory: Path, pkgname: str, globaltimes: Union[list[np.datetime64], np.ndarray], binary: bool) -> str:
+        return self.render_with_geometric_constants(directory, pkgname, globaltimes, binary)
