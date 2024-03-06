@@ -8,9 +8,9 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
 )
-from imod.mf6.interfaces.igridpackage import IGridPackage
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 
-class MobileStorageTransfer(Package, IGridPackage):
+class MobileStorageTransfer(Package, IRegridPackage):
     """
     Mobile Storage.
 

@@ -11,9 +11,9 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
-from imod.mf6.interfaces.igridpackage import IGridPackage
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 
-class ConstantConcentration(BoundaryCondition, IGridPackage):
+class ConstantConcentration(BoundaryCondition, IRegridPackage):
     """
     Constant Concentration package.
 

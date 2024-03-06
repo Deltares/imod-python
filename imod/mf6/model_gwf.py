@@ -11,7 +11,7 @@ from imod.mf6.clipped_boundary_condition_creator import create_clipped_boundary
 from imod.mf6.model import Modflow6Model
 from imod.mf6.utilities.regrid import RegridderType
 from imod.typing import GridDataArray
-
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 
 class GroundwaterFlowModel(Modflow6Model):
     _mandatory_packages = ("npf", "ic", "oc", "sto")
@@ -44,7 +44,7 @@ class GroundwaterFlowModel(Modflow6Model):
         """
         methods: defaultdict = defaultdict(list)
         for pkg_name, pkg in self.items():
-            if pkg.is_regridding_supported():
+            if  isinstance(pkg, IRegridPackage):
                 pkg_methods = pkg.get_regrid_methods()
                 for variable in pkg_methods:
                     if (

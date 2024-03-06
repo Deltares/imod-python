@@ -14,10 +14,10 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
-from imod.mf6.interfaces.igridpackage import IGridPackage
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 
 
-class GeneralHeadBoundary(BoundaryCondition,IGridPackage):
+class GeneralHeadBoundary(BoundaryCondition,IRegridPackage):
     """
     The General-Head Boundary package is used to simulate head-dependent flux
     boundaries.

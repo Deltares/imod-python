@@ -9,9 +9,9 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
 )
-from imod.mf6.interfaces.igridpackage import IGridPackage
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 
-class Dispersion(Package, IGridPackage):
+class Dispersion(Package, IRegridPackage):
     """
     Molecular Diffusion and Dispersion.
 

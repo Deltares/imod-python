@@ -14,8 +14,8 @@ from imod.schemata import (
     IndexesSchema,
 )
 
-from imod.mf6.interfaces.igridpackage import IGridPackage
-class VerticesDiscretization(Package, IGridPackage):
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
+class VerticesDiscretization(Package, IRegridPackage):
     """
     Discretization by Vertices (DISV).
 

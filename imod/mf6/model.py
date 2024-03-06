@@ -27,7 +27,7 @@ from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray
 from imod.typing.grid import ones_like
-
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 
 class Modflow6Model(collections.UserDict, abc.ABC):
     _mandatory_packages: Tuple[str, ...] = ()
@@ -479,7 +479,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         new_model = self.__class__()
 
         for pkg_name, pkg in self.items():
-            if pkg.is_regridding_supported():
+            if isinstance(pkg, IRegridPackage):
                 new_model[pkg_name] = pkg.regrid_like(target_grid)
             else:
                 raise NotImplementedError(

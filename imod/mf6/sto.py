@@ -12,7 +12,7 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
 )
-from imod.mf6.interfaces.igridpackage import IGridPackage
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 
 class Storage(Package):
     _pkg_id = "sto_deprecated"
@@ -23,7 +23,7 @@ class Storage(Package):
         )
 
 
-class StorageBase(Package, IGridPackage, abc.ABC):
+class StorageBase(Package, IRegridPackage, abc.ABC):
     def get_options(self, d):
         # Skip both variables in grid_data and "transient".
         not_options = list(self._grid_data.keys())

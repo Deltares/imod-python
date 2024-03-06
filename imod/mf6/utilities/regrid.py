@@ -9,7 +9,7 @@ from imod.typing.grid import GridDataArray
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
-from imod.mf6.interfaces.igridpackage import IGridPackage
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.interfaces.ipackage import IPackage
 from imod.mf6.utilities.regridding_types import RegridderType
 import copy
@@ -161,7 +161,7 @@ def regrid_like(
     return clip_by_grid(package, target_grid_2d)
 
 def _regrid_array(
-        package: IGridPackage,
+        package: IRegridPackage,
         varname: str,
         regridder_collection: RegridderInstancesCollection,
         regridder_name: str,
@@ -214,7 +214,7 @@ def _regrid_array(
 
 @typedispatch  # type: ignore[no-redef]
 def _regrid_like(
-    package: IGridPackage,
+    package: IRegridPackage,
     target_grid: GridDataArray,
     regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
 ) -> IPackage:

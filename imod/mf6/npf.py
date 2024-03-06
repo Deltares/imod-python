@@ -14,7 +14,7 @@ from imod.schemata import (
     IndexesSchema,
 )
 from imod.typing import GridDataArray
-from imod.mf6.interfaces.igridpackage import IGridPackage
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 
 def _dataarray_to_bool(griddataarray: GridDataArray) -> bool:
     if griddataarray is None or griddataarray.values is None:
@@ -33,7 +33,7 @@ def _dataarray_to_bool(griddataarray: GridDataArray) -> bool:
     return griddataarray.values.item()
 
 
-class NodePropertyFlow(Package, IGridPackage):
+class NodePropertyFlow(Package, IRegridPackage):
     """
     Node Property Flow package.
 

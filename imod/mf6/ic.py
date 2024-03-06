@@ -8,9 +8,9 @@ from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import DTypeSchema, IdentityNoDataSchema, IndexesSchema
 
 
-from imod.mf6.interfaces.igridpackage import IGridPackage
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 
-class InitialConditions(Package, IGridPackage):
+class InitialConditions(Package, IRegridPackage):
     """
     Initial Conditions (IC) Package information is read from the file that is
     specified by "IC6" as the file type. Only one IC Package can be specified
