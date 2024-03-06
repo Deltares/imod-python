@@ -71,9 +71,15 @@ def create_transport_model(flow_model, species_name, dispersivity, retardation, 
 
 
 # %%
-# Create the spatial discretization.
 @pytest.fixture(scope="function")
 def flow_transport_simulation():
+    """
+    This fixture is a variation on the model also present in
+    examples/mf6/example_1d_transport.py. To make that model more useful for
+    testing eg partitioning or regridding, some boundary conditions were added
+    (2 wells, one extractor and one injector which injects with a nonzero
+    concentration) as well as a recharge zone with a nonzero concentration.
+    """
     nlay = 1
     nrow = 2
     ncol = 101
