@@ -19,7 +19,7 @@ from imod.mf6.utilities.regrid import RegridderType
 class Advection(Package):
     _pkg_id = "adv"
     _template = Package._initialize_template(_pkg_id)
-    _regrid_method: dict[str, Tuple[RegridderType, str]] = {}   
+    _regrid_method: dict[str, tuple[RegridderType, str]] = {}   
 
     def __init__(self, scheme: str):
         dict_dataset = {"scheme": scheme}
