@@ -190,7 +190,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             else:
                 np.savetxt(fname=f, X=da.values, fmt=fmt)
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def _get_render_dictionary(self, directory: pathlib.Path, pkgname: str, globaltimes: Union[list[np.datetime64], np.ndarray], binary: bool) ->dict[str,Any]:
         d = {}
         if directory is None:
             pkg_directory = pkgname
@@ -198,7 +198,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             pkg_directory = pathlib.Path(directory) / pkgname
 
         for varname in self.dataset.data_vars:
-            key = self._keyword_map.get(varname, varname)
+            key = self._keyword_map.get(str(varname), str(varname))
 
             if hasattr(self, "_grid_data") and varname in self._grid_data:
                 layered, value = self._compose_values(
@@ -213,7 +213,10 @@ class Package(PackageBase, IPackage, abc.ABC):
 
         if (hasattr(self, "_auxiliary_data")) and (names := get_variable_names(self)):
             d["auxiliary"] = names
-
+        return d
+    
+    def render(self, directory, pkgname, globaltimes, binary):
+        d = self._get_render_dictionary( directory, pkgname, globaltimes, binary)
         return self._template.render(d)
 
     @staticmethod

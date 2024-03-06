@@ -124,10 +124,11 @@ class SubdomainCases:
         return das, expected, equidistant
 
 
-def _save_subdomains_no_species(subdomains, tmp_path):
+def _save_subdomains_no_species(subdomains, tmp_path, start_nr=0):
     for i, subdomain in enumerate(subdomains):
+        nr = start_nr + i
         for layer, da in subdomain.groupby("layer"):
-            idf.write(tmp_path / f"subdomains_20000101_l{layer}_p00{i}.idf", da)
+            idf.write(tmp_path / f"subdomains_20000101_l{layer}_p00{nr}.idf", da)
 
 
 def _save_subdomains_species(subdomains, tmp_path):
@@ -144,6 +145,34 @@ def _save_subdomains_species(subdomains, tmp_path):
 )
 def test_open_subdomains(subdomains, expected, equidistant, tmp_path):
     _save_subdomains_no_species(subdomains, tmp_path)
+
+    da = idf.open_subdomains(tmp_path / "subdomains_*.idf").load()
+
+    dx, dy = dxdy_full(equidistant)
+    expected_coords = util.spatial._xycoords((0.0, 8.0, 0.0, 6.0), (dx, dy))
+
+    assert da.dims == ("time", "layer", "y", "x")
+
+    assert np.all(da.isel(time=0) == expected)
+    assert len(da.x) == 8
+    assert len(da.y) == 6
+
+    assert np.all(da["y"].values == expected_coords["y"])
+    assert np.all(da["x"].values == expected_coords["x"])
+    assert np.all(da["dx"].values == dx)
+    assert np.all(da["dy"].values == dy)
+
+    assert da.values.dtype == np.float32
+
+    assert isinstance(da, xr.DataArray)
+
+
+@parametrize_with_cases(
+    "subdomains,expected,equidistant", cases=SubdomainCases, has_tag="no_species"
+)
+def test_open_subdomains__start_nr_not_zero(subdomains, expected, equidistant, tmp_path):
+    # Test if no issue like https://github.com/Deltares/imod-python/issues/197 exists
+    _save_subdomains_no_species(subdomains, tmp_path, start_nr=2)
 
     da = idf.open_subdomains(tmp_path / "subdomains_*.idf").load()
 
