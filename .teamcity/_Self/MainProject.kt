@@ -1,5 +1,6 @@
 package _Self
 
+import Deploy.DeployProject
 import Nightly.NightlyProject
 import Pixi.PixiProject
 import Templates.*
@@ -51,6 +52,7 @@ object MainProject : Project({
         }
     }
 
+    subProject(DeployProject)
     subProject(NightlyProject)
     subProject(PixiProject)
 })
