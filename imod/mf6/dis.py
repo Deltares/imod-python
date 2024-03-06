@@ -16,8 +16,9 @@ from imod.schemata import (
     IndexesSchema,
 )
 
+from imod.mf6.interfaces.igridpackage import IGridPackage
 
-class StructuredDiscretization(Package):
+class StructuredDiscretization(Package, IGridPackage):
     """
     Discretization information for structered grids is specified using the file.
     (DIS6) Only one discretization input file (DISU6, DISV6 or DIS6) can be

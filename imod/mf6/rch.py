@@ -14,9 +14,8 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
-
-
-class Recharge(BoundaryCondition):
+from imod.mf6.interfaces.igridpackage import IGridPackage
+class Recharge(BoundaryCondition, IGridPackage):
     """
     Recharge Package.
     Any number of RCH Packages can be specified for a single groundwater flow

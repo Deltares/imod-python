@@ -11,8 +11,8 @@ from imod.schemata import (
     OtherCoordsSchema,
 )
 
-
-class MassSourceLoading(BoundaryCondition):
+from imod.mf6.interfaces.igridpackage import IGridPackage
+class MassSourceLoading(BoundaryCondition, IGridPackage):
     """
     Mass Source Loading (SRC) package for structured discretization (DIS)
     models. Any number of SRC Packages can be specified for a single

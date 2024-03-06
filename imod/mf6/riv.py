@@ -14,9 +14,9 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
+from imod.mf6.interfaces.igridpackage import IGridPackage
 
-
-class River(BoundaryCondition):
+class River(BoundaryCondition, IGridPackage):
     """
     River package.
     Any number of RIV Packages can be specified for a single groundwater flow

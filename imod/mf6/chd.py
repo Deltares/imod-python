@@ -13,9 +13,10 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
+from imod.mf6.interfaces.igridpackage import IGridPackage
 
 
-class ConstantHead(BoundaryCondition):
+class ConstantHead(BoundaryCondition, IGridPackage):
     """
     Constant-Head package. Any number of CHD Packages can be specified for a
     single groundwater flow model; however, an error will occur if a CHD Package

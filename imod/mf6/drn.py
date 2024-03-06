@@ -14,9 +14,9 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
+from imod.mf6.interfaces.igridpackage import IGridPackage
 
-
-class Drainage(BoundaryCondition):
+class Drainage(BoundaryCondition, IGridPackage):
     """
     The Drain package is used to simulate head-dependent flux boundaries.
     https://water.usgs.gov/ogw/modflow/mf6io.pdf#page=67

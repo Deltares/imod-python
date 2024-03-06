@@ -11,9 +11,9 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
 )
+from imod.mf6.interfaces.igridpackage import IGridPackage
 
-
-class ImmobileStorageTransfer(Package):
+class ImmobileStorageTransfer(Package, IGridPackage):
     """
     The Immobile Storage and Transfer (IST) package represents an immobile
     fraction of groundwater. Any number of IST Packages can be specified for a

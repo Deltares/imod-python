@@ -1,7 +1,6 @@
 import abc
-from enum import Enum
-from typing import Any, Optional, Tuple, Union
 
+from typing import Any, Optional, Union
 import xarray as xr
 import xugrid as xu
 from xugrid.regrid.regridder import BaseRegridder
@@ -9,20 +8,12 @@ from fastcore.dispatch import typedispatch
 from imod.typing.grid import GridDataArray
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
-
-class RegridderType(Enum):
-    """
-    Enumerator referring to regridder types in ``xugrid``.
-    These can be used safely in scripts, remaining backwards compatible for
-    when it is decided to rename regridders in ``xugrid``. For an explanation
-    what each regridder type does, we refer to the `xugrid documentation <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_
-    """
-
-    CENTROIDLOCATOR = xu.CentroidLocatorRegridder
-    BARYCENTRIC = xu.BarycentricInterpolator
-    OVERLAP = xu.OverlapRegridder
-    RELATIVEOVERLAP = xu.RelativeOverlapRegridder
-
+from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
+from imod.mf6.interfaces.igridpackage import IGridPackage
+from imod.mf6.interfaces.ipackage import IPackage
+from imod.mf6.utilities.regridding_types import RegridderType
+import copy
+from xarray.core.utils import is_scalar
 
 class RegridderInstancesCollection:
     """
@@ -157,4 +148,145 @@ def regrid_like(
     """
     return clip_by_grid(package, target_grid)
 
+@typedispatch  # type: ignore[no-redef]
+def regrid_like(
+    package: IPointDataPackage, target_grid: GridDataArray, *_
+) -> IPointDataPackage:
+    """
+    The regrid_like method is irrelevant for this package as it is
+    grid-agnostic, instead this method clips the package based on the grid
+    exterior.
+    """
+    target_grid_2d = target_grid.isel(layer=0, drop=True, missing_dims="ignore")
+    return clip_by_grid(package, target_grid_2d)
 
+def _regrid_array(
+        package: IGridPackage,
+        varname: str,
+        regridder_collection: RegridderInstancesCollection,
+        regridder_name: str,
+        regridder_function: str,
+        target_grid: GridDataArray,
+    ) -> Optional[GridDataArray]:
+        """
+        Regrids a data_array. The array is specified by its key in the dataset.
+        Each data-array can represent:
+        -a scalar value, valid for the whole grid
+        -an array of a different scalar per layer
+        -an array with a value per grid block
+        -None
+        """
+
+        # skip regridding for arrays with no valid values (such as "None")
+        if not package._valid(package.dataset[varname].values[()]):
+            return None
+
+        # the dataarray might be a scalar. If it is, then it does not need regridding.
+        if is_scalar(package.dataset[varname]):
+            return package.dataset[varname].values[()]
+
+        if isinstance(package.dataset[varname], xr.DataArray):
+            coords = package.dataset[varname].coords
+            # if it is an xr.DataArray it may be layer-based; then no regridding is needed
+            if not ("x" in coords and "y" in coords):
+                return package.dataset[varname]
+
+            # if it is an xr.DataArray it needs the dx, dy coordinates for regridding, which are otherwise not mandatory
+            if not ("dx" in coords and "dy" in coords):
+                raise ValueError(
+                    f"DataArray {varname} does not have both a dx and dy coordinates"
+                )
+
+        # obtain an instance of a regridder for the chosen method
+        regridder = regridder_collection.get_regridder(
+            regridder_name,
+            regridder_function,
+        )
+
+        # store original dtype of data
+        original_dtype = package.dataset[varname].dtype
+
+        # regrid data array
+        regridded_array = regridder.regrid(package.dataset[varname])
+
+        # reconvert the result to the same dtype as the original
+        return regridded_array.astype(original_dtype)
+
+@typedispatch  # type: ignore[no-redef]
+def _regrid_like(
+    package: IGridPackage,
+    target_grid: GridDataArray,
+    regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
+) -> IPackage:
+    """
+    Creates a package of the same type as this package, based on another discretization.
+    It regrids all the arrays in this package to the desired discretization, and leaves the options
+    unmodified. At the moment only regridding to a different planar grid is supported, meaning
+    ``target_grid`` has different ``"x"`` and ``"y"`` or different ``cell2d`` coords.
+
+    The regridding methods can be specified in the _regrid_method attribute of the package. These are the defaults
+    that specify how each array should be regridded. These defaults can be overridden using the input
+    parameters of this function.
+
+    Examples
+    --------
+    To regrid the npf package with a non-default method for the k-field, call regrid_like with these arguments:
+
+    >>> new_npf = npf.regrid_like(like, {"k": (imod.RegridderType.OVERLAP, "mean")})
+
+
+    Parameters
+    ----------
+    target_grid: xr.DataArray or xu.UgridDataArray
+        a grid defined over the same discretization as the one we want to regrid the package to
+    regridder_types: dict(str->(regridder type,str))
+        dictionary mapping arraynames (str) to a tuple of regrid type (a specialization class of BaseRegridder) and function name (str)
+        this dictionary can be used to override the default mapping method.
+
+    Returns
+    -------
+    a package with the same options as this package, and with all the data-arrays regridded to another discretization,
+    similar to the one used in input argument "target_grid"
+    """
+    if not hasattr(package, "_regrid_method"):
+        raise NotImplementedError(
+            f"Package {type(package).__name__} does not support regridding"
+        )
+
+    regridder_collection = RegridderInstancesCollection(
+        package.dataset, target_grid=target_grid
+    )
+
+    regridder_settings = copy.deepcopy(package._regrid_method)
+    if regridder_types is not None:
+        regridder_settings.update(regridder_types)
+
+    new_package_data = get_non_grid_data(package, list(regridder_settings.keys()))
+
+    for (
+        varname,
+        regridder_type_and_function,
+    ) in regridder_settings.items():
+        regridder_name, regridder_function = regridder_type_and_function
+
+        # skip variables that are not in this dataset
+        if varname not in package.dataset.keys():
+            continue
+
+        # regrid the variable
+        new_package_data[varname] = _regrid_array(
+            varname,
+            regridder_collection,
+            regridder_name,
+            regridder_function,
+            target_grid,
+        )
+        # set dx and dy if present in target_grid
+        new_package_data[varname] = assign_coord_if_present(
+            "dx", target_grid, new_package_data[varname]
+        )
+        new_package_data[varname] = assign_coord_if_present(
+            "dy", target_grid, new_package_data[varname]
+        )
+
+    return package.__class__(**new_package_data)

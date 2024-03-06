@@ -31,8 +31,9 @@ SEGMENT_BOUNDARY_DIMS_SCHEMA = (
     | DimsSchema("segment", "{face_dim}")
 )
 
+from imod.mf6.interfaces.igridpackage import IGridPackage
 
-class Evapotranspiration(BoundaryCondition):
+class Evapotranspiration(BoundaryCondition, IGridPackage):
     """
     Evapotranspiration (EVT) Package.
     Any number of EVT Packages can be specified for a single groundwater flow

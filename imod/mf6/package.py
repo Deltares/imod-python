@@ -23,10 +23,7 @@ from imod.mf6.pkgbase import (
     PackageBase,
 )
 from imod.mf6.utilities.regrid import (
-    RegridderInstancesCollection,
     RegridderType,
-    assign_coord_if_present,
-    get_non_grid_data,
 )
 from imod.mf6.utilities.schemata import filter_schemata_dict
 from imod.mf6.validation import validation_pkg_error_message
@@ -38,7 +35,7 @@ from imod.schemata import (
     ValidationError,
 )
 from imod.typing import GridDataArray
-
+from imod.mf6.utilities.regrid import _regrid_like
 
 class Package(PackageBase, IPackage, abc.ABC):
     """
@@ -601,57 +598,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             return self._regrid_method
         return None
 
-    def _regrid_array(
-        self,
-        varname: str,
-        regridder_collection: RegridderInstancesCollection,
-        regridder_name: str,
-        regridder_function: str,
-        target_grid: GridDataArray,
-    ) -> Optional[GridDataArray]:
-        """
-        Regrids a data_array. The array is specified by its key in the dataset.
-        Each data-array can represent:
-        -a scalar value, valid for the whole grid
-        -an array of a different scalar per layer
-        -an array with a value per grid block
-        -None
-        """
 
-        # skip regridding for arrays with no valid values (such as "None")
-        if not self._valid(self.dataset[varname].values[()]):
-            return None
-
-        # the dataarray might be a scalar. If it is, then it does not need regridding.
-        if is_scalar(self.dataset[varname]):
-            return self.dataset[varname].values[()]
-
-        if isinstance(self.dataset[varname], xr.DataArray):
-            coords = self.dataset[varname].coords
-            # if it is an xr.DataArray it may be layer-based; then no regridding is needed
-            if not ("x" in coords and "y" in coords):
-                return self.dataset[varname]
-
-            # if it is an xr.DataArray it needs the dx, dy coordinates for regridding, which are otherwise not mandatory
-            if not ("dx" in coords and "dy" in coords):
-                raise ValueError(
-                    f"DataArray {varname} does not have both a dx and dy coordinates"
-                )
-
-        # obtain an instance of a regridder for the chosen method
-        regridder = regridder_collection.get_regridder(
-            regridder_name,
-            regridder_function,
-        )
-
-        # store original dtype of data
-        original_dtype = self.dataset[varname].dtype
-
-        # regrid data array
-        regridded_array = regridder.regrid(self.dataset[varname])
-
-        # reconvert the result to the same dtype as the original
-        return regridded_array.astype(original_dtype)
 
     def regrid_like(
         self,
@@ -688,48 +635,8 @@ class Package(PackageBase, IPackage, abc.ABC):
         a package with the same options as this package, and with all the data-arrays regridded to another discretization,
         similar to the one used in input argument "target_grid"
         """
-        if not hasattr(self, "_regrid_method"):
-            raise NotImplementedError(
-                f"Package {type(self).__name__} does not support regridding"
-            )
+        return _regrid_like(target_grid,regridder_types) 
 
-        regridder_collection = RegridderInstancesCollection(
-            self.dataset, target_grid=target_grid
-        )
-
-        regridder_settings = copy.deepcopy(self._regrid_method)
-        if regridder_types is not None:
-            regridder_settings.update(regridder_types)
-
-        new_package_data = get_non_grid_data(self, list(regridder_settings.keys()))
-
-        for (
-            varname,
-            regridder_type_and_function,
-        ) in regridder_settings.items():
-            regridder_name, regridder_function = regridder_type_and_function
-
-            # skip variables that are not in this dataset
-            if varname not in self.dataset.keys():
-                continue
-
-            # regrid the variable
-            new_package_data[varname] = self._regrid_array(
-                varname,
-                regridder_collection,
-                regridder_name,
-                regridder_function,
-                target_grid,
-            )
-            # set dx and dy if present in target_grid
-            new_package_data[varname] = assign_coord_if_present(
-                "dx", target_grid, new_package_data[varname]
-            )
-            new_package_data[varname] = assign_coord_if_present(
-                "dy", target_grid, new_package_data[varname]
-            )
-
-        return self.__class__(**new_package_data)
 
     def _skip_masking_dataarray(self, array_name: str) -> bool:
         if hasattr(self, "_skip_mask_arrays"):
