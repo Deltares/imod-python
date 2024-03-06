@@ -50,7 +50,7 @@ class ExchangeBase(Package):
         if hasattr(self, "_template"):
             template = self._template
         else:
-            raise RuntimeError("exchange file does not have a template")
+            raise RuntimeError("exchange package does not have a template")
         
         d = Package._get_render_dictionary(self, directory, pkgname, globaltimes, binary)
         is_structured = len(self.dataset["cell_id1"].shape) > 1
