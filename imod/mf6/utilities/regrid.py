@@ -5,9 +5,10 @@ from typing import Any, Optional, Tuple, Union
 import xarray as xr
 import xugrid as xu
 from xugrid.regrid.regridder import BaseRegridder
-
+from fastcore.dispatch import typedispatch
 from imod.typing.grid import GridDataArray
-
+from imod.mf6.utilities.clip import clip_by_grid
+from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 
 class RegridderType(Enum):
     """
@@ -145,3 +146,15 @@ def assign_coord_if_present(
                 {coordname: target_grid.coords[coordname].values[()]}
             )
     return maybe_has_coords_attr
+
+@typedispatch  # type: ignore[no-redef]
+def regrid_like(
+    package: ILineDataPackage, target_grid: GridDataArray, *_) -> ILineDataPackage:
+    """
+    The regrid_like method is irrelevant for this package as it is
+    grid-agnostic, instead this method clips the package based on the grid
+    exterior.
+    """
+    return clip_by_grid(package, target_grid)
+
+
