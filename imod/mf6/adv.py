@@ -12,13 +12,15 @@ robust alternative.
 from copy import deepcopy
 
 from imod.mf6.package import Package
+from imod.mf6.utilities.regrid import RegridderType
 
 
 class Advection(Package):
     _pkg_id = "adv"
     _template = Package._initialize_template(_pkg_id)
+    _regrid_method: dict[str, tuple[RegridderType, str]] = {}   
 
-    def __init__(self, scheme):
+    def __init__(self, scheme: str):
         dict_dataset = {"scheme": scheme}
         super().__init__(dict_dataset)
 
@@ -42,7 +44,9 @@ class AdvectionUpstream(Advection):
     Note: all constructor arguments will be ignored
     """
 
-    def __init__(self):
+    def __init__(self, scheme: str = "upstream"):
+        if not scheme  =="upstream":
+            raise ValueError("error in scheme parameter. Should be 'upstream' if present.")
         super().__init__(scheme="upstream")
 
 
@@ -58,7 +62,9 @@ class AdvectionCentral(Advection):
     Note: all constructor arguments will be ignored
     """
 
-    def __init__(self):
+    def __init__(self,  scheme: str = "central"):
+        if not scheme  =="central":
+            raise ValueError("error in scheme parameter. Should be 'central' if present.")        
         super().__init__(scheme="central")
 
 
@@ -69,5 +75,7 @@ class AdvectionTVD(Advection):
     Note: all constructor arguments will be ignored
     """
 
-    def __init__(self):
+    def __init__(self,  scheme: str = "TVD"):
+        if not scheme  =="TVD":
+            raise ValueError("error in scheme parameter. Should be 'TVD' if present.")              
         super().__init__(scheme="TVD")
