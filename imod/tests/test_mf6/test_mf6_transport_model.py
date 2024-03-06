@@ -124,8 +124,8 @@ def test_transport_balance_loading(tmp_path, flow_transport_simulation):
     assert balance_time.coords["time"].dtype == np.dtype("datetime64[ns]")
 
     assert np.all(
-        balance_notime.sel(species="a")["ssm"].values
-        == balance_time.sel(species="a")["ssm"].values
+        balance_notime.sel(species="a")["source-sink mix_ssm"].values
+        == balance_time.sel(species="a")["source-sink mix_ssm"].values
     )
 
 

@@ -481,6 +481,7 @@ def grid_info(like: xr.DataArray) -> Dict[str, Any]:
 
 def get_header_advanced_package(headers: Dict[str, List[Union[cbc.Imeth1Header, cbc.Imeth6Header]]]) -> cbc.Imeth6Header | None:
     for key, header in headers.items():
-        if 'gwf_' in key:
+        # multimodels have a gwf-gwf budget for flow-ja-face between domains
+        if not 'flow-ja-face' in key and 'gwf_' in key:
             return header[0]
     return None

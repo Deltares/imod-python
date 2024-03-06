@@ -1,6 +1,7 @@
 import numpy as np
 import xarray as xr
 
+from imod.prepare.layer import get_upper_active_layer_number
 from imod.mf6.boundary_condition import AdvancedBoundaryCondition, BoundaryCondition
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.schemata import (
@@ -186,12 +187,12 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         "theta_sat": [IdentityNoDataSchema("kv_sat"), AllValueSchema(">=", 0.0)],
         "theta_init": [IdentityNoDataSchema("kv_sat"), AllValueSchema(">=", 0.0)],
         "epsilon": [IdentityNoDataSchema("kv_sat")],
-        "infiltration_rate": [IdentityNoDataSchema("kv_sat")],
-        "et_pot": [IdentityNoDataSchema("kv_sat")],
-        "extinction_depth": [IdentityNoDataSchema("kv_sat")],
-        "extinction_theta": [IdentityNoDataSchema("kv_sat")],
-        "root_potential": [IdentityNoDataSchema("kv_sat")],
-        "root_activity": [IdentityNoDataSchema("kv_sat")],
+        "infiltration_rate": [IdentityNoDataSchema("stress_period_active")],
+        "et_pot": [IdentityNoDataSchema("stress_period_active")],
+        "extinction_depth": [IdentityNoDataSchema("stress_period_active")],
+        "extinction_theta": [IdentityNoDataSchema("stress_period_active")],
+        "root_potential": [IdentityNoDataSchema("stress_period_active")],
+        "root_activity": [IdentityNoDataSchema("stress_period_active")],
     }
 
     _package_data = (
@@ -238,6 +239,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         landflag = self._determine_landflag(kv_sat)
         iuzno = self._create_uzf_numbers(landflag)
         ivertcon = self._determine_vertical_connection(iuzno)
+        stress_period_active = landflag.where(landflag == 1)
 
         dict_dataset = {
             # Package data
@@ -248,6 +250,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
             "theta_init": theta_init,
             "epsilon": epsilon,
             # Stress period data
+            "stress_period_active": stress_period_active,
             "infiltration_rate": infiltration_rate,
             "et_pot": et_pot,
             "extinction_depth": extinction_depth,
@@ -349,10 +352,13 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
 
     def _create_uzf_numbers(self, landflag):
         """Create unique UZF ID's. Inactive cells equal 0"""
-        return np.cumsum(np.ravel(landflag)).reshape(landflag.shape) * landflag
+        active_nodes = xr.ones_like(landflag).where(landflag.notnull(), other =0.0)
+        return np.nancumsum(active_nodes).reshape(landflag.shape) * active_nodes
 
     def _determine_landflag(self, kv_sat):
-        return (np.isfinite(kv_sat)).astype(np.int32)
+        """ returns the landflag for uzf-model. Landflag == 1 for top active UZF-nodes """
+        land_nodes = xr.ones_like(kv_sat,dtype = np.int32).where(kv_sat.layer == get_upper_active_layer_number(kv_sat),other = 0)
+        return land_nodes.where(kv_sat.notnull())
 
     def _determine_vertical_connection(self, uzf_number):
         return uzf_number.shift(layer=-1, fill_value=0)
@@ -429,6 +435,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
     def _validate(self, schemata, **kwargs):
         # Insert additional kwargs
         kwargs["kv_sat"] = self["kv_sat"]
+        kwargs["stress_period_active"] = self["stress_period_active"]
         errors = super()._validate(schemata, **kwargs)
 
         return errors
