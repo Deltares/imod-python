@@ -1,9 +1,9 @@
 import numpy as np
 import xarray as xr
 
-from imod.prepare.layer import get_upper_active_layer_number
 from imod.mf6.boundary_condition import AdvancedBoundaryCondition, BoundaryCondition
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
+from imod.prepare.layer import get_upper_active_layer_number
 from imod.schemata import (
     AllInsideNoDataSchema,
     AllNoDataSchema,
