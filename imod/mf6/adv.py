@@ -10,7 +10,6 @@ robust alternative.
 """
 
 from copy import deepcopy
-from typing import Tuple
 
 from imod.mf6.package import Package
 from imod.mf6.utilities.regrid import RegridderType
