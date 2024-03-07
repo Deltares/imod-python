@@ -22,7 +22,7 @@ from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.regridding_types import RegridderType
 from imod.schemata import ValidationError
-from imod.typing.grid import GridDataArray
+from imod.typing.grid import GridDataArray, ones_like
 
 
 class RegridderInstancesCollection:
@@ -363,7 +363,7 @@ def _regrid_like(
             )
 
     methods = _get_unique_regridder_types(model)
-    output_domain = model._get_regridding_domain(target_grid, methods)
+    output_domain = _get_regridding_domain(model, target_grid, methods)
     new_model.mask_all_packages(output_domain)
     new_model.purge_empty_packages()
     if validate:
@@ -372,3 +372,29 @@ def _regrid_like(
         if status_info.has_errors():
             raise ValidationError("\n" + status_info.to_string())
     return new_model
+
+def _get_regridding_domain(
+    model: IModel,
+    target_grid: GridDataArray,
+    methods: defaultdict[RegridderType, list[str]],
+) -> GridDataArray:
+    """
+    This method computes the output-domain for a regridding operation by regridding idomain with
+    all regridders. Each regridder may leave some cells inactive. The output domain for the model consists of those
+    cells that all regridders consider active.
+    """
+    idomain = model.domain
+    regridder_collection = RegridderInstancesCollection(
+        idomain, target_grid=target_grid
+    )
+    included_in_all = ones_like(target_grid)
+    regridders =[regridder_collection.get_regridder( regriddertype,function) for regriddertype, functionlist in methods.items() for function in functionlist]
+    for regridder in regridders:
+        regridded_idomain = regridder.regrid(idomain)
+        included_in_all = included_in_all.where(regridded_idomain.notnull())            
+        included_in_all = regridded_idomain.where(regridded_idomain <=0, other = included_in_all)
+
+    new_idomain = included_in_all.where(included_in_all.notnull(), other=0)
+    new_idomain = new_idomain.astype(int)
+
+    return new_idomain

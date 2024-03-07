@@ -527,32 +527,6 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         dis = self._get_diskey()
         return self[dis]["bottom"]
 
-    def _get_regridding_domain(
-        self,
-        target_grid: GridDataArray,
-        methods: defaultdict[RegridderType, list[str]],
-    ) -> GridDataArray:
-        """
-        This method computes the output-domain for a regridding operation by regridding idomain with
-        all regridders. Each regridder may leave some cells inactive. The output domain for the model consists of those
-        cells that all regridders consider active.
-        """
-        idomain = self.domain
-        regridder_collection = RegridderInstancesCollection(
-            idomain, target_grid=target_grid
-        )
-        included_in_all = ones_like(target_grid)
-        regridders =[regridder_collection.get_regridder( regriddertype,function) for regriddertype, functionlist in methods.items() for function in functionlist]
-        for regridder in regridders:
-            regridded_idomain = regridder.regrid(idomain)
-            included_in_all = included_in_all.where(regridded_idomain.notnull())            
-            included_in_all = regridded_idomain.where(regridded_idomain <=0, other = included_in_all)
-
-        new_idomain = included_in_all.where(included_in_all.notnull(), other=0)
-        new_idomain = new_idomain.astype(int)
-
-        return new_idomain
-
     def __repr__(self) -> str:
         INDENT = "    "
         typename = type(self).__name__
