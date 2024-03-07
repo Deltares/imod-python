@@ -667,3 +667,24 @@ class Package(PackageBase, IPackage, abc.ABC):
         if hasattr(self, "_auxiliary_data"):
             return self._auxiliary_data
         return {}
+
+    def get_non_grid_data(self, grid_names: list[str]) -> dict[str, Any]:
+        """
+        This function copies the attributes of a dataset that are scalars, such as options.
+
+        parameters
+        ----------
+        grid_names: list of str
+            the names of the attribbutes of a dataset that are grids.
+        """
+        result = {}
+        all_non_grid_data = list(self.dataset.keys())
+        for name in grid_names:
+            if name in all_non_grid_data:
+                all_non_grid_data.remove(name)
+        for name in all_non_grid_data:
+            if "time" in self.dataset[name].coords:
+                result[name] = self.dataset[name]
+            else:
+                result[name] = self.dataset[name].values[()]
+        return result

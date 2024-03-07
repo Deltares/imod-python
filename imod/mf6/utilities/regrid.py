@@ -112,27 +112,6 @@ class RegridderInstancesCollection:
         return self.__get_existing_regridder(regridder_class, method)
 
 
-def get_non_grid_data(package, grid_names: list[str]) -> dict[str, Any]:
-    """
-    This function copies the attributes of a dataset that are scalars, such as options.
-
-    parameters
-    ----------
-    grid_names: list of str
-        the names of the attribbutes of a dataset that are grids.
-    """
-    result = {}
-    all_non_grid_data = list(package.dataset.keys())
-    for name in grid_names:
-        if name in all_non_grid_data:
-            all_non_grid_data.remove(name)
-    for name in all_non_grid_data:
-        if "time" in package.dataset[name].coords:
-            result[name] = package.dataset[name]
-        else:
-            result[name] = package.dataset[name].values[()]
-    return result
-
 
 def assign_coord_if_present(
     coordname: str, target_grid: GridDataArray, maybe_has_coords_attr: Any
