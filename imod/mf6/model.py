@@ -29,6 +29,7 @@ from imod.typing import GridDataArray
 from imod.typing.grid import ones_like
 from imod.mf6.interfaces.imodel import IModel
 from imod.mf6.utilities.regrid import _get_unique_regridder_types
+from imod.mf6.utilities.regrid import _regrid_like
 
 class Modflow6Model(collections.UserDict, IModel, abc.ABC):
     _mandatory_packages: Tuple[str, ...] = ()
@@ -477,27 +478,9 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         a model with similar packages to the input model, and with all the data-arrays regridded to another discretization,
         similar to the one used in input argument "target_grid"
         """
-        new_model = self.__class__()
 
-        for pkg_name, pkg in self.items():
-            if pkg.is_regridding_supported():
-                new_model[pkg_name] = pkg.regrid_like(target_grid)
-            else:
-                raise NotImplementedError(
-                    f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
-                )
-
-        methods = _get_unique_regridder_types(self)
-        output_domain = self._get_regridding_domain(target_grid, methods)
-        new_model.mask_all_packages(output_domain)
-        new_model.purge_empty_packages()
-        if validate:
-            status_info = NestedStatusInfo("Model validation status")
-            status_info.add(new_model._validate("Regridded model"))
-            if status_info.has_errors():
-                raise ValidationError("\n" + status_info.to_string())
-        return new_model
-
+        return _regrid_like(self, target_grid, validate)
+ 
     def mask_all_packages(
         self,
         mask: GridDataArray,

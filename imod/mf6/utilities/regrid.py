@@ -16,6 +16,9 @@ import copy
 from xarray.core.utils import is_scalar
 from imod.mf6.interfaces.imodel import IModel
 from collections import defaultdict
+from imod.mf6.statusinfo import NestedStatusInfo
+from imod.schemata import ValidationError
+from imod.mf6.auxiliary_variables import expand_transient_auxiliary_variables, remove_expanded_auxiliary_variables_from_dataset
 
 class RegridderInstancesCollection:
     """
@@ -254,6 +257,9 @@ def _regrid_like(
         raise NotImplementedError(
             f"Package {type(package).__name__} does not support regridding"
         )
+    
+    if hasattr(package,"auxiliary_data_fields"):
+        remove_expanded_auxiliary_variables_from_dataset(package)
 
     regridder_collection = RegridderInstancesCollection(
         package.dataset, target_grid=target_grid
@@ -291,15 +297,17 @@ def _regrid_like(
         new_package_data[varname] = assign_coord_if_present(
             "dy", target_grid, new_package_data[varname]
         )
+    if hasattr(package,"auxiliary_data_fields"):
+        expand_transient_auxiliary_variables(package)
 
     return package.__class__(**new_package_data)
 
-def _get_unique_regridder_types(self) -> defaultdict[RegridderType, list[str]]:
+def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, list[str]]:
     """
     This function loops over the packages and  collects all regridder-types that are in use.
     """
     methods: defaultdict = defaultdict(list)
-    for pkg_name, pkg in self.items():
+    for pkg_name, pkg in model.items():
         if  pkg.is_regridding_supported():
             pkg_methods = pkg.get_regrid_methods()
             for variable in pkg_methods:
@@ -316,3 +324,46 @@ def _get_unique_regridder_types(self) -> defaultdict[RegridderType, list[str]]:
                 f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
             )
     return methods
+
+@typedispatch  # type: ignore[no-redef]
+def _regrid_like(
+    model: IModel, target_grid: GridDataArray, validate: bool = True
+) -> IModel:
+    """
+    Creates a model by regridding the packages of this model to another discretization.
+    It regrids all the arrays in the package using the default regridding methods.
+    At the moment only regridding to a different planar grid is supported, meaning
+    ``target_grid`` has different ``"x"`` and ``"y"`` or different ``cell2d`` coords.
+
+    Parameters
+    ----------
+    target_grid: xr.DataArray or xu.UgridDataArray
+        a grid defined over the same discretization as the one we want to regrid the package to
+    validate: bool
+        set to true to validate the regridded packages
+
+    Returns
+    -------
+    a model with similar packages to the input model, and with all the data-arrays regridded to another discretization,
+    similar to the one used in input argument "target_grid"
+    """
+    new_model = model.__class__()
+
+    for pkg_name, pkg in model.items():
+        if pkg.is_regridding_supported():
+            new_model[pkg_name] = pkg.regrid_like(target_grid)
+        else:
+            raise NotImplementedError(
+                f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
+            )
+
+    methods = _get_unique_regridder_types(model)
+    output_domain = model._get_regridding_domain(target_grid, methods)
+    new_model.mask_all_packages(output_domain)
+    new_model.purge_empty_packages()
+    if validate:
+        status_info = NestedStatusInfo("Model validation status")
+        status_info.add(new_model._validate("Regridded model"))
+        if status_info.has_errors():
+            raise ValidationError("\n" + status_info.to_string())
+    return new_model
