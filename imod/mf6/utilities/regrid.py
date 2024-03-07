@@ -201,7 +201,7 @@ def _regrid_array(
         # reconvert the result to the same dtype as the original
         return regridded_array.astype(original_dtype)
 
-@typedispatch 
+@typedispatch   # type: ignore[no-redef]
 def _regrid_like(
     package: IRegridPackage,
     target_grid: GridDataArray,
@@ -309,7 +309,7 @@ def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, lis
             )
     return methods
 
-@typedispatch
+@typedispatch   # type: ignore[no-redef]
 def _regrid_like(
     model: IModel, target_grid: GridDataArray, validate: bool = True
 ) -> IModel:
