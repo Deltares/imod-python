@@ -37,30 +37,6 @@ class GroundwaterFlowModel(Modflow6Model):
             "under_relaxation": under_relaxation,
         }
 
-
-    def _get_unique_regridder_types(self) -> defaultdict[RegridderType, list[str]]:
-        """
-        This function loops over the packages and  collects all regridder-types that are in use.
-        """
-        methods: defaultdict = defaultdict(list)
-        for pkg_name, pkg in self.items():
-            if  pkg.is_regridding_supported():
-                pkg_methods = pkg.get_regrid_methods()
-                for variable in pkg_methods:
-                    if (
-                        variable in pkg.dataset.data_vars
-                        and pkg.dataset[variable].values[()] is not None
-                    ):
-                        regriddertype = pkg_methods[variable][0]
-                        functiontype = pkg_methods[variable][1]
-                        if functiontype not in  methods[regriddertype]:
-                            methods[regriddertype].append(functiontype)
-            else:
-                raise NotImplementedError(
-                    f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
-                )
-        return methods
-
     def clip_box(
         self,
         time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
