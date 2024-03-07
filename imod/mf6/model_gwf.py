@@ -44,7 +44,7 @@ class GroundwaterFlowModel(Modflow6Model):
         """
         methods: defaultdict = defaultdict(list)
         for pkg_name, pkg in self.items():
-            if  isinstance(pkg, IRegridPackage):
+            if  pkg.is_regridding_supported():
                 pkg_methods = pkg.get_regrid_methods()
                 for variable in pkg_methods:
                     if (

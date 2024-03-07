@@ -479,7 +479,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         new_model = self.__class__()
 
         for pkg_name, pkg in self.items():
-            if isinstance(pkg, IRegridPackage):
+            if pkg.is_regridding_supported():
                 new_model[pkg_name] = pkg.regrid_like(target_grid)
             else:
                 raise NotImplementedError(
