@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Tuple, Union
+from typing import Union
 
 import numpy as np
 import pandas as pd
@@ -32,7 +32,7 @@ class ExchangeBase(Package):
     def package_name(self) -> str:
         return f"{self.model_name1}_{self.model_name2}"
 
-    def get_specification(self) -> Tuple[str, str, str, str]:
+    def get_specification(self) -> tuple[str, str, str, str]:
         """
         Returns a tuple containing the exchange type, the exchange file name, and the model names. This can be used
         to write the exchange information in the simulation .nam input file

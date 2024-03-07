@@ -15,7 +15,11 @@ import xugrid as xu
 from xarray.core.utils import is_scalar
 
 import imod
-from imod.mf6.auxiliary_variables import get_variable_names
+from imod.mf6.auxiliary_variables import (
+    expand_transient_auxiliary_variables,
+    get_variable_names,
+    remove_expanded_auxiliary_variables_from_dataset,
+)
 from imod.mf6.interfaces.ipackage import IPackage
 from imod.mf6.pkgbase import (
     EXCHANGE_PACKAGES,
@@ -537,12 +541,15 @@ class Package(PackageBase, IPackage, abc.ABC):
         """
 
         masked = {}
+        if hasattr(self,"auxiliary_data_fields"):
+            remove_expanded_auxiliary_variables_from_dataset(self)
         for var in self.dataset.data_vars.keys():
             if self._skip_masking_variable(var, self.dataset[var]):
                 masked[var] = self.dataset[var]
             else:
                 masked[var] = self._mask_spatial_var(var, mask)
-
+        if hasattr(self,"auxiliary_data_fields"):
+            expand_transient_auxiliary_variables(self)
         return type(self)(**masked)
 
     def _skip_masking_variable(self, var: str, da: GridDataArray)->bool: 

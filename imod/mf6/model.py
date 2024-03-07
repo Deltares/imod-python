@@ -586,3 +586,4 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
     def is_use_newton(self):
         return False
+

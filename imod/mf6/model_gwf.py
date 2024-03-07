@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections import defaultdict
 from typing import Optional
 
 import cftime
@@ -9,7 +8,6 @@ import numpy as np
 from imod.mf6 import ConstantHead
 from imod.mf6.clipped_boundary_condition_creator import create_clipped_boundary
 from imod.mf6.model import Modflow6Model
-from imod.mf6.utilities.regrid import RegridderType
 from imod.typing import GridDataArray
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 

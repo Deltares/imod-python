@@ -104,6 +104,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
 
     _regrid_method = {
         "rate": (RegridderType.OVERLAP, "mean"),
+        "concentration": (RegridderType.OVERLAP, "mean"),
     }
 
     def __init__(

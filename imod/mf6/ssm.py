@@ -1,8 +1,11 @@
+from typing import Tuple
+
 import numpy as np
 
 from imod.logging import logger
 from imod.mf6 import GroundwaterFlowModel
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.utilities.regrid import RegridderType
 from imod.schemata import DTypeSchema
 
 
@@ -38,6 +41,8 @@ class SourceSinkMixing(BoundaryCondition):
     }
 
     _write_schemata = {}
+
+    _regrid_method: dict[str, Tuple[RegridderType, str]] = {}
 
     def __init__(
         self,
