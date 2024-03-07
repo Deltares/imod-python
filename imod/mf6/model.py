@@ -27,9 +27,10 @@ from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray
 from imod.typing.grid import ones_like
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
+from imod.mf6.interfaces.imodel import IModel
+from imod.mf6.utilities.regrid import _get_unique_regridder_types
 
-class Modflow6Model(collections.UserDict, abc.ABC):
+class Modflow6Model(collections.UserDict, IModel, abc.ABC):
     _mandatory_packages: Tuple[str, ...] = ()
     _model_id: Optional[str] = None
     _template: Template
@@ -486,7 +487,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                     f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
                 )
 
-        methods = self._get_unique_regridder_types()
+        methods = _get_unique_regridder_types(self)
         output_domain = self._get_regridding_domain(target_grid, methods)
         new_model.mask_all_packages(output_domain)
         new_model.purge_empty_packages()
@@ -585,6 +586,3 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
     def is_use_newton(self):
         return False
-
-    def _get_unique_regridder_types(self):
-        raise NotImplementedError(f"Regridding not supported for {self}")
