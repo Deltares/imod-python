@@ -4,7 +4,6 @@ import abc
 import collections
 import inspect
 import pathlib
-from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
 from typing import Optional, Union
@@ -23,15 +22,12 @@ from imod.mf6.interfaces.imodel import IModel
 from imod.mf6.package import Package
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.utilities.regrid import (
-    RegridderInstancesCollection,
-    RegridderType,
     _regrid_like,
 )
 from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray
-from imod.typing.grid import ones_like
 
 
 class Modflow6Model(collections.UserDict, IModel, abc.ABC):
