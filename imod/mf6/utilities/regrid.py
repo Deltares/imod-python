@@ -253,7 +253,7 @@ def _regrid_like(
     if regridder_types is not None:
         regridder_settings.update(regridder_types)
 
-    new_package_data = get_non_grid_data(package, list(regridder_settings.keys()))
+    new_package_data = package.get_non_grid_data( list(regridder_settings.keys()))
 
     for (
         varname,
