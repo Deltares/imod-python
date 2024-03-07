@@ -9,7 +9,7 @@ from imod.mf6 import ConstantHead
 from imod.mf6.clipped_boundary_condition_creator import create_clipped_boundary
 from imod.mf6.model import Modflow6Model
 from imod.typing import GridDataArray
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
+
 
 class GroundwaterFlowModel(Modflow6Model):
     _mandatory_packages = ("npf", "ic", "oc", "sto")

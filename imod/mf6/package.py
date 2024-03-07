@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import abc
-import copy
 import numbers
 import pathlib
 from collections import defaultdict
@@ -28,6 +27,7 @@ from imod.mf6.pkgbase import (
 )
 from imod.mf6.utilities.regrid import (
     RegridderType,
+    _regrid_like,
 )
 from imod.mf6.utilities.schemata import filter_schemata_dict
 from imod.mf6.validation import validation_pkg_error_message
@@ -39,7 +39,7 @@ from imod.schemata import (
     ValidationError,
 )
 from imod.typing import GridDataArray
-from imod.mf6.utilities.regrid import _regrid_like
+
 
 class Package(PackageBase, IPackage, abc.ABC):
     """

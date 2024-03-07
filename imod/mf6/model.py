@@ -7,7 +7,7 @@ import pathlib
 from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
-from typing import Optional, Tuple, Union
+from typing import Optional, Union
 
 import cftime
 import jinja2
@@ -19,20 +19,23 @@ import xugrid as xu
 from jinja2 import Template
 
 import imod
+from imod.mf6.interfaces.imodel import IModel
 from imod.mf6.package import Package
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
-from imod.mf6.utilities.regrid import RegridderInstancesCollection, RegridderType
+from imod.mf6.utilities.regrid import (
+    RegridderInstancesCollection,
+    RegridderType,
+    _regrid_like,
+)
 from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray
 from imod.typing.grid import ones_like
-from imod.mf6.interfaces.imodel import IModel
-from imod.mf6.utilities.regrid import _get_unique_regridder_types
-from imod.mf6.utilities.regrid import _regrid_like
+
 
 class Modflow6Model(collections.UserDict, IModel, abc.ABC):
-    _mandatory_packages: Tuple[str, ...] = ()
+    _mandatory_packages: tuple[str, ...] = ()
     _model_id: Optional[str] = None
     _template: Template
 
@@ -164,7 +167,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
     def __get_domain_geometry(
         self,
-    ) -> Tuple[
+    ) -> tuple[
         Union[xr.DataArray, xu.UgridDataArray],
         Union[xr.DataArray, xu.UgridDataArray],
         Union[xr.DataArray, xu.UgridDataArray],

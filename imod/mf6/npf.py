@@ -2,6 +2,7 @@ import warnings
 
 import numpy as np
 
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import PKG_DIMS_SCHEMA
@@ -14,7 +15,7 @@ from imod.schemata import (
     IndexesSchema,
 )
 from imod.typing import GridDataArray
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
+
 
 def _dataarray_to_bool(griddataarray: GridDataArray) -> bool:
     if griddataarray is None or griddataarray.values is None:

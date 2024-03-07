@@ -1,5 +1,7 @@
 from enum import Enum
+
 import xugrid as xu
+
 
 class RegridderType(Enum):
     """

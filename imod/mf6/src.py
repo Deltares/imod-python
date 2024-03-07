@@ -1,6 +1,7 @@
 import numpy as np
 
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.schemata import (
@@ -11,7 +12,7 @@ from imod.schemata import (
     OtherCoordsSchema,
 )
 
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
+
 class MassSourceLoading(BoundaryCondition, IRegridPackage):
     """
     Mass Source Loading (SRC) package for structured discretization (DIS)

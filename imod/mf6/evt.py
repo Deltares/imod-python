@@ -33,6 +33,7 @@ SEGMENT_BOUNDARY_DIMS_SCHEMA = (
 
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 
+
 class Evapotranspiration(BoundaryCondition, IRegridPackage):
     """
     Evapotranspiration (EVT) Package.

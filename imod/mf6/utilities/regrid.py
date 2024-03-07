@@ -1,24 +1,29 @@
 import abc
-
+import copy
+from collections import defaultdict
 from typing import Any, Optional, Union
+
 import xarray as xr
 import xugrid as xu
-from xugrid.regrid.regridder import BaseRegridder
 from fastcore.dispatch import typedispatch
-from imod.typing.grid import GridDataArray
-from imod.mf6.utilities.clip import clip_by_grid
+from xarray.core.utils import is_scalar
+from xugrid.regrid.regridder import BaseRegridder
+
+from imod.mf6.auxiliary_variables import (
+    expand_transient_auxiliary_variables,
+    remove_expanded_auxiliary_variables_from_dataset,
+)
 from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
+from imod.mf6.interfaces.imodel import IModel
+from imod.mf6.interfaces.ipackage import IPackage
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.interfaces.ipackage import IPackage
-from imod.mf6.utilities.regridding_types import RegridderType
-import copy
-from xarray.core.utils import is_scalar
-from imod.mf6.interfaces.imodel import IModel
-from collections import defaultdict
 from imod.mf6.statusinfo import NestedStatusInfo
+from imod.mf6.utilities.clip import clip_by_grid
+from imod.mf6.utilities.regridding_types import RegridderType
 from imod.schemata import ValidationError
-from imod.mf6.auxiliary_variables import expand_transient_auxiliary_variables, remove_expanded_auxiliary_variables_from_dataset
+from imod.typing.grid import GridDataArray
+
 
 class RegridderInstancesCollection:
     """
@@ -33,7 +38,7 @@ class RegridderInstancesCollection:
         target_grid: Union[xr.DataArray, xu.UgridDataArray],
     ) -> None:
         self.regridder_instances: dict[
-            Tuple[type[BaseRegridder], Optional[str]], BaseRegridder
+            tuple[type[BaseRegridder], Optional[str]], BaseRegridder
         ] = {}
         self._source_grid = source_grid
         self._target_grid = target_grid
