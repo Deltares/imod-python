@@ -128,27 +128,6 @@ def assign_coord_if_present(
             )
     return maybe_has_coords_attr
 
-@typedispatch  # type: ignore[no-redef]
-def regrid_like(
-    package: ILineDataPackage, target_grid: GridDataArray, *_) -> ILineDataPackage:
-    """
-    The regrid_like method is irrelevant for this package as it is
-    grid-agnostic, instead this method clips the package based on the grid
-    exterior.
-    """
-    return clip_by_grid(package, target_grid)
-
-@typedispatch  # type: ignore[no-redef]
-def regrid_like(
-    package: IPointDataPackage, target_grid: GridDataArray, *_
-) -> IPointDataPackage:
-    """
-    The regrid_like method is irrelevant for this package as it is
-    grid-agnostic, instead this method clips the package based on the grid
-    exterior.
-    """
-    target_grid_2d = target_grid.isel(layer=0, drop=True, missing_dims="ignore")
-    return clip_by_grid(package, target_grid_2d)
 
 def _regrid_array(
         package: IRegridPackage,
@@ -403,6 +382,27 @@ def _regrid_like(
 
     return result
 
+@typedispatch  # type: ignore[no-redef]
+def _regrid_like(
+    package: ILineDataPackage, target_grid: GridDataArray, *_) -> ILineDataPackage:
+    """
+    The regrid_like method is irrelevant for this package as it is
+    grid-agnostic, instead this method clips the package based on the grid
+    exterior.
+    """
+    return clip_by_grid(package, target_grid)
+
+@typedispatch  # type: ignore[no-redef]
+def _regrid_like(
+    package: IPointDataPackage, target_grid: GridDataArray, *_
+) -> IPointDataPackage:
+    """
+    he regrid_like method is irrelevant for this package as it is
+    grid-agnostic, instead this method clips the package based on the grid
+    exterior.
+    """
+    target_grid_2d = target_grid.isel(layer=0, drop=True, missing_dims="ignore")
+    return clip_by_grid(package, target_grid_2d)
 
 def _get_regridding_domain(
     model: IModel,

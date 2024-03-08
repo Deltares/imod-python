@@ -16,7 +16,6 @@ from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
-from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.grid import broadcast_to_full_domain
 from imod.mf6.utilities.regrid import RegridderType
 from imod.schemata import EmptyIndexesSchema
@@ -591,16 +590,6 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         new = cls.__new__(cls)
         new.dataset = copy.deepcopy(self.dataset)
         return new
-
-    def regrid_like(
-        self, target_grid: GridDataArray, *_
-    ) -> "HorizontalFlowBarrierBase":
-        """
-        The regrid_like method is irrelevant for this package as it is
-        grid-agnostic, instead this method clips the package based on the grid
-        exterior.
-        """
-        return clip_by_grid(self, target_grid)
 
     def mask(self, _) -> Package:
         """
