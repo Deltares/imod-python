@@ -16,7 +16,7 @@ class IModel( IDict):
     def purge_empty_packages(self, model_name: Optional[str] = "") -> None:
         raise NotImplementedError
     
-    def _validate(self, model_name: str = "") -> StatusInfoBase:
+    def validate(self, model_name: str = "") -> StatusInfoBase:
          raise NotImplementedError
     
     @property

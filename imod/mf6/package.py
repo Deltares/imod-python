@@ -679,9 +679,8 @@ class Package(PackageBase, IPackage, abc.ABC):
         """
         result = {}
         all_non_grid_data = list(self.dataset.keys())
-        for name in grid_names:
-            if name in all_non_grid_data:
-                all_non_grid_data.remove(name)
+        for name in (gridname for gridname in grid_names if gridname in all_non_grid_data):
+            all_non_grid_data.remove(name)
         for name in all_non_grid_data:
             if "time" in self.dataset[name].coords:
                 result[name] = self.dataset[name]

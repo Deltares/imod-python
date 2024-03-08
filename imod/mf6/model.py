@@ -185,7 +185,7 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
         k = npf["k"]
         return k
 
-    def _validate(self, model_name: str = "") -> StatusInfoBase:
+    def validate(self, model_name: str = "") -> StatusInfoBase:
         try:
             diskey = self._get_diskey()
         except Exception as e:
@@ -236,7 +236,7 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
         modeldirectory = workdir / modelname
         Path(modeldirectory).mkdir(exist_ok=True, parents=True)
         if validate:
-            model_status_info = self._validate(modelname)
+            model_status_info = self.validate(modelname)
             if model_status_info.has_errors():
                 return model_status_info
 
@@ -295,7 +295,7 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
         modeldirectory = pathlib.Path(directory) / modelname
         modeldirectory.mkdir(exist_ok=True, parents=True)
         if validate:
-            statusinfo = self._validate()
+            statusinfo = self.validate()
             if statusinfo.has_errors():
                 raise ValidationError(statusinfo.to_string())
 

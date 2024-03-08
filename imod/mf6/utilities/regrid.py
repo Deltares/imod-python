@@ -328,7 +328,7 @@ def _regrid_like(
     new_model.purge_empty_packages()
     if validate:
         status_info = NestedStatusInfo("Model validation status")
-        status_info.add(new_model._validate("Regridded model"))
+        status_info.add(new_model.validate("Regridded model"))
         if status_info.has_errors():
             raise ValidationError("\n" + status_info.to_string())
     return new_model
