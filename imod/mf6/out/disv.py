@@ -1,6 +1,6 @@
 import os
 import struct
-from typing import Any, BinaryIO, Dict, List, Optional, Tuple, Union
+from typing import Any, BinaryIO, Dict, List, Optional, Tuple
 
 import dask
 import numba

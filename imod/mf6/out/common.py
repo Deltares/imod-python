@@ -1,8 +1,7 @@
 import pathlib
-from typing import BinaryIO, Dict, List, Union, Any
+from typing import Any, BinaryIO, Dict, List, Union
 
 import numpy as np
-
 
 # Type annotations
 IntArray = np.ndarray
