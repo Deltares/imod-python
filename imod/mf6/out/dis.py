@@ -11,7 +11,7 @@ import imod
 from imod.mf6.utilities.dataset import assign_datetime_coords
 
 from . import cbc
-from .common import FilePath, FloatArray, IntArray, _to_nan
+from .common import FilePath, FloatArray, IntArray, _to_nan, get_header_advanced_package
 
 
 # Binary Grid File / DIS Grids
@@ -478,10 +478,3 @@ def grid_info(like: xr.DataArray) -> Dict[str, Any]:
             "x": like["x"],
         },
     }
-
-def get_header_advanced_package(headers: Dict[str, List[Union[cbc.Imeth1Header, cbc.Imeth6Header]]]) -> cbc.Imeth6Header | None:
-    for key, header in headers.items():
-        # multimodels have a gwf-gwf budget for flow-ja-face between domains
-        if not 'flow-ja-face' in key and 'gwf_' in key:
-            return header[0]
-    return None

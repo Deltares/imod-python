@@ -12,7 +12,7 @@ import xugrid as xu
 from imod.mf6.utilities.dataset import assign_datetime_coords
 
 from . import cbc
-from .common import FilePath, FloatArray, IntArray, _to_nan
+from .common import FilePath, FloatArray, IntArray, _to_nan, get_header_advanced_package
 
 
 def _ugrid_iavert_javert(
@@ -531,9 +531,3 @@ def grid_info(like: xu.UgridDataArray) -> Dict[str, Any]:
             facedim: like[facedim],
         },
     }
-
-def get_header_advanced_package(headers: Dict[str, List[Union[cbc.Imeth1Header, cbc.Imeth6Header]]]) -> cbc.Imeth6Header | None:
-    for key, header in headers.items():
-        if 'gwf_' in key:
-            return header[0]
-    return None
