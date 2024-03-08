@@ -1,10 +1,14 @@
-from imod.typing import GridDataArray
 from typing import Optional
-from imod.mf6.statusinfo import  StatusInfoBase
-import collections
 
-class IModel(collections.UserDict):   
+from imod.mf6.interfaces.idict import IDict
+from imod.mf6.statusinfo import StatusInfoBase
+from imod.typing import GridDataArray
 
+
+class IModel( IDict):   
+    """
+    Interface for imod.mf6.model.Modflow6Model
+    """
     def mask_all_packages(  self, mask: GridDataArray    ):
         raise NotImplementedError
 

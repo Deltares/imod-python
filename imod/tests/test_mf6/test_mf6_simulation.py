@@ -415,7 +415,7 @@ class TestModflow6Simulation:
 
         # Act/Assert
         with pytest.raises(RuntimeError):
-            _ = split_simulation.regrid_like(None, None)
+            _ = split_simulation.regrid_like("new_simulation", split_transient_twri_model["GWF_1_2"].domain)
 
 
 def compare_submodel_partition_info(first: PartitionInfo, second: PartitionInfo):

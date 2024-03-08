@@ -18,6 +18,7 @@ from imod.mf6.interfaces.imodel import IModel
 from imod.mf6.interfaces.ipackage import IPackage
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
+from imod.mf6.interfaces.isimulation import ISimulation
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.regridding_types import RegridderType
@@ -201,6 +202,30 @@ def _regrid_array(
         # reconvert the result to the same dtype as the original
         return regridded_array.astype(original_dtype)
 
+def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, list[str]]:
+    """
+    This function loops over the packages and  collects all regridder-types that are in use.
+    """
+    methods: defaultdict = defaultdict(list)
+    for pkg_name, pkg in model.items():
+        if  pkg.is_regridding_supported():
+            pkg_methods = pkg.get_regrid_methods()
+            for variable in pkg_methods:
+                if (
+                    variable in pkg.dataset.data_vars
+                    and pkg.dataset[variable].values[()] is not None
+                ):
+                    regriddertype = pkg_methods[variable][0]
+                    functiontype = pkg_methods[variable][1]
+                    if functiontype not in  methods[regriddertype]:
+                        methods[regriddertype].append(functiontype)
+        else:
+            raise NotImplementedError(
+                f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
+            )
+    return methods
+
+
 @typedispatch   # type: ignore[no-redef]
 def _regrid_like(
     package: IRegridPackage,
@@ -286,29 +311,6 @@ def _regrid_like(
 
     return package.__class__(**new_package_data)
 
-def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, list[str]]:
-    """
-    This function loops over the packages and  collects all regridder-types that are in use.
-    """
-    methods: defaultdict = defaultdict(list)
-    for pkg_name, pkg in model.items():
-        if  pkg.is_regridding_supported():
-            pkg_methods = pkg.get_regrid_methods()
-            for variable in pkg_methods:
-                if (
-                    variable in pkg.dataset.data_vars
-                    and pkg.dataset[variable].values[()] is not None
-                ):
-                    regriddertype = pkg_methods[variable][0]
-                    functiontype = pkg_methods[variable][1]
-                    if functiontype not in  methods[regriddertype]:
-                        methods[regriddertype].append(functiontype)
-        else:
-            raise NotImplementedError(
-                f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
-            )
-    return methods
-
 @typedispatch   # type: ignore[no-redef]
 def _regrid_like(
     model: IModel, target_grid: GridDataArray, validate: bool = True
@@ -351,6 +353,56 @@ def _regrid_like(
         if status_info.has_errors():
             raise ValidationError("\n" + status_info.to_string())
     return new_model
+
+@typedispatch   # type: ignore[no-redef]
+def _regrid_like(
+    simulation: ISimulation,
+    regridded_simulation_name: str,
+    target_grid: GridDataArray,
+    validate: bool = True,
+) -> ISimulation:
+    """
+    This method creates a new simulation object. The models contained in the new simulation are regridded versions
+    of the models in the input object (this).
+    Time discretization and solver settings are copied.
+
+    Parameters
+    ----------
+    regridded_simulation_name: str
+        name given to the output simulation
+    target_grid: xr.DataArray or  xu.UgridDataArray
+        discretization onto which the models  in this simulation will be regridded
+    validate: bool
+        set to true to validate the regridded packages
+
+    Returns
+    -------
+    a new simulation object with regridded models
+    """
+
+    if simulation.is_split():
+        raise RuntimeError(
+            "Unable to regrid simulation. Regridding can only be done on simulations that haven't been split." +
+            " Therefore regridding should be done before splitting the simulation."
+        )
+    if not simulation.has_one_flow_model() :
+        raise ValueError(
+            "Unable to regrid simulation. Regridding can only be done on simulations that have a single flow model."
+        )
+    result = simulation.__class__(regridded_simulation_name)
+    for key, item in simulation.items():
+        if isinstance(item, IModel):
+            result[key] = item.regrid_like(target_grid, validate)
+        elif key == "gwtgwf_exchanges":
+            pass            
+        elif isinstance(item, IPackage) and not isinstance(item, IRegridPackage):
+            result[key] = copy.deepcopy(item)
+
+        else:
+            raise NotImplementedError(f"regridding not supported for {key}")
+
+    return result
+
 
 def _get_regridding_domain(
     model: IModel,
