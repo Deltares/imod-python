@@ -1,9 +1,8 @@
 import pathlib
-from typing import BinaryIO, Dict, List, Union
+from typing import BinaryIO, Dict, List, Union, Any
 
 import numpy as np
 
-from . import cbc
 
 # Type annotations
 IntArray = np.ndarray
@@ -24,8 +23,8 @@ def _to_nan(a: FloatArray, dry_nan: bool) -> FloatArray:
 
 
 def get_header_advanced_package(
-    headers: Dict[str, List[Union[cbc.Imeth1Header, cbc.Imeth6Header]]],
-) -> cbc.Imeth6Header | None:
+    headers: Dict[str, List[Any]],
+) -> Any:
     for key, header in headers.items():
         # multimodels have a gwf-gwf budget for flow-ja-face between domains
         if not "flow-ja-face" in key and "gwf_" in key:
