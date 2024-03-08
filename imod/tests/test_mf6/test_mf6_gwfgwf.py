@@ -75,24 +75,24 @@ class TestGwfgwf:
 
         expected = textwrap.dedent(
             """
-        begin options
-        end options
-
-        begin dimensions
-          nexg 9
-        end dimensions
-
-        begin exchangedata
-          12 1 1 12 1 2 1 1.0 1.0 2.0
-          12 2 1 12 2 2 1 1.0 1.0 2.0
-          12 3 1 12 3 2 1 1.0 1.0 2.0
-          13 1 1 13 1 2 1 1.0 1.0 2.0
-          13 2 1 13 2 2 1 1.0 1.0 2.0
-          13 3 1 13 3 2 1 1.0 1.0 2.0
-          14 1 1 14 1 2 1 1.0 1.0 2.0
-          14 2 1 14 2 2 1 1.0 1.0 2.0
-          14 3 1 14 3 2 1 1.0 1.0 2.0
-        end exchangedata
+    begin options
+    end options
+    
+    begin dimensions
+      nexg 9
+    end dimensions
+    
+    begin exchangedata
+    12 1 1 12 1 2 1 1.0 1.0 2.0
+    12 2 1 12 2 2 1 1.0 1.0 2.0
+    12 3 1 12 3 2 1 1.0 1.0 2.0
+    13 1 1 13 1 2 1 1.0 1.0 2.0
+    13 2 1 13 2 2 1 1.0 1.0 2.0
+    13 3 1 13 3 2 1 1.0 1.0 2.0
+    14 1 1 14 1 2 1 1.0 1.0 2.0
+    14 2 1 14 2 2 1 1.0 1.0 2.0
+    14 3 1 14 3 2 1 1.0 1.0 2.0 
+    end exchangedata
         """
         )
         actual = remove_comment_lines(actual)
@@ -109,25 +109,25 @@ class TestGwfgwf:
 
         expected = textwrap.dedent(
             """
-        begin options
-          auxiliary angldegx cdist
-        end options
-
-        begin dimensions
-          nexg 9
-        end dimensions
-
-        begin exchangedata
-          12 1 12 2 1 1.0 1.0 2.0 90.0 2.0
-          12 2 12 2 1 1.0 1.0 2.0 90.0 2.0
-          12 3 12 4 1 1.0 1.0 2.0 90.0 2.0
-          13 1 13 2 1 1.0 1.0 2.0 90.0 2.0
-          13 2 13 2 1 1.0 1.0 2.0 90.0 2.0
-          13 3 13 4 1 1.0 1.0 2.0 90.0 2.0
-          14 1 14 2 1 1.0 1.0 2.0 90.0 2.0
-          14 2 14 2 1 1.0 1.0 2.0 90.0 2.0
-          14 3 14 4 1 1.0 1.0 2.0 90.0 2.0
-        end exchangedata
+    begin options
+      auxiliary angldegx cdist
+    end options
+    
+    begin dimensions
+      nexg 9
+    end dimensions
+    
+    begin exchangedata
+    12 1 12 2 1 1.0 1.0 2.0 90.0 2.0
+    12 2 12 2 1 1.0 1.0 2.0 90.0 2.0
+    12 3 12 4 1 1.0 1.0 2.0 90.0 2.0
+    13 1 13 2 1 1.0 1.0 2.0 90.0 2.0
+    13 2 13 2 1 1.0 1.0 2.0 90.0 2.0
+    13 3 13 4 1 1.0 1.0 2.0 90.0 2.0
+    14 1 14 2 1 1.0 1.0 2.0 90.0 2.0
+    14 2 14 2 1 1.0 1.0 2.0 90.0 2.0
+    14 3 14 4 1 1.0 1.0 2.0 90.0 2.0 
+    end exchangedata
         """
         )
         actual = remove_comment_lines(actual)

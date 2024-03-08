@@ -71,9 +71,15 @@ def create_transport_model(flow_model, species_name, dispersivity, retardation, 
 
 
 # %%
-# Create the spatial discretization.
 @pytest.fixture(scope="function")
 def flow_transport_simulation():
+    """
+    This fixture is a variation on the model also present in
+    examples/mf6/example_1d_transport.py. To make that model more useful for
+    testing eg partitioning or regridding, some boundary conditions were added
+    (2 wells, one extractor and one injector which injects with a nonzero
+    concentration) as well as a recharge zone with a nonzero concentration.
+    """
     nlay = 1
     nrow = 2
     ncol = 101
@@ -85,7 +91,7 @@ def flow_transport_simulation():
     x = np.arange(xmin, xmax, dx) + 0.5 * dx
 
     grid_dims = ("layer", "y", "x")
-    grid_coords = {"layer": layer, "y": y, "x": x}
+    grid_coords = {"layer": layer, "y": y, "x": x, "dx": dx, "dy": 1.}
     grid_shape = (nlay, nrow, ncol)
     grid = xr.DataArray(
         np.ones(grid_shape, dtype=int), coords=grid_coords, dims=grid_dims
@@ -116,9 +122,6 @@ def flow_transport_simulation():
     gwf_model["npf"] = imod.mf6.NodePropertyFlow(
         icelltype=1,
         k=xr.full_like(grid, 1.0, dtype=float),
-        variable_vertical_conductance=True,
-        dewatered=True,
-        perched=True,
     )
     gwf_model["dis"] = imod.mf6.StructuredDiscretization(
         top=0.0,
@@ -138,7 +141,7 @@ def flow_transport_simulation():
         species=["species_a", "species_b", "species_c", "species_d"]
     )
     recharge_rate = xr.full_like(grid, np.nan, dtype=float)
-    recharge_rate[..., 20:60] = 0.001
+    recharge_rate[..., 20:60] = 0.0001
     gwf_model["rch"] = imod.mf6.Recharge(recharge_rate, recharge_conc, "AUX")
     # %%
     # Create the simulation.
@@ -157,7 +160,7 @@ def flow_transport_simulation():
         concentration_boundary_type="Aux",
         screen_top=[0.0, 0.0],
         screen_bottom=[-1.0, -1.0],
-        rate=[1.0, -2.0],
+        rate=[0.1, -0.2],
         minimum_k=0.0001,
         concentration=injection_concentration,
     )
