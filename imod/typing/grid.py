@@ -280,3 +280,16 @@ def is_equal(array1: xr.DataArray, array2: xr.DataArray)->bool:
 @typedispatch
 def is_equal(array1: object, array2:object)->bool:
     return False
+
+
+@typedispatch
+def is_same_domain(array1: xu.UgridDataArray, array2: xu.UgridDataArray)->bool:
+    return  array1.coords.equals(array2.coords) and array1.ugrid.grid.equals(array2.ugrid.grid)
+
+@typedispatch
+def is_same_domain(array1: xr.DataArray, array2: xr.DataArray)->bool:
+    return array1.coords.equals(array2.coords)
+
+@typedispatch
+def is_same_domain(array1: object, array2:object)->bool:
+    return False

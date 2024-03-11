@@ -43,6 +43,7 @@ from imod.typing import GridDataArray, GridDataset
 from imod.typing.grid import (
     concat,
     is_equal,
+    is_same_domain,
     is_unstructured,
     merge_partitions,
 )
@@ -1267,12 +1268,19 @@ class Modflow6Simulation(collections.UserDict):
         """
         if any([coord not in ["x", "y", "layer", "mesh2d_nFaces", "dx", "dy"] for coord in mask.coords]):
             raise ValueError("unexpected coordinate dimension in masking domain")
+        
 
-        flowmodels = self.get_models_of_type("gwf6")
-        transportmodels = self.get_models_of_type("gwt6")                
-        models = flowmodels + transportmodels
+        if is_split(self):
+                raise ValueError("masking can only be applied to simulations that have not been split. Apply masking before splitting.")                    
 
-        first_dis = models[0].domain
-        for m in models:
-            if m.domain == first_dis:
-                m.mask_all_packages(mask)
+        flowmodels =[key for key in self.get_models_of_type("gwf6").keys()]
+        transportmodels = [key for key in self.get_models_of_type("gwt6").keys()]          
+        modelnames = flowmodels + transportmodels
+
+
+        first_dis = self[modelnames[0]].domain
+        for name in modelnames:
+            if is_same_domain(self[name].domain, first_dis):
+                self[name].mask_all_packages(mask)
+            else:
+                raise ValueError("masking can only be applied to simulations when all the models in the simulation use the same grid.")
