@@ -25,7 +25,7 @@ def test_masked_model_validation_inactive_cell_pillar(
     unstructured_flow_model.mask_all_packages(mask)
 
     # test output validity
-    errors = unstructured_flow_model._validate("model")
+    errors = unstructured_flow_model.validate("model")
     assert len(errors.errors) == 0
     assert_model_can_run(unstructured_flow_model, "disv", tmp_path)
 
@@ -47,7 +47,7 @@ def test_masked_model_validation_one_inactive_cell(
     unstructured_flow_model.mask_all_packages(mask)
 
     # test output validity
-    errors = unstructured_flow_model._validate("model")
+    errors = unstructured_flow_model.validate("model")
     assert len(errors.errors) == 0
     assert_model_can_run(unstructured_flow_model, "disv", tmp_path)
 
@@ -88,7 +88,7 @@ def test_masked_model_layered_and_scalar_package_input(
     unstructured_flow_model.mask_all_packages(mask)
 
     # Test output validity
-    errors = unstructured_flow_model._validate("model")
+    errors = unstructured_flow_model.validate("model")
     assert len(errors.errors) == 0
     assert_model_can_run(unstructured_flow_model, "disv", tmp_path)
 
