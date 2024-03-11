@@ -1,12 +1,13 @@
 from copy import deepcopy
 from pathlib import Path
 
+import numpy as np
 import pytest
+import xarray as xr
 
 import imod
 from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
-import numpy as np
-import xarray as xr
+
 
 def test_mask_simulation(
     tmp_path: Path,
