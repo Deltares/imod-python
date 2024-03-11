@@ -1278,9 +1278,8 @@ class Modflow6Simulation(collections.UserDict):
         modelnames = flowmodels + transportmodels
 
 
-        first_dis = self[modelnames[0]].domain
         for name in modelnames:
-            if is_same_domain(self[name].domain, first_dis):
+            if is_same_domain(self[name].domain, mask):
                 self[name].mask_all_packages(mask)
             else:
                 raise ValueError("masking can only be applied to simulations when all the models in the simulation use the same grid.")
