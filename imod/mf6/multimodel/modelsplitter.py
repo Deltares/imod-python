@@ -14,6 +14,7 @@ from imod.mf6.utilities.grid import get_active_domain_slice
 from imod.mf6.wel import Well
 from imod.typing import GridDataArray
 from imod.typing.grid import is_unstructured, ones_like
+from imod.logging import logger
 
 HIGH_LEVEL_PKGS = (HorizontalFlowBarrierBase, Well)
 
@@ -102,8 +103,7 @@ def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6
         if not sliced_package.is_empty():
             new_model[pkg_name] = sliced_package
         else:
-            # TODO: Add this to logger
-            print(
+             logger.info(
                 f"package {pkg_name} removed in partition {partition_info.id}, because all empty"
             )
 
