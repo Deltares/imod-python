@@ -1249,3 +1249,30 @@ class Modflow6Simulation(collections.UserDict):
         for flow_name, tpt_models_of_flow_model in flow_transport_mapping.items():
             flow_model = self[flow_name]
             flow_model.update_buoyancy_package(tpt_models_of_flow_model)
+
+
+    def mask_all_models(
+        self,
+        mask: GridDataArray,
+    ):
+        """
+        This function applies a mask to all models in a simulation, provided they use
+        the same discretization. 
+
+        Parameters
+        ----------
+        mask: xr.DataArray, xu.UgridDataArray of ints
+            idomain-like integer array. 1 sets cells to active, 0 sets cells to inactive, 
+            -1 sets cells to vertical passthrough
+        """
+        if any([coord not in ["x", "y", "layer", "mesh2d_nFaces", "dx", "dy"] for coord in mask.coords]):
+            raise ValueError("unexpected coordinate dimension in masking domain")
+
+        flowmodels = self.get_models_of_type("gwf6")
+        transportmodels = self.get_models_of_type("gwt6")                
+        models = flowmodels + transportmodels
+
+        first_dis = models[0].domain
+        for m in models:
+            if m.domain == first_dis:
+                m.mask_all_packages(mask)
