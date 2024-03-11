@@ -2,6 +2,7 @@ from typing import List, NamedTuple
 
 import numpy as np
 
+from imod.logging import logger
 from imod.mf6.auxiliary_variables import (
     expand_transient_auxiliary_variables,
     remove_expanded_auxiliary_variables_from_dataset,
@@ -14,7 +15,6 @@ from imod.mf6.utilities.grid import get_active_domain_slice
 from imod.mf6.wel import Well
 from imod.typing import GridDataArray
 from imod.typing.grid import is_unstructured, ones_like
-from imod.logging import logger
 
 HIGH_LEVEL_PKGS = (HorizontalFlowBarrierBase, Well)
 
