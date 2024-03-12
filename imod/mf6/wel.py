@@ -590,9 +590,9 @@ class Well(BoundaryCondition, IPointDataPackage):
         ds = ds.assign(**ds_vars.data_vars)
 
         ds = remove_inactive(ds, active)
-
-        # TODO: make options like "save_flows" configurable. Issue github #623
-        ds["save_flows"] = True
+        ds["save_flows"] = self["save_flows"].values[()]
+        ds["print_flows"] = self["print_flows"].values[()]
+        ds["print_input"] = self["print_input"].values[()]
 
         return Mf6Wel(**ds.data_vars)
 
