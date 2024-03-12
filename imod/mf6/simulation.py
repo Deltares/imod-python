@@ -1258,7 +1258,11 @@ class Modflow6Simulation(collections.UserDict):
     ):
         """
         This function applies a mask to all models in a simulation, provided they use
-        the same discretization. 
+        the same discretization. The  method parameter "mask" is an idomain-like array.
+        Masking will overwrite idomain with the mask where the mask is 0 or -1.
+        Where the mask is 1, the original value of idomain will be kept.
+        Masking will update the packages accordingly, blanking their input where needed,
+        and is therefore not a reversible operation.  
 
         Parameters
         ----------
