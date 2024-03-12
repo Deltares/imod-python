@@ -145,6 +145,7 @@ def make_twri_model():
         screen_bottom=screen_bottom,
         rate=rate_wel,
         minimum_k=1e-19,
+        save_flows=True
     )
     gwf_model["dis"] = imod.mf6.StructuredDiscretization(
         top=200.0, bottom=bottom, idomain=idomain
