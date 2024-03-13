@@ -1,11 +1,9 @@
-from typing import Optional, Tuple
+from typing import Optional
 
 import numpy as np
 import xarray as xr
 
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
-from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
@@ -15,7 +13,7 @@ from imod.schemata import (
 )
 
 
-class ImmobileStorageTransfer(Package, IRegridPackage):
+class ImmobileStorageTransfer(Package):
     """
     The Immobile Storage and Transfer (IST) package represents an immobile
     fraction of groundwater. Any number of IST Packages can be specified for a
@@ -254,6 +252,3 @@ class ImmobileStorageTransfer(Package, IRegridPackage):
         }
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method
