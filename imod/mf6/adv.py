@@ -14,9 +14,9 @@ from typing import Optional, Tuple
 
 from imod.mf6.package import Package
 from imod.mf6.utilities.regrid import RegridderType
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 
-
-class Advection(Package):
+class Advection(Package, IRegridPackage):
     _pkg_id = "adv"
     _template = Package._initialize_template(_pkg_id)
     _regrid_method: dict[str, tuple[RegridderType, str]] = {}   
