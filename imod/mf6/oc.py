@@ -5,12 +5,12 @@ from typing import Optional, Tuple, Union
 
 import numpy as np
 
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.utilities.dataset import is_dataarray_none
 from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.write_context import WriteContext
 from imod.schemata import DTypeSchema
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
 
 OUTPUT_EXT_MAPPING = {
     "head": "hds",

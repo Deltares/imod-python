@@ -594,12 +594,6 @@ class Package(PackageBase, IPackage, abc.ABC):
 
         return array_mask              
 
-    def is_regridding_supported(self) -> bool:
-        """
-        returns true if package supports regridding.
-        """
-        return hasattr(self, "_regrid_method")
-
 
     def regrid_like(
         self,

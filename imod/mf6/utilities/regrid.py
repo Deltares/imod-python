@@ -186,8 +186,8 @@ def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, lis
     This function loops over the packages and  collects all regridder-types that are in use.
     """
     methods: defaultdict = defaultdict(list)
-    for pkg_name, pkg in model.items():
-        if  pkg.is_regridding_supported():
+    for _, pkg in model.items():
+        if  isinstance(pkg, IRegridPackage):
             pkg_methods = pkg.get_regrid_methods()
             for variable in pkg_methods:
                 if (
@@ -198,10 +198,6 @@ def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, lis
                     functiontype = pkg_methods[variable][1]
                     if functiontype not in  methods[regriddertype]:
                         methods[regriddertype].append(functiontype)
-        else:
-            raise NotImplementedError(
-                f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
-            )
     return methods
 
 
@@ -315,7 +311,7 @@ def _regrid_like(
     new_model = model.__class__()
 
     for pkg_name, pkg in model.items():
-        if pkg.is_regridding_supported():
+        if isinstance(pkg, (IRegridPackage, ILineDataPackage, IPointDataPackage)):
             new_model[pkg_name] = pkg.regrid_like(target_grid)
         else:
             raise NotImplementedError(
