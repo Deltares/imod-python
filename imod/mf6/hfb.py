@@ -295,7 +295,9 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         super().__init__(dict_dataset)
 
         self.line_data = geometry
-
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method
+    
     def _get_variable_names_for_gdf(self) -> list[str]:
         return [
             self._get_variable_name(),

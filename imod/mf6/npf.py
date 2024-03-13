@@ -15,7 +15,7 @@ from imod.schemata import (
     IndexesSchema,
 )
 from imod.typing import GridDataArray
-
+from typing import Tuple, Optional
 
 def _dataarray_to_bool(griddataarray: GridDataArray) -> bool:
     if griddataarray is None or griddataarray.values is None:
@@ -451,3 +451,6 @@ class NodePropertyFlow(Package, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
+    
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method

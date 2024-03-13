@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Tuple
 
 import numpy as np
 
@@ -254,3 +254,6 @@ class Evapotranspiration(BoundaryCondition, IRegridPackage):
         bin_ds = unstack_dim_into_variable(bin_ds, "segment")
 
         return bin_ds
+    
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method

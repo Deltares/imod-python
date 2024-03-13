@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Optional
 
 import numpy as np
 
@@ -169,3 +169,5 @@ class SourceSinkMixing(BoundaryCondition):
             save_flows=save_flows,
             validate=validate,
         )
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method

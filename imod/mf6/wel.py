@@ -611,6 +611,9 @@ class Well(BoundaryCondition, IPointDataPackage):
             "layer", errors="ignore"
         )
         return mask_2D(self, domain_2d)
+    
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method    
 
 
 class WellDisStructured(DisStructuredBoundaryCondition):

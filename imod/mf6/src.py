@@ -13,7 +13,7 @@ from imod.schemata import (
 )
 
 
-class MassSourceLoading(BoundaryCondition, IRegridPackage):
+class MassSourceLoading(BoundaryCondition):
     """
     Mass Source Loading (SRC) package for structured discretization (DIS)
     models. Any number of SRC Packages can be specified for a single

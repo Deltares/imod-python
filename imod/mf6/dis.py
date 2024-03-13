@@ -1,7 +1,7 @@
 import pathlib
 
 import numpy as np
-
+from typing import Tuple, Optional
 import imod
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
@@ -144,4 +144,8 @@ class StructuredDiscretization(Package, IRegridPackage):
         kwargs["bottom"] = self["bottom"]
         errors = super()._validate(schemata, **kwargs)
 
+
         return errors
+    
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method

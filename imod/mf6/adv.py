@@ -13,7 +13,7 @@ from copy import deepcopy
 
 from imod.mf6.package import Package
 from imod.mf6.utilities.regrid import RegridderType
-
+from typing import Optional, Tuple
 
 class Advection(Package):
     _pkg_id = "adv"
@@ -34,7 +34,9 @@ class Advection(Package):
         retuns a copy of itself.
         """
         return deepcopy(self)
-
+    
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method
 
 class AdvectionUpstream(Advection):
     """

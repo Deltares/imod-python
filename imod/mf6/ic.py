@@ -7,7 +7,7 @@ from imod.mf6.package import Package
 from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import DTypeSchema, IdentityNoDataSchema, IndexesSchema
-
+from typing import Optional, Tuple
 
 class InitialConditions(Package, IRegridPackage):
     """
@@ -92,3 +92,6 @@ class InitialConditions(Package, IRegridPackage):
             self["start"], icdirectory, "strt", binary=binary
         )
         return self._template.render(d)
+    
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method

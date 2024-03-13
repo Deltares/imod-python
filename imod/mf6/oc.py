@@ -10,6 +10,7 @@ from imod.mf6.utilities.dataset import is_dataarray_none
 from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.write_context import WriteContext
 from imod.schemata import DTypeSchema
+from typing import Optional, Tuple
 
 OUTPUT_EXT_MAPPING = {
     "head": "hds",
@@ -206,3 +207,6 @@ class OutputControl(Package):
     @property
     def is_budget_output(self) -> bool:
         return self.dataset["save_budget"].values[()] is not None
+    
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method

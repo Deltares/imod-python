@@ -15,7 +15,7 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
-
+from typing import Optional, Tuple
 
 class River(BoundaryCondition, IRegridPackage):
     """
@@ -167,3 +167,6 @@ class River(BoundaryCondition, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
+    
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method

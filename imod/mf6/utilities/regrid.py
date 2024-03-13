@@ -253,7 +253,7 @@ def _regrid_like(
         package.dataset, target_grid=target_grid
     )
 
-    regridder_settings = copy.deepcopy(package._regrid_method)
+    regridder_settings = package.get_regrid_methods()
     if regridder_types is not None:
         regridder_settings.update(regridder_types)
 

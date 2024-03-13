@@ -13,7 +13,7 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
 )
-
+from typing import Optional, Tuple
 
 class Storage(Package):
     _pkg_id = "sto_deprecated"
@@ -63,7 +63,8 @@ class StorageBase(Package, IRegridPackage, abc.ABC):
         d = self.get_options(d)
 
         return d
-
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method
 
 class SpecificStorage(StorageBase):
     """
