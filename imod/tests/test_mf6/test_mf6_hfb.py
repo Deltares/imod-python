@@ -411,3 +411,29 @@ def test_is_empty():
 
     hfb = HorizontalFlowBarrierResistance(geometry)
     assert not hfb.is_empty()
+
+@pytest.mark.parametrize(
+    "parameterizable_basic_dis",
+    [BasicDisSettings(nlay=2, nrow=3, ncol=3, xstart=0, xstop=3)],
+    indirect=True,
+)
+@pytest.mark.parametrize("print_input", [True, False])
+def test_set_options(print_input, parameterizable_basic_dis):
+    idomain, top, bottom = parameterizable_basic_dis
+    hfb = HorizontalFlowBarrierResistance(
+        geometry=gpd.GeoDataFrame(
+            geometry=[
+                shapely.linestrings([-1000.0, 1000.0], [0.3, 0.3]),
+            ],
+            data={
+                "resistance": [1e3],
+                "ztop": [10.0],
+                "zbottom": [0.0],
+            },
+           
+        ),
+        print_input = print_input
+    )
+    k = ones_like(top)
+    mf6_package = hfb.to_mf6_pkg(idomain, top, bottom, k)
+    assert mf6_package.dataset["print_input"].values[()] == print_input

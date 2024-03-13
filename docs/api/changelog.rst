@@ -25,7 +25,9 @@ Fixed
   notice. Function now throws a DeprecationWarning to use
   :func:`imod.prepare.spatial.round_extent` instead.
 - :meth'`imod.mf6.Modflow6Simulation.write` failed after splitting the simulation. This has been fixed.
-
+- modflow options like "print flow" , "save flow" and "print input" can now be set on
+:class:`imod.mf6.Well`
+ 
 Added
 ~~~~~
 - The :func:`imod.mf6.model.mask_all_packages` now also masks the idomain array
