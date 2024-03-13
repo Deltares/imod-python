@@ -1,3 +1,5 @@
+from typing import Optional, Tuple
+
 import numpy as np
 
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
@@ -11,7 +13,7 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
 )
-from typing import Optional, Tuple
+
 
 class Dispersion(Package, IRegridPackage):
     """

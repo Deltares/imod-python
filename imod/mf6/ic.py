@@ -1,4 +1,5 @@
 import warnings
+from typing import Optional, Tuple
 
 import numpy as np
 
@@ -7,7 +8,7 @@ from imod.mf6.package import Package
 from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import DTypeSchema, IdentityNoDataSchema, IndexesSchema
-from typing import Optional, Tuple
+
 
 class InitialConditions(Package, IRegridPackage):
     """

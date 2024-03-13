@@ -1,10 +1,11 @@
-from typing import Optional
+from typing import Optional, Tuple
 
 import numpy as np
 import xarray as xr
 
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
+from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
@@ -12,8 +13,7 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
 )
-from typing import Optional, Tuple
-from imod.mf6.utilities.regrid import RegridderType
+
 
 class ImmobileStorageTransfer(Package, IRegridPackage):
     """

@@ -1,4 +1,5 @@
 import warnings
+from typing import Optional, Tuple
 
 import numpy as np
 
@@ -15,7 +16,7 @@ from imod.schemata import (
     IndexesSchema,
 )
 from imod.typing import GridDataArray
-from typing import Tuple, Optional
+
 
 def _dataarray_to_bool(griddataarray: GridDataArray) -> bool:
     if griddataarray is None or griddataarray.values is None:

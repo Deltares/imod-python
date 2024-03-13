@@ -1,7 +1,7 @@
 import collections
 import os
 from pathlib import Path
-from typing import Tuple, Union
+from typing import Optional, Tuple, Union
 
 import numpy as np
 
@@ -10,7 +10,6 @@ from imod.mf6.utilities.dataset import is_dataarray_none
 from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.write_context import WriteContext
 from imod.schemata import DTypeSchema
-from typing import Optional, Tuple
 
 OUTPUT_EXT_MAPPING = {
     "head": "hds",

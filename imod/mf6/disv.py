@@ -1,6 +1,7 @@
+from typing import Optional, Tuple
+
 import numpy as np
 import pandas as pd
-from typing import Tuple, Optional
 
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package

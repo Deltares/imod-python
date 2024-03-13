@@ -10,10 +10,11 @@ robust alternative.
 """
 
 from copy import deepcopy
+from typing import Optional, Tuple
 
 from imod.mf6.package import Package
 from imod.mf6.utilities.regrid import RegridderType
-from typing import Optional, Tuple
+
 
 class Advection(Package):
     _pkg_id = "adv"

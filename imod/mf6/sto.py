@@ -1,4 +1,5 @@
 import abc
+from typing import Optional, Tuple
 
 import numpy as np
 
@@ -13,7 +14,7 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
 )
-from typing import Optional, Tuple
+
 
 class Storage(Package):
     _pkg_id = "sto_deprecated"

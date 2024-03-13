@@ -1,3 +1,5 @@
+from typing import Optional, Tuple
+
 import numpy as np
 
 from imod.mf6.boundary_condition import BoundaryCondition
@@ -15,7 +17,7 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
-from typing import Optional, Tuple
+
 
 class Recharge(BoundaryCondition, IRegridPackage):
     """

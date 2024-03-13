@@ -1,7 +1,6 @@
 import numpy as np
 
 from imod.mf6.boundary_condition import BoundaryCondition
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.schemata import (
