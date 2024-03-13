@@ -64,8 +64,7 @@ class StorageBase(Package, IRegridPackage, abc.ABC):
         d = self.get_options(d)
 
         return d
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method
+
 
 class SpecificStorage(StorageBase):
     """
@@ -189,7 +188,9 @@ class SpecificStorage(StorageBase):
         d = self._render_dict(directory, pkgname, globaltimes, binary)
         return self._template.render(d)
 
-
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method
+    
 class StorageCoefficient(StorageBase):
     """
     Storage Package with a storage coefficient.  Be careful,
@@ -323,3 +324,6 @@ class StorageCoefficient(StorageBase):
         d = self._render_dict(directory, pkgname, globaltimes, binary)
         d["storagecoefficient"] = True
         return self._template.render(d)
+    
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method
