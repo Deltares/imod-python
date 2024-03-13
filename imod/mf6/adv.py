@@ -12,9 +12,10 @@ robust alternative.
 from copy import deepcopy
 from typing import Optional, Tuple
 
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.utilities.regrid import RegridderType
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
+
 
 class Advection(Package, IRegridPackage):
     _pkg_id = "adv"

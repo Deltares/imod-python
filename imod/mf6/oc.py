@@ -10,6 +10,7 @@ from imod.mf6.utilities.dataset import is_dataarray_none
 from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.write_context import WriteContext
 from imod.schemata import DTypeSchema
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 
 OUTPUT_EXT_MAPPING = {
     "head": "hds",
@@ -18,7 +19,7 @@ OUTPUT_EXT_MAPPING = {
 }
 
 
-class OutputControl(Package):
+class OutputControl(Package, IRegridPackage):
     """
     The Output Control Option determines how and when heads, budgets and/or
     concentrations are printed to the listing file and/or written to a separate
