@@ -42,7 +42,9 @@ from imod.schemata import (
     ValidationError,
 )
 from imod.typing import GridDataArray
+from imod.mf6.utilities.logging_decorators  import log_decorator
 
+from imod.logging.loglevel import LogLevel
 
 class Package(PackageBase, IPackage, abc.ABC):
     """
@@ -264,6 +266,8 @@ class Package(PackageBase, IPackage, abc.ABC):
 
         return layered, values
 
+
+    @log_decorator(start_level =LogLevel.CRITICAL, start_message = "starting write")
     def write(
         self,
         pkgname: str,
