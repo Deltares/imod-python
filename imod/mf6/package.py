@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import abc
-import copy
 import numbers
 import pathlib
 from collections import defaultdict
@@ -27,10 +26,8 @@ from imod.mf6.pkgbase import (
     PackageBase,
 )
 from imod.mf6.utilities.regrid import (
-    RegridderInstancesCollection,
     RegridderType,
-    assign_coord_if_present,
-    get_non_grid_data,
+    _regrid_like,
 )
 from imod.mf6.utilities.schemata import filter_schemata_dict
 from imod.mf6.validation import validation_pkg_error_message
@@ -597,68 +594,6 @@ class Package(PackageBase, IPackage, abc.ABC):
 
         return array_mask              
 
-    def is_regridding_supported(self) -> bool:
-        """
-        returns true if package supports regridding.
-        """
-        return hasattr(self, "_regrid_method")
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        if hasattr(self, "_regrid_method"):
-            return self._regrid_method
-        return None
-
-    def _regrid_array(
-        self,
-        varname: str,
-        regridder_collection: RegridderInstancesCollection,
-        regridder_name: str,
-        regridder_function: str,
-        target_grid: GridDataArray,
-    ) -> Optional[GridDataArray]:
-        """
-        Regrids a data_array. The array is specified by its key in the dataset.
-        Each data-array can represent:
-        -a scalar value, valid for the whole grid
-        -an array of a different scalar per layer
-        -an array with a value per grid block
-        -None
-        """
-
-        # skip regridding for arrays with no valid values (such as "None")
-        if not self._valid(self.dataset[varname].values[()]):
-            return None
-
-        # the dataarray might be a scalar. If it is, then it does not need regridding.
-        if is_scalar(self.dataset[varname]):
-            return self.dataset[varname].values[()]
-
-        if isinstance(self.dataset[varname], xr.DataArray):
-            coords = self.dataset[varname].coords
-            # if it is an xr.DataArray it may be layer-based; then no regridding is needed
-            if not ("x" in coords and "y" in coords):
-                return self.dataset[varname]
-
-            # if it is an xr.DataArray it needs the dx, dy coordinates for regridding, which are otherwise not mandatory
-            if not ("dx" in coords and "dy" in coords):
-                raise ValueError(
-                    f"DataArray {varname} does not have both a dx and dy coordinates"
-                )
-
-        # obtain an instance of a regridder for the chosen method
-        regridder = regridder_collection.get_regridder(
-            regridder_name,
-            regridder_function,
-        )
-
-        # store original dtype of data
-        original_dtype = self.dataset[varname].dtype
-
-        # regrid data array
-        regridded_array = regridder.regrid(self.dataset[varname])
-
-        # reconvert the result to the same dtype as the original
-        return regridded_array.astype(original_dtype)
 
     def regrid_like(
         self,
@@ -695,53 +630,8 @@ class Package(PackageBase, IPackage, abc.ABC):
         a package with the same options as this package, and with all the data-arrays regridded to another discretization,
         similar to the one used in input argument "target_grid"
         """
-        if not hasattr(self, "_regrid_method"):
-            raise NotImplementedError(
-                f"Package {type(self).__name__} does not support regridding"
-            )
-        
-        if hasattr(self,"auxiliary_data_fields"):
-            remove_expanded_auxiliary_variables_from_dataset(self)
+        return _regrid_like(self, target_grid,regridder_types) 
 
-        regridder_collection = RegridderInstancesCollection(
-            self.dataset, target_grid=target_grid
-        )
-
-        regridder_settings = copy.deepcopy(self._regrid_method)
-        if regridder_types is not None:
-            regridder_settings.update(regridder_types)
-
-        new_package_data = get_non_grid_data(self, list(regridder_settings.keys()))
-
-        for (
-            varname,
-            regridder_type_and_function,
-        ) in regridder_settings.items():
-            regridder_name, regridder_function = regridder_type_and_function
-
-            # skip variables that are not in this dataset
-            if varname not in self.dataset.keys():
-                continue
-
-            # regrid the variable
-            new_package_data[varname] = self._regrid_array(
-                varname,
-                regridder_collection,
-                regridder_name,
-                regridder_function,
-                target_grid,
-            )
-            # set dx and dy if present in target_grid
-            new_package_data[varname] = assign_coord_if_present(
-                "dx", target_grid, new_package_data[varname]
-            )
-            new_package_data[varname] = assign_coord_if_present(
-                "dy", target_grid, new_package_data[varname]
-            )
-        if hasattr(self,"auxiliary_data_fields"):
-            expand_transient_auxiliary_variables(self)
-
-        return self.__class__(**new_package_data)
 
     def _skip_masking_dataarray(self, array_name: str) -> bool:
         if hasattr(self, "_skip_mask_arrays"):
@@ -765,3 +655,23 @@ class Package(PackageBase, IPackage, abc.ABC):
         if hasattr(self, "_auxiliary_data"):
             return self._auxiliary_data
         return {}
+
+    def get_non_grid_data(self, grid_names: list[str]) -> dict[str, Any]:
+        """
+        This function copies the attributes of a dataset that are scalars, such as options.
+
+        parameters
+        ----------
+        grid_names: list of str
+            the names of the attribbutes of a dataset that are grids.
+        """
+        result = {}
+        all_non_grid_data = list(self.dataset.keys())
+        for name in (gridname for gridname in grid_names if gridname in all_non_grid_data):
+            all_non_grid_data.remove(name)
+        for name in all_non_grid_data:
+            if "time" in self.dataset[name].coords:
+                result[name] = self.dataset[name]
+            else:
+                result[name] = self.dataset[name].values[()]
+        return result

@@ -1,7 +1,9 @@
 import abc
+from typing import Optional, Tuple
 
 import numpy as np
 
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import PKG_DIMS_SCHEMA
@@ -23,7 +25,7 @@ class Storage(Package):
         )
 
 
-class StorageBase(Package, abc.ABC):
+class StorageBase(Package, IRegridPackage, abc.ABC):
     def get_options(self, d):
         # Skip both variables in grid_data and "transient".
         not_options = list(self._grid_data.keys())
@@ -186,7 +188,9 @@ class SpecificStorage(StorageBase):
         d = self._render_dict(directory, pkgname, globaltimes, binary)
         return self._template.render(d)
 
-
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method
+    
 class StorageCoefficient(StorageBase):
     """
     Storage Package with a storage coefficient.  Be careful,
@@ -320,3 +324,6 @@ class StorageCoefficient(StorageBase):
         d = self._render_dict(directory, pkgname, globaltimes, binary)
         d["storagecoefficient"] = True
         return self._template.render(d)
+    
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method

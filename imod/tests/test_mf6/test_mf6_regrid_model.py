@@ -19,7 +19,7 @@ def test_regrid_structured_model_to_structured_model(
     new_gwf_model = structured_flow_model.regrid_like(finer_idomain)
 
     assert len(new_gwf_model.items()) == len(structured_flow_model.items())
-    validation_result = new_gwf_model._validate("test_model")
+    validation_result = new_gwf_model.validate("test_model")
     assert not validation_result.has_errors()
 
 
@@ -40,7 +40,7 @@ def test_regrid_structured_model_with_wells_to_structured_model(
     new_gwf_model = structured_flow_model.regrid_like(finer_idomain)
 
     assert len(new_gwf_model.items()) == len(structured_flow_model.items())
-    validation_result = new_gwf_model._validate("test_model")
+    validation_result = new_gwf_model.validate("test_model")
     assert not validation_result.has_errors()
 
 
@@ -61,7 +61,7 @@ def test_regrid_unstructured_model_with_wells_to_unstructured_model(
     new_gwf_model = unstructured_flow_model.regrid_like(finer_idomain)
 
     assert len(new_gwf_model.items()) == len(unstructured_flow_model.items())
-    validation_result = new_gwf_model._validate("test_model")
+    validation_result = new_gwf_model.validate("test_model")
     assert not validation_result.has_errors()
 
 
@@ -73,7 +73,7 @@ def test_regrid_unstructured_model_to_unstructured_model(
     new_gwf_model = unstructured_flow_model.regrid_like(finer_idomain)
 
     assert len(new_gwf_model.items()) == len(unstructured_flow_model.items())
-    validation_result = new_gwf_model._validate("test_model")
+    validation_result = new_gwf_model.validate("test_model")
     assert not validation_result.has_errors()
 
 
@@ -113,7 +113,7 @@ def test_regrid_unstructured_model_with_inactive_cells(
     new_gwf_model = unstructured_flow_model.regrid_like(finer_idomain)
 
     assert len(new_gwf_model.items()) == len(unstructured_flow_model.items())
-    validation_result = new_gwf_model._validate("test_model")
+    validation_result = new_gwf_model.validate("test_model")
     assert not validation_result.has_errors()
     new_idomain = new_gwf_model.domain
     assert (
