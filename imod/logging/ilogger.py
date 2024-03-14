@@ -67,16 +67,3 @@ class ILogger:
         """
         raise NotImplementedError
 
-def log_with_level(logger: ILogger,loglevel: LogLevel, message: str) -> None:
-    if loglevel == LogLevel.DEBUG:
-        logger.debug(message)
-    elif  loglevel == LogLevel.INFO:
-        logger.info(message)
-    elif  loglevel == LogLevel.WARNING:
-        logger.warning(message)   
-    elif loglevel == LogLevel.ERROR:
-        logger.error(message)   
-    elif loglevel == LogLevel.CRITICAL:      
-        logger.critical(message)   
-    else:
-        raise ValueError(f"Unknown logging urgency at level {loglevel}")

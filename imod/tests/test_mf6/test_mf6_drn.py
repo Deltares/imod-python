@@ -80,7 +80,7 @@ def transient_concentration_drainage():
 
 def test_write(drainage, tmp_path):
 
-    imod.logging.configure(LoggerType.PYTHON, log_level = LogLevel.DEBUG  ,add_default_file_handler=True, add_default_stream_handler = True)
+    imod.logging.configure(LoggerType.PYTHON, log_level = LogLevel.DEBUG  ,add_default_file_handler=True, add_default_stream_handler = False)
 
     drn = imod.mf6.Drainage(**drainage)
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)

@@ -267,7 +267,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         return layered, values
 
 
-    @log_decorator(start_level =LogLevel.CRITICAL, start_message = "starting write")
+    @log_decorator()
     def write(
         self,
         pkgname: str,
