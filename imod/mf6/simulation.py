@@ -1277,8 +1277,8 @@ class Modflow6Simulation(collections.UserDict):
         if is_split(self):
                 raise ValueError("masking can only be applied to simulations that have not been split. Apply masking before splitting.")                    
 
-        flowmodels =[key for key in self.get_models_of_type("gwf6").keys()]
-        transportmodels = [key for key in self.get_models_of_type("gwt6").keys()]          
+        flowmodels =list(self.get_models_of_type("gwf6").keys())
+        transportmodels = list(self.get_models_of_type("gwt6").keys())      
         modelnames = flowmodels + transportmodels
 
 
