@@ -1253,7 +1253,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             raise ValueError("unexpected coordinate dimension in masking domain")
         
 
-        if is_split(self):
+        if self.is_split():
             raise ValueError("masking can only be applied to simulations that have not been split. Apply masking before splitting.")                    
 
         flowmodels =list(self.get_models_of_type("gwf6").keys())
