@@ -1,17 +1,20 @@
-import pathlib
-import textwrap
+
 
 import numpy as np
-import pandas as pd
 import pytest
 import xarray as xr
 
 import imod
-from imod.mf6.utilities.package import get_repeat_stress
-from imod.mf6.write_context import WriteContext
-from imod.schemata import ValidationError
 from imod.logging import LoggerType, LogLevel
+from imod.mf6.write_context import WriteContext
 
+from pathlib import Path
+
+import os
+from io import StringIO
+import sys
+
+out = StringIO()
 @pytest.fixture(scope="function")
 def drainage():
     layer = np.arange(1, 4)
@@ -27,10 +30,21 @@ def drainage():
     drn = dict(elevation=elevation, conductance=conductance)
     return drn
 
-def test_write(drainage, tmp_path):
-
-    imod.logging.configure(LoggerType.PYTHON, log_level = LogLevel.DEBUG  ,add_default_file_handler=True, add_default_stream_handler = True)
-
+def test_write_package_is_logged(drainage, tmp_path):
+    # arrange
+    logfile_path  = tmp_path/'logfile.txt'
     drn = imod.mf6.Drainage(**drainage)
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
-    drn.write("mydrn", [1], write_context)
+
+    # act
+    with open(logfile_path, 'w') as sys.stdout:
+        imod.logging.configure(LoggerType.PYTHON, log_level = LogLevel.DEBUG  ,add_default_file_handler=False, add_default_stream_handler = True)
+        drn.write("mydrn", [1], write_context)
+   
+    # assert
+    with open(logfile_path, "r") as log_file:
+        unknown = log_file.read()
+
+        assert "beginning execution of imod.mf6.package.write for object <class 'imod.mf6.drn.Drainage'>" in unknown
+        assert "finished execution of imod.mf6.package.write  for object <class 'imod.mf6.drn.Drainage'>" in unknown
+

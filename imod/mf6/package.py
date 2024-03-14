@@ -26,6 +26,7 @@ from imod.mf6.pkgbase import (
     TRANSPORT_PACKAGES,
     PackageBase,
 )
+from imod.mf6.utilities.logging_decorators import log_decorator
 from imod.mf6.utilities.regrid import (
     RegridderInstancesCollection,
     RegridderType,
@@ -42,9 +43,7 @@ from imod.schemata import (
     ValidationError,
 )
 from imod.typing import GridDataArray
-from imod.mf6.utilities.logging_decorators  import log_decorator
 
-from imod.logging.loglevel import LogLevel
 
 class Package(PackageBase, IPackage, abc.ABC):
     """

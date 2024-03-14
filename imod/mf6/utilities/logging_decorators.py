@@ -1,20 +1,22 @@
-from imod.logging import logger, ILogger
+from imod.logging import ILogger, logger
 from imod.logging.loglevel import LogLevel
 
 
 def log_with_level(logger: ILogger,loglevel: LogLevel, message: str) -> None:
-    if loglevel == LogLevel.DEBUG:
-        logger.debug(message)
-    elif  loglevel == LogLevel.INFO:
-        logger.info(message)
-    elif  loglevel == LogLevel.WARNING:
-        logger.warning(message)   
-    elif loglevel == LogLevel.ERROR:
-        logger.error(message)   
-    elif loglevel == LogLevel.CRITICAL:      
-        logger.critical(message)   
-    else:
-        raise ValueError(f"Unknown logging urgency at level {loglevel}")
+
+    match loglevel:
+        case LogLevel.DEBUG:
+            logger.debug(message)
+        case LogLevel.INFO:
+            logger.info(message)
+        case LogLevel.WARNING:
+            logger.warning(message)   
+        case LogLevel.ERROR:
+            logger.error(message)   
+        case LogLevel.CRITICAL:      
+            logger.critical(message)   
+        case _:
+            raise ValueError(f"Unknown logging urgency at level {loglevel}")
 
 # decorator to calculate duration
 # taken by any function.

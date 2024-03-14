@@ -7,10 +7,11 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.logging import LoggerType, LogLevel
 from imod.mf6.utilities.package import get_repeat_stress
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
-from imod.logging import LoggerType, LogLevel
+
 
 @pytest.fixture(scope="function")
 def drainage():
