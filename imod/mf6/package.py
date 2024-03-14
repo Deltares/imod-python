@@ -26,7 +26,7 @@ from imod.mf6.pkgbase import (
     TRANSPORT_PACKAGES,
     PackageBase,
 )
-from imod.mf6.utilities.logging_decorators import log_decorator
+from imod.mf6.utilities.logging_decorators import standard_log_decorator
 from imod.mf6.utilities.regrid import (
     RegridderInstancesCollection,
     RegridderType,
@@ -266,7 +266,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         return layered, values
 
 
-    @log_decorator()
+    @standard_log_decorator()
     def write(
         self,
         pkgname: str,

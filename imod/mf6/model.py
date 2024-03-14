@@ -8,6 +8,7 @@ from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
 from typing import Optional, Tuple, Union
+from imod.mf6.utilities.logging_decorators import standard_log_decorator
 
 import cftime
 import jinja2
@@ -222,7 +223,8 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 model_status_info.add(pkg_errors_to_status_info(pkg_name, pkg_errors))
 
         return model_status_info
-
+    
+    @standard_log_decorator()
     def write(
         self, modelname, globaltimes, validate: bool, write_context: WriteContext
     ) -> StatusInfoBase:

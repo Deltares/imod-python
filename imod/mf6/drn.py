@@ -14,7 +14,7 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
-
+from imod.mf6.utilities.logging_decorators import standard_log_decorator
 
 class Drainage(BoundaryCondition):
     """
@@ -113,6 +113,7 @@ class Drainage(BoundaryCondition):
         "concentration": (RegridderType.OVERLAP, "mean"),
     }
 
+    @standard_log_decorator()
     def __init__(
         self,
         elevation,

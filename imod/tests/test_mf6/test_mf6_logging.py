@@ -33,18 +33,61 @@ def drainage():
 def test_write_package_is_logged(drainage, tmp_path):
     # arrange
     logfile_path  = tmp_path/'logfile.txt'
-    drn = imod.mf6.Drainage(**drainage)
-    write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
+
 
     # act
     with open(logfile_path, 'w') as sys.stdout:
         imod.logging.configure(LoggerType.PYTHON, log_level = LogLevel.DEBUG  ,add_default_file_handler=False, add_default_stream_handler = True)
+        drn = imod.mf6.Drainage(**drainage)
+        write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
         drn.write("mydrn", [1], write_context)
    
     # assert
     with open(logfile_path, "r") as log_file:
-        unknown = log_file.read()
+        log = log_file.read()
+        assert "beginning execution of imod.mf6.drn.__init__ for object <class 'imod.mf6.drn.Drainage'>" in log
+        assert "finished execution of imod.mf6.drn.__init__  for object <class 'imod.mf6.drn.Drainage'>" in log        
+        assert "beginning execution of imod.mf6.package.write for object <class 'imod.mf6.drn.Drainage'>" in log
+        assert "finished execution of imod.mf6.package.write  for object <class 'imod.mf6.drn.Drainage'>" in log
 
-        assert "beginning execution of imod.mf6.package.write for object <class 'imod.mf6.drn.Drainage'>" in unknown
-        assert "finished execution of imod.mf6.package.write  for object <class 'imod.mf6.drn.Drainage'>" in unknown
+
+def test_write_model_is_logged(flow_transport_simulation: imod.mf6.Modflow6Simulation, tmp_path: Path):
+    # arrange
+    logfile_path  = tmp_path/'logfile.txt'
+    transport_model = flow_transport_simulation["tpt_c"]
+    write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
+    globaltimes = np.array(
+        [
+            "2000-01-01",
+        ],
+        dtype="datetime64[ns]",
+    )
+    # act
+    with open(logfile_path, 'w') as sys.stdout:
+        imod.logging.configure(LoggerType.PYTHON, log_level = LogLevel.DEBUG  ,add_default_file_handler=False, add_default_stream_handler = True)
+        transport_model.write("model.txt", globaltimes, True, write_context)
+   
+    # assert
+    with open(logfile_path, "r") as log_file:
+        log = log_file.read()
+
+        assert "beginning execution of imod.mf6.model.write for object <class 'imod.mf6.model_gwt.GroundwaterTransportModel'>" in log
+        assert "finished execution of imod.mf6.model.write  for object <class 'imod.mf6.model_gwt.GroundwaterTransportModel'>" in log        
+
+def test_write_simulation_is_logged(flow_transport_simulation: imod.mf6.Modflow6Simulation, tmp_path:Path):
+    # arrange
+    logfile_path  = tmp_path/'logfile.txt'
+
+    # act
+    with open(logfile_path, 'w') as sys.stdout:
+        imod.logging.configure(LoggerType.PYTHON, log_level = LogLevel.DEBUG  ,add_default_file_handler=False, add_default_stream_handler = True)
+        flow_transport_simulation.write(tmp_path, True, True, True)
+   
+    # assert
+    with open(logfile_path, "r") as log_file:
+        log = log_file.read()
+
+        assert "beginning execution of imod.mf6.simulation.write for object <class 'imod.mf6.simulation.Modflow6Simulation'>" in log
+        assert "finished execution of imod.mf6.simulation.write  for object <class 'imod.mf6.simulation.Modflow6Simulation'>" in log        
+
 

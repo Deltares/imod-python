@@ -10,12 +10,13 @@ from imod.mf6.clipped_boundary_condition_creator import create_clipped_boundary
 from imod.mf6.model import Modflow6Model
 from imod.typing import GridDataArray
 
-
+from imod.mf6.utilities.logging_decorators import init_log_decorator
 class GroundwaterFlowModel(Modflow6Model):
     _mandatory_packages = ("npf", "ic", "oc", "sto")
     _model_id = "gwf6"
     _template = Modflow6Model._initialize_template("gwf-nam.j2")
 
+    @init_log_decorator()
     def __init__(
         self,
         listing_file: Optional[str] = None,

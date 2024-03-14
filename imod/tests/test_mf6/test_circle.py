@@ -8,11 +8,13 @@ import xugrid as xu
 
 import imod
 from imod.mf6.write_context import WriteContext
-
+from imod.logging import LoggerType, LogLevel
+from imod.mf6.write_context import WriteContext
 
 @pytest.mark.usefixtures("circle_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_write_and_run(circle_model, tmp_path):
+    imod.logging.configure(LoggerType.PYTHON, log_level = LogLevel.DEBUG  ,add_default_file_handler=True, add_default_stream_handler = True)
     simulation = circle_model
 
     with pytest.raises(

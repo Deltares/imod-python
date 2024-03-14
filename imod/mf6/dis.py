@@ -15,8 +15,7 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
 )
-
-
+from imod.mf6.utilities.logging_decorators import init_log_decorator
 class StructuredDiscretization(Package):
     """
     Discretization information for structered grids is specified using the file.
@@ -90,6 +89,7 @@ class StructuredDiscretization(Package):
 
     _skip_mask_arrays = ["bottom"]
 
+    @init_log_decorator()
     def __init__(self, top, bottom, idomain, validate: bool = True):
         dict_dataset = {
             "idomain": idomain,
