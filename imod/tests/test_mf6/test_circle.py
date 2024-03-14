@@ -1,5 +1,6 @@
 import sys
 import textwrap
+from copy import deepcopy
 from datetime import datetime
 
 import numpy as np
@@ -21,6 +22,11 @@ def test_simulation_write_and_run(circle_model, tmp_path):
         circle_model.run()
 
     modeldir = tmp_path / "circle"
+
+    mask = deepcopy(circle_model["GWF_1"].domain)
+    mask.values[:, 133] = -1    
+    simulation.mask_all_models(mask)
+    
     simulation.write(modeldir, binary=False, use_absolute_paths=True)
     simulation.run()
 

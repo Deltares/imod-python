@@ -293,3 +293,16 @@ def is_same_domain(grid1: xr.DataArray, grid2: xr.DataArray)->bool:
 @typedispatch
 def is_same_domain(grid1: object, grid2:object)->bool:
     return False
+
+@typedispatch
+def get_spatial_dimension_names( grid: xr.DataArray)-> list[str]:
+    return ["x", "y", "layer", "dx", "dy"]
+
+@typedispatch
+def get_spatial_dimension_names( grid: xu.UgridDataArray)-> list[str]:
+    facedim = grid.ugrid.grid.face_dimension
+    return [ facedim, "layer"]
+
+@typedispatch
+def get_spatial_dimension_names( grid: object)-> list[str]:
+    return []

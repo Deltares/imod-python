@@ -42,6 +42,7 @@ from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
 from imod.typing.grid import (
     concat,
+    get_spatial_dimension_names,
     is_equal,
     is_same_domain,
     is_unstructured,
@@ -1270,12 +1271,13 @@ class Modflow6Simulation(collections.UserDict):
             idomain-like integer array. 1 sets cells to active, 0 sets cells to inactive, 
             -1 sets cells to vertical passthrough
         """
-        if any([coord not in ["x", "y", "layer", "mesh2d_nFaces", "dx", "dy"] for coord in mask.coords]):
+        spatial_dims = get_spatial_dimension_names(mask)
+        if any([coord not in spatial_dims for coord in mask.coords]):
             raise ValueError("unexpected coordinate dimension in masking domain")
         
 
         if is_split(self):
-                raise ValueError("masking can only be applied to simulations that have not been split. Apply masking before splitting.")                    
+            raise ValueError("masking can only be applied to simulations that have not been split. Apply masking before splitting.")                    
 
         flowmodels =list(self.get_models_of_type("gwf6").keys())
         transportmodels = list(self.get_models_of_type("gwt6").keys())      
