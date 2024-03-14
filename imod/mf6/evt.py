@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Tuple
 
 import numpy as np
 
@@ -31,8 +31,10 @@ SEGMENT_BOUNDARY_DIMS_SCHEMA = (
     | DimsSchema("segment", "{face_dim}")
 )
 
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 
-class Evapotranspiration(BoundaryCondition):
+
+class Evapotranspiration(BoundaryCondition, IRegridPackage):
     """
     Evapotranspiration (EVT) Package.
     Any number of EVT Packages can be specified for a single groundwater flow
@@ -252,3 +254,6 @@ class Evapotranspiration(BoundaryCondition):
         bin_ds = unstack_dim_into_variable(bin_ds, "segment")
 
         return bin_ds
+    
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method

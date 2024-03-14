@@ -1,6 +1,7 @@
 from abc import abstractmethod
 
-from numpy import ndarray
+import numpy as np
+from numpy.typing import NDArray
 
 from imod.mf6.interfaces.ipackagebase import IPackageBase
 
@@ -12,10 +13,10 @@ class IPointDataPackage(IPackageBase):
 
     @property
     @abstractmethod
-    def x(self) -> ndarray[float]:
+    def x(self) -> NDArray[np.float64]:
         raise NotImplementedError
 
     @property
     @abstractmethod
-    def y(self) -> ndarray[float]:
+    def y(self) ->NDArray[np.float64]:
         raise NotImplementedError

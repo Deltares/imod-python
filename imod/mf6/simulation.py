@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import collections
-import copy
 import pathlib
 import subprocess
 import warnings
@@ -25,6 +24,7 @@ from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwfgwt import GWFGWT
 from imod.mf6.gwtgwt import GWTGWT
 from imod.mf6.ims import Solution
+from imod.mf6.interfaces.isimulation import ISimulation
 from imod.mf6.model import Modflow6Model
 from imod.mf6.model_gwf import GroundwaterFlowModel
 from imod.mf6.model_gwt import GroundwaterTransportModel
@@ -37,6 +37,7 @@ from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
 from imod.mf6.ssm import SourceSinkMixing
 from imod.mf6.statusinfo import NestedStatusInfo
+from imod.mf6.utilities.regrid import _regrid_like
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
@@ -75,16 +76,7 @@ def get_packages(simulation: Modflow6Simulation) -> dict[str, Package]:
         if isinstance(pkg, Package)
     }
 
-
-def is_split(simulation: Modflow6Simulation) -> bool:
-    return "split_exchanges" in simulation.keys()
-
-
-def has_one_flow_model(simulation: Modflow6Simulation) -> bool:
-    flow_models = simulation.get_models_of_type("gwf6")
-    return  len(flow_models) == 1
-
-class Modflow6Simulation(collections.UserDict):
+class Modflow6Simulation(collections.UserDict, ISimulation):
     def _initialize_template(self):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
         env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
@@ -252,7 +244,7 @@ class Modflow6Simulation(collections.UserDict):
         """
         # create write context
         write_context = WriteContext(directory, binary, use_absolute_paths)
-        if is_split(self):
+        if self.is_split():
             write_context.is_partitioned = True
 
         # Check models for required content
@@ -606,7 +598,7 @@ class Modflow6Simulation(collections.UserDict):
         elif len(modelnames) == 1:
             modelname = next(iter(modelnames))
             return self._open_single_output_single_model(modelname, output, **settings)
-        elif is_split(self):
+        elif self.is_split():
             if "budget" in output:
                 return self._merge_budgets(modelnames, output, **settings)
             else:
@@ -705,7 +697,7 @@ class Modflow6Simulation(collections.UserDict):
         # [[Ta, Tb]] -> [[Ta], [Tb]]
         tpt_names_per_species = list(zip(*all_tpt_names))
 
-        if is_split(self):
+        if self.is_split():
             # [[Ta_1, Tb_1], [Ta_2, Tb_2]] -> [Ta, Tb]
             unpartitioned_modelnames = [
                 tpt_name.rpartition("_")[0] for tpt_name in all_tpt_names[0]
@@ -901,7 +893,7 @@ class Modflow6Simulation(collections.UserDict):
                 result.append(exchange.get_specification())
 
         # exchange for splitting models
-        if is_split(self):
+        if self.is_split():
             for exchange in self["split_exchanges"]:
                 result.append(exchange.get_specification())
         return result
@@ -954,12 +946,12 @@ class Modflow6Simulation(collections.UserDict):
         clipped : Simulation
         """
 
-        if is_split(self):
+        if self.is_split():
             raise RuntimeError(
                 "Unable to clip simulation. Clipping can only be done on simulations that haven't been split."  +
                 "Therefore clipping should be done before splitting the simulation."
             )
-        if not has_one_flow_model(self):
+        if not self.has_one_flow_model():
             raise ValueError(
                 "Unable to clip simulation. Clipping can only be done on simulations that have a single flow model ."
             )        
@@ -993,12 +985,12 @@ class Modflow6Simulation(collections.UserDict):
 
         The method return a new simulation containing all the split models and packages
         """
-        if is_split(self):
+        if self.is_split():
             raise RuntimeError(
                 "Unable to split simulation. Splitting can only be done on simulations that haven't been split."
             )
 
-        if not has_one_flow_model(self):
+        if not self.has_one_flow_model():
             raise ValueError(
                 "splitting of simulations with more (or less) than 1 flow model currently not supported."
             )
@@ -1060,7 +1052,7 @@ class Modflow6Simulation(collections.UserDict):
     def regrid_like(
         self,
         regridded_simulation_name: str,
-        target_grid: Union[xr.DataArray, xu.UgridDataArray],
+        target_grid: GridDataArray,
         validate: bool = True,
     ) -> "Modflow6Simulation":
         """
@@ -1082,32 +1074,10 @@ class Modflow6Simulation(collections.UserDict):
         a new simulation object with regridded models
         """
 
-        if is_split(self):
-            raise RuntimeError(
-                "Unable to regrid simulation. Regridding can only be done on simulations that haven't been split." +
-                " Therefore regridding should be done before splitting the simulation."
-            )
-        if not has_one_flow_model(self) :
-            raise ValueError(
-                "Unable to regrid simulation. Regridding can only be done on simulations that have a single flow model."
-            )
-        result = self.__class__(regridded_simulation_name)
-        for key, item in self.items():
-            if isinstance(item, Modflow6Model):
-                result[key] = item.regrid_like(target_grid, validate)
-            elif isinstance(item, imod.mf6.Solution) or isinstance(
-                item, imod.mf6.TimeDiscretization
-            ):
-                result[key] = copy.deepcopy(item)
-            elif key == "gwtgwf_exchanges":
-                pass
-            else:
-                raise NotImplementedError(f"regridding not supported for {key}")
-
-        return result
+        return _regrid_like(self, regridded_simulation_name,target_grid,  validate )
 
     def _add_modelsplit_exchanges(self, exchanges_list: list[GWFGWF]) -> None:
-        if not is_split(self):
+        if not self.is_split():
             self["split_exchanges"] = []
         self["split_exchanges"].extend(exchanges_list)
 
@@ -1239,7 +1209,7 @@ class Modflow6Simulation(collections.UserDict):
                         "auxiliary_variable_name"
                     ].values[0]
                     ssm_package = SourceSinkMixing.from_flow_model(
-                        flow_model, state_variable_name, is_split=is_split(self)
+                        flow_model, state_variable_name, is_split=self.is_split()
                     )
                     if ssm_package is not None:
                         tpt_model[ssm_key] = ssm_package
@@ -1249,3 +1219,12 @@ class Modflow6Simulation(collections.UserDict):
         for flow_name, tpt_models_of_flow_model in flow_transport_mapping.items():
             flow_model = self[flow_name]
             flow_model.update_buoyancy_package(tpt_models_of_flow_model)
+
+
+    def is_split(self) -> bool:
+        return "split_exchanges" in self.keys()
+
+
+    def has_one_flow_model(self) -> bool:
+        flow_models = self.get_models_of_type("gwf6")
+        return  len(flow_models) == 1            
