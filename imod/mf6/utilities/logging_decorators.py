@@ -3,7 +3,9 @@ from imod.logging.loglevel import LogLevel
 
 
 def log_with_level(logger: ILogger,loglevel: LogLevel, message: str) -> None:
-
+    '''
+    logs a message with the specified urgency level.
+    '''
     match loglevel:
         case LogLevel.DEBUG:
             logger.debug(message)
