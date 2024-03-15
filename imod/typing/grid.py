@@ -280,3 +280,29 @@ def is_equal(array1: xr.DataArray, array2: xr.DataArray)->bool:
 @typedispatch
 def is_equal(array1: object, array2:object)->bool:
     return False
+
+
+@typedispatch
+def is_same_domain(grid1: xu.UgridDataArray, grid2: xu.UgridDataArray)->bool:
+    return  grid1.coords.equals(grid2.coords) and grid1.ugrid.grid.equals(grid2.ugrid.grid)
+
+@typedispatch
+def is_same_domain(grid1: xr.DataArray, grid2: xr.DataArray)->bool:
+    return grid1.coords.equals(grid2.coords)
+
+@typedispatch
+def is_same_domain(grid1: object, grid2:object)->bool:
+    return False
+
+@typedispatch
+def get_spatial_dimension_names( grid: xr.DataArray)-> list[str]:
+    return ["x", "y", "layer", "dx", "dy"]
+
+@typedispatch
+def get_spatial_dimension_names( grid: xu.UgridDataArray)-> list[str]:
+    facedim = grid.ugrid.grid.face_dimension
+    return [ facedim, "layer"]
+
+@typedispatch
+def get_spatial_dimension_names( grid: object)-> list[str]:
+    return []
