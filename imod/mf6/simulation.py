@@ -43,12 +43,11 @@ from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
 from imod.typing.grid import (
     concat,
-    get_spatial_dimension_names,
     is_equal,
-    is_same_domain,
     is_unstructured,
     merge_partitions,
 )
+from imod.mf6.utilities.mask import _mask_all_models
 
 OUTPUT_FUNC_MAPPING: dict[str, Callable] = {
     "head": open_hds,
@@ -1229,7 +1228,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
     def has_one_flow_model(self) -> bool:
         flow_models = self.get_models_of_type("gwf6")
-        return  len(flow_models) == 1            
+        return  len(flow_models) == 1       
+         
     def mask_all_models(
         self,
         mask: GridDataArray,
@@ -1248,21 +1248,4 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             idomain-like integer array. 1 sets cells to active, 0 sets cells to inactive, 
             -1 sets cells to vertical passthrough
         """
-        spatial_dims = get_spatial_dimension_names(mask)
-        if any([coord not in spatial_dims for coord in mask.coords]):
-            raise ValueError("unexpected coordinate dimension in masking domain")
-        
-
-        if self.is_split():
-            raise ValueError("masking can only be applied to simulations that have not been split. Apply masking before splitting.")                    
-
-        flowmodels =list(self.get_models_of_type("gwf6").keys())
-        transportmodels = list(self.get_models_of_type("gwt6").keys())      
-        modelnames = flowmodels + transportmodels
-
-
-        for name in modelnames:
-            if is_same_domain(self[name].domain, mask):
-                self[name].mask_all_packages(mask)
-            else:
-                raise ValueError("masking can only be applied to simulations when all the models in the simulation use the same grid.")
+        _mask_all_models(self, mask)

@@ -28,6 +28,7 @@ from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray
+from imod.mf6.utilities.mask import _mask_all_packages
 
 
 class Modflow6Model( collections.UserDict, IModel, abc.ABC):
@@ -500,12 +501,8 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
             idomain-like integer array. 1 sets cells to active, 0 sets cells to inactive, 
             -1 sets cells to vertical passthrough
         """
-        if any([coord not in ["x", "y", "layer", "mesh2d_nFaces", "dx", "dy"] for coord in mask.coords]):
-            raise ValueError("unexpected coordinate dimension in masking domain")
 
-        for pkgname, pkg in self.items():
-            self[pkgname] = pkg.mask(mask)
-        self.purge_empty_packages()
+        _mask_all_packages(self, mask)
 
     def purge_empty_packages(self, model_name: Optional[str] = "") -> None:
         """
