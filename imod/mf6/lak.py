@@ -18,6 +18,7 @@ from imod import mf6
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.package import Package
 from imod.mf6.pkgbase import PackageBase
+from imod.mf6.utilities.logging_decorators import init_log_decorator
 from imod.mf6.write_context import WriteContext
 from imod.schemata import AllValueSchema, DimsSchema, DTypeSchema
 
@@ -678,6 +679,7 @@ class Lake(BoundaryCondition):
         "outlet_width": [AllValueSchema(">", 0)],
     }
 
+    @init_log_decorator()
     def __init__(
         # lake
         self,

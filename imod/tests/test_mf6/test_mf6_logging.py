@@ -1,5 +1,9 @@
 
 
+import sys
+from io import StringIO
+from pathlib import Path
+
 import numpy as np
 import pytest
 import xarray as xr
@@ -7,12 +11,6 @@ import xarray as xr
 import imod
 from imod.logging import LoggerType, LogLevel
 from imod.mf6.write_context import WriteContext
-
-from pathlib import Path
-
-import os
-from io import StringIO
-import sys
 
 out = StringIO()
 @pytest.fixture(scope="function")

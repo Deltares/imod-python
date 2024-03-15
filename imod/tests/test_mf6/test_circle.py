@@ -7,9 +7,9 @@ import pytest
 import xugrid as xu
 
 import imod
-from imod.mf6.write_context import WriteContext
 from imod.logging import LoggerType, LogLevel
 from imod.mf6.write_context import WriteContext
+
 
 @pytest.mark.usefixtures("circle_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")

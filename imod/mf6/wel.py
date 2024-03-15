@@ -22,6 +22,7 @@ from imod.mf6.package import Package
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.utilities.grid import create_layered_top
+from imod.mf6.utilities.logging_decorators import init_log_decorator
 from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext
@@ -187,6 +188,8 @@ class Well(BoundaryCondition, IPointDataPackage):
 
     _regrid_method: dict[str, Tuple[RegridderType, str]] = {}
 
+
+    @init_log_decorator()
     def __init__(
         self,
         x: list[float],
@@ -696,6 +699,8 @@ class WellDisStructured(DisStructuredBoundaryCondition):
 
     _write_schemata = {}
 
+
+    @init_log_decorator()
     def __init__(
         self,
         layer,
@@ -855,6 +860,8 @@ class WellDisVertices(DisVerticesBoundaryCondition):
 
     _write_schemata = {}
 
+
+    @init_log_decorator()
     def __init__(
         self,
         layer,

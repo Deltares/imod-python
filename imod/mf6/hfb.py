@@ -18,6 +18,7 @@ from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.grid import broadcast_to_full_domain
+from imod.mf6.utilities.logging_decorators import init_log_decorator
 from imod.mf6.utilities.regrid import RegridderType
 from imod.schemata import EmptyIndexesSchema
 from imod.typing import GridDataArray
@@ -729,7 +730,7 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
     >>> hfb = imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic(barrier_gdf)
 
     """
-
+    @init_log_decorator()
     def __init__(
         self,
         geometry: "gpd.GeoDataFrame",
@@ -789,7 +790,7 @@ class LayeredHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierB
     >>> hfb = imod.mf6.LayeredHorizontalFlowBarrierHydraulicCharacteristic(barrier_gdf)
 
     """
-
+    @init_log_decorator()
     def __init__(
         self,
         geometry: "gpd.GeoDataFrame",
@@ -855,7 +856,7 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     >>> hfb = imod.mf6.HorizontalFlowBarrierMultiplier(barrier_gdf)
 
     """
-
+    @init_log_decorator()
     def __init__(
         self,
         geometry: "gpd.GeoDataFrame",
@@ -920,7 +921,7 @@ class LayeredHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     >>> hfb = imod.mf6.LayeredHorizontalFlowBarrierMultiplier(barrier_gdf)
 
     """
-
+    @init_log_decorator()
     def __init__(
         self,
         geometry: "gpd.GeoDataFrame",
@@ -1005,7 +1006,7 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
 
 
     """
-
+    @init_log_decorator()
     def __init__(
         self,
         geometry: "gpd.GeoDataFrame",
@@ -1066,7 +1067,7 @@ class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
 
 
     """
-
+    @init_log_decorator()
     def __init__(
         self,
         geometry: "gpd.GeoDataFrame",

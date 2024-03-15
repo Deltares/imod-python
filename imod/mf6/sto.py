@@ -3,6 +3,7 @@ import abc
 import numpy as np
 
 from imod.mf6.package import Package
+from imod.mf6.utilities.logging_decorators import init_log_decorator
 from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
@@ -163,6 +164,7 @@ class SpecificStorage(StorageBase):
 
     _template = Package._initialize_template(_pkg_id)
 
+    @init_log_decorator()
     def __init__(
         self,
         specific_storage,
@@ -296,7 +298,7 @@ class StorageCoefficient(StorageBase):
     }
 
     _template = Package._initialize_template(_pkg_id)
-
+    @init_log_decorator()
     def __init__(
         self,
         storage_coefficient,

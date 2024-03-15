@@ -1,6 +1,7 @@
 import numpy as np
 
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.utilities.logging_decorators import init_log_decorator
 from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
@@ -108,6 +109,7 @@ class Recharge(BoundaryCondition):
         "concentration": (RegridderType.OVERLAP, "mean"),
     }
 
+    @init_log_decorator()
     def __init__(
         self,
         rate,

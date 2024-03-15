@@ -4,6 +4,7 @@ import numpy as np
 
 import imod
 from imod.mf6.package import Package
+from imod.mf6.utilities.logging_decorators import init_log_decorator
 from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import DisBottomSchema
 from imod.schemata import (
@@ -15,7 +16,8 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
 )
-from imod.mf6.utilities.logging_decorators import init_log_decorator
+
+
 class StructuredDiscretization(Package):
     """
     Discretization information for structered grids is specified using the file.

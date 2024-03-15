@@ -8,7 +8,6 @@ from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
 from typing import Optional, Tuple, Union
-from imod.mf6.utilities.logging_decorators import standard_log_decorator
 
 import cftime
 import jinja2
@@ -22,6 +21,7 @@ from jinja2 import Template
 import imod
 from imod.mf6.package import Package
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
+from imod.mf6.utilities.logging_decorators import standard_log_decorator
 from imod.mf6.utilities.regrid import RegridderInstancesCollection, RegridderType
 from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.write_context import WriteContext
@@ -290,6 +290,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         return NestedStatusInfo(modelname)
 
+    @standard_log_decorator()
     def dump(
         self, directory, modelname, validate: bool = True, mdal_compliant: bool = False
     ):
