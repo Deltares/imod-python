@@ -184,7 +184,8 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         k = npf["k"]
         return k
-
+    
+    @standard_log_decorator()
     def _validate(self, model_name: str = "") -> StatusInfoBase:
         try:
             diskey = self._get_diskey()

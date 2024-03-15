@@ -292,6 +292,7 @@ class Package(PackageBase, IPackage, abc.ABC):
                             path = pkgdirectory / f"{key}.dat"
                             self.write_text_griddata(path, da, dtype)
 
+    @standard_log_decorator()
     def _validate(self, schemata: dict, **kwargs) -> dict[str, list[ValidationError]]:
         errors = defaultdict(list)
         for variable, var_schemata in schemata.items():
