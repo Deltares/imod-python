@@ -18,8 +18,7 @@ def log_with_level(logger: ILogger,loglevel: LogLevel, message: str) -> None:
         case _:
             raise ValueError(f"Unknown logging urgency at level {loglevel}")
 
-# decorator to calculate duration
-# taken by any function.
+# decorator to print log messages announcing the begin and end of the decorated method
 def standard_log_decorator(start_level: LogLevel = LogLevel.INFO, end_level: LogLevel = LogLevel.DEBUG):
     def decorator(fun):
         def wrapper(*args, **kwargs):
@@ -34,7 +33,7 @@ def standard_log_decorator(start_level: LogLevel = LogLevel.INFO, end_level: Log
         return wrapper
     return  decorator
        
-    
+# decorator to print log messages announcing the begin and end of initialization methods
 def init_log_decorator(start_level: LogLevel = LogLevel.INFO, end_level: LogLevel = LogLevel.DEBUG):
     def decorator(fun):
         def wrapper(*args, **kwargs):
