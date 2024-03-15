@@ -19,7 +19,6 @@ from imod.mf6.boundary_condition import (
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
-from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.utilities.grid import create_layered_top
 from imod.mf6.utilities.logging_decorators import init_log_decorator
@@ -593,20 +592,12 @@ class Well(BoundaryCondition, IPointDataPackage):
         ds = ds.assign(**ds_vars.data_vars)
 
         ds = remove_inactive(ds, active)
-
-        # TODO: make options like "save_flows" configurable. Issue github #623
-        ds["save_flows"] = True
+        ds["save_flows"] = self["save_flows"].values[()]
+        ds["print_flows"] = self["print_flows"].values[()]
+        ds["print_input"] = self["print_input"].values[()]
 
         return Mf6Wel(**ds.data_vars)
 
-    def regrid_like(self, target_grid: GridDataArray, *_) -> Well:
-        """
-        The regrid_like method is irrelevant for this package as it is
-        grid-agnostic, instead this method clips the package based on the grid
-        exterior.
-        """
-        target_grid_2d = target_grid.isel(layer=0, drop=True, missing_dims="ignore")
-        return clip_by_grid(self, target_grid_2d)
 
     def mask(self, domain: GridDataArray) -> Well:
         """
@@ -623,6 +614,9 @@ class Well(BoundaryCondition, IPointDataPackage):
             "layer", errors="ignore"
         )
         return mask_2D(self, domain_2d)
+    
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method    
 
 
 class WellDisStructured(DisStructuredBoundaryCondition):

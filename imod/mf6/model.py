@@ -4,10 +4,9 @@ import abc
 import collections
 import inspect
 import pathlib
-from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
-from typing import Optional, Tuple, Union
+from typing import Optional, Union
 
 import cftime
 import jinja2
@@ -19,19 +18,21 @@ import xugrid as xu
 from jinja2 import Template
 
 import imod
+from imod.mf6.interfaces.imodel import IModel
 from imod.mf6.package import Package
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.utilities.logging_decorators import standard_log_decorator
-from imod.mf6.utilities.regrid import RegridderInstancesCollection, RegridderType
+from imod.mf6.utilities.regrid import (
+    _regrid_like,
+)
 from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray
-from imod.typing.grid import ones_like
 
 
-class Modflow6Model(collections.UserDict, abc.ABC):
-    _mandatory_packages: Tuple[str, ...] = ()
+class Modflow6Model( collections.UserDict, IModel, abc.ABC):
+    _mandatory_packages: tuple[str, ...] = ()
     _model_id: Optional[str] = None
     _template: Template
 
@@ -163,7 +164,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
     def __get_domain_geometry(
         self,
-    ) -> Tuple[
+    ) -> tuple[
         Union[xr.DataArray, xu.UgridDataArray],
         Union[xr.DataArray, xu.UgridDataArray],
         Union[xr.DataArray, xu.UgridDataArray],
@@ -186,7 +187,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         return k
     
     @standard_log_decorator()
-    def _validate(self, model_name: str = "") -> StatusInfoBase:
+    def validate(self, model_name: str = "") -> StatusInfoBase:
         try:
             diskey = self._get_diskey()
         except Exception as e:
@@ -238,7 +239,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         modeldirectory = workdir / modelname
         Path(modeldirectory).mkdir(exist_ok=True, parents=True)
         if validate:
-            model_status_info = self._validate(modelname)
+            model_status_info = self.validate(modelname)
             if model_status_info.has_errors():
                 return model_status_info
 
@@ -298,7 +299,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         modeldirectory = pathlib.Path(directory) / modelname
         modeldirectory.mkdir(exist_ok=True, parents=True)
         if validate:
-            statusinfo = self._validate()
+            statusinfo = self.validate()
             if statusinfo.has_errors():
                 raise ValidationError(statusinfo.to_string())
 
@@ -480,27 +481,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         a model with similar packages to the input model, and with all the data-arrays regridded to another discretization,
         similar to the one used in input argument "target_grid"
         """
-        new_model = self.__class__()
 
-        for pkg_name, pkg in self.items():
-            if pkg.is_regridding_supported():
-                new_model[pkg_name] = pkg.regrid_like(target_grid)
-            else:
-                raise NotImplementedError(
-                    f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
-                )
-
-        methods = self._get_unique_regridder_types()
-        output_domain = self._get_regridding_domain(target_grid, methods)
-        new_model.mask_all_packages(output_domain)
-        new_model.purge_empty_packages()
-        if validate:
-            status_info = NestedStatusInfo("Model validation status")
-            status_info.add(new_model._validate("Regridded model"))
-            if status_info.has_errors():
-                raise ValidationError("\n" + status_info.to_string())
-        return new_model
-
+        return _regrid_like(self, target_grid, validate)
+ 
     def mask_all_packages(
         self,
         mask: GridDataArray,
@@ -544,32 +527,6 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         dis = self._get_diskey()
         return self[dis]["bottom"]
 
-    def _get_regridding_domain(
-        self,
-        target_grid: GridDataArray,
-        methods: defaultdict[RegridderType, list[str]],
-    ) -> GridDataArray:
-        """
-        This method computes the output-domain for a regridding operation by regridding idomain with
-        all regridders. Each regridder may leave some cells inactive. The output domain for the model consists of those
-        cells that all regridders consider active.
-        """
-        idomain = self.domain
-        regridder_collection = RegridderInstancesCollection(
-            idomain, target_grid=target_grid
-        )
-        included_in_all = ones_like(target_grid)
-        regridders =[regridder_collection.get_regridder( regriddertype,function) for regriddertype, functionlist in methods.items() for function in functionlist]
-        for regridder in regridders:
-            regridded_idomain = regridder.regrid(idomain)
-            included_in_all = included_in_all.where(regridded_idomain.notnull())            
-            included_in_all = regridded_idomain.where(regridded_idomain <=0, other = included_in_all)
-
-        new_idomain = included_in_all.where(included_in_all.notnull(), other=0)
-        new_idomain = new_idomain.astype(int)
-
-        return new_idomain
-
     def __repr__(self) -> str:
         INDENT = "    "
         typename = type(self).__name__
@@ -590,25 +547,3 @@ class Modflow6Model(collections.UserDict, abc.ABC):
     def is_use_newton(self):
         return False
 
-    def _get_unique_regridder_types(self) -> defaultdict[RegridderType, list[str]]:
-        """
-        This function loops over the packages and  collects all regridder-types that are in use.
-        """
-        methods: defaultdict = defaultdict(list)
-        for pkg_name, pkg in self.items():
-            if pkg.is_regridding_supported():
-                pkg_methods = pkg.get_regrid_methods()
-                for variable in pkg_methods:
-                    if (
-                        variable in pkg.dataset.data_vars
-                        and pkg.dataset[variable].values[()] is not None
-                    ):
-                        regriddertype = pkg_methods[variable][0]
-                        functiontype = pkg_methods[variable][1]
-                        if functiontype not in  methods[regriddertype]:
-                            methods[regriddertype].append(functiontype)
-            else:
-                raise NotImplementedError(
-                    f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
-                )
-        return methods

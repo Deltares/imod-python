@@ -43,8 +43,8 @@ def test_write_package_is_logged(drainage, tmp_path):
     # assert
     with open(logfile_path, "r") as log_file:
         log = log_file.read()
-        assert "beginning execution of imod.mf6.drn.__init__ for object <class 'imod.mf6.drn.Drainage'>" in log
-        assert "finished execution of imod.mf6.drn.__init__  for object <class 'imod.mf6.drn.Drainage'>" in log        
+        assert "Initializing the <class 'imod.mf6.drn.Drainage'> package..." in log
+        assert "Succesfully initialized the <class 'imod.mf6.drn.Drainage'>..." in log        
         assert "beginning execution of imod.mf6.package.write for object <class 'imod.mf6.drn.Drainage'>" in log
         assert "finished execution of imod.mf6.package.write  for object <class 'imod.mf6.drn.Drainage'>" in log
 

@@ -37,7 +37,6 @@ class GroundwaterFlowModel(Modflow6Model):
             "under_relaxation": under_relaxation,
         }
 
-
     def clip_box(
         self,
         time_min: Optional[cftime.datetime | np.datetime64 | str] = None,

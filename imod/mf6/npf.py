@@ -1,7 +1,9 @@
 import warnings
+from typing import Optional, Tuple
 
 import numpy as np
 
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.utilities.logging_decorators import init_log_decorator
 from imod.mf6.utilities.regrid import RegridderType
@@ -34,7 +36,7 @@ def _dataarray_to_bool(griddataarray: GridDataArray) -> bool:
     return griddataarray.values.item()
 
 
-class NodePropertyFlow(Package):
+class NodePropertyFlow(Package, IRegridPackage):
     """
     Node Property Flow package.
 
@@ -452,3 +454,6 @@ class NodePropertyFlow(Package):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
+    
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method

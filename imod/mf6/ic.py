@@ -1,7 +1,9 @@
 import warnings
+from typing import Optional, Tuple
 
 import numpy as np
 
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.utilities.logging_decorators import init_log_decorator
 from imod.mf6.utilities.regrid import RegridderType
@@ -9,7 +11,7 @@ from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import DTypeSchema, IdentityNoDataSchema, IndexesSchema
 
 
-class InitialConditions(Package):
+class InitialConditions(Package, IRegridPackage):
     """
     Initial Conditions (IC) Package information is read from the file that is
     specified by "IC6" as the file type. Only one IC Package can be specified
@@ -93,3 +95,6 @@ class InitialConditions(Package):
             self["start"], icdirectory, "strt", binary=binary
         )
         return self._template.render(d)
+    
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method

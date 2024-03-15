@@ -1,6 +1,9 @@
+from typing import Optional, Tuple
+
 import numpy as np
 
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.utilities.logging_decorators import init_log_decorator
 from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
@@ -16,7 +19,7 @@ from imod.schemata import (
 )
 
 
-class ConstantHead(BoundaryCondition):
+class ConstantHead(BoundaryCondition, IRegridPackage):
     """
     Constant-Head package. Any number of CHD Packages can be specified for a
     single groundwater flow model; however, an error will occur if a CHD Package
@@ -146,3 +149,6 @@ class ConstantHead(BoundaryCondition):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
+    
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method

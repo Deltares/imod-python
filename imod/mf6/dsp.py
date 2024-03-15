@@ -1,5 +1,8 @@
+from typing import Optional, Tuple
+
 import numpy as np
 
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.utilities.logging_decorators import init_log_decorator
 from imod.mf6.utilities.regrid import RegridderType
@@ -13,7 +16,7 @@ from imod.schemata import (
 )
 
 
-class Dispersion(Package):
+class Dispersion(Package, IRegridPackage):
     """
     Molecular Diffusion and Dispersion.
 
@@ -189,3 +192,6 @@ class Dispersion(Package):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
+    
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method    
