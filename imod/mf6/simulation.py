@@ -453,9 +453,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         ``flowja=False`` and the array is returned in "grid form", meaning:
 
             * DIS: in right, front, and lower face flow. All flows are placed in
-            the cell.
+              the cell.
             * DISV: in horizontal and lower face flow.the horizontal flows are
-            placed on the edges and the lower face flow is placed on the faces.
+              placed on the edges and the lower face flow is placed on the faces.
 
         When ``flowja=True``, the flow-ja-face array is returned as it is found in
         the CBC file, with a flow for every cell to cell connection. Additionally,

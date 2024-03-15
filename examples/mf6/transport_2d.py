@@ -1,3 +1,23 @@
+"""
+Transport 2d example
+====================
+
+The simulation shown here comes from the  1999 MT3DMS report, p 138:
+Two-Dimensional Transport in a Uniform Flow of solute injected
+continuously from a point source in a steady-state uniform flow field.
+
+In this example, we build up the model, and the we run the model as is.
+Next, we split the model in 4 partitions and run that as well.
+Finally, we show that the difference in outcome for the partitioned and unpartitioned models
+is small.
+
+MT3DMS: A Modular Three-Dimensional
+Multispecies Transport Model for Simulation
+of Advection, Dispersion, and Chemical
+Reactions of Contaminants in Groundwater
+Systems; Documentation and User's Guide
+"""
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -6,23 +26,6 @@ import xarray as xr
 import imod
 from imod.mf6.multimodel.partition_generator import get_label_array
 from imod.typing.grid import nan_like, zeros_like
-
-'''
-The simulation shown here comes from the  1999 MT3DMS report, p 138:
-Two-Dimensional Transport in a Uniform Flow of solute injected
-continuously from a point source in a steady-state uniform flow field.
-
-In this example, we build up the model, and the we run the model as is.
-Next, we split the model in 4 partitions and run that as well.
-Finally we show that the difference in outcome for the partitioned and unpartitioned models
-is small. 
-
-MT3DMS: A Modular Three-Dimensional
-Multispecies Transport Model for Simulation
-of Advection, Dispersion, and Chemical
-Reactions of Contaminants in Groundwater
-Systems; Documentation and User's Guide
-'''
 
 # %%
 # Set some grid dimensions
@@ -190,7 +193,7 @@ simulation.write(modeldir, binary=False)
 
 # %%
 # To split the model in 4 partitions, we must create a label array.
-# We use the utility function  ``get_label_array'' for that.
+# We use the utility function  ``get_label_array`` for that.
 
 label_array = get_label_array(simulation, 4)
 fig, ax = plt.subplots()
