@@ -12,6 +12,7 @@ from imod.mf6.auxiliary_variables import (
     remove_expanded_auxiliary_variables_from_dataset,
 )
 
+import numbers
 
 def _mask_all_models(
         simulation: ISimulation,
@@ -49,16 +50,16 @@ def _mask_all_packages(
     model.purge_empty_packages()
 
 
-def _mask(package: IPackage,  mask: GridDataArray):
+def _mask(package: IPackage,  mask: GridDataArray) -> IPackage:
     masked = {}
-    if hasattr(package,"auxiliary_data_fields"):
+    if len(package.auxiliary_data_fields) > 0:
         remove_expanded_auxiliary_variables_from_dataset(package)
     for var in package.dataset.data_vars.keys():
-        if package._skip_masking_variable(var, package.dataset[var]):
+        if _skip_masking_variable(package, var, package.dataset[var]):
             masked[var] = package.dataset[var]
         else:
-            masked[var] = package._mask_spatial_var(var, mask)
-    if hasattr(package,"auxiliary_data_fields"):
+            masked[var] = _mask_spatial_var(package, var, mask)
+    if len(package.auxiliary_data_fields) > 0:
         expand_transient_auxiliary_variables(package)
     return type(package)(**masked)
 
@@ -78,7 +79,7 @@ def _skip_masking_variable(package: IPackage, var: str, da: GridDataArray)->bool
 
 def _mask_spatial_var(self, var: str, mask: GridDataArray)->GridDataArray:
     da = self.dataset[var]
-    array_mask = self._adjust_mask_for_unlayered_data(da, mask)
+    array_mask = _adjust_mask_for_unlayered_data(da, mask)
 
     if issubclass(da.dtype.type, numbers.Integral):
         if var == "idomain":
@@ -92,7 +93,7 @@ def _mask_spatial_var(self, var: str, mask: GridDataArray)->GridDataArray:
             f"Expected dtype float or integer. Received instead: {da.dtype}"
         )
 
-def _adjust_mask_for_unlayered_data(self, da: GridDataArray, mask: GridDataArray)->GridDataArray:
+def _adjust_mask_for_unlayered_data(da: GridDataArray, mask: GridDataArray)->GridDataArray:
     '''
     Some arrays are not layered while the mask is layered (for example the
     top array in dis or disv packaged). In that case we use the top layer of

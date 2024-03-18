@@ -39,7 +39,7 @@ from imod.schemata import (
     ValidationError,
 )
 from imod.typing import GridDataArray
-
+from imod.mf6.utilities.mask import _mask
 
 class Package(PackageBase, IPackage, abc.ABC):
     """
@@ -540,7 +540,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             The package with part masked.
         """
 
-     
+        return _mask(self, mask)
 
 
     def regrid_like(
