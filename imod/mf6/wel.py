@@ -11,6 +11,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.logging.logging_decorators import init_log_decorator
 from imod.mf6.boundary_condition import (
     BoundaryCondition,
     DisStructuredBoundaryCondition,
@@ -21,7 +22,6 @@ from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
 from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.utilities.grid import create_layered_top
-from imod.logging.logging_decorators import  init_log_decorator
 from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext

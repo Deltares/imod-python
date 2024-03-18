@@ -1,5 +1,7 @@
 from abc import abstractmethod
+
 from imod.logging.loglevel import LogLevel
+
 
 class ILogger:
     """

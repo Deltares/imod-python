@@ -20,6 +20,7 @@ import xugrid as xu
 import imod
 import imod.logging
 import imod.mf6.exchangebase
+from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwfgwt import GWFGWT
 from imod.mf6.gwtgwt import GWTGWT
@@ -37,7 +38,6 @@ from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
 from imod.mf6.ssm import SourceSinkMixing
 from imod.mf6.statusinfo import NestedStatusInfo
-from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6.utilities.regrid import _regrid_like
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError

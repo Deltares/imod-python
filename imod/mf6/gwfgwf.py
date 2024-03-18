@@ -5,10 +5,10 @@ import cftime
 import numpy as np
 import xarray as xr
 
+from imod.logging.logging_decorators import init_log_decorator
 from imod.mf6.auxiliary_variables import expand_transient_auxiliary_variables
 from imod.mf6.exchangebase import ExchangeBase
 from imod.mf6.package import Package
-from imod.logging.logging_decorators import  init_log_decorator
 from imod.typing import GridDataArray
 from imod.typing.grid import ones_like
 

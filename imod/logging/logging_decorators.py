@@ -1,5 +1,6 @@
-from imod.logging import ILogger, logger
+from imod.logging import logger
 from imod.logging.loglevel import LogLevel
+
 
 # decorator to print log messages announcing the begin and end of the decorated method
 def standard_log_decorator(start_level: LogLevel = LogLevel.INFO, end_level: LogLevel = LogLevel.DEBUG):

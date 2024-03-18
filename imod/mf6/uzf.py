@@ -1,8 +1,8 @@
 import numpy as np
 import xarray as xr
 
+from imod.logging.logging_decorators import init_log_decorator
 from imod.mf6.boundary_condition import AdvancedBoundaryCondition, BoundaryCondition
-from imod.logging.logging_decorators import  init_log_decorator
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,

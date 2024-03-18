@@ -5,10 +5,10 @@ from typing import Optional
 import cftime
 import numpy as np
 
+from imod.logging.logging_decorators import init_log_decorator
 from imod.mf6 import ConstantHead
 from imod.mf6.clipped_boundary_condition_creator import create_clipped_boundary
 from imod.mf6.model import Modflow6Model
-from imod.logging.logging_decorators import  init_log_decorator
 from imod.typing import GridDataArray
 
 

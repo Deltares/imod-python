@@ -12,12 +12,12 @@ import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
 
+from imod.logging.logging_decorators import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
 from imod.mf6.utilities.grid import broadcast_to_full_domain
-from imod.logging.logging_decorators import  init_log_decorator
 from imod.mf6.utilities.regrid import RegridderType
 from imod.schemata import EmptyIndexesSchema
 from imod.typing import GridDataArray

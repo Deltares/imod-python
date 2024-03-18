@@ -2,9 +2,9 @@ from typing import Optional, Tuple
 
 import numpy as np
 
+from imod.logging.logging_decorators import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.logging.logging_decorators import  init_log_decorator
 from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (

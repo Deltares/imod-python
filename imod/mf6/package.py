@@ -14,6 +14,7 @@ import xugrid as xu
 from xarray.core.utils import is_scalar
 
 import imod
+from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6.auxiliary_variables import (
     expand_transient_auxiliary_variables,
     get_variable_names,
@@ -25,7 +26,6 @@ from imod.mf6.pkgbase import (
     TRANSPORT_PACKAGES,
     PackageBase,
 )
-from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6.utilities.regrid import (
     RegridderType,
     _regrid_like,
