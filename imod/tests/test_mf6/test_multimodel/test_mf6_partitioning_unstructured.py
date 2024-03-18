@@ -338,7 +338,6 @@ def test_partitioning_unstructured_with_well(
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partition_transport(    tmp_path: Path,
     circle_model_transport: Modflow6Simulation,partition_array: xu.UgridDataArray):
-    #%%
     circle_model_transport.write(tmp_path)
     circle_model_transport.run()
     concentration = circle_model_transport.open_concentration()
@@ -348,7 +347,7 @@ def test_partition_transport(    tmp_path: Path,
     new_circle_model.write(tmp_path/"split", binary=False)
     new_circle_model.run()       
     new_concentration = new_circle_model.open_concentration()
-    #%%    
+
     new_concentration = new_concentration.ugrid.reindex_like(concentration)
     new_budget = new_circle_model.open_transport_budget(["salinity"])
     new_budget = new_budget.ugrid.reindex_like(budget)
@@ -356,7 +355,6 @@ def test_partition_transport(    tmp_path: Path,
         concentration.values, new_concentration["concentration"].values, rtol=7e-5, atol=3e-3
     )
 
-    #%%
     for budget_term in ("ssm", "flow-lower-face", "storage-aqueous", "flow-horizontal-face"):
         rtol = 7e-5
         atol = 3e-3
