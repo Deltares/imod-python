@@ -492,7 +492,11 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
         This function applies a mask to all packages in a model. The mask must
         be presented as an idomain-like integer array that has 0 (inactive) or
         -1 (vertical passthrough) values in filtered cells and 1 in active
-        cells
+        cells.
+        Masking will overwrite idomain with the mask where the mask is 0 or -1.
+        Where the mask is 1, the original value of idomain will be kept. Masking
+        will update the packages accordingly, blanking their input where needed,
+        and is therefore not a reversible operation. 
         
         Parameters
         ----------
