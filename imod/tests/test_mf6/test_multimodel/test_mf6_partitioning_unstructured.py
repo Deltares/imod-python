@@ -338,20 +338,43 @@ def test_partitioning_unstructured_with_well(
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partition_transport(    tmp_path: Path,
     circle_model_transport: Modflow6Simulation,partition_array: xu.UgridDataArray):
-
+    #%%
     circle_model_transport.write(tmp_path)
     circle_model_transport.run()
     concentration = circle_model_transport.open_concentration()
+    budget = circle_model_transport.open_transport_budget(["salinity"])
 
     new_circle_model = circle_model_transport.split(partition_array)
     new_circle_model.write(tmp_path/"split", binary=False)
     new_circle_model.run()       
     new_concentration = new_circle_model.open_concentration()
+    #%%    
     new_concentration = new_concentration.ugrid.reindex_like(concentration)
+    new_budget = new_circle_model.open_transport_budget(["salinity"])
+    new_budget = new_budget.ugrid.reindex_like(budget)
     np.testing.assert_allclose(
         concentration.values, new_concentration["concentration"].values, rtol=7e-5, atol=3e-3
     )
 
+    #%%
+    for budget_term in ("ssm", "flow-lower-face", "storage-aqueous", "flow-horizontal-face"):
+        rtol = 7e-5
+        atol = 3e-3
+        if budget_term == "flow-lower-face":
+            atol = 1.45
+            rtol = 0.008          
+        if budget_term == "flow-horizontal-face":
+            atol =0.33
+            rtol = 8e-3 
+            if partition_array["name"].values[()] == "concentric":
+                atol = new_budget["gwt-gwt"].values.max()
+                rtol = atol*20
+        if budget_term == "storage-aqueous":            
+            atol = 0.33
+            rtol = 0.00077       
+        np.testing.assert_allclose(
+            budget[budget_term].values, new_budget[budget_term].values, rtol=rtol, atol=atol
+        )
 
 
 @pytest.mark.usefixtures("circle_model_transport_multispecies_variable_density")

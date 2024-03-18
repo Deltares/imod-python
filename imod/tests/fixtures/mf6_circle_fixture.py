@@ -286,9 +286,9 @@ def circle_model_transport():
         density_concentration_slope=[slope],
         species=["salinity"],
     )    
-    transport_model = imod.mf6.GroundwaterTransportModel()
+    transport_model = imod.mf6.GroundwaterTransportModel(save_flows=True)
     transport_model["ssm"] = imod.mf6.SourceSinkMixing.from_flow_model(
-        gwf_model, "salinity"
+        gwf_model, "salinity", save_flows=True
     )
     transport_model["disv"] = gwf_model["disv"]
 
@@ -307,8 +307,8 @@ def circle_model_transport():
         xt3d_off=False,
         xt3d_rhs=False,
     )
-    transport_model["adv"] = imod.mf6.AdvectionUpstream()
-    transport_model["mst"] = imod.mf6.MobileStorageTransfer(porosity)
+    transport_model["adv"] = imod.mf6.AdvectionUpstream( )
+    transport_model["mst"] = imod.mf6.MobileStorageTransfer(porosity, save_flows=True)
 
     # %% 
     # Define the maximum concentration as the initial conditions, also output
