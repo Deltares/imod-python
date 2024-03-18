@@ -1,3 +1,4 @@
+from filecmp import dircmp
 from pathlib import Path
 
 import geopandas as gpd
@@ -10,7 +11,7 @@ from pytest_cases import parametrize_with_cases
 import imod
 from imod.mf6 import Modflow6Simulation
 from imod.typing.grid import zeros_like
-from filecmp import dircmp
+
 
 @pytest.mark.usefixtures("circle_model")
 @pytest.fixture(scope="function")
