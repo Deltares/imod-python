@@ -42,7 +42,8 @@ def _mask_all_packages(
     model: IModel,
     mask: GridDataArray,
 ):
-    if any([coord not in ["x", "y", "layer", "mesh2d_nFaces", "dx", "dy"] for coord in mask.coords]):
+    spatial_dimension_names = get_spatial_dimension_names(mask)
+    if any([coord not in spatial_dimension_names for coord in mask.coords]):
         raise ValueError("unexpected coordinate dimension in masking domain")
 
     for pkgname, pkg in model.items():
