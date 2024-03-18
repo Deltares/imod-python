@@ -4,7 +4,7 @@ import numpy as np
 import xarray as xr
 
 from imod.mf6.package import Package
-from imod.mf6.utilities.logging_decorators import init_log_decorator
+from imod.logging.logging_decorators import  init_log_decorator
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,

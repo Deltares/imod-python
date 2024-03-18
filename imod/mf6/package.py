@@ -25,7 +25,7 @@ from imod.mf6.pkgbase import (
     TRANSPORT_PACKAGES,
     PackageBase,
 )
-from imod.mf6.utilities.logging_decorators import standard_log_decorator
+from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6.utilities.regrid import (
     RegridderType,
     _regrid_like,

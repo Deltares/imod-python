@@ -6,7 +6,7 @@ from imod.logging import logger
 from imod.mf6 import GroundwaterFlowModel
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.utilities.logging_decorators import init_log_decorator
+from imod.logging.logging_decorators import  init_log_decorator
 from imod.mf6.utilities.regrid import RegridderType
 from imod.schemata import DTypeSchema
 
