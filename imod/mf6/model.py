@@ -21,6 +21,7 @@ import imod
 from imod.mf6.interfaces.imodel import IModel
 from imod.mf6.package import Package
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
+from imod.mf6.utilities.mask import _mask_all_packages
 from imod.mf6.utilities.regrid import (
     _regrid_like,
 )
@@ -28,7 +29,6 @@ from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray
-from imod.mf6.utilities.mask import _mask_all_packages
 
 
 class Modflow6Model( collections.UserDict, IModel, abc.ABC):

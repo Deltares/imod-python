@@ -1,18 +1,18 @@
 
-from imod.mf6.interfaces.isimulation import ISimulation
+import numbers
+
+import numpy as np
+from xarray.core.utils import is_scalar
+
+from imod.mf6.auxiliary_variables import (
+        expand_transient_auxiliary_variables,
+        remove_expanded_auxiliary_variables_from_dataset,
+)
 from imod.mf6.interfaces.imodel import IModel
 from imod.mf6.interfaces.ipackage import IPackage
+from imod.mf6.interfaces.isimulation import ISimulation
 from imod.typing.grid import GridDataArray, get_spatial_dimension_names, is_same_domain
 
-from xarray.core.utils import is_scalar
-import numpy as np
-from imod.mf6.auxiliary_variables import (
-    expand_transient_auxiliary_variables,
-    get_variable_names,
-    remove_expanded_auxiliary_variables_from_dataset,
-)
-
-import numbers
 
 def _mask_all_models(
         simulation: ISimulation,

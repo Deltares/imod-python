@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import abc
-import numbers
 import pathlib
 from collections import defaultdict
 from typing import Any, Mapping, Optional, Tuple, Union
@@ -12,19 +11,15 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 
-
 import imod
-from imod.mf6.auxiliary_variables import (
-    expand_transient_auxiliary_variables,
-    get_variable_names,
-    remove_expanded_auxiliary_variables_from_dataset,
-)
+from imod.mf6.auxiliary_variables import get_variable_names
 from imod.mf6.interfaces.ipackage import IPackage
 from imod.mf6.pkgbase import (
     EXCHANGE_PACKAGES,
     TRANSPORT_PACKAGES,
     PackageBase,
 )
+from imod.mf6.utilities.mask import _mask
 from imod.mf6.utilities.regrid import (
     RegridderType,
     _regrid_like,
@@ -39,7 +34,7 @@ from imod.schemata import (
     ValidationError,
 )
 from imod.typing import GridDataArray
-from imod.mf6.utilities.mask import _mask
+
 
 class Package(PackageBase, IPackage, abc.ABC):
     """
