@@ -47,7 +47,8 @@ Added
   split multi-species simulations.
   :meth:`imod.mf6.Modflow6Simulation.regrid_like` can now regrid simulations that have 1 or more transport models.
 - added logging to various initialization methods, write methods and dump methods. `See the
-  documentation. <https://deltares.github.io/imod-python/api/generated/logging/imod.logging.html>`_
+  documentation <https://deltares.github.io/imod-python/api/generated/logging/imod.logging.html>`_
+  how to activate logging.
 
 Changed
 ~~~~~~~
