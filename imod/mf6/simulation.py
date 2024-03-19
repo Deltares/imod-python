@@ -905,7 +905,12 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             for k, v in self.items()
             if isinstance(v, Modflow6Model) and (v.model_id() == modeltype)
         }
-
+    def get_models(self):
+        return {
+            k: v
+            for k, v in self.items()
+            if isinstance(v, Modflow6Model)
+        }
     def clip_box(
         self,
         time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
@@ -1001,10 +1006,10 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             raise ValueError("a simulation without any models cannot be split.")
 
         original_models = {**flow_models,** transport_models}
-        for model in original_models.values():
+        for model_name, model in original_models.items():
             supported, error_with_object = model.is_support_splitting()
             if not supported:
-                raise ValueError(f"cannot be split due to presence of package '{error_with_object}'")
+                raise ValueError(f"simulation cannot be split due to presence of package '{error_with_object}' in model '{model_name}'")
 
         original_packages = get_packages(self)
 

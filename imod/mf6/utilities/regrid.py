@@ -412,6 +412,12 @@ def _regrid_like(
     target_grid_2d = target_grid.isel(layer=0, drop=True, missing_dims="ignore")
     return clip_by_grid(package, target_grid_2d)
 
+@typedispatch  # type: ignore[no-redef]
+def _regrid_like(
+    package: object, target_grid: GridDataArray, *_
+) -> None:
+    raise ValueError("this object cannot be regridded")
+
 def _get_regridding_domain(
     model: IModel,
     target_grid: GridDataArray,

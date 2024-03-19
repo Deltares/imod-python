@@ -573,7 +573,10 @@ class Package(PackageBase, IPackage, abc.ABC):
         a package with the same options as this package, and with all the data-arrays regridded to another discretization,
         similar to the one used in input argument "target_grid"
         """
-        return _regrid_like(self, target_grid,regridder_types) 
+        try:
+            result = _regrid_like(self, target_grid,regridder_types) 
+        except:
+            raise ValueError("package could not be regridded.")
 
 
     def _skip_masking_dataarray(self, array_name: str) -> bool:
