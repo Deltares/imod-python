@@ -43,10 +43,10 @@ def test_write_package_is_logged(drainage, tmp_path):
     # assert
     with open(logfile_path, "r") as log_file:
         log = log_file.read()
-        assert "Initializing the <class 'imod.mf6.drn.Drainage'> package..." in log
-        assert "Succesfully initialized the <class 'imod.mf6.drn.Drainage'>..." in log        
-        assert "beginning execution of imod.mf6.package.write for object <class 'imod.mf6.drn.Drainage'>" in log
-        assert "finished execution of imod.mf6.package.write  for object <class 'imod.mf6.drn.Drainage'>" in log
+        assert "Initializing the Drainage package..." in log
+        assert "Succesfully initialized the Drainage..." in log        
+        assert "beginning execution of imod.mf6.package.write for object Drainage..." in log
+        assert "finished execution of imod.mf6.package.write  for object Drainage..." in log
 
 
 def test_write_model_is_logged(flow_transport_simulation: imod.mf6.Modflow6Simulation, tmp_path: Path):
@@ -69,8 +69,8 @@ def test_write_model_is_logged(flow_transport_simulation: imod.mf6.Modflow6Simul
     with open(logfile_path, "r") as log_file:
         log = log_file.read()
 
-        assert "beginning execution of imod.mf6.model.write for object <class 'imod.mf6.model_gwt.GroundwaterTransportModel'>" in log
-        assert "finished execution of imod.mf6.model.write  for object <class 'imod.mf6.model_gwt.GroundwaterTransportModel'>" in log        
+        assert "beginning execution of imod.mf6.model.write for object GroundwaterTransportModel" in log
+        assert "finished execution of imod.mf6.model.write  for object GroundwaterTransportModel" in log        
 
 def test_write_simulation_is_logged(flow_transport_simulation: imod.mf6.Modflow6Simulation, tmp_path:Path):
     # arrange
@@ -85,7 +85,7 @@ def test_write_simulation_is_logged(flow_transport_simulation: imod.mf6.Modflow6
     with open(logfile_path, "r") as log_file:
         log = log_file.read()
 
-        assert "beginning execution of imod.mf6.simulation.write for object <class 'imod.mf6.simulation.Modflow6Simulation'>" in log
-        assert "finished execution of imod.mf6.simulation.write  for object <class 'imod.mf6.simulation.Modflow6Simulation'>" in log        
+        assert "beginning execution of imod.mf6.simulation.write for object Modflow6Simulation" in log
+        assert "finished execution of imod.mf6.simulation.write  for object Modflow6Simulation" in log        
 
 

@@ -7,8 +7,8 @@ def standard_log_decorator(start_level: LogLevel = LogLevel.INFO, end_level: Log
     def decorator(fun):
         def wrapper(*args, **kwargs):
             object_name = str(type(args[0]).__name__)
-            start_message = f"beginning execution of {fun.__module__}.{fun.__name__} for object {object_type}..."
-            end_message = f"finished execution of {fun.__module__}.{fun.__name__}  for object {object_type}..."
+            start_message = f"beginning execution of {fun.__module__}.{fun.__name__} for object {object_name}..."
+            end_message = f"finished execution of {fun.__module__}.{fun.__name__}  for object {object_name}..."
 
             logger.log(loglevel=start_level, message=start_message)
             return_value = fun(*args, **kwargs)
@@ -22,8 +22,8 @@ def init_log_decorator(start_level: LogLevel = LogLevel.INFO, end_level: LogLeve
     def decorator(fun):
         def wrapper(*args, **kwargs):
             object_name = str(type(args[0]).__name__)
-            start_message = f"Initializing the {object_type} package..."
-            end_message = f"Succesfully initialized the {object_type}..."
+            start_message = f"Initializing the {object_name} package..."
+            end_message = f"Succesfully initialized the {object_name}..."
 
             logger.log( loglevel=start_level,message=start_message)
             return_value = fun(*args, **kwargs)
