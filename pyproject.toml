@@ -42,7 +42,7 @@ dependencies = [
     "tomli_w",
     "toolz",
     "tqdm",
-    "xarray >=2023.04.0",
+    "xarray >=2023.08.0",
     "xugrid >=0.9.0",
 ]
 
