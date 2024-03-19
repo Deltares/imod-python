@@ -21,7 +21,7 @@ def standard_log_decorator(start_level: LogLevel = LogLevel.INFO, end_level: Log
 def init_log_decorator(start_level: LogLevel = LogLevel.INFO, end_level: LogLevel = LogLevel.DEBUG):
     def decorator(fun):
         def wrapper(*args, **kwargs):
-            object_type = str(type(args[0]))
+            object_name = str(type(args[0]).__name__)
             start_message = f"Initializing the {object_type} package..."
             end_message = f"Succesfully initialized the {object_type}..."
 
