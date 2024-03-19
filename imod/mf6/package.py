@@ -675,3 +675,6 @@ class Package(PackageBase, IPackage, abc.ABC):
             else:
                 result[name] = self.dataset[name].values[()]
         return result
+    
+    def is_support_slicing(self)->bool:
+        return True

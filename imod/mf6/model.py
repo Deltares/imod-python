@@ -28,7 +28,7 @@ from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray
-
+from  typing import Tuple
 
 class Modflow6Model( collections.UserDict, IModel, abc.ABC):
     _mandatory_packages: tuple[str, ...] = ()
@@ -547,3 +547,8 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
     def is_use_newton(self):
         return False
 
+    def is_support_slicing(self)->Tuple[bool, str]:
+        for package_name, package in self.items():
+            if not package.is_support_slicing():
+                return False, f"slicing is not supported for package {package_name}"
+        return True, ""

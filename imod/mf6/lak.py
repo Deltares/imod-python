@@ -1206,3 +1206,6 @@ class Lake(BoundaryCondition):
         f.write(trimmedblock)
         f.write(f"end {title}\n")
         return
+    
+    def is_support_slicing(self)->bool:
+        return False
