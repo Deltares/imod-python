@@ -21,6 +21,7 @@ import imod
 from imod.mf6.interfaces.imodel import IModel
 from imod.mf6.package import Package
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
+from imod.mf6.utilities.mask import _mask_all_packages
 from imod.mf6.utilities.regrid import (
     _regrid_like,
 )
@@ -500,12 +501,8 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
             idomain-like integer array. 1 sets cells to active, 0 sets cells to inactive, 
             -1 sets cells to vertical passthrough
         """
-        if any([coord not in ["x", "y", "layer", "mesh2d_nFaces", "dx", "dy"] for coord in mask.coords]):
-            raise ValueError("unexpected coordinate dimension in masking domain")
 
-        for pkgname, pkg in self.items():
-            self[pkgname] = pkg.mask(mask)
-        self.purge_empty_packages()
+        _mask_all_packages(self, mask)
 
     def purge_empty_packages(self, model_name: Optional[str] = "") -> None:
         """
