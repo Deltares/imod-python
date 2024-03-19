@@ -6,7 +6,7 @@ import inspect
 import pathlib
 from copy import deepcopy
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Tuple, Union
 
 import cftime
 import jinja2
@@ -29,7 +29,7 @@ from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray
-from  typing import Tuple
+
 
 class Modflow6Model( collections.UserDict, IModel, abc.ABC):
     _mandatory_packages: tuple[str, ...] = ()
@@ -478,7 +478,6 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
         a model with similar packages to the input model, and with all the data-arrays regridded to another discretization,
         similar to the one used in input argument "target_grid"
         """
-
         return _regrid_like(self, target_grid, validate)
  
     def mask_all_packages(
@@ -544,8 +543,14 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
     def is_use_newton(self):
         return False
 
-    def is_support_slicing(self)->Tuple[bool, str]:
+    def is_support_splitting(self)->Tuple[bool, str]:
         for package_name, package in self.items():
-            if not package.is_support_slicing():
-                return False, f"slicing is not supported for package {package_name}"
+            if not package.is_support_splitting():
+                return False, package_name
         return True, ""
+    
+    def is_support_regridding(self)->Tuple[bool, str]:
+        for package_name, package in self.items():
+            if not package.is_support_regridding():
+                return False, package_name
+        return True, ""    

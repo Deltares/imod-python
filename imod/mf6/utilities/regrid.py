@@ -308,6 +308,9 @@ def _regrid_like(
     a model with similar packages to the input model, and with all the data-arrays regridded to another discretization,
     similar to the one used in input argument "target_grid"
     """
+    supported, offending_object_name = model.is_support_regridding()
+    if not supported:
+        raise ValueError(f"regridding this model cannot be done due to the presence of package {offending_object_name}")
     new_model = model.__class__()
 
     for pkg_name, pkg in model.items():
@@ -364,6 +367,15 @@ def _regrid_like(
         raise ValueError(
             "Unable to regrid simulation. Regridding can only be done on simulations that have a single flow model."
         )
+    
+    models = simulation.get_models()
+    for model_name, model in models.items():
+        supported, offending_object_name = model.is_support_regridding()
+        if not supported:
+            raise ValueError(
+                f"Unable to regrid simulation, due to the presence of package '{offending_object_name}' in model {model_name} "
+            )            
+            
     result = simulation.__class__(regridded_simulation_name)
     for key, item in simulation.items():
         if isinstance(item, IModel):

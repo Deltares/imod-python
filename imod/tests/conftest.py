@@ -45,6 +45,7 @@ from .fixtures.mf6_lake_package_fixture import (
     lake_table,
     naardermeer,
 )
+from .fixtures.mf6_rectangle_with_lakes import rectangle_with_lakes
 from .fixtures.mf6_small_models_fixture import (
     solution_settings,
     structured_flow_model,
@@ -73,5 +74,3 @@ from .fixtures.mf6_welltest_fixture import (
 )
 from .fixtures.msw_fixture import fixed_format_parser
 from .fixtures.msw_model_fixture import coupled_mf6_model, msw_model
-
-from .fixtures.mf6_rectangle_with_lakes import rectangle_with_lakes

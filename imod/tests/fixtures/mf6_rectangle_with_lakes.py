@@ -1,8 +1,10 @@
 import numpy as np
-import xarray as xr
 import pytest
+import xarray as xr
+
 import imod
-from imod.mf6.lak import LakeData, Lake
+from imod.mf6.lak import Lake, LakeData
+
 
 def create_lake(idomain, xmin_index, xmax_index, ymin_index, ymax_index, name):
 

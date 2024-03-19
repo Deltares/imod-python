@@ -1,7 +1,10 @@
 
-import pytest
 import copy
+
+import pytest
+
 from imod.typing.grid import zeros_like
+
 
 @pytest.mark.usefixtures("rectangle_with_lakes")
 def test_mf6_partition_with_lakes(rectangle_with_lakes, tmp_path):

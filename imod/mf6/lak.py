@@ -1207,5 +1207,8 @@ class Lake(BoundaryCondition):
         f.write(f"end {title}\n")
         return
     
-    def is_support_slicing(self)->bool:
+    def is_support_splitting(self)->bool:
+        return False
+    
+    def is_support_regridding(self)->bool:
         return False

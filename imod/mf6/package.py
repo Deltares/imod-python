@@ -619,5 +619,8 @@ class Package(PackageBase, IPackage, abc.ABC):
                 result[name] = self.dataset[name].values[()]
         return result
     
-    def is_support_slicing(self)->bool:
+    def is_support_splitting(self)->bool:
         return True
+    
+    def is_support_regridding(self)->bool:
+        return True    

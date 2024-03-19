@@ -1000,7 +1000,12 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         if not any(flow_models) and not any(transport_models):
             raise ValueError("a simulation without any models cannot be split.")
 
-        original_models = get_models(self)
+        original_models = {**flow_models,** transport_models}
+        for model in original_models.values():
+            supported, error_with_object = model.is_support_splitting()
+            if not supported:
+                raise ValueError(f"cannot be split due to presence of package '{error_with_object}'")
+
         original_packages = get_packages(self)
 
         partition_info = create_partition_info(submodel_labels)

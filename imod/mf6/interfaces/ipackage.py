@@ -1,6 +1,6 @@
 import abc
 from abc import abstractmethod
-from typing import Any
+from typing import Any, Tuple
 
 from imod.mf6.interfaces.ipackagebase import IPackageBase
 
@@ -25,3 +25,7 @@ class IPackage(IPackageBase, metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def auxiliary_data_fields(self) -> dict[str, str]:
         raise NotImplementedError
+    
+    @abstractmethod    
+    def is_support_regridding(self)->Tuple[bool, str]:
+         raise NotImplementedError           
