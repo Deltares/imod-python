@@ -6,7 +6,7 @@ from imod.logging.loglevel import LogLevel
 def standard_log_decorator(start_level: LogLevel = LogLevel.INFO, end_level: LogLevel = LogLevel.DEBUG):
     def decorator(fun):
         def wrapper(*args, **kwargs):
-            object_type = str(type(args[0]))
+            object_name = str(type(args[0]).__name__)
             start_message = f"beginning execution of {fun.__module__}.{fun.__name__} for object {object_type}..."
             end_message = f"finished execution of {fun.__module__}.{fun.__name__}  for object {object_type}..."
 
