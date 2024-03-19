@@ -11,6 +11,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.logging.logging_decorators import init_log_decorator
 from imod.mf6.boundary_condition import (
     BoundaryCondition,
     DisStructuredBoundaryCondition,
@@ -186,6 +187,8 @@ class Well(BoundaryCondition, IPointDataPackage):
 
     _regrid_method: dict[str, Tuple[RegridderType, str]] = {}
 
+
+    @init_log_decorator()
     def __init__(
         self,
         x: list[float],
@@ -690,6 +693,8 @@ class WellDisStructured(DisStructuredBoundaryCondition):
 
     _write_schemata = {}
 
+
+    @init_log_decorator()
     def __init__(
         self,
         layer,
@@ -849,6 +854,8 @@ class WellDisVertices(DisVerticesBoundaryCondition):
 
     _write_schemata = {}
 
+
+    @init_log_decorator()
     def __init__(
         self,
         layer,

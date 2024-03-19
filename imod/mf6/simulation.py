@@ -20,6 +20,7 @@ import xugrid as xu
 import imod
 import imod.logging
 import imod.mf6.exchangebase
+from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwfgwt import GWFGWT
 from imod.mf6.gwtgwt import GWTGWT
@@ -218,6 +219,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         d["solutiongroups"] = [solutiongroups]
         return self._template.render(d)
 
+    @standard_log_decorator()
     def write(
         self,
         directory=".",
@@ -816,6 +818,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         dis_id = model[diskey]._pkg_id
         return flow_model_path / f"{diskey}.{dis_id}.grb"
 
+    @standard_log_decorator()
     def dump(
         self, directory=".", validate: bool = True, mdal_compliant: bool = False
     ) -> None:

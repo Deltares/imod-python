@@ -12,7 +12,10 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-from imod.mf6.auxiliary_variables import get_variable_names
+from imod.logging.logging_decorators import standard_log_decorator
+from imod.mf6.auxiliary_variables import (
+    get_variable_names,
+)
 from imod.mf6.interfaces.ipackage import IPackage
 from imod.mf6.pkgbase import (
     EXCHANGE_PACKAGES,
@@ -256,6 +259,8 @@ class Package(PackageBase, IPackage, abc.ABC):
 
         return layered, values
 
+
+    @standard_log_decorator()
     def write(
         self,
         pkgname: str,
@@ -281,6 +286,7 @@ class Package(PackageBase, IPackage, abc.ABC):
                             path = pkgdirectory / f"{key}.dat"
                             self.write_text_griddata(path, da, dtype)
 
+    @standard_log_decorator()
     def _validate(self, schemata: dict, **kwargs) -> dict[str, list[ValidationError]]:
         errors = defaultdict(list)
         for variable, var_schemata in schemata.items():

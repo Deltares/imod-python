@@ -5,6 +5,7 @@ import cftime
 import numpy as np
 import xarray as xr
 
+from imod.logging.logging_decorators import init_log_decorator
 from imod.mf6.auxiliary_variables import expand_transient_auxiliary_variables
 from imod.mf6.exchangebase import ExchangeBase
 from imod.mf6.package import Package
@@ -23,6 +24,7 @@ class GWTGWT(ExchangeBase):
     _pkg_id = "gwtgwt"
     _template = Package._initialize_template(_pkg_id)
 
+    @init_log_decorator()
     def __init__(
         self,
         transport_model_id1: str,
