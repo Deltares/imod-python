@@ -1,3 +1,4 @@
+from filecmp import dircmp
 from pathlib import Path
 
 import geopandas as gpd
@@ -381,4 +382,26 @@ def test_partition_transport_multispecies(    tmp_path: Path,
 
     #TODO: also compare budget results. For now just open them. 
     _ = new_circle_model.open_flow_budget()
-    _ = new_circle_model.open_transport_budget()     
+    _ = new_circle_model.open_transport_budget()
+
+@pytest.mark.usefixtures("circle_model")
+def test_slice_model_twice(tmp_path, circle_model):
+
+    flow_model = circle_model["GWF_1"]
+    active = flow_model.domain
+
+    submodel_labels = zeros_like(active)
+    submodel_labels = submodel_labels.drop_vars("layer")
+    submodel_labels.values[ :, 50:] = 1
+    submodel_labels = submodel_labels.sel(layer=0, drop=True)
+
+    split_simulation_1 = circle_model.split(submodel_labels)
+    split_simulation_1.write(tmp_path/"split_simulation_1", binary=False, validate=True, use_absolute_paths=False)
+    split_simulation_2 = circle_model.split(submodel_labels)
+    split_simulation_2.write(tmp_path/"split_simulation_2", binary=False, validate=True, use_absolute_paths=False)    
+
+     #check that text output was not affected by splitting
+    diff = dircmp(tmp_path/"split_simulation_1", tmp_path/"split_simulation_2")
+    assert len(diff.diff_files) == 0
+    assert len(diff.left_only) == 0
+    assert len(diff.right_only) == 0       	
