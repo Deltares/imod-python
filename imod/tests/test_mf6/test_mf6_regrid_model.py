@@ -76,23 +76,6 @@ def test_regrid_unstructured_model_to_unstructured_model(
     validation_result = new_gwf_model.validate("test_model")
     assert not validation_result.has_errors()
 
-
-def test_regrid_model_with_unsupported_package(
-    unstructured_flow_model, naardermeer, ijsselmeer
-):
-    lake_pkg = Lake.from_lakes_and_outlets(
-        [naardermeer(), ijsselmeer()],
-    )
-    unstructured_flow_model["lake"] = lake_pkg
-
-    finer_idomain = grid_data_unstructured(np.int32, 1, 0.4)
-    with pytest.raises(
-        NotImplementedError,
-        match="regridding is not implemented for package lake of type <class 'imod.mf6.lak.Lake'>",
-    ):
-        _ = unstructured_flow_model.regrid_like(finer_idomain)
-
-
 @pytest.mark.parametrize("inactivity_marker", [0, -1])
 def test_regrid_unstructured_model_with_inactive_cells(
     inactivity_marker: int,

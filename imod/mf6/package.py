@@ -575,9 +575,11 @@ class Package(PackageBase, IPackage, abc.ABC):
         """
         try:
             result = _regrid_like(self, target_grid,regridder_types) 
+        except ValueError as e:
+            raise e
         except:
             raise ValueError("package could not be regridded.")
-
+        return result
 
     def _skip_masking_dataarray(self, array_name: str) -> bool:
         if hasattr(self, "_skip_mask_arrays"):

@@ -416,7 +416,7 @@ def _regrid_like(
 def _regrid_like(
     package: object, target_grid: GridDataArray, *_
 ) -> None:
-    raise ValueError("this object cannot be regridded")
+    raise TypeError("this object cannot be regridded")
 
 def _get_regridding_domain(
     model: IModel,
