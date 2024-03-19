@@ -34,8 +34,6 @@ def rectangle_with_lakes():
     x = np.arange(xmin, xmax, dx) + 0.5 * dx
     coords = {"layer": layer, "y": y, "x": x}
     bottom = xr.DataArray([-200.0, -300.0], {"layer": layer}, ("layer",))
-    # top & bottom
-    surface = 0.0
 
     # Discretization data
     icelltype = xr.DataArray([1, 0], {"layer": layer}, ("layer",))

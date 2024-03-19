@@ -1,8 +1,10 @@
+import numpy as np
 import pytest
 import xarray as xr
-import numpy as np
 
 from imod.typing.grid import zeros_like
+
+
 def finer_grid(grid):
     xmin = grid.coords["x"].min().values[()]
     xmax = grid.coords["x"].max().values[()]

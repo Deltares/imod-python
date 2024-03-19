@@ -3,6 +3,7 @@
 from imod.mf6.interfaces.idict import IDict
 from imod.mf6.interfaces.imodel import IModel
 
+
 class ISimulation(IDict):   
     """
     Interface for imod.mf6.simulation.Modflow6Simulation

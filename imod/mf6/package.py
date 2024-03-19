@@ -577,7 +577,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             result = _regrid_like(self, target_grid,regridder_types) 
         except ValueError as e:
             raise e
-        except:
+        except  Exception:
             raise ValueError("package could not be regridded.")
         return result
 

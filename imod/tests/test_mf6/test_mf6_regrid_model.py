@@ -4,7 +4,6 @@ import numpy as np
 import pytest
 
 import imod
-from imod.mf6.lak import Lake
 from imod.tests.fixtures.mf6_small_models_fixture import (
     grid_data_structured,
     grid_data_unstructured,
