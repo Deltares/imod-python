@@ -409,12 +409,20 @@ def test_partition_transport_multispecies(    tmp_path: Path,
 
     np.testing.assert_allclose(conc.values, conc_new["concentration"].values, rtol=4e-4, atol=5e-3)
     np.testing.assert_allclose(head.values, head_new["head"].values, atol=1e-3)
-    for key in ["flow-lower-face", "flow-horizontal-face"]:
+    # Compare the budgets.
+    # The tolerance is set as the maximum value in the  gwf-gwf or gwt-gwt 
+    # exchange as this contains flow/transport in the split case that would 
+    # be in one of the other arrays in the unsplit case.  
+    for key in ["flow-lower-face", "flow-horizontal-face", "sto-ss", "rch"]:
         atol = flow_budget_new["gwf-gwf"].values.max()[()]*1.0001
         np.testing.assert_allclose(
             flow_budget[key].values, flow_budget_new[key].values, rtol = 9, atol=atol
         )
-
+    for key in ["flow-lower-face", "flow-horizontal-face", "storage-aqueous", "ssm"]:
+        atol = transport_budget_new["gwt-gwt"].values.max()[()]*1.0001
+        np.testing.assert_allclose(
+            transport_budget[key].values, transport_budget_new[key].values, rtol = 9, atol=atol
+        )
 
 @pytest.mark.usefixtures("circle_model")
 def test_slice_model_twice(tmp_path, circle_model):
