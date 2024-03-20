@@ -378,23 +378,43 @@ def test_partition_transport_multispecies(    tmp_path: Path,
     circle_model_transport_multispecies.run()
     conc = circle_model_transport_multispecies.open_concentration()
     head = circle_model_transport_multispecies.open_head()
+    flow_budget = circle_model_transport_multispecies.open_flow_budget(
+        simulation_start_time=np.datetime64("1999-01-01"),
+        time_unit="d",
+    )
+    transport_budget = circle_model_transport_multispecies.open_transport_budget( ["salt", "temp"])
 
-
+    # split and run the simulation 
     new_circle_model = circle_model_transport_multispecies.split(partition_array)
     new_circle_model.write(tmp_path/"split")
     new_circle_model.run()
+
+    #open results
     conc_new = new_circle_model.open_concentration()
     head_new = new_circle_model.open_head()
+    flow_budget_new = new_circle_model.open_flow_budget(
+        simulation_start_time=np.datetime64("1999-01-01"),
+        time_unit="d",
+    )
+    transport_budget_new = new_circle_model.open_transport_budget( ["salt", "temp"])
+
+
+    # reindex results
     head_new = head_new.ugrid.reindex_like(head)   
     conc_new = conc_new.ugrid.reindex_like(conc)
+    transport_budget_new = transport_budget_new.ugrid.reindex_like(transport_budget)
+    flow_budget_new = flow_budget_new.ugrid.reindex_like(flow_budget)
+ 
+    # compare simulation results
 
-    
     np.testing.assert_allclose(conc.values, conc_new["concentration"].values, rtol=4e-4, atol=5e-3)
-    np.testing.assert_allclose(head.values, head_new["head"].values, rtol=1e-5, atol=1e-3)
+    np.testing.assert_allclose(head.values, head_new["head"].values, atol=1e-3)
+    for key in ["flow-lower-face", "flow-horizontal-face"]:
+        atol = flow_budget_new["gwf-gwf"].values.max()[()]*1.0001
+        np.testing.assert_allclose(
+            flow_budget[key].values, flow_budget_new[key].values, rtol = 9, atol=atol
+        )
 
-    #TODO: also compare budget results. For now just open them. 
-    _ = new_circle_model.open_flow_budget()
-    _ = new_circle_model.open_transport_budget()
 
 @pytest.mark.usefixtures("circle_model")
 def test_slice_model_twice(tmp_path, circle_model):

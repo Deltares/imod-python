@@ -114,7 +114,7 @@ def make_circle_model_flow_with_transport_data(species: list[str]):
 
 
 
-    gwf_model = imod.mf6.GroundwaterFlowModel()
+    gwf_model = imod.mf6.GroundwaterFlowModel(save_flows=True)
     gwf_model["disv"] = imod.mf6.VerticesDiscretization(
         top=10.0, bottom=bottom, idomain=idomain
     )
@@ -136,7 +136,7 @@ def make_circle_model_flow_with_transport_data(species: list[str]):
         save_flows=False,
     )
     gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
-    gwf_model["rch"] = imod.mf6.Recharge(rch_rate, concentration=rch_concentration)
+    gwf_model["rch"] = imod.mf6.Recharge(rch_rate,save_flows=True, concentration=rch_concentration)
 
     simulation = imod.mf6.Modflow6Simulation("circle")
     simulation["GWF_1"] = gwf_model
@@ -361,7 +361,7 @@ def circle_model_transport_multispecies_variable_density():
 
     for specie in species:
 
-        transport_model = imod.mf6.GroundwaterTransportModel()
+        transport_model = imod.mf6.GroundwaterTransportModel(save_flows=True)
         transport_model["ssm"] = imod.mf6.SourceSinkMixing.from_flow_model(
             gwf_model, specie, save_flows=True
         )
