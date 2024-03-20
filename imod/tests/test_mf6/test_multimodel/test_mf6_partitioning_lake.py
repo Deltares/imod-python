@@ -55,3 +55,27 @@ def test_mf6_package_regrid_with_lakes(rectangle_with_lakes, tmp_path):
 
     with pytest.raises(ValueError, match="package(.+)not be regridded"):
         _ = package.regrid_like( new_grid)
+
+
+@pytest.mark.usefixtures("rectangle_with_lakes")
+def test_mf6_simulation_clip_with_lakes(rectangle_with_lakes, tmp_path):
+    simulation = rectangle_with_lakes
+
+    with pytest.raises(ValueError, match="simulation(.+)clipped(.*)lake"):
+        _ = simulation.clip_box(x_min= 200, y_min=  200, x_max= 1000, y_max= 1000)
+
+
+@pytest.mark.usefixtures("rectangle_with_lakes")
+def test_mf6_model_clip_with_lakes(rectangle_with_lakes, tmp_path):
+    model = rectangle_with_lakes["GWF_1"]
+
+    with pytest.raises(ValueError, match="model(.+)clipped(.*)lake"):
+        _ = model.clip_box(x_min= 200, y_min=  200, x_max= 1000, y_max= 1000)
+
+@pytest.mark.usefixtures("rectangle_with_lakes")
+def test_mf6_package_clip_with_lakes(rectangle_with_lakes, tmp_path):
+    simulation = rectangle_with_lakes
+    package = simulation["GWF_1"]["lake"]
+
+    with pytest.raises(ValueError, match="package(.+)clipping"):
+        _ = package.clip_box(x_min= 200, y_min=  200, x_max= 1000, y_max= 1000)

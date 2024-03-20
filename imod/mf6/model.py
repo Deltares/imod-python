@@ -388,6 +388,10 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
         y_max: optional, float
         state_for_boundary :
         """
+        supported, error_with_object = self.is_support_clipping()
+        if not supported:
+            raise ValueError(f"model cannot be clipped due to presence of package '{error_with_object}' in model")     
+
         clipped = self._clip_box_packages(
             time_min,
             time_max,
@@ -397,6 +401,7 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
             x_max,
             y_min,
             y_max,
+            state_for_boundary
         )
 
         return clipped
@@ -556,5 +561,11 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
     def is_support_regridding(self)->Tuple[bool, str]:
         for package_name, package in self.items():
             if not package.is_support_regridding():
+                return False, package_name
+        return True, ""    
+
+    def is_support_clipping(self)->Tuple[bool, str]:
+        for package_name, package in self.items():
+            if not package.is_support_clipping():
                 return False, package_name
         return True, ""    

@@ -1214,3 +1214,6 @@ class Lake(BoundaryCondition):
     
     def is_support_regridding(self)->bool:
         return False
+    
+    def is_support_clipping(self)->bool:
+        return False         

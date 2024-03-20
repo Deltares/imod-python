@@ -467,6 +467,10 @@ class Package(PackageBase, IPackage, abc.ABC):
         -------
         clipped: Package
         """
+        if not self.is_support_clipping():
+            raise ValueError("this package does not support clipping.")
+
+
         selection = self.dataset
         if "time" in selection:
             time = selection["time"].values
@@ -635,3 +639,6 @@ class Package(PackageBase, IPackage, abc.ABC):
     
     def is_support_regridding(self)->bool:
         return True    
+    
+    def is_support_clipping(self)->bool:
+        return True        

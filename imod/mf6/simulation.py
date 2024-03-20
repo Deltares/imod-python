@@ -963,7 +963,11 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         if not self.has_one_flow_model():
             raise ValueError(
                 "Unable to clip simulation. Clipping can only be done on simulations that have a single flow model ."
-            )        
+            ) 
+        for model_name, model in self.get_models().items():
+            supported, error_with_object = model.is_support_clipping()
+            if not supported:
+                raise ValueError(f"simulation cannot be clipped due to presence of package '{error_with_object}' in model '{model_name}'")               
 
         clipped = type(self)(name=self.name)
         for key, value in self.items():
