@@ -10,6 +10,7 @@ from imod.mf6.auxiliary_variables import expand_transient_auxiliary_variables
 from imod.mf6.exchangebase import ExchangeBase
 from imod.mf6.package import Package
 from imod.typing import GridDataArray
+from imod.typing.grid import ones_like
 
 
 class GWTGWT(ExchangeBase):
@@ -48,7 +49,7 @@ class GWTGWT(ExchangeBase):
             "model_name_2": transport_model_id2,
             "flow_model_name_1": flow_model_id1,
             "flow_model_name_2": flow_model_id2,
-            "ihc": xr.DataArray(np.ones_like(cl1, dtype=int)),
+            "ihc": ones_like(cl1, dtype=int),
             "cl1": cl1,
             "cl2": cl2,
             "hwva": hwva,
