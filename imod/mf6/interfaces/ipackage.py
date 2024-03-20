@@ -27,5 +27,5 @@ class IPackage(IPackageBase, metaclass=abc.ABCMeta):
         raise NotImplementedError
     
     @abstractmethod    
-    def is_support_regridding(self)->Tuple[bool, str]:
+    def is_support_regridding(self)->bool:
          raise NotImplementedError           
