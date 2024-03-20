@@ -3,6 +3,7 @@ from typing import Optional, Sequence
 import numpy as np
 import xarray as xr
 
+from imod.logging.logging_decorators import init_log_decorator
 from imod.mf6.package import Package
 from imod.schemata import DTypeSchema
 
@@ -98,6 +99,7 @@ class Buoyancy(Package):
 
     _write_schemata = {}
 
+    @init_log_decorator()
     def __init__(
         self,
         reference_density: float,

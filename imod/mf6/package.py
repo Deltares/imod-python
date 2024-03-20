@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import abc
-import numbers
 import pathlib
 from collections import defaultdict
 from typing import Any, Mapping, Optional, Tuple, Union
@@ -11,13 +10,11 @@ import jinja2
 import numpy as np
 import xarray as xr
 import xugrid as xu
-from xarray.core.utils import is_scalar
 
 import imod
+from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6.auxiliary_variables import (
-    expand_transient_auxiliary_variables,
     get_variable_names,
-    remove_expanded_auxiliary_variables_from_dataset,
 )
 from imod.mf6.interfaces.ipackage import IPackage
 from imod.mf6.pkgbase import (
@@ -25,6 +22,7 @@ from imod.mf6.pkgbase import (
     TRANSPORT_PACKAGES,
     PackageBase,
 )
+from imod.mf6.utilities.mask import _mask
 from imod.mf6.utilities.regrid import (
     RegridderType,
     _regrid_like,
@@ -261,6 +259,8 @@ class Package(PackageBase, IPackage, abc.ABC):
 
         return layered, values
 
+
+    @standard_log_decorator()
     def write(
         self,
         pkgname: str,
@@ -286,6 +286,7 @@ class Package(PackageBase, IPackage, abc.ABC):
                             path = pkgdirectory / f"{key}.dat"
                             self.write_text_griddata(path, da, dtype)
 
+    @standard_log_decorator()
     def _validate(self, schemata: dict, **kwargs) -> dict[str, list[ValidationError]]:
         errors = defaultdict(list)
         for variable, var_schemata in schemata.items():
@@ -540,59 +541,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             The package with part masked.
         """
 
-        masked = {}
-        if hasattr(self,"auxiliary_data_fields"):
-            remove_expanded_auxiliary_variables_from_dataset(self)
-        for var in self.dataset.data_vars.keys():
-            if self._skip_masking_variable(var, self.dataset[var]):
-                masked[var] = self.dataset[var]
-            else:
-                masked[var] = self._mask_spatial_var(var, mask)
-        if hasattr(self,"auxiliary_data_fields"):
-            expand_transient_auxiliary_variables(self)
-        return type(self)(**masked)
-
-    def _skip_masking_variable(self, var: str, da: GridDataArray)->bool: 
-        if self._skip_masking_dataarray(var) or len(da.dims) == 0 or set(da.coords).issubset(["layer"]):
-            return True
-        if is_scalar(da.values[()]):
-            return True
-        spatial_dims = ["x", "y", "mesh2d_nFaces", "layer"]
-        if not np.any( [coord in spatial_dims for coord in da.coords]):
-            return True
-        return False
-
-    def _mask_spatial_var(self, var: str, mask: GridDataArray)->GridDataArray:
-        da = self.dataset[var]
-        array_mask = self._adjust_mask_for_unlayered_data(da, mask)
-
-        if issubclass(da.dtype.type, numbers.Integral):
-            if var == "idomain":
-                return da.where(array_mask > 0, other=array_mask)
-            else:
-                return da.where(array_mask > 0, other=0)
-        elif issubclass(da.dtype.type, numbers.Real):
-            return da.where(array_mask > 0)
-        else:
-            raise TypeError(
-                f"Expected dtype float or integer. Received instead: {da.dtype}"
-            )
-
-    def _adjust_mask_for_unlayered_data(self, da: GridDataArray, mask: GridDataArray)->GridDataArray:
-        '''
-        Some arrays are not layered while the mask is layered (for example the
-        top array in dis or disv packaged). In that case we use the top layer of
-        the mask to perform the masking. If layer is not a dataset dimension,
-        but still a dataset coordinate, we limit the mask to the relevant layer
-        coordinate(s). 
-        '''
-        array_mask  = mask
-        if "layer" in da.coords and "layer" not in da.dims:
-            array_mask = mask.sel(layer=da.coords["layer"])        
-        if "layer" not in da.coords and "layer" in array_mask.coords:
-            array_mask = mask.isel(layer=0)
-
-        return array_mask              
+        return _mask(self, mask)
 
 
     def regrid_like(

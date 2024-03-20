@@ -18,9 +18,11 @@ import xugrid as xu
 from jinja2 import Template
 
 import imod
+from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6.interfaces.imodel import IModel
 from imod.mf6.package import Package
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
+from imod.mf6.utilities.mask import _mask_all_packages
 from imod.mf6.utilities.regrid import (
     _regrid_like,
 )
@@ -184,7 +186,8 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
 
         k = npf["k"]
         return k
-
+    
+    @standard_log_decorator()
     def validate(self, model_name: str = "") -> StatusInfoBase:
         try:
             diskey = self._get_diskey()
@@ -223,7 +226,8 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
                 model_status_info.add(pkg_errors_to_status_info(pkg_name, pkg_errors))
 
         return model_status_info
-
+    
+    @standard_log_decorator()
     def write(
         self, modelname, globaltimes, validate: bool, write_context: WriteContext
     ) -> StatusInfoBase:
@@ -289,6 +293,7 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
 
         return NestedStatusInfo(modelname)
 
+    @standard_log_decorator()
     def dump(
         self, directory, modelname, validate: bool = True, mdal_compliant: bool = False
     ):
@@ -500,12 +505,8 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
             idomain-like integer array. 1 sets cells to active, 0 sets cells to inactive, 
             -1 sets cells to vertical passthrough
         """
-        if any([coord not in ["x", "y", "layer", "mesh2d_nFaces", "dx", "dy"] for coord in mask.coords]):
-            raise ValueError("unexpected coordinate dimension in masking domain")
 
-        for pkgname, pkg in self.items():
-            self[pkgname] = pkg.mask(mask)
-        self.purge_empty_packages()
+        _mask_all_packages(self, mask)
 
     def purge_empty_packages(self, model_name: Optional[str] = "") -> None:
         """

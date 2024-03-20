@@ -1,5 +1,7 @@
 from abc import abstractmethod
 
+from imod.logging.loglevel import LogLevel
+
 
 class ILogger:
     """
@@ -65,3 +67,21 @@ class ILogger:
             message to be logged
         """
         raise NotImplementedError
+
+    def log(self, loglevel: LogLevel, message: str) -> None:
+        '''
+        logs a message with the specified urgency level.
+        '''
+        match loglevel:
+            case LogLevel.DEBUG:
+                self.debug(message)
+            case LogLevel.INFO:
+                self.info(message)
+            case LogLevel.WARNING:
+                self.warning(message)   
+            case LogLevel.ERROR:
+                self.error(message)   
+            case LogLevel.CRITICAL:      
+                self.critical(message)   
+            case _:
+                raise ValueError(f"Unknown logging urgency at level {loglevel}")

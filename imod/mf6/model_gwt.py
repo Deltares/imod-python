@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Optional
 
+from imod.logging.logging_decorators import init_log_decorator
 from imod.mf6.model import Modflow6Model
 
 
@@ -15,6 +16,7 @@ class GroundwaterTransportModel(Modflow6Model):
     _model_id = "gwt6"
     _template = Modflow6Model._initialize_template("gwt-nam.j2")
 
+    @init_log_decorator()
     def __init__(
         self,
         listing_file: Optional[str] = None,

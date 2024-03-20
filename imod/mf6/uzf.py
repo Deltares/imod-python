@@ -1,6 +1,7 @@
 import numpy as np
 import xarray as xr
 
+from imod.logging.logging_decorators import init_log_decorator
 from imod.mf6.boundary_condition import AdvancedBoundaryCondition, BoundaryCondition
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.schemata import (
@@ -201,7 +202,8 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
     _pkg_id = "uzf"
 
     _template = BoundaryCondition._initialize_template(_pkg_id)
-
+    
+    @init_log_decorator()
     def __init__(
         self,
         surface_depression_depth,
