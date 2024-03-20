@@ -7,6 +7,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.logging import LoggerType, LogLevel
 from imod.mf6.utilities.package import get_repeat_stress
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
@@ -79,6 +80,9 @@ def transient_concentration_drainage():
 
 
 def test_write(drainage, tmp_path):
+
+    imod.logging.configure(LoggerType.PYTHON, log_level = LogLevel.DEBUG  ,add_default_file_handler=True, add_default_stream_handler = False)
+
     drn = imod.mf6.Drainage(**drainage)
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
     drn.write("mydrn", [1], write_context)

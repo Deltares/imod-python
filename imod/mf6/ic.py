@@ -3,6 +3,7 @@ from typing import Optional, Tuple
 
 import numpy as np
 
+from imod.logging.logging_decorators import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.utilities.regrid import RegridderType
@@ -68,6 +69,7 @@ class InitialConditions(Package, IRegridPackage):
         ),  # TODO set to barycentric once supported
     }
 
+    @init_log_decorator()
     def __init__(self, start=None, head=None, validate: bool = True):
         if start is None:
             start = head

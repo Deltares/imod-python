@@ -3,6 +3,7 @@ from typing import Optional, Tuple
 
 import numpy as np
 
+from imod.logging.logging_decorators import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.utilities.regrid import RegridderType
@@ -165,6 +166,7 @@ class SpecificStorage(StorageBase):
 
     _template = Package._initialize_template(_pkg_id)
 
+    @init_log_decorator()
     def __init__(
         self,
         specific_storage,
@@ -300,7 +302,7 @@ class StorageCoefficient(StorageBase):
     }
 
     _template = Package._initialize_template(_pkg_id)
-
+    @init_log_decorator()
     def __init__(
         self,
         storage_coefficient,

@@ -5,6 +5,7 @@ from typing import Optional, Tuple, Union
 
 import numpy as np
 
+from imod.logging.logging_decorators import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.utilities.dataset import is_dataarray_none
@@ -83,6 +84,7 @@ class OutputControl(Package, IRegridPackage):
     _write_schemata = {}
     _regrid_method: dict[str, Tuple[RegridderType, str]] = {}
 
+    @init_log_decorator()
     def __init__(
         self,
         save_head=None,
