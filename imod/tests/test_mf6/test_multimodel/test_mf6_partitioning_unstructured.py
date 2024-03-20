@@ -355,23 +355,14 @@ def test_partition_transport(    tmp_path: Path,
         concentration.values, new_concentration["concentration"].values, rtol=7e-5, atol=3e-3
     )
 
+    # Compare the budgets before and after splitting the simulation. 
+    # The tolerance is set as the maximum value in the  gwt-gwt 
+    # exchange as this contains mass transport in the split case that would 
+    # be in one of the other arrays in the unsplit case.  
     for budget_term in ("ssm", "flow-lower-face", "storage-aqueous", "flow-horizontal-face"):
-        rtol = 7e-5
-        atol = 3e-3
-        if budget_term == "flow-lower-face":
-            atol = 1.45
-            rtol = 0.008          
-        if budget_term == "flow-horizontal-face":
-            atol =0.33
-            rtol = 8e-3 
-            if partition_array["name"].values[()] == "concentric":
-                atol = new_budget["gwt-gwt"].values.max()
-                rtol = atol*20
-        if budget_term == "storage-aqueous":            
-            atol = 0.33
-            rtol = 0.00077       
+        atol = new_budget["gwt-gwt"].values.max()
         np.testing.assert_allclose(
-            budget[budget_term].values, new_budget[budget_term].values, rtol=rtol, atol=atol
+            budget[budget_term].values, new_budget[budget_term].values, atol=atol
         )
 
 
