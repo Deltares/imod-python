@@ -204,7 +204,9 @@ def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, lis
 @typedispatch   # type: ignore[no-redef]
 def _regrid_like(
     package: IRegridPackage,
-    target_grid: GridDataArray,
+    target_grid: GridDataArray,    
+    regrid_context: RegridderInstancesCollection,
+
     regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
 ) -> IPackage:
     """
@@ -245,10 +247,6 @@ def _regrid_like(
     if hasattr(package,"auxiliary_data_fields"):
         remove_expanded_auxiliary_variables_from_dataset(package)
 
-    regridder_collection = RegridderInstancesCollection(
-        package.dataset, target_grid=target_grid
-    )
-
     regridder_settings = package.get_regrid_methods()
     if regridder_types is not None:
         regridder_settings.update(regridder_types)
@@ -269,7 +267,7 @@ def _regrid_like(
         new_package_data[varname] = _regrid_array(
             package,
             varname,
-            regridder_collection,
+            regrid_context,
             regridder_name,
             regridder_function,
             target_grid,
@@ -309,17 +307,17 @@ def _regrid_like(
     similar to the one used in input argument "target_grid"
     """
     new_model = model.__class__()
-
+    regrid_context = RegridderInstancesCollection(model.domain, target_grid)
     for pkg_name, pkg in model.items():
         if isinstance(pkg, (IRegridPackage, ILineDataPackage, IPointDataPackage)):
-            new_model[pkg_name] = pkg.regrid_like(target_grid)
+            new_model[pkg_name] = pkg.regrid_like(target_grid, regrid_context)
         else:
             raise NotImplementedError(
                 f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
             )
 
     methods = _get_unique_regridder_types(model)
-    output_domain = _get_regridding_domain(model, target_grid, methods)
+    output_domain = _get_regridding_domain(model, target_grid, regrid_context, methods)
     new_model.mask_all_packages(output_domain)
     new_model.purge_empty_packages()
     if validate:
@@ -403,6 +401,7 @@ def _regrid_like(
 def _get_regridding_domain(
     model: IModel,
     target_grid: GridDataArray,
+    regrid_context: RegridderInstancesCollection,
     methods: defaultdict[RegridderType, list[str]],
 ) -> GridDataArray:
     """
@@ -411,11 +410,8 @@ def _get_regridding_domain(
     cells that all regridders consider active.
     """
     idomain = model.domain
-    regridder_collection = RegridderInstancesCollection(
-        idomain, target_grid=target_grid
-    )
     included_in_all = ones_like(target_grid)
-    regridders =[regridder_collection.get_regridder( regriddertype,function) for regriddertype, functionlist in methods.items() for function in functionlist]
+    regridders =[regrid_context.get_regridder( regriddertype,function) for regriddertype, functionlist in methods.items() for function in functionlist]
     for regridder in regridders:
         regridded_idomain = regridder.regrid(idomain)
         included_in_all = included_in_all.where(regridded_idomain.notnull())            

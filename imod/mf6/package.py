@@ -547,6 +547,7 @@ class Package(PackageBase, IPackage, abc.ABC):
     def regrid_like(
         self,
         target_grid: GridDataArray,
+        regrid_context: Any,
         regridder_types: Optional[dict[str, Tuple[RegridderType, str]]] = None,
     ) -> "Package":
         """
@@ -579,7 +580,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         a package with the same options as this package, and with all the data-arrays regridded to another discretization,
         similar to the one used in input argument "target_grid"
         """
-        return _regrid_like(self, target_grid,regridder_types) 
+        return _regrid_like(self, target_grid,regrid_context, regridder_types) 
 
 
     def _skip_masking_dataarray(self, array_name: str) -> bool:
