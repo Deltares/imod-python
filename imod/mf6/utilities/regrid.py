@@ -82,6 +82,8 @@ class RegridderInstancesCollection:
 
     def get_regridder(
         self,
+        source_grid : GridDataArray,
+        target_grid : GridDataArray,
         regridder_type: Union[RegridderType, BaseRegridder],
         method: Optional[str] = None,
     ) -> BaseRegridder:
@@ -168,6 +170,8 @@ def _regrid_array(
 
         # obtain an instance of a regridder for the chosen method
         regridder = regridder_collection.get_regridder(
+            package.dataset[varname],
+            target_grid,
             regridder_name,
             regridder_function,
         )
@@ -411,7 +415,7 @@ def _get_regridding_domain(
     """
     idomain = model.domain
     included_in_all = ones_like(target_grid)
-    regridders =[regrid_context.get_regridder( regriddertype,function) for regriddertype, functionlist in methods.items() for function in functionlist]
+    regridders =[regrid_context.get_regridder(idomain, target_grid, regriddertype,function) for regriddertype, functionlist in methods.items() for function in functionlist]
     for regridder in regridders:
         regridded_idomain = regridder.regrid(idomain)
         included_in_all = included_in_all.where(regridded_idomain.notnull())            
