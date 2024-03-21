@@ -306,3 +306,18 @@ def get_spatial_dimension_names( grid: xu.UgridDataArray)-> list[str]:
 @typedispatch
 def get_spatial_dimension_names( grid: object)-> list[str]:
     return []
+
+@typedispatch
+def get_2d_grid_hash( grid: xr.DataArray)-> int:
+    x = hash(pickle.dumps(grid["x"].values))
+    y = hash(pickle.dumps(grid["y"].values))
+    return x + y
+
+@typedispatch
+def get_2d_grid_hash( grid: xu.UgridDataArray)-> int:
+    g =  hash(pickle.dumps(grid.ugrid.grid))
+    return g
+
+@typedispatch
+def get_2d_grid_hash( grid: object)-> int:
+    raise ValueError("get_2d_grid_hash not supported for this object.")

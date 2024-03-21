@@ -23,7 +23,7 @@ from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.regridding_types import RegridderType
 from imod.schemata import ValidationError
-from imod.typing.grid import GridDataArray, ones_like
+from imod.typing.grid import GridDataArray, ones_like, get_2d_grid_hash
 
 
 class RegridderInstancesCollection:
@@ -44,27 +44,9 @@ class RegridderInstancesCollection:
         self._source_grid = source_grid
         self._target_grid = target_grid
 
-    def __has_regridder(
-        self, regridder_type: type[BaseRegridder], method: Optional[str] = None
-    ) -> bool:
-        return (regridder_type, method) in self.regridder_instances.keys()
+        self.weights_cache = {}
 
-    def __get_existing_regridder(
-        self, regridder_type: type[BaseRegridder], method: Optional[str]
-    ) -> BaseRegridder:
-        if self.__has_regridder(regridder_type, method):
-            return self.regridder_instances[(regridder_type, method)]
-        raise ValueError("no existing regridder of type " + str(regridder_type))
 
-    def __create_regridder(
-        self, regridder_type: type[BaseRegridder], method: Optional[str]
-    ) -> BaseRegridder:
-        method_args = () if method is None else (method,)
-
-        self.regridder_instances[(regridder_type, method)] = regridder_type(
-            self._source_grid, self._target_grid, *method_args
-        )
-        return self.regridder_instances[(regridder_type, method)]
 
     def __get_regridder_class(
         self, regridder_type: RegridderType | BaseRegridder
@@ -108,11 +90,25 @@ class RegridderInstancesCollection:
         a regridder of the specified characteristics
         """
         regridder_class = self.__get_regridder_class(regridder_type)
+        source_hash  = get_2d_grid_hash(source_grid)
+        target_hash  = get_2d_grid_hash(target_grid) 
+        key = (source_hash, target_hash, regridder_class)
 
-        if not self.__has_regridder(regridder_class, method):
-            self.__create_regridder(regridder_class, method)
 
-        return self.__get_existing_regridder(regridder_class, method)
+    
+        if not key in self.weights_cache.keys():
+            kwargs = {"source": source_grid, "target": target_grid}
+            if method is not None:
+                kwargs["method"] = method                
+            regridder = regridder_class(**kwargs)            
+            self.weights_cache[key] = regridder.weights
+        else:
+            kwargs = {}
+            kwargs["weights"] = self.weights_cache[key]
+            kwargs["target"] =  target_grid
+            regridder = regridder_class.from_weights(**kwargs)
+
+        return regridder
 
 
 
