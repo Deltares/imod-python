@@ -98,7 +98,7 @@ class RegridderInstancesCollection:
 
         source_hash  = get_2d_grid_hash(source_grid)
         target_hash  = get_2d_grid_hash(target_grid) 
-        key = (source_hash, target_hash, regridder_class)       
+        key = (source_hash, target_hash, regridder_class, method)       
         if not key in self.weights_cache.keys():
             kwargs = {"source": source_grid, "target": target_grid}
             if method is not None:
