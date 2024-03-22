@@ -90,12 +90,15 @@ class RegridderInstancesCollection:
         a regridder of the specified characteristics
         """
         regridder_class = self.__get_regridder_class(regridder_type)
+
+        if "layer" not in source_grid.coords and "layer" in target_grid.coords:
+            target_grid = copy.deepcopy(target_grid)
+            target_grid = target_grid.drop_vars("layer")
+            
+
         source_hash  = get_2d_grid_hash(source_grid)
         target_hash  = get_2d_grid_hash(target_grid) 
-        key = (source_hash, target_hash, regridder_class)
-
-
-    
+        key = (source_hash, target_hash, regridder_class)       
         if not key in self.weights_cache.keys():
             kwargs = {"source": source_grid, "target": target_grid}
             if method is not None:

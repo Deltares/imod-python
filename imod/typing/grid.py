@@ -309,9 +309,11 @@ def get_spatial_dimension_names( grid: object)-> list[str]:
 
 @typedispatch
 def get_2d_grid_hash( grid: xr.DataArray)-> int:
-    x = hash(pickle.dumps(grid["x"].values))
-    y = hash(pickle.dumps(grid["y"].values))
-    return x + y
+    result = hash(pickle.dumps(grid["x"].values))
+    result += hash(pickle.dumps(grid["y"].values))
+    if " layer"  in grid.coords:
+        result += hash(pickle.dumps(grid["layer"].values))
+    return result
 
 @typedispatch
 def get_2d_grid_hash( grid: xu.UgridDataArray)-> int:
