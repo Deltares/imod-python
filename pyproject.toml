@@ -114,12 +114,15 @@ convention = "numpy"
 "test_examples.py" = ["F401"]
 
 [tool.mypy]
-files = ["imod/mf6/**.py"]
+files = [
+    "imod/mf6/**.py",
+    "imod/logging/**.py",
+]
 follow_imports = "silent"
 warn_unused_configs = true
 
 [[tool.mypy.overrides]]
-module = 'mf6'
+module = ['mf6', 'logging']
 follow_imports = "normal"
 
 [[tool.mypy.overrides]]

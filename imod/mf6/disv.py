@@ -3,7 +3,7 @@ from typing import Optional, Tuple
 import numpy as np
 import pandas as pd
 
-from imod.logging.logging_decorators import init_log_decorator
+from imod.logging import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.utilities.regrid import RegridderType

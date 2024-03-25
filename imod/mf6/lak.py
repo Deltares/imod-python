@@ -15,7 +15,7 @@ import pandas as pd
 import xarray as xr
 
 from imod import mf6
-from imod.logging.logging_decorators import init_log_decorator
+from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.package import Package
 from imod.mf6.pkgbase import PackageBase

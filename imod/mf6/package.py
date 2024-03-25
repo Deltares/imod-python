@@ -12,7 +12,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-from imod.logging.logging_decorators import standard_log_decorator
+from imod.logging import standard_log_decorator
 from imod.mf6.auxiliary_variables import (
     get_variable_names,
 )
