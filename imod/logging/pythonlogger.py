@@ -1,6 +1,5 @@
 import logging
 import sys
-from typing import Optional
 
 from imod.logging.ilogger import ILogger
 from imod.logging.loglevel import LogLevel
@@ -12,7 +11,7 @@ def _formatter():
     )
 
 
-def _stack_level(additional_depth: Optional[int]) -> int:
+def _stack_level(additional_depth: int) -> int:
     """
     The stack level is used to print the file and line number of the line being logged.
     Because there are a few layers between the place where the imod logger is used and
@@ -24,10 +23,7 @@ def _stack_level(additional_depth: Optional[int]) -> int:
     """
 
     default_stack_level = 3
-    if additional_depth is not None:
-        return default_stack_level + additional_depth
-    else:
-        return default_stack_level
+    return default_stack_level + additional_depth
 
 
 class PythonLogger(ILogger):
@@ -49,19 +45,19 @@ class PythonLogger(ILogger):
         if add_default_file_handler:
             self._add_file_handler()
 
-    def debug(self, message: str, additional_depth: Optional[int] = None) -> None:
+    def debug(self, message: str, additional_depth: int = 0) -> None:
         self.logger.debug(message, stacklevel=_stack_level(additional_depth))
 
-    def info(self, message: str, additional_depth: Optional[int] = None) -> None:
+    def info(self, message: str, additional_depth: int = 0) -> None:
         self.logger.info(message, stacklevel=_stack_level(additional_depth))
 
-    def warning(self, message: str, additional_depth: Optional[int] = None) -> None:
+    def warning(self, message: str, additional_depth: int = 0) -> None:
         self.logger.warning(message, stacklevel=_stack_level(additional_depth))
 
-    def error(self, message: str, additional_depth: Optional[int] = None) -> None:
+    def error(self, message: str, additional_depth: int = 0) -> None:
         self.logger.error(message, stacklevel=_stack_level(additional_depth))
 
-    def critical(self, message: str, additional_depth: Optional[int] = None) -> None:
+    def critical(self, message: str, additional_depth: int = 0) -> None:
         self.logger.critical(message, stacklevel=_stack_level(additional_depth))
 
     def _set_level(self, log_level: LogLevel) -> None:

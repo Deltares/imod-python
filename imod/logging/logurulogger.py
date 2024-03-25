@@ -1,5 +1,4 @@
 import sys
-from typing import Optional
 
 from loguru import logger
 
@@ -7,7 +6,7 @@ from imod.logging.ilogger import ILogger
 from imod.logging.loglevel import LogLevel
 
 
-def _depth_level(additional_depth: Optional[int]) -> int:
+def _depth_level(additional_depth: int) -> int:
     """
     The depth level is used to print the file and line number of the line being logged.
     Because there are a few layers between the place where the imod logger is used and
@@ -19,10 +18,7 @@ def _depth_level(additional_depth: Optional[int]) -> int:
     """
 
     default_stack_level = 2
-    if additional_depth is not None:
-        return default_stack_level + additional_depth
-    else:
-        return default_stack_level
+    return default_stack_level + additional_depth
 
 
 class LoguruLogger(ILogger):
@@ -44,17 +40,17 @@ class LoguruLogger(ILogger):
         if add_default_file_handler:
             logger.add("imod-python.log", level=log_level.value)
 
-    def debug(self, message: str, additional_depth: Optional[int] = None) -> None:
+    def debug(self, message: str, additional_depth: int = 0) -> None:
         logger.opt(depth=_depth_level(additional_depth)).debug(message)
 
-    def info(self, message: str, additional_depth: Optional[int] = None) -> None:
+    def info(self, message: str, additional_depth: int = 0) -> None:
         logger.opt(depth=_depth_level(additional_depth)).info(message)
 
-    def warning(self, message: str, additional_depth: Optional[int] = None) -> None:
+    def warning(self, message: str, additional_depth: int = 0) -> None:
         logger.opt(depth=_depth_level(additional_depth)).warning(message)
 
-    def error(self, message: str, additional_depth: Optional[int] = None) -> None:
+    def error(self, message: str, additional_depth: int = 0) -> None:
         logger.opt(depth=_depth_level(additional_depth)).error(message)
 
-    def critical(self, message: str, additional_depth: Optional[int] = None) -> None:
+    def critical(self, message: str, additional_depth: int = 0) -> None:
         logger.opt(depth=_depth_level(additional_depth)).critical(message)
