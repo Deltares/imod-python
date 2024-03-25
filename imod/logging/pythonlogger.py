@@ -1,5 +1,6 @@
 import logging
 import sys
+from typing import Optional
 
 from imod.logging.ilogger import ILogger
 from imod.logging.loglevel import LogLevel
@@ -9,6 +10,24 @@ def _formatter():
     return logging.Formatter(
         "%(name)s: %(asctime)s | %(levelname)s | %(filename)s:%(lineno)s | %(process)d >>> %(message)s"
     )
+
+
+def _stack_level(additional_depth: Optional[int]) -> int:
+    """
+    The stack level is used to print the file and line number of the line being logged.
+    Because there are a few layers between the place where the imod logger is used and
+    the place where the pyton logger is used we need to set a custom stack level.
+
+    An additional_depth can be provided to add to this default stack level.
+    This is useful when a decorator is added which introduces an additional level between
+    the imod logger and the python logger.
+    """
+
+    default_stack_level = 3
+    if additional_depth is not None:
+        return default_stack_level + additional_depth
+    else:
+        return default_stack_level
 
 
 class PythonLogger(ILogger):
@@ -30,20 +49,20 @@ class PythonLogger(ILogger):
         if add_default_file_handler:
             self._add_file_handler()
 
-    def debug(self, message: str) -> None:
-        self.logger.debug(message, stacklevel=3)
+    def debug(self, message: str, additional_depth: Optional[int] = None) -> None:
+        self.logger.debug(message, stacklevel=_stack_level(additional_depth))
 
-    def info(self, message: str) -> None:
-        self.logger.info(message, stacklevel=3)
+    def info(self, message: str, additional_depth: Optional[int] = None) -> None:
+        self.logger.info(message, stacklevel=_stack_level(additional_depth))
 
-    def warning(self, message: str) -> None:
-        self.logger.warning(message, stacklevel=3)
+    def warning(self, message: str, additional_depth: Optional[int] = None) -> None:
+        self.logger.warning(message, stacklevel=_stack_level(additional_depth))
 
-    def error(self, message: str) -> None:
-        self.logger.error(message, stacklevel=3)
+    def error(self, message: str, additional_depth: Optional[int] = None) -> None:
+        self.logger.error(message, stacklevel=_stack_level(additional_depth))
 
-    def critical(self, message: str) -> None:
-        self.logger.critical(message, stacklevel=3)
+    def critical(self, message: str, additional_depth: Optional[int] = None) -> None:
+        self.logger.critical(message, stacklevel=_stack_level(additional_depth))
 
     def _set_level(self, log_level: LogLevel) -> None:
         self.logger.setLevel(log_level.value)

@@ -12,7 +12,7 @@ import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
 
-from imod.logging.logging_decorators import init_log_decorator
+from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier

@@ -20,7 +20,7 @@ import xugrid as xu
 import imod
 import imod.logging
 import imod.mf6.exchangebase
-from imod.logging.logging_decorators import standard_log_decorator
+from imod.logging import standard_log_decorator
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwfgwt import GWFGWT
 from imod.mf6.gwtgwt import GWTGWT
