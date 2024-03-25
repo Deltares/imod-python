@@ -4,7 +4,7 @@ from textwrap import dedent
 class MetaMod:
     """
     This class has been moved to ``primod``,
-    `see example here. <https://deltares.github.io/iMOD-Documentation/coupler_metamod_example.html>`_
+    `See example here <https://deltares.github.io/iMOD-Documentation/coupler_metamod_example.html>`_.
     """
 
     def __init__(self, *args, **kwargs):

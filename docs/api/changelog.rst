@@ -26,7 +26,7 @@ Fixed
   :func:`imod.prepare.spatial.round_extent` instead.
 - :meth'`imod.mf6.Modflow6Simulation.write` failed after splitting the simulation. This has been fixed.
 - modflow options like "print flow" , "save flow" and "print input" can now be set on
-:class:`imod.mf6.Well`
+  :class:`imod.mf6.Well`
  
 Added
 ~~~~~
@@ -36,7 +36,7 @@ Added
 - Validation for incompatible settings in the :class:`imod.mf6.NodePropertyFlow`
   and :class:`imod.mf6.Dispersion` packages.
 - Checks that only one flow model is present in a simulation when calling
-:func:`imod.mf6.Modflow6Simulation.regrid_like`, :func:`imod.mf6.Modflow6Simulation.clip_box` or  :func:`imod.mf6.Modflow6Simulation.split` 
+  :func:`imod.mf6.Modflow6Simulation.regrid_like`, :func:`imod.mf6.Modflow6Simulation.clip_box` or  :func:`imod.mf6.Modflow6Simulation.split`
 - Added support for coupling a GroundwaterFlowModel and Transport Model i.c.w.
   the 6.4.3 release of MODFLOW. Using an older version of iMOD Python
   with this version of MODFLOW will result in an error.
@@ -498,7 +498,7 @@ Fixed
   if ``top_source`` or ``bottom_source`` are NaN.
 - :func:`imod.gen.write` no longer errors on dataframes with empty columns.
 - :func:`imod.mf6.BoundaryCondition.set_repeat_stress` reinstated. This is  
- a temporary measure, it gives a deprecation warning.
+  a temporary measure, it gives a deprecation warning.
 
 Changed
 ~~~~~~~
