@@ -7,8 +7,6 @@ from imod.mf6.lak import Lake, LakeData
 
 
 def create_lake(idomain, xmin_index, xmax_index, ymin_index, ymax_index, name):
-
-
     is_lake = xr.full_like(idomain, False, dtype=bool)
     is_lake.values[0, xmin_index:xmax_index+1, ymin_index:ymax_index+1] = True
 
@@ -100,8 +98,6 @@ def rectangle_with_lakes():
     lake2 = create_lake (idomain, 12, 13, 12,13, "second_lake")
     simulation["GWF_1"]["lake"] = Lake.from_lakes_and_outlets([lake1, lake2])
     return simulation
-
-
 
 def create_lake_data_structured(
     is_lake,

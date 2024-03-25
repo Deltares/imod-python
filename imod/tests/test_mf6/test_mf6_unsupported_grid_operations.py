@@ -21,7 +21,6 @@ def finer_grid(grid):
 def test_mf6_simulation_partition_with_lakes(rectangle_with_lakes, tmp_path):
     simulation = rectangle_with_lakes
 
-
     label_array = zeros_like(simulation["GWF_1"].domain.sel(layer=1))
     label_array.values[10:, 10:] = 1
 
