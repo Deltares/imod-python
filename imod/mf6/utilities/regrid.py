@@ -23,7 +23,7 @@ from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.regridding_types import RegridderType
 from imod.schemata import ValidationError
-from imod.typing.grid import GridDataArray, ones_like, get_grid_geometry_hash
+from imod.typing.grid import GridDataArray, get_grid_geometry_hash, ones_like
 
 
 class RegridderWeightsCache:

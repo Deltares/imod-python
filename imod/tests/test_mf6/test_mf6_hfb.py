@@ -17,10 +17,10 @@ from imod.mf6 import (
     LayeredHorizontalFlowBarrierResistance,
 )
 from imod.mf6.hfb import to_connected_cells_dataset
+from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
 from imod.typing.grid import ones_like
 
-from imod.mf6.utilities.regrid import RegridderWeightsCache
 
 @pytest.mark.parametrize("dis", ["basic_unstructured_dis", "basic_dis"])
 @pytest.mark.parametrize(

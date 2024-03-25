@@ -1,11 +1,12 @@
 import copy
+import pickle
 
 import pytest
 from xugrid import OverlapRegridder
 
 from imod.mf6 import Dispersion
-from imod.mf6.utilities.regrid import RegridderWeightsCache, RegridderType
-import pickle
+from imod.mf6.utilities.regrid import RegridderType, RegridderWeightsCache
+
 
 def test_regridders_weight_cache_returns_similar_instance_when_enum_and_method_match(
     basic_unstructured_dis,
@@ -86,11 +87,11 @@ def test_regridders_weight_cache_grows_up_to_size_limit(
     cache_size = 3
     collection = RegridderWeightsCache(grid, new_grid, cache_size)
 
-    instance_1 = collection.get_regridder(grid, new_grid, RegridderType.OVERLAP, "harmonic_mean")
-    instance_2 = collection.get_regridder(grid, new_grid, RegridderType.BARYCENTRIC)
-    instance_3 =  collection.get_regridder(grid, new_grid, RegridderType.CENTROIDLOCATOR)
+    _ = collection.get_regridder(grid, new_grid, RegridderType.OVERLAP, "harmonic_mean")
+    _ = collection.get_regridder(grid, new_grid, RegridderType.BARYCENTRIC)
+    _ =  collection.get_regridder(grid, new_grid, RegridderType.CENTROIDLOCATOR)
     assert len(collection.weights_cache) ==cache_size
-    instance_4 =  collection.get_regridder(grid, new_grid, RegridderType.RELATIVEOVERLAP, method="conductance") 
+    _ =  collection.get_regridder(grid, new_grid, RegridderType.RELATIVEOVERLAP, method="conductance") 
     assert len(collection.weights_cache) == cache_size 
   
 
