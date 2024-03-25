@@ -31,4 +31,3 @@ class GroundwaterTransportModel(Modflow6Model):
             "print_flows": print_flows,
             "save_flows": save_flows,
         }
-

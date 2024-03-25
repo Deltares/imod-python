@@ -9,9 +9,10 @@ class IPackage(IPackageBase, metaclass=abc.ABCMeta):
     """
     Interface for imod.mf6.package.Package
     """
+
     @abstractmethod
     def _valid(self, value):
-        raise NotImplementedError        
+        raise NotImplementedError
 
     @abstractmethod
     def __init__(self, *args, **kwargs) -> None:

@@ -165,4 +165,3 @@ def values_within_range(
         return True
     else:
         return da == da.clip(min=min, max=max)
-

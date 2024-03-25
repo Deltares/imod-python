@@ -5,6 +5,7 @@ class IDict(abc.ABC):
     """
     Interface for collections.UserDict
     """
+
     def __setitem__(self, key, item):
         raise NotImplementedError
 
@@ -55,6 +56,3 @@ class IDict(abc.ABC):
 
     def __unicode__(self):
         raise NotImplementedError
-
-
-

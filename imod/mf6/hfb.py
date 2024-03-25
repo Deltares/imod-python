@@ -36,6 +36,7 @@ try:
 except ImportError:
     shapely = MissingOptionalModule("shapely")
 
+
 @typedispatch  # type: ignore[no-redef]
 def _derive_connected_cell_ids(
     idomain: xr.DataArray, grid: xu.Ugrid2d, edge_index: np.ndarray
@@ -296,9 +297,10 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         super().__init__(dict_dataset)
 
         self.line_data = geometry
+
     def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
         return self._regrid_method
-    
+
     def _get_variable_names_for_gdf(self) -> list[str]:
         return [
             self._get_variable_name(),
@@ -721,6 +723,7 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
     >>> hfb = imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic(barrier_gdf)
 
     """
+
     @init_log_decorator()
     def __init__(
         self,
@@ -781,6 +784,7 @@ class LayeredHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierB
     >>> hfb = imod.mf6.LayeredHorizontalFlowBarrierHydraulicCharacteristic(barrier_gdf)
 
     """
+
     @init_log_decorator()
     def __init__(
         self,
@@ -847,6 +851,7 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     >>> hfb = imod.mf6.HorizontalFlowBarrierMultiplier(barrier_gdf)
 
     """
+
     @init_log_decorator()
     def __init__(
         self,
@@ -912,6 +917,7 @@ class LayeredHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     >>> hfb = imod.mf6.LayeredHorizontalFlowBarrierMultiplier(barrier_gdf)
 
     """
+
     @init_log_decorator()
     def __init__(
         self,
@@ -997,6 +1003,7 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
 
 
     """
+
     @init_log_decorator()
     def __init__(
         self,
@@ -1058,6 +1065,7 @@ class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
 
 
     """
+
     @init_log_decorator()
     def __init__(
         self,

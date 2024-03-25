@@ -94,5 +94,13 @@ class GWFGWF(ExchangeBase):
     ) -> Package:
         raise NotImplementedError("this package cannot be clipped")
 
-    def render(self, directory: Path, pkgname: str, globaltimes: Union[list[np.datetime64], np.ndarray], binary: bool) -> str:
-       return self.render_with_geometric_constants(directory, pkgname, globaltimes, binary)
+    def render(
+        self,
+        directory: Path,
+        pkgname: str,
+        globaltimes: Union[list[np.datetime64], np.ndarray],
+        binary: bool,
+    ) -> str:
+        return self.render_with_geometric_constants(
+            directory, pkgname, globaltimes, binary
+        )

@@ -33,9 +33,10 @@ def round_extent(extent, cellsize):
     """
     # Import locally to avoid circular imports
     from imod.prepare.spatial import round_extent
+
     warnings.warn(
         "Use of `imod.util.round_extent` is deprecated, please use the new "
-        "location `imod.prepare.spatial.round_extent`", 
-        DeprecationWarning
-        )
+        "location `imod.prepare.spatial.round_extent`",
+        DeprecationWarning,
+    )
     return round_extent(extent, cellsize)

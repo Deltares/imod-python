@@ -1,4 +1,3 @@
-
 import abc
 from typing import Optional
 
@@ -10,5 +9,6 @@ class IRegridPackage(IPackage, abc.ABC):
     """
     Interface for packages that support regridding
     """
+
     def get_regrid_methods(self) -> Optional[dict[str, tuple[RegridderType, str]]]:
-         raise NotImplementedError       
+        raise NotImplementedError

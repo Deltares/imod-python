@@ -159,11 +159,18 @@ def test_to_mf6_pkg__high_lvl_transient(basic_dis, well_high_lvl_test_data_trans
 @pytest.mark.parametrize("save_flows", [True, False])
 @pytest.mark.parametrize("print_input", [True, False])
 @pytest.mark.parametrize("print_flows", [True, False])
-def test_to_mf6_pkg__save_flows(basic_dis, well_high_lvl_test_data_transient, save_flows, print_input, print_flows):
+def test_to_mf6_pkg__save_flows(
+    basic_dis, well_high_lvl_test_data_transient, save_flows, print_input, print_flows
+):
     # Arrange
     idomain, top, bottom = basic_dis
 
-    wel = imod.mf6.Well(*well_high_lvl_test_data_transient, save_flows=save_flows, print_input= print_input, print_flows= print_flows)
+    wel = imod.mf6.Well(
+        *well_high_lvl_test_data_transient,
+        save_flows=save_flows,
+        print_input=print_input,
+        print_flows=print_flows,
+    )
     active = idomain == 1
     k = xr.ones_like(idomain)
 
@@ -173,8 +180,9 @@ def test_to_mf6_pkg__save_flows(basic_dis, well_high_lvl_test_data_transient, sa
 
     # Assert
     mf6_ds["save_flows"].values[()] == save_flows
-    mf6_ds["print_input"].values[()] == print_input 
+    mf6_ds["print_input"].values[()] == print_input
     mf6_ds["print_flows"].values[()] == print_flows
+
 
 def test_is_empty(well_high_lvl_test_data_transient):
     # Arrange

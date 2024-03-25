@@ -171,5 +171,6 @@ class SourceSinkMixing(BoundaryCondition, IRegridPackage):
             save_flows=save_flows,
             validate=validate,
         )
+
     def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
         return self._regrid_method

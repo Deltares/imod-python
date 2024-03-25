@@ -95,6 +95,6 @@ class InitialConditions(Package, IRegridPackage):
             self["start"], icdirectory, "strt", binary=binary
         )
         return self._template.render(d)
-    
+
     def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
         return self._regrid_method

@@ -32,6 +32,7 @@ class _LoggerHolder(ILogger):
     For the user it seems that they are directly using the logger the configured, and they are not
     aware they are making use of an intermediary object.
     """
+
     _instance: ILogger
 
     def __init__(self) -> None:

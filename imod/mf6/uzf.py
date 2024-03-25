@@ -202,7 +202,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
     _pkg_id = "uzf"
 
     _template = BoundaryCondition._initialize_template(_pkg_id)
-    
+
     @init_log_decorator()
     def __init__(
         self,

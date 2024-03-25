@@ -37,11 +37,14 @@ class PartitionArrayCases:
 
     def case_concentric(self, idomain_top) -> xu.UgridDataArray:
         centroids = idomain_top.ugrid.grid.centroids
-        dist = np.sqrt( centroids[:,0]* centroids[:,0] +  centroids[:,1]* centroids[:,1])
+        dist = np.sqrt(
+            centroids[:, 0] * centroids[:, 0] + centroids[:, 1] * centroids[:, 1]
+        )
         concentric = zeros_like(idomain_top)
-        concentric.values =  np.where(dist < 500, 0, 1)
-        concentric["name"] = "concentric"        
-        return  concentric 
+        concentric.values = np.where(dist < 500, 0, 1)
+        concentric["name"] = "concentric"
+        return concentric
+
 
 class WellCases:
     def case_one_well(self):
@@ -165,7 +168,7 @@ def test_partitioning_unstructured(
     split_simulation = simulation.split(partition_array)
 
     split_simulation.write(tmp_path, binary=False)
-    split_simulation.run()    # %%
+    split_simulation.run()  # %%
     head = split_simulation.open_head(simulation_start_time="01-01-1999", time_unit="d")
     head = head.ugrid.reindex_like(original_head)
 
@@ -179,7 +182,9 @@ def test_partitioning_unstructured(
         head["head"].values, original_head.values, rtol=1e-5, atol=1e-3
     )
     for key in ["flow-lower-face", "flow-horizontal-face"]:
-        if partition_array["name"].values[()] == "concentric" and key in [ "flow-horizontal-face"]:
+        if partition_array["name"].values[()] == "concentric" and key in [
+            "flow-horizontal-face"
+        ]:
             continue
         np.testing.assert_allclose(
             flow_cbc[key].values, original_flow_cbc[key].values, rtol=1e-5, atol=1e-3
@@ -190,7 +195,10 @@ def test_partitioning_unstructured(
 @pytest.mark.parametrize("inactivity_marker", [0, -1])
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partitioning_unstructured_with_inactive_cells(
-    tmp_path: Path, circle_model: Modflow6Simulation, partition_array: xu.UgridDataArray, inactivity_marker: int
+    tmp_path: Path,
+    circle_model: Modflow6Simulation,
+    partition_array: xu.UgridDataArray,
+    inactivity_marker: int,
 ):
     simulation = circle_model
 
@@ -279,10 +287,15 @@ def test_partitioning_unstructured_hfb(
     # m to 0 m, and the HFB adds extra complexity to this.
     np.testing.assert_allclose(head["head"].values, original_head.values, rtol=0.005)
     for key in ["flow-lower-face", "flow-horizontal-face"]:
-        if partition_array["name"].values[()] == "concentric" and key in [ "flow-horizontal-face"]:
+        if partition_array["name"].values[()] == "concentric" and key in [
+            "flow-horizontal-face"
+        ]:
             continue
         np.testing.assert_allclose(
-            flow_cbc[key].values, original_flow_cbc[key].values, rtol=1., atol=31.66250038
+            flow_cbc[key].values,
+            original_flow_cbc[key].values,
+            rtol=1.0,
+            atol=31.66250038,
         )
 
 
@@ -318,7 +331,7 @@ def test_partitioning_unstructured_with_well(
     split_simulation.run()
 
     head = split_simulation.open_head()
-    head= head.ugrid.reindex_like(original_head)
+    head = head.ugrid.reindex_like(original_head)
     # TODO:
     # Uncomment when fixed: https://gitlab.com/deltares/imod/imod-python/-/issues/683
     cbc = split_simulation.open_flow_budget()
@@ -336,72 +349,92 @@ def test_partitioning_unstructured_with_well(
 
 @pytest.mark.usefixtures("circle_model_transport")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
-def test_partition_transport(    tmp_path: Path,
-    circle_model_transport: Modflow6Simulation,partition_array: xu.UgridDataArray):
-
+def test_partition_transport(
+    tmp_path: Path,
+    circle_model_transport: Modflow6Simulation,
+    partition_array: xu.UgridDataArray,
+):
     circle_model_transport.write(tmp_path)
     circle_model_transport.run()
     concentration = circle_model_transport.open_concentration()
 
     new_circle_model = circle_model_transport.split(partition_array)
-    new_circle_model.write(tmp_path/"split", binary=False)
-    new_circle_model.run()       
+    new_circle_model.write(tmp_path / "split", binary=False)
+    new_circle_model.run()
     new_concentration = new_circle_model.open_concentration()
     new_concentration = new_concentration.ugrid.reindex_like(concentration)
     np.testing.assert_allclose(
-        concentration.values, new_concentration["concentration"].values, rtol=7e-5, atol=3e-3
+        concentration.values,
+        new_concentration["concentration"].values,
+        rtol=7e-5,
+        atol=3e-3,
     )
-
 
 
 @pytest.mark.usefixtures("circle_model_transport_multispecies_variable_density")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
-def test_partition_transport_multispecies(    tmp_path: Path,
-    circle_model_transport_multispecies_variable_density: Modflow6Simulation,partition_array: xu.UgridDataArray):
-    
-    #TODO: put buoyancy package back
+def test_partition_transport_multispecies(
+    tmp_path: Path,
+    circle_model_transport_multispecies_variable_density: Modflow6Simulation,
+    partition_array: xu.UgridDataArray,
+):
+    # TODO: put buoyancy package back
     circle_model_transport_multispecies_variable_density["GWF_1"].pop("buoyancy")
-    circle_model_transport_multispecies = circle_model_transport_multispecies_variable_density
-    circle_model_transport_multispecies.write(tmp_path/"original")
+    circle_model_transport_multispecies = (
+        circle_model_transport_multispecies_variable_density
+    )
+    circle_model_transport_multispecies.write(tmp_path / "original")
     circle_model_transport_multispecies.run()
     conc = circle_model_transport_multispecies.open_concentration()
     head = circle_model_transport_multispecies.open_head()
 
-
     new_circle_model = circle_model_transport_multispecies.split(partition_array)
-    new_circle_model.write(tmp_path/"split")
+    new_circle_model.write(tmp_path / "split")
     new_circle_model.run()
     conc_new = new_circle_model.open_concentration()
     head_new = new_circle_model.open_head()
-    head_new = head_new.ugrid.reindex_like(head)   
+    head_new = head_new.ugrid.reindex_like(head)
     conc_new = conc_new.ugrid.reindex_like(conc)
 
-    
-    np.testing.assert_allclose(conc.values, conc_new["concentration"].values, rtol=4e-4, atol=5e-3)
-    np.testing.assert_allclose(head.values, head_new["head"].values, rtol=1e-5, atol=1e-3)
+    np.testing.assert_allclose(
+        conc.values, conc_new["concentration"].values, rtol=4e-4, atol=5e-3
+    )
+    np.testing.assert_allclose(
+        head.values, head_new["head"].values, rtol=1e-5, atol=1e-3
+    )
 
-    #TODO: also compare budget results. For now just open them. 
+    # TODO: also compare budget results. For now just open them.
     _ = new_circle_model.open_flow_budget()
     _ = new_circle_model.open_transport_budget()
 
+
 @pytest.mark.usefixtures("circle_model")
 def test_slice_model_twice(tmp_path, circle_model):
-
     flow_model = circle_model["GWF_1"]
     active = flow_model.domain
 
     submodel_labels = zeros_like(active)
     submodel_labels = submodel_labels.drop_vars("layer")
-    submodel_labels.values[ :, 50:] = 1
+    submodel_labels.values[:, 50:] = 1
     submodel_labels = submodel_labels.sel(layer=0, drop=True)
 
     split_simulation_1 = circle_model.split(submodel_labels)
-    split_simulation_1.write(tmp_path/"split_simulation_1", binary=False, validate=True, use_absolute_paths=False)
+    split_simulation_1.write(
+        tmp_path / "split_simulation_1",
+        binary=False,
+        validate=True,
+        use_absolute_paths=False,
+    )
     split_simulation_2 = circle_model.split(submodel_labels)
-    split_simulation_2.write(tmp_path/"split_simulation_2", binary=False, validate=True, use_absolute_paths=False)    
+    split_simulation_2.write(
+        tmp_path / "split_simulation_2",
+        binary=False,
+        validate=True,
+        use_absolute_paths=False,
+    )
 
-     #check that text output was not affected by splitting
-    diff = dircmp(tmp_path/"split_simulation_1", tmp_path/"split_simulation_2")
+    # check that text output was not affected by splitting
+    diff = dircmp(tmp_path / "split_simulation_1", tmp_path / "split_simulation_2")
     assert len(diff.diff_files) == 0
     assert len(diff.left_only) == 0
-    assert len(diff.right_only) == 0       	
+    assert len(diff.right_only) == 0
