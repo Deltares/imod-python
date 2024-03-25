@@ -120,13 +120,13 @@ def test_simulation_open_flow_budget(circle_model, tmp_path):
 
     assert isinstance(budget, xu.UgridDataset)
     assert sorted(budget.keys()) == [
-        "chd",
+        "chd_chd",
         "flow-horizontal-face",
         "flow-horizontal-face-x",
         "flow-horizontal-face-y",
         "flow-lower-face",
     ]
-    assert isinstance(budget["chd"], xu.UgridDataArray)
+    assert isinstance(budget["chd_chd"], xu.UgridDataArray)
 
 def test_write_circle_model_twice(circle_model, tmp_path):  
     

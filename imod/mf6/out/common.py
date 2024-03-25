@@ -1,5 +1,5 @@
 import pathlib
-from typing import BinaryIO, Union
+from typing import Any, BinaryIO, Dict, List, Union
 
 import numpy as np
 
@@ -19,3 +19,13 @@ def _to_nan(a: FloatArray, dry_nan: bool) -> FloatArray:
     if dry_nan:
         a[a == -1e30] = np.nan
     return a
+
+
+def get_header_advanced_package(
+    headers: Dict[str, List[Any]],
+) -> Any:
+    for key, header in headers.items():
+        # multimodels have a gwf-gwf budget for flow-ja-face between domains
+        if not "flow-ja-face" in key and "gwf_" in key:
+            return header[0]
+    return None

@@ -57,9 +57,10 @@ def test_wrong_dtype(test_data):
 
 def test_landflag(test_data):
     expected = np.ones((2, 2, 2))
-    expected[:, 0, 0] = 0
+    expected[1:2, :, :] = 0
+    expected[:, 0, 0] = np.nan
     uzf = imod.mf6.UnsaturatedZoneFlow(**test_data)
-    assert np.all(uzf["landflag"].values == expected)
+    np.testing.assert_equal(uzf["landflag"].values,expected)
 
 
 def test_iuzno(test_data):
@@ -92,12 +93,13 @@ def test_to_sparsedata(test_data):
     arrdict = uzf._ds_to_arrdict(bin_data.isel(time=0))
     layer = bin_data.isel(time=0)["layer"].values
     struct_array = uzf._to_struct_array(arrdict, layer)
-    expected_iuzno = np.array([1, 2, 3, 4, 5, 6])
+    land_nodes = uzf["landflag"].to_numpy().flatten() == 1
+    expected_iuzno = np.array([0, 1, 2, 3, 0, 4, 5, 6])[land_nodes]
     assert struct_array.dtype[0] == np.dtype("int32")  # pylint: disable=unsubscriptable-object
     assert struct_array.dtype[1] == np.dtype("float64")  # pylint: disable=unsubscriptable-object
     assert np.all(struct_array["iuzno"] == expected_iuzno)
     assert len(struct_array.dtype) == 8
-    assert len(struct_array) == 6
+    assert len(struct_array) == expected_iuzno.size
 
 
 def test_fill_perioddata(test_data):

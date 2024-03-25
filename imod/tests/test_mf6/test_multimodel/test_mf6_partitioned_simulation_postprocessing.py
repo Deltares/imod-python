@@ -131,11 +131,11 @@ def test_import_balances_structured(
     # Assert
     expected_keys = [
         "gwf-gwf",
-        "chd",
+        "chd_chd",
         "flow-right-face",
         "sto-ss",
         "flow-lower-face",
-        "drn",
+        "drn_drn",
         "flow-front-face",
     ]
     expected_coords = ["x", "y", "layer", "time", "dx", "dy"]
@@ -165,7 +165,7 @@ def test_import_balances_unstructured(
 
     # Assert
     expected_keys = [
-        "chd",
+        "chd_chd",
         "flow-horizontal-face",
         "gwf-gwf",
         "flow-horizontal-face-y",
