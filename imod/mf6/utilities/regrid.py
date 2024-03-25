@@ -37,6 +37,7 @@ class RegridderWeightsCache:
         self,
         source_grid: Union[xr.DataArray, xu.UgridDataArray],
         target_grid: Union[xr.DataArray, xu.UgridDataArray],
+        cache_size: int = 4
     ) -> None:
         self.regridder_instances: dict[
             tuple[type[BaseRegridder], Optional[str]], BaseRegridder
@@ -45,8 +46,7 @@ class RegridderWeightsCache:
         self._target_grid = target_grid
 
         self.weights_cache = {}
-
-
+        self.cache_size = cache_size
 
     def __get_regridder_class(
         self, regridder_type: RegridderType | BaseRegridder
@@ -99,6 +99,8 @@ class RegridderWeightsCache:
         target_hash  = get_grid_geometry_hash(target_grid) 
         key = (source_hash, target_hash, regridder_class)       
         if not key in self.weights_cache.keys():
+            if len(self.weights_cache) >= self.cache_size:
+                self.remove_one_regridder()
             kwargs = {"source": source_grid, "target": target_grid}     
             if method is not None:
                 kwargs["method"] = method
@@ -112,6 +114,9 @@ class RegridderWeightsCache:
 
         return regridder
 
+    def remove_one_regridder(self):
+        keys = list(self.weights_cache.keys())
+        self.weights_cache.pop(keys[0])
 
 
 def assign_coord_if_present(

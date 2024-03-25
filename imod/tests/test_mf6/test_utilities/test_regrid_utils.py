@@ -7,7 +7,7 @@ from imod.mf6 import Dispersion
 from imod.mf6.utilities.regrid import RegridderWeightsCache, RegridderType
 import pickle
 
-def test_instance_collection_returns_same_instance_when_enum_and_method_match(
+def test_regridders_weight_cache_returns_similar_instance_when_enum_and_method_match(
     basic_unstructured_dis,
 ):
     grid, _, _ = basic_unstructured_dis
@@ -21,7 +21,7 @@ def test_instance_collection_returns_same_instance_when_enum_and_method_match(
     assert hash (pickle.dumps(first_instance)) == hash (pickle.dumps(second_instance))
 
 
-def test_instance_collection_combining_different_instantiation_parmeters(
+def test_regridders_weight_cache_combining_different_instantiation_parmeters(
     basic_unstructured_dis,
 ):
     grid, _, _ = basic_unstructured_dis
@@ -34,7 +34,7 @@ def test_instance_collection_combining_different_instantiation_parmeters(
 
     assert hash (pickle.dumps(first_instance)) == hash (pickle.dumps(second_instance))
 
-def test_instance_collection_returns_different_instance_when_name_does_not_match(
+def test_regridders_weight_cache_returns_different_instance_when_name_does_not_match(
     basic_unstructured_dis,
 ):
     grid, _, _ = basic_unstructured_dis
@@ -47,7 +47,7 @@ def test_instance_collection_returns_different_instance_when_name_does_not_match
 
     assert hash (pickle.dumps(first_instance)) != hash (pickle.dumps(second_instance))
 
-def test_instance_collection_returns_different_instance_when_method_does_not_match(
+def test_regridders_weight_cache_returns_different_instance_when_method_does_not_match(
     basic_unstructured_dis,
 ):
     grid, _, _ = basic_unstructured_dis
@@ -76,6 +76,23 @@ def test_non_regridder_cannot_be_instantiated(
 
     with pytest.raises(ValueError):
         _ = collection.get_regridder(grid, new_grid, nonregridder, "geometric_mean")
+
+
+def test_regridders_weight_cache_grows_up_to_size_limit(
+    basic_unstructured_dis,
+):
+    grid, _, _ = basic_unstructured_dis
+    new_grid = copy.deepcopy(grid)
+    cache_size = 3
+    collection = RegridderWeightsCache(grid, new_grid, cache_size)
+
+    instance_1 = collection.get_regridder(grid, new_grid, RegridderType.OVERLAP, "harmonic_mean")
+    instance_2 = collection.get_regridder(grid, new_grid, RegridderType.BARYCENTRIC)
+    instance_3 =  collection.get_regridder(grid, new_grid, RegridderType.CENTROIDLOCATOR)
+    assert len(collection.weights_cache) ==cache_size
+    instance_4 =  collection.get_regridder(grid, new_grid, RegridderType.RELATIVEOVERLAP, method="conductance") 
+    assert len(collection.weights_cache) == cache_size 
+  
 
 
 def test_error_messages(basic_unstructured_dis):
