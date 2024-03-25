@@ -37,7 +37,7 @@ class RegridderWeightsCache:
         self,
         source_grid: Union[xr.DataArray, xu.UgridDataArray],
         target_grid: Union[xr.DataArray, xu.UgridDataArray],
-        cache_size: int = 4
+        cache_size: int = 6
     ) -> None:
         self.regridder_instances: dict[
             tuple[type[BaseRegridder], Optional[str]], BaseRegridder
