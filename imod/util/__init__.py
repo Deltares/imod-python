@@ -10,6 +10,7 @@ import warnings
 from imod.util.context import cd, ignore_warnings
 from imod.util.path import temporary_directory
 from imod.util.spatial import (
+    coord_reference,
     empty_2d,
     empty_2d_transient,
     empty_3d,
