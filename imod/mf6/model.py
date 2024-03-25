@@ -388,7 +388,7 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
         y_max: optional, float
         state_for_boundary :
         """
-        supported, error_with_object = self.is_support_clipping()
+        supported, error_with_object = self.is_clipping_supported()
         if not supported:
             raise ValueError(f"model cannot be clipped due to presence of package '{error_with_object}' in model")     
 
@@ -566,6 +566,6 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
 
     def is_clipping_supported(self)->Tuple[bool, str]:
         for package_name, package in self.items():
-            if not package.is_support_clipping():
+            if not package.is_clipping_supported():
                 return False, package_name
         return True, ""    

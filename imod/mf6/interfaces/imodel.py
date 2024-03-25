@@ -23,5 +23,5 @@ class IModel( IDict):
     def domain(self):
          raise NotImplementedError        
     
-    def is_support_regridding(self)->Tuple[bool, str]:
+    def is_regridding_supported(self)->Tuple[bool, str]:
          raise NotImplementedError             
