@@ -92,7 +92,6 @@ class RegridderWeightsCache:
         regridder_class = self.__get_regridder_class(regridder_type)
 
         if "layer" not in source_grid.coords and "layer" in target_grid.coords:
-            target_grid = copy.deepcopy(target_grid)
             target_grid = target_grid.drop_vars("layer")
             
         source_hash  = get_grid_geometry_hash(source_grid)
