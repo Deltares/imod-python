@@ -320,6 +320,7 @@ def _regrid_like(
             )
 
     methods = _get_unique_regridder_types(model)
+    regrid_context.weights_cache = {}
     output_domain = _get_regridding_domain(model, target_grid, regrid_context, methods)
     new_model.mask_all_packages(output_domain)
     new_model.purge_empty_packages()
