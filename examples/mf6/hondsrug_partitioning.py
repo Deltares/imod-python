@@ -1,6 +1,6 @@
 """
 Partitioning a regional model
-===========================
+=============================
 
 This example shows how a model can be partitioned into submodels. This will
 allow parallelization when solving the model. The example used is the Hondsrug
