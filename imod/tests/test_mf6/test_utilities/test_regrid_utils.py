@@ -5,7 +5,7 @@ from xugrid import OverlapRegridder
 
 from imod.mf6 import Dispersion
 from imod.mf6.utilities.regrid import RegridderWeightsCache, RegridderType
-
+import pickle
 
 def test_instance_collection_returns_same_instance_when_enum_and_method_match(
     basic_unstructured_dis,
@@ -18,7 +18,7 @@ def test_instance_collection_returns_same_instance_when_enum_and_method_match(
     first_instance = collection.get_regridder(grid, new_grid, RegridderType.OVERLAP, "harmonic_mean")
     second_instance = collection.get_regridder(grid, new_grid, RegridderType.OVERLAP, "harmonic_mean")
 
-    assert first_instance == second_instance
+    assert hash (pickle.dumps(first_instance)) == hash (pickle.dumps(second_instance))
 
 
 def test_instance_collection_combining_different_instantiation_parmeters(
@@ -32,8 +32,7 @@ def test_instance_collection_combining_different_instantiation_parmeters(
     first_instance = collection.get_regridder(grid, new_grid, RegridderType.OVERLAP, "harmonic_mean")
     second_instance = collection.get_regridder(grid, new_grid, OverlapRegridder, "harmonic_mean")
 
-    assert first_instance == second_instance
-
+    assert hash (pickle.dumps(first_instance)) == hash (pickle.dumps(second_instance))
 
 def test_instance_collection_returns_different_instance_when_name_does_not_match(
     basic_unstructured_dis,
@@ -46,8 +45,7 @@ def test_instance_collection_returns_different_instance_when_name_does_not_match
     first_instance = collection.get_regridder(grid, new_grid, RegridderType.CENTROIDLOCATOR)
     second_instance = collection.get_regridder(grid, new_grid, RegridderType.BARYCENTRIC)
 
-    assert first_instance != second_instance
-
+    assert hash (pickle.dumps(first_instance)) != hash (pickle.dumps(second_instance))
 
 def test_instance_collection_returns_different_instance_when_method_does_not_match(
     basic_unstructured_dis,
@@ -60,8 +58,7 @@ def test_instance_collection_returns_different_instance_when_method_does_not_mat
     first_instance = collection.get_regridder(grid, new_grid, RegridderType.OVERLAP, "geometric_mean")
     second_instance = collection.get_regridder(grid, new_grid, RegridderType.OVERLAP, "harmonic_mean")
 
-    assert first_instance != second_instance
-
+    assert hash (pickle.dumps(first_instance)) != hash (pickle.dumps(second_instance))
 
 def test_non_regridder_cannot_be_instantiated(
     basic_unstructured_dis,

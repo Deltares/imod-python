@@ -99,11 +99,15 @@ class RegridderWeightsCache:
         target_hash  = get_grid_geometry_hash(target_grid) 
         key = (source_hash, target_hash, regridder_class)       
         if not key in self.weights_cache.keys():
-            kwargs = {"source": source_grid, "target": target_grid, "method": method}        
+            kwargs = {"source": source_grid, "target": target_grid}     
+            if method is not None:
+                kwargs["method"] = method
             regridder = regridder_class(**kwargs)            
             self.weights_cache[key] = regridder.weights
         else:
-            kwargs = {"weights": self.weights_cache[key],"target": target_grid, "method": method }
+            kwargs = {"weights": self.weights_cache[key],"target": target_grid}
+            if method is not None:
+                kwargs["method"] = method            
             regridder = regridder_class.from_weights(**kwargs)
 
         return regridder
