@@ -553,18 +553,33 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
         return False
 
     def is_splitting_supported(self)->Tuple[bool, str]:
+        """
+        Returns True if all the packages in the model supports splitting. If one
+        of the packages in the model does not support splitting, it returns the
+        name of the first one. 
+        """
         for package_name, package in self.items():
             if not package.is_splitting_supported():
                 return False, package_name
         return True, ""
     
     def is_regridding_supported(self)->Tuple[bool, str]:
+        """
+        Returns True if all the packages in the model supports regridding. If one
+        of the packages in the model does not support regridding, it returns the
+        name of the first one. 
+        """        
         for package_name, package in self.items():
             if not package.is_regridding_supported():
                 return False, package_name
         return True, ""    
 
     def is_clipping_supported(self)->Tuple[bool, str]:
+        """
+        Returns True if all the packages in the model supports clipping. If one
+        of the packages in the model does not support clipping, it returns the
+        name of the first one. 
+        """                
         for package_name, package in self.items():
             if not package.is_clipping_supported():
                 return False, package_name
