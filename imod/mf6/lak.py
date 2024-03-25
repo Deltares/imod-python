@@ -1209,11 +1209,11 @@ class Lake(BoundaryCondition):
         f.write(f"end {title}\n")
         return
     
-    def is_support_splitting(self)->bool:
+    def is_splitting_supported(self)->bool:
         return False
     
-    def is_support_regridding(self)->bool:
+    def is_regridding_supported(self)->bool:
         return False
     
-    def is_support_clipping(self)->bool:
+    def is_clipping_supported(self)->bool:
         return False         

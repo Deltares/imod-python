@@ -552,19 +552,19 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
     def is_use_newton(self):
         return False
 
-    def is_support_splitting(self)->Tuple[bool, str]:
+    def is_splitting_supported(self)->Tuple[bool, str]:
         for package_name, package in self.items():
-            if not package.is_support_splitting():
+            if not package.is_splitting_supported():
                 return False, package_name
         return True, ""
     
-    def is_support_regridding(self)->Tuple[bool, str]:
+    def is_regridding_supported(self)->Tuple[bool, str]:
         for package_name, package in self.items():
-            if not package.is_support_regridding():
+            if not package.is_regridding_supported():
                 return False, package_name
         return True, ""    
 
-    def is_support_clipping(self)->Tuple[bool, str]:
+    def is_clipping_supported(self)->Tuple[bool, str]:
         for package_name, package in self.items():
             if not package.is_support_clipping():
                 return False, package_name

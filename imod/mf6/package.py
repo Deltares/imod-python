@@ -467,7 +467,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         -------
         clipped: Package
         """
-        if not self.is_support_clipping():
+        if not self.is_clipping_supported():
             raise ValueError("this package does not support clipping.")
 
 
@@ -634,11 +634,11 @@ class Package(PackageBase, IPackage, abc.ABC):
                 result[name] = self.dataset[name].values[()]
         return result
     
-    def is_support_splitting(self)->bool:
+    def is_splitting_supported(self)->bool:
         return True
     
-    def is_support_regridding(self)->bool:
+    def is_regridding_supported(self)->bool:
         return True    
     
-    def is_support_clipping(self)->bool:
+    def is_clipping_supported(self)->bool:
         return True        
