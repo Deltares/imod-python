@@ -293,7 +293,7 @@ def _regrid_like(
 
 @typedispatch   # type: ignore[no-redef]
 def _regrid_like(
-    model: IModel, target_grid: GridDataArray, validate: bool = True
+    model: IModel, target_grid: GridDataArray, validate: bool = True, regrid_context: Optional[RegridderWeightsCache] = None
 ) -> IModel:
     """
     Creates a model by regridding the packages of this model to another discretization.
@@ -314,7 +314,8 @@ def _regrid_like(
     similar to the one used in input argument "target_grid"
     """
     new_model = model.__class__()
-    regrid_context = RegridderWeightsCache(model.domain, target_grid)
+    if regrid_context is None:
+        regrid_context = RegridderWeightsCache(model.domain, target_grid)
     for pkg_name, pkg in model.items():
         if isinstance(pkg, (IRegridPackage, ILineDataPackage, IPointDataPackage)):
             new_model[pkg_name] = pkg.regrid_like(target_grid, regrid_context)
@@ -369,10 +370,13 @@ def _regrid_like(
         raise ValueError(
             "Unable to regrid simulation. Regridding can only be done on simulations that have a single flow model."
         )
+    flow_models = simulation.get_models_of_type("gwf6")
+    old_grid = list(flow_models.values())[0].domain
+    regrid_context = RegridderWeightsCache(old_grid, target_grid)    
     result = simulation.__class__(regridded_simulation_name)
     for key, item in simulation.items():
         if isinstance(item, IModel):
-            result[key] = item.regrid_like(target_grid, validate)
+            result[key] = item.regrid_like(target_grid, validate, regrid_context)
         elif key == "gwtgwf_exchanges":
             pass            
         elif isinstance(item, IPackage) and not isinstance(item, IRegridPackage):

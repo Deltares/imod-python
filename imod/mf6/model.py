@@ -24,7 +24,7 @@ from imod.mf6.package import Package
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.utilities.mask import _mask_all_packages
 from imod.mf6.utilities.regrid import (
-    _regrid_like,
+    _regrid_like, RegridderWeightsCache
 )
 from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.write_context import WriteContext
@@ -462,7 +462,7 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
         return clipped
 
     def regrid_like(
-        self, target_grid: GridDataArray, validate: bool = True
+        self, target_grid: GridDataArray,  validate: bool = True, regrid_context:Optional[RegridderWeightsCache] = None
     ) -> "Modflow6Model":
         """
         Creates a model by regridding the packages of this model to another discretization.
@@ -483,7 +483,7 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
         similar to the one used in input argument "target_grid"
         """
 
-        return _regrid_like(self, target_grid, validate)
+        return _regrid_like(self, target_grid, validate, regrid_context)
  
     def mask_all_packages(
         self,
