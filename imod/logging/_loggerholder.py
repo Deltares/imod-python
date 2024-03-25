@@ -49,17 +49,17 @@ class _LoggerHolder(ILogger):
     def instance(self, value: ILogger) -> None:
         self._instance = value
 
-    def debug(self, message: str, additional_depth: Optional[int]) -> None:
+    def debug(self, message: str, additional_depth: Optional[int] = None) -> None:
         self.instance.debug(message, additional_depth)
 
-    def info(self, message: str, additional_depth: Optional[int]) -> None:
+    def info(self, message: str, additional_depth: Optional[int] = None) -> None:
         self.instance.info(message, additional_depth)
 
-    def warning(self, message: str, additional_depth: Optional[int]) -> None:
+    def warning(self, message: str, additional_depth: Optional[int] = None) -> None:
         self.instance.warning(message, additional_depth)
 
-    def error(self, message: str, additional_depth: Optional[int]) -> None:
+    def error(self, message: str, additional_depth: Optional[int] = None) -> None:
         self.instance.error(message, additional_depth)
 
-    def critical(self, message: str, additional_depth: Optional[int]) -> None:
+    def critical(self, message: str, additional_depth: Optional[int] = None) -> None:
         self.instance.critical(message, additional_depth)
