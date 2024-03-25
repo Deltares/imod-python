@@ -37,7 +37,7 @@ from imod.schemata import (
     ValidationError,
 )
 from imod.typing import GridDataArray
-
+from imod.mf6.utilities.regrid import RegridderWeightsCache
 
 class Package(PackageBase, IPackage, abc.ABC):
     """
@@ -547,7 +547,7 @@ class Package(PackageBase, IPackage, abc.ABC):
     def regrid_like(
         self,
         target_grid: GridDataArray,
-        regrid_context: Any,
+        regrid_context: RegridderWeightsCache,
         regridder_types: Optional[dict[str, Tuple[RegridderType, str]]] = None,
     ) -> "Package":
         """
@@ -574,6 +574,9 @@ class Package(PackageBase, IPackage, abc.ABC):
         regridder_types: dict(str->(regridder type,str))
            dictionary mapping arraynames (str) to a tuple of regrid type (a specialization class of BaseRegridder) and function name (str)
             this dictionary can be used to override the default mapping method.
+        regrid_context: Optional RegridderWeightsCache
+            stores regridder weights for different regridders. Can be used to speed up regridding,
+            if the same regridders are used several times for regridding different arrays.             
 
         Returns
         -------

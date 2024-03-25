@@ -474,6 +474,9 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
             a grid defined over the same discretization as the one we want to regrid the package to
         validate: bool
             set to true to validate the regridded packages
+        regrid_context: Optional RegridderWeightsCache
+            stores regridder weights for different regridders. Can be used to speed up regridding,
+            if the same regridders are used several times for regridding different arrays.        
 
         Returns
         -------
