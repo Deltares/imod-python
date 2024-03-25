@@ -1012,7 +1012,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         if not any(flow_models) and not any(transport_models):
             raise ValueError("a simulation without any models cannot be split.")
 
-        original_models = {**flow_models,** transport_models}
+        original_models = {**flow_models,**transport_models}
         for model_name, model in original_models.items():
             supported, error_with_object = model.is_splitting_supported()
             if not supported:
