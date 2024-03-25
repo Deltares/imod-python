@@ -20,7 +20,7 @@ from imod.mf6.hfb import to_connected_cells_dataset
 from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
 from imod.typing.grid import ones_like
 
-from imod.mf6.utilities.regrid import RegridderInstancesCollection
+from imod.mf6.utilities.regrid import RegridderWeightsCache
 
 @pytest.mark.parametrize("dis", ["basic_unstructured_dis", "basic_dis"])
 @pytest.mark.parametrize(
@@ -137,7 +137,7 @@ def test_to_mf6_creates_mf6_adapter(
     else:
         idomain_clipped = idomain.sel(x=slice(None, 54.0))
 
-    regrid_context = RegridderInstancesCollection(idomain.sel(layer=1), idomain_clipped.sel(layer=1))
+    regrid_context = RegridderWeightsCache(idomain.sel(layer=1), idomain_clipped.sel(layer=1))
 
     hfb_clipped = hfb.regrid_like(idomain_clipped.sel(layer=1), regrid_context)
 

@@ -308,7 +308,7 @@ def get_spatial_dimension_names( grid: object)-> list[str]:
     return []
 
 @typedispatch
-def get_2d_grid_hash( grid: xr.DataArray)-> int:
+def get_grid_geometry_hash( grid: xr.DataArray)-> int:
     result = hash(pickle.dumps(grid["x"].values))
     result += hash(pickle.dumps(grid["y"].values))
     if " layer"  in grid.coords:
@@ -316,10 +316,10 @@ def get_2d_grid_hash( grid: xr.DataArray)-> int:
     return result
 
 @typedispatch
-def get_2d_grid_hash( grid: xu.UgridDataArray)-> int:
+def get_grid_geometry_hash( grid: xu.UgridDataArray)-> int:
     g =  hash(pickle.dumps(grid.ugrid.grid))
     return g
 
 @typedispatch
-def get_2d_grid_hash( grid: object)-> int:
-    raise ValueError("get_2d_grid_hash not supported for this object.")
+def get_grid_geometry_hash( grid: object)-> int:
+    raise ValueError("get_grid_geometry_hash not supported for this object.")

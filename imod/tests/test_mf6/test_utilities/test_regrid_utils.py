@@ -4,7 +4,7 @@ import pytest
 from xugrid import OverlapRegridder
 
 from imod.mf6 import Dispersion
-from imod.mf6.utilities.regrid import RegridderInstancesCollection, RegridderType
+from imod.mf6.utilities.regrid import RegridderWeightsCache, RegridderType
 
 
 def test_instance_collection_returns_same_instance_when_enum_and_method_match(
@@ -13,7 +13,7 @@ def test_instance_collection_returns_same_instance_when_enum_and_method_match(
     grid, _, _ = basic_unstructured_dis
     new_grid = copy.deepcopy(grid)
 
-    collection = RegridderInstancesCollection(grid, new_grid)
+    collection = RegridderWeightsCache(grid, new_grid)
 
     first_instance = collection.get_regridder(grid, new_grid, RegridderType.OVERLAP, "harmonic_mean")
     second_instance = collection.get_regridder(grid, new_grid, RegridderType.OVERLAP, "harmonic_mean")
@@ -27,7 +27,7 @@ def test_instance_collection_combining_different_instantiation_parmeters(
     grid, _, _ = basic_unstructured_dis
     new_grid = copy.deepcopy(grid)
 
-    collection = RegridderInstancesCollection(grid, new_grid)
+    collection = RegridderWeightsCache(grid, new_grid)
 
     first_instance = collection.get_regridder(grid, new_grid, RegridderType.OVERLAP, "harmonic_mean")
     second_instance = collection.get_regridder(grid, new_grid, OverlapRegridder, "harmonic_mean")
@@ -41,7 +41,7 @@ def test_instance_collection_returns_different_instance_when_name_does_not_match
     grid, _, _ = basic_unstructured_dis
     new_grid = copy.deepcopy(grid)
 
-    collection = RegridderInstancesCollection(grid, new_grid)
+    collection = RegridderWeightsCache(grid, new_grid)
 
     first_instance = collection.get_regridder(grid, new_grid, RegridderType.CENTROIDLOCATOR)
     second_instance = collection.get_regridder(grid, new_grid, RegridderType.BARYCENTRIC)
@@ -55,7 +55,7 @@ def test_instance_collection_returns_different_instance_when_method_does_not_mat
     grid, _, _ = basic_unstructured_dis
     new_grid = copy.deepcopy(grid)
 
-    collection = RegridderInstancesCollection(grid, new_grid)
+    collection = RegridderWeightsCache(grid, new_grid)
 
     first_instance = collection.get_regridder(grid, new_grid, RegridderType.OVERLAP, "geometric_mean")
     second_instance = collection.get_regridder(grid, new_grid, RegridderType.OVERLAP, "harmonic_mean")
@@ -69,7 +69,7 @@ def test_non_regridder_cannot_be_instantiated(
     grid, _, _ = basic_unstructured_dis
     new_grid = copy.deepcopy(grid)
 
-    collection = RegridderInstancesCollection(grid, new_grid)
+    collection = RegridderWeightsCache(grid, new_grid)
 
     # we create a class with the same constructor-signature as a regridder has, but it is not a regridder
     # still, it is an abc.ABCMeta
@@ -85,7 +85,7 @@ def test_error_messages(basic_unstructured_dis):
     grid, _, _ = basic_unstructured_dis
     new_grid = copy.deepcopy(grid)
 
-    collection = RegridderInstancesCollection(grid, new_grid)
+    collection = RegridderWeightsCache(grid, new_grid)
     with pytest.raises(TypeError):
         _ = collection.get_regridder(grid, new_grid, 
             RegridderType.BARYCENTRIC,
@@ -105,7 +105,7 @@ def test_create_regridder_from_class_not_enum(
     grid, _, _ = basic_unstructured_dis
     new_grid = copy.deepcopy(grid)
 
-    collection = RegridderInstancesCollection(grid, new_grid)
+    collection = RegridderWeightsCache(grid, new_grid)
     regridder = collection.get_regridder(grid, new_grid, OverlapRegridder, "harmonic_mean")
 
     assert isinstance(regridder, OverlapRegridder)

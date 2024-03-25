@@ -26,7 +26,7 @@ import xarray as xr
 from example_models import create_twri_simulation
 
 from imod.mf6.utilities.regrid import RegridderType
-from imod.mf6.utilities.regrid import RegridderInstancesCollection
+from imod.mf6.utilities.regrid import RegridderWeightsCache
 # %%
 # Now we create the twri simulation itself. It yields a simulation of a flow problem, with a grid of 3 layers and 15 cells in both x and y directions.
 # To better illustrate the regridding, we replace the K field with a lognormal random K field. The original k-field is a constant per layer.
@@ -94,7 +94,7 @@ regridded_k_2.sel(layer=1).plot(y="y", yincrease=False, ax=ax)
 # in this example we'll regrid the npf package manually and the rest of the packages using default methods.
 
 regridder_types = {"k": (RegridderType.CENTROIDLOCATOR, None)}
-regrid_context = RegridderInstancesCollection(model["npf"]["k"] , target_grid)
+regrid_context = RegridderWeightsCache(model["npf"]["k"] , target_grid)
 npf_regridded = model["npf"].regrid_like(
     target_grid=target_grid,regrid_context=regrid_context,  regridder_types=regridder_types
 )

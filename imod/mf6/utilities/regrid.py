@@ -23,10 +23,10 @@ from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.regridding_types import RegridderType
 from imod.schemata import ValidationError
-from imod.typing.grid import GridDataArray, ones_like, get_2d_grid_hash
+from imod.typing.grid import GridDataArray, ones_like, get_grid_geometry_hash
 
 
-class RegridderInstancesCollection:
+class RegridderWeightsCache:
     """
     This class stores any number of regridders that can regrid a single source grid to a single target grid.
     By storing the regridders, we make sure the regridders can be re-used for different arrays on the same grid.
@@ -95,21 +95,15 @@ class RegridderInstancesCollection:
             target_grid = copy.deepcopy(target_grid)
             target_grid = target_grid.drop_vars("layer")
             
-
-        source_hash  = get_2d_grid_hash(source_grid)
-        target_hash  = get_2d_grid_hash(target_grid) 
+        source_hash  = get_grid_geometry_hash(source_grid)
+        target_hash  = get_grid_geometry_hash(target_grid) 
         key = (source_hash, target_hash, regridder_class)       
         if not key in self.weights_cache.keys():
-            kwargs = {"source": source_grid, "target": target_grid}
-            kwargs["method"] = method                
+            kwargs = {"source": source_grid, "target": target_grid, "method": method}        
             regridder = regridder_class(**kwargs)            
             self.weights_cache[key] = regridder.weights
         else:
-            kwargs = {}
-            kwargs["weights"] = self.weights_cache[key]
-            kwargs["target"] =  target_grid
-            kwargs["method"] = method  
-
+            kwargs = {"weights": self.weights_cache[key],"target": target_grid, "method": method }
             regridder = regridder_class.from_weights(**kwargs)
 
         return regridder
@@ -134,7 +128,7 @@ def assign_coord_if_present(
 def _regrid_array(
         package: IRegridPackage,
         varname: str,
-        regridder_collection: RegridderInstancesCollection,
+        regridder_collection: RegridderWeightsCache,
         regridder_name: str,
         regridder_function: str,
         target_grid: GridDataArray,
@@ -209,7 +203,7 @@ def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, lis
 def _regrid_like(
     package: IRegridPackage,
     target_grid: GridDataArray,    
-    regrid_context: RegridderInstancesCollection,
+    regrid_context: RegridderWeightsCache,
 
     regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
 ) -> IPackage:
@@ -311,7 +305,7 @@ def _regrid_like(
     similar to the one used in input argument "target_grid"
     """
     new_model = model.__class__()
-    regrid_context = RegridderInstancesCollection(model.domain, target_grid)
+    regrid_context = RegridderWeightsCache(model.domain, target_grid)
     for pkg_name, pkg in model.items():
         if isinstance(pkg, (IRegridPackage, ILineDataPackage, IPointDataPackage)):
             new_model[pkg_name] = pkg.regrid_like(target_grid, regrid_context)
@@ -405,7 +399,7 @@ def _regrid_like(
 def _get_regridding_domain(
     model: IModel,
     target_grid: GridDataArray,
-    regrid_context: RegridderInstancesCollection,
+    regrid_context: RegridderWeightsCache,
     methods: defaultdict[RegridderType, list[str]],
 ) -> GridDataArray:
     """
