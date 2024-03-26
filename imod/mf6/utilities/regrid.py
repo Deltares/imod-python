@@ -99,7 +99,7 @@ class RegridderWeightsCache:
         key = (source_hash, target_hash, regridder_class)       
         if not key in self.weights_cache.keys():
             if len(self.weights_cache) >= self.max_cache_size:
-                self.remove_one_regridder()
+                self.remove_first_regridder()
             kwargs = {"source": source_grid, "target": target_grid}     
             if method is not None:
                 kwargs["method"] = method
