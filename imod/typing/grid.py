@@ -311,8 +311,6 @@ def get_spatial_dimension_names( grid: object)-> list[str]:
 def get_grid_geometry_hash( grid: xr.DataArray)-> int:
     result = hash(pickle.dumps(grid["x"].values))
     result += hash(pickle.dumps(grid["y"].values))
-    if " layer"  in grid.coords:
-        result += hash(pickle.dumps(grid["layer"].values))
     return result
 
 @typedispatch
