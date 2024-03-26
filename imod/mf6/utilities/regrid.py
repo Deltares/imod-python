@@ -113,7 +113,7 @@ class RegridderWeightsCache:
 
         return regridder
 
-    def remove_one_regridder(self):
+    def remove_first_regridder(self):
         keys = list(self.weights_cache.keys())
         self.weights_cache.pop(keys[0])
 
