@@ -27,6 +27,6 @@ class IPackage(IPackageBase, metaclass=abc.ABCMeta):
     def auxiliary_data_fields(self) -> dict[str, str]:
         raise NotImplementedError
 
-    @abstractmethod    
-    def is_regridding_supported(self)->bool:
-         raise NotImplementedError           
+    @abstractmethod
+    def is_regridding_supported(self) -> bool:
+        raise NotImplementedError

@@ -11,11 +11,14 @@ def finer_grid(grid):
     ymin = grid.coords["y"].min().values[()]
     ymax = grid.coords["y"].max().values[()]
     steps_x = len(grid.coords["x"])
-    steps_y = len(grid.coords["y"])   
+    steps_y = len(grid.coords["y"])
     layers = grid.coords["layer"]
-    new_x = np.arange(xmin, xmax, (xmax-xmin)/(steps_x*2))
-    new_y =  np.arange(ymax, ymin, -(ymax-ymin)/(steps_y*2))
-    return xr.DataArray(dims=["layer", "y","x"], coords ={"layer":layers, "y": new_y, "x": new_x})
+    new_x = np.arange(xmin, xmax, (xmax - xmin) / (steps_x * 2))
+    new_y = np.arange(ymax, ymin, -(ymax - ymin) / (steps_y * 2))
+    return xr.DataArray(
+        dims=["layer", "y", "x"], coords={"layer": layers, "y": new_y, "x": new_x}
+    )
+
 
 @pytest.mark.usefixtures("rectangle_with_lakes")
 def test_mf6_simulation_partition_with_lakes(rectangle_with_lakes, tmp_path):
@@ -27,6 +30,7 @@ def test_mf6_simulation_partition_with_lakes(rectangle_with_lakes, tmp_path):
     with pytest.raises(ValueError, match="simulation(.+)lake(.+)GWF_1"):
         _ = simulation.split(label_array)
 
+
 @pytest.mark.usefixtures("rectangle_with_lakes")
 def test_mf6_simulation_regrid_with_lakes(rectangle_with_lakes, tmp_path):
     simulation = rectangle_with_lakes
@@ -36,6 +40,7 @@ def test_mf6_simulation_regrid_with_lakes(rectangle_with_lakes, tmp_path):
     with pytest.raises(ValueError, match="simulation(.+)lake(.+)GWF_1"):
         _ = simulation.regrid_like("regridded_simulation", new_grid, True)
 
+
 @pytest.mark.usefixtures("rectangle_with_lakes")
 def test_mf6_model_regrid_with_lakes(rectangle_with_lakes, tmp_path):
     simulation = rectangle_with_lakes
@@ -43,7 +48,7 @@ def test_mf6_model_regrid_with_lakes(rectangle_with_lakes, tmp_path):
     new_grid = finer_grid(simulation["GWF_1"].domain)
 
     with pytest.raises(ValueError, match="model(.+)lake"):
-        _ = model.regrid_like( new_grid, True)
+        _ = model.regrid_like(new_grid, True)
 
 
 @pytest.mark.usefixtures("rectangle_with_lakes")
@@ -53,7 +58,7 @@ def test_mf6_package_regrid_with_lakes(rectangle_with_lakes, tmp_path):
     new_grid = finer_grid(simulation["GWF_1"].domain)
 
     with pytest.raises(ValueError, match="package(.+)not be regridded"):
-        _ = package.regrid_like( new_grid)
+        _ = package.regrid_like(new_grid)
 
 
 @pytest.mark.usefixtures("rectangle_with_lakes")
@@ -61,7 +66,7 @@ def test_mf6_simulation_clip_with_lakes(rectangle_with_lakes, tmp_path):
     simulation = rectangle_with_lakes
 
     with pytest.raises(ValueError, match="simulation(.+)clipped(.*)lake"):
-        _ = simulation.clip_box(x_min= 200, y_min=  200, x_max= 1000, y_max= 1000)
+        _ = simulation.clip_box(x_min=200, y_min=200, x_max=1000, y_max=1000)
 
 
 @pytest.mark.usefixtures("rectangle_with_lakes")
@@ -69,7 +74,8 @@ def test_mf6_model_clip_with_lakes(rectangle_with_lakes, tmp_path):
     model = rectangle_with_lakes["GWF_1"]
 
     with pytest.raises(ValueError, match="model(.+)clipped(.*)lake"):
-        _ = model.clip_box(x_min= 200, y_min=  200, x_max= 1000, y_max= 1000)
+        _ = model.clip_box(x_min=200, y_min=200, x_max=1000, y_max=1000)
+
 
 @pytest.mark.usefixtures("rectangle_with_lakes")
 def test_mf6_package_clip_with_lakes(rectangle_with_lakes, tmp_path):
@@ -77,4 +83,4 @@ def test_mf6_package_clip_with_lakes(rectangle_with_lakes, tmp_path):
     package = simulation["GWF_1"]["lake"]
 
     with pytest.raises(ValueError, match="package(.+)clipping"):
-        _ = package.clip_box(x_min= 200, y_min=  200, x_max= 1000, y_max= 1000)
+        _ = package.clip_box(x_min=200, y_min=200, x_max=1000, y_max=1000)

@@ -13,5 +13,5 @@ class ISimulation(IDict):
     def has_one_flow_model(self) -> bool:
         raise NotImplementedError
 
-    def get_models(self) ->dict[str, IModel]:
-         raise NotImplementedError       
+    def get_models(self) -> dict[str, IModel]:
+        raise NotImplementedError

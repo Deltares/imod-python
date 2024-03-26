@@ -8,12 +8,13 @@ from imod.mf6.lak import Lake, LakeData
 
 def create_lake(idomain, xmin_index, xmax_index, ymin_index, ymax_index, name):
     is_lake = xr.full_like(idomain, False, dtype=bool)
-    is_lake.values[0, xmin_index:xmax_index+1, ymin_index:ymax_index+1] = True
+    is_lake.values[0, xmin_index : xmax_index + 1, ymin_index : ymax_index + 1] = True
 
     lake_table = None
     return create_lake_data_structured(
         is_lake, starting_stage=11.0, name=name, lake_table=lake_table
     )
+
 
 @pytest.fixture(scope="function")
 def rectangle_with_lakes():
@@ -44,7 +45,6 @@ def rectangle_with_lakes():
     head = xr.full_like(like, np.nan).sel(layer=[1, 2])
     head[..., 0] = 0.0
 
-
     # Create and fill the groundwater model.
     gwf_model = imod.mf6.GroundwaterFlowModel()
     gwf_model["dis"] = imod.mf6.StructuredDiscretization(
@@ -58,7 +58,7 @@ def rectangle_with_lakes():
         specific_yield=0.15,
         convertible=0,
         transient=True,
-    ) 
+    )
     gwf_model["ic"] = imod.mf6.InitialConditions(start=0.0)
 
     gwf_model["npf"] = imod.mf6.NodePropertyFlow(
@@ -71,7 +71,6 @@ def rectangle_with_lakes():
         save_flows=True,
     )
     gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
-
 
     simulation = imod.mf6.Modflow6Simulation("ex01-twri")
     simulation["GWF_1"] = gwf_model
@@ -94,10 +93,11 @@ def rectangle_with_lakes():
     )
     # Collect time discretization
     simulation.create_time_discretization(additional_times=["2000-01-01", "2000-01-02"])
-    lake1 = create_lake (idomain, 2, 3, 2,3, "first_lake")
-    lake2 = create_lake (idomain, 12, 13, 12,13, "second_lake")
+    lake1 = create_lake(idomain, 2, 3, 2, 3, "first_lake")
+    lake2 = create_lake(idomain, 12, 13, 12, 13, "second_lake")
     simulation["GWF_1"]["lake"] = Lake.from_lakes_and_outlets([lake1, lake2])
     return simulation
+
 
 def create_lake_data_structured(
     is_lake,
@@ -116,7 +116,7 @@ def create_lake_data_structured(
     HORIZONTAL = 0
     connection_type = xr.full_like(is_lake, HORIZONTAL, dtype=np.float64).where(is_lake)
     bed_leak = xr.full_like(is_lake, 0.2, dtype=np.float64).where(is_lake)
-    top_elevation = xr.full_like(is_lake, 0., dtype=np.float64).where(is_lake)
+    top_elevation = xr.full_like(is_lake, 0.0, dtype=np.float64).where(is_lake)
     bot_elevation = xr.full_like(is_lake, -1.0, dtype=np.float64).where(is_lake)
     connection_length = xr.full_like(is_lake, 0.5, dtype=np.float64).where(is_lake)
     connection_width = xr.full_like(is_lake, 0.6, dtype=np.float64).where(is_lake)

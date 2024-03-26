@@ -75,6 +75,7 @@ def test_regrid_unstructured_model_to_unstructured_model(
     validation_result = new_gwf_model.validate("test_model")
     assert not validation_result.has_errors()
 
+
 @pytest.mark.parametrize("inactivity_marker", [0, -1])
 def test_regrid_unstructured_model_with_inactive_cells(
     inactivity_marker: int,
