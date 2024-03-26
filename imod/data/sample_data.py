@@ -14,6 +14,7 @@ import xarray as xr
 import xugrid as xu
 
 from imod.formats.prj import open_projectfile_data
+from imod.mf6 import Modflow6Simulation
 from imod.util.imports import MissingOptionalModule
 
 try:
@@ -106,3 +107,23 @@ def imod5_projectfile_data(path: Union[str, Path]) -> dict:
         archive.extractall(path)
 
     return open_projectfile_data(Path(path) / "iMOD5_model_pooch" / "iMOD5_model.prj")
+
+
+def hondsrug_simulation(path: Union[str, Path]) -> Modflow6Simulation:
+    fname_simulation = REGISTRY.fetch("hondsrug-simulation.zip")
+
+    with ZipFile(fname_simulation) as archive:
+        archive.extractall(path)
+    
+    return Modflow6Simulation.from_file(Path(path) / "mf6-hondsrug-example.toml")
+
+
+def hondsrug_crosssection(path: Union[str, Path]) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
+    fname_simulation = REGISTRY.fetch("hondsrug-crosssection.zip")
+
+    with ZipFile(fname_simulation) as archive:
+        archive.extractall(path)
+    
+    return gpd.read_file(Path(path) / "crosssection.shp")
+
+
