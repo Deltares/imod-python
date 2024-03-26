@@ -15,7 +15,12 @@ from imod.mf6.write_context import WriteContext
 @pytest.mark.usefixtures("circle_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_write_and_run(circle_model, tmp_path):
-    imod.logging.configure(LoggerType.PYTHON, log_level = LogLevel.DEBUG  ,add_default_file_handler=True, add_default_stream_handler = True)
+    imod.logging.configure(
+        LoggerType.PYTHON,
+        log_level=LogLevel.DEBUG,
+        add_default_file_handler=True,
+        add_default_stream_handler=True,
+    )
     simulation = circle_model
 
     with pytest.raises(
@@ -26,9 +31,9 @@ def test_simulation_write_and_run(circle_model, tmp_path):
     modeldir = tmp_path / "circle"
 
     mask = deepcopy(circle_model["GWF_1"].domain)
-    mask.values[:, 133] = -1    
+    mask.values[:, 133] = -1
     simulation.mask_all_models(mask)
-    
+
     simulation.write(modeldir, binary=False, use_absolute_paths=True)
     simulation.run()
 

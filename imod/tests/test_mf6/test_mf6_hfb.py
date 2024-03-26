@@ -305,9 +305,9 @@ def test_to_mf6_remove_invalid_edges(
 ):
     # Arrange.
     idomain, top, bottom = parameterizable_basic_dis
-    idomain.loc[
-        {"x": idomain.coords["x"][-1]}
-    ] = inactivity_marker  # make cells inactive
+    idomain.loc[{"x": idomain.coords["x"][-1]}] = (
+        inactivity_marker  # make cells inactive
+    )
     k = ones_like(top)
 
     barrier_y = [0.0, 2.0]
@@ -415,6 +415,7 @@ def test_is_empty():
     hfb = HorizontalFlowBarrierResistance(geometry)
     assert not hfb.is_empty()
 
+
 @pytest.mark.parametrize(
     "parameterizable_basic_dis",
     [BasicDisSettings(nlay=2, nrow=3, ncol=3, xstart=0, xstop=3)],
@@ -433,9 +434,8 @@ def test_set_options(print_input, parameterizable_basic_dis):
                 "ztop": [10.0],
                 "zbottom": [0.0],
             },
-           
         ),
-        print_input = print_input
+        print_input=print_input,
     )
     k = ones_like(top)
     mf6_package = hfb.to_mf6_pkg(idomain, top, bottom, k)

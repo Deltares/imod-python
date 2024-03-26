@@ -53,15 +53,21 @@ def test_compose__pattern():
     targetpath = pathlib.Path(d["directory"], "head_2018-02-22_l05.foo")
 
     d["time"] = datetime.datetime(2018, 2, 22, 9, 6, 57)
-    path = imod.util.path.compose(d, pattern="{name}_{time:%Y-%m-%d}_l{layer:02d}{extension}")
+    path = imod.util.path.compose(
+        d, pattern="{name}_{time:%Y-%m-%d}_l{layer:02d}{extension}"
+    )
     assert path == targetpath
 
     d["time"] = cftime.DatetimeProlepticGregorian(2018, 2, 22, 9, 6, 57)
-    path = imod.util.path.compose(d, pattern="{name}_{time:%Y-%m-%d}_l{layer:02d}{extension}")
+    path = imod.util.path.compose(
+        d, pattern="{name}_{time:%Y-%m-%d}_l{layer:02d}{extension}"
+    )
     assert path == targetpath
 
     d["time"] = np.datetime64("2018-02-22 09:06:57")
-    path = imod.util.path.compose(d, pattern="{name}_{time:%Y-%m-%d}_l{layer:02d}{extension}")
+    path = imod.util.path.compose(
+        d, pattern="{name}_{time:%Y-%m-%d}_l{layer:02d}{extension}"
+    )
     assert path == targetpath
 
     targetpath = pathlib.Path(d["directory"], ".foo_makes_head_no_layer5_sense_day22")
@@ -129,7 +135,9 @@ def test_decompose_nonstandard_date():
 
 
 def test_decompose_only_year():
-    d = imod.util.path.decompose("path/to/head_2018_l5.idf", pattern="{name}_{time}_l{layer}")
+    d = imod.util.path.decompose(
+        "path/to/head_2018_l5.idf", pattern="{name}_{time}_l{layer}"
+    )
     refd = {
         "extension": ".idf",
         "directory": pathlib.Path("path", "to"),

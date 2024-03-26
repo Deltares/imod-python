@@ -3,6 +3,7 @@ Conventional IDF filenames can be understood and constructed using
 :func:`imod.util.path.decompose` and :func:`imod.util.path.compose`. These are used
 automatically in :func:`imod.idf`.
 """
+
 import datetime
 import pathlib
 import re
@@ -15,6 +16,7 @@ import numpy as np
 from imod.util.time import _compose_timestring, to_datetime
 
 Pattern = re.Pattern
+
 
 def _custom_pattern_to_regex_pattern(pattern: str):
     """
@@ -189,6 +191,7 @@ def compose(d, pattern=None) -> pathlib.Path:
         return pathlib.Path(d["directory"]) / s
     else:
         return pathlib.Path(s)
+
 
 def temporary_directory() -> pathlib.Path:
     tempdir = tempfile.TemporaryDirectory()

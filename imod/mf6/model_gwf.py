@@ -5,7 +5,7 @@ from typing import Optional
 import cftime
 import numpy as np
 
-from imod.logging.logging_decorators import init_log_decorator
+from imod.logging import init_log_decorator
 from imod.mf6 import ConstantHead
 from imod.mf6.clipped_boundary_condition_creator import create_clipped_boundary
 from imod.mf6.model import Modflow6Model
@@ -108,11 +108,11 @@ class GroundwaterFlowModel(Modflow6Model):
     def set_newton(self, is_newton: bool) -> None:
         self._options["newton"] = is_newton
 
-    def update_buoyancy_package(self, transport_models_per_flow_model)->None:
-        '''
-        If the simulation is partitioned, then the buoyancy package, if present, 
+    def update_buoyancy_package(self, transport_models_per_flow_model) -> None:
+        """
+        If the simulation is partitioned, then the buoyancy package, if present,
         must be updated for the renamed transport models.
-        '''
+        """
         buoyancy_key = self._get_pkgkey("buy")
         if buoyancy_key is None:
             return
@@ -120,7 +120,3 @@ class GroundwaterFlowModel(Modflow6Model):
         transport_models_old = buoyancy_package.get_transport_model_names()
         if len(transport_models_old) == len(transport_models_per_flow_model):
             buoyancy_package.update_transport_models(transport_models_per_flow_model)
-        
-
-
-            

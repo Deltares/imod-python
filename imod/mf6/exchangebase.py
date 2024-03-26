@@ -44,35 +44,42 @@ class ExchangeBase(Package):
             self.model_name1,
             self.model_name2,
         )
-    
-    def render_with_geometric_constants(self,  directory: Path, pkgname: str, globaltimes: Union[list[np.datetime64], np.ndarray], binary: bool) -> str:
-        
+
+    def render_with_geometric_constants(
+        self,
+        directory: Path,
+        pkgname: str,
+        globaltimes: Union[list[np.datetime64], np.ndarray],
+        binary: bool,
+    ) -> str:
         if hasattr(self, "_template"):
             template = self._template
         else:
             raise RuntimeError("exchange package does not have a template")
-        
-        d = Package._get_render_dictionary(self, directory, pkgname, globaltimes, binary)
-        
-        datablock = pd.DataFrame()
-        datablock["layer1"] =  self.dataset["layer"].values[:] 
 
-        # If the grid is structured, the cell_id arrays will have both a row and a column dimension, 
+        d = Package._get_render_dictionary(
+            self, directory, pkgname, globaltimes, binary
+        )
+
+        datablock = pd.DataFrame()
+        datablock["layer1"] = self.dataset["layer"].values[:]
+
+        # If the grid is structured, the cell_id arrays will have both a row and a column dimension,
         # but if it is unstructured, it will have only a cellid dimension
         is_structured = len(self.dataset["cell_id1"].shape) > 1
         is_structured = is_structured and self.dataset["cell_id1"].shape[1] > 1
 
-        datablock["cell_id1_1"] = self.dataset["cell_id1"].values[:,0]  
+        datablock["cell_id1_1"] = self.dataset["cell_id1"].values[:, 0]
         if is_structured:
-             datablock["cell_id1_2"] = self.dataset["cell_id1"].values[:,1]
-        datablock["layer2"] =  self.dataset["layer"].values[:]  
-        datablock["cell_id2_1"] = self.dataset["cell_id2"].values[:,0]
-        if is_structured: 
-             datablock["cell_id2_2"] = self.dataset["cell_id2"].values[:,1]
+            datablock["cell_id1_2"] = self.dataset["cell_id1"].values[:, 1]
+        datablock["layer2"] = self.dataset["layer"].values[:]
+        datablock["cell_id2_1"] = self.dataset["cell_id2"].values[:, 0]
+        if is_structured:
+            datablock["cell_id2_2"] = self.dataset["cell_id2"].values[:, 1]
 
-        for key in ["ihc", "cl1", "cl2", "hwva", "angldegx", "cdist" ]:
-            if key in  self.dataset.keys():
-                  datablock[key] = self.dataset[key].values[:]      
-                                      
-        d["datablock"] = datablock.to_string(index=False,  header=False )
-        return template.render(d)        
+        for key in ["ihc", "cl1", "cl2", "hwva", "angldegx", "cdist"]:
+            if key in self.dataset.keys():
+                datablock[key] = self.dataset[key].values[:]
+
+        d["datablock"] = datablock.to_string(index=False, header=False)
+        return template.render(d)

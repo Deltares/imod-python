@@ -21,6 +21,7 @@ def ignore_warnings():
         warnings.simplefilter("ignore", RuntimeWarning)
         yield
 
+
 @contextlib.contextmanager
 def cd(path: Union[str, pathlib.Path]):
     """

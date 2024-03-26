@@ -3,7 +3,7 @@ from typing import Optional
 import numpy as np
 import xarray as xr
 
-from imod.logging.logging_decorators import init_log_decorator
+from imod.logging import init_log_decorator
 from imod.mf6.package import Package
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
@@ -187,7 +187,7 @@ class ImmobileStorageTransfer(Package):
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0))
         ],
     }
-    
+
     @init_log_decorator()
     def __init__(
         self,
