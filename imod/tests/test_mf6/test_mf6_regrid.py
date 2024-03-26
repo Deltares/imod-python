@@ -116,7 +116,7 @@ def test_regrid_structured():
     """
     structured_grid_packages = create_package_instances(is_structured=True)
     new_grid = grid_data_structured(np.float64, 12, 2.5)
-    old_grid = grid_data_structured (np.float_, 1.0e-4, 5.0)
+    old_grid = grid_data_structured(np.float64, 1.0e-4, 5.0)
 
 
     regrid_context = RegridderWeightsCache(old_grid, new_grid)
