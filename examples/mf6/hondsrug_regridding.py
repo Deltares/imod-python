@@ -16,7 +16,6 @@ regridding are shown next.
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
-from example_models import create_hondsrug_simulation
 
 import imod
 from imod.typing import GridDataArray
@@ -25,9 +24,11 @@ from imod.typing import GridDataArray
 # Obtain the simulation, write it, run it, and plot some heads.
 # There is a separate example contained in :doc:`/examples/mf6/hondsrug`
 # that you should look at if you are interested in the model building
-gwf_simulation = create_hondsrug_simulation()
+tmpdir = imod.util.temporary_directory()
 
-original_modeldir = imod.util.temporary_directory() / "original"
+gwf_simulation = imod.data.hondsrug_simulation(tmpdir / "hondsrug_saved")
+
+original_modeldir = tmpdir / "original"
 gwf_simulation.write(original_modeldir)
 gwf_simulation.run()
 hds_original = gwf_simulation.open_head()
@@ -68,7 +69,7 @@ regridded_simulation = gwf_simulation.regrid_like(
     "hondsrug-regridded", target_grid, validate=False
 )
 
-regridded_modeldir = original_modeldir / ".." / "regridded"
+regridded_modeldir = tmpdir / "regridded"
 regridded_simulation.write(regridded_modeldir, validate=False)
 
 regridded_simulation.run()

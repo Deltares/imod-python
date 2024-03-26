@@ -14,7 +14,6 @@ comparison.
 
 # %% Import packages
 import matplotlib.pyplot as plt
-from example_models import create_hondsrug_simulation
 
 import imod
 from imod.mf6.multimodel.partition_generator import get_label_array
@@ -24,13 +23,14 @@ from imod.mf6.multimodel.partition_generator import get_label_array
 # There is a separate example contained in
 # :doc:`hondsrug </examples/mf6/hondsrug>`
 # that you should look at if you are interested in the model building
-gwf_simulation = create_hondsrug_simulation()
+tmpdir = imod.util.temporary_directory()
+
+gwf_simulation = imod.data.hondsrug_simulation(tmpdir / "hondsrug_saved")
 
 
 # %%
 # Write the model and run it (before partitioning, so we can compare if the results are similar)
-modeldir = imod.util.temporary_directory()
-original_modeldir = modeldir / "original"
+original_modeldir = tmpdir / "original"
 
 gwf_simulation.write(original_modeldir, False, False)
 
@@ -63,7 +63,9 @@ split_simulation = gwf_simulation.split(submodel_labels)
 
 # %%
 # Now we  write and run the partitioned model
-split_simulation.write(modeldir, False, False)
+split_modeldir = tmpdir / "split"
+
+split_simulation.write(split_modeldir, False, False)
 split_simulation.run()
 
 
