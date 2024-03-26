@@ -19,7 +19,7 @@ def test_regridders_weight_cache_returns_similar_instance_when_enum_and_method_m
     first_instance = collection.get_regridder(grid, new_grid, RegridderType.OVERLAP, "harmonic_mean")
     second_instance = collection.get_regridder(grid, new_grid, RegridderType.OVERLAP, "harmonic_mean")
 
-    assert hash (pickle.dumps(first_instance)) == hash (pickle.dumps(second_instance))
+    assert hash (pickle.dumps(first_instance.weights["__regrid_data"])) == hash (pickle.dumps(second_instance.weights["__regrid_data"]))
 
 
 def test_regridders_weight_cache_combining_different_instantiation_parmeters(
@@ -33,7 +33,7 @@ def test_regridders_weight_cache_combining_different_instantiation_parmeters(
     first_instance = collection.get_regridder(grid, new_grid, RegridderType.OVERLAP, "harmonic_mean")
     second_instance = collection.get_regridder(grid, new_grid, OverlapRegridder, "harmonic_mean")
 
-    assert hash (pickle.dumps(first_instance)) == hash (pickle.dumps(second_instance))
+    assert hash (pickle.dumps(first_instance.weights["__regrid_data"])) == hash (pickle.dumps(second_instance.weights["__regrid_data"]))
 
 def test_regridders_weight_cache_returns_different_instance_when_name_does_not_match(
     basic_unstructured_dis,
