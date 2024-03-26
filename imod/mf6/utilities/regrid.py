@@ -30,6 +30,7 @@ class RegridderWeightsCache:
     """
     This class stores any number of regridders that can regrid a single source grid to a single target grid.
     By storing the regridders, we make sure the regridders can be re-used for different arrays on the same grid.
+    Regridders are stored based on their type (`see these docs<https://deltares.github.io/xugrid/examples/regridder_overview.html>`_) and planar coordinates (x, y).
     This is important because computing the regridding weights is a costly affair.
     """
 
