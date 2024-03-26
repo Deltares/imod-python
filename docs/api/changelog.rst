@@ -49,6 +49,8 @@ Added
 - added logging to various initialization methods, write methods and dump methods. `See the
   documentation <https://deltares.github.io/imod-python/api/generated/logging/imod.logging.html>`_
   how to activate logging.
+- added :func:`imod.data.hondsrug_simulation` and
+  :func:`imod.data.hondsrug_crosssection` data.
 
 Changed
 ~~~~~~~
