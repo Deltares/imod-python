@@ -89,9 +89,14 @@ fig, ax = plt.subplots()
 regridded_k_2.sel(layer=1).plot(y="y", yincrease=False, ax=ax)
 
 
-# %%
-# Finally, we can regrid package per package. This allows us to choose the regridding method as well.
-# in this example we'll regrid the npf package manually and the rest of the packages using default methods.
+# %% Finally, we can regrid package per package. This allows us to choose the
+# regridding method as well. in this example we'll regrid the npf package
+# manually and the rest of the packages using default methods.
+#
+# Note that we create a RegridderWeightsCache here. This will store the weights
+# of the regridder. Using the same cache to regrid another package will lead to
+# a performance increase if that package uses the same regridding method,
+# because initializing a regridder is costly. 
 
 regridder_types = {"k": (RegridderType.CENTROIDLOCATOR, None)}
 regrid_context = RegridderWeightsCache(model["npf"]["k"] , target_grid)
