@@ -139,6 +139,7 @@ class TestGwfgwf:
         with pytest.raises(NotImplementedError):
             sample_gwfgwf_structured.clip_box(0, 100, 1, 12, 0, 100, 0, 100)
 
+
 @pytest.mark.parametrize("newton_option", [False, True])
 def test_option_newton_propagated(circle_model, newton_option, tmp_path):
     # set newton option on original model

@@ -13,7 +13,10 @@ def get_repeat_stress(times) -> xr.DataArray:
     times: Dict of datetime-like to datetime-like.
         The data of the value datetime is used for the key datetime.
     """
-    keys = [imod.util.time.to_datetime_internal(key, use_cftime=False) for key in times.keys()]
+    keys = [
+        imod.util.time.to_datetime_internal(key, use_cftime=False)
+        for key in times.keys()
+    ]
     values = [
         imod.util.time.to_datetime_internal(value, use_cftime=False)
         for value in times.values()

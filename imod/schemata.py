@@ -77,7 +77,9 @@ def scalar_None(obj):
         return (len(obj.shape) == 0) & (~obj.notnull()).all()
 
 
-def align_other_obj_with_coords(obj: GridDataArray, other_obj: GridDataArray) -> Tuple[xr.DataArray, xr.DataArray]:
+def align_other_obj_with_coords(
+    obj: GridDataArray, other_obj: GridDataArray
+) -> Tuple[xr.DataArray, xr.DataArray]:
     """
     Align other_obj with obj if coordname in obj but not in its dims.
     Avoid issues like:
@@ -87,10 +89,11 @@ def align_other_obj_with_coords(obj: GridDataArray, other_obj: GridDataArray) ->
     for coordname in obj.coords.keys():
         if (coordname in other_obj.dims) and not (coordname in obj.dims):
             obj = obj.expand_dims(coordname)
-    # Note: 
+    # Note:
     # xr.align forces xu.UgridDataArray to xr.DataArray. Keep that in mind
     # in further data processing.
     return xr.align(obj, other_obj, join="left")
+
 
 class ValidationError(Exception):
     pass
@@ -312,7 +315,9 @@ class CompatibleSettingsSchema(BaseSchema):
         expected = np.all(other_obj == self.other_value)
 
         if obj and not expected:
-            raise ValidationError(f"Incompatible setting: {self.other} should be {self.other_value}")
+            raise ValidationError(
+                f"Incompatible setting: {self.other} should be {self.other_value}"
+            )
 
 
 class CoordsSchema(BaseSchema):

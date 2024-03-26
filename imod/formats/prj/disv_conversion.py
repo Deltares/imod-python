@@ -2,6 +2,7 @@
 Most of the functionality here attempts to replicate what iMOD does with
 project files.
 """
+
 from __future__ import annotations
 
 import itertools

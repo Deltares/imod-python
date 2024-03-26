@@ -90,7 +90,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         is the volumetric well rate. A positive value indicates well
         (injection) and a negative value indicates discharge (extraction) (q).
         If provided as DataArray, an ``"index"`` dimension is required and an
-        optional ``"time"`` dimension and coordinate specify transient input. 
+        optional ``"time"`` dimension and coordinate specify transient input.
         In the latter case, it is important that dimensions are in the order:
         ``("time", "index")``
     concentration: array of floats (xr.DataArray, optional)
@@ -100,8 +100,8 @@ class Well(BoundaryCondition, IPointDataPackage):
         if this flow package is used in simulations also involving transport, then this keyword specifies
         how outflow over this boundary is computed.
     id: list of Any, optional
-        assign an identifier code to each well. if not provided, one will be generated 
-        Must be convertible to string, and unique entries.  
+        assign an identifier code to each well. if not provided, one will be generated
+        Must be convertible to string, and unique entries.
     minimum_k: float, optional
         on creating point wells, no point wells will be placed in cells with a lower horizontal conductivity than this
     minimum_thickness: float, optional
@@ -148,13 +148,13 @@ class Well(BoundaryCondition, IPointDataPackage):
     >>> imod.mf6.Well(x, y, screen_top, screen_bottom, rate)
 
     For a transient well:
-    
+
     >>> weltimes = pd.date_range("2000-01-01", "2000-01-03")
 
     >>> rate_factor_time = xr.DataArray([0.5, 1.0], coords={"time": weltimes}, dims=("time",))
     >>> rate_transient = rate_factor_time * xr.DataArray(rate, dims=("index",))
 
-    >>> imod.mf6.Well(x, y, screen_top, screen_bottom, rate_transient)        
+    >>> imod.mf6.Well(x, y, screen_top, screen_bottom, rate_transient)
     """
 
     @property
@@ -187,7 +187,6 @@ class Well(BoundaryCondition, IPointDataPackage):
 
     _regrid_method: dict[str, Tuple[RegridderType, str]] = {}
 
-
     @init_log_decorator()
     def __init__(
         self,
@@ -195,7 +194,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         y: list[float],
         screen_top: list[float],
         screen_bottom: list[float],
-        rate: list[float]| xr.DataArray,
+        rate: list[float] | xr.DataArray,
         concentration: Optional[list[float] | xr.DataArray] = None,
         concentration_boundary_type="aux",
         id: Optional[list[Any]] = None,
@@ -214,7 +213,7 @@ class Well(BoundaryCondition, IPointDataPackage):
             set_id = set(id)
             if len(id) != len(set_id):
                 raise ValueError("id's must be unique")
-            id = [ str(i) for i in id]                
+            id = [str(i) for i in id]
         dict_dataset = {
             "screen_top": _assign_dims(screen_top),
             "screen_bottom": _assign_dims(screen_bottom),
@@ -598,7 +597,6 @@ class Well(BoundaryCondition, IPointDataPackage):
 
         return Mf6Wel(**ds.data_vars)
 
-
     def mask(self, domain: GridDataArray) -> Well:
         """
         Mask wells based on two-dimensional domain. For three-dimensional
@@ -614,9 +612,9 @@ class Well(BoundaryCondition, IPointDataPackage):
             "layer", errors="ignore"
         )
         return mask_2D(self, domain_2d)
-    
+
     def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method    
+        return self._regrid_method
 
 
 class WellDisStructured(DisStructuredBoundaryCondition):
@@ -692,7 +690,6 @@ class WellDisStructured(DisStructuredBoundaryCondition):
     }
 
     _write_schemata = {}
-
 
     @init_log_decorator()
     def __init__(
@@ -853,7 +850,6 @@ class WellDisVertices(DisVerticesBoundaryCondition):
     }
 
     _write_schemata = {}
-
 
     @init_log_decorator()
     def __init__(

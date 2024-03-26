@@ -24,14 +24,10 @@ def _dataarray_to_bool(griddataarray: GridDataArray) -> bool:
         return False
 
     if griddataarray.values.size != 1:
-        raise ValueError(
-            "DataArray is not a single value"
-        )
+        raise ValueError("DataArray is not a single value")
 
     if griddataarray.values.dtype != bool:
-        raise ValueError(
-            "DataArray is not a boolean"
-        )
+        raise ValueError("DataArray is not a boolean")
 
     return griddataarray.values.item()
 
@@ -278,8 +274,16 @@ class NodePropertyFlow(Package, IRegridPackage):
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
         ],
-        "alternative_cell_averaging": [DTypeSchema(str), DimsSchema(), CompatibleSettingsSchema("xt3d_option", False)],
-        "rhs_option": [DTypeSchema(np.bool_), DimsSchema(), CompatibleSettingsSchema("xt3d_option", True)],
+        "alternative_cell_averaging": [
+            DTypeSchema(str),
+            DimsSchema(),
+            CompatibleSettingsSchema("xt3d_option", False),
+        ],
+        "rhs_option": [
+            DTypeSchema(np.bool_),
+            DimsSchema(),
+            CompatibleSettingsSchema("xt3d_option", True),
+        ],
         "save_flows": [DTypeSchema(np.bool_), DimsSchema()],
         "starting_head_as_confined_thickness": [DTypeSchema(np.bool_)],
         "variable_vertical_conductance": [DTypeSchema(np.bool_)],
@@ -454,6 +458,6 @@ class NodePropertyFlow(Package, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
-    
+
     def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
         return self._regrid_method

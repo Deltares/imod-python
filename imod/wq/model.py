@@ -405,7 +405,9 @@ class SeawatModel(Model):
         package_set = sorted(package_set)
         baskey = self._get_pkgkey("bas6")
         bas = self[baskey]
-        _, xmin, xmax, _, ymin, ymax = imod.util.spatial.spatial_reference(bas["ibound"])
+        _, xmin, xmax, _, ymin, ymax = imod.util.spatial.spatial_reference(
+            bas["ibound"]
+        )
 
         if not self.use_cftime:
             start_time = pd.to_datetime(globaltimes[0])

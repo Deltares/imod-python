@@ -220,8 +220,11 @@ def test_partitioning_structured(
         head["head"].values, original_head.values, rtol=1e-4, atol=1e-4
     )
 
+
 @pytest.mark.usefixtures("transient_twri_model")
-@parametrize_with_cases("partition_array", cases=PartitionArrayCases, glob="*four_squares")
+@parametrize_with_cases(
+    "partition_array", cases=PartitionArrayCases, glob="*four_squares"
+)
 def test_split_dump(
     tmp_path: Path,
     transient_twri_model: Modflow6Simulation,
@@ -229,16 +232,19 @@ def test_split_dump(
 ):
     simulation = transient_twri_model
     split_simulation = simulation.split(partition_array)
-    split_simulation.dump(tmp_path/"split")
-    reloaded_split = imod.mf6.Modflow6Simulation.from_file(tmp_path/"split/ex01-twri_partioned.toml")
+    split_simulation.dump(tmp_path / "split")
+    reloaded_split = imod.mf6.Modflow6Simulation.from_file(
+        tmp_path / "split/ex01-twri_partioned.toml"
+    )
 
-    split_simulation.write(tmp_path/"split/original")
-    reloaded_split.write(tmp_path/"split/reloaded")
+    split_simulation.write(tmp_path / "split/original")
+    reloaded_split.write(tmp_path / "split/reloaded")
 
-    diff = dircmp(tmp_path/"split/original", tmp_path/"split/reloaded")
+    diff = dircmp(tmp_path / "split/original", tmp_path / "split/reloaded")
     assert len(diff.diff_files) == 0
     assert len(diff.left_only) == 0
-    assert len(diff.right_only) == 0    
+    assert len(diff.right_only) == 0
+
 
 @pytest.mark.usefixtures("transient_twri_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases.case_four_squares)
@@ -250,18 +256,19 @@ def test_partitioning_write_after_split(
     simulation = transient_twri_model
 
     # write simulation before splitting, then split simulation, then write the simulation a second time
-    simulation.write(tmp_path/ "first_time", binary=False)
+    simulation.write(tmp_path / "first_time", binary=False)
 
     _ = simulation.split(partition_array)
 
-    simulation.write(tmp_path/ "second_time", binary=False)
+    simulation.write(tmp_path / "second_time", binary=False)
 
-    #check that text output was not affected by splitting
-    diff = dircmp(tmp_path/"first_time", tmp_path/"second_time")
+    # check that text output was not affected by splitting
+    diff = dircmp(tmp_path / "first_time", tmp_path / "second_time")
     assert len(diff.diff_files) == 0
     assert len(diff.left_only) == 0
-    assert len(diff.right_only) == 0    
-    
+    assert len(diff.right_only) == 0
+
+
 @pytest.mark.usefixtures("transient_twri_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partitioning_structured_with_inactive_cells(

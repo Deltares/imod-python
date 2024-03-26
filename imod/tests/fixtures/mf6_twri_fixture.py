@@ -145,7 +145,7 @@ def make_twri_model():
         screen_bottom=screen_bottom,
         rate=rate_wel,
         minimum_k=1e-19,
-        save_flows=True
+        save_flows=True,
     )
     gwf_model["dis"] = imod.mf6.StructuredDiscretization(
         top=200.0, bottom=bottom, idomain=idomain
@@ -180,11 +180,9 @@ def make_twri_model():
         transient=False,
     )
 
-    #The mere presence of the api package should not impact results. It
-    #should not prevent model execution, splitting or partitioning. 
-    gwf_model["api"] = imod.mf6.ApiPackage(
-        maxbound = 20
-    )
+    # The mere presence of the api package should not impact results. It
+    # should not prevent model execution, splitting or partitioning.
+    gwf_model["api"] = imod.mf6.ApiPackage(maxbound=20)
 
     # Attach it to a simulation
     simulation = imod.mf6.Modflow6Simulation("ex01-twri")

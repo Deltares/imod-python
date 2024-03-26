@@ -192,7 +192,8 @@ class SpecificStorage(StorageBase):
 
     def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
         return self._regrid_method
-    
+
+
 class StorageCoefficient(StorageBase):
     """
     Storage Package with a storage coefficient.  Be careful,
@@ -302,6 +303,7 @@ class StorageCoefficient(StorageBase):
     }
 
     _template = Package._initialize_template(_pkg_id)
+
     @init_log_decorator()
     def __init__(
         self,
@@ -326,6 +328,6 @@ class StorageCoefficient(StorageBase):
         d = self._render_dict(directory, pkgname, globaltimes, binary)
         d["storagecoefficient"] = True
         return self._template.render(d)
-    
+
     def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
         return self._regrid_method

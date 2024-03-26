@@ -79,7 +79,7 @@ class BoundaryCondition(Package, abc.ABC):
         else:
             expand_transient_auxiliary_variables(self)
 
-    def set_repeat_stress(self, times: dict[np.datetime64,np.datetime64]) -> None:
+    def set_repeat_stress(self, times: dict[np.datetime64, np.datetime64]) -> None:
         """
         Set repeat stresses: re-use data of earlier periods.
 
@@ -106,7 +106,7 @@ class BoundaryCondition(Package, abc.ABC):
         )
 
         self.dataset["repeat_stress"] = get_repeat_stress(times)
-        
+
     def _max_active_n(self):
         """
         Determine the maximum active number of cells that are active

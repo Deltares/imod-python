@@ -1,10 +1,13 @@
 from imod.logging.loglevel import LogLevel
 
 
-def standard_log_decorator(start_level: LogLevel = LogLevel.INFO, end_level: LogLevel = LogLevel.DEBUG):
+def standard_log_decorator(
+    start_level: LogLevel = LogLevel.INFO, end_level: LogLevel = LogLevel.DEBUG
+):
     """
     Decorator to print log messages announcing the beginning and end of the decorated method
     """
+
     def decorator(fun):
         def wrapper(*args, **kwargs):
             from imod.logging import logger
@@ -17,14 +20,19 @@ def standard_log_decorator(start_level: LogLevel = LogLevel.INFO, end_level: Log
             return_value = fun(*args, **kwargs)
             logger.log(loglevel=end_level, message=end_message, additional_depth=2)
             return return_value
-        return wrapper
-    return decorator
-       
 
-def init_log_decorator(start_level: LogLevel = LogLevel.INFO, end_level: LogLevel = LogLevel.DEBUG):
+        return wrapper
+
+    return decorator
+
+
+def init_log_decorator(
+    start_level: LogLevel = LogLevel.INFO, end_level: LogLevel = LogLevel.DEBUG
+):
     """
     Decorator to print log messages announcing the beginning and end of initialization methods
     """
+
     def decorator(fun):
         def wrapper(*args, **kwargs):
             from imod.logging import logger
@@ -37,6 +45,7 @@ def init_log_decorator(start_level: LogLevel = LogLevel.INFO, end_level: LogLeve
             return_value = fun(*args, **kwargs)
             logger.log(loglevel=end_level, message=end_message, additional_depth=2)
             return return_value
+
         return wrapper
+
     return decorator
-         
