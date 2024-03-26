@@ -1,6 +1,6 @@
 import abc
 from abc import abstractmethod
-from typing import Any, Tuple
+from typing import Any
 
 from imod.mf6.interfaces.ipackagebase import IPackageBase
 
