@@ -25,6 +25,7 @@ from imod.mf6.pkgbase import (
 from imod.mf6.utilities.mask import _mask
 from imod.mf6.utilities.regrid import (
     RegridderType,
+    RegridderWeightsCache,
     _regrid_like,
 )
 from imod.mf6.utilities.schemata import filter_schemata_dict
@@ -37,7 +38,7 @@ from imod.schemata import (
     ValidationError,
 )
 from imod.typing import GridDataArray
-from imod.mf6.utilities.regrid import RegridderWeightsCache
+
 
 class Package(PackageBase, IPackage, abc.ABC):
     """

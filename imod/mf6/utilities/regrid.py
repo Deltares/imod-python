@@ -28,8 +28,8 @@ from imod.typing.grid import GridDataArray, get_grid_geometry_hash, ones_like
 
 class RegridderWeightsCache:
     """
-    This class stores any number of regridders that can regrid a single source grid to a single target grid.
-    By storing the regridders, we make sure the regridders can be re-used for different arrays on the same grid.
+    This class stores the weight arrays for regridders and can therefore create instances of regridders
+    fast that can be used for different arrays on the same grid.
     This is important because computing the regridding weights is a costly affair.
     """
 
@@ -37,7 +37,7 @@ class RegridderWeightsCache:
         self,
         source_grid: Union[xr.DataArray, xu.UgridDataArray],
         target_grid: Union[xr.DataArray, xu.UgridDataArray],
-        cache_size: int = 6
+        max_cache_size: int = 6
     ) -> None:
         self.regridder_instances: dict[
             tuple[type[BaseRegridder], Optional[str]], BaseRegridder
@@ -46,7 +46,7 @@ class RegridderWeightsCache:
         self._target_grid = target_grid
 
         self.weights_cache = {}
-        self.cache_size = cache_size
+        self.max_cache_size = max_cache_size
 
     def __get_regridder_class(
         self, regridder_type: RegridderType | BaseRegridder
@@ -98,7 +98,7 @@ class RegridderWeightsCache:
         target_hash  = get_grid_geometry_hash(target_grid) 
         key = (source_hash, target_hash, regridder_class)       
         if not key in self.weights_cache.keys():
-            if len(self.weights_cache) >= self.cache_size:
+            if len(self.weights_cache) >= self.max_cache_size:
                 self.remove_one_regridder()
             kwargs = {"source": source_grid, "target": target_grid}     
             if method is not None:

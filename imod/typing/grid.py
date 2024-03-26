@@ -315,8 +315,10 @@ def get_grid_geometry_hash( grid: xr.DataArray)-> int:
 
 @typedispatch
 def get_grid_geometry_hash( grid: xu.UgridDataArray)-> int:
-    g =  hash(pickle.dumps(grid.ugrid.grid))
-    return g
+    result =  hash(pickle.dumps(grid.ugrid.grid.node_x))
+    result =+  hash(pickle.dumps(grid.ugrid.grid.node_y))
+    result =+  hash(pickle.dumps(grid.ugrid.grid.node_face_connectivity))    
+    return result
 
 @typedispatch
 def get_grid_geometry_hash( grid: object)-> int:
