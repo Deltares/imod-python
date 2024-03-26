@@ -96,12 +96,14 @@ regridded_k_2.sel(layer=1).plot(y="y", yincrease=False, ax=ax)
 # Note that we create a RegridderWeightsCache here. This will store the weights
 # of the regridder. Using the same cache to regrid another package will lead to
 # a performance increase if that package uses the same regridding method,
-# because initializing a regridder is costly. 
+# because initializing a regridder is costly.
 
 regridder_types = {"k": (RegridderType.CENTROIDLOCATOR, None)}
-regrid_context = RegridderWeightsCache(model["npf"]["k"] , target_grid)
+regrid_context = RegridderWeightsCache(model["npf"]["k"], target_grid)
 npf_regridded = model["npf"].regrid_like(
-    target_grid=target_grid,regrid_context=regrid_context,  regridder_types=regridder_types
+    target_grid=target_grid,
+    regrid_context=regrid_context,
+    regridder_types=regridder_types,
 )
 new_model["npf"] = npf_regridded
 

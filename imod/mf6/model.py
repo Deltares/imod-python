@@ -459,7 +459,10 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         return clipped
 
     def regrid_like(
-        self, target_grid: GridDataArray,  validate: bool = True, regrid_context:Optional[RegridderWeightsCache] = None
+        self,
+        target_grid: GridDataArray,
+        validate: bool = True,
+        regrid_context: Optional[RegridderWeightsCache] = None,
     ) -> "Modflow6Model":
         """
         Creates a model by regridding the packages of this model to another discretization.
@@ -475,7 +478,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             set to true to validate the regridded packages
         regrid_context: Optional RegridderWeightsCache
             stores regridder weights for different regridders. Can be used to speed up regridding,
-            if the same regridders are used several times for regridding different arrays.        
+            if the same regridders are used several times for regridding different arrays.
 
         Returns
         -------

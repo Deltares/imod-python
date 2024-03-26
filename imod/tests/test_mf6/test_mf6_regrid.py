@@ -118,7 +118,6 @@ def test_regrid_structured():
     new_grid = grid_data_structured(np.float64, 12, 2.5)
     old_grid = grid_data_structured(np.float64, 1.0e-4, 5.0)
 
-
     regrid_context = RegridderWeightsCache(old_grid, new_grid)
     new_packages = []
     for package in structured_grid_packages:
@@ -139,9 +138,9 @@ def test_regrid_unstructured():
     """
     unstructured_grid_packages = create_package_instances(is_structured=False)
     new_grid = grid_data_unstructured(np.float64, 12, 2.5)
-    old_grid = grid_data_unstructured (np.float_, 1.0e-4, 5.0)
+    old_grid = grid_data_unstructured(np.float_, 1.0e-4, 5.0)
     regrid_context = RegridderWeightsCache(old_grid, new_grid)
-        
+
     new_packages = []
     for package in unstructured_grid_packages:
         new_packages.append(package.regrid_like(new_grid, regrid_context))
@@ -173,7 +172,7 @@ def test_regrid_structured_missing_dx_and_dy():
     )
 
     new_grid = grid_data_structured(np.float64, 12, 0.25)
-    old_grid = grid_data_unstructured (np.float_, 1.0e-4, 5.0)    
+    old_grid = grid_data_unstructured(np.float_, 1.0e-4, 5.0)
     regrid_context = RegridderWeightsCache(old_grid, new_grid)
     with pytest.raises(
         ValueError,
@@ -252,7 +251,7 @@ def test_regridding_can_skip_validation():
     # Regrid the package to a finer domain
     new_grid = grid_data_structured(np.float64, 1.0, 0.025)
     old_grid = grid_data_structured(np.float64, -20.0, 0.25)
-    regrid_context = RegridderWeightsCache(old_grid, new_grid)    
+    regrid_context = RegridderWeightsCache(old_grid, new_grid)
     regridded_package = sto_package.regrid_like(new_grid, regrid_context)
 
     # Check that write validation still fails for the regridded package
@@ -299,7 +298,7 @@ def test_regridding_layer_based_array():
     )
     old_grid = grid_data_structured(np.float64, -20.0, 0.25)
     new_grid = grid_data_structured(np.float64, 1.0, 0.025)
-    regrid_context = RegridderWeightsCache(old_grid, new_grid)        
+    regrid_context = RegridderWeightsCache(old_grid, new_grid)
     regridded_package = sto_package.regrid_like(new_grid, regrid_context)
 
     assert (

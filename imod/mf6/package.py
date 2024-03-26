@@ -581,14 +581,14 @@ class Package(PackageBase, IPackage, abc.ABC):
             this dictionary can be used to override the default mapping method.
         regrid_context: Optional RegridderWeightsCache
             stores regridder weights for different regridders. Can be used to speed up regridding,
-            if the same regridders are used several times for regridding different arrays.             
+            if the same regridders are used several times for regridding different arrays.
 
         Returns
         -------
         a package with the same options as this package, and with all the data-arrays regridded to another discretization,
         similar to the one used in input argument "target_grid"
         """
-        return _regrid_like(self, target_grid,regrid_context, regridder_types) 
+        return _regrid_like(self, target_grid, regrid_context, regridder_types)
 
     def _skip_masking_dataarray(self, array_name: str) -> bool:
         if hasattr(self, "_skip_mask_arrays"):

@@ -317,19 +317,22 @@ def get_spatial_dimension_names(grid: xu.UgridDataArray) -> list[str]:
 def get_spatial_dimension_names(grid: object) -> list[str]:
     return []
 
+
 @typedispatch
-def get_grid_geometry_hash( grid: xr.DataArray)-> int:
+def get_grid_geometry_hash(grid: xr.DataArray) -> int:
     result = hash(pickle.dumps(grid["x"].values))
     result += hash(pickle.dumps(grid["y"].values))
     return result
 
-@typedispatch
-def get_grid_geometry_hash( grid: xu.UgridDataArray)-> int:
-    result =  hash(pickle.dumps(grid.ugrid.grid.node_x))
-    result =+  hash(pickle.dumps(grid.ugrid.grid.node_y))
-    result =+  hash(pickle.dumps(grid.ugrid.grid.node_face_connectivity))    
-    return result
 
 @typedispatch
-def get_grid_geometry_hash( grid: object)-> int:
+def get_grid_geometry_hash(grid: xu.UgridDataArray) -> int:
+    result = hash(pickle.dumps(grid.ugrid.grid.node_x))
+    result = +hash(pickle.dumps(grid.ugrid.grid.node_y))
+    result = +hash(pickle.dumps(grid.ugrid.grid.node_face_connectivity))
+    return result
+
+
+@typedispatch
+def get_grid_geometry_hash(grid: object) -> int:
     raise ValueError("get_grid_geometry_hash not supported for this object.")
