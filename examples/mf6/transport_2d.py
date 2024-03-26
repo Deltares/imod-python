@@ -40,7 +40,7 @@ top = 10.0
 dims = ("layer", "y", "x")
 
 # %%
-# Construct the "idomain" array, and then the discretization package which represents the model grid.  
+# Construct the "idomain" array, and then the discretization package which represents the model grid.
 y = np.arange(delr * nrow, 0, -delr)
 x = np.arange(0, delc * ncol, delc)
 coords = {"layer": [1], "y": y, "x": x, "dx": delc, "dy": -delr}
@@ -54,9 +54,9 @@ gwf_model["dis"] = imod.mf6.StructuredDiscretization(
 
 
 # %%
-# Construct the other flow packages. Flow is steady-state in this simulation, 
+# Construct the other flow packages. Flow is steady-state in this simulation,
 # meaning specific storage is set to zero.
-# 
+#
 gwf_model["sto"] = imod.mf6.SpecificStorage(
     specific_storage=0.0,
     specific_yield=0.0,
@@ -64,16 +64,13 @@ gwf_model["sto"] = imod.mf6.SpecificStorage(
     convertible=0,
 )
 gwf_model["npf"] = imod.mf6.NodePropertyFlow(
-    icelltype=zeros_like(idomain),
-    k=1.0,
-    save_flows=True,
-    save_specific_discharge=True
+    icelltype=zeros_like(idomain), k=1.0, save_flows=True, save_specific_discharge=True
 )
 gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
 gwf_model["ic"] = imod.mf6.InitialConditions(start=10.0)
 
 # %%
-# Set up the boundary conditions. We have: 2 constant head boundaries at 
+# Set up the boundary conditions. We have: 2 constant head boundaries at
 # the left and right, chosen so that the velocity is 1/3 m/day
 # and a well that injects 1 m3 per day, with a concentration of 1000
 Lx = 460
@@ -117,9 +114,9 @@ gwf_model["wel"] = imod.mf6.Well(
 
 
 # %%
-# Now construct the transport simulation. The flow boundaries 
+# Now construct the transport simulation. The flow boundaries
 # already have inflow concentration data associated, so the transport
-# boundaries can be imported using the ssm package, and the rest of the 
+# boundaries can be imported using the ssm package, and the rest of the
 # transport model definition is straightforward.
 tpt_model = imod.mf6.GroundwaterTransportModel()
 tpt_model["ssm"] = imod.mf6.SourceSinkMixing.from_flow_model(
@@ -144,7 +141,7 @@ tpt_model["dis"] = gwf_model["dis"]
 # %%
 # Create a simulation and add the flow and transport models to it.
 # Then define some ims packages: 1 for every type of model.
-# Finally create 365 time steps of 1 day each. 
+# Finally create 365 time steps of 1 day each.
 simulation = imod.mf6.Modflow6Simulation("ex01-twri")
 simulation["GWF_1"] = gwf_model
 simulation["TPT_1"] = tpt_model
@@ -197,7 +194,7 @@ simulation.write(modeldir, binary=False)
 
 label_array = get_label_array(simulation, 4)
 fig, ax = plt.subplots()
-label_array.plot(ax = ax)
+label_array.plot(ax=ax)
 
 split_simulation = simulation.split(label_array)
 # %%
@@ -207,18 +204,16 @@ conc = simulation.open_concentration()
 
 # %%
 # Run the split model and load the simulation results.
-split_modeldir = modeldir /"split"
+split_modeldir = modeldir / "split"
 split_simulation.write(split_modeldir, binary=False)
 split_simulation.run()
-split_conc =  split_simulation.open_concentration()["concentration"]
+split_conc = split_simulation.open_concentration()["concentration"]
 fig, ax = plt.subplots()
-split_conc.isel(layer=0, time = 364).plot.contourf(ax = ax, levels=[0.1, 1, 10])
+split_conc.isel(layer=0, time=364).plot.contourf(ax=ax, levels=[0.1, 1, 10])
 
 # %%
-# Compute the difference between the split and unsplit simulation results for transport at the 
+# Compute the difference between the split and unsplit simulation results for transport at the
 # end of the simulation, and print them
-diff = abs(conc -split_conc)
+diff = abs(conc - split_conc)
 fig, ax = plt.subplots()
-diff.isel(layer=0, time = 364).plot.contourf(ax=ax)
-
-
+diff.isel(layer=0, time=364).plot.contourf(ax=ax)

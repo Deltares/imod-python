@@ -127,6 +127,7 @@ def test_inconsistent_nan(riv_data, dis_data):
 
     assert len(errors) == 1
 
+
 @parametrize_with_cases("riv_data,dis_data", cases=RivDisCases)
 def test_layer_as_coord_in_active_cells(riv_data, dis_data):
     # Test if no bugs like https://github.com/Deltares/imod-python/issues/830
@@ -139,6 +140,7 @@ def test_layer_as_coord_in_active_cells(riv_data, dis_data):
 
     assert len(errors) == 0
 
+
 @parametrize_with_cases("riv_data,dis_data", cases=RivDisCases)
 def test_layer_as_coord_in_inactive_cells(riv_data, dis_data):
     river = imod.mf6.River(**riv_data)
@@ -149,6 +151,7 @@ def test_layer_as_coord_in_inactive_cells(riv_data, dis_data):
     errors = river._validate(river._write_schemata, **dis_data)
 
     assert len(errors) == 1
+
 
 @parametrize_with_cases("riv_data", cases=RivCases)
 def test_check_layer(riv_data):

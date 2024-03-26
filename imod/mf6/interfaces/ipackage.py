@@ -9,9 +9,10 @@ class IPackage(IPackageBase, metaclass=abc.ABCMeta):
     """
     Interface for imod.mf6.package.Package
     """
+
     @abstractmethod
     def _valid(self, value):
-        raise NotImplementedError        
+        raise NotImplementedError
 
     @abstractmethod
     def __init__(self, *args, **kwargs) -> None:
@@ -25,7 +26,7 @@ class IPackage(IPackageBase, metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def auxiliary_data_fields(self) -> dict[str, str]:
         raise NotImplementedError
-    
+
     @abstractmethod    
     def is_regridding_supported(self)->bool:
          raise NotImplementedError           

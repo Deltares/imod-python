@@ -63,7 +63,6 @@ def test_dispersion_options():
 
     assert actual == expected
 
-
     disp = imod.mf6.Dispersion(1e-4, 1.0, 10.0, 1.0, 2.0, 3.0, False, True)
     actual = disp.render(directory, "dsp", globaltimes, True)
     expected = textwrap.dedent(
@@ -90,6 +89,7 @@ def test_dispersion_options():
 
     assert actual == expected
 
+
 def test_dispersion_erronous_options():
     message = textwrap.dedent(
         """
@@ -98,7 +98,10 @@ def test_dispersion_erronous_options():
     )
 
     with pytest.raises(ValidationError, match=re.escape(message)):
-      imod.mf6.Dispersion(1e-4, 1.0, 10.0, 1.0, 2.0, 3.0, xt3d_off=True, xt3d_rhs=True)
+        imod.mf6.Dispersion(
+            1e-4, 1.0, 10.0, 1.0, 2.0, 3.0, xt3d_off=True, xt3d_rhs=True
+        )
+
 
 def test_dispersion_layered():
     def layered(data):
@@ -115,7 +118,7 @@ def test_dispersion_layered():
         transversal_vertical=layered([16.0, 17.0, 18.0]),
         xt3d_off=True,
         xt3d_rhs=True,
-        validate=False
+        validate=False,
     )
 
     actual = disp.render(directory, "dsp", globaltimes, True)

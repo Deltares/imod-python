@@ -9,7 +9,7 @@ class ILogger:
     """
 
     @abstractmethod
-    def debug(self, message: str) -> None:
+    def debug(self, message: str, additional_depth: int) -> None:
         """
         Log message with severity ':attr:`~imod.logging.loglevel.LogLevel.DEBUG`'.
 
@@ -17,11 +17,14 @@ class ILogger:
         ----------
         message : str
             message to be logged
+        additional_depth: Optional[int]
+            additional depth level. Use this to correct the filename and line number
+            when you add logging to a decorator
         """
         raise NotImplementedError
 
     @abstractmethod
-    def info(self, message: str) -> None:
+    def info(self, message: str, additional_depth: int) -> None:
         """
         Log message with severity ':attr:`~imod.logging.loglevel.LogLevel.INFO`'.
 
@@ -29,11 +32,14 @@ class ILogger:
         ----------
         message : str
             message to be logged
+        additional_depth: Optional[int]
+            additional depth level. Use this to correct the filename and line number
+            when you add logging to a decorator
         """
         raise NotImplementedError
 
     @abstractmethod
-    def warning(self, message: str) -> None:
+    def warning(self, message: str, additional_depth: int) -> None:
         """
         Log message with severity ':attr:`~imod.logging.loglevel.LogLevel.WARNING`'.
 
@@ -41,11 +47,14 @@ class ILogger:
         ----------
         message : str
             message to be logged
+        additional_depth: Optional[int]
+            additional depth level. Use this to correct the filename and line number
+            when you add logging to a decorator
         """
         raise NotImplementedError
 
     @abstractmethod
-    def error(self, message: str) -> None:
+    def error(self, message: str, additional_depth: int) -> None:
         """
         Log message with severity ':attr:`~imod.logging.loglevel.LogLevel.ERROR`'.
 
@@ -53,11 +62,14 @@ class ILogger:
         ----------
         message : str
             message to be logged
+        additional_depth: Optional[int]
+            additional depth level. Use this to correct the filename and line number
+            when you add logging to a decorator
         """
         raise NotImplementedError
 
     @abstractmethod
-    def critical(self, message: str) -> None:
+    def critical(self, message: str, additional_depth: int) -> None:
         """
         Log message with severity ':attr:`~imod.logging.loglevel.LogLevel.CRITICAL`'.
 
@@ -65,23 +77,26 @@ class ILogger:
         ----------
         message : str
             message to be logged
+        additional_depth: Optional[int]
+            additional depth level. Use this to correct the filename and line number
+            when you add logging to a decorator
         """
         raise NotImplementedError
 
-    def log(self, loglevel: LogLevel, message: str) -> None:
-        '''
+    def log(self, loglevel: LogLevel, message: str, additional_depth: int) -> None:
+        """
         logs a message with the specified urgency level.
-        '''
+        """
         match loglevel:
             case LogLevel.DEBUG:
-                self.debug(message)
+                self.debug(message, additional_depth)
             case LogLevel.INFO:
-                self.info(message)
+                self.info(message, additional_depth)
             case LogLevel.WARNING:
-                self.warning(message)   
+                self.warning(message, additional_depth)
             case LogLevel.ERROR:
-                self.error(message)   
-            case LogLevel.CRITICAL:      
-                self.critical(message)   
+                self.error(message, additional_depth)
+            case LogLevel.CRITICAL:
+                self.critical(message, additional_depth)
             case _:
                 raise ValueError(f"Unknown logging urgency at level {loglevel}")

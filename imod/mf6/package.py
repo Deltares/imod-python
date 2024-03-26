@@ -12,7 +12,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-from imod.logging.logging_decorators import standard_log_decorator
+from imod.logging import standard_log_decorator
 from imod.mf6.auxiliary_variables import (
     get_variable_names,
 )
@@ -185,7 +185,13 @@ class Package(PackageBase, IPackage, abc.ABC):
             else:
                 np.savetxt(fname=f, X=da.values, fmt=fmt)
 
-    def _get_render_dictionary(self, directory: pathlib.Path, pkgname: str, globaltimes: Union[list[np.datetime64], np.ndarray], binary: bool) ->dict[str,Any]:
+    def _get_render_dictionary(
+        self,
+        directory: pathlib.Path,
+        pkgname: str,
+        globaltimes: Union[list[np.datetime64], np.ndarray],
+        binary: bool,
+    ) -> dict[str, Any]:
         d = {}
         if directory is None:
             pkg_directory = pkgname
@@ -209,9 +215,9 @@ class Package(PackageBase, IPackage, abc.ABC):
         if (hasattr(self, "_auxiliary_data")) and (names := get_variable_names(self)):
             d["auxiliary"] = names
         return d
-    
+
     def render(self, directory, pkgname, globaltimes, binary):
-        d = self._get_render_dictionary( directory, pkgname, globaltimes, binary)
+        d = self._get_render_dictionary(directory, pkgname, globaltimes, binary)
         return self._template.render(d)
 
     @staticmethod
@@ -258,7 +264,6 @@ class Package(PackageBase, IPackage, abc.ABC):
                     values = None
 
         return layered, values
-
 
     @standard_log_decorator()
     def write(
@@ -536,7 +541,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         Parameters
         ----------
         mask: xr.DataArray, xu.UgridDataArray of ints
-            idomain-like integer array. 1 sets cells to active, 0 sets cells to inactive, 
+            idomain-like integer array. 1 sets cells to active, 0 sets cells to inactive,
             -1 sets cells to vertical passthrough
 
         Returns
@@ -546,7 +551,6 @@ class Package(PackageBase, IPackage, abc.ABC):
         """
 
         return _mask(self, mask)
-
 
     def regrid_like(
         self,
@@ -590,7 +594,6 @@ class Package(PackageBase, IPackage, abc.ABC):
         except  Exception:
             raise ValueError("package could not be regridded.")
         return result
-
     def _skip_masking_dataarray(self, array_name: str) -> bool:
         if hasattr(self, "_skip_mask_arrays"):
             return array_name in self._skip_mask_arrays
@@ -625,7 +628,9 @@ class Package(PackageBase, IPackage, abc.ABC):
         """
         result = {}
         all_non_grid_data = list(self.dataset.keys())
-        for name in (gridname for gridname in grid_names if gridname in all_non_grid_data):
+        for name in (
+            gridname for gridname in grid_names if gridname in all_non_grid_data
+        ):
             all_non_grid_data.remove(name)
         for name in all_non_grid_data:
             if "time" in self.dataset[name].coords:

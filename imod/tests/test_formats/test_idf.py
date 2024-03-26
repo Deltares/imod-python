@@ -170,7 +170,9 @@ def test_open_subdomains(subdomains, expected, equidistant, tmp_path):
 @parametrize_with_cases(
     "subdomains,expected,equidistant", cases=SubdomainCases, has_tag="no_species"
 )
-def test_open_subdomains__start_nr_not_zero(subdomains, expected, equidistant, tmp_path):
+def test_open_subdomains__start_nr_not_zero(
+    subdomains, expected, equidistant, tmp_path
+):
     # Test if no issue like https://github.com/Deltares/imod-python/issues/197 exists
     _save_subdomains_no_species(subdomains, tmp_path, start_nr=2)
 

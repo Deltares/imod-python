@@ -5,7 +5,7 @@ import cftime
 import numpy as np
 import xarray as xr
 
-from imod.logging.logging_decorators import init_log_decorator
+from imod.logging import init_log_decorator
 from imod.mf6.auxiliary_variables import expand_transient_auxiliary_variables
 from imod.mf6.exchangebase import ExchangeBase
 from imod.mf6.package import Package
@@ -91,6 +91,13 @@ class GWTGWT(ExchangeBase):
     ) -> Package:
         raise NotImplementedError("this package cannot be clipped")
 
-
-    def render(self, directory: Path, pkgname: str, globaltimes: Union[list[np.datetime64], np.ndarray], binary: bool) -> str:
-        return self.render_with_geometric_constants(directory, pkgname, globaltimes, binary)
+    def render(
+        self,
+        directory: Path,
+        pkgname: str,
+        globaltimes: Union[list[np.datetime64], np.ndarray],
+        binary: bool,
+    ) -> str:
+        return self.render_with_geometric_constants(
+            directory, pkgname, globaltimes, binary
+        )

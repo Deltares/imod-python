@@ -20,7 +20,7 @@ import xugrid as xu
 import imod
 import imod.logging
 import imod.mf6.exchangebase
-from imod.logging.logging_decorators import standard_log_decorator
+from imod.logging import standard_log_decorator
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwfgwt import GWFGWT
 from imod.mf6.gwtgwt import GWTGWT
@@ -77,6 +77,7 @@ def get_packages(simulation: Modflow6Simulation) -> dict[str, Package]:
         for pkg_name, pkg in simulation.items()
         if isinstance(pkg, Package)
     }
+
 
 class Modflow6Simulation(collections.UserDict, ISimulation):
     def _initialize_template(self):
@@ -606,9 +607,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 return self._merge_budgets(modelnames, output, **settings)
             else:
                 return self._merge_states(modelnames, output, **settings)
-        raise ValueError(
-            "error in _open_single_output"
-        )
+        raise ValueError("error in _open_single_output")
 
     def _merge_states(
         self, modelnames: list[str], output: str, **settings
@@ -637,13 +636,14 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         cbc[exchange_key] = exchange_budgets
         return cbc
 
-
     def _pad_missing_variables(self, cbc_per_partition: list[GridDataset]) -> None:
         """
         Boundary conditions can be missing in certain partitions, as do their
         budgets, in which case we manually assign an empty grid of nans.
         """
-        dims_per_unique_key = {key: cbc[key].dims for cbc in cbc_per_partition for key in cbc.keys()}
+        dims_per_unique_key = {
+            key: cbc[key].dims for cbc in cbc_per_partition for key in cbc.keys()
+        }
         for cbc in cbc_per_partition:
             missing_keys = set(dims_per_unique_key.keys()) - set(cbc.keys())
 
@@ -652,14 +652,18 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 missing_coords = {dim: cbc.coords[dim] for dim in missing_dims}
 
                 shape = tuple([len(missing_coords[dim]) for dim in missing_dims])
-                chunks = (1,) +  shape[1:]
+                chunks = (1,) + shape[1:]
                 missing_data = dask.array.full(shape, np.nan, chunks=chunks)
 
-                missing_grid = xr.DataArray(missing_data, dims=missing_dims, coords=missing_coords)
+                missing_grid = xr.DataArray(
+                    missing_data, dims=missing_dims, coords=missing_coords
+                )
                 if isinstance(cbc, xu.UgridDataset):
-                    missing_grid = xu.UgridDataArray(missing_grid, grid=cbc.ugrid.grid,)
+                    missing_grid = xu.UgridDataArray(
+                        missing_grid,
+                        grid=cbc.ugrid.grid,
+                    )
                 cbc[missing] = missing_grid
-
 
     def _merge_budgets(
         self, modelnames: list[str], output: str, **settings
@@ -833,7 +837,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 toml_content[cls_name][key] = model_toml_path.relative_to(
                     directory
                 ).as_posix()
-            elif key in ["gwtgwf_exchanges","split_exchanges"]:
+            elif key in ["gwtgwf_exchanges", "split_exchanges"]:
                 toml_content[key] = collections.defaultdict(list)
                 for exchange_package in self[key]:
                     exchange_type, filename, _, _ = exchange_package.get_specification()
@@ -863,7 +867,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 imod.mf6.Solution,
                 imod.mf6.GWFGWF,
                 imod.mf6.GWFGWT,
-                imod.mf6.GWTGWT
+                imod.mf6.GWTGWT,
             )
         }
 
@@ -873,7 +877,6 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         simulation = Modflow6Simulation(name=toml_path.stem)
         for key, entry in toml_content.items():
-           
             if not key in ["gwtgwf_exchanges", "split_exchanges"]:
                 item_cls = classes[key]
                 for name, filename in entry.items():
@@ -957,13 +960,13 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         if self.is_split():
             raise RuntimeError(
-                "Unable to clip simulation. Clipping can only be done on simulations that haven't been split."  +
-                "Therefore clipping should be done before splitting the simulation."
+                "Unable to clip simulation. Clipping can only be done on simulations that haven't been split."
+                + "Therefore clipping should be done before splitting the simulation."
             )
         if not self.has_one_flow_model():
             raise ValueError(
                 "Unable to clip simulation. Clipping can only be done on simulations that have a single flow model ."
-            ) 
+            )
         for model_name, model in self.get_models().items():
             supported, error_with_object = model.is_clipping_supported()
             if not supported:
@@ -1007,7 +1010,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             raise ValueError(
                 "splitting of simulations with more (or less) than 1 flow model currently not supported."
             )
-        transport_models = self.get_models_of_type("gwt6")        
+        transport_models = self.get_models_of_type("gwt6")
         flow_models = self.get_models_of_type("gwf6")
         if not any(flow_models) and not any(transport_models):
             raise ValueError("a simulation without any models cannot be split.")
@@ -1092,7 +1095,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         a new simulation object with regridded models
         """
 
-        return _regrid_like(self, regridded_simulation_name,target_grid,  validate )
+        return _regrid_like(self, regridded_simulation_name, target_grid, validate)
 
     def _add_modelsplit_exchanges(self, exchanges_list: list[GWFGWF]) -> None:
         if not self.is_split():
@@ -1232,21 +1235,19 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                     if ssm_package is not None:
                         tpt_model[ssm_key] = ssm_package
 
-    def _update_buoyancy_packages(self)->None:
+    def _update_buoyancy_packages(self) -> None:
         flow_transport_mapping = self._get_transport_models_per_flow_model()
         for flow_name, tpt_models_of_flow_model in flow_transport_mapping.items():
             flow_model = self[flow_name]
             flow_model.update_buoyancy_package(tpt_models_of_flow_model)
 
-
     def is_split(self) -> bool:
         return "split_exchanges" in self.keys()
 
-
     def has_one_flow_model(self) -> bool:
         flow_models = self.get_models_of_type("gwf6")
-        return  len(flow_models) == 1       
-         
+        return len(flow_models) == 1
+
     def mask_all_models(
         self,
         mask: GridDataArray,
@@ -1257,12 +1258,12 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         Masking will overwrite idomain with the mask where the mask is 0 or -1.
         Where the mask is 1, the original value of idomain will be kept.
         Masking will update the packages accordingly, blanking their input where needed,
-        and is therefore not a reversible operation.  
+        and is therefore not a reversible operation.
 
         Parameters
         ----------
         mask: xr.DataArray, xu.UgridDataArray of ints
-            idomain-like integer array. 1 sets cells to active, 0 sets cells to inactive, 
+            idomain-like integer array. 1 sets cells to active, 0 sets cells to inactive,
             -1 sets cells to vertical passthrough
         """
         _mask_all_models(self, mask)

@@ -116,7 +116,7 @@ def test_write_well_from_model_transient_rate(
     tmp_path: Path, twri_simulation: imod.mf6.Modflow6Simulation
 ):
     times = twri_simulation["time_discretization"]["time"]
-    rate = xr.DataArray(dims=("index", "time"), coords={"index": [0,1], "time":times})
+    rate = xr.DataArray(dims=("index", "time"), coords={"index": [0, 1], "time": times})
     rate.sel(index=0).values[:] = 5.0
     rate.sel(index=1).values[:] = 4.0
     twri_simulation["GWF_1"]["well"] = imod.mf6.Well(
@@ -140,6 +140,7 @@ def test_write_well_from_model_transient_rate(
         file = Path(f"{tmp_path}/GWF_1/well/wel-{i}.dat")
         assert pathlib.Path.exists(file)
     assert twri_simulation.run() is None
+
 
 def test_write_all_wells_filtered_out(
     tmp_path: Path, twri_simulation: imod.mf6.Modflow6Simulation
@@ -244,11 +245,10 @@ def test_constraints_are_configurable(
     with pytest.raises(ValueError):
         twri_simulation.write(tmp_path, binary=False)
 
-def test_non_unique_ids(
-   twri_simulation: imod.mf6.Modflow6Simulation
-):
+
+def test_non_unique_ids(twri_simulation: imod.mf6.Modflow6Simulation):
     times = twri_simulation["time_discretization"]["time"]
-    rate = xr.DataArray(dims=("index", "time"), coords={"index": [0,1], "time":times})
+    rate = xr.DataArray(dims=("index", "time"), coords={"index": [0, 1], "time": times})
     rate.sel(index=0).values[:] = 5.0
     rate.sel(index=1).values[:] = 4.0
     with pytest.raises(ValueError):

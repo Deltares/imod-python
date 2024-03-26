@@ -18,7 +18,7 @@ import xugrid as xu
 from jinja2 import Template
 
 import imod
-from imod.logging.logging_decorators import standard_log_decorator
+from imod.logging import standard_log_decorator
 from imod.mf6.interfaces.imodel import IModel
 from imod.mf6.package import Package
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
@@ -32,7 +32,7 @@ from imod.schemata import ValidationError
 from imod.typing import GridDataArray
 
 
-class Modflow6Model( collections.UserDict, IModel, abc.ABC):
+class Modflow6Model(collections.UserDict, IModel, abc.ABC):
     _mandatory_packages: tuple[str, ...] = ()
     _model_id: Optional[str] = None
     _template: Template
@@ -42,7 +42,6 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
         env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
         return env.get_template(name)
-
 
     def __init__(self, **kwargs):
         collections.UserDict.__init__(self)
@@ -186,7 +185,7 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
 
         k = npf["k"]
         return k
-    
+
     @standard_log_decorator()
     def validate(self, model_name: str = "") -> StatusInfoBase:
         try:
@@ -226,7 +225,7 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
                 model_status_info.add(pkg_errors_to_status_info(pkg_name, pkg_errors))
 
         return model_status_info
-    
+
     @standard_log_decorator()
     def write(
         self, modelname, globaltimes, validate: bool, write_context: WriteContext
@@ -488,7 +487,7 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
         similar to the one used in input argument "target_grid"
         """
         return _regrid_like(self, target_grid, validate)
- 
+
     def mask_all_packages(
         self,
         mask: GridDataArray,
@@ -501,12 +500,12 @@ class Modflow6Model( collections.UserDict, IModel, abc.ABC):
         Masking will overwrite idomain with the mask where the mask is 0 or -1.
         Where the mask is 1, the original value of idomain will be kept. Masking
         will update the packages accordingly, blanking their input where needed,
-        and is therefore not a reversible operation. 
-        
+        and is therefore not a reversible operation.
+
         Parameters
         ----------
         mask: xr.DataArray, xu.UgridDataArray of ints
-            idomain-like integer array. 1 sets cells to active, 0 sets cells to inactive, 
+            idomain-like integer array. 1 sets cells to active, 0 sets cells to inactive,
             -1 sets cells to vertical passthrough
         """
 

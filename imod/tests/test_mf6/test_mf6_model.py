@@ -354,9 +354,8 @@ def test_purge_empty_package(
     assert original_nr_packages == len(unstructured_flow_model.items())
 
 
-
 def test_deepcopy(
     unstructured_flow_model: GroundwaterFlowModel,
 ):
-    # test  making a deepcopy will not crash 
+    # test  making a deepcopy will not crash
     _ = deepcopy(unstructured_flow_model)

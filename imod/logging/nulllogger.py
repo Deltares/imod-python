@@ -9,17 +9,17 @@ class NullLogger(ILogger):
     def __init__(self) -> None:
         pass
 
-    def debug(self, message: str) -> None:
+    def debug(self, message: str, additional_depth: int = 0) -> None:
         pass
 
-    def info(self, message: str) -> None:
+    def info(self, message: str, additional_depth: int = 0) -> None:
         pass
 
-    def warning(self, message: str) -> None:
+    def warning(self, message: str, additional_depth: int = 0) -> None:
         pass
 
-    def error(self, message: str) -> None:
+    def error(self, message: str, additional_depth: int = 0) -> None:
         pass
 
-    def critical(self, message: str) -> None:
+    def critical(self, message: str, additional_depth: int = 0) -> None:
         pass
