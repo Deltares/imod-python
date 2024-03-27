@@ -499,24 +499,26 @@ def test_partition_transport_multispecies(
 
     for key in ["flow-lower-face", "flow-horizontal-face", "sto-ss", "rch"]:
         marker = is_exchange_cell
-      
-        atol = actual_flow_budget["gwf-gwf"].values.max()[()] * 1.0001
+
+        rtol=0.3
+        atol=3e-3
         np.testing.assert_allclose(
             expected_flow_budget[key].where(~marker,0).values,
             actual_flow_budget[key].where(~marker,0).values,
-            rtol=9,
-            atol=atol,
+            rtol=rtol,
+            atol=atol
         )
     for key in ["flow-lower-face", "flow-horizontal-face", "storage-aqueous", "ssm"]:
         marker = is_exchange_cell
         if key ==  "flow-horizontal-face":
-            marker = is_exchange_edge       
-        atol = actual_transport_budget["gwt-gwt"].values.max()[()] * 1.0001
+            marker = is_exchange_edge    
+        rtol=0.3
+        atol=3e-3            
         np.testing.assert_allclose(
             expected_transport_budget[key].where(~marker,0).values,
             actual_transport_budget[key].where(~marker,0).values,
-            rtol=9,
-            atol=atol,
+            rtol=rtol,
+            atol=atol
         )
 
 
