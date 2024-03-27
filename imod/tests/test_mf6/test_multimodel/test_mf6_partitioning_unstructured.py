@@ -155,11 +155,11 @@ def test_partitioning_unstructured(
     simulation.write(original_dir, binary=False)
     simulation.run()
 
-    original_head = simulation.open_head(
+    expected_head = simulation.open_head(
         simulation_start_time=np.datetime64("1999-01-01"),
         time_unit="d",
     )
-    original_flow_cbc = simulation.open_flow_budget(
+    expected_flow_cbc = simulation.open_flow_budget(
         simulation_start_time=np.datetime64("1999-01-01"),
         time_unit="d",
     )
@@ -169,17 +169,19 @@ def test_partitioning_unstructured(
 
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()  # %%
-    head = split_simulation.open_head(simulation_start_time="01-01-1999", time_unit="d")
-    head = head.ugrid.reindex_like(original_head)
+    actual_head = split_simulation.open_head(
+        simulation_start_time="01-01-1999", time_unit="d"
+    )
+    actual_head = actual_head.ugrid.reindex_like(expected_head)
 
-    flow_cbc = split_simulation.open_flow_budget(
+    actual_flow_cbc = split_simulation.open_flow_budget(
         simulation_start_time=np.datetime64("1999-01-01"), time_unit="d"
     )
-    flow_cbc = flow_cbc.ugrid.reindex_like(original_flow_cbc)
+    actual_flow_cbc = actual_flow_cbc.ugrid.reindex_like(expected_flow_cbc)
 
     # Compare the head result of the original simulation with the result of the partitioned simulation.
     np.testing.assert_allclose(
-        head["head"].values, original_head.values, rtol=1e-5, atol=1e-3
+        actual_head["head"].values, expected_head.values, rtol=1e-5, atol=1e-3
     )
     for key in ["flow-lower-face", "flow-horizontal-face"]:
         if partition_array["name"].values[()] == "concentric" and key in [
@@ -187,7 +189,10 @@ def test_partitioning_unstructured(
         ]:
             continue
         np.testing.assert_allclose(
-            flow_cbc[key].values, original_flow_cbc[key].values, rtol=1e-5, atol=1e-3
+            actual_flow_cbc[key].values,
+            expected_flow_cbc[key].values,
+            rtol=1e-5,
+            atol=1e-3,
         )
 
 
@@ -220,7 +225,7 @@ def test_partitioning_unstructured_with_inactive_cells(
 
     simulation.run()
 
-    original_head = simulation.open_head()
+    expected_head = simulation.open_head()
 
     # TODO: Fix issue 669
     #    original_cbc = imod.mf6.open_cbc(
@@ -234,13 +239,13 @@ def test_partitioning_unstructured_with_inactive_cells(
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()
 
-    head = split_simulation.open_head()
-    head = head.ugrid.reindex_like(original_head)
+    actual_head = split_simulation.open_head()
+    actual_head = actual_head.ugrid.reindex_like(expected_head)
     # _ = split_simulation.open_flow_budget()
 
     # Compare the head result of the original simulation with the result of the partitioned simulation
     np.testing.assert_allclose(
-        head["head"].values, original_head.values, rtol=1e-5, atol=1e-3
+        actual_head["head"].values, expected_head.values, rtol=1e-5, atol=1e-3
     )
 
 
@@ -265,8 +270,8 @@ def test_partitioning_unstructured_hfb(
     simulation.write(original_dir, binary=False)
     simulation.run()
 
-    original_head = simulation.open_head()
-    original_flow_cbc = simulation.open_flow_budget()
+    expected_head = simulation.open_head()
+    expected_flow_cbc = simulation.open_flow_budget()
 
     # Partition the simulation, run it, and save the (merged) results
     split_simulation = simulation.split(partition_array)
@@ -274,26 +279,28 @@ def test_partitioning_unstructured_hfb(
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()
 
-    head = split_simulation.open_head()
+    actual_head = split_simulation.open_head()
 
-    flow_cbc = split_simulation.open_flow_budget()
+    actual_flow_cbc = split_simulation.open_flow_budget()
 
-    head = head.ugrid.reindex_like(original_head)
-    flow_cbc = flow_cbc.ugrid.reindex_like(original_flow_cbc)
+    actual_head = actual_head.ugrid.reindex_like(expected_head)
+    actual_flow_cbc = actual_flow_cbc.ugrid.reindex_like(expected_flow_cbc)
 
     # Compare the head result of the original simulation with the result of the
     # partitioned simulation. Criteria are a bit looser than in other tests
     # because we are dealing with a problem with heads ranging roughly from 20
     # m to 0 m, and the HFB adds extra complexity to this.
-    np.testing.assert_allclose(head["head"].values, original_head.values, rtol=0.005)
+    np.testing.assert_allclose(
+        actual_head["head"].values, expected_head.values, rtol=0.005
+    )
     for key in ["flow-lower-face", "flow-horizontal-face"]:
         if partition_array["name"].values[()] == "concentric" and key in [
             "flow-horizontal-face"
         ]:
             continue
         np.testing.assert_allclose(
-            flow_cbc[key].values,
-            original_flow_cbc[key].values,
+            actual_flow_cbc[key].values,
+            expected_flow_cbc[key].values,
             rtol=1.0,
             atol=31.66250038,
         )
@@ -321,8 +328,8 @@ def test_partitioning_unstructured_with_well(
     simulation.write(original_dir, binary=False)
     simulation.run()
 
-    original_head = simulation.open_head()
-    original_flow_cbc = simulation.open_flow_budget()
+    expected_head = simulation.open_head()
+    expected_flow_cbc = simulation.open_flow_budget()
 
     # Partition the simulation, run it, and save the (merged) results
     split_simulation = simulation.split(partition_array)
@@ -330,20 +337,23 @@ def test_partitioning_unstructured_with_well(
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()
 
-    head = split_simulation.open_head()
-    head = head.ugrid.reindex_like(original_head)
+    actual_head = split_simulation.open_head()
+    actual_head = actual_head.ugrid.reindex_like(expected_head)
     # TODO:
     # Uncomment when fixed: https://gitlab.com/deltares/imod/imod-python/-/issues/683
-    cbc = split_simulation.open_flow_budget()
-    cbc = cbc.ugrid.reindex_like(original_flow_cbc)
+    actual_cbc = split_simulation.open_flow_budget()
+    actual_cbc = actual_cbc.ugrid.reindex_like(expected_flow_cbc)
     # Compare the head result of the original simulation with the result of the
     # partitioned simulation.
     np.testing.assert_allclose(
-        head["head"].values, original_head.values, rtol=1e-5, atol=1e-3
+        actual_head["head"].values, expected_head.values, rtol=1e-5, atol=1e-3
     )
     for key in ["flow-lower-face", "flow-horizontal-face"]:
         np.testing.assert_allclose(
-            cbc[key].values, original_flow_cbc[key].values, rtol=1, atol=0.01615156
+            actual_cbc[key].values,
+            expected_flow_cbc[key].values,
+            rtol=1,
+            atol=0.01615156,
         )
 
 
@@ -364,7 +374,9 @@ def test_partition_transport(
     new_circle_model.run()
     actual_concentration = new_circle_model.open_concentration()
 
-    actual_concentration = actual_concentration.ugrid.reindex_like(expected_concentration)
+    actual_concentration = actual_concentration.ugrid.reindex_like(
+        expected_concentration
+    )
     actual_budget = new_circle_model.open_transport_budget(["salinity"])
     actual_budget = actual_budget.ugrid.reindex_like(expected_budget)
     np.testing.assert_allclose(
@@ -374,15 +386,24 @@ def test_partition_transport(
         atol=3e-3,
     )
 
-    # Compare the budgets before and after splitting the simulation. 
-    # The tolerance is set as the maximum value in the  gwt-gwt 
-    # exchange as this contains mass transport in the split case that would 
-    # be in one of the other arrays in the unsplit case.  
-    for budget_term in ("ssm", "flow-lower-face", "storage-aqueous", "flow-horizontal-face"):
+    # Compare the budgets before and after splitting the simulation.
+    # The tolerance is set as the maximum value in the  gwt-gwt
+    # exchange as this contains mass transport in the split case that would
+    # be in one of the other arrays in the unsplit case.
+    for budget_term in (
+        "ssm",
+        "flow-lower-face",
+        "storage-aqueous",
+        "flow-horizontal-face",
+    ):
         atol = actual_budget["gwt-gwt"].values.max()
         np.testing.assert_allclose(
-            expected_budget[budget_term].sel(time=364).values, actual_budget[budget_term].sel(time=364).values,rtol = 200, atol=atol
+            expected_budget[budget_term].sel(time=364).values,
+            actual_budget[budget_term].sel(time=364).values,
+            rtol=200,
+            atol=atol,
         )
+
 
 @pytest.mark.usefixtures("circle_model_transport_multispecies_variable_density")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
@@ -404,49 +425,58 @@ def test_partition_transport_multispecies(
         simulation_start_time=np.datetime64("1999-01-01"),
         time_unit="d",
     )
-    expected_transport_budget = circle_model_transport_multispecies.open_transport_budget( ["salt", "temp"])
+    expected_transport_budget = (
+        circle_model_transport_multispecies.open_transport_budget(["salt", "temp"])
+    )
 
-    # split and run the simulation 
+    # split and run the simulation
     new_circle_model = circle_model_transport_multispecies.split(partition_array)
     new_circle_model.write(tmp_path / "split")
     new_circle_model.run()
 
-    #open results
-    conc_new = new_circle_model.open_concentration()
-    head_new = new_circle_model.open_head()
+    # open results
+    actual_conc = new_circle_model.open_concentration()
+    actual_head = new_circle_model.open_head()
     flow_budget_new = new_circle_model.open_flow_budget(
         simulation_start_time=np.datetime64("1999-01-01"),
         time_unit="d",
     )
-    transport_budget_new = new_circle_model.open_transport_budget( ["salt", "temp"])
-
+    actual_transport_budget = new_circle_model.open_transport_budget(["salt", "temp"])
 
     # reindex results
-    head_new = head_new.ugrid.reindex_like(expected_head)
-    conc_new = conc_new.ugrid.reindex_like(expected_conc)
-    transport_budget_new = transport_budget_new.ugrid.reindex_like(expected_transport_budget)
-    flow_budget_new = flow_budget_new.ugrid.reindex_like(expected_flow_budget)
- 
+    actual_head = actual_head.ugrid.reindex_like(expected_head)
+    actual_conc = actual_conc.ugrid.reindex_like(expected_conc)
+    actual_transport_budget = actual_transport_budget.ugrid.reindex_like(
+        expected_transport_budget
+    )
+    actual_flow_budget = flow_budget_new.ugrid.reindex_like(expected_flow_budget)
+
     # compare simulation results
-    np.testing.assert_allclose(    
-        expected_conc.values, conc_new["concentration"].values, rtol=4e-4, atol=5e-3
+    np.testing.assert_allclose(
+        expected_conc.values, actual_conc["concentration"].values, rtol=4e-4, atol=5e-3
     )
     np.testing.assert_allclose(
-        expected_head.values, head_new["head"].values, rtol=1e-5, atol=1e-3
+        expected_head.values, actual_head["head"].values, rtol=1e-5, atol=1e-3
     )
     # Compare the budgets.
-    # The tolerance is set as the maximum value in the  gwf-gwf or gwt-gwt     
-    # exchange as this contains flow/transport in the split case that would 
-    # be in one of the other arrays in the unsplit case.  
+    # The tolerance is set as the maximum value in the  gwf-gwf or gwt-gwt
+    # exchange as this contains flow/transport in the split case that would
+    # be in one of the other arrays in the unsplit case.
     for key in ["flow-lower-face", "flow-horizontal-face", "sto-ss", "rch"]:
-        atol = flow_budget_new["gwf-gwf"].values.max()[()]*1.0001
+        atol = actual_flow_budget["gwf-gwf"].values.max()[()] * 1.0001
         np.testing.assert_allclose(
-            expected_flow_budget[key].values, flow_budget_new[key].values, rtol = 9, atol=atol
+            expected_flow_budget[key].values,
+            actual_flow_budget[key].values,
+            rtol=9,
+            atol=atol,
         )
     for key in ["flow-lower-face", "flow-horizontal-face", "storage-aqueous", "ssm"]:
-        atol = transport_budget_new["gwt-gwt"].values.max()[()]*1.0001
+        atol = actual_transport_budget["gwt-gwt"].values.max()[()] * 1.0001
         np.testing.assert_allclose(
-            expected_transport_budget[key].values, transport_budget_new[key].values, rtol = 9, atol=atol
+            expected_transport_budget[key].values,
+            actual_transport_budget[key].values,
+            rtol=9,
+            atol=atol,
         )
 
 

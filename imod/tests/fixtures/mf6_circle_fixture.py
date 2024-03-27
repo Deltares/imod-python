@@ -138,7 +138,9 @@ def make_circle_model_flow_with_transport_data(species: list[str]):
         save_flows=False,
     )
     gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
-    gwf_model["rch"] = imod.mf6.Recharge(rch_rate,save_flows=True, concentration=rch_concentration)
+    gwf_model["rch"] = imod.mf6.Recharge(
+        rch_rate, save_flows=True, concentration=rch_concentration
+    )
 
     simulation = imod.mf6.Modflow6Simulation("circle")
     simulation["GWF_1"] = gwf_model
@@ -307,7 +309,7 @@ def circle_model_transport():
         xt3d_off=False,
         xt3d_rhs=False,
     )
-    transport_model["adv"] = imod.mf6.AdvectionUpstream( )
+    transport_model["adv"] = imod.mf6.AdvectionUpstream()
     transport_model["mst"] = imod.mf6.MobileStorageTransfer(porosity, save_flows=True)
 
     # %%
