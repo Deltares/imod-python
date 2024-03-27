@@ -27,21 +27,22 @@ tmpdir = imod.util.temporary_directory()
 
 gwf_simulation = imod.data.hondsrug_simulation(tmpdir / "hondsrug_saved")
 
+# %% 
+# The model was written before the xt3d_option and rhs_option arguments were
+# added to iMOD Python. Set missing options to False.
+gwf_simulation["GWF"]["npf"].set_xt3d_option(is_xt3d_used=False, is_rhs=False)
 
 # %%
-# Write the model and run it (before partitioning, so we can compare if the results are similar)
+# Write the model and run it (before partitioning, so we can compare if the
+# results are similar).
 original_modeldir = tmpdir / "original"
 
-gwf_simulation.write(original_modeldir, False, False)
-
+gwf_simulation.write(original_modeldir)
 gwf_simulation.run()
 
 # %%
-# plot the simulation results of the unpartitioned model
-hds_original = imod.mf6.open_hds(
-    original_modeldir / "GWF_1" / "GWF_1.hds",
-    original_modeldir / "GWF_1" / "dis.dis.grb",
-)
+# Plot the simulation results of the unpartitioned model.
+hds_original = gwf_simulation.open_head()
 
 fig, ax = plt.subplots()
 
@@ -49,7 +50,7 @@ hds_original.sel(layer=3).isel(time=6).plot(ax=ax)
 ax.set_title("hondsrug original ")
 # %%
 # Now we partition the Hondsrug model
-idomain = gwf_simulation["GWF_1"].domain
+idomain = gwf_simulation["GWF"].domain
 number_partitions = 16
 submodel_labels = get_label_array(gwf_simulation, number_partitions)
 
@@ -65,7 +66,7 @@ split_simulation = gwf_simulation.split(submodel_labels)
 # Now we  write and run the partitioned model
 split_modeldir = tmpdir / "split"
 
-split_simulation.write(split_modeldir, False, False)
+split_simulation.write(split_modeldir)
 split_simulation.run()
 
 

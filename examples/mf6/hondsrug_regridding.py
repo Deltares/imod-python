@@ -28,8 +28,18 @@ tmpdir = imod.util.temporary_directory()
 
 gwf_simulation = imod.data.hondsrug_simulation(tmpdir / "hondsrug_saved")
 
+# %% 
+# The model was written before the xt3d_option and rhs_option arguments were
+# added to iMOD Python. Set missing options to False.
+gwf_simulation["GWF"]["npf"].set_xt3d_option(is_xt3d_used=False, is_rhs=False)
+
+# %%
+# Write simulation
 original_modeldir = tmpdir / "original"
 gwf_simulation.write(original_modeldir)
+
+# %%
+# Run and open heads
 gwf_simulation.run()
 hds_original = gwf_simulation.open_head()
 
@@ -38,7 +48,7 @@ hds_original.sel(layer=3).isel(time=6).plot(ax=ax)
 
 # %%
 # Create the target grid we will regrid to.
-idomain = gwf_simulation["GWF_1"]["dis"]["idomain"]
+idomain = gwf_simulation["GWF"]["dis"]["idomain"]
 
 nlay = len(idomain.coords["layer"].values)
 nrow = 50
@@ -142,78 +152,78 @@ plot_histograms_side_by_side(
 # %%
 # Compare constant head arrays.
 plot_histograms_side_by_side(
-    gwf_simulation["GWF_1"]["chd"].dataset["head"],
-    regridded_simulation["GWF_1"]["chd"].dataset["head"],
+    gwf_simulation["GWF"]["chd"].dataset["head"],
+    regridded_simulation["GWF"]["chd"].dataset["head"],
     "chd head",
 )
 
 # %%
 # Compare horizontal hydraulic conductivities.
 plot_histograms_side_by_side(
-    gwf_simulation["GWF_1"]["npf"].dataset["k"],
-    regridded_simulation["GWF_1"]["npf"].dataset["k"],
+    gwf_simulation["GWF"]["npf"].dataset["k"],
+    regridded_simulation["GWF"]["npf"].dataset["k"],
     "npf k",
 )
 # %%
 # Compare vertical hydraulic conductivities.
 plot_histograms_side_by_side(
-    gwf_simulation["GWF_1"]["npf"].dataset["k33"],
-    regridded_simulation["GWF_1"]["npf"].dataset["k33"],
+    gwf_simulation["GWF"]["npf"].dataset["k33"],
+    regridded_simulation["GWF"]["npf"].dataset["k33"],
     "npf k33",
 )
 # %%
 # Compare starting heads.
 plot_histograms_side_by_side(
-    gwf_simulation["GWF_1"]["ic"].dataset["start"],
-    regridded_simulation["GWF_1"]["ic"].dataset["start"],
+    gwf_simulation["GWF"]["ic"].dataset["start"],
+    regridded_simulation["GWF"]["ic"].dataset["start"],
     "ic start",
 )
 
 # %%
 # Compare river stages.
 plot_histograms_side_by_side(
-    gwf_simulation["GWF_1"]["riv"].dataset["stage"],
-    regridded_simulation["GWF_1"]["riv"].dataset["stage"],
+    gwf_simulation["GWF"]["riv"].dataset["stage"],
+    regridded_simulation["GWF"]["riv"].dataset["stage"],
     "riv stage",
 )
 
 # %%
 # Compare river bottom elevations.
 plot_histograms_side_by_side(
-    gwf_simulation["GWF_1"]["riv"].dataset["bottom_elevation"],
-    regridded_simulation["GWF_1"]["riv"].dataset["bottom_elevation"],
+    gwf_simulation["GWF"]["riv"].dataset["bottom_elevation"],
+    regridded_simulation["GWF"]["riv"].dataset["bottom_elevation"],
     "riv bottom elevation",
 )
 
 # %%
 # Compare riverbed conductance.
 plot_histograms_side_by_side(
-    gwf_simulation["GWF_1"]["riv"].dataset["conductance"],
-    regridded_simulation["GWF_1"]["riv"].dataset["conductance"],
+    gwf_simulation["GWF"]["riv"].dataset["conductance"],
+    regridded_simulation["GWF"]["riv"].dataset["conductance"],
     "riv conductance",
 )
 
 # %%
 # Compare recharge rates.
 plot_histograms_side_by_side(
-    gwf_simulation["GWF_1"]["rch"].dataset["rate"],
-    regridded_simulation["GWF_1"]["rch"].dataset["rate"],
+    gwf_simulation["GWF"]["rch"].dataset["rate"],
+    regridded_simulation["GWF"]["rch"].dataset["rate"],
     "rch rate",
 )
 
 # %%
 # Compare drainage elevations.
 plot_histograms_side_by_side(
-    gwf_simulation["GWF_1"]["drn-pipe"].dataset["elevation"],
-    regridded_simulation["GWF_1"]["drn-pipe"].dataset["elevation"],
+    gwf_simulation["GWF"]["drn-pipe"].dataset["elevation"],
+    regridded_simulation["GWF"]["drn-pipe"].dataset["elevation"],
     "drn-pipe elevation",
 )
 
 # %%
 # Compare drain conductances.
 plot_histograms_side_by_side(
-    gwf_simulation["GWF_1"]["drn-pipe"].dataset["conductance"],
-    regridded_simulation["GWF_1"]["drn-pipe"].dataset["conductance"],
+    gwf_simulation["GWF"]["drn-pipe"].dataset["conductance"],
+    regridded_simulation["GWF"]["drn-pipe"].dataset["conductance"],
     "drn-pipe conductance",
 )
 # %%
