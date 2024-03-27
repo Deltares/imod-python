@@ -1208,3 +1208,12 @@ class Lake(BoundaryCondition):
         f.write(trimmedblock)
         f.write(f"end {title}\n")
         return
+
+    def is_splitting_supported(self) -> bool:
+        return False
+
+    def is_regridding_supported(self) -> bool:
+        return False
+
+    def is_clipping_supported(self) -> bool:
+        return False

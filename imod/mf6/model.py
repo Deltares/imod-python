@@ -6,7 +6,7 @@ import inspect
 import pathlib
 from copy import deepcopy
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Tuple, Union
 
 import cftime
 import jinja2
@@ -387,6 +387,12 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         y_max: optional, float
         state_for_boundary :
         """
+        supported, error_with_object = self.is_clipping_supported()
+        if not supported:
+            raise ValueError(
+                f"model cannot be clipped due to presence of package '{error_with_object}' in model"
+            )
+
         clipped = self._clip_box_packages(
             time_min,
             time_max,
@@ -396,6 +402,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             x_max,
             y_min,
             y_max,
+            state_for_boundary,
         )
 
         return clipped
@@ -481,7 +488,6 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         a model with similar packages to the input model, and with all the data-arrays regridded to another discretization,
         similar to the one used in input argument "target_grid"
         """
-
         return _regrid_like(self, target_grid, validate)
 
     def mask_all_packages(
@@ -546,3 +552,36 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
     def is_use_newton(self):
         return False
+
+    def is_splitting_supported(self) -> Tuple[bool, str]:
+        """
+        Returns True if all the packages in the model supports splitting. If one
+        of the packages in the model does not support splitting, it returns the
+        name of the first one.
+        """
+        for package_name, package in self.items():
+            if not package.is_splitting_supported():
+                return False, package_name
+        return True, ""
+
+    def is_regridding_supported(self) -> Tuple[bool, str]:
+        """
+        Returns True if all the packages in the model supports regridding. If one
+        of the packages in the model does not support regridding, it returns the
+        name of the first one.
+        """
+        for package_name, package in self.items():
+            if not package.is_regridding_supported():
+                return False, package_name
+        return True, ""
+
+    def is_clipping_supported(self) -> Tuple[bool, str]:
+        """
+        Returns True if all the packages in the model supports clipping. If one
+        of the packages in the model does not support clipping, it returns the
+        name of the first one.
+        """
+        for package_name, package in self.items():
+            if not package.is_clipping_supported():
+                return False, package_name
+        return True, ""
