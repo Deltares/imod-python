@@ -12,7 +12,6 @@ import imod
 from imod.mf6 import Modflow6Simulation
 from imod.typing.grid import zeros_like
 
-
 @pytest.mark.usefixtures("circle_model")
 @pytest.fixture(scope="function")
 def idomain_top(circle_model):
@@ -368,6 +367,7 @@ def test_partition_transport(
     circle_model_transport.run()
     expected_concentration = circle_model_transport.open_concentration()
     expected_budget = circle_model_transport.open_transport_budget(["salinity"])
+    expected_budget = expected_budget.sel(time=364)
 
     new_circle_model = circle_model_transport.split(partition_array)
     new_circle_model.write(tmp_path / "split", binary=False)
@@ -377,31 +377,52 @@ def test_partition_transport(
     actual_concentration = actual_concentration.ugrid.reindex_like(
         expected_concentration
     )
-    actual_budget = new_circle_model.open_transport_budget(["salinity"])
-    actual_budget = actual_budget.ugrid.reindex_like(expected_budget)
     np.testing.assert_allclose(
         expected_concentration.values,
         actual_concentration["concentration"].values,
         rtol=7e-5,
         atol=3e-3,
-    )
+    )    
+
+
 
     # Compare the budgets before and after splitting the simulation.
     # The tolerance is set as the maximum value in the  gwt-gwt
     # exchange as this contains mass transport in the split case that would
     # be in one of the other arrays in the unsplit case.
+    actual_budget = new_circle_model.open_transport_budget(["salinity"])
+    actual_budget = actual_budget.sel(time=364)    
+    actual_budget = actual_budget.ugrid.reindex_like(expected_budget)
+
+    # create a cell-aray of booleans that is true on the exchange boundary cells and false in other locations
+    is_exchange_cell = actual_budget["gwt-gwt"].where(actual_budget["gwt-gwt"]!=0).notnull()
+    is_exchange_cell = is_exchange_cell.sel(layer=1)
+
+    # create a edge-aray of booleans that is true on the exchange boundary edges and false in other locations    
+    face_edge = is_exchange_cell.ugrid.grid.edge_face_connectivity
+    face_1 = is_exchange_cell.values[face_edge[:,0]]
+    face_2 = is_exchange_cell.values[face_edge[:,1]] 
+    is_exchange_edge = zeros_like(expected_budget["flow-horizontal-face"]).sel(layer=1)
+    is_exchange_edge.values = np.where(face_1 & face_2, 1,0)
+    is_exchange_edge = is_exchange_edge.astype(bool)
+          
+
+
     for budget_term in (
         "ssm",
         "flow-lower-face",
         "storage-aqueous",
         "flow-horizontal-face",
     ):
-        atol = actual_budget["gwt-gwt"].values.max()
+        marker = is_exchange_cell
+        if budget_term ==  "flow-horizontal-face":
+            marker = is_exchange_edge
+
         np.testing.assert_allclose(
-            expected_budget[budget_term].sel(time=364).values,
-            actual_budget[budget_term].sel(time=364).values,
-            rtol=200,
-            atol=atol,
+            expected_budget[budget_term].where(~marker,0).values,
+            actual_budget[budget_term].where(~marker,0).values,
+            rtol=0.3,
+            atol=3e-3,
         )
 
 
