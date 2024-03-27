@@ -128,12 +128,8 @@ def test_specific_discharge_results(
 
     # Reindex the arrays that come from modflow output to match the indexing of unsplit results
     split_head = split_head.ugrid.reindex_like(original_heads)
-    split_balances_x_v2 = split_balances_x_v2.ugrid.reindex_like(
-        original_balances_x_v2
-    )
-    split_balances_y_v2 = split_balances_y_v2.ugrid.reindex_like(
-        original_balances_y_v2
-    )
+    split_balances_x_v2 = split_balances_x_v2.ugrid.reindex_like(original_balances_x_v2)
+    split_balances_y_v2 = split_balances_y_v2.ugrid.reindex_like(original_balances_y_v2)
 
     # Compute differences in head and specific discharge results
     head_diff = original_heads.isel(layer=0, time=-1) - split_head.isel(

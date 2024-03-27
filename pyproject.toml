@@ -101,7 +101,6 @@ ignore = [
     "PD004",
     "PD901",
 ]
-fixable = ["I"]
 ignore-init-module-imports = true
 
 [tool.ruff.lint.pydocstyle]

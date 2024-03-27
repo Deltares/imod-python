@@ -185,7 +185,13 @@ class Package(PackageBase, IPackage, abc.ABC):
             else:
                 np.savetxt(fname=f, X=da.values, fmt=fmt)
 
-    def _get_render_dictionary(self, directory: pathlib.Path, pkgname: str, globaltimes: Union[list[np.datetime64], np.ndarray], binary: bool) ->dict[str,Any]:
+    def _get_render_dictionary(
+        self,
+        directory: pathlib.Path,
+        pkgname: str,
+        globaltimes: Union[list[np.datetime64], np.ndarray],
+        binary: bool,
+    ) -> dict[str, Any]:
         d = {}
         if directory is None:
             pkg_directory = pkgname
@@ -209,9 +215,9 @@ class Package(PackageBase, IPackage, abc.ABC):
         if (hasattr(self, "_auxiliary_data")) and (names := get_variable_names(self)):
             d["auxiliary"] = names
         return d
-    
+
     def render(self, directory, pkgname, globaltimes, binary):
-        d = self._get_render_dictionary( directory, pkgname, globaltimes, binary)
+        d = self._get_render_dictionary(directory, pkgname, globaltimes, binary)
         return self._template.render(d)
 
     @staticmethod
@@ -258,7 +264,6 @@ class Package(PackageBase, IPackage, abc.ABC):
                     values = None
 
         return layered, values
-
 
     @standard_log_decorator()
     def write(
@@ -467,6 +472,9 @@ class Package(PackageBase, IPackage, abc.ABC):
         -------
         clipped: Package
         """
+        if not self.is_clipping_supported():
+            raise ValueError("this package does not support clipping.")
+
         selection = self.dataset
         if "time" in selection:
             time = selection["time"].values
@@ -532,7 +540,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         Parameters
         ----------
         mask: xr.DataArray, xu.UgridDataArray of ints
-            idomain-like integer array. 1 sets cells to active, 0 sets cells to inactive, 
+            idomain-like integer array. 1 sets cells to active, 0 sets cells to inactive,
             -1 sets cells to vertical passthrough
 
         Returns
@@ -542,7 +550,6 @@ class Package(PackageBase, IPackage, abc.ABC):
         """
 
         return _mask(self, mask)
-
 
     def regrid_like(
         self,
@@ -579,8 +586,13 @@ class Package(PackageBase, IPackage, abc.ABC):
         a package with the same options as this package, and with all the data-arrays regridded to another discretization,
         similar to the one used in input argument "target_grid"
         """
-        return _regrid_like(self, target_grid,regridder_types) 
-
+        try:
+            result = _regrid_like(self, target_grid, regridder_types)
+        except ValueError as e:
+            raise e
+        except Exception:
+            raise ValueError("package could not be regridded.")
+        return result
 
     def _skip_masking_dataarray(self, array_name: str) -> bool:
         if hasattr(self, "_skip_mask_arrays"):
@@ -616,7 +628,9 @@ class Package(PackageBase, IPackage, abc.ABC):
         """
         result = {}
         all_non_grid_data = list(self.dataset.keys())
-        for name in (gridname for gridname in grid_names if gridname in all_non_grid_data):
+        for name in (
+            gridname for gridname in grid_names if gridname in all_non_grid_data
+        ):
             all_non_grid_data.remove(name)
         for name in all_non_grid_data:
             if "time" in self.dataset[name].coords:
@@ -624,3 +638,12 @@ class Package(PackageBase, IPackage, abc.ABC):
             else:
                 result[name] = self.dataset[name].values[()]
         return result
+
+    def is_splitting_supported(self) -> bool:
+        return True
+
+    def is_regridding_supported(self) -> bool:
+        return True
+
+    def is_clipping_supported(self) -> bool:
+        return True

@@ -187,7 +187,7 @@ class ImmobileStorageTransfer(Package):
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0))
         ],
     }
-    
+
     @init_log_decorator()
     def __init__(
         self,

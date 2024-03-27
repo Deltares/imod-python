@@ -51,6 +51,7 @@ Added
   how to activate logging.
 - added :func:`imod.data.hondsrug_simulation` and
   :func:`imod.data.hondsrug_crosssection` data.
+- simulations and models that include a lake package now raise an exception on clipping, partitioning or regridding. 
 
 Changed
 ~~~~~~~

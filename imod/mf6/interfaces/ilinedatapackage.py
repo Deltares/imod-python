@@ -7,7 +7,6 @@ if TYPE_CHECKING:
     import geopandas as gpd
 
 
-
 class ILineDataPackage(IPackageBase):
     """
     Interface for packages for which the data is defined by lines independent of the domain definition.

@@ -18,5 +18,5 @@ class IPointDataPackage(IPackageBase):
 
     @property
     @abstractmethod
-    def y(self) ->NDArray[np.float64]:
+    def y(self) -> NDArray[np.float64]:
         raise NotImplementedError

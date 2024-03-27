@@ -75,17 +75,18 @@ def test_buoyancy_package_full():
     print(expected)
     assert actual == expected
 
-def test_buoyancy_package_update_transport_names( ):
+
+def test_buoyancy_package_update_transport_names():
     directory = pathlib.Path("mymodel")
-    globaltimes = [np.datetime64("2000-01-01")]  
+    globaltimes = [np.datetime64("2000-01-01")]
     buy = imod.mf6.Buoyancy(
         reference_density=1000.0,
         reference_concentration=[4.0, 25.0],
         density_concentration_slope=[0.7, -0.375],
         modelname=["gwt-1", "gwt-2"],
         species=["salinity", "temperature"],
-    )    
-    buy.update_transport_models(["gwt-1_0","gwt-2_0" ])
+    )
+    buy.update_transport_models(["gwt-1_0", "gwt-2_0"])
     expected = textwrap.dedent(
         """\
         begin options
@@ -100,21 +101,20 @@ def test_buoyancy_package_update_transport_names( ):
           1 0.7 4.0 gwt-1_0 salinity
           2 -0.375 25.0 gwt-2_0 temperature
         end packagedata"""
-      )
+    )
     actual = buy.render(directory, "buy", globaltimes, False)
     assert actual == expected
 
 
-def test_buoyancy_package_update_transport_names_check( ):    
+def test_buoyancy_package_update_transport_names_check():
     buy = imod.mf6.Buoyancy(
         reference_density=1000.0,
         reference_concentration=[4.0, 25.0],
         density_concentration_slope=[0.7, -0.375],
-        modelname=["gwt-2", "gwt-1"], 
+        modelname=["gwt-2", "gwt-1"],
         species=["salinity", "temperature"],
-    )    
+    )
 
-    #update the transport models, but in the wrong order
+    # update the transport models, but in the wrong order
     with pytest.raises(ValueError):
-      buy.update_transport_models(["gwt-1_0","gwt-2_0" ])
-
+        buy.update_transport_models(["gwt-1_0", "gwt-2_0"])

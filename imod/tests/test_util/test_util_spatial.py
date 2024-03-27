@@ -118,15 +118,20 @@ def test_empty():
     with pytest.raises(ValueError, match="time must be 1d"):
         imod.util.spatial.empty_2d_transient(1.0, 0.0, 2.0, -1.0, 10.0, 12.0, [times])
 
-    da2dt = imod.util.spatial.empty_2d_transient(1.0, 0.0, 2.0, -1.0, 10.0, 12.0, times[0])
+    da2dt = imod.util.spatial.empty_2d_transient(
+        1.0, 0.0, 2.0, -1.0, 10.0, 12.0, times[0]
+    )
     assert da2dt.ndim == 3
     da2dt = imod.util.spatial.empty_2d_transient(1.0, 0.0, 2.0, -1.0, 10.0, 12.0, times)
     assert isinstance(da2dt["time"].values[0], np.datetime64)
     assert da2dt.dims == ("time", "y", "x")
 
-    da3dt = imod.util.spatial.empty_3d_transient(1.0, 0.0, 2.0, -1.0, 10.0, 12.0, [0, 1], times)
+    da3dt = imod.util.spatial.empty_3d_transient(
+        1.0, 0.0, 2.0, -1.0, 10.0, 12.0, [0, 1], times
+    )
     assert da3dt.ndim == 4
     assert da3dt.dims == ("time", "layer", "y", "x")
+
 
 def test_compliant_ugrid2d(ugrid_ds, write=False):
     uds = imod.util.spatial.mdal_compliant_ugrid2d(ugrid_ds)

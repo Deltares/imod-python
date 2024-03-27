@@ -100,18 +100,18 @@ class MobileStorageTransfer(Package, IRegridPackage):
         "sp2": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),
     }
 
-
     _regrid_method = {
         "porosity": (RegridderType.OVERLAP, "mean"),
         "decay": (RegridderType.OVERLAP, "mean"),
         "decay_sorbed": (
             RegridderType.OVERLAP,
             "mean",
-        ), 
+        ),
         "bulk_density": (RegridderType.OVERLAP, "mean"),
         "distcoef": (RegridderType.OVERLAP, "mean"),
-        "sp2": (RegridderType.OVERLAP, "mean"),        
+        "sp2": (RegridderType.OVERLAP, "mean"),
     }
+
     @init_log_decorator()
     def __init__(
         self,
@@ -145,6 +145,6 @@ class MobileStorageTransfer(Package, IRegridPackage):
         }
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
-        
+
     def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
         return self._regrid_method

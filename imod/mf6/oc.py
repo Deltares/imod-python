@@ -209,6 +209,6 @@ class OutputControl(Package, IRegridPackage):
     @property
     def is_budget_output(self) -> bool:
         return self.dataset["save_budget"].values[()] is not None
-    
+
     def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
         return self._regrid_method

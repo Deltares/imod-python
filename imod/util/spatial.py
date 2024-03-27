@@ -44,6 +44,7 @@ def _xycoords(bounds, cellsizes) -> Dict[str, Any]:
             coords["dy"] = ("y", dy)
     return coords
 
+
 def coord_reference(da_coord) -> Tuple[float, float, float]:
     """
     Extracts dx, xmin, xmax for a coordinate DataArray, where x is any coordinate.
@@ -195,9 +196,7 @@ def ugrid2d_data(da: xr.DataArray, face_dim: str) -> xr.DataArray:
     )
 
 
-def unstack_dim_into_variable(
-    dataset: GridDataset, dim: str
-) -> GridDataset:
+def unstack_dim_into_variable(dataset: GridDataset, dim: str) -> GridDataset:
     """
     Unstack each variable containing ``dim`` into separate variables.
     """
@@ -378,6 +377,7 @@ def to_ugrid2d(data: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
             )
         ds[data.name] = ugrid2d_data(data, grid.face_dimension)
     return mdal_compliant_ugrid2d(ds)
+
 
 def empty_2d(
     dx: Union[float, FloatArray],
@@ -583,6 +583,7 @@ def empty_3d_transient(
         dims=["time", "layer", "y", "x"],
     )
 
+
 def _layer(layer: Union[int, Sequence[int], IntArray]) -> IntArray:
     layer = np.atleast_1d(layer)
     if layer.ndim > 1:
@@ -611,4 +612,3 @@ def is_divisor(numerator: FloatArray, denominator: float) -> bool:
     denominator = abs(denominator)
     remainder = np.abs(numerator) % denominator
     return (np.isclose(remainder, 0.0) | np.isclose(remainder, denominator)).all()
-

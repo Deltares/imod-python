@@ -96,7 +96,7 @@ class ILogger:
                 self.warning(message, additional_depth)
             case LogLevel.ERROR:
                 self.error(message, additional_depth)
-            case LogLevel.CRITICAL:      
+            case LogLevel.CRITICAL:
                 self.critical(message, additional_depth)
             case _:
                 raise ValueError(f"Unknown logging urgency at level {loglevel}")
