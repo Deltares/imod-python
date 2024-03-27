@@ -33,6 +33,8 @@ class _LoggerHolder(ILogger):
     aware they are making use of an intermediary object.
     """
 
+    _instance: ILogger
+
     def __init__(self) -> None:
         self._instance = NullLogger()
 
@@ -47,17 +49,17 @@ class _LoggerHolder(ILogger):
     def instance(self, value: ILogger) -> None:
         self._instance = value
 
-    def debug(self, message: str) -> None:
-        self.instance.debug(message)
+    def debug(self, message: str, additional_depth: int = 0) -> None:
+        self.instance.debug(message, additional_depth)
 
-    def info(self, message: str) -> None:
-        self.instance.info(message)
+    def info(self, message: str, additional_depth: int = 0) -> None:
+        self.instance.info(message, additional_depth)
 
-    def warning(self, message: str) -> None:
-        self.instance.warning(message)
+    def warning(self, message: str, additional_depth: int = 0) -> None:
+        self.instance.warning(message, additional_depth)
 
-    def error(self, message: str) -> None:
-        self.instance.error(message)
+    def error(self, message: str, additional_depth: int = 0) -> None:
+        self.instance.error(message, additional_depth)
 
-    def critical(self, message: str) -> None:
-        self.instance.critical(message)
+    def critical(self, message: str, additional_depth: int = 0) -> None:
+        self.instance.critical(message, additional_depth)

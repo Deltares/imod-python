@@ -862,7 +862,9 @@ def _zonal_aggregate_raster(
     * Sample the raster at the rasterized polygon cells
     * Store both in a dataframe, groupby and aggregate according to `method`
     """
-    data_dx, xmin, xmax, data_dy, ymin, ymax = imod.util.spatial.spatial_reference(raster)
+    data_dx, xmin, xmax, data_dy, ymin, ymax = imod.util.spatial.spatial_reference(
+        raster
+    )
     dx = resolution
     dy = -dx
     nodata = -1

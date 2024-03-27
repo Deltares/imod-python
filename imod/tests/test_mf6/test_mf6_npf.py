@@ -138,7 +138,6 @@ def test_incompatible_setting():
         )
 
 
-
 def test_wrong_dim():
     layer = np.array([1, 2, 3])
     icelltype = xr.DataArray(

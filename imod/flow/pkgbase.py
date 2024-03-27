@@ -453,7 +453,10 @@ class BoundaryCondition(Package, abc.ABC):
             )
 
         # Replace both key and value by the right datetime type
-        d = {imod.util.time.to_datetime_internal(k, use_cftime): v for k, v in periods.items()}
+        d = {
+            imod.util.time.to_datetime_internal(k, use_cftime): v
+            for k, v in periods.items()
+        }
 
         for varname in self._variable_order:
             self.dataset[varname].attrs["stress_periodic"] = d

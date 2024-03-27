@@ -2,7 +2,7 @@ from typing import Optional, Tuple
 
 import numpy as np
 
-from imod.logging.logging_decorators import init_log_decorator
+from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.utilities.regrid import RegridderType
@@ -149,6 +149,6 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
-    
+
     def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
         return self._regrid_method

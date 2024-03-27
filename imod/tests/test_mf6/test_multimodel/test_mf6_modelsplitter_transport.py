@@ -32,6 +32,7 @@ def test_slice_model_structured(flow_transport_simulation: Modflow6Simulation):
         for package_name in list(transport_model.keys()):
             assert package_name in list(submodel.keys())
 
+
 @pytest.mark.usefixtures("flow_transport_simulation")
 def test_split_dump(
     tmp_path: Path,
@@ -42,22 +43,29 @@ def test_split_dump(
     submodel_labels = zeros_like(simulation["flow"].domain)
     submodel_labels = submodel_labels.drop_vars("layer")
     submodel_labels.values[:, :, 15:] = 1
-    submodel_labels.values[:, :, 95:] = 2    
+    submodel_labels.values[:, :, 95:] = 2
     submodel_labels = submodel_labels.sel(layer=0, drop=True)
 
     split_simulation = simulation.split(submodel_labels)
-    split_simulation.write(tmp_path/"split/original") # a write is necessary before the dump to generate the gwtgwf packages
-    split_simulation.dump(tmp_path/"split")
-    reloaded_split = Modflow6Simulation.from_file(tmp_path/"split/1d_tpt_benchmark_partioned.toml")
-    reloaded_split.write(tmp_path/"split/reloaded")
-    
-    diff = dircmp(tmp_path/"split/original", tmp_path/"split/reloaded")
+    split_simulation.write(
+        tmp_path / "split/original"
+    )  # a write is necessary before the dump to generate the gwtgwf packages
+    split_simulation.dump(tmp_path / "split")
+    reloaded_split = Modflow6Simulation.from_file(
+        tmp_path / "split/1d_tpt_benchmark_partioned.toml"
+    )
+    reloaded_split.write(tmp_path / "split/reloaded")
+
+    diff = dircmp(tmp_path / "split/original", tmp_path / "split/reloaded")
     assert len(diff.diff_files) == 0
     assert len(diff.left_only) == 0
-    assert len(diff.right_only) == 0    
+    assert len(diff.right_only) == 0
+
 
 @pytest.mark.usefixtures("flow_transport_simulation")
-def test_split_flow_and_transport_model(tmp_path: Path, flow_transport_simulation: Modflow6Simulation):
+def test_split_flow_and_transport_model(
+    tmp_path: Path, flow_transport_simulation: Modflow6Simulation
+):
     simulation = flow_transport_simulation
 
     flow_model = simulation["flow"]
@@ -196,7 +204,10 @@ def test_split_flow_and_transport_model_evaluate_output_with_species(
 @pytest.mark.parametrize("advection_scheme", ["TVD", "upstream", "central"])
 @pytest.mark.parametrize("dsp_xt3d_off", [True, False])
 def test_split_flow_and_transport_settings(
-    tmp_path: Path, flow_transport_simulation: Modflow6Simulation, advection_scheme: str, dsp_xt3d_off: bool
+    tmp_path: Path,
+    flow_transport_simulation: Modflow6Simulation,
+    advection_scheme: str,
+    dsp_xt3d_off: bool,
 ):
     simulation = flow_transport_simulation
 
@@ -226,7 +237,6 @@ def test_split_flow_and_transport_settings(
         new_simulation["split_exchanges"][2].dataset["dsp_xt3d_off"].values[()]
         == dsp_xt3d_off
     )
-    assert (
-        new_simulation["split_exchanges"][2].dataset["dsp_xt3d_rhs"].values[()]
-        == (not dsp_xt3d_off)
+    assert new_simulation["split_exchanges"][2].dataset["dsp_xt3d_rhs"].values[()] == (
+        not dsp_xt3d_off
     )

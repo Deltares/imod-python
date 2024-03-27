@@ -5,9 +5,8 @@ import imod
 
 
 def test_render(tmp_path: Path):
-
     api = imod.mf6.ApiPackage(
-        maxbound= 33, print_input=True, print_flows=True, save_flows=True
+        maxbound=33, print_input=True, print_flows=True, save_flows=True
     )
     actual = api.render(tmp_path, "api", [], True)
 

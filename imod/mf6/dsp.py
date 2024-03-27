@@ -2,7 +2,7 @@ from typing import Optional, Tuple
 
 import numpy as np
 
-from imod.logging.logging_decorators import init_log_decorator
+from imod.logging import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.utilities.regrid import RegridderType
@@ -120,7 +120,11 @@ class Dispersion(Package, IRegridPackage):
             PKG_DIMS_SCHEMA,
         ],
         "xt3d_off": [DTypeSchema(np.bool_), DimsSchema()],
-        "xt3d_rhs": [DTypeSchema(np.bool_), DimsSchema(), CompatibleSettingsSchema(other="xt3d_off", other_value=False)],
+        "xt3d_rhs": [
+            DTypeSchema(np.bool_),
+            DimsSchema(),
+            CompatibleSettingsSchema(other="xt3d_off", other_value=False),
+        ],
     }
 
     _write_schemata = {
@@ -146,7 +150,7 @@ class Dispersion(Package, IRegridPackage):
 
     _regrid_method = {
         "diffusion_coefficient": (RegridderType.OVERLAP, "mean"),
-        "longitudinal_horizontal": (RegridderType.OVERLAP, "mean"), 
+        "longitudinal_horizontal": (RegridderType.OVERLAP, "mean"),
         "transversal_horizontal1": (
             RegridderType.OVERLAP,
             "mean",
@@ -158,7 +162,6 @@ class Dispersion(Package, IRegridPackage):
         "transversal_horizontal2": (RegridderType.OVERLAP, "mean"),
         "transversal_vertical": (RegridderType.OVERLAP, "mean"),
     }
-
 
     @init_log_decorator()
     def __init__(
@@ -192,6 +195,6 @@ class Dispersion(Package, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
-    
+
     def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method    
+        return self._regrid_method

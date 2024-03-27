@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from imod.logging.logging_decorators import init_log_decorator
+from imod.logging import init_log_decorator
 from imod.mf6.model import Modflow6Model
 
 
@@ -31,4 +31,3 @@ class GroundwaterTransportModel(Modflow6Model):
             "print_flows": print_flows,
             "save_flows": save_flows,
         }
-

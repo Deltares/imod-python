@@ -1,6 +1,6 @@
 """
 Lake package example
-====
+====================
 
 This is a synthetic example (using invented, not necesarily physical data) of how to use the
 lake package api to generate models with lakes.
