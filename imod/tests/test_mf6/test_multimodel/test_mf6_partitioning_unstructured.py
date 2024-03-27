@@ -355,6 +355,42 @@ def test_partitioning_unstructured_with_well(
             atol=0.01615156,
         )
 
+def run_simulation(tmp_path, simulation, species):
+    simulation.write(tmp_path)
+    simulation.run()    
+    head  = simulation.open_head()
+    concentration = simulation.open_concentration()
+    flow_budget = simulation.open_flow_budget()
+    flow_budget = flow_budget.sel(time=364)        
+    transport_budget = simulation.open_transport_budget(species)
+    transport_budget = transport_budget.sel(time=364)    
+    return head, concentration,flow_budget, transport_budget
+
+def get_exchange_masks(actual_transport_budget, expected_transport_budget):
+    is_multispecies = "species" in  actual_transport_budget.coords
+    species= ""
+    if is_multispecies:
+        species = actual_transport_budget.coords["species"][0]
+    # create a cell-aray of booleans that is true on the exchange boundary cells and false in other locations
+    is_exchange_cell = actual_transport_budget["gwt-gwt"].where(actual_transport_budget["gwt-gwt"]!=0).notnull()
+    is_exchange_cell = is_exchange_cell.sel(layer=1)
+    if is_multispecies:
+        is_exchange_cell = is_exchange_cell.sel(species=species)
+        is_exchange_cell =is_exchange_cell.drop_vars("species")
+
+    # create a edge-aray of booleans that is true on the exchange boundary edges and false in other locations    
+    face_edge = is_exchange_cell.ugrid.grid.edge_face_connectivity
+    face_1 = is_exchange_cell.values[face_edge[:,0]]
+    face_2 = is_exchange_cell.values[face_edge[:,1]] 
+    if is_multispecies:
+        is_exchange_edge = zeros_like(expected_transport_budget["flow-horizontal-face"]).sel(layer=1, species=species)
+    else:
+        is_exchange_edge = zeros_like(expected_transport_budget["flow-horizontal-face"]).sel(layer=1)
+    is_exchange_edge.values = np.where(face_1 & face_2, 1,0)
+    is_exchange_edge = is_exchange_edge.astype(bool)
+    if is_multispecies:
+        is_exchange_edge =is_exchange_edge.drop_vars("species")
+    return is_exchange_cell, is_exchange_edge
 
 @pytest.mark.usefixtures("circle_model_transport")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
@@ -363,20 +399,16 @@ def test_partition_transport(
     circle_model_transport: Modflow6Simulation,
     partition_array: xu.UgridDataArray,
 ):
-    circle_model_transport.write(tmp_path)
-    circle_model_transport.run()
-    expected_concentration = circle_model_transport.open_concentration()
-    expected_budget = circle_model_transport.open_transport_budget(["salinity"])
-    expected_budget = expected_budget.sel(time=364)
+    _, expected_concentration, _, expected_budget = run_simulation(tmp_path, circle_model_transport, ["salinity"])
 
     new_circle_model = circle_model_transport.split(partition_array)
-    new_circle_model.write(tmp_path / "split", binary=False)
-    new_circle_model.run()
-    actual_concentration = new_circle_model.open_concentration()
+
+    _, actual_concentration,_,  actual_budget = run_simulation(tmp_path, new_circle_model, ["salinity"])
 
     actual_concentration = actual_concentration.ugrid.reindex_like(
         expected_concentration
     )
+    actual_budget = actual_budget.ugrid.reindex_like(expected_budget)    
     np.testing.assert_allclose(
         expected_concentration.values,
         actual_concentration["concentration"].values,
@@ -385,29 +417,8 @@ def test_partition_transport(
     )    
 
 
-
-    # Compare the budgets before and after splitting the simulation.
-    # The tolerance is set as the maximum value in the  gwt-gwt
-    # exchange as this contains mass transport in the split case that would
-    # be in one of the other arrays in the unsplit case.
-    actual_budget = new_circle_model.open_transport_budget(["salinity"])
-    actual_budget = actual_budget.sel(time=364)    
-    actual_budget = actual_budget.ugrid.reindex_like(expected_budget)
-
-    # create a cell-aray of booleans that is true on the exchange boundary cells and false in other locations
-    is_exchange_cell = actual_budget["gwt-gwt"].where(actual_budget["gwt-gwt"]!=0).notnull()
-    is_exchange_cell = is_exchange_cell.sel(layer=1)
-
-    # create a edge-aray of booleans that is true on the exchange boundary edges and false in other locations    
-    face_edge = is_exchange_cell.ugrid.grid.edge_face_connectivity
-    face_1 = is_exchange_cell.values[face_edge[:,0]]
-    face_2 = is_exchange_cell.values[face_edge[:,1]] 
-    is_exchange_edge = zeros_like(expected_budget["flow-horizontal-face"]).sel(layer=1)
-    is_exchange_edge.values = np.where(face_1 & face_2, 1,0)
-    is_exchange_edge = is_exchange_edge.astype(bool)
+    is_exchange_cell, is_exchange_edge = get_exchange_masks(actual_budget, expected_budget)
           
-
-
     for budget_term in (
         "ssm",
         "flow-lower-face",
@@ -438,33 +449,13 @@ def test_partition_transport_multispecies(
     circle_model_transport_multispecies = (
         circle_model_transport_multispecies_variable_density
     )
-    circle_model_transport_multispecies.write(tmp_path / "original")
-    circle_model_transport_multispecies.run()
-    expected_conc = circle_model_transport_multispecies.open_concentration()
-    expected_head = circle_model_transport_multispecies.open_head()
-    expected_flow_budget = circle_model_transport_multispecies.open_flow_budget(
-        simulation_start_time=np.datetime64("1999-01-01"),
-        time_unit="d",
-    )
-    expected_transport_budget = (
-        circle_model_transport_multispecies.open_transport_budget( simulation_start_time=np.datetime64("1999-01-01"),
-        time_unit="d", species_ls=["salt", "temp"])
-    )
+    expected_head, expected_conc, expected_flow_budget, expected_transport_budget = run_simulation(tmp_path, circle_model_transport_multispecies, ["salt", "temp"])
 
-    # split and run the simulation
+    # split the simulation
     new_circle_model = circle_model_transport_multispecies.split(partition_array)
-    new_circle_model.write(tmp_path / "split")
-    new_circle_model.run()
 
     # open results
-    actual_conc = new_circle_model.open_concentration()
-    actual_head = new_circle_model.open_head()
-    flow_budget_new = new_circle_model.open_flow_budget(
-        simulation_start_time=np.datetime64("1999-01-01"),
-        time_unit="d",
-    )
-    actual_transport_budget = new_circle_model.open_transport_budget( simulation_start_time=np.datetime64("1999-01-01"),
-        time_unit="d",species_ls=["salt", "temp"])
+    actual_head, actual_conc,actual_flow_budget, actual_transport_budget = run_simulation(tmp_path, new_circle_model, ["salt", "temp"])
 
     # reindex results
     actual_head = actual_head.ugrid.reindex_like(expected_head)
@@ -472,7 +463,7 @@ def test_partition_transport_multispecies(
     actual_transport_budget = actual_transport_budget.ugrid.reindex_like(
         expected_transport_budget
     )
-    actual_flow_budget = flow_budget_new.ugrid.reindex_like(expected_flow_budget)
+    actual_flow_budget = actual_flow_budget.ugrid.reindex_like(expected_flow_budget)
 
     # compare simulation results
     np.testing.assert_allclose(
@@ -483,25 +474,15 @@ def test_partition_transport_multispecies(
     )
     # Compare the budgets.
     # create a cell-aray of booleans that is true on the exchange boundary cells and false in other locations
-    is_exchange_cell = actual_flow_budget["gwf-gwf"].where(actual_flow_budget["gwf-gwf"]!=0).notnull()
-    last_time = actual_flow_budget.coords["time"][-1].values[()]    
-    is_exchange_cell = is_exchange_cell.sel(layer=1, time = last_time)
-
-    # create a edge-aray of booleans that is true on the exchange boundary edges and false in other locations    
-
-    face_edge = is_exchange_cell.ugrid.grid.edge_face_connectivity
-    print(is_exchange_cell.values)
-    face_1 = is_exchange_cell.values[face_edge[:,0]]
-    face_2 = is_exchange_cell.values[face_edge[:,1]] 
-    is_exchange_edge = zeros_like(actual_transport_budget["flow-horizontal-face"]).sel(layer=1, time = last_time, species="temp")
-    is_exchange_edge.values = np.where(face_1 & face_2, 1,0)
-    is_exchange_edge = is_exchange_edge.astype(bool)
+    is_exchange_cell, is_exchange_edge = get_exchange_masks(actual_transport_budget, expected_transport_budget)
 
     for key in ["flow-lower-face", "flow-horizontal-face", "sto-ss", "rch"]:
         marker = is_exchange_cell
+        if key ==  "flow-horizontal-face":
+            marker = is_exchange_edge  
 
         rtol=0.3
-        atol=3e-3
+        atol=3e-3 
         np.testing.assert_allclose(
             expected_flow_budget[key].where(~marker,0).values,
             actual_flow_budget[key].where(~marker,0).values,
