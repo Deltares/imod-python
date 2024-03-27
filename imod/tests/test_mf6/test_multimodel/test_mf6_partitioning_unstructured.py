@@ -356,20 +356,20 @@ def test_partition_transport(
 ):
     circle_model_transport.write(tmp_path)
     circle_model_transport.run()
-    concentration = circle_model_transport.open_concentration()
-    budget = circle_model_transport.open_transport_budget(["salinity"])
+    expected_concentration = circle_model_transport.open_concentration()
+    expected_budget = circle_model_transport.open_transport_budget(["salinity"])
 
     new_circle_model = circle_model_transport.split(partition_array)
     new_circle_model.write(tmp_path / "split", binary=False)
     new_circle_model.run()
-    new_concentration = new_circle_model.open_concentration()
+    actual_concentration = new_circle_model.open_concentration()
 
-    new_concentration = new_concentration.ugrid.reindex_like(concentration)
-    new_budget = new_circle_model.open_transport_budget(["salinity"])
-    new_budget = new_budget.ugrid.reindex_like(budget)
+    actual_concentration = actual_concentration.ugrid.reindex_like(expected_concentration)
+    actual_budget = new_circle_model.open_transport_budget(["salinity"])
+    actual_budget = actual_budget.ugrid.reindex_like(expected_budget)
     np.testing.assert_allclose(
-        concentration.values,
-        new_concentration["concentration"].values,
+        expected_concentration.values,
+        actual_concentration["concentration"].values,
         rtol=7e-5,
         atol=3e-3,
     )
@@ -379,9 +379,9 @@ def test_partition_transport(
     # exchange as this contains mass transport in the split case that would 
     # be in one of the other arrays in the unsplit case.  
     for budget_term in ("ssm", "flow-lower-face", "storage-aqueous", "flow-horizontal-face"):
-        atol = new_budget["gwt-gwt"].values.max()
+        atol = actual_budget["gwt-gwt"].values.max()
         np.testing.assert_allclose(
-            budget[budget_term].sel(time=364).values, new_budget[budget_term].sel(time=364).values,rtol = 200, atol=atol
+            expected_budget[budget_term].sel(time=364).values, actual_budget[budget_term].sel(time=364).values,rtol = 200, atol=atol
         )
 
 @pytest.mark.usefixtures("circle_model_transport_multispecies_variable_density")
@@ -398,13 +398,13 @@ def test_partition_transport_multispecies(
     )
     circle_model_transport_multispecies.write(tmp_path / "original")
     circle_model_transport_multispecies.run()
-    conc = circle_model_transport_multispecies.open_concentration()
-    head = circle_model_transport_multispecies.open_head()
-    flow_budget = circle_model_transport_multispecies.open_flow_budget(
+    expected_conc = circle_model_transport_multispecies.open_concentration()
+    expected_head = circle_model_transport_multispecies.open_head()
+    expected_flow_budget = circle_model_transport_multispecies.open_flow_budget(
         simulation_start_time=np.datetime64("1999-01-01"),
         time_unit="d",
     )
-    transport_budget = circle_model_transport_multispecies.open_transport_budget( ["salt", "temp"])
+    expected_transport_budget = circle_model_transport_multispecies.open_transport_budget( ["salt", "temp"])
 
     # split and run the simulation 
     new_circle_model = circle_model_transport_multispecies.split(partition_array)
@@ -422,29 +422,31 @@ def test_partition_transport_multispecies(
 
 
     # reindex results
-    head_new = head_new.ugrid.reindex_like(head)
-    conc_new = conc_new.ugrid.reindex_like(conc)
-    transport_budget_new = transport_budget_new.ugrid.reindex_like(transport_budget)
-    flow_budget_new = flow_budget_new.ugrid.reindex_like(flow_budget)
+    head_new = head_new.ugrid.reindex_like(expected_head)
+    conc_new = conc_new.ugrid.reindex_like(expected_conc)
+    transport_budget_new = transport_budget_new.ugrid.reindex_like(expected_transport_budget)
+    flow_budget_new = flow_budget_new.ugrid.reindex_like(expected_flow_budget)
  
     # compare simulation results
     np.testing.assert_allclose(    
-        conc.values, conc_new["concentration"].values, rtol=4e-4, atol=5e-3
+        expected_conc.values, conc_new["concentration"].values, rtol=4e-4, atol=5e-3
     )
     np.testing.assert_allclose(
-        head.values, head_new["head"].values, rtol=1e-5, atol=1e-3
+        expected_head.values, head_new["head"].values, rtol=1e-5, atol=1e-3
     )
+    # Compare the budgets.
+    # The tolerance is set as the maximum value in the  gwf-gwf or gwt-gwt     
     # exchange as this contains flow/transport in the split case that would 
     # be in one of the other arrays in the unsplit case.  
     for key in ["flow-lower-face", "flow-horizontal-face", "sto-ss", "rch"]:
         atol = flow_budget_new["gwf-gwf"].values.max()[()]*1.0001
         np.testing.assert_allclose(
-            flow_budget[key].values, flow_budget_new[key].values, rtol = 9, atol=atol
+            expected_flow_budget[key].values, flow_budget_new[key].values, rtol = 9, atol=atol
         )
     for key in ["flow-lower-face", "flow-horizontal-face", "storage-aqueous", "ssm"]:
         atol = transport_budget_new["gwt-gwt"].values.max()[()]*1.0001
         np.testing.assert_allclose(
-            transport_budget[key].values, transport_budget_new[key].values, rtol = 9, atol=atol
+            expected_transport_budget[key].values, transport_budget_new[key].values, rtol = 9, atol=atol
         )
 
 
