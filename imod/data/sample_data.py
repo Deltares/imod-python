@@ -114,7 +114,7 @@ def hondsrug_simulation(path: Union[str, Path]) -> Modflow6Simulation:
 
     with ZipFile(fname_simulation) as archive:
         archive.extractall(path)
-    
+
     return Modflow6Simulation.from_file(Path(path) / "mf6-hondsrug-example.toml")
 
 
@@ -123,7 +123,5 @@ def hondsrug_crosssection(path: Union[str, Path]) -> "geopandas.GeoDataFrame":  
 
     with ZipFile(fname_simulation) as archive:
         archive.extractall(path)
-    
+
     return gpd.read_file(Path(path) / "crosssection.shp")
-
-
