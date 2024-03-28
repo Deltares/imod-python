@@ -23,13 +23,14 @@ from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.regridding_types import RegridderType
 from imod.schemata import ValidationError
-from imod.typing.grid import GridDataArray, ones_like
+from imod.typing.grid import GridDataArray, get_grid_geometry_hash, ones_like
 
 
-class RegridderInstancesCollection:
+class RegridderWeightsCache:
     """
     This class stores any number of regridders that can regrid a single source grid to a single target grid.
     By storing the regridders, we make sure the regridders can be re-used for different arrays on the same grid.
+    Regridders are stored based on their type (`see these docs<https://deltares.github.io/xugrid/examples/regridder_overview.html>`_) and planar coordinates (x, y).
     This is important because computing the regridding weights is a costly affair.
     """
 
@@ -37,6 +38,7 @@ class RegridderInstancesCollection:
         self,
         source_grid: Union[xr.DataArray, xu.UgridDataArray],
         target_grid: Union[xr.DataArray, xu.UgridDataArray],
+        max_cache_size: int = 6,
     ) -> None:
         self.regridder_instances: dict[
             tuple[type[BaseRegridder], Optional[str]], BaseRegridder
@@ -44,27 +46,8 @@ class RegridderInstancesCollection:
         self._source_grid = source_grid
         self._target_grid = target_grid
 
-    def __has_regridder(
-        self, regridder_type: type[BaseRegridder], method: Optional[str] = None
-    ) -> bool:
-        return (regridder_type, method) in self.regridder_instances.keys()
-
-    def __get_existing_regridder(
-        self, regridder_type: type[BaseRegridder], method: Optional[str]
-    ) -> BaseRegridder:
-        if self.__has_regridder(regridder_type, method):
-            return self.regridder_instances[(regridder_type, method)]
-        raise ValueError("no existing regridder of type " + str(regridder_type))
-
-    def __create_regridder(
-        self, regridder_type: type[BaseRegridder], method: Optional[str]
-    ) -> BaseRegridder:
-        method_args = () if method is None else (method,)
-
-        self.regridder_instances[(regridder_type, method)] = regridder_type(
-            self._source_grid, self._target_grid, *method_args
-        )
-        return self.regridder_instances[(regridder_type, method)]
+        self.weights_cache = {}
+        self.max_cache_size = max_cache_size
 
     def __get_regridder_class(
         self, regridder_type: RegridderType | BaseRegridder
@@ -82,6 +65,8 @@ class RegridderInstancesCollection:
 
     def get_regridder(
         self,
+        source_grid: GridDataArray,
+        target_grid: GridDataArray,
         regridder_type: Union[RegridderType, BaseRegridder],
         method: Optional[str] = None,
     ) -> BaseRegridder:
@@ -107,10 +92,31 @@ class RegridderInstancesCollection:
         """
         regridder_class = self.__get_regridder_class(regridder_type)
 
-        if not self.__has_regridder(regridder_class, method):
-            self.__create_regridder(regridder_class, method)
+        if "layer" not in source_grid.coords and "layer" in target_grid.coords:
+            target_grid = target_grid.drop_vars("layer")
 
-        return self.__get_existing_regridder(regridder_class, method)
+        source_hash = get_grid_geometry_hash(source_grid)
+        target_hash = get_grid_geometry_hash(target_grid)
+        key = (source_hash, target_hash, regridder_class)
+        if not key in self.weights_cache.keys():
+            if len(self.weights_cache) >= self.max_cache_size:
+                self.remove_first_regridder()
+            kwargs = {"source": source_grid, "target": target_grid}
+            if method is not None:
+                kwargs["method"] = method
+            regridder = regridder_class(**kwargs)
+            self.weights_cache[key] = regridder.weights
+        else:
+            kwargs = {"weights": self.weights_cache[key], "target": target_grid}
+            if method is not None:
+                kwargs["method"] = method
+            regridder = regridder_class.from_weights(**kwargs)
+
+        return regridder
+
+    def remove_first_regridder(self):
+        keys = list(self.weights_cache.keys())
+        self.weights_cache.pop(keys[0])
 
 
 def assign_coord_if_present(
@@ -131,7 +137,7 @@ def assign_coord_if_present(
 def _regrid_array(
     package: IRegridPackage,
     varname: str,
-    regridder_collection: RegridderInstancesCollection,
+    regridder_collection: RegridderWeightsCache,
     regridder_name: str,
     regridder_function: str,
     target_grid: GridDataArray,
@@ -167,6 +173,8 @@ def _regrid_array(
 
     # obtain an instance of a regridder for the chosen method
     regridder = regridder_collection.get_regridder(
+        package.dataset[varname],
+        target_grid,
         regridder_name,
         regridder_function,
     )
@@ -205,6 +213,7 @@ def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, lis
 def _regrid_like(
     package: IRegridPackage,
     target_grid: GridDataArray,
+    regrid_context: RegridderWeightsCache,
     regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
 ) -> IPackage:
     """
@@ -231,6 +240,9 @@ def _regrid_like(
     regridder_types: dict(str->(regridder type,str))
         dictionary mapping arraynames (str) to a tuple of regrid type (a specialization class of BaseRegridder) and function name (str)
         this dictionary can be used to override the default mapping method.
+    regrid_context: RegridderWeightsCache
+        stores regridder weights for different regridders. Can be used to speed up regridding,
+        if the same regridders are used several times for regridding different arrays.
 
     Returns
     -------
@@ -244,10 +256,6 @@ def _regrid_like(
 
     if hasattr(package, "auxiliary_data_fields"):
         remove_expanded_auxiliary_variables_from_dataset(package)
-
-    regridder_collection = RegridderInstancesCollection(
-        package.dataset, target_grid=target_grid
-    )
 
     regridder_settings = package.get_regrid_methods()
     if regridder_types is not None:
@@ -269,7 +277,7 @@ def _regrid_like(
         new_package_data[varname] = _regrid_array(
             package,
             varname,
-            regridder_collection,
+            regrid_context,
             regridder_name,
             regridder_function,
             target_grid,
@@ -289,7 +297,10 @@ def _regrid_like(
 
 @typedispatch  # type: ignore[no-redef]
 def _regrid_like(
-    model: IModel, target_grid: GridDataArray, validate: bool = True
+    model: IModel,
+    target_grid: GridDataArray,
+    validate: bool = True,
+    regrid_context: Optional[RegridderWeightsCache] = None,
 ) -> IModel:
     """
     Creates a model by regridding the packages of this model to another discretization.
@@ -303,6 +314,9 @@ def _regrid_like(
         a grid defined over the same discretization as the one we want to regrid the package to
     validate: bool
         set to true to validate the regridded packages
+    regrid_context: Optional RegridderWeightsCache
+        stores regridder weights for different regridders. Can be used to speed up regridding,
+        if the same regridders are used several times for regridding different arrays.
 
     Returns
     -------
@@ -315,17 +329,18 @@ def _regrid_like(
             f"regridding this model cannot be done due to the presence of package {error_with_object_name}"
         )
     new_model = model.__class__()
-
+    if regrid_context is None:
+        regrid_context = RegridderWeightsCache(model.domain, target_grid)
     for pkg_name, pkg in model.items():
         if isinstance(pkg, (IRegridPackage, ILineDataPackage, IPointDataPackage)):
-            new_model[pkg_name] = pkg.regrid_like(target_grid)
+            new_model[pkg_name] = pkg.regrid_like(target_grid, regrid_context)
         else:
             raise NotImplementedError(
                 f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
             )
 
     methods = _get_unique_regridder_types(model)
-    output_domain = _get_regridding_domain(model, target_grid, methods)
+    output_domain = _get_regridding_domain(model, target_grid, regrid_context, methods)
     new_model.mask_all_packages(output_domain)
     new_model.purge_empty_packages()
     if validate:
@@ -371,6 +386,9 @@ def _regrid_like(
         raise ValueError(
             "Unable to regrid simulation. Regridding can only be done on simulations that have a single flow model."
         )
+    flow_models = simulation.get_models_of_type("gwf6")
+    old_grid = list(flow_models.values())[0].domain
+    regrid_context = RegridderWeightsCache(old_grid, target_grid)
 
     models = simulation.get_models()
     for model_name, model in models.items():
@@ -383,7 +401,7 @@ def _regrid_like(
     result = simulation.__class__(regridded_simulation_name)
     for key, item in simulation.items():
         if isinstance(item, IModel):
-            result[key] = item.regrid_like(target_grid, validate)
+            result[key] = item.regrid_like(target_grid, validate, regrid_context)
         elif key == "gwtgwf_exchanges":
             pass
         elif isinstance(item, IPackage) and not isinstance(item, IRegridPackage):
@@ -428,6 +446,7 @@ def _regrid_like(package: object, target_grid: GridDataArray, *_) -> None:
 def _get_regridding_domain(
     model: IModel,
     target_grid: GridDataArray,
+    regrid_context: RegridderWeightsCache,
     methods: defaultdict[RegridderType, list[str]],
 ) -> GridDataArray:
     """
@@ -436,12 +455,9 @@ def _get_regridding_domain(
     cells that all regridders consider active.
     """
     idomain = model.domain
-    regridder_collection = RegridderInstancesCollection(
-        idomain, target_grid=target_grid
-    )
     included_in_all = ones_like(target_grid)
     regridders = [
-        regridder_collection.get_regridder(regriddertype, function)
+        regrid_context.get_regridder(idomain, target_grid, regriddertype, function)
         for regriddertype, functionlist in methods.items()
         for function in functionlist
     ]

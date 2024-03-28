@@ -27,6 +27,9 @@ Fixed
 - :meth'`imod.mf6.Modflow6Simulation.write` failed after splitting the simulation. This has been fixed.
 - modflow options like "print flow" , "save flow" and "print input" can now be set on
   :class:`imod.mf6.Well`
+- when regridding a :class:`imod.mf6.Modflow6Simulation`, :class:`imod.mf6.GroundwaterFlowModel`,  :class:`imod.mf6.GroundwaterTransportModel`
+  or a :class:`imod.mf6.package`, regridding weights are now cached and can be re-used over the different objects that are regridded.
+  This improves performance considerably in most use cases: when regridding is applied over the same grid cells with the same regridder type, but with different values/methods, multiple times.
  
 Added
 ~~~~~
