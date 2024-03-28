@@ -377,9 +377,11 @@ def get_exchange_masks(actual_flow_budget, expected_flow_budget):
     face_edge = is_exchange_cell.ugrid.grid.edge_face_connectivity
     face_1 = is_exchange_cell.values[face_edge[:, 0]]
     face_2 = is_exchange_cell.values[face_edge[:, 1]]
-    is_exchange_edge = zeros_like(expected_flow_budget["flow-horizontal-face"]).sel(
-        layer=1
-    ).astype(bool)
+    is_exchange_edge = (
+        zeros_like(expected_flow_budget["flow-horizontal-face"])
+        .sel(layer=1)
+        .astype(bool)
+    )
     is_exchange_edge.values = face_1 & face_2
     return is_exchange_cell, is_exchange_edge
 
