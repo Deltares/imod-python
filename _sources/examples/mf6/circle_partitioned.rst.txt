@@ -100,7 +100,7 @@ Visualize the computed heads in the top layer.
  .. code-block:: none
 
 
-    <matplotlib.tri._tricontour.TriContourSet object at 0x0000026922F66FD0>
+    <matplotlib.tri._tricontour.TriContourSet object at 0x0000015AA839D950>
 
 
 
@@ -133,7 +133,7 @@ Visualize the flow-horizontal-face-x componenty of the balances.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.183 seconds)
+   **Total running time of the script:** (0 minutes 3.762 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_circle_partitioned.py:

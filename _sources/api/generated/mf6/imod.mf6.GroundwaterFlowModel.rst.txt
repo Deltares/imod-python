@@ -21,9 +21,14 @@
       ~GroundwaterFlowModel.from_file
       ~GroundwaterFlowModel.fromkeys
       ~GroundwaterFlowModel.get
+      ~GroundwaterFlowModel.has_key
+      ~GroundwaterFlowModel.is_clipping_supported
+      ~GroundwaterFlowModel.is_regridding_supported
+      ~GroundwaterFlowModel.is_splitting_supported
       ~GroundwaterFlowModel.is_use_newton
       ~GroundwaterFlowModel.items
       ~GroundwaterFlowModel.keys
+      ~GroundwaterFlowModel.mask_all_packages
       ~GroundwaterFlowModel.model_id
       ~GroundwaterFlowModel.pop
       ~GroundwaterFlowModel.popitem
@@ -33,6 +38,8 @@
       ~GroundwaterFlowModel.set_newton
       ~GroundwaterFlowModel.setdefault
       ~GroundwaterFlowModel.update
+      ~GroundwaterFlowModel.update_buoyancy_package
+      ~GroundwaterFlowModel.validate
       ~GroundwaterFlowModel.values
       ~GroundwaterFlowModel.write
    

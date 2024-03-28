@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.wq.bas &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>imod.wq.bas &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -593,8 +593,8 @@ document.write(`
         <span class="n">d</span><span class="p">[</span><span class="s2">&quot;nlay&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;nrow&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;ncol&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;ibound&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
         <span class="c1"># TODO: check dx &gt; 0, dy &lt; 0?</span>
         <span class="k">if</span> <span class="s2">&quot;dx&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="ow">or</span> <span class="s2">&quot;dy&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">:</span>  <span class="c1"># assume equidistant</span>
-            <span class="n">dx</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">coord_reference</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">])</span>
-            <span class="n">dy</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">coord_reference</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">])</span>
+            <span class="n">dx</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">coord_reference</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">])</span>
+            <span class="n">dy</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">coord_reference</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;dx&quot;</span><span class="p">]</span>
             <span class="n">dy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;dy&quot;</span><span class="p">]</span>

@@ -23,9 +23,15 @@
       ~Modflow6Simulation.fromkeys
       ~Modflow6Simulation.get
       ~Modflow6Simulation.get_exchange_relationships
+      ~Modflow6Simulation.get_models
       ~Modflow6Simulation.get_models_of_type
+      ~Modflow6Simulation.get_solution_name
+      ~Modflow6Simulation.has_key
+      ~Modflow6Simulation.has_one_flow_model
+      ~Modflow6Simulation.is_split
       ~Modflow6Simulation.items
       ~Modflow6Simulation.keys
+      ~Modflow6Simulation.mask_all_models
       ~Modflow6Simulation.open_concentration
       ~Modflow6Simulation.open_flow_budget
       ~Modflow6Simulation.open_head

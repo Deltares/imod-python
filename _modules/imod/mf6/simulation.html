@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.simulation &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>imod.mf6.simulation &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -451,14 +451,15 @@ document.write(`
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">pathlib</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">DefaultDict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
 
 <span class="kn">import</span> <span class="nn">cftime</span>
+<span class="kn">import</span> <span class="nn">dask</span>
 <span class="kn">import</span> <span class="nn">jinja2</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">tomli</span>
@@ -469,8 +470,12 @@ document.write(`
 <span class="kn">import</span> <span class="nn">imod</span>
 <span class="kn">import</span> <span class="nn">imod.logging</span>
 <span class="kn">import</span> <span class="nn">imod.mf6.exchangebase</span>
+<span class="kn">from</span> <span class="nn">imod.logging</span> <span class="kn">import</span> <span class="n">standard_log_decorator</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.gwfgwf</span> <span class="kn">import</span> <span class="n">GWFGWF</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.gwfgwt</span> <span class="kn">import</span> <span class="n">GWFGWT</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.gwtgwt</span> <span class="kn">import</span> <span class="n">GWTGWT</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.ims</span> <span class="kn">import</span> <span class="n">Solution</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.interfaces.isimulation</span> <span class="kn">import</span> <span class="n">ISimulation</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.model</span> <span class="kn">import</span> <span class="n">Modflow6Model</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.model_gwf</span> <span class="kn">import</span> <span class="n">GroundwaterFlowModel</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.model_gwt</span> <span class="kn">import</span> <span class="n">GroundwaterTransportModel</span>
@@ -481,11 +486,19 @@ document.write(`
 <span class="kn">from</span> <span class="nn">imod.mf6.multimodel.modelsplitter</span> <span class="kn">import</span> <span class="n">create_partition_info</span><span class="p">,</span> <span class="n">slice_model</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.out</span> <span class="kn">import</span> <span class="n">open_cbc</span><span class="p">,</span> <span class="n">open_conc</span><span class="p">,</span> <span class="n">open_hds</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.package</span> <span class="kn">import</span> <span class="n">Package</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.ssm</span> <span class="kn">import</span> <span class="n">SourceSinkMixing</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.statusinfo</span> <span class="kn">import</span> <span class="n">NestedStatusInfo</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.utilities.mask</span> <span class="kn">import</span> <span class="n">_mask_all_models</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.utilities.regrid</span> <span class="kn">import</span> <span class="n">_regrid_like</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.write_context</span> <span class="kn">import</span> <span class="n">WriteContext</span>
 <span class="kn">from</span> <span class="nn">imod.schemata</span> <span class="kn">import</span> <span class="n">ValidationError</span>
 <span class="kn">from</span> <span class="nn">imod.typing</span> <span class="kn">import</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="n">GridDataset</span>
-<span class="kn">from</span> <span class="nn">imod.typing.grid</span> <span class="kn">import</span> <span class="n">concat</span><span class="p">,</span> <span class="n">is_unstructured</span><span class="p">,</span> <span class="n">merge</span><span class="p">,</span> <span class="n">merge_partitions</span><span class="p">,</span> <span class="n">nan_like</span>
+<span class="kn">from</span> <span class="nn">imod.typing.grid</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">concat</span><span class="p">,</span>
+    <span class="n">is_equal</span><span class="p">,</span>
+    <span class="n">is_unstructured</span><span class="p">,</span>
+    <span class="n">merge_partitions</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="n">OUTPUT_FUNC_MAPPING</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;head&quot;</span><span class="p">:</span> <span class="n">open_hds</span><span class="p">,</span>
@@ -516,11 +529,7 @@ document.write(`
     <span class="p">}</span>
 
 
-<span class="k">def</span> <span class="nf">is_split</span><span class="p">(</span><span class="n">simulation</span><span class="p">:</span> <span class="n">Modflow6Simulation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-    <span class="k">return</span> <span class="s2">&quot;split_exchanges&quot;</span> <span class="ow">in</span> <span class="n">simulation</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-
-
-<div class="viewcode-block" id="Modflow6Simulation"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Modflow6Simulation.html#imod.mf6.Modflow6Simulation">[docs]</a><span class="k">class</span> <span class="nc">Modflow6Simulation</span><span class="p">(</span><span class="n">collections</span><span class="o">.</span><span class="n">UserDict</span><span class="p">):</span>
+<div class="viewcode-block" id="Modflow6Simulation"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Modflow6Simulation.html#imod.mf6.Modflow6Simulation">[docs]</a><span class="k">class</span> <span class="nc">Modflow6Simulation</span><span class="p">(</span><span class="n">collections</span><span class="o">.</span><span class="n">UserDict</span><span class="p">,</span> <span class="n">ISimulation</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">_initialize_template</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">loader</span> <span class="o">=</span> <span class="n">jinja2</span><span class="o">.</span><span class="n">PackageLoader</span><span class="p">(</span><span class="s2">&quot;imod&quot;</span><span class="p">,</span> <span class="s2">&quot;templates/mf6&quot;</span><span class="p">)</span>
         <span class="n">env</span> <span class="o">=</span> <span class="n">jinja2</span><span class="o">.</span><span class="n">Environment</span><span class="p">(</span><span class="n">loader</span><span class="o">=</span><span class="n">loader</span><span class="p">,</span> <span class="n">keep_trailing_newline</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -605,7 +614,7 @@ document.write(`
         <span class="p">)</span>
 
         <span class="n">times</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">imod</span><span class="o">.</span><span class="n">wq</span><span class="o">.</span><span class="n">timeutil</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cftime</span><span class="p">)</span>
+            <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">to_datetime_internal</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cftime</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">time</span> <span class="ow">in</span> <span class="n">additional_times</span>
         <span class="p">]</span>
         <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
@@ -615,7 +624,7 @@ document.write(`
         <span class="c1"># np.unique also sorts</span>
         <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">times</span><span class="p">))</span>
 
-        <span class="n">duration</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">wq</span><span class="o">.</span><span class="n">timeutil</span><span class="o">.</span><span class="n">timestep_duration</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cftime</span><span class="p">)</span>
+        <span class="n">duration</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">timestep_duration</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cftime</span><span class="p">)</span>
         <span class="c1"># Generate time discretization, just rely on default arguments</span>
         <span class="c1"># Probably won&#39;t be used that much anyway?</span>
         <span class="n">timestep_duration</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
@@ -661,7 +670,8 @@ document.write(`
         <span class="n">d</span><span class="p">[</span><span class="s2">&quot;solutiongroups&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">solutiongroups</span><span class="p">]</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Modflow6Simulation.write"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Modflow6Simulation.write.html#imod.mf6.Modflow6Simulation.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span>
+    <span class="nd">@standard_log_decorator</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">directory</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span>
         <span class="n">binary</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -688,7 +698,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># create write context</span>
         <span class="n">write_context</span> <span class="o">=</span> <span class="n">WriteContext</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">binary</span><span class="p">,</span> <span class="n">use_absolute_paths</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">is_split</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_split</span><span class="p">():</span>
             <span class="n">write_context</span><span class="o">.</span><span class="n">is_partitioned</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="c1"># Check models for required content</span>
@@ -746,7 +756,7 @@ document.write(`
         <span class="k">if</span> <span class="n">status_info</span><span class="o">.</span><span class="n">has_errors</span><span class="p">():</span>
             <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">status_info</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">directory</span> <span class="o">=</span> <span class="n">directory</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">directory</span> <span class="o">=</span> <span class="n">directory</span>
 
 <div class="viewcode-block" id="Modflow6Simulation.run"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Modflow6Simulation.run.html#imod.mf6.Modflow6Simulation.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mf6path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;mf6&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -873,6 +883,8 @@ document.write(`
             <span class="n">species_ls</span><span class="o">=</span><span class="n">species_ls</span><span class="p">,</span>
             <span class="n">simulation_start_time</span><span class="o">=</span><span class="n">simulation_start_time</span><span class="p">,</span>
             <span class="n">time_unit</span><span class="o">=</span><span class="n">time_unit</span><span class="p">,</span>
+            <span class="n">merge_to_dataset</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">flowja</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Modflow6Simulation.open_flow_budget"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Modflow6Simulation.open_flow_budget.html#imod.mf6.Modflow6Simulation.open_flow_budget">[docs]</a>    <span class="k">def</span> <span class="nf">open_flow_budget</span><span class="p">(</span>
@@ -895,9 +907,9 @@ document.write(`
 <span class="sd">        ``flowja=False`` and the array is returned in &quot;grid form&quot;, meaning:</span>
 
 <span class="sd">            * DIS: in right, front, and lower face flow. All flows are placed in</span>
-<span class="sd">            the cell.</span>
+<span class="sd">              the cell.</span>
 <span class="sd">            * DISV: in horizontal and lower face flow.the horizontal flows are</span>
-<span class="sd">            placed on the edges and the lower face flow is placed on the faces.</span>
+<span class="sd">              placed on the edges and the lower face flow is placed on the faces.</span>
 
 <span class="sd">        When ``flowja=True``, the flow-ja-face array is returned as it is found in</span>
 <span class="sd">        the CBC file, with a flow for every cell to cell connection. Additionally,</span>
@@ -941,6 +953,7 @@ document.write(`
             <span class="n">flowja</span><span class="o">=</span><span class="n">flowja</span><span class="p">,</span>
             <span class="n">simulation_start_time</span><span class="o">=</span><span class="n">simulation_start_time</span><span class="p">,</span>
             <span class="n">time_unit</span><span class="o">=</span><span class="n">time_unit</span><span class="p">,</span>
+            <span class="n">merge_to_dataset</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Modflow6Simulation.open_concentration"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Modflow6Simulation.open_concentration.html#imod.mf6.Modflow6Simulation.open_concentration">[docs]</a>    <span class="k">def</span> <span class="nf">open_concentration</span><span class="p">(</span>
@@ -1006,33 +1019,45 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">modeltype</span> <span class="o">=</span> <span class="n">OUTPUT_MODEL_MAPPING</span><span class="p">[</span><span class="n">output</span><span class="p">]</span>
         <span class="n">modelnames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_models_of_type</span><span class="p">(</span><span class="n">modeltype</span><span class="o">.</span><span class="n">_model_id</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-        <span class="c1"># Pop species_ls, set to modelnames in case not found</span>
-        <span class="n">species_ls</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;species_ls&quot;</span><span class="p">,</span> <span class="n">modelnames</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">modelnames</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">modeltype</span> <span class="o">=</span> <span class="n">OUTPUT_MODEL_MAPPING</span><span class="p">[</span><span class="n">output</span><span class="p">]</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Could not find any models of appropriate type for </span><span class="si">{</span><span class="n">output</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;make sure a model of type </span><span class="si">{</span><span class="n">modeltype</span><span class="si">}</span><span class="s2"> is assigned to simulation.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">output</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;head&quot;</span><span class="p">,</span> <span class="s2">&quot;budget-flow&quot;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_single_output</span><span class="p">(</span><span class="n">modelnames</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">output</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;concentration&quot;</span><span class="p">,</span> <span class="s2">&quot;budget-transport&quot;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_concat_species</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unexpected error when opening </span><span class="si">{</span><span class="n">output</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">modelnames</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">_open_single_output</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">modelnames</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">output</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span> <span class="o">|</span> <span class="n">GridDataset</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Open single output, e.g. concentration of single species, or heads. This</span>
+<span class="sd">        can be output of partitioned models that need to be merged.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">modelnames</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">modeltype</span> <span class="o">=</span> <span class="n">OUTPUT_MODEL_MAPPING</span><span class="p">[</span><span class="n">output</span><span class="p">]</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Could not find any models of appropriate type for </span><span class="si">{</span><span class="n">output</span><span class="si">}</span><span class="s2">, &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;make sure a model of type </span><span class="si">{</span><span class="n">modeltype</span><span class="si">}</span><span class="s2"> is assigned to simulation.&quot;</span>
             <span class="p">)</span>
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">modelnames</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">modelname</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">modelnames</span><span class="p">))</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_output_single_model</span><span class="p">(</span><span class="n">modelname</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">is_split</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_single_output_single_model</span><span class="p">(</span><span class="n">modelname</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_split</span><span class="p">():</span>
             <span class="k">if</span> <span class="s2">&quot;budget&quot;</span> <span class="ow">in</span> <span class="n">output</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_merge_budgets</span><span class="p">(</span><span class="n">modelnames</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_merge_states</span><span class="p">(</span><span class="n">modelnames</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">output</span> <span class="o">==</span> <span class="s2">&quot;concentration&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_concat_concentrations</span><span class="p">(</span>
-                <span class="n">modelnames</span><span class="p">,</span> <span class="n">species_ls</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span>
-            <span class="p">)</span>
-        <span class="k">elif</span> <span class="n">output</span> <span class="o">==</span> <span class="s2">&quot;budget-transport&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_concat_transport_budgets</span><span class="p">(</span>
-                <span class="n">modelnames</span><span class="p">,</span> <span class="n">species_ls</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Unexpected error when opening </span><span class="si">{</span><span class="n">output</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">modelnames</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;error in _open_single_output&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_merge_states</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">modelnames</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">output</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span>
@@ -1040,7 +1065,7 @@ document.write(`
         <span class="n">state_partitions</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">modelname</span> <span class="ow">in</span> <span class="n">modelnames</span><span class="p">:</span>
             <span class="n">state_partitions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_open_output_single_model</span><span class="p">(</span><span class="n">modelname</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_open_single_output_single_model</span><span class="p">(</span><span class="n">modelname</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">)</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">merge_partitions</span><span class="p">(</span><span class="n">state_partitions</span><span class="p">)</span>
 
@@ -1061,6 +1086,35 @@ document.write(`
         <span class="n">cbc</span><span class="p">[</span><span class="n">exchange_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">exchange_budgets</span>
         <span class="k">return</span> <span class="n">cbc</span>
 
+    <span class="k">def</span> <span class="nf">_pad_missing_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cbc_per_partition</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">GridDataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Boundary conditions can be missing in certain partitions, as do their</span>
+<span class="sd">        budgets, in which case we manually assign an empty grid of nans.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dims_per_unique_key</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">key</span><span class="p">:</span> <span class="n">cbc</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span> <span class="k">for</span> <span class="n">cbc</span> <span class="ow">in</span> <span class="n">cbc_per_partition</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">cbc</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">cbc</span> <span class="ow">in</span> <span class="n">cbc_per_partition</span><span class="p">:</span>
+            <span class="n">missing_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dims_per_unique_key</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">cbc</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+            <span class="k">for</span> <span class="n">missing</span> <span class="ow">in</span> <span class="n">missing_keys</span><span class="p">:</span>
+                <span class="n">missing_dims</span> <span class="o">=</span> <span class="n">dims_per_unique_key</span><span class="p">[</span><span class="n">missing</span><span class="p">]</span>
+                <span class="n">missing_coords</span> <span class="o">=</span> <span class="p">{</span><span class="n">dim</span><span class="p">:</span> <span class="n">cbc</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">missing_dims</span><span class="p">}</span>
+
+                <span class="n">shape</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">missing_coords</span><span class="p">[</span><span class="n">dim</span><span class="p">])</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">missing_dims</span><span class="p">])</span>
+                <span class="n">chunks</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span> <span class="o">+</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="n">missing_data</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="n">chunks</span><span class="p">)</span>
+
+                <span class="n">missing_grid</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+                    <span class="n">missing_data</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">missing_dims</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">missing_coords</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cbc</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">):</span>
+                    <span class="n">missing_grid</span> <span class="o">=</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">(</span>
+                        <span class="n">missing_grid</span><span class="p">,</span>
+                        <span class="n">grid</span><span class="o">=</span><span class="n">cbc</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="n">cbc</span><span class="p">[</span><span class="n">missing</span><span class="p">]</span> <span class="o">=</span> <span class="n">missing_grid</span>
+
     <span class="k">def</span> <span class="nf">_merge_budgets</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">modelnames</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">output</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataset</span><span class="p">:</span>
@@ -1069,68 +1123,73 @@ document.write(`
 
         <span class="n">cbc_per_partition</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">modelname</span> <span class="ow">in</span> <span class="n">modelnames</span><span class="p">:</span>
-            <span class="n">partition_model</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">modelname</span><span class="p">]</span>
-            <span class="n">partition_domain</span> <span class="o">=</span> <span class="n">partition_model</span><span class="o">.</span><span class="n">domain</span>
-            <span class="n">cbc_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_output_single_model</span><span class="p">(</span><span class="n">modelname</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">)</span>
-            <span class="c1"># Force list of dicts to list of DataArrays to work around:</span>
-            <span class="c1"># https://github.com/Deltares/xugrid/issues/179</span>
-            <span class="n">cbc_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">da</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">da</span> <span class="ow">in</span> <span class="n">cbc_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
-            <span class="n">cbc</span> <span class="o">=</span> <span class="n">merge</span><span class="p">(</span><span class="n">cbc_list</span><span class="p">)</span>
+            <span class="n">cbc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_single_output_single_model</span><span class="p">(</span><span class="n">modelname</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">)</span>
             <span class="c1"># Merge and assign exchange budgets to dataset</span>
             <span class="c1"># FUTURE: Refactor to insert these exchange budgets in horizontal</span>
             <span class="c1"># flows.</span>
             <span class="n">cbc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_merge_and_assign_exchange_budgets</span><span class="p">(</span><span class="n">cbc</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">is_unstructured</span><span class="p">(</span><span class="n">cbc</span><span class="p">):</span>
-                <span class="n">cbc</span> <span class="o">=</span> <span class="n">cbc</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">partition_domain</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+                <span class="n">cbc</span> <span class="o">=</span> <span class="n">cbc</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">modelname</span><span class="p">]</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
             <span class="n">cbc_per_partition</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cbc</span><span class="p">)</span>
 
-        <span class="c1"># Boundary conditions can be missing in certain partitions, as do their</span>
-        <span class="c1"># budgets, in which case we manually assign an empty grid of nans.</span>
-        <span class="n">unique_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">key</span> <span class="k">for</span> <span class="n">cbc</span> <span class="ow">in</span> <span class="n">cbc_per_partition</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">cbc</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
-        <span class="k">for</span> <span class="n">cbc</span> <span class="ow">in</span> <span class="n">cbc_per_partition</span><span class="p">:</span>
-            <span class="n">missing_keys</span> <span class="o">=</span> <span class="n">unique_keys</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">cbc</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-            <span class="n">present_keys</span> <span class="o">=</span> <span class="n">unique_keys</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">cbc</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-            <span class="n">first_present_key</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">present_keys</span><span class="p">))</span>
-            <span class="k">for</span> <span class="n">missing</span> <span class="ow">in</span> <span class="n">missing_keys</span><span class="p">:</span>
-                <span class="n">cbc</span><span class="p">[</span><span class="n">missing</span><span class="p">]</span> <span class="o">=</span> <span class="n">nan_like</span><span class="p">(</span><span class="n">cbc</span><span class="p">[</span><span class="n">first_present_key</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pad_missing_variables</span><span class="p">(</span><span class="n">cbc_per_partition</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">merge_partitions</span><span class="p">(</span><span class="n">cbc_per_partition</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_concat_concentrations</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">modelnames</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">species_ls</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">output</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
-        <span class="n">concentrations</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">modelname</span><span class="p">,</span> <span class="n">species</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">modelnames</span><span class="p">,</span> <span class="n">species_ls</span><span class="p">):</span>
-            <span class="n">conc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_output_single_model</span><span class="p">(</span><span class="n">modelname</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">)</span>
-            <span class="c1"># Bug in mypy when using unions in isInstance</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conc</span><span class="p">,</span> <span class="n">GridDataArray</span><span class="p">):</span>  <span class="c1"># type: ignore</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Type error. Expected GridDataArray but got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">conc</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span>
-            <span class="n">conc</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">GridDataArray</span><span class="p">,</span> <span class="n">conc</span><span class="p">)</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">species</span><span class="o">=</span><span class="n">species</span><span class="p">)</span>
-            <span class="n">concentrations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conc</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">concat</span><span class="p">(</span><span class="n">concentrations</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="s2">&quot;species&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_concat_species</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">species_ls</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span> <span class="o">|</span> <span class="n">GridDataset</span><span class="p">:</span>
+        <span class="c1"># groupby flow model, to somewhat enforce consistent transport model</span>
+        <span class="c1"># ordening. Say:</span>
+        <span class="c1"># F = Flow model, T = Transport model</span>
+        <span class="c1"># a = species &quot;a&quot;, b = species &quot;b&quot;</span>
+        <span class="c1"># 1 = partition 1, 2 = partition 2</span>
+        <span class="c1"># then this:</span>
+        <span class="c1"># F1Ta1 F1Tb1 F2Ta2 F2Tb2 -&gt; F1: [Ta1, Tb1], F2: [Ta2, Tb2]</span>
+        <span class="c1"># F1Ta1 F2Tb1 F1Ta1 F2Tb2 -&gt; F1: [Ta1, Tb1], F2: [Ta2, Tb2]</span>
+        <span class="n">tpt_models_per_flow_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_transport_models_per_flow_model</span><span class="p">()</span>
+        <span class="n">all_tpt_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tpt_models_per_flow_model</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
 
-    <span class="k">def</span> <span class="nf">_concat_transport_budgets</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">modelnames</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">species_ls</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">output</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataset</span><span class="p">:</span>
-        <span class="n">budgets</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">modelname</span><span class="p">,</span> <span class="n">species</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">modelnames</span><span class="p">,</span> <span class="n">species_ls</span><span class="p">):</span>
-            <span class="n">budget_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_output_single_model</span><span class="p">(</span><span class="n">modelname</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">)</span>
-            <span class="c1"># Force list of dicts to list of DataArrays to work around:</span>
-            <span class="c1"># https://github.com/Deltares/xugrid/issues/179</span>
-            <span class="n">budget_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">da</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">da</span> <span class="ow">in</span> <span class="n">budget_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
-            <span class="n">budget</span> <span class="o">=</span> <span class="n">merge</span><span class="p">(</span><span class="n">budget_list</span><span class="p">)</span>
-            <span class="n">budget</span> <span class="o">=</span> <span class="n">budget</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">species</span><span class="o">=</span><span class="n">species</span><span class="p">)</span>
-            <span class="n">budgets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">budget</span><span class="p">)</span>
+        <span class="c1"># [[Ta_1, Tb_1], [Ta_2, Tb_2]] -&gt; [[Ta_1, Ta_2], [Tb_1, Tb_2]]</span>
+        <span class="c1"># [[Ta, Tb]] -&gt; [[Ta], [Tb]]</span>
+        <span class="n">tpt_names_per_species</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">all_tpt_names</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="n">concat</span><span class="p">(</span><span class="n">budgets</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="s2">&quot;species&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_split</span><span class="p">():</span>
+            <span class="c1"># [[Ta_1, Tb_1], [Ta_2, Tb_2]] -&gt; [Ta, Tb]</span>
+            <span class="n">unpartitioned_modelnames</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">tpt_name</span><span class="o">.</span><span class="n">rpartition</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">tpt_name</span> <span class="ow">in</span> <span class="n">all_tpt_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># [[Ta, Tb]] -&gt; [Ta, Tb]</span>
+            <span class="n">unpartitioned_modelnames</span> <span class="o">=</span> <span class="n">all_tpt_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_open_output_single_model</span><span class="p">(</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">species_ls</span><span class="p">:</span>
+            <span class="n">species_ls</span> <span class="o">=</span> <span class="n">unpartitioned_modelnames</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">species_ls</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tpt_names_per_species</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;species_ls does not equal the number of transport models, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;expected length </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">tpt_names_per_species</span><span class="p">)</span><span class="si">}</span><span class="s2">, received </span><span class="si">{</span><span class="n">species_ls</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">species_ls</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_single_output</span><span class="p">(</span>
+                <span class="nb">list</span><span class="p">(</span><span class="n">tpt_names_per_species</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">output</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Concatenate species</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">species</span><span class="p">,</span> <span class="n">tpt_names</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">species_ls</span><span class="p">,</span> <span class="n">tpt_names_per_species</span><span class="p">):</span>
+            <span class="n">output_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_single_output</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">tpt_names</span><span class="p">),</span> <span class="n">output</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">)</span>
+            <span class="n">output_data</span> <span class="o">=</span> <span class="n">output_data</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">species</span><span class="o">=</span><span class="n">species</span><span class="p">)</span>
+            <span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output_data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">concat</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="s2">&quot;species&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_open_single_output_single_model</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">modelname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GridDataArray</span><span class="p">]:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span> <span class="o">|</span> <span class="n">GridDataset</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Opens output of single model</span>
+<span class="sd">        Opens single output of single model</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1213,6 +1272,7 @@ document.write(`
         <span class="n">dis_id</span> <span class="o">=</span> <span class="n">model</span><span class="p">[</span><span class="n">diskey</span><span class="p">]</span><span class="o">.</span><span class="n">_pkg_id</span>
         <span class="k">return</span> <span class="n">flow_model_path</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">diskey</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">dis_id</span><span class="si">}</span><span class="s2">.grb&quot;</span>
 
+    <span class="nd">@standard_log_decorator</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">validate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">mdal_compliant</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1227,6 +1287,15 @@ document.write(`
                 <span class="n">toml_content</span><span class="p">[</span><span class="n">cls_name</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_toml_path</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span>
                     <span class="n">directory</span>
                 <span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;gwtgwf_exchanges&quot;</span><span class="p">,</span> <span class="s2">&quot;split_exchanges&quot;</span><span class="p">]:</span>
+                <span class="n">toml_content</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">exchange_package</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+                    <span class="n">exchange_type</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">exchange_package</span><span class="o">.</span><span class="n">get_specification</span><span class="p">()</span>
+                    <span class="n">exchange_class_short</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">exchange_package</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
+                    <span class="n">path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">.nc&quot;</span>
+                    <span class="n">exchange_package</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">to_netcdf</span><span class="p">(</span><span class="n">directory</span> <span class="o">/</span> <span class="n">path</span><span class="p">)</span>
+                    <span class="n">toml_content</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">exchange_class_short</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">.nc&quot;</span>
                 <span class="n">value</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">to_netcdf</span><span class="p">(</span><span class="n">directory</span> <span class="o">/</span> <span class="n">path</span><span class="p">)</span>
@@ -1246,6 +1315,9 @@ document.write(`
                 <span class="n">GroundwaterTransportModel</span><span class="p">,</span>
                 <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">TimeDiscretization</span><span class="p">,</span>
                 <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Solution</span><span class="p">,</span>
+                <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">GWFGWF</span><span class="p">,</span>
+                <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">GWFGWT</span><span class="p">,</span>
+                <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">GWTGWT</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="p">}</span>
 
@@ -1255,10 +1327,18 @@ document.write(`
 
         <span class="n">simulation</span> <span class="o">=</span> <span class="n">Modflow6Simulation</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">toml_path</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">toml_content</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">item_cls</span> <span class="o">=</span> <span class="n">classes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">entry</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">path</span> <span class="o">=</span> <span class="n">toml_path</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">filename</span>
-                <span class="n">simulation</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">item_cls</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;gwtgwf_exchanges&quot;</span><span class="p">,</span> <span class="s2">&quot;split_exchanges&quot;</span><span class="p">]:</span>
+                <span class="n">item_cls</span> <span class="o">=</span> <span class="n">classes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">entry</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">path</span> <span class="o">=</span> <span class="n">toml_path</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">filename</span>
+                    <span class="n">simulation</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">item_cls</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">simulation</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">exchange_class</span><span class="p">,</span> <span class="n">exchange_list</span> <span class="ow">in</span> <span class="n">entry</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">item_cls</span> <span class="o">=</span> <span class="n">classes</span><span class="p">[</span><span class="n">exchange_class</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">exchange_list</span><span class="p">:</span>
+                        <span class="n">path</span> <span class="o">=</span> <span class="n">toml_path</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">filename</span>
+                        <span class="n">simulation</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item_cls</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">simulation</span>
 
@@ -1270,10 +1350,9 @@ document.write(`
                 <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">exchange</span><span class="o">.</span><span class="n">get_specification</span><span class="p">())</span>
 
         <span class="c1"># exchange for splitting models</span>
-        <span class="k">if</span> <span class="n">is_split</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_split</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">exchange</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;split_exchanges&quot;</span><span class="p">]:</span>
                 <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">exchange</span><span class="o">.</span><span class="n">get_specification</span><span class="p">())</span>
-
         <span class="k">return</span> <span class="n">result</span>
 
     <span class="k">def</span> <span class="nf">get_models_of_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modeltype</span><span class="p">):</span>
@@ -1282,6 +1361,9 @@ document.write(`
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Modflow6Model</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">model_id</span><span class="p">()</span> <span class="o">==</span> <span class="n">modeltype</span><span class="p">)</span>
         <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">get_models</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Modflow6Model</span><span class="p">)}</span>
 
 <div class="viewcode-block" id="Modflow6Simulation.clip_box"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Modflow6Simulation.clip_box.html#imod.mf6.Modflow6Simulation.clip_box">[docs]</a>    <span class="k">def</span> <span class="nf">clip_box</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1324,10 +1406,21 @@ document.write(`
 <span class="sd">        clipped : Simulation</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="n">is_split</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_split</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="s2">&quot;Unable to clip simulation. Clipping can only be done on simulations that haven&#39;t been split.&quot;</span>
+                <span class="o">+</span> <span class="s2">&quot;Therefore clipping should be done before splitting the simulation.&quot;</span>
             <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_one_flow_model</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Unable to clip simulation. Clipping can only be done on simulations that have a single flow model .&quot;</span>
+            <span class="p">)</span>
+        <span class="k">for</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">model</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_models</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">supported</span><span class="p">,</span> <span class="n">error_with_object</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">is_clipping_supported</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">supported</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;simulation cannot be clipped due to presence of package &#39;</span><span class="si">{</span><span class="n">error_with_object</span><span class="si">}</span><span class="s2">&#39; in model &#39;</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+                <span class="p">)</span>
 
         <span class="n">clipped</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -1348,7 +1441,7 @@ document.write(`
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">clipped</span></div>
 
-<div class="viewcode-block" id="Modflow6Simulation.split"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Modflow6Simulation.split.html#imod.mf6.Modflow6Simulation.split">[docs]</a>    <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">submodel_labels</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Modflow6Simulation</span><span class="p">:</span>
+<div class="viewcode-block" id="Modflow6Simulation.split"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Modflow6Simulation.split.html#imod.mf6.Modflow6Simulation.split">[docs]</a>    <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">submodel_labels</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Modflow6Simulation</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Split a simulation in different partitions using a submodel_labels array.</span>
 
@@ -1358,12 +1451,28 @@ document.write(`
 
 <span class="sd">        The method return a new simulation containing all the split models and packages</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">is_split</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_split</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="s2">&quot;Unable to split simulation. Splitting can only be done on simulations that haven&#39;t been split.&quot;</span>
             <span class="p">)</span>
 
-        <span class="n">original_models</span> <span class="o">=</span> <span class="n">get_models</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_one_flow_model</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;splitting of simulations with more (or less) than 1 flow model currently not supported.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">transport_models</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_models_of_type</span><span class="p">(</span><span class="s2">&quot;gwt6&quot;</span><span class="p">)</span>
+        <span class="n">flow_models</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_models_of_type</span><span class="p">(</span><span class="s2">&quot;gwf6&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">flow_models</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">transport_models</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;a simulation without any models cannot be split.&quot;</span><span class="p">)</span>
+
+        <span class="n">original_models</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">flow_models</span><span class="p">,</span> <span class="o">**</span><span class="n">transport_models</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">original_models</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">supported</span><span class="p">,</span> <span class="n">error_with_object</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">is_splitting_supported</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">supported</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;simulation cannot be split due to presence of package &#39;</span><span class="si">{</span><span class="n">error_with_object</span><span class="si">}</span><span class="s2">&#39; in model &#39;</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+                <span class="p">)</span>
+
         <span class="n">original_packages</span> <span class="o">=</span> <span class="n">get_packages</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="n">partition_info</span> <span class="o">=</span> <span class="n">create_partition_info</span><span class="p">(</span><span class="n">submodel_labels</span><span class="p">)</span>
@@ -1380,27 +1489,35 @@ document.write(`
 
         <span class="n">new_simulation</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Modflow6Simulation</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_partioned&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">package_name</span><span class="p">,</span> <span class="n">package</span> <span class="ow">in</span> <span class="p">{</span><span class="o">**</span><span class="n">original_packages</span><span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">new_simulation</span><span class="p">[</span><span class="n">package_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">package</span>
+            <span class="n">new_simulation</span><span class="p">[</span><span class="n">package_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">package</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">original_models</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">solution_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_solution_name</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+            <span class="n">new_simulation</span><span class="p">[</span><span class="n">solution_name</span><span class="p">]</span><span class="o">.</span><span class="n">remove_model_from_solution</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">submodel_partition_info</span> <span class="ow">in</span> <span class="n">partition_info</span><span class="p">:</span>
                 <span class="n">new_model_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">submodel_partition_info</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="n">new_simulation</span><span class="p">[</span><span class="n">new_model_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">slice_model</span><span class="p">(</span>
                     <span class="n">submodel_partition_info</span><span class="p">,</span> <span class="n">model</span>
                 <span class="p">)</span>
+                <span class="n">new_simulation</span><span class="p">[</span><span class="n">solution_name</span><span class="p">]</span><span class="o">.</span><span class="n">add_model_to_solution</span><span class="p">(</span><span class="n">new_model_name</span><span class="p">)</span>
 
-        <span class="n">exchanges</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">original_models</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">exchanges</span> <span class="o">+=</span> <span class="n">exchange_creator</span><span class="o">.</span><span class="n">create_exchanges</span><span class="p">(</span>
-                <span class="n">model_name</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">domain</span><span class="o">.</span><span class="n">layer</span>
+        <span class="n">exchanges</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">flow_model_name</span><span class="p">,</span> <span class="n">flow_model</span> <span class="ow">in</span> <span class="n">flow_models</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">exchanges</span> <span class="o">+=</span> <span class="n">exchange_creator</span><span class="o">.</span><span class="n">create_gwfgwf_exchanges</span><span class="p">(</span>
+                <span class="n">flow_model_name</span><span class="p">,</span> <span class="n">flow_model</span><span class="o">.</span><span class="n">domain</span><span class="o">.</span><span class="n">layer</span>
             <span class="p">)</span>
 
-        <span class="n">new_simulation</span><span class="p">[</span><span class="s2">&quot;solver&quot;</span><span class="p">][</span><span class="s2">&quot;modelnames&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
-            <span class="nb">list</span><span class="p">(</span><span class="n">get_models</span><span class="p">(</span><span class="n">new_simulation</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-        <span class="p">)</span>
-
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">transport_models</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">tpt_model_name</span> <span class="ow">in</span> <span class="n">transport_models</span><span class="p">:</span>
+                <span class="n">exchanges</span> <span class="o">+=</span> <span class="n">exchange_creator</span><span class="o">.</span><span class="n">create_gwtgwt_exchanges</span><span class="p">(</span>
+                    <span class="n">tpt_model_name</span><span class="p">,</span> <span class="n">flow_model_name</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">domain</span><span class="o">.</span><span class="n">layer</span>
+                <span class="p">)</span>
         <span class="n">new_simulation</span><span class="o">.</span><span class="n">_add_modelsplit_exchanges</span><span class="p">(</span><span class="n">exchanges</span><span class="p">)</span>
-        <span class="n">new_simulation</span><span class="o">.</span><span class="n">_set_exchange_options</span><span class="p">()</span>
+        <span class="n">new_simulation</span><span class="o">.</span><span class="n">_update_buoyancy_packages</span><span class="p">()</span>
+        <span class="n">new_simulation</span><span class="o">.</span><span class="n">_set_flow_exchange_options</span><span class="p">()</span>
+        <span class="n">new_simulation</span><span class="o">.</span><span class="n">_set_transport_exchange_options</span><span class="p">()</span>
+        <span class="n">new_simulation</span><span class="o">.</span><span class="n">_update_ssm_packages</span><span class="p">()</span>
 
         <span class="n">new_simulation</span><span class="o">.</span><span class="n">_filter_inactive_cells_from_exchanges</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">new_simulation</span></div>
@@ -1408,7 +1525,7 @@ document.write(`
 <div class="viewcode-block" id="Modflow6Simulation.regrid_like"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Modflow6Simulation.regrid_like.html#imod.mf6.Modflow6Simulation.regrid_like">[docs]</a>    <span class="k">def</span> <span class="nf">regrid_like</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">regridded_simulation_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">target_grid</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">],</span>
+        <span class="n">target_grid</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
         <span class="n">validate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Modflow6Simulation&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1430,41 +1547,49 @@ document.write(`
 <span class="sd">        a new simulation object with regridded models</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="n">is_split</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="s2">&quot;Unable to regrid simulation. Regridding can only be done on simulations that haven&#39;t been split.&quot;</span>
-            <span class="p">)</span>
-
-        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="n">regridded_simulation_name</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">GroundwaterFlowModel</span><span class="p">):</span>
-                <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">regrid_like</span><span class="p">(</span><span class="n">target_grid</span><span class="p">,</span> <span class="n">validate</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Solution</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span>
-                <span class="n">item</span><span class="p">,</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">TimeDiscretization</span>
-            <span class="p">):</span>
-                <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;regridding not supported for </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">result</span></div>
+        <span class="k">return</span> <span class="n">_regrid_like</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regridded_simulation_name</span><span class="p">,</span> <span class="n">target_grid</span><span class="p">,</span> <span class="n">validate</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_add_modelsplit_exchanges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exchanges_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">GWFGWF</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_split</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_split</span><span class="p">():</span>
             <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;split_exchanges&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;split_exchanges&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">exchanges_list</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_set_exchange_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_set_flow_exchange_options</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># collect some options that we will auto-set</span>
         <span class="k">for</span> <span class="n">exchange</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;split_exchanges&quot;</span><span class="p">]:</span>
-            <span class="n">model_name_1</span> <span class="o">=</span> <span class="n">exchange</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;model_name_1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[()]</span>
-            <span class="n">model_1</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">model_name_1</span><span class="p">]</span>
-            <span class="n">exchange</span><span class="o">.</span><span class="n">set_options</span><span class="p">(</span>
-                <span class="n">save_flows</span><span class="o">=</span><span class="n">model_1</span><span class="p">[</span><span class="s2">&quot;oc&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">is_budget_output</span><span class="p">,</span>
-                <span class="n">dewatered</span><span class="o">=</span><span class="n">model_1</span><span class="p">[</span><span class="s2">&quot;npf&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">is_dewatered</span><span class="p">,</span>
-                <span class="n">variablecv</span><span class="o">=</span><span class="n">model_1</span><span class="p">[</span><span class="s2">&quot;npf&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">is_variable_vertical_conductance</span><span class="p">,</span>
-                <span class="n">xt3d</span><span class="o">=</span><span class="n">model_1</span><span class="p">[</span><span class="s2">&quot;npf&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_xt3d_option</span><span class="p">(),</span>
-                <span class="n">newton</span><span class="o">=</span><span class="n">model_1</span><span class="o">.</span><span class="n">is_use_newton</span><span class="p">(),</span>
-            <span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exchange</span><span class="p">,</span> <span class="n">GWFGWF</span><span class="p">):</span>
+                <span class="n">model_name_1</span> <span class="o">=</span> <span class="n">exchange</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;model_name_1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[()]</span>
+                <span class="n">model_1</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">model_name_1</span><span class="p">]</span>
+                <span class="n">exchange</span><span class="o">.</span><span class="n">set_options</span><span class="p">(</span>
+                    <span class="n">save_flows</span><span class="o">=</span><span class="n">model_1</span><span class="p">[</span><span class="s2">&quot;oc&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">is_budget_output</span><span class="p">,</span>
+                    <span class="n">dewatered</span><span class="o">=</span><span class="n">model_1</span><span class="p">[</span><span class="s2">&quot;npf&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">is_dewatered</span><span class="p">,</span>
+                    <span class="n">variablecv</span><span class="o">=</span><span class="n">model_1</span><span class="p">[</span><span class="s2">&quot;npf&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">is_variable_vertical_conductance</span><span class="p">,</span>
+                    <span class="n">xt3d</span><span class="o">=</span><span class="n">model_1</span><span class="p">[</span><span class="s2">&quot;npf&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_xt3d_option</span><span class="p">(),</span>
+                    <span class="n">newton</span><span class="o">=</span><span class="n">model_1</span><span class="o">.</span><span class="n">is_use_newton</span><span class="p">(),</span>
+                <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_transport_exchange_options</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">exchange</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;split_exchanges&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exchange</span><span class="p">,</span> <span class="n">GWTGWT</span><span class="p">):</span>
+                <span class="n">model_name_1</span> <span class="o">=</span> <span class="n">exchange</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;model_name_1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[()]</span>
+                <span class="n">model_1</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">model_name_1</span><span class="p">]</span>
+                <span class="n">advection_key</span> <span class="o">=</span> <span class="n">model_1</span><span class="o">.</span><span class="n">_get_pkgkey</span><span class="p">(</span><span class="s2">&quot;adv&quot;</span><span class="p">)</span>
+                <span class="n">dispersion_key</span> <span class="o">=</span> <span class="n">model_1</span><span class="o">.</span><span class="n">_get_pkgkey</span><span class="p">(</span><span class="s2">&quot;dsp&quot;</span><span class="p">)</span>
+
+                <span class="n">scheme</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">xt3d_off</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">xt3d_rhs</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="n">advection_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">scheme</span> <span class="o">=</span> <span class="n">model_1</span><span class="p">[</span><span class="n">advection_key</span><span class="p">]</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;scheme&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[()]</span>
+                <span class="k">if</span> <span class="n">dispersion_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">xt3d_off</span> <span class="o">=</span> <span class="n">model_1</span><span class="p">[</span><span class="n">dispersion_key</span><span class="p">]</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;xt3d_off&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[()]</span>
+                    <span class="n">xt3d_rhs</span> <span class="o">=</span> <span class="n">model_1</span><span class="p">[</span><span class="n">dispersion_key</span><span class="p">]</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;xt3d_rhs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[()]</span>
+                <span class="n">exchange</span><span class="o">.</span><span class="n">set_options</span><span class="p">(</span>
+                    <span class="n">save_flows</span><span class="o">=</span><span class="n">model_1</span><span class="p">[</span><span class="s2">&quot;oc&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">is_budget_output</span><span class="p">,</span>
+                    <span class="n">adv_scheme</span><span class="o">=</span><span class="n">scheme</span><span class="p">,</span>
+                    <span class="n">dsp_xt3d_off</span><span class="o">=</span><span class="n">xt3d_off</span><span class="p">,</span>
+                    <span class="n">dsp_xt3d_rhs</span><span class="o">=</span><span class="n">xt3d_rhs</span><span class="p">,</span>
+                <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_filter_inactive_cells_from_exchanges</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">ex</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;split_exchanges&quot;</span><span class="p">]:</span>
@@ -1494,6 +1619,13 @@ document.write(`
         <span class="n">active_exchange_domain</span> <span class="o">=</span> <span class="n">active_exchange_domain</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">)</span>
         <span class="n">ex</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">ex</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">active_exchange_domain</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">])</span>
 
+    <span class="k">def</span> <span class="nf">get_solution_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Solution</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">model_name</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;modelnames&quot;</span><span class="p">]:</span>
+                    <span class="k">return</span> <span class="n">k</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">typename</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="n">INDENT</span> <span class="o">=</span> <span class="s2">&quot;    &quot;</span>
@@ -1513,18 +1645,80 @@ document.write(`
             <span class="n">content</span> <span class="o">=</span> <span class="n">attrs</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;)</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">]</span>
         <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_generate_gwfgwt_exchanges</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_transport_models_per_flow_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
         <span class="n">flow_models</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_models_of_type</span><span class="p">(</span><span class="s2">&quot;gwf6&quot;</span><span class="p">)</span>
         <span class="n">transport_models</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_models_of_type</span><span class="p">(</span><span class="s2">&quot;gwt6&quot;</span><span class="p">)</span>
-
         <span class="c1"># exchange for flow and transport</span>
-        <span class="n">exchanges</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">flow_models</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">transport_models</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">flow_model_name</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">flow_models</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">transport_model_name</span> <span class="ow">in</span> <span class="n">transport_models</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="n">exchanges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">GWFGWT</span><span class="p">(</span><span class="n">flow_model_name</span><span class="p">,</span> <span class="n">transport_model_name</span><span class="p">))</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">exchanges</span></div>
+        <span class="k">for</span> <span class="n">flow_model_name</span> <span class="ow">in</span> <span class="n">flow_models</span><span class="p">:</span>
+            <span class="n">flow_model</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">flow_model_name</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">tpt_model_name</span> <span class="ow">in</span> <span class="n">transport_models</span><span class="p">:</span>
+                <span class="n">tpt_model</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">tpt_model_name</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">is_equal</span><span class="p">(</span><span class="n">tpt_model</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="n">flow_model</span><span class="o">.</span><span class="n">domain</span><span class="p">):</span>
+                    <span class="n">result</span><span class="p">[</span><span class="n">flow_model_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tpt_model_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span> <span class="nf">_generate_gwfgwt_exchanges</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">GWFGWT</span><span class="p">]:</span>
+        <span class="n">exchanges</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">flow_transport_mapping</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_transport_models_per_flow_model</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">flow_name</span><span class="p">,</span> <span class="n">tpt_models_of_flow_model</span> <span class="ow">in</span> <span class="n">flow_transport_mapping</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tpt_models_of_flow_model</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">transport_model_name</span> <span class="ow">in</span> <span class="n">tpt_models_of_flow_model</span><span class="p">:</span>
+                    <span class="n">exchanges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">GWFGWT</span><span class="p">(</span><span class="n">flow_name</span><span class="p">,</span> <span class="n">transport_model_name</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">exchanges</span>
+
+    <span class="k">def</span> <span class="nf">_update_ssm_packages</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">flow_transport_mapping</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_transport_models_per_flow_model</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">flow_name</span><span class="p">,</span> <span class="n">tpt_models_of_flow_model</span> <span class="ow">in</span> <span class="n">flow_transport_mapping</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">flow_model</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">flow_name</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">tpt_model_name</span> <span class="ow">in</span> <span class="n">tpt_models_of_flow_model</span><span class="p">:</span>
+                <span class="n">tpt_model</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">tpt_model_name</span><span class="p">]</span>
+                <span class="n">ssm_key</span> <span class="o">=</span> <span class="n">tpt_model</span><span class="o">.</span><span class="n">_get_pkgkey</span><span class="p">(</span><span class="s2">&quot;ssm&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">ssm_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">old_ssm_package</span> <span class="o">=</span> <span class="n">tpt_model</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">ssm_key</span><span class="p">)</span>
+                    <span class="n">state_variable_name</span> <span class="o">=</span> <span class="n">old_ssm_package</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span>
+                        <span class="s2">&quot;auxiliary_variable_name&quot;</span>
+                    <span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">ssm_package</span> <span class="o">=</span> <span class="n">SourceSinkMixing</span><span class="o">.</span><span class="n">from_flow_model</span><span class="p">(</span>
+                        <span class="n">flow_model</span><span class="p">,</span> <span class="n">state_variable_name</span><span class="p">,</span> <span class="n">is_split</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">is_split</span><span class="p">()</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">ssm_package</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">tpt_model</span><span class="p">[</span><span class="n">ssm_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ssm_package</span>
+
+    <span class="k">def</span> <span class="nf">_update_buoyancy_packages</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">flow_transport_mapping</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_transport_models_per_flow_model</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">flow_name</span><span class="p">,</span> <span class="n">tpt_models_of_flow_model</span> <span class="ow">in</span> <span class="n">flow_transport_mapping</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">flow_model</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">flow_name</span><span class="p">]</span>
+            <span class="n">flow_model</span><span class="o">.</span><span class="n">update_buoyancy_package</span><span class="p">(</span><span class="n">tpt_models_of_flow_model</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">is_split</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;split_exchanges&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">has_one_flow_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">flow_models</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_models_of_type</span><span class="p">(</span><span class="s2">&quot;gwf6&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">flow_models</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">mask_all_models</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">mask</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function applies a mask to all models in a simulation, provided they use</span>
+<span class="sd">        the same discretization. The  method parameter &quot;mask&quot; is an idomain-like array.</span>
+<span class="sd">        Masking will overwrite idomain with the mask where the mask is 0 or -1.</span>
+<span class="sd">        Where the mask is 1, the original value of idomain will be kept.</span>
+<span class="sd">        Masking will update the packages accordingly, blanking their input where needed,</span>
+<span class="sd">        and is therefore not a reversible operation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mask: xr.DataArray, xu.UgridDataArray of ints</span>
+<span class="sd">            idomain-like integer array. 1 sets cells to active, 0 sets cells to inactive,</span>
+<span class="sd">            -1 sets cells to vertical passthrough</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_mask_all_models</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span></div>
 </pre></div>
 
                 </article>

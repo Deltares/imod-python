@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.formats.prj.disv_conversion &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>imod.formats.prj.disv_conversion &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -453,6 +453,8 @@ document.write(`
 <span class="sd">project files.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
 <span class="kn">import</span> <span class="nn">itertools</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
@@ -466,19 +468,15 @@ document.write(`
 
 <span class="kn">import</span> <span class="nn">imod</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.model</span> <span class="kn">import</span> <span class="n">Modflow6Model</span>
-<span class="kn">from</span> <span class="nn">imod.mf6.utilities.package_utils</span> <span class="kn">import</span> <span class="n">get_repeat_stress</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.utilities.package</span> <span class="kn">import</span> <span class="n">get_repeat_stress</span>
 <span class="kn">from</span> <span class="nn">imod.prepare.layer</span> <span class="kn">import</span> <span class="n">get_upper_active_grid_cells</span>
 <span class="kn">from</span> <span class="nn">imod.typing</span> <span class="kn">import</span> <span class="n">GridDataArray</span>
+<span class="kn">from</span> <span class="nn">imod.util.imports</span> <span class="kn">import</span> <span class="n">MissingOptionalModule</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">gpd</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;geopandas&quot;</span><span class="p">)</span>
-
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">shapely</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">shapely</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;shapely&quot;</span><span class="p">)</span>
+    <span class="n">gpd</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;geopandas&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">hash_xy</span><span class="p">(</span><span class="n">da</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>

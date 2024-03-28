@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>imod.mf6.Solution &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>imod.mf6.Solution &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -125,8 +125,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -505,6 +505,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../util/imod.util.transform.html">imod.util.transform</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../util/imod.util.to_ugrid2d.html">imod.util.to_ugrid2d</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../util/imod.util.mdal_compliant_ugrid2d.html">imod.util.mdal_compliant_ugrid2d</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../util/imod.util.from_mdal_compliant_ugrid2d.html">imod.util.from_mdal_compliant_ugrid2d</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../logging.html">Logging</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -518,19 +519,24 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../logging/imod.logging.ilogger.ILogger.html">imod.logging.ilogger.ILogger</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../logging/imod.logging.loglevel.html">imod.logging.loglevel</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../logging/imod.logging.logging_decorators.html">imod.logging.logging_decorators</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../logging/imod.logging.logging_decorators.init_log_decorator.html">imod.logging.logging_decorators.init_log_decorator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../logging/imod.logging.logging_decorators.standard_log_decorator.html">imod.logging.logging_decorators.standard_log_decorator</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../logging/imod.logging.loglevel.html">imod.logging.loglevel</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-12"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../logging/imod.logging.loglevel.LogLevel.html">imod.logging.loglevel.LogLevel</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../logging/imod.logging.logurulogger.html">imod.logging.logurulogger</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-12"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../logging/imod.logging.logurulogger.html">imod.logging.logurulogger</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-13"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../logging/imod.logging.logurulogger.LoguruLogger.html">imod.logging.logurulogger.LoguruLogger</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../logging/imod.logging.nulllogger.html">imod.logging.nulllogger</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-13"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../logging/imod.logging.nulllogger.html">imod.logging.nulllogger</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-14"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../logging/imod.logging.nulllogger.NullLogger.html">imod.logging.nulllogger.NullLogger</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../logging/imod.logging.pythonlogger.html">imod.logging.pythonlogger</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-14"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../logging/imod.logging.pythonlogger.html">imod.logging.pythonlogger</a><input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-15"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../logging/imod.logging.pythonlogger.PythonLogger.html">imod.logging.pythonlogger.PythonLogger</a></li>
 </ul>
 </li>
@@ -538,7 +544,7 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../mf6.html">MODFLOW6</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-15"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../mf6.html">MODFLOW6</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-16"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.open_hds.html">imod.mf6.open_hds</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.open_cbc.html">imod.mf6.open_cbc</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.read_cbc_headers.html">imod.mf6.read_cbc_headers</a></li>
@@ -554,7 +560,9 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.split.html">imod.mf6.Modflow6Simulation.split</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.regrid_like.html">imod.mf6.Modflow6Simulation.regrid_like</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.GroundwaterFlowModel.html">imod.mf6.GroundwaterFlowModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.mf6.GroundwaterFlowModel.mask_all_packages.html">imod.mf6.GroundwaterFlowModel.mask_all_packages</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.GroundwaterTransportModel.html">imod.mf6.GroundwaterTransportModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.mf6.GroundwaterTransportModel.mask_all_packages.html">imod.mf6.GroundwaterTransportModel.mask_all_packages</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.StructuredDiscretization.html">imod.mf6.StructuredDiscretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.VerticesDiscretization.html">imod.mf6.VerticesDiscretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.TimeDiscretization.html">imod.mf6.TimeDiscretization</a></li>
@@ -593,7 +601,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.SourceSinkMixing.from_flow_model.html">imod.mf6.SourceSinkMixing.from_flow_model</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../wq.html">iMOD-WQ</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-16"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../wq.html">iMOD-WQ</a><input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-17"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.SeawatModel.html">imod.wq.SeawatModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.SeawatModel.create_time_discretization.html">imod.wq.SeawatModel.create_time_discretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.TimeDiscretization.html">imod.wq.TimeDiscretization</a></li>
@@ -627,7 +635,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.TimeVaryingConstantConcentration.html">imod.wq.TimeVaryingConstantConcentration</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../flow.html">iMODFLOW</a><input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-17"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../flow.html">iMODFLOW</a><input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-18"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../flow/imod.flow.ImodflowModel.html">imod.flow.ImodflowModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../flow/imod.flow.ImodflowModel.create_time_discretization.html">imod.flow.ImodflowModel.create_time_discretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../flow/imod.flow.Boundary.html">imod.flow.Boundary</a></li>
@@ -652,7 +660,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../flow/imod.flow.Well.html">imod.flow.Well</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../msw.html">MetaSWAP</a><input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-18"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../msw.html">MetaSWAP</a><input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-19"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.GridData.html">imod.msw.GridData</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.Infiltration.html">imod.msw.Infiltration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.Ponding.html">imod.msw.Ponding</a></li>
@@ -674,7 +682,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.MetaSwapModel.html">imod.msw.MetaSwapModel</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../metamod.html">MetaMod</a><input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-19"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../metamod.html">MetaMod</a><input class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-20"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../metamod/imod.couplers.metamod.MetaMod.html">imod.couplers.metamod.MetaMod</a></li>
 </ul>
 </li>
@@ -1054,7 +1062,7 @@ provided in the wrong manner. Defaults to True.</p></li>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="imod.mf6.Solution.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modelnames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outer_dvclose</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outer_maximum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner_maximum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner_dvclose</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner_rclose</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_acceleration</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">under_relaxation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">under_relaxation_theta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">under_relaxation_kappa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">under_relaxation_gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">under_relaxation_momentum</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backtracking_number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backtracking_tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backtracking_reduction_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backtracking_residual_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rclose_option</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relaxation_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preconditioner_levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preconditioner_drop_tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_orthogonalizations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reordering_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_option</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'summary'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csv_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_ptc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/imod/mf6/ims.html#Solution.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imod.mf6.Solution.__init__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#imod.mf6.Solution.__init__" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
@@ -1064,52 +1072,64 @@ provided in the wrong manner. Defaults to True.</p></li>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#imod.mf6.Solution.__init__" title="imod.mf6.Solution.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(modelnames, outer_dvclose, ...[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#imod.mf6.Solution.__init__" title="imod.mf6.Solution.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">clip_box</span></code>([time_min, time_max, layer_min, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_model_to_solution</span></code>(modelname)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">clip_box</span></code>([time_min, time_max, layer_min, ...])</p></td>
 <td><p>Clip a package by a bounding box (time, layer, y, x).</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_file</span></code>(path, **kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_file</span></code>(path, **kwargs)</p></td>
 <td><p>Loads an imod mf6 package from a file (currently only netcdf and zarr are supported).</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_regrid_methods</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_models_in_solution</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_empty</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_non_grid_data</span></code>(grid_names)</p></td>
+<td><p>This function copies the attributes of a dataset that are scalars, such as options.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_clipping_supported</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_empty</span></code>()</p></td>
 <td><p>Returns True if the package is empty- for example if it contains only no-data values.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_grid_agnostic_package</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_grid_agnostic_package</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_regridding_supported</span></code>()</p></td>
-<td><p>returns true if package supports regridding.</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_regridding_supported</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_splitting_supported</span></code>()</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">isel</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mask</span></code>(domain)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mask</span></code>(mask)</p></td>
 <td><p>Mask values outside of domain.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">regrid_like</span></code>(target_grid[, regridder_types])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">regrid_like</span></code>(target_grid, regrid_context[, ...])</p></td>
 <td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">render</span></code>(directory, pkgname, globaltimes, binary)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_model_from_solution</span></code>(modelname)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sel</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">render</span></code>(directory, pkgname, globaltimes, binary)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">skip_masking_dataarray</span></code>(array_name)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sel</span></code>()</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_netcdf</span></code>(*args, **kwargs)</p></td>
 <td><p>Write dataset contents to a netCDF file.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code>(pkgname, globaltimes, write_context)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_binary_griddata</span></code>(outpath, da, dtype)</p></td>

@@ -17,16 +17,18 @@
       ~InitialConditions.clip_box
       ~InitialConditions.copy
       ~InitialConditions.from_file
+      ~InitialConditions.get_non_grid_data
       ~InitialConditions.get_regrid_methods
+      ~InitialConditions.is_clipping_supported
       ~InitialConditions.is_empty
       ~InitialConditions.is_grid_agnostic_package
       ~InitialConditions.is_regridding_supported
+      ~InitialConditions.is_splitting_supported
       ~InitialConditions.isel
       ~InitialConditions.mask
       ~InitialConditions.regrid_like
       ~InitialConditions.render
       ~InitialConditions.sel
-      ~InitialConditions.skip_masking_dataarray
       ~InitialConditions.to_netcdf
       ~InitialConditions.write
       ~InitialConditions.write_binary_griddata

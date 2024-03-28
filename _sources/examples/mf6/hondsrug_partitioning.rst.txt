@@ -19,7 +19,7 @@
 
 
 Partitioning a regional model
-===========================
+=============================
 
 This example shows how a model can be partitioned into submodels. This will
 allow parallelization when solving the model. The example used is the Hondsrug
@@ -30,12 +30,11 @@ head array for the whole grid. we print both the heads obtained without
 partitioning, and the merged heads of the partitioned simulation, ' for
 comparison.
 
-.. GENERATED FROM PYTHON SOURCE LINES 16-22
+.. GENERATED FROM PYTHON SOURCE LINES 16-21
 
 .. code-block:: Python
 
     import matplotlib.pyplot as plt
-    from example_models import create_hondsrug_simulation
 
     import imod
     from imod.mf6.multimodel.partition_generator import get_label_array
@@ -47,49 +46,58 @@ comparison.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 23-27
+.. GENERATED FROM PYTHON SOURCE LINES 22-26
 
 Obtain the simulation, write it, run it, and plot some heads.
 There is a separate example contained in
 :doc:`hondsrug </examples/mf6/hondsrug>`
 that you should look at if you are interested in the model building
 
-.. GENERATED FROM PYTHON SOURCE LINES 27-30
+.. GENERATED FROM PYTHON SOURCE LINES 26-30
 
 .. code-block:: Python
 
-    gwf_simulation = create_hondsrug_simulation()
+    tmpdir = imod.util.temporary_directory()
+
+    gwf_simulation = imod.data.hondsrug_simulation(tmpdir / "hondsrug_saved")
 
 
 
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    D:\buildAgent\work\b1e15a22da7c0d7f\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\groupby.py:534: FutureWarning: 'A' is deprecated and will be removed in a future version, please use 'YE' instead.
-      index_grouper = pd.Grouper(
-    D:\buildAgent\work\b1e15a22da7c0d7f\imod-python\examples\mf6\example_models.py:375: UserWarning: Converting non-nanosecond precision datetime values to nanosecond precision. This behavior can eventually be relaxed in xarray, as it is an artifact from pandas which is now beginning to support non-nanosecond precision values. This warning is caused by passing non-nanosecond np.datetime64 or np.timedelta64 values to the DataArray or Variable constructor; it can be silenced by converting the values to nanosecond precision ahead of time.
-      rch_ss = rch_ss.assign_coords(time=starttime_steady)
 
 
+.. GENERATED FROM PYTHON SOURCE LINES 31-33
 
+The model was written before the xt3d_option and rhs_option arguments were
+added to iMOD Python. Set missing options to False.
 
-.. GENERATED FROM PYTHON SOURCE LINES 31-32
-
-Write the model and run it (before partitioning, so we can compare if the results are similar)
-
-.. GENERATED FROM PYTHON SOURCE LINES 32-39
+.. GENERATED FROM PYTHON SOURCE LINES 33-35
 
 .. code-block:: Python
 
-    modeldir = imod.util.temporary_directory()
-    original_modeldir = modeldir / "original"
+    gwf_simulation["GWF"]["npf"].set_xt3d_option(is_xt3d_used=False, is_rhs=False)
 
-    gwf_simulation.write(original_modeldir, False, False)
 
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 36-38
+
+Write the model and run it (before partitioning, so we can compare if the
+results are similar).
+
+.. GENERATED FROM PYTHON SOURCE LINES 38-43
+
+.. code-block:: Python
+
+    original_modeldir = tmpdir / "original"
+
+    gwf_simulation.write(original_modeldir)
     gwf_simulation.run()
 
 
@@ -99,18 +107,15 @@ Write the model and run it (before partitioning, so we can compare if the result
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-41
+.. GENERATED FROM PYTHON SOURCE LINES 44-45
 
-plot the simulation results of the unpartitioned model
+Plot the simulation results of the unpartitioned model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-50
+.. GENERATED FROM PYTHON SOURCE LINES 45-51
 
 .. code-block:: Python
 
-    hds_original = imod.mf6.open_hds(
-        original_modeldir / "GWF_1" / "GWF_1.hds",
-        original_modeldir / "GWF_1" / "dis.dis.grb",
-    )
+    hds_original = gwf_simulation.open_head()
 
     fig, ax = plt.subplots()
 
@@ -134,15 +139,15 @@ plot the simulation results of the unpartitioned model
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 51-52
+.. GENERATED FROM PYTHON SOURCE LINES 52-53
 
 Now we partition the Hondsrug model
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-56
+.. GENERATED FROM PYTHON SOURCE LINES 53-57
 
 .. code-block:: Python
 
-    idomain = gwf_simulation["GWF_1"].domain
+    idomain = gwf_simulation["GWF"].domain
     number_partitions = 16
     submodel_labels = get_label_array(gwf_simulation, number_partitions)
 
@@ -153,11 +158,11 @@ Now we partition the Hondsrug model
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-58
+.. GENERATED FROM PYTHON SOURCE LINES 58-59
 
 plot the partitioning array. It shows how the model will be partitioned.
 
-.. GENERATED FROM PYTHON SOURCE LINES 58-64
+.. GENERATED FROM PYTHON SOURCE LINES 59-65
 
 .. code-block:: Python
 
@@ -176,27 +181,20 @@ plot the partitioning array. It shows how the model will be partitioned.
    :class: sphx-glr-single-img
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    package chd removed in partition 5, because all empty
-    package chd removed in partition 6, because all empty
-    package chd removed in partition 9, because all empty
-    package chd removed in partition 10, because all empty
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 65-66
+.. GENERATED FROM PYTHON SOURCE LINES 66-67
 
 Now we  write and run the partitioned model
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-70
+.. GENERATED FROM PYTHON SOURCE LINES 67-73
 
 .. code-block:: Python
 
-    split_simulation.write(modeldir, False, False)
+    split_modeldir = tmpdir / "split"
+
+    split_simulation.write(split_modeldir)
     split_simulation.run()
 
 
@@ -207,11 +205,11 @@ Now we  write and run the partitioned model
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-72
+.. GENERATED FROM PYTHON SOURCE LINES 74-75
 
 Load and plot the simulation results. Also plot the differences with the original model
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-83
+.. GENERATED FROM PYTHON SOURCE LINES 75-86
 
 .. code-block:: Python
 
@@ -259,7 +257,7 @@ Load and plot the simulation results. Also plot the differences with the origina
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (4 minutes 7.326 seconds)
+   **Total running time of the script:** (3 minutes 56.871 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_hondsrug_partitioning.py:

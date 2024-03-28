@@ -17,17 +17,20 @@
       ~ConstantHead.clip_box
       ~ConstantHead.copy
       ~ConstantHead.from_file
+      ~ConstantHead.get_non_grid_data
       ~ConstantHead.get_period_varnames
       ~ConstantHead.get_regrid_methods
+      ~ConstantHead.is_clipping_supported
       ~ConstantHead.is_empty
       ~ConstantHead.is_grid_agnostic_package
       ~ConstantHead.is_regridding_supported
+      ~ConstantHead.is_splitting_supported
       ~ConstantHead.isel
       ~ConstantHead.mask
       ~ConstantHead.regrid_like
       ~ConstantHead.render
       ~ConstantHead.sel
-      ~ConstantHead.skip_masking_dataarray
+      ~ConstantHead.set_repeat_stress
       ~ConstantHead.to_netcdf
       ~ConstantHead.write
       ~ConstantHead.write_binary_griddata

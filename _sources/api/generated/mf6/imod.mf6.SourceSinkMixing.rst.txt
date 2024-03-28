@@ -18,17 +18,20 @@
       ~SourceSinkMixing.copy
       ~SourceSinkMixing.from_file
       ~SourceSinkMixing.from_flow_model
+      ~SourceSinkMixing.get_non_grid_data
       ~SourceSinkMixing.get_period_varnames
       ~SourceSinkMixing.get_regrid_methods
+      ~SourceSinkMixing.is_clipping_supported
       ~SourceSinkMixing.is_empty
       ~SourceSinkMixing.is_grid_agnostic_package
       ~SourceSinkMixing.is_regridding_supported
+      ~SourceSinkMixing.is_splitting_supported
       ~SourceSinkMixing.isel
       ~SourceSinkMixing.mask
       ~SourceSinkMixing.regrid_like
       ~SourceSinkMixing.render
       ~SourceSinkMixing.sel
-      ~SourceSinkMixing.skip_masking_dataarray
+      ~SourceSinkMixing.set_repeat_stress
       ~SourceSinkMixing.to_netcdf
       ~SourceSinkMixing.write
       ~SourceSinkMixing.write_binary_griddata

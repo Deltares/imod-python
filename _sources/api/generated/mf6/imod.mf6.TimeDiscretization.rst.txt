@@ -17,16 +17,17 @@
       ~TimeDiscretization.clip_box
       ~TimeDiscretization.copy
       ~TimeDiscretization.from_file
-      ~TimeDiscretization.get_regrid_methods
+      ~TimeDiscretization.get_non_grid_data
+      ~TimeDiscretization.is_clipping_supported
       ~TimeDiscretization.is_empty
       ~TimeDiscretization.is_grid_agnostic_package
       ~TimeDiscretization.is_regridding_supported
+      ~TimeDiscretization.is_splitting_supported
       ~TimeDiscretization.isel
       ~TimeDiscretization.mask
       ~TimeDiscretization.regrid_like
       ~TimeDiscretization.render
       ~TimeDiscretization.sel
-      ~TimeDiscretization.skip_masking_dataarray
       ~TimeDiscretization.to_netcdf
       ~TimeDiscretization.write
       ~TimeDiscretization.write_binary_griddata

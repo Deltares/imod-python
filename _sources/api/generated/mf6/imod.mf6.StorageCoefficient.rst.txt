@@ -17,17 +17,19 @@
       ~StorageCoefficient.clip_box
       ~StorageCoefficient.copy
       ~StorageCoefficient.from_file
+      ~StorageCoefficient.get_non_grid_data
       ~StorageCoefficient.get_options
       ~StorageCoefficient.get_regrid_methods
+      ~StorageCoefficient.is_clipping_supported
       ~StorageCoefficient.is_empty
       ~StorageCoefficient.is_grid_agnostic_package
       ~StorageCoefficient.is_regridding_supported
+      ~StorageCoefficient.is_splitting_supported
       ~StorageCoefficient.isel
       ~StorageCoefficient.mask
       ~StorageCoefficient.regrid_like
       ~StorageCoefficient.render
       ~StorageCoefficient.sel
-      ~StorageCoefficient.skip_masking_dataarray
       ~StorageCoefficient.to_netcdf
       ~StorageCoefficient.write
       ~StorageCoefficient.write_binary_griddata

@@ -1,0 +1,31 @@
+imod.logging.logging\_decorators
+================================
+
+.. automodule:: imod.logging.logging_decorators
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      init_log_decorator
+      standard_log_decorator
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

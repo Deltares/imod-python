@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.select.points &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>imod.select.points &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -560,7 +560,7 @@ document.write(`
 
     <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">points</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">da_x</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">coord_reference</span><span class="p">(</span><span class="n">da_x</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">coord_reference</span><span class="p">(</span><span class="n">da_x</span><span class="p">)</span>
         <span class="c1"># Inplace bitwise operator</span>
         <span class="n">in_bounds</span> <span class="o">&amp;=</span> <span class="p">(</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="n">xmin</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">xmax</span><span class="p">)</span>
 
@@ -590,7 +590,7 @@ document.write(`
 <span class="k">def</span> <span class="nf">_get_indices_1d</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">coordname</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="n">x_decreasing</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">indexes</span><span class="p">[</span><span class="n">coordname</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_decreasing</span>
-    <span class="n">dx</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">coord_reference</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">coordname</span><span class="p">])</span>
+    <span class="n">dx</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">coord_reference</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">coordname</span><span class="p">])</span>
 
     <span class="n">ncell</span> <span class="o">=</span> <span class="n">da</span><span class="p">[</span><span class="n">coordname</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
     <span class="c1"># Compute edges</span>

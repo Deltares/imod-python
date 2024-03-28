@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Installing Python and packages &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>Installing Python and packages &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -125,8 +125,8 @@
     
     
     
-    <img src="../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -621,8 +621,16 @@ In the imod folder use the following command:</p>
 <p>This essentially temporarily updates your <a class="reference external" href="https://en.wikipedia.org/wiki/PATH_(variable)">PATH variable</a>, which is the set
 of directories where executable programs are located. closing the command prompt,
 these directories are removed from PATH again so that the Python installation is
-properly isolated.</p>
-<p>Read more at the full <a class="reference external" href="https://pixi.sh/">pixi docs</a>.</p>
+properly isolated. Read more at the full <a class="reference external" href="https://pixi.sh/">pixi docs</a>.</p>
+<p>Use the following command to have a pixi environment with ipython, ipykernel,
+and jupyter for interactive scripting (e.g. plotting data with matplotlib):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">run</span> <span class="o">--</span><span class="n">environment</span> <span class="n">interactive</span> <span class="n">install</span>
+</pre></div>
+</div>
+<p>Then start the interactive environment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">shell</span> <span class="o">--</span><span class="n">environment</span> <span class="n">interactive</span>
+</pre></div>
+</div>
 </section>
 <section id="installing-a-newer-or-old-version">
 <h2>Installing a newer or old version<a class="headerlink" href="#installing-a-newer-or-old-version" title="Permalink to this heading">#</a></h2>

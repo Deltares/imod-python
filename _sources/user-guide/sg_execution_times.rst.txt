@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:05.519** total execution time for 6 files **from user-guide**:
+**00:06.419** total execution time for 6 files **from user-guide**:
 
 .. container::
 
@@ -33,16 +33,16 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_user-guide_01-raster-data.py` (``01-raster-data.py``)
-     - 00:03.062
+     - 00:03.149
      - 0.0
    * - :ref:`sphx_glr_user-guide_06-lazy-evaluation.py` (``06-lazy-evaluation.py``)
-     - 00:01.431
+     - 00:01.843
      - 0.0
    * - :ref:`sphx_glr_user-guide_02-vector-data.py` (``02-vector-data.py``)
-     - 00:00.961
+     - 00:01.354
      - 0.0
    * - :ref:`sphx_glr_user-guide_07-time-discretization.py` (``07-time-discretization.py``)
-     - 00:00.064
+     - 00:00.073
      - 0.0
    * - :ref:`sphx_glr_user-guide_03-timeseries-data.py` (``03-timeseries-data.py``)
      - 00:00.000

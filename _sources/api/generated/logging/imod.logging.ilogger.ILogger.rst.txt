@@ -21,6 +21,7 @@ imod.logging.ilogger.ILogger
       ~ILogger.debug
       ~ILogger.error
       ~ILogger.info
+      ~ILogger.log
       ~ILogger.warning
    
    

@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Reproject data &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>Reproject data &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -125,8 +125,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -411,7 +411,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../mf6/circle.html">Circle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/circle_partitioned.html">Circle partitioned</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/circle_transport.html">Freshwater lens (circle)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mf6/different_ways_to_regrid_models.html">Diffferent ways to regrid models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/different_ways_to_regrid_models.html">Different ways to regrid models</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/ex01_twri.html">TWRI</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/example_1d_transport.html">1D Solute Transport Benchmarks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/example_models.html">Example models</a></li>
@@ -432,6 +432,7 @@ document.write(`
 
 
 <li class="toctree-l2"><a class="reference internal" href="../mf6/lake.html">Lake package example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/transport_2d.html">Transport 2d example</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../imodflow/index.html">iMODFLOW</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -551,7 +552,7 @@ to download the full example code</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>D:\buildAgent\work\b1e15a22da7c0d7f\imod-python\examples\prepare\reproject.py:26: FutureWarning: This function is deprecated. See: https://pyproj4.github.io/pyproj/stable/gotchas.html#upgrading-to-pyproj-2-from-pyproj-1
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>D:\buildAgent\work\4b9080cbb3354582\imod-python\examples\prepare\reproject.py:26: FutureWarning: This function is deprecated. See: https://pyproj4.github.io/pyproj/stable/gotchas.html#upgrading-to-pyproj-2-from-pyproj-1
   x, y = pyproj.transform(wgs84, amersfoort, lat, lon)
 [132152.59039576206, 92645.5317909315, 177892.31256041114] [468151.410998257, 447126.74989173946, 467201.53865388624]
 </pre></div>
@@ -590,7 +591,7 @@ three options:</p>
 <span class="n">ahn</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_reproject_001.png" srcset="../../_images/sphx_glr_reproject_001.png" alt="dx = 100.0, dy = -100.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x0000026927F29D90&gt;
+<img src="../../_images/sphx_glr_reproject_001.png" srcset="../../_images/sphx_glr_reproject_001.png" alt="dx = 100.0, dy = -100.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x0000015AAB419310&gt;
 </pre></div>
 </div>
 <p>We’ll create our like grid Resampling DataArray to a new cellsize of 50.0 m,
@@ -634,7 +635,7 @@ reprojection.</p>
 <span class="n">ahn_utm</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_reproject_002.png" srcset="../../_images/sphx_glr_reproject_002.png" alt="reproject" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x000002692803C2D0&gt;
+<img src="../../_images/sphx_glr_reproject_002.png" srcset="../../_images/sphx_glr_reproject_002.png" alt="reproject" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x0000015AAE5C6250&gt;
 </pre></div>
 </div>
 </section>
@@ -654,7 +655,7 @@ it’s coordinate system will be EPSG:32631:</p>
 EPSG:32631
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.028 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.024 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-prepare-reproject-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/91eb500f47b71468fd3dc7f6e78c0b44/reproject.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">reproject.ipynb</span></code></a></p>

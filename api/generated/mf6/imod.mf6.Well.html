@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>imod.mf6.Well &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>imod.mf6.Well &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -125,8 +125,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -505,6 +505,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../util/imod.util.transform.html">imod.util.transform</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../util/imod.util.to_ugrid2d.html">imod.util.to_ugrid2d</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../util/imod.util.mdal_compliant_ugrid2d.html">imod.util.mdal_compliant_ugrid2d</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../util/imod.util.from_mdal_compliant_ugrid2d.html">imod.util.from_mdal_compliant_ugrid2d</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../logging.html">Logging</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -518,19 +519,24 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../logging/imod.logging.ilogger.ILogger.html">imod.logging.ilogger.ILogger</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../logging/imod.logging.loglevel.html">imod.logging.loglevel</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../logging/imod.logging.logging_decorators.html">imod.logging.logging_decorators</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../logging/imod.logging.logging_decorators.init_log_decorator.html">imod.logging.logging_decorators.init_log_decorator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../logging/imod.logging.logging_decorators.standard_log_decorator.html">imod.logging.logging_decorators.standard_log_decorator</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../logging/imod.logging.loglevel.html">imod.logging.loglevel</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-12"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../logging/imod.logging.loglevel.LogLevel.html">imod.logging.loglevel.LogLevel</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../logging/imod.logging.logurulogger.html">imod.logging.logurulogger</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-12"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../logging/imod.logging.logurulogger.html">imod.logging.logurulogger</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-13"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../logging/imod.logging.logurulogger.LoguruLogger.html">imod.logging.logurulogger.LoguruLogger</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../logging/imod.logging.nulllogger.html">imod.logging.nulllogger</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-13"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../logging/imod.logging.nulllogger.html">imod.logging.nulllogger</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-14"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../logging/imod.logging.nulllogger.NullLogger.html">imod.logging.nulllogger.NullLogger</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../logging/imod.logging.pythonlogger.html">imod.logging.pythonlogger</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-14"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../logging/imod.logging.pythonlogger.html">imod.logging.pythonlogger</a><input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-15"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../logging/imod.logging.pythonlogger.PythonLogger.html">imod.logging.pythonlogger.PythonLogger</a></li>
 </ul>
 </li>
@@ -538,7 +544,7 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../mf6.html">MODFLOW6</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-15"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../mf6.html">MODFLOW6</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-16"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.open_hds.html">imod.mf6.open_hds</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.open_cbc.html">imod.mf6.open_cbc</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.read_cbc_headers.html">imod.mf6.read_cbc_headers</a></li>
@@ -554,7 +560,9 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.split.html">imod.mf6.Modflow6Simulation.split</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.regrid_like.html">imod.mf6.Modflow6Simulation.regrid_like</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.GroundwaterFlowModel.html">imod.mf6.GroundwaterFlowModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.mf6.GroundwaterFlowModel.mask_all_packages.html">imod.mf6.GroundwaterFlowModel.mask_all_packages</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.GroundwaterTransportModel.html">imod.mf6.GroundwaterTransportModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.mf6.GroundwaterTransportModel.mask_all_packages.html">imod.mf6.GroundwaterTransportModel.mask_all_packages</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.StructuredDiscretization.html">imod.mf6.StructuredDiscretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.VerticesDiscretization.html">imod.mf6.VerticesDiscretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.TimeDiscretization.html">imod.mf6.TimeDiscretization</a></li>
@@ -593,7 +601,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.SourceSinkMixing.from_flow_model.html">imod.mf6.SourceSinkMixing.from_flow_model</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../wq.html">iMOD-WQ</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-16"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../wq.html">iMOD-WQ</a><input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-17"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.SeawatModel.html">imod.wq.SeawatModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.SeawatModel.create_time_discretization.html">imod.wq.SeawatModel.create_time_discretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.TimeDiscretization.html">imod.wq.TimeDiscretization</a></li>
@@ -627,7 +635,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../wq/imod.wq.TimeVaryingConstantConcentration.html">imod.wq.TimeVaryingConstantConcentration</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../flow.html">iMODFLOW</a><input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-17"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../flow.html">iMODFLOW</a><input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-18"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../flow/imod.flow.ImodflowModel.html">imod.flow.ImodflowModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../flow/imod.flow.ImodflowModel.create_time_discretization.html">imod.flow.ImodflowModel.create_time_discretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../flow/imod.flow.Boundary.html">imod.flow.Boundary</a></li>
@@ -652,7 +660,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../flow/imod.flow.Well.html">imod.flow.Well</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../msw.html">MetaSWAP</a><input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-18"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../msw.html">MetaSWAP</a><input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-19"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.GridData.html">imod.msw.GridData</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.Infiltration.html">imod.msw.Infiltration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.Ponding.html">imod.msw.Ponding</a></li>
@@ -674,7 +682,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../msw/imod.msw.MetaSwapModel.html">imod.msw.MetaSwapModel</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../metamod.html">MetaMod</a><input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-19"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../metamod.html">MetaMod</a><input class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-20"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../metamod/imod.couplers.metamod.MetaMod.html">imod.couplers.metamod.MetaMod</a></li>
 </ul>
 </li>
@@ -751,16 +759,22 @@ Any number of WEL Packages can be specified for a single groundwater flow model.
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>screen_top</strong> (<em>float</em><em> or </em><em>list of floats</em>) – is the top of the well screen.</p></li>
-<li><p><strong>screen_bottom</strong> (<em>float</em><em> or </em><em>list of floats</em>) – is the bottom of the well screen.</p></li>
 <li><p><strong>y</strong> (<em>float</em><em> or </em><em>list of floats</em>) – is the y location of the well.</p></li>
 <li><p><strong>x</strong> (<em>float</em><em> or </em><em>list of floats</em>) – is the x location of the well.</p></li>
-<li><p><strong>rate</strong> (<em>float</em><em> or </em><em>list of floats</em>) – is the volumetric well rate. A positive value indicates well
-(injection) and a negative value indicates discharge (extraction) (q).</p></li>
+<li><p><strong>screen_top</strong> (<em>float</em><em> or </em><em>list of floats</em>) – is the top of the well screen.</p></li>
+<li><p><strong>screen_bottom</strong> (<em>float</em><em> or </em><em>list of floats</em>) – is the bottom of the well screen.</p></li>
+<li><p><strong>rate</strong> (<em>float</em><em>, </em><em>list of floats</em><em> or </em><em>xr.DataArray</em>) – is the volumetric well rate. A positive value indicates well
+(injection) and a negative value indicates discharge (extraction) (q).
+If provided as DataArray, an <code class="docutils literal notranslate"><span class="pre">&quot;index&quot;</span></code> dimension is required and an
+optional <code class="docutils literal notranslate"><span class="pre">&quot;time&quot;</span></code> dimension and coordinate specify transient input.
+In the latter case, it is important that dimensions are in the order:
+<code class="docutils literal notranslate"><span class="pre">(&quot;time&quot;,</span> <span class="pre">&quot;index&quot;)</span></code></p></li>
 <li><p><strong>concentration</strong> (<em>array of floats</em><em> (</em><em>xr.DataArray</em><em>, </em><em>optional</em><em>)</em>) – if this flow package is used in simulations also involving transport, then this array is used
 as the  concentration for inflow over this boundary.</p></li>
 <li><p><strong>concentration_boundary_type</strong> (<em>(</em><em>{&quot;AUX&quot;</em><em>, </em><em>&quot;AUXMIXED&quot;}</em><em>, </em><em>optional</em><em>)</em>) – if this flow package is used in simulations also involving transport, then this keyword specifies
 how outflow over this boundary is computed.</p></li>
+<li><p><strong>id</strong> (<em>list of Any</em><em>, </em><em>optional</em>) – assign an identifier code to each well. if not provided, one will be generated
+Must be convertible to string, and unique entries.</p></li>
 <li><p><strong>minimum_k</strong> (<em>float</em><em>, </em><em>optional</em>) – on creating point wells, no point wells will be placed in cells with a lower horizontal conductivity than this</p></li>
 <li><p><strong>minimum_thickness</strong> (<em>float</em><em>, </em><em>optional</em>) – on creating point wells, no point wells will be placed in cells with a lower thickness than this</p></li>
 <li><p><strong>print_input</strong> (<em>(</em><em>{True</em><em>, </em><em>False}</em><em>, </em><em>optional</em><em>)</em>) – keyword to indicate that the list of well information will be written to
@@ -789,9 +803,31 @@ datetime will be used. Can also be set with a dictionary using the
 </ul>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">screen_top</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">screen_bottom</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="mf">83.0</span><span class="p">,</span> <span class="mf">77.0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="mf">81.0</span><span class="p">,</span> <span class="mf">82.0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rate</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Well</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">screen_top</span><span class="p">,</span> <span class="n">screen_bottom</span><span class="p">,</span> <span class="n">rate</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For a transient well:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">weltimes</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s2">&quot;2000-01-01&quot;</span><span class="p">,</span> <span class="s2">&quot;2000-01-03&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">rate_factor_time</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">weltimes</span><span class="p">},</span> <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">,))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rate_transient</span> <span class="o">=</span> <span class="n">rate_factor_time</span> <span class="o">*</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">rate</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">,))</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Well</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">screen_top</span><span class="p">,</span> <span class="n">screen_bottom</span><span class="p">,</span> <span class="n">rate_transient</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="imod.mf6.Well.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">screen_top</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">screen_bottom</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concentration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">DataArray</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concentration_boundary_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'aux'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_thickness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_flows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_flows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repeat_stress</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">DataArray</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/imod/mf6/wel.html#Well.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imod.mf6.Well.__init__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#imod.mf6.Well.__init__" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
@@ -801,7 +837,7 @@ datetime will be used. Can also be set with a dictionary using the
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#imod.mf6.Well.__init__" title="imod.mf6.Well.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(x, y, screen_top, screen_bottom, rate)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#imod.mf6.Well.__init__" title="imod.mf6.Well.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(**kwargs)</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">clip_box</span></code>([time_min, time_max, layer_min, ...])</p></td>
@@ -813,10 +849,16 @@ datetime will be used. Can also be set with a dictionary using the
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_file</span></code>(path, **kwargs)</p></td>
 <td><p>Loads an imod mf6 package from a file (currently only netcdf and zarr are supported).</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_period_varnames</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_non_grid_data</span></code>(grid_names)</p></td>
+<td><p>This function copies the attributes of a dataset that are scalars, such as options.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_period_varnames</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_regrid_methods</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_regrid_methods</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_clipping_supported</span></code>()</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_empty</span></code>()</p></td>
@@ -826,42 +868,45 @@ datetime will be used. Can also be set with a dictionary using the
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_regridding_supported</span></code>()</p></td>
-<td><p>returns true if package supports regridding.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">isel</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mask</span></code>(domain)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_splitting_supported</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">isel</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mask</span></code>(domain)</p></td>
 <td><p>Mask wells based on two-dimensional domain.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">regrid_like</span></code>(target_grid, *_)</p></td>
-<td><p>The regrid_like method is irrelevant for this package as it is grid-agnostic, instead this method clips the package based on the grid exterior.</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">regrid_like</span></code>(target_grid, regrid_context[, ...])</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">render</span></code>(directory, pkgname, globaltimes, binary)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">render</span></code>(directory, pkgname, globaltimes, binary)</p></td>
 <td><p>Render fills in the template only, doesn't write binary data</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sel</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sel</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">skip_masking_dataarray</span></code>(array_name)</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_repeat_stress</span></code>(times)</p></td>
+<td><p>Set repeat stresses: re-use data of earlier periods.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_mf6_pkg</span></code>(active, top, bottom, k[, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_mf6_pkg</span></code>(active, top, bottom, k[, ...])</p></td>
 <td><p>Write package to Modflow 6 package.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_netcdf</span></code>(*args, **kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_netcdf</span></code>(*args, **kwargs)</p></td>
 <td><p>Write dataset contents to a netCDF file.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code>(pkgname, globaltimes, write_context)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code>(pkgname, globaltimes, write_context)</p></td>
 <td><p>writes the blockfile and binary data</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_binary_griddata</span></code>(outpath, da, dtype)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_binary_griddata</span></code>(outpath, da, dtype)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_blockfile</span></code>(pkgname, globaltimes, ...)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_blockfile</span></code>(pkgname, globaltimes, ...)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_text_griddata</span></code>(outpath, da, dtype)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_text_griddata</span></code>(outpath, da, dtype)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>

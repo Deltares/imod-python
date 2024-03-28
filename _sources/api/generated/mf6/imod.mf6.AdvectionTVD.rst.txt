@@ -17,16 +17,18 @@
       ~AdvectionTVD.clip_box
       ~AdvectionTVD.copy
       ~AdvectionTVD.from_file
+      ~AdvectionTVD.get_non_grid_data
       ~AdvectionTVD.get_regrid_methods
+      ~AdvectionTVD.is_clipping_supported
       ~AdvectionTVD.is_empty
       ~AdvectionTVD.is_grid_agnostic_package
       ~AdvectionTVD.is_regridding_supported
+      ~AdvectionTVD.is_splitting_supported
       ~AdvectionTVD.isel
       ~AdvectionTVD.mask
       ~AdvectionTVD.regrid_like
       ~AdvectionTVD.render
       ~AdvectionTVD.sel
-      ~AdvectionTVD.skip_masking_dataarray
       ~AdvectionTVD.to_netcdf
       ~AdvectionTVD.write
       ~AdvectionTVD.write_binary_griddata

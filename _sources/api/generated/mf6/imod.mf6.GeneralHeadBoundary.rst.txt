@@ -17,17 +17,20 @@
       ~GeneralHeadBoundary.clip_box
       ~GeneralHeadBoundary.copy
       ~GeneralHeadBoundary.from_file
+      ~GeneralHeadBoundary.get_non_grid_data
       ~GeneralHeadBoundary.get_period_varnames
       ~GeneralHeadBoundary.get_regrid_methods
+      ~GeneralHeadBoundary.is_clipping_supported
       ~GeneralHeadBoundary.is_empty
       ~GeneralHeadBoundary.is_grid_agnostic_package
       ~GeneralHeadBoundary.is_regridding_supported
+      ~GeneralHeadBoundary.is_splitting_supported
       ~GeneralHeadBoundary.isel
       ~GeneralHeadBoundary.mask
       ~GeneralHeadBoundary.regrid_like
       ~GeneralHeadBoundary.render
       ~GeneralHeadBoundary.sel
-      ~GeneralHeadBoundary.skip_masking_dataarray
+      ~GeneralHeadBoundary.set_repeat_stress
       ~GeneralHeadBoundary.to_netcdf
       ~GeneralHeadBoundary.write
       ~GeneralHeadBoundary.write_binary_griddata

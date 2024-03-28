@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Diffferent ways to regrid models &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>Different ways to regrid models &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -125,8 +125,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -411,7 +411,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="circle.html">Circle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="circle_partitioned.html">Circle partitioned</a></li>
 <li class="toctree-l2"><a class="reference internal" href="circle_transport.html">Freshwater lens (circle)</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Diffferent ways to regrid models</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Different ways to regrid models</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ex01_twri.html">TWRI</a></li>
 <li class="toctree-l2"><a class="reference internal" href="example_1d_transport.html">1D Solute Transport Benchmarks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="example_models.html">Example models</a></li>
@@ -432,6 +432,7 @@ document.write(`
 
 
 <li class="toctree-l2"><a class="reference internal" href="lake.html">Lake package example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transport_2d.html">Transport 2d example</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../imodflow/index.html">iMODFLOW</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -507,7 +508,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link">MODFLOW6</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">Diffferent...</li>
+    <li class="breadcrumb-item active" aria-current="page">Different...</li>
   </ul>
 </nav>
 </div>
@@ -529,9 +530,9 @@ document.write(`
 <p><a class="reference internal" href="#sphx-glr-download-examples-mf6-different-ways-to-regrid-models-py"><span class="std std-ref">Go to the end</span></a>
 to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="diffferent-ways-to-regrid-models">
-<span id="sphx-glr-examples-mf6-different-ways-to-regrid-models-py"></span><h1>Diffferent ways to regrid models<a class="headerlink" href="#diffferent-ways-to-regrid-models" title="Permalink to this heading">#</a></h1>
-<p>This example focuses on regridding. It uses the TWRI model from modflow6 (<a href="#id1"><span class="problematic" id="id2">`Harbaugh, 2005`_</span></a>).
+<section class="sphx-glr-example-title" id="different-ways-to-regrid-models">
+<span id="sphx-glr-examples-mf6-different-ways-to-regrid-models-py"></span><h1>Different ways to regrid models<a class="headerlink" href="#different-ways-to-regrid-models" title="Permalink to this heading">#</a></h1>
+<p>This example focuses on regridding. It uses the TWRI model from modflow6 (<cite>Harbaugh, 2005</cite>).
 More information about this model can be found in an example dedicated to building this model ( ex01_twri.py)</p>
 <p>In overview, we’ll set the following steps:
 * we build a new grid, onto which we want to regrid the twri model
@@ -548,7 +549,7 @@ structured model, we can make due with few packages.</p>
 <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
 <span class="kn">from</span> <span class="nn">example_models</span> <span class="kn">import</span> <span class="n">create_twri_simulation</span>
 
-<span class="kn">from</span> <span class="nn">imod.mf6.regridding_utils</span> <span class="kn">import</span> <span class="n">RegridderType</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.utilities.regrid</span> <span class="kn">import</span> <span class="n">RegridderType</span><span class="p">,</span> <span class="n">RegridderWeightsCache</span>
 </pre></div>
 </div>
 <p>Now we create the twri simulation itself. It yields a simulation of a flow problem, with a grid of 3 layers and 15 cells in both x and y directions.
@@ -561,7 +562,7 @@ To better illustrate the regridding, we replace the K field with a lognormal ran
 <span class="n">simulation</span><span class="p">[</span><span class="s2">&quot;GWF_1&quot;</span><span class="p">][</span><span class="s2">&quot;npf&quot;</span><span class="p">][</span><span class="s2">&quot;k&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heterogeneous_k</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>D:\buildAgent\work\b1e15a22da7c0d7f\imod-python\imod\mf6\wel.py:204: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\wel.py:236: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
   index_coord = np.arange(self.dataset.dims[&quot;index&quot;])
 </pre></div>
 </div>
@@ -570,7 +571,7 @@ To better illustrate the regridding, we replace the K field with a lognormal ran
 <span class="n">heterogeneous_k</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_different_ways_to_regrid_models_001.png" srcset="../../_images/sphx_glr_different_ways_to_regrid_models_001.png" alt="layer = 1, dx = 5e+03, dy = -5e+03" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x00000269260E29D0&gt;
+<img src="../../_images/sphx_glr_different_ways_to_regrid_models_001.png" srcset="../../_images/sphx_glr_different_ways_to_regrid_models_001.png" alt="layer = 1, dx = 5e+03, dy = -5e+03" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x0000015AACB36FD0&gt;
 </pre></div>
 </div>
 <p>Now we create a new grid for this simulation. It has 3 layers,  45 rows and 20 columns.
@@ -603,7 +604,7 @@ specifies that field “k” uses an OVERLAP regridder in combination with the a
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">new_simulation</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">regrid_like</span><span class="p">(</span><span class="s2">&quot;regridded_twri&quot;</span><span class="p">,</span> <span class="n">target_grid</span><span class="o">=</span><span class="n">target_grid</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>D:\buildAgent\work\b1e15a22da7c0d7f\imod-python\imod\mf6\wel.py:287: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\wel.py:319: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
   in_bounds = np.full(ds.dims[&quot;index&quot;], True)
 </pre></div>
 </div>
@@ -613,7 +614,7 @@ specifies that field “k” uses an OVERLAP regridder in combination with the a
 <span class="n">regridded_k_1</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_different_ways_to_regrid_models_002.png" srcset="../../_images/sphx_glr_different_ways_to_regrid_models_002.png" alt="layer = 1, dx = 6251, dy = -3572" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x0000026927A12D50&gt;
+<img src="../../_images/sphx_glr_different_ways_to_regrid_models_002.png" srcset="../../_images/sphx_glr_different_ways_to_regrid_models_002.png" alt="layer = 1, dx = 6251, dy = -3572" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x0000015AAE20D7D0&gt;
 </pre></div>
 </div>
 <p>A second way to regrid  twri  is to regrid the groundwater flow model.</p>
@@ -625,17 +626,24 @@ specifies that field “k” uses an OVERLAP regridder in combination with the a
 <span class="n">regridded_k_2</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_different_ways_to_regrid_models_003.png" srcset="../../_images/sphx_glr_different_ways_to_regrid_models_003.png" alt="layer = 1, dx = 6251, dy = -3572" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>D:\buildAgent\work\b1e15a22da7c0d7f\imod-python\imod\mf6\wel.py:287: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
+<img src="../../_images/sphx_glr_different_ways_to_regrid_models_003.png" srcset="../../_images/sphx_glr_different_ways_to_regrid_models_003.png" alt="layer = 1, dx = 6251, dy = -3572" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\wel.py:319: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
   in_bounds = np.full(ds.dims[&quot;index&quot;], True)
 
-&lt;matplotlib.collections.QuadMesh object at 0x0000026927BCB110&gt;
+&lt;matplotlib.collections.QuadMesh object at 0x0000015AAAEF7ED0&gt;
 </pre></div>
 </div>
-<p>Finally, we can regrid package per package. This allows us to choose the regridding method as well.
-in this example we’ll regrid the npf package manually and the rest of the packages using default methods.</p>
+<p>regridding method as well. in this example we’ll regrid the npf package
+manually and the rest of the packages using default methods.</p>
+<p>Note that we create a RegridderWeightsCache here. This will store the weights
+of the regridder. Using the same cache to regrid another package will lead to
+a performance increase if that package uses the same regridding method,
+because initializing a regridder is costly.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">regridder_types</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;k&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">RegridderType</span><span class="o">.</span><span class="n">CENTROIDLOCATOR</span><span class="p">,</span> <span class="kc">None</span><span class="p">)}</span>
+<span class="n">regrid_context</span> <span class="o">=</span> <span class="n">RegridderWeightsCache</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;npf&quot;</span><span class="p">][</span><span class="s2">&quot;k&quot;</span><span class="p">],</span> <span class="n">target_grid</span><span class="p">)</span>
 <span class="n">npf_regridded</span> <span class="o">=</span> <span class="n">model</span><span class="p">[</span><span class="s2">&quot;npf&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">regrid_like</span><span class="p">(</span>
-    <span class="n">target_grid</span><span class="o">=</span><span class="n">target_grid</span><span class="p">,</span> <span class="n">regridder_types</span><span class="o">=</span><span class="n">regridder_types</span>
+    <span class="n">target_grid</span><span class="o">=</span><span class="n">target_grid</span><span class="p">,</span>
+    <span class="n">regrid_context</span><span class="o">=</span><span class="n">regrid_context</span><span class="p">,</span>
+    <span class="n">regridder_types</span><span class="o">=</span><span class="n">regridder_types</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">new_model</span><span class="p">[</span><span class="s2">&quot;npf&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">npf_regridded</span>
 
@@ -645,10 +653,10 @@ in this example we’ll regrid the npf package manually and the rest of the pack
 <span class="n">regridded_k_3</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_different_ways_to_regrid_models_004.png" srcset="../../_images/sphx_glr_different_ways_to_regrid_models_004.png" alt="layer = 1, dx = 6251, dy = -3572" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x00000269280DE810&gt;
+<img src="../../_images/sphx_glr_different_ways_to_regrid_models_004.png" srcset="../../_images/sphx_glr_different_ways_to_regrid_models_004.png" alt="layer = 1, dx = 6251, dy = -3572" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x0000015AA99A24D0&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 9.570 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 13.077 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-different-ways-to-regrid-models-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/f256ac396944cfb800f53ea6e7935675/different_ways_to_regrid_models.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">different_ways_to_regrid_models.ipynb</span></code></a></p>

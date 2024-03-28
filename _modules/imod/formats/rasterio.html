@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.formats.rasterio &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>imod.formats.rasterio &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -463,15 +463,16 @@ document.write(`
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-<span class="kn">from</span> <span class="nn">imod</span> <span class="kn">import</span> <span class="n">util</span>
+<span class="kn">import</span> <span class="nn">imod</span>
 <span class="kn">from</span> <span class="nn">imod.formats</span> <span class="kn">import</span> <span class="n">array_io</span>
+<span class="kn">from</span> <span class="nn">imod.util.imports</span> <span class="kn">import</span> <span class="n">MissingOptionalModule</span>
 
 <span class="c1"># since rasterio is a big dependency that is sometimes hard to install</span>
 <span class="c1"># and not always required, we made this an optional dependency</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">rasterio</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">rasterio</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;rasterio&quot;</span><span class="p">)</span>
+    <span class="n">rasterio</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;rasterio&quot;</span><span class="p">)</span>
 
 <span class="n">f_open</span> <span class="o">=</span> <span class="nb">open</span>
 
@@ -580,7 +581,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="header"><a class="viewcode-back" href="../../../api/generated/io/imod.formats.rasterio.header.html#imod.formats.rasterio.header">[docs]</a><span class="k">def</span> <span class="nf">header</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
-    <span class="n">attrs</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">decompose</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span>
+    <span class="n">attrs</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">decompose</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span>
 
     <span class="c1"># TODO:</span>
     <span class="c1"># Check bands, rotation, etc.</span>
@@ -881,7 +882,7 @@ document.write(`
     <span class="k">if</span> <span class="n">extradims</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Only x and y dimensions supported, found </span><span class="si">{</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="c1"># transform will be affine object in next xarray</span>
-    <span class="n">profile</span><span class="p">[</span><span class="s2">&quot;transform&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">da</span><span class="p">)</span>
+    <span class="n">profile</span><span class="p">[</span><span class="s2">&quot;transform&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">da</span><span class="p">)</span>
     <span class="n">profile</span><span class="p">[</span><span class="s2">&quot;driver&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">driver</span>
     <span class="n">profile</span><span class="p">[</span><span class="s2">&quot;height&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">size</span>
     <span class="n">profile</span><span class="p">[</span><span class="s2">&quot;width&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">size</span>
@@ -891,7 +892,7 @@ document.write(`
 
     <span class="c1"># Allow writing ASCII grids even if rasterio isn&#39;t installed. This is</span>
     <span class="c1"># useful for e.g. MetaSWAP input.</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rasterio</span><span class="p">,</span> <span class="n">util</span><span class="o">.</span><span class="n">MissingOptionalModule</span><span class="p">)</span> <span class="ow">and</span> <span class="n">driver</span> <span class="o">==</span> <span class="s2">&quot;AAIGrid&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rasterio</span><span class="p">,</span> <span class="n">MissingOptionalModule</span><span class="p">)</span> <span class="ow">and</span> <span class="n">driver</span> <span class="o">==</span> <span class="s2">&quot;AAIGrid&quot;</span><span class="p">:</span>
         <span class="n">write_aaigrid</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">da</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">profile</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">Env</span><span class="p">():</span>
@@ -908,7 +909,7 @@ document.write(`
 <span class="sd">    written, like the ``imod.rasterio.write`` function. This function is more general</span>
 <span class="sd">    and also supports ``time`` and ``layer`` and other dimensions. It will split these up,</span>
 <span class="sd">    give them their own filename according to the conventions in</span>
-<span class="sd">    ``imod.util.compose``, and write them each.</span>
+<span class="sd">    ``imod.util.path.compose``, and write them each.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>

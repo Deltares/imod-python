@@ -1,8 +1,8 @@
 """
-Diffferent ways to regrid models
+Different ways to regrid models
 ================================
 
-This example focuses on regridding. It uses the TWRI model from modflow6 (`Harbaugh, 2005`_).
+This example focuses on regridding. It uses the TWRI model from modflow6 (`Harbaugh, 2005`).
 More information about this model can be found in an example dedicated to building this model ( ex01_twri.py)
 
 In overview, we'll set the following steps:
@@ -25,7 +25,7 @@ import numpy as np
 import xarray as xr
 from example_models import create_twri_simulation
 
-from imod.mf6.regridding_utils import RegridderType
+from imod.mf6.utilities.regrid import RegridderType, RegridderWeightsCache
 
 # %%
 # Now we create the twri simulation itself. It yields a simulation of a flow problem, with a grid of 3 layers and 15 cells in both x and y directions.
@@ -89,13 +89,21 @@ fig, ax = plt.subplots()
 regridded_k_2.sel(layer=1).plot(y="y", yincrease=False, ax=ax)
 
 
-# %%
-# Finally, we can regrid package per package. This allows us to choose the regridding method as well.
-# in this example we'll regrid the npf package manually and the rest of the packages using default methods.
+# %% Finally, we can regrid package per package. This allows us to choose the
+# regridding method as well. in this example we'll regrid the npf package
+# manually and the rest of the packages using default methods.
+#
+# Note that we create a RegridderWeightsCache here. This will store the weights
+# of the regridder. Using the same cache to regrid another package will lead to
+# a performance increase if that package uses the same regridding method,
+# because initializing a regridder is costly.
 
 regridder_types = {"k": (RegridderType.CENTROIDLOCATOR, None)}
+regrid_context = RegridderWeightsCache(model["npf"]["k"], target_grid)
 npf_regridded = model["npf"].regrid_like(
-    target_grid=target_grid, regridder_types=regridder_types
+    target_grid=target_grid,
+    regrid_context=regrid_context,
+    regridder_types=regridder_types,
 )
 new_model["npf"] = npf_regridded
 

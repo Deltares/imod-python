@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.visualize.pyvista &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>imod.visualize.pyvista &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -495,8 +495,9 @@ document.write(`
 <span class="kn">import</span> <span class="nn">tqdm</span>
 <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
 
-<span class="kn">from</span> <span class="nn">imod</span> <span class="kn">import</span> <span class="n">util</span>
+<span class="kn">import</span> <span class="nn">imod</span>
 <span class="kn">from</span> <span class="nn">imod.select</span> <span class="kn">import</span> <span class="n">points_values</span>
+<span class="kn">from</span> <span class="nn">imod.util.imports</span> <span class="kn">import</span> <span class="n">MissingOptionalModule</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">pyvista</span> <span class="k">as</span> <span class="nn">pv</span>
@@ -505,8 +506,8 @@ document.write(`
     <span class="k">if</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkVersion</span><span class="p">()</span><span class="o">.</span><span class="n">GetVTKMajorVersion</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">9</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;VTK version of 9.0 or higher required&quot;</span><span class="p">)</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">pv</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;pyvista&quot;</span><span class="p">)</span>
-    <span class="n">vtk</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;vtk&quot;</span><span class="p">)</span>
+    <span class="n">pv</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;pyvista&quot;</span><span class="p">)</span>
+    <span class="n">vtk</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;vtk&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">exterior</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
@@ -870,7 +871,7 @@ document.write(`
 <span class="sd">    https://docs.pyvista.org/index.html</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># x and y dimension</span>
-    <span class="n">dx</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">spatial_reference</span><span class="p">(</span><span class="n">da</span><span class="p">)</span>
+    <span class="n">dx</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">spatial_reference</span><span class="p">(</span><span class="n">da</span><span class="p">)</span>
     <span class="n">nx</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
     <span class="n">ny</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">vertices_coords</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">nx</span><span class="p">)</span>
@@ -912,7 +913,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">transpose_coords</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="n">dz</span><span class="p">,</span> <span class="n">zmin</span><span class="p">,</span> <span class="n">zmax</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">coord_reference</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">])</span>
+        <span class="n">dz</span><span class="p">,</span> <span class="n">zmin</span><span class="p">,</span> <span class="n">zmax</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">coord_reference</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">])</span>
         <span class="n">nz</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
         <span class="n">z</span> <span class="o">=</span> <span class="n">vertices_coords</span><span class="p">(</span><span class="n">dz</span><span class="p">,</span> <span class="n">zmin</span><span class="p">,</span> <span class="n">zmax</span><span class="p">,</span> <span class="n">nz</span><span class="p">)</span>
 

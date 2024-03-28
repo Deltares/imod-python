@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.out &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>imod.mf6.out &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -494,6 +494,9 @@ document.write(`
 <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
 <span class="kn">import</span> <span class="nn">xugrid</span> <span class="k">as</span> <span class="nn">xu</span>
 
+<span class="kn">from</span> <span class="nn">imod.typing</span> <span class="kn">import</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="n">GridDataset</span>
+<span class="kn">from</span> <span class="nn">imod.typing.grid</span> <span class="kn">import</span> <span class="n">merge_with_dictionary</span>
+
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">dis</span><span class="p">,</span> <span class="n">disu</span><span class="p">,</span> <span class="n">disv</span>
 <span class="kn">from</span> <span class="nn">.cbc</span> <span class="kn">import</span> <span class="n">read_cbc_headers</span>
 <span class="kn">from</span> <span class="nn">.common</span> <span class="kn">import</span> <span class="n">FilePath</span><span class="p">,</span> <span class="n">_grb_text</span>
@@ -556,7 +559,7 @@ document.write(`
     <span class="n">dry_nan</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">simulation_start_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">time_unit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Open modflow6 heads (.hds) file.</span>
 
@@ -606,7 +609,7 @@ document.write(`
     <span class="n">dry_nan</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">simulation_start_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">time_unit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Open Modflow6 &quot;Unformatted Concentration&quot; (.ucn) file.</span>
 
@@ -621,6 +624,22 @@ document.write(`
 <span class="sd">    grb_path: Union[str, pathlib.Path]</span>
 <span class="sd">    dry_nan: bool, default value: False.</span>
 <span class="sd">        Whether to convert dry values to NaN.</span>
+<span class="sd">    simulation_start_time : Optional datetime</span>
+<span class="sd">        The time and date correpsonding to the beginning of the simulation.</span>
+<span class="sd">        Use this to convert the time coordinates of the output array to</span>
+<span class="sd">        calendar time/dates. time_unit must also be present if this argument is present.</span>
+<span class="sd">    time_unit: Optional str</span>
+<span class="sd">        The time unit MF6 is working in, in string representation.</span>
+<span class="sd">        Only used if simulation_start_time was provided.</span>
+<span class="sd">        Admissible values are:</span>
+<span class="sd">        ns -&gt; nanosecond</span>
+<span class="sd">        ms -&gt; microsecond</span>
+<span class="sd">        s -&gt; second</span>
+<span class="sd">        m -&gt; minute</span>
+<span class="sd">        h -&gt; hour</span>
+<span class="sd">        d -&gt; day</span>
+<span class="sd">        w -&gt; week</span>
+<span class="sd">        Units &quot;month&quot; or &quot;year&quot; are not supported, as they do not represent unambiguous timedelta values durations.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -637,7 +656,7 @@ document.write(`
     <span class="n">path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">,</span>
     <span class="n">like</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">],</span>
     <span class="n">dry_nan</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Open modflow6 heads (.hds) file.</span>
 
@@ -677,7 +696,8 @@ document.write(`
     <span class="n">flowja</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">simulation_start_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">time_unit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">]]:</span>
+    <span class="n">merge_to_dataset</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataset</span> <span class="o">|</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GridDataArray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Open modflow6 cell-by-cell (.cbc) file.</span>
 
@@ -709,10 +729,28 @@ document.write(`
 <span class="sd">    flowja: bool, default value: False</span>
 <span class="sd">        Whether to return the flow-ja-face values &quot;as is&quot; (``True``) or in a</span>
 <span class="sd">        grid form (``False``).</span>
+<span class="sd">    simulation_start_time : Optional datetime</span>
+<span class="sd">        The time and date correpsonding to the beginning of the simulation.</span>
+<span class="sd">        Use this to convert the time coordinates of the output array to</span>
+<span class="sd">        calendar time/dates. time_unit must also be present if this argument is present.</span>
+<span class="sd">    time_unit: Optional str</span>
+<span class="sd">        The time unit MF6 is working in, in string representation.</span>
+<span class="sd">        Only used if simulation_start_time was provided.</span>
+<span class="sd">        Admissible values are:</span>
+<span class="sd">        ns -&gt; nanosecond</span>
+<span class="sd">        ms -&gt; microsecond</span>
+<span class="sd">        s -&gt; second</span>
+<span class="sd">        m -&gt; minute</span>
+<span class="sd">        h -&gt; hour</span>
+<span class="sd">        d -&gt; day</span>
+<span class="sd">        w -&gt; week</span>
+<span class="sd">        Units &quot;month&quot; or &quot;year&quot; are not supported, as they do not represent unambiguous timedelta values durations.</span>
+<span class="sd">    merge_to_dataset: bool, default value: False</span>
+<span class="sd">        Merge output to dataset.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    cbc_content: Dict[str, xr.DataArray]</span>
+<span class="sd">    cbc_content: xr.Dataset | Dict[str, xr.DataArray]</span>
 <span class="sd">        DataArray contains float64 data of the budgets, with dimensions (&quot;time&quot;,</span>
 <span class="sd">        &quot;layer&quot;, &quot;y&quot;, &quot;x&quot;).</span>
 
@@ -737,7 +775,10 @@ document.write(`
     <span class="n">grb_content</span> <span class="o">=</span> <span class="n">read_grb</span><span class="p">(</span><span class="n">grb_path</span><span class="p">)</span>
     <span class="n">distype</span> <span class="o">=</span> <span class="n">grb_content</span><span class="p">[</span><span class="s2">&quot;distype&quot;</span><span class="p">]</span>
     <span class="n">_open</span> <span class="o">=</span> <span class="n">_get_function</span><span class="p">(</span><span class="n">_OPEN_CBC</span><span class="p">,</span> <span class="n">distype</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">_open</span><span class="p">(</span><span class="n">cbc_path</span><span class="p">,</span> <span class="n">grb_content</span><span class="p">,</span> <span class="n">flowja</span><span class="p">,</span> <span class="n">simulation_start_time</span><span class="p">,</span> <span class="n">time_unit</span><span class="p">)</span></div>
+    <span class="n">cbc</span> <span class="o">=</span> <span class="n">_open</span><span class="p">(</span><span class="n">cbc_path</span><span class="p">,</span> <span class="n">grb_content</span><span class="p">,</span> <span class="n">flowja</span><span class="p">,</span> <span class="n">simulation_start_time</span><span class="p">,</span> <span class="n">time_unit</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">merge_to_dataset</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">merge_with_dictionary</span><span class="p">(</span><span class="n">cbc</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cbc</span></div>
 </pre></div>
 
                 </article>

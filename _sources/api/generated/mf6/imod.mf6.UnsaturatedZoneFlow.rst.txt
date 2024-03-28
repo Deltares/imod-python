@@ -18,17 +18,19 @@
       ~UnsaturatedZoneFlow.copy
       ~UnsaturatedZoneFlow.fill_stress_perioddata
       ~UnsaturatedZoneFlow.from_file
+      ~UnsaturatedZoneFlow.get_non_grid_data
       ~UnsaturatedZoneFlow.get_period_varnames
-      ~UnsaturatedZoneFlow.get_regrid_methods
+      ~UnsaturatedZoneFlow.is_clipping_supported
       ~UnsaturatedZoneFlow.is_empty
       ~UnsaturatedZoneFlow.is_grid_agnostic_package
       ~UnsaturatedZoneFlow.is_regridding_supported
+      ~UnsaturatedZoneFlow.is_splitting_supported
       ~UnsaturatedZoneFlow.isel
       ~UnsaturatedZoneFlow.mask
       ~UnsaturatedZoneFlow.regrid_like
       ~UnsaturatedZoneFlow.render
       ~UnsaturatedZoneFlow.sel
-      ~UnsaturatedZoneFlow.skip_masking_dataarray
+      ~UnsaturatedZoneFlow.set_repeat_stress
       ~UnsaturatedZoneFlow.to_netcdf
       ~UnsaturatedZoneFlow.write
       ~UnsaturatedZoneFlow.write_binary_griddata

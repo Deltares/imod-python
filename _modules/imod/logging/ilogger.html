@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.logging.ilogger &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>imod.logging.ilogger &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -450,6 +450,8 @@ document.write(`
   <h1>Source code for imod.logging.ilogger</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">abstractmethod</span>
 
+<span class="kn">from</span> <span class="nn">imod.logging.loglevel</span> <span class="kn">import</span> <span class="n">LogLevel</span>
+
 
 <div class="viewcode-block" id="ILogger"><a class="viewcode-back" href="../../../api/generated/logging/imod.logging.ilogger.ILogger.html#imod.logging.ilogger.ILogger">[docs]</a><span class="k">class</span> <span class="nc">ILogger</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -457,7 +459,7 @@ document.write(`
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="ILogger.debug"><a class="viewcode-back" href="../../../api/generated/logging/imod.logging.ilogger.ILogger.html#imod.logging.ilogger.ILogger.debug">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">additional_depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log message with severity &#39;:attr:`~imod.logging.loglevel.LogLevel.DEBUG`&#39;.</span>
 
@@ -465,11 +467,14 @@ document.write(`
 <span class="sd">        ----------</span>
 <span class="sd">        message : str</span>
 <span class="sd">            message to be logged</span>
+<span class="sd">        additional_depth: Optional[int]</span>
+<span class="sd">            additional depth level. Use this to correct the filename and line number</span>
+<span class="sd">            when you add logging to a decorator</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="ILogger.info"><a class="viewcode-back" href="../../../api/generated/logging/imod.logging.ilogger.ILogger.html#imod.logging.ilogger.ILogger.info">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">additional_depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log message with severity &#39;:attr:`~imod.logging.loglevel.LogLevel.INFO`&#39;.</span>
 
@@ -477,11 +482,14 @@ document.write(`
 <span class="sd">        ----------</span>
 <span class="sd">        message : str</span>
 <span class="sd">            message to be logged</span>
+<span class="sd">        additional_depth: Optional[int]</span>
+<span class="sd">            additional depth level. Use this to correct the filename and line number</span>
+<span class="sd">            when you add logging to a decorator</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="ILogger.warning"><a class="viewcode-back" href="../../../api/generated/logging/imod.logging.ilogger.ILogger.html#imod.logging.ilogger.ILogger.warning">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">warning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">warning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">additional_depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log message with severity &#39;:attr:`~imod.logging.loglevel.LogLevel.WARNING`&#39;.</span>
 
@@ -489,11 +497,14 @@ document.write(`
 <span class="sd">        ----------</span>
 <span class="sd">        message : str</span>
 <span class="sd">            message to be logged</span>
+<span class="sd">        additional_depth: Optional[int]</span>
+<span class="sd">            additional depth level. Use this to correct the filename and line number</span>
+<span class="sd">            when you add logging to a decorator</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="ILogger.error"><a class="viewcode-back" href="../../../api/generated/logging/imod.logging.ilogger.ILogger.html#imod.logging.ilogger.ILogger.error">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">additional_depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log message with severity &#39;:attr:`~imod.logging.loglevel.LogLevel.ERROR`&#39;.</span>
 
@@ -501,11 +512,14 @@ document.write(`
 <span class="sd">        ----------</span>
 <span class="sd">        message : str</span>
 <span class="sd">            message to be logged</span>
+<span class="sd">        additional_depth: Optional[int]</span>
+<span class="sd">            additional depth level. Use this to correct the filename and line number</span>
+<span class="sd">            when you add logging to a decorator</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="ILogger.critical"><a class="viewcode-back" href="../../../api/generated/logging/imod.logging.ilogger.ILogger.html#imod.logging.ilogger.ILogger.critical">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">additional_depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log message with severity &#39;:attr:`~imod.logging.loglevel.LogLevel.CRITICAL`&#39;.</span>
 
@@ -513,8 +527,29 @@ document.write(`
 <span class="sd">        ----------</span>
 <span class="sd">        message : str</span>
 <span class="sd">            message to be logged</span>
+<span class="sd">        additional_depth: Optional[int]</span>
+<span class="sd">            additional depth level. Use this to correct the filename and line number</span>
+<span class="sd">            when you add logging to a decorator</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="ILogger.log"><a class="viewcode-back" href="../../../api/generated/logging/imod.logging.ilogger.ILogger.html#imod.logging.ilogger.ILogger.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loglevel</span><span class="p">:</span> <span class="n">LogLevel</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">additional_depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        logs a message with the specified urgency level.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">match</span> <span class="n">loglevel</span><span class="p">:</span>
+            <span class="k">case</span> <span class="n">LogLevel</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">additional_depth</span><span class="p">)</span>
+            <span class="k">case</span> <span class="n">LogLevel</span><span class="o">.</span><span class="n">INFO</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">additional_depth</span><span class="p">)</span>
+            <span class="k">case</span> <span class="n">LogLevel</span><span class="o">.</span><span class="n">WARNING</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">additional_depth</span><span class="p">)</span>
+            <span class="k">case</span> <span class="n">LogLevel</span><span class="o">.</span><span class="n">ERROR</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">additional_depth</span><span class="p">)</span>
+            <span class="k">case</span> <span class="n">LogLevel</span><span class="o">.</span><span class="n">CRITICAL</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">additional_depth</span><span class="p">)</span>
+            <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown logging urgency at level </span><span class="si">{</span><span class="n">loglevel</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div></div>
 </pre></div>
 
                 </article>

@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Developing &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>Developing &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -124,8 +124,8 @@
     
     
     
-    <img src="_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -492,12 +492,12 @@ this <a class="reference external" href="https://learngitbranching.js.org/">inte
 </section>
 <section id="code-style">
 <h3>Code style<a class="headerlink" href="#code-style" title="Permalink to this heading">#</a></h3>
-<p>We use <a class="reference external" href="https://github.com/ambv/black">black</a> for automatic code formatting. Like <em>Black</em>, we are
+<p>We use <a class="reference external" href="https://github.com/astral-sh/ruff">ruff</a> for automatic code formatting. Like <em>ruff</em>, we are
 uncompromising about formatting. Continuous Integration <strong>will fail</strong> if
-running <code class="docutils literal notranslate"><span class="pre">black</span> <span class="pre">.</span></code> from within the repository root folder would make
+running <code class="docutils literal notranslate"><span class="pre">ruff</span> <span class="pre">.</span></code> from within the repository root folder would make
 any formatting changes.</p>
-<p>Integration black into your workflow is easy. Find the instructions
-<a class="reference external" href="https://github.com/ambv/black#editor-integration">here</a>. If you’re using VisualStudioCode (which we heartily recommend),
+<p>Integration ruff into your workflow is easy. Find the instructions
+<a class="reference external" href="https://docs.astral.sh/ruff/integrations/">here</a>. If you’re using VisualStudioCode (which we heartily recommend),
 consider enabling the <a class="reference external" href="https://code.visualstudio.com/updates/v1_6#_format-on-save">Format On Save</a> option – it’ll save a lot of
 hassle.</p>
 </section>
@@ -525,25 +525,24 @@ ask for some clarifications.</p>
 <section id="how-to-release-a-new-version">
 <h2>How to release a new version<a class="headerlink" href="#how-to-release-a-new-version" title="Permalink to this heading">#</a></h2>
 <p>To follow these steps, you need to be one of the maintainers for imod on both
-<a class="reference external" href="https://pypi.org/project/imod/">PyPI</a> and <a class="reference external" href="https://github.com/conda-forge/imod-feedstock">conda-forge</a>.</p>
+<a class="reference external" href="https://pypi.org/project/imod/">PyPI</a> and <a class="reference external" href="https://github.com/conda-forge/imod-feedstock">conda-forge</a>, as well as access to the
+<a class="reference external" href="https://dpcbuild.deltares.nl">Deltares Teamcity build environment</a>.</p>
 <ol class="arabic simple">
 <li><p>Update the <a class="reference internal" href="api/changelog.html"><span class="doc">Changelog</span></a> and the <code class="docutils literal notranslate"><span class="pre">__version__</span></code> in <code class="docutils literal notranslate"><span class="pre">imod/__init__.py</span></code>,
 and the version entry in the <code class="docutils literal notranslate"><span class="pre">pixi.toml</span></code> for complenetess.</p></li>
 <li><p>Create a tag on your local machine and push it GitHub. <a class="reference external" href="https://github.com/Deltares/imod-python/tags">Old tags are here</a>. <a class="reference external" href="https://github.com/Deltares/imod-python/releases">Old releases are
 here</a>. The tag name should be <code class="docutils literal notranslate"><span class="pre">vx.y.z</span></code>,
 where x, y and z are version numbers according to <a class="reference external" href="https://semver.org/">Semantic Versioning</a>.</p></li>
-<li><p>Create a Release on <a class="reference external" href="https://github.com/Deltares/imod-python/releases">GitHub</a>.
-Choose the tag you want to release. For the release title use the tag number.
-For the release description use <code class="docutils literal notranslate"><span class="pre">See</span>
-<span class="pre">https://deltares.github.io/imod-python/api/changelog.html</span></code></p></li>
-<li><p>Locally, <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">fetch</span> <span class="pre">--tags</span></code> and <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">pull</span></code>, verify you are on the commit
-you want to release, and that it is clean.</p></li>
-<li><p>Run <code class="docutils literal notranslate"><span class="pre">pixi</span> <span class="pre">run</span> <span class="pre">pypi-publish</span></code> to build the package and upload to PyPI.</p></li>
-<li><p>For <a class="reference external" href="https://github.com/conda-forge/imod-feedstock">conda-forge</a>, a PR
-will be created automatically. If the requirements are up to date in
-<a class="reference external" href="https://github.com/conda-forge/imod-feedstock/blob/master/recipe/meta.yaml">meta.yaml</a>
-then you can merge it. Otherwise you have to edit them and push this to the
-bot’s branch.</p></li>
+<li><p>On Teamcity go to the <a class="reference external" href="https://dpcbuild.deltares.nl/buildConfiguration/iMOD6_IMODPython_Windows_DeployAll?mode=builds">Deploy All</a>
+build step in the <cite>Deploy</cite> project.</p></li>
+<li><p>Press the <cite>Run</cite> button and select the <cite>Changes</cite> Tab.</p></li>
+<li><p>Select the branch/tag you want to release and press <cite>Run Build</cite></p></li>
+</ol>
+<p>The TeamCity pipeline will:</p>
+<ol class="arabic simple">
+<li><p>Create a release on GitHub</p></li>
+<li><p>Create the imod-python package and upload it to PyPi</p></li>
+<li><p>Build the documentation and deploy it</p></li>
 </ol>
 </section>
 <section id="developing-examples">
@@ -600,36 +599,26 @@ changes. However, to start afresh, run:</p>
 </pre></div>
 </div>
 <p>This will get rid of all files generated by Sphinx.</p>
+<p>Creating the docs can also be done using pixi. Run the following command to build it:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pixi run --environment default docs</span>
+</pre></div>
+</div>
 </section>
 <section id="debugging-continuous-integration">
 <h2>Debugging Continuous Integration<a class="headerlink" href="#debugging-continuous-integration" title="Permalink to this heading">#</a></h2>
-<p>Continuous Integration runs on an image with a specific operating system, and
-Python installation. Due to system idiosyncrasies, CI failing might not
-reproduce locally. If an issue requires more than trial-and-error changes,
-Docker may be the easiest way to debug.</p>
-<p>On windows, install Docker:
-<a class="reference external" href="https://docs.docker.com/docker-for-windows/install/">https://docs.docker.com/docker-for-windows/install/</a></p>
-<p>Pull the CI image (at the time of writing), and run it interactively:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">docker pull condaforge/mambaforge:latest</span>
-<span class="go">docker run -it condaforge/mambaforge</span>
+<p>The commands run during the Continuous Integration are they same as the tasks defined
+in the pixi tasks list. For example if the MyPy step fails you can locally run the command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pixi run --environment default mypy_lint</span>
 </pre></div>
 </div>
-<p>This should land you in the docker image. Next, we reproduce the CI setup steps.
-Some changes are required, such as installing git and cloning the repository,
-which happens automatically within CI.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">apt-get update -q -y</span>
-<span class="go">apt-get install -y build-essential</span>
-<span class="go">mamba install git</span>
-<span class="go">cd /usr/src</span>
-<span class="go">git clone https://github.com/Deltares/imod-python.git</span>
-<span class="go">cd imod-python</span>
-<span class="go">mamba env create -f imod-environment.yml --name imod</span>
-<span class="go">mamba env update -f imod-environment-dev.yml --name imod</span>
-<span class="go">source activate imod</span>
-<span class="go">pip install -e .</span>
+<p>Or if the Unit tests are failing you can run:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pixi run --environment default unittests</span>
 </pre></div>
 </div>
-<p>At this point, everything should be ready to run the tests on the Docker image.</p>
+<p>To full lists of tasks  can be found in the pixi.toml file or can be found by running</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pixi task list</span>
+</pre></div>
+</div>
 </section>
 </section>
 

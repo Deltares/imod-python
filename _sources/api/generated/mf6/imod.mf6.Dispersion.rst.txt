@@ -17,16 +17,18 @@
       ~Dispersion.clip_box
       ~Dispersion.copy
       ~Dispersion.from_file
+      ~Dispersion.get_non_grid_data
       ~Dispersion.get_regrid_methods
+      ~Dispersion.is_clipping_supported
       ~Dispersion.is_empty
       ~Dispersion.is_grid_agnostic_package
       ~Dispersion.is_regridding_supported
+      ~Dispersion.is_splitting_supported
       ~Dispersion.isel
       ~Dispersion.mask
       ~Dispersion.regrid_like
       ~Dispersion.render
       ~Dispersion.sel
-      ~Dispersion.skip_masking_dataarray
       ~Dispersion.to_netcdf
       ~Dispersion.write
       ~Dispersion.write_binary_griddata

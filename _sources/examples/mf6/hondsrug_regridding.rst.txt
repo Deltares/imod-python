@@ -42,14 +42,13 @@ regridding are shown next.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 16-24
+.. GENERATED FROM PYTHON SOURCE LINES 16-23
 
 .. code-block:: Python
 
     import matplotlib.pyplot as plt
     import numpy as np
     import xarray as xr
-    from example_models import create_hondsrug_simulation
 
     import imod
     from imod.typing import GridDataArray
@@ -61,20 +60,71 @@ regridding are shown next.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-28
+.. GENERATED FROM PYTHON SOURCE LINES 24-27
 
 Obtain the simulation, write it, run it, and plot some heads.
 There is a separate example contained in :doc:`/examples/mf6/hondsrug`
 that you should look at if you are interested in the model building
 
-.. GENERATED FROM PYTHON SOURCE LINES 28-38
+.. GENERATED FROM PYTHON SOURCE LINES 27-31
 
 .. code-block:: Python
 
-    gwf_simulation = create_hondsrug_simulation()
+    tmpdir = imod.util.temporary_directory()
 
-    original_modeldir = imod.util.temporary_directory() / "original"
+    gwf_simulation = imod.data.hondsrug_simulation(tmpdir / "hondsrug_saved")
+
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 32-34
+
+The model was written before the xt3d_option and rhs_option arguments were
+added to iMOD Python. Set missing options to False.
+
+.. GENERATED FROM PYTHON SOURCE LINES 34-36
+
+.. code-block:: Python
+
+    gwf_simulation["GWF"]["npf"].set_xt3d_option(is_xt3d_used=False, is_rhs=False)
+
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 37-38
+
+Write simulation
+
+.. GENERATED FROM PYTHON SOURCE LINES 38-41
+
+.. code-block:: Python
+
+    original_modeldir = tmpdir / "original"
     gwf_simulation.write(original_modeldir)
+
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 42-43
+
+Run and open heads
+
+.. GENERATED FROM PYTHON SOURCE LINES 43-49
+
+.. code-block:: Python
+
     gwf_simulation.run()
     hds_original = gwf_simulation.open_head()
 
@@ -94,24 +144,20 @@ that you should look at if you are interested in the model building
 
  .. code-block:: none
 
-    D:\buildAgent\work\b1e15a22da7c0d7f\imod-python\.pixi\envs\default\Lib\site-packages\xarray\core\groupby.py:534: FutureWarning: 'A' is deprecated and will be removed in a future version, please use 'YE' instead.
-      index_grouper = pd.Grouper(
-    D:\buildAgent\work\b1e15a22da7c0d7f\imod-python\examples\mf6\example_models.py:375: UserWarning: Converting non-nanosecond precision datetime values to nanosecond precision. This behavior can eventually be relaxed in xarray, as it is an artifact from pandas which is now beginning to support non-nanosecond precision values. This warning is caused by passing non-nanosecond np.datetime64 or np.timedelta64 values to the DataArray or Variable constructor; it can be silenced by converting the values to nanosecond precision ahead of time.
-      rch_ss = rch_ss.assign_coords(time=starttime_steady)
 
-    <matplotlib.collections.QuadMesh object at 0x000002692128E1D0>
+    <matplotlib.collections.QuadMesh object at 0x0000015AAC9CB210>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 39-40
+.. GENERATED FROM PYTHON SOURCE LINES 50-51
 
 Create the target grid we will regrid to.
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-62
+.. GENERATED FROM PYTHON SOURCE LINES 51-73
 
 .. code-block:: Python
 
-    idomain = gwf_simulation["GWF_1"]["dis"]["idomain"]
+    idomain = gwf_simulation["GWF"]["dis"]["idomain"]
 
     nlay = len(idomain.coords["layer"].values)
     nrow = 50
@@ -140,12 +186,12 @@ Create the target grid we will regrid to.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 63-65
+.. GENERATED FROM PYTHON SOURCE LINES 74-76
 
 Regridding
 ==========
 
-.. GENERATED FROM PYTHON SOURCE LINES 65-78
+.. GENERATED FROM PYTHON SOURCE LINES 76-89
 
 .. code-block:: Python
 
@@ -155,7 +201,7 @@ Regridding
         "hondsrug-regridded", target_grid, validate=False
     )
 
-    regridded_modeldir = original_modeldir / ".." / "regridded"
+    regridded_modeldir = tmpdir / "regridded"
     regridded_simulation.write(regridded_modeldir, validate=False)
 
     regridded_simulation.run()
@@ -169,12 +215,12 @@ Regridding
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 79-81
+.. GENERATED FROM PYTHON SOURCE LINES 90-92
 
 Results visualization
 =====================
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-128
+.. GENERATED FROM PYTHON SOURCE LINES 92-139
 
 .. code-block:: Python
 
@@ -241,15 +287,15 @@ Results visualization
 
     summary statistics head
     ~~~~~~~~~~~~~~~~~~~~~~~~~~
-    mean (original) 5.581319897749301                    mean (regridded) 5.279009526678086
-    min (original) 0.04073443694382525                      min (regridded) 0.1824987266280732
-    max (original) 17.30898058097886                      max (regridded) 17.60210733085749
-    variance (original) 8.857501814710492                 variance (regridded) 8.826954940274549
+    mean (original) 5.581319897749301                    mean (regridded) 4.404148626603712
+    min (original) 0.04073443694382525                      min (regridded) 0.17061075128112985
+    max (original) 17.30898058097886                      max (regridded) 12.600521120032152
+    variance (original) 8.857501814710492                 variance (regridded) 4.650317522208325
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 129-136
+.. GENERATED FROM PYTHON SOURCE LINES 140-147
 
 Comparison with histograms
 ==========================
@@ -259,7 +305,7 @@ We advice to always check how your input is regridded. In this example we upscal
 many input parameters are regridded with a ``mean`` method. This means that their input
 range is reduced, which can be seen in tailings in the histograms becoming shorter.
 
-.. GENERATED FROM PYTHON SOURCE LINES 136-141
+.. GENERATED FROM PYTHON SOURCE LINES 147-152
 
 .. code-block:: Python
 
@@ -280,17 +326,17 @@ range is reduced, which can be seen in tailings in the histograms becoming short
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 142-143
+.. GENERATED FROM PYTHON SOURCE LINES 153-154
 
 Compare constant head arrays.
 
-.. GENERATED FROM PYTHON SOURCE LINES 143-149
+.. GENERATED FROM PYTHON SOURCE LINES 154-160
 
 .. code-block:: Python
 
     plot_histograms_side_by_side(
-        gwf_simulation["GWF_1"]["chd"].dataset["head"],
-        regridded_simulation["GWF_1"]["chd"].dataset["head"],
+        gwf_simulation["GWF"]["chd"].dataset["head"],
+        regridded_simulation["GWF"]["chd"].dataset["head"],
         "chd head",
     )
 
@@ -306,17 +352,17 @@ Compare constant head arrays.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 150-151
+.. GENERATED FROM PYTHON SOURCE LINES 161-162
 
 Compare horizontal hydraulic conductivities.
 
-.. GENERATED FROM PYTHON SOURCE LINES 151-156
+.. GENERATED FROM PYTHON SOURCE LINES 162-167
 
 .. code-block:: Python
 
     plot_histograms_side_by_side(
-        gwf_simulation["GWF_1"]["npf"].dataset["k"],
-        regridded_simulation["GWF_1"]["npf"].dataset["k"],
+        gwf_simulation["GWF"]["npf"].dataset["k"],
+        regridded_simulation["GWF"]["npf"].dataset["k"],
         "npf k",
     )
 
@@ -331,17 +377,17 @@ Compare horizontal hydraulic conductivities.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 157-158
+.. GENERATED FROM PYTHON SOURCE LINES 168-169
 
 Compare vertical hydraulic conductivities.
 
-.. GENERATED FROM PYTHON SOURCE LINES 158-163
+.. GENERATED FROM PYTHON SOURCE LINES 169-174
 
 .. code-block:: Python
 
     plot_histograms_side_by_side(
-        gwf_simulation["GWF_1"]["npf"].dataset["k33"],
-        regridded_simulation["GWF_1"]["npf"].dataset["k33"],
+        gwf_simulation["GWF"]["npf"].dataset["k33"],
+        regridded_simulation["GWF"]["npf"].dataset["k33"],
         "npf k33",
     )
 
@@ -356,17 +402,17 @@ Compare vertical hydraulic conductivities.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 164-165
+.. GENERATED FROM PYTHON SOURCE LINES 175-176
 
 Compare starting heads.
 
-.. GENERATED FROM PYTHON SOURCE LINES 165-171
+.. GENERATED FROM PYTHON SOURCE LINES 176-182
 
 .. code-block:: Python
 
     plot_histograms_side_by_side(
-        gwf_simulation["GWF_1"]["ic"].dataset["start"],
-        regridded_simulation["GWF_1"]["ic"].dataset["start"],
+        gwf_simulation["GWF"]["ic"].dataset["start"],
+        regridded_simulation["GWF"]["ic"].dataset["start"],
         "ic start",
     )
 
@@ -382,17 +428,17 @@ Compare starting heads.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 172-173
+.. GENERATED FROM PYTHON SOURCE LINES 183-184
 
 Compare river stages.
 
-.. GENERATED FROM PYTHON SOURCE LINES 173-179
+.. GENERATED FROM PYTHON SOURCE LINES 184-190
 
 .. code-block:: Python
 
     plot_histograms_side_by_side(
-        gwf_simulation["GWF_1"]["riv"].dataset["stage"],
-        regridded_simulation["GWF_1"]["riv"].dataset["stage"],
+        gwf_simulation["GWF"]["riv"].dataset["stage"],
+        regridded_simulation["GWF"]["riv"].dataset["stage"],
         "riv stage",
     )
 
@@ -408,17 +454,17 @@ Compare river stages.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 180-181
+.. GENERATED FROM PYTHON SOURCE LINES 191-192
 
 Compare river bottom elevations.
 
-.. GENERATED FROM PYTHON SOURCE LINES 181-187
+.. GENERATED FROM PYTHON SOURCE LINES 192-198
 
 .. code-block:: Python
 
     plot_histograms_side_by_side(
-        gwf_simulation["GWF_1"]["riv"].dataset["bottom_elevation"],
-        regridded_simulation["GWF_1"]["riv"].dataset["bottom_elevation"],
+        gwf_simulation["GWF"]["riv"].dataset["bottom_elevation"],
+        regridded_simulation["GWF"]["riv"].dataset["bottom_elevation"],
         "riv bottom elevation",
     )
 
@@ -434,17 +480,17 @@ Compare river bottom elevations.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 188-189
+.. GENERATED FROM PYTHON SOURCE LINES 199-200
 
 Compare riverbed conductance.
 
-.. GENERATED FROM PYTHON SOURCE LINES 189-195
+.. GENERATED FROM PYTHON SOURCE LINES 200-206
 
 .. code-block:: Python
 
     plot_histograms_side_by_side(
-        gwf_simulation["GWF_1"]["riv"].dataset["conductance"],
-        regridded_simulation["GWF_1"]["riv"].dataset["conductance"],
+        gwf_simulation["GWF"]["riv"].dataset["conductance"],
+        regridded_simulation["GWF"]["riv"].dataset["conductance"],
         "riv conductance",
     )
 
@@ -460,17 +506,17 @@ Compare riverbed conductance.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 196-197
+.. GENERATED FROM PYTHON SOURCE LINES 207-208
 
 Compare recharge rates.
 
-.. GENERATED FROM PYTHON SOURCE LINES 197-203
+.. GENERATED FROM PYTHON SOURCE LINES 208-214
 
 .. code-block:: Python
 
     plot_histograms_side_by_side(
-        gwf_simulation["GWF_1"]["rch"].dataset["rate"],
-        regridded_simulation["GWF_1"]["rch"].dataset["rate"],
+        gwf_simulation["GWF"]["rch"].dataset["rate"],
+        regridded_simulation["GWF"]["rch"].dataset["rate"],
         "rch rate",
     )
 
@@ -486,17 +532,17 @@ Compare recharge rates.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 204-205
+.. GENERATED FROM PYTHON SOURCE LINES 215-216
 
 Compare drainage elevations.
 
-.. GENERATED FROM PYTHON SOURCE LINES 205-211
+.. GENERATED FROM PYTHON SOURCE LINES 216-222
 
 .. code-block:: Python
 
     plot_histograms_side_by_side(
-        gwf_simulation["GWF_1"]["drn-pipe"].dataset["elevation"],
-        regridded_simulation["GWF_1"]["drn-pipe"].dataset["elevation"],
+        gwf_simulation["GWF"]["drn-pipe"].dataset["elevation"],
+        regridded_simulation["GWF"]["drn-pipe"].dataset["elevation"],
         "drn-pipe elevation",
     )
 
@@ -512,17 +558,17 @@ Compare drainage elevations.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 212-213
+.. GENERATED FROM PYTHON SOURCE LINES 223-224
 
 Compare drain conductances.
 
-.. GENERATED FROM PYTHON SOURCE LINES 213-218
+.. GENERATED FROM PYTHON SOURCE LINES 224-229
 
 .. code-block:: Python
 
     plot_histograms_side_by_side(
-        gwf_simulation["GWF_1"]["drn-pipe"].dataset["conductance"],
-        regridded_simulation["GWF_1"]["drn-pipe"].dataset["conductance"],
+        gwf_simulation["GWF"]["drn-pipe"].dataset["conductance"],
+        regridded_simulation["GWF"]["drn-pipe"].dataset["conductance"],
         "drn-pipe conductance",
     )
 
@@ -540,7 +586,7 @@ Compare drain conductances.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 59.271 seconds)
+   **Total running time of the script:** (1 minutes 56.881 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_hondsrug_regridding.py:

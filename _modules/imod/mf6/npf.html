@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.npf &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>imod.mf6.npf &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -449,14 +449,19 @@ document.write(`
                   
   <h1>Source code for imod.mf6.npf</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
+<span class="kn">from</span> <span class="nn">imod.logging</span> <span class="kn">import</span> <span class="n">init_log_decorator</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.interfaces.iregridpackage</span> <span class="kn">import</span> <span class="n">IRegridPackage</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.package</span> <span class="kn">import</span> <span class="n">Package</span>
-<span class="kn">from</span> <span class="nn">imod.mf6.regridding_utils</span> <span class="kn">import</span> <span class="n">RegridderType</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.utilities.regrid</span> <span class="kn">import</span> <span class="n">RegridderType</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.validation</span> <span class="kn">import</span> <span class="n">PKG_DIMS_SCHEMA</span>
 <span class="kn">from</span> <span class="nn">imod.schemata</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AllValueSchema</span><span class="p">,</span>
+    <span class="n">CompatibleSettingsSchema</span><span class="p">,</span>
+    <span class="n">DimsSchema</span><span class="p">,</span>
     <span class="n">DTypeSchema</span><span class="p">,</span>
     <span class="n">IdentityNoDataSchema</span><span class="p">,</span>
     <span class="n">IndexesSchema</span><span class="p">,</span>
@@ -469,19 +474,15 @@ document.write(`
         <span class="k">return</span> <span class="kc">False</span>
 
     <span class="k">if</span> <span class="n">griddataarray</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;DataArray is not a single value&quot;</span>
-        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;DataArray is not a single value&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">griddataarray</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;DataArray is not a boolean&quot;</span>
-        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;DataArray is not a boolean&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">griddataarray</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="NodePropertyFlow"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.NodePropertyFlow.html#imod.mf6.NodePropertyFlow">[docs]</a><span class="k">class</span> <span class="nc">NodePropertyFlow</span><span class="p">(</span><span class="n">Package</span><span class="p">):</span>
+<div class="viewcode-block" id="NodePropertyFlow"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.NodePropertyFlow.html#imod.mf6.NodePropertyFlow">[docs]</a><span class="k">class</span> <span class="nc">NodePropertyFlow</span><span class="p">(</span><span class="n">Package</span><span class="p">,</span> <span class="n">IRegridPackage</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Node Property Flow package.</span>
 
@@ -723,13 +724,22 @@ document.write(`
             <span class="n">IndexesSchema</span><span class="p">(),</span>
             <span class="n">PKG_DIMS_SCHEMA</span><span class="p">,</span>
         <span class="p">],</span>
-        <span class="s2">&quot;alternative_cell_averaging&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="nb">str</span><span class="p">)],</span>
-        <span class="s2">&quot;save_flows&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)],</span>
+        <span class="s2">&quot;alternative_cell_averaging&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="n">DTypeSchema</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span>
+            <span class="n">DimsSchema</span><span class="p">(),</span>
+            <span class="n">CompatibleSettingsSchema</span><span class="p">(</span><span class="s2">&quot;xt3d_option&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;rhs_option&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span>
+            <span class="n">DimsSchema</span><span class="p">(),</span>
+            <span class="n">CompatibleSettingsSchema</span><span class="p">(</span><span class="s2">&quot;xt3d_option&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;save_flows&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span> <span class="n">DimsSchema</span><span class="p">()],</span>
         <span class="s2">&quot;starting_head_as_confined_thickness&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)],</span>
         <span class="s2">&quot;variable_vertical_conductance&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)],</span>
         <span class="s2">&quot;dewatered&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)],</span>
         <span class="s2">&quot;perched&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)],</span>
-        <span class="s2">&quot;save_specific_discharge&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)],</span>
+        <span class="s2">&quot;save_specific_discharge&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span> <span class="n">DimsSchema</span><span class="p">()],</span>
     <span class="p">}</span>
 
     <span class="n">_write_schemata</span> <span class="o">=</span> <span class="p">{</span>
@@ -795,7 +805,8 @@ document.write(`
         <span class="s2">&quot;rewet_layer&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">RegridderType</span><span class="o">.</span><span class="n">OVERLAP</span><span class="p">,</span> <span class="s2">&quot;mean&quot;</span><span class="p">),</span>
     <span class="p">}</span>
 
-<div class="viewcode-block" id="NodePropertyFlow.__init__"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.NodePropertyFlow.html#imod.mf6.NodePropertyFlow.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="nd">@init_log_decorator</span><span class="p">()</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">icelltype</span><span class="p">,</span>
         <span class="n">k</span><span class="p">,</span>
@@ -862,7 +873,7 @@ document.write(`
             <span class="s2">&quot;rhs_option&quot;</span><span class="p">:</span> <span class="n">rhs_option</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dict_dataset</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_xt3d_option</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -889,7 +900,17 @@ document.write(`
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the &quot;dewatered&quot; option value for this object. Used only when variable_vertical_conductance is true</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_dataarray_to_bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;dewatered&quot;</span><span class="p">])</span></div>
+        <span class="k">return</span> <span class="n">_dataarray_to_bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;dewatered&quot;</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schemata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># Insert additional kwargs</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;xt3d_option&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;xt3d_option&quot;</span><span class="p">]</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_validate</span><span class="p">(</span><span class="n">schemata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">errors</span>
+
+    <span class="k">def</span> <span class="nf">get_regrid_methods</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">RegridderType</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regrid_method</span></div>
 </pre></div>
 
                 </article>

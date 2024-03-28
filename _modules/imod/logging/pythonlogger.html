@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.logging.pythonlogger &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>imod.logging.pythonlogger &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -461,6 +461,21 @@ document.write(`
     <span class="p">)</span>
 
 
+<span class="k">def</span> <span class="nf">_stack_level</span><span class="p">(</span><span class="n">additional_depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The stack level is used to print the file and line number of the line being logged.</span>
+<span class="sd">    Because there are a few layers between the place where the imod logger is used and</span>
+<span class="sd">    the place where the pyton logger is used we need to set a custom stack level.</span>
+
+<span class="sd">    An additional_depth can be provided to add to this default stack level.</span>
+<span class="sd">    This is useful when a decorator is added which introduces an additional level between</span>
+<span class="sd">    the imod logger and the python logger.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">default_stack_level</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="k">return</span> <span class="n">default_stack_level</span> <span class="o">+</span> <span class="n">additional_depth</span>
+
+
 <div class="viewcode-block" id="PythonLogger"><a class="viewcode-back" href="../../../api/generated/logging/imod.logging.pythonlogger.PythonLogger.html#imod.logging.pythonlogger.PythonLogger">[docs]</a><span class="k">class</span> <span class="nc">PythonLogger</span><span class="p">(</span><span class="n">ILogger</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The :class:`PythonLogger` is used to log messages using the default python logging framework.</span>
@@ -480,20 +495,20 @@ document.write(`
         <span class="k">if</span> <span class="n">add_default_file_handler</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_add_file_handler</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="PythonLogger.debug"><a class="viewcode-back" href="../../../api/generated/logging/imod.logging.pythonlogger.PythonLogger.html#imod.logging.pythonlogger.PythonLogger.debug">[docs]</a>    <span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span></div>
+<div class="viewcode-block" id="PythonLogger.debug"><a class="viewcode-back" href="../../../api/generated/logging/imod.logging.pythonlogger.PythonLogger.html#imod.logging.pythonlogger.PythonLogger.debug">[docs]</a>    <span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">additional_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="n">_stack_level</span><span class="p">(</span><span class="n">additional_depth</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="PythonLogger.info"><a class="viewcode-back" href="../../../api/generated/logging/imod.logging.pythonlogger.PythonLogger.html#imod.logging.pythonlogger.PythonLogger.info">[docs]</a>    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span></div>
+<div class="viewcode-block" id="PythonLogger.info"><a class="viewcode-back" href="../../../api/generated/logging/imod.logging.pythonlogger.PythonLogger.html#imod.logging.pythonlogger.PythonLogger.info">[docs]</a>    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">additional_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="n">_stack_level</span><span class="p">(</span><span class="n">additional_depth</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="PythonLogger.warning"><a class="viewcode-back" href="../../../api/generated/logging/imod.logging.pythonlogger.PythonLogger.html#imod.logging.pythonlogger.PythonLogger.warning">[docs]</a>    <span class="k">def</span> <span class="nf">warning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span></div>
+<div class="viewcode-block" id="PythonLogger.warning"><a class="viewcode-back" href="../../../api/generated/logging/imod.logging.pythonlogger.PythonLogger.html#imod.logging.pythonlogger.PythonLogger.warning">[docs]</a>    <span class="k">def</span> <span class="nf">warning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">additional_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="n">_stack_level</span><span class="p">(</span><span class="n">additional_depth</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="PythonLogger.error"><a class="viewcode-back" href="../../../api/generated/logging/imod.logging.pythonlogger.PythonLogger.html#imod.logging.pythonlogger.PythonLogger.error">[docs]</a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span></div>
+<div class="viewcode-block" id="PythonLogger.error"><a class="viewcode-back" href="../../../api/generated/logging/imod.logging.pythonlogger.PythonLogger.html#imod.logging.pythonlogger.PythonLogger.error">[docs]</a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">additional_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="n">_stack_level</span><span class="p">(</span><span class="n">additional_depth</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="PythonLogger.critical"><a class="viewcode-back" href="../../../api/generated/logging/imod.logging.pythonlogger.PythonLogger.html#imod.logging.pythonlogger.PythonLogger.critical">[docs]</a>    <span class="k">def</span> <span class="nf">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span></div>
+<div class="viewcode-block" id="PythonLogger.critical"><a class="viewcode-back" href="../../../api/generated/logging/imod.logging.pythonlogger.PythonLogger.html#imod.logging.pythonlogger.PythonLogger.critical">[docs]</a>    <span class="k">def</span> <span class="nf">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">additional_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="n">_stack_level</span><span class="p">(</span><span class="n">additional_depth</span><span class="p">))</span></div>
 
     <span class="k">def</span> <span class="nf">_set_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_level</span><span class="p">:</span> <span class="n">LogLevel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">log_level</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>

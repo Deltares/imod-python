@@ -17,16 +17,18 @@
       ~OutputControl.clip_box
       ~OutputControl.copy
       ~OutputControl.from_file
+      ~OutputControl.get_non_grid_data
       ~OutputControl.get_regrid_methods
+      ~OutputControl.is_clipping_supported
       ~OutputControl.is_empty
       ~OutputControl.is_grid_agnostic_package
       ~OutputControl.is_regridding_supported
+      ~OutputControl.is_splitting_supported
       ~OutputControl.isel
       ~OutputControl.mask
       ~OutputControl.regrid_like
       ~OutputControl.render
       ~OutputControl.sel
-      ~OutputControl.skip_masking_dataarray
       ~OutputControl.to_netcdf
       ~OutputControl.write
       ~OutputControl.write_binary_griddata

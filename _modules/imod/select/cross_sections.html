@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.select.cross_sections &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>imod.select.cross_sections &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -453,7 +453,7 @@ document.write(`
 <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
 
 <span class="kn">import</span> <span class="nn">imod</span>
-<span class="kn">from</span> <span class="nn">imod.util</span> <span class="kn">import</span> <span class="n">MissingOptionalModule</span>
+<span class="kn">from</span> <span class="nn">imod.util.imports</span> <span class="kn">import</span> <span class="n">MissingOptionalModule</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">shapely.geometry</span> <span class="k">as</span> <span class="nn">sg</span>
@@ -701,7 +701,7 @@ document.write(`
 
 
 <span class="k">def</span> <span class="nf">_cross_section</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">linecoords</span><span class="p">):</span>
-    <span class="n">dx</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial_reference</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">dx</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">spatial_reference</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
         <span class="n">dx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dy</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
@@ -823,7 +823,7 @@ document.write(`
 <span class="sd">        cross-section. The cellsizes along &quot;s&quot; are given in the &quot;ds&quot; coordinate.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Check for intersection</span>
-    <span class="n">_</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial_reference</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">spatial_reference</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="n">bounding_box</span> <span class="o">=</span> <span class="n">_bounding_box</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">sg</span><span class="o">.</span><span class="n">LineString</span><span class="p">([</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">])</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">bounding_box</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Line does not intersect data&quot;</span><span class="p">)</span>

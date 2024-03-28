@@ -17,17 +17,19 @@
       ~WellDisStructured.clip_box
       ~WellDisStructured.copy
       ~WellDisStructured.from_file
+      ~WellDisStructured.get_non_grid_data
       ~WellDisStructured.get_period_varnames
-      ~WellDisStructured.get_regrid_methods
+      ~WellDisStructured.is_clipping_supported
       ~WellDisStructured.is_empty
       ~WellDisStructured.is_grid_agnostic_package
       ~WellDisStructured.is_regridding_supported
+      ~WellDisStructured.is_splitting_supported
       ~WellDisStructured.isel
       ~WellDisStructured.mask
       ~WellDisStructured.regrid_like
       ~WellDisStructured.render
       ~WellDisStructured.sel
-      ~WellDisStructured.skip_masking_dataarray
+      ~WellDisStructured.set_repeat_stress
       ~WellDisStructured.to_netcdf
       ~WellDisStructured.write
       ~WellDisStructured.write_binary_griddata

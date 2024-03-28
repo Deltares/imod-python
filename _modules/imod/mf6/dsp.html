@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.dsp &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>imod.mf6.dsp &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -448,14 +448,25 @@ document.write(`
                 <article class="bd-article">
                   
   <h1>Source code for imod.mf6.dsp</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">imod.logging</span> <span class="kn">import</span> <span class="n">init_log_decorator</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.interfaces.iregridpackage</span> <span class="kn">import</span> <span class="n">IRegridPackage</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.package</span> <span class="kn">import</span> <span class="n">Package</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.utilities.regrid</span> <span class="kn">import</span> <span class="n">RegridderType</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.validation</span> <span class="kn">import</span> <span class="n">PKG_DIMS_SCHEMA</span>
-<span class="kn">from</span> <span class="nn">imod.schemata</span> <span class="kn">import</span> <span class="n">DTypeSchema</span><span class="p">,</span> <span class="n">IdentityNoDataSchema</span><span class="p">,</span> <span class="n">IndexesSchema</span>
+<span class="kn">from</span> <span class="nn">imod.schemata</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CompatibleSettingsSchema</span><span class="p">,</span>
+    <span class="n">DimsSchema</span><span class="p">,</span>
+    <span class="n">DTypeSchema</span><span class="p">,</span>
+    <span class="n">IdentityNoDataSchema</span><span class="p">,</span>
+    <span class="n">IndexesSchema</span><span class="p">,</span>
+<span class="p">)</span>
 
 
-<div class="viewcode-block" id="Dispersion"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Dispersion.html#imod.mf6.Dispersion">[docs]</a><span class="k">class</span> <span class="nc">Dispersion</span><span class="p">(</span><span class="n">Package</span><span class="p">):</span>
+<div class="viewcode-block" id="Dispersion"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Dispersion.html#imod.mf6.Dispersion">[docs]</a><span class="k">class</span> <span class="nc">Dispersion</span><span class="p">(</span><span class="n">Package</span><span class="p">,</span> <span class="n">IRegridPackage</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Molecular Diffusion and Dispersion.</span>
 
@@ -558,8 +569,12 @@ document.write(`
             <span class="n">IndexesSchema</span><span class="p">(),</span>
             <span class="n">PKG_DIMS_SCHEMA</span><span class="p">,</span>
         <span class="p">],</span>
-        <span class="s2">&quot;xt3d_off&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)],</span>
-        <span class="s2">&quot;xt3d_rhs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)],</span>
+        <span class="s2">&quot;xt3d_off&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span> <span class="n">DimsSchema</span><span class="p">()],</span>
+        <span class="s2">&quot;xt3d_rhs&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">),</span>
+            <span class="n">DimsSchema</span><span class="p">(),</span>
+            <span class="n">CompatibleSettingsSchema</span><span class="p">(</span><span class="n">other</span><span class="o">=</span><span class="s2">&quot;xt3d_off&quot;</span><span class="p">,</span> <span class="n">other_value</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="p">],</span>
     <span class="p">}</span>
 
     <span class="n">_write_schemata</span> <span class="o">=</span> <span class="p">{</span>
@@ -583,7 +598,23 @@ document.write(`
         <span class="p">),</span>
     <span class="p">}</span>
 
-<div class="viewcode-block" id="Dispersion.__init__"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Dispersion.html#imod.mf6.Dispersion.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="n">_regrid_method</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;diffusion_coefficient&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">RegridderType</span><span class="o">.</span><span class="n">OVERLAP</span><span class="p">,</span> <span class="s2">&quot;mean&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;longitudinal_horizontal&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">RegridderType</span><span class="o">.</span><span class="n">OVERLAP</span><span class="p">,</span> <span class="s2">&quot;mean&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;transversal_horizontal1&quot;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">RegridderType</span><span class="o">.</span><span class="n">OVERLAP</span><span class="p">,</span>
+            <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;longitudinal_vertical&quot;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">RegridderType</span><span class="o">.</span><span class="n">OVERLAP</span><span class="p">,</span>
+            <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;transversal_horizontal2&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">RegridderType</span><span class="o">.</span><span class="n">OVERLAP</span><span class="p">,</span> <span class="s2">&quot;mean&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;transversal_vertical&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">RegridderType</span><span class="o">.</span><span class="n">OVERLAP</span><span class="p">,</span> <span class="s2">&quot;mean&quot;</span><span class="p">),</span>
+    <span class="p">}</span>
+
+    <span class="nd">@init_log_decorator</span><span class="p">()</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">diffusion_coefficient</span><span class="p">,</span>
         <span class="n">longitudinal_horizontal</span><span class="p">,</span>
@@ -606,7 +637,17 @@ document.write(`
             <span class="s2">&quot;transversal_vertical&quot;</span><span class="p">:</span> <span class="n">transversal_vertical</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dict_dataset</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schemata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># Insert additional kwargs</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;xt3d_off&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;xt3d_off&quot;</span><span class="p">]</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_validate</span><span class="p">(</span><span class="n">schemata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">errors</span>
+
+    <span class="k">def</span> <span class="nf">get_regrid_methods</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">RegridderType</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regrid_method</span></div>
 </pre></div>
 
                 </article>

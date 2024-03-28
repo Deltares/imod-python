@@ -31,7 +31,9 @@ Model objects & methods
     Modflow6Simulation.split
     Modflow6Simulation.regrid_like
     GroundwaterFlowModel
+    GroundwaterFlowModel.mask_all_packages     
     GroundwaterTransportModel
+    GroundwaterTransportModel.mask_all_packages
 
 Discretization
 --------------

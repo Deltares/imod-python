@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Lake package example &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>Lake package example &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -49,7 +49,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/mf6/lake';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="iMODFLOW" href="../imodflow/index.html" />
+    <link rel="next" title="Transport 2d example" href="transport_2d.html" />
     <link rel="prev" title="Regridding a regional model" href="hondsrug_regridding.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -125,8 +125,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -411,7 +411,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="circle.html">Circle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="circle_partitioned.html">Circle partitioned</a></li>
 <li class="toctree-l2"><a class="reference internal" href="circle_transport.html">Freshwater lens (circle)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="different_ways_to_regrid_models.html">Diffferent ways to regrid models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="different_ways_to_regrid_models.html">Different ways to regrid models</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ex01_twri.html">TWRI</a></li>
 <li class="toctree-l2"><a class="reference internal" href="example_1d_transport.html">1D Solute Transport Benchmarks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="example_models.html">Example models</a></li>
@@ -432,6 +432,7 @@ document.write(`
 
 
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Lake package example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transport_2d.html">Transport 2d example</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../imodflow/index.html">iMODFLOW</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -583,7 +584,7 @@ structured model, we can make due with few packages.</p>
 <span class="n">is_lake</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">imshow</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_lake_001.png" srcset="../../_images/sphx_glr_lake_001.png" alt="layer = 1" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x000002692314CB10&gt;
+<img src="../../_images/sphx_glr_lake_001.png" srcset="../../_images/sphx_glr_lake_001.png" alt="layer = 1" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x0000015AACE40650&gt;
 </pre></div>
 </div>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">VERTICAL</span> <span class="o">=</span> <span class="mi">1</span>
@@ -627,7 +628,7 @@ structured model, we can make due with few packages.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>D:\buildAgent\work\b1e15a22da7c0d7f\imod-python\examples\mf6\lake.py:74: UserWarning: Converting non-nanosecond precision datetime values to nanosecond precision. This behavior can eventually be relaxed in xarray, as it is an artifact from pandas which is now beginning to support non-nanosecond precision values. This warning is caused by passing non-nanosecond np.datetime64 or np.timedelta64 values to the DataArray or Variable constructor; it can be silenced by converting the values to nanosecond precision ahead of time.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>D:\buildAgent\work\4b9080cbb3354582\imod-python\examples\mf6\lake.py:74: UserWarning: Converting non-nanosecond precision datetime values to nanosecond precision. This behavior can eventually be relaxed in xarray, as it is an artifact from pandas which is now beginning to support non-nanosecond precision values. This warning is caused by passing non-nanosecond np.datetime64 or np.timedelta64 values to the DataArray or Variable constructor; it can be silenced by converting the values to nanosecond precision ahead of time.
   rainfall = xr.DataArray(
 </pre></div>
 </div>
@@ -726,7 +727,7 @@ parameters. The model is characterized by:</p>
 <span class="n">simulation</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">modeldir</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>D:\buildAgent\work\b1e15a22da7c0d7f\imod-python\imod\mf6\lak.py:1043: UserWarning: The `squeeze` kwarg to GroupBy is being removed.Pass .groupby(..., squeeze=False) to disable squeezing, which is the new default, and to silence this warning.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\lak.py:1045: UserWarning: The `squeeze` kwarg to GroupBy is being removed.Pass .groupby(..., squeeze=False) to disable squeezing, which is the new default, and to silence this warning.
   for iperiod, (_, period_data) in zip(
 </pre></div>
 </div>
@@ -758,10 +759,10 @@ describes how to add it to yours.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">head</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contourf</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_lake_002.png" srcset="../../_images/sphx_glr_lake_002.png" alt="dx = 5e+03, dy = -5e+03, layer = 1, time = 4.90..." class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x0000026923D46310&gt;
+<img src="../../_images/sphx_glr_lake_002.png" srcset="../../_images/sphx_glr_lake_002.png" alt="dx = 5e+03, dy = -5e+03, layer = 1, time = 4.90..." class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x0000015AAAFE1F10&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.711 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.722 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-lake-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/3e561bea3b8b74fe958e91a442daed49/lake.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">lake.ipynb</span></code></a></p>
@@ -794,11 +795,11 @@ describes how to add it to yours.</p>
       </div>
     </a>
     <a class="right-next"
-       href="../imodflow/index.html"
+       href="transport_2d.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">iMODFLOW</p>
+        <p class="prev-next-title">Transport 2d example</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

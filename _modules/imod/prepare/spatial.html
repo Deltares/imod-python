@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.prepare.spatial &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>imod.prepare.spatial &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -460,7 +460,7 @@ document.write(`
 
 <span class="kn">import</span> <span class="nn">imod</span>
 <span class="kn">from</span> <span class="nn">imod.prepare</span> <span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">pcg</span>
-<span class="kn">from</span> <span class="nn">imod.util</span> <span class="kn">import</span> <span class="n">MissingOptionalModule</span>
+<span class="kn">from</span> <span class="nn">imod.util.imports</span> <span class="kn">import</span> <span class="n">MissingOptionalModule</span>
 
 <span class="c1"># since rasterio is a big dependency that is sometimes hard to install</span>
 <span class="c1"># and not always required, we made this an optional dependency</span>
@@ -695,7 +695,7 @@ document.write(`
         <span class="n">shapes</span><span class="p">,</span>
         <span class="n">out_shape</span><span class="o">=</span><span class="n">like</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
         <span class="n">fill</span><span class="o">=</span><span class="n">fill</span><span class="p">,</span>
-        <span class="n">transform</span><span class="o">=</span><span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">like</span><span class="p">),</span>
+        <span class="n">transform</span><span class="o">=</span><span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">like</span><span class="p">),</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -724,7 +724,7 @@ document.write(`
     <span class="k">if</span> <span class="n">values</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
         <span class="n">values</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 
-    <span class="n">transform</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">da</span><span class="p">)</span>
+    <span class="n">transform</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">da</span><span class="p">)</span>
     <span class="n">shapes</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">shapes</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
 
     <span class="n">geometries</span> <span class="o">=</span> <span class="p">[]</span>
@@ -871,7 +871,7 @@ document.write(`
 
     <span class="c1"># Get spatial data from template</span>
     <span class="k">if</span> <span class="n">like</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">dx</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial_reference</span><span class="p">(</span><span class="n">like</span><span class="p">)</span>
+        <span class="n">dx</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">spatial_reference</span><span class="p">(</span><span class="n">like</span><span class="p">)</span>
         <span class="n">nrow</span><span class="p">,</span> <span class="n">ncol</span> <span class="o">=</span> <span class="n">like</span><span class="o">.</span><span class="n">shape</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">cellsizes</span> <span class="o">=</span> <span class="n">spatial_reference</span><span class="p">[</span><span class="s2">&quot;cellsizes&quot;</span><span class="p">]</span>
@@ -879,7 +879,7 @@ document.write(`
         <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">cellsizes</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dy</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot rasterize to a non-equidistant grid&quot;</span><span class="p">)</span>
-        <span class="n">coords</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">_xycoords</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">cellsizes</span><span class="p">)</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">_xycoords</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">cellsizes</span><span class="p">)</span>
         <span class="n">xmin</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">bounds</span>
         <span class="n">nrow</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
         <span class="n">ncol</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
@@ -1038,7 +1038,7 @@ document.write(`
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Avoid side-effects</span>
     <span class="n">like</span> <span class="o">=</span> <span class="n">like</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">_</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial_reference</span><span class="p">(</span><span class="n">like</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">spatial_reference</span><span class="p">(</span><span class="n">like</span><span class="p">)</span>
     <span class="n">dx</span> <span class="o">=</span> <span class="n">resolution</span>
     <span class="n">dy</span> <span class="o">=</span> <span class="o">-</span><span class="n">dx</span>
     <span class="n">nodata</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
@@ -1101,7 +1101,7 @@ document.write(`
 <span class="sd">    chunks : list of xr.DataArray</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">_</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial_reference</span><span class="p">(</span><span class="n">like</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">spatial_reference</span><span class="p">(</span><span class="n">like</span><span class="p">)</span>
     <span class="c1"># Compute how many rows and columns are necessary for fine resolution</span>
     <span class="n">nrow</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">ymax</span> <span class="o">-</span> <span class="n">ymin</span><span class="p">)</span> <span class="o">/</span> <span class="n">resolution</span><span class="p">)</span>
     <span class="n">ncol</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">xmax</span> <span class="o">-</span> <span class="n">xmin</span><span class="p">)</span> <span class="o">/</span> <span class="n">resolution</span><span class="p">)</span>
@@ -1236,10 +1236,10 @@ document.write(`
 <span class="sd">        )</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">dx</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial_reference</span><span class="p">(</span><span class="n">like</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">is_divisor</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">resolution</span><span class="p">):</span>
+    <span class="n">dx</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">spatial_reference</span><span class="p">(</span><span class="n">like</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">is_divisor</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">resolution</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;resolution is not an (integer) divisor of dx&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">is_divisor</span><span class="p">(</span><span class="n">dy</span><span class="p">,</span> <span class="n">resolution</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">is_divisor</span><span class="p">(</span><span class="n">dy</span><span class="p">,</span> <span class="n">resolution</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;resolution is not an (integer) divisor of dy&quot;</span><span class="p">)</span>
 
     <span class="n">like_chunks</span><span class="p">,</span> <span class="n">rowstarts</span><span class="p">,</span> <span class="n">colstarts</span> <span class="o">=</span> <span class="n">_create_chunks</span><span class="p">(</span><span class="n">like</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">chunksize</span><span class="p">)</span>
@@ -1312,7 +1312,9 @@ document.write(`
 <span class="sd">    * Sample the raster at the rasterized polygon cells</span>
 <span class="sd">    * Store both in a dataframe, groupby and aggregate according to `method`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">data_dx</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">data_dy</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial_reference</span><span class="p">(</span><span class="n">raster</span><span class="p">)</span>
+    <span class="n">data_dx</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">data_dy</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">spatial_reference</span><span class="p">(</span>
+        <span class="n">raster</span>
+    <span class="p">)</span>
     <span class="n">dx</span> <span class="o">=</span> <span class="n">resolution</span>
     <span class="n">dy</span> <span class="o">=</span> <span class="o">-</span><span class="n">dx</span>
     <span class="n">nodata</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
@@ -1369,7 +1371,7 @@ document.write(`
 <span class="sd">    * Rasterize a, rasterize b for the same domain</span>
 <span class="sd">    * Store both in a dataframe, groupby and aggregate according to `method`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial_reference</span><span class="p">(</span><span class="n">like</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">spatial_reference</span><span class="p">(</span><span class="n">like</span><span class="p">)</span>
     <span class="n">dx</span> <span class="o">=</span> <span class="n">resolution</span>
     <span class="n">dy</span> <span class="o">=</span> <span class="o">-</span><span class="n">dx</span>
     <span class="n">nodata</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
@@ -1467,10 +1469,10 @@ document.write(`
 <span class="sd">    &gt;&gt;&gt;    method=pd.Series.mode,</span>
 <span class="sd">    &gt;&gt;&gt; )</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">dx</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial_reference</span><span class="p">(</span><span class="n">raster</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">is_divisor</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">resolution</span><span class="p">):</span>
+    <span class="n">dx</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">spatial_reference</span><span class="p">(</span><span class="n">raster</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">is_divisor</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">resolution</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;resolution is not an (integer) divisor of dx&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">is_divisor</span><span class="p">(</span><span class="n">dy</span><span class="p">,</span> <span class="n">resolution</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">is_divisor</span><span class="p">(</span><span class="n">dy</span><span class="p">,</span> <span class="n">resolution</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;resolution is not an (integer) divisor of dy&quot;</span><span class="p">)</span>
 
     <span class="n">without_chunks</span> <span class="o">=</span> <span class="p">(</span><span class="n">raster</span><span class="o">.</span><span class="n">chunks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
@@ -1528,10 +1530,10 @@ document.write(`
 <span class="sd">    -------</span>
 <span class="sd">    zonal_aggregates: pandas.DataFrame</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">dx</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial_reference</span><span class="p">(</span><span class="n">like</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">is_divisor</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">resolution</span><span class="p">):</span>
+    <span class="n">dx</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">spatial_reference</span><span class="p">(</span><span class="n">like</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">is_divisor</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">resolution</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;resolution is not an (integer) divisor of dx&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">is_divisor</span><span class="p">(</span><span class="n">dy</span><span class="p">,</span> <span class="n">resolution</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">is_divisor</span><span class="p">(</span><span class="n">dy</span><span class="p">,</span> <span class="n">resolution</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;resolution is not an (integer) divisor of dy&quot;</span><span class="p">)</span>
 
     <span class="n">like_chunks</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_create_chunks</span><span class="p">(</span><span class="n">like</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">chunksize</span><span class="p">)</span>

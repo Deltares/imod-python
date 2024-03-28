@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.formats.ipf &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>imod.formats.ipf &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -466,7 +466,7 @@ document.write(`
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-<span class="kn">from</span> <span class="nn">imod</span> <span class="kn">import</span> <span class="n">util</span>
+<span class="kn">import</span> <span class="nn">imod</span>
 
 
 <span class="k">def</span> <span class="nf">_infer_delimwhitespace</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">ncol</span><span class="p">):</span>
@@ -792,7 +792,7 @@ document.write(`
     <span class="k">else</span><span class="p">:</span>
         <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
-            <span class="n">layer</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">decompose</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span>
+            <span class="n">layer</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">decompose</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">df</span> <span class="o">=</span> <span class="n">_read</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">assoc_kwargs</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
@@ -1147,10 +1147,10 @@ document.write(`
 
         <span class="k">for</span> <span class="n">layer</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">):</span>
             <span class="n">d</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">layer</span>
-            <span class="n">fn</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+            <span class="n">fn</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
             <span class="n">_compose_ipf</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">itype</span><span class="p">,</span> <span class="n">assoc_ext</span><span class="p">,</span> <span class="n">nodata</span><span class="p">,</span> <span class="n">assoc_columns</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">fn</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
         <span class="n">_compose_ipf</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">itype</span><span class="p">,</span> <span class="n">assoc_ext</span><span class="p">,</span> <span class="n">nodata</span><span class="p">,</span> <span class="n">assoc_columns</span><span class="p">)</span></div>
 </pre></div>
 

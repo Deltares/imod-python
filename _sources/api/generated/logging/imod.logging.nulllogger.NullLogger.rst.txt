@@ -21,6 +21,7 @@ imod.logging.nulllogger.NullLogger
       ~NullLogger.debug
       ~NullLogger.error
       ~NullLogger.info
+      ~NullLogger.log
       ~NullLogger.warning
    
    

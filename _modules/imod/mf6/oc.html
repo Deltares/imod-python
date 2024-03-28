@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.oc &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>imod.mf6.oc &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -451,13 +451,15 @@ document.write(`
 <span></span><span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
+<span class="kn">from</span> <span class="nn">imod.logging</span> <span class="kn">import</span> <span class="n">init_log_decorator</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.interfaces.iregridpackage</span> <span class="kn">import</span> <span class="n">IRegridPackage</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.package</span> <span class="kn">import</span> <span class="n">Package</span>
-<span class="kn">from</span> <span class="nn">imod.mf6.regridding_utils</span> <span class="kn">import</span> <span class="n">RegridderType</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.utilities.dataset</span> <span class="kn">import</span> <span class="n">is_dataarray_none</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.utilities.regrid</span> <span class="kn">import</span> <span class="n">RegridderType</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.write_context</span> <span class="kn">import</span> <span class="n">WriteContext</span>
 <span class="kn">from</span> <span class="nn">imod.schemata</span> <span class="kn">import</span> <span class="n">DTypeSchema</span>
 
@@ -468,7 +470,7 @@ document.write(`
 <span class="p">}</span>
 
 
-<div class="viewcode-block" id="OutputControl"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.OutputControl.html#imod.mf6.OutputControl">[docs]</a><span class="k">class</span> <span class="nc">OutputControl</span><span class="p">(</span><span class="n">Package</span><span class="p">):</span>
+<div class="viewcode-block" id="OutputControl"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.OutputControl.html#imod.mf6.OutputControl">[docs]</a><span class="k">class</span> <span class="nc">OutputControl</span><span class="p">(</span><span class="n">Package</span><span class="p">,</span> <span class="n">IRegridPackage</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The Output Control Option determines how and when heads, budgets and/or</span>
 <span class="sd">    concentrations are printed to the listing file and/or written to a separate</span>
@@ -532,7 +534,8 @@ document.write(`
     <span class="n">_write_schemata</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">_regrid_method</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">RegridderType</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
 
-<div class="viewcode-block" id="OutputControl.__init__"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.OutputControl.html#imod.mf6.OutputControl.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="nd">@init_log_decorator</span><span class="p">()</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">save_head</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">save_budget</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -560,7 +563,7 @@ document.write(`
             <span class="s2">&quot;concentration_file&quot;</span><span class="p">:</span> <span class="n">concentration_file</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dict_dataset</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_ocsetting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">setting</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get oc setting based on its type. If integers return f&#39;frequency {setting}&#39;, if&quot;&quot;&quot;</span>
@@ -655,7 +658,10 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_budget_output</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;save_budget&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[()]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;save_budget&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[()]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">get_regrid_methods</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">RegridderType</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regrid_method</span></div>
 </pre></div>
 
                 </article>

@@ -30,6 +30,7 @@
 
    imod.logging.config
    imod.logging.ilogger
+   imod.logging.logging_decorators
    imod.logging.loglevel
    imod.logging.logurulogger
    imod.logging.nulllogger

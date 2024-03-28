@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>iMOD Python: make massive MODFLOW models &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>iMOD Python: make massive MODFLOW models &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -124,8 +124,8 @@
     
     
     
-    <img src="_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -445,12 +445,13 @@ file formats;</p></li>
 <p>We currently support the following MODFLOW-based models:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://www.usgs.gov/software/modflow-6-usgs-modular-hydrologic-model">USGS MODFLOW 6</a> (<a class="reference internal" href="api/mf6.html"><span class="doc">MODFLOW6</span></a>), structured (DIS) and discretization by
-vertices (DISV) grids only, and not all advanced stress packages yet (LAK,
-MAW, SFR, UZF)</p></li>
+vertices (DISV) grids only, and not all advanced stress packages (only LAK and
+UZF)</p></li>
 <li><p><a class="reference external" href="https://oss.deltares.nl/web/imod">iMOD-WQ</a> (<a class="reference internal" href="api/wq.html"><span class="doc">iMOD-WQ</span></a>), which integrates SEAWAT (density-dependent
 groundwater flow) and MT3DMS (multi-species reactive transport calculations)</p></li>
 <li><p><a class="reference external" href="https://oss.deltares.nl/web/imod">iMODFLOW</a> (<a class="reference internal" href="api/flow.html"><span class="doc">iMODFLOW</span></a>)</p></li>
 </ul>
+<p>Development currently focuses on supporting more Modflow 6 functionalities.</p>
 <p>This Python package is developed primarily by the Groundwater Management Group
 at <a class="reference external" href="https://www.deltares.nl">Deltares</a>. It is used together with a broader set of open source tools and
 standards for reproducible modeling and data analysis:</p>

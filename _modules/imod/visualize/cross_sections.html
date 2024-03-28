@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.visualize.cross_sections &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>imod.visualize.cross_sections &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -487,7 +487,7 @@ document.write(`
     <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">*</span><span class="n">dims</span><span class="p">,</span> <span class="n">transpose_coords</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">values</span>
     <span class="n">xcoord</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">dx</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">coord_reference</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="n">xcoord</span><span class="p">])</span>
+    <span class="n">dx</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">coord_reference</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="n">xcoord</span><span class="p">])</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
         <span class="k">if</span> <span class="n">dx</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
             <span class="n">dx</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dx</span><span class="p">)</span>

@@ -17,17 +17,20 @@
       ~Recharge.clip_box
       ~Recharge.copy
       ~Recharge.from_file
+      ~Recharge.get_non_grid_data
       ~Recharge.get_period_varnames
       ~Recharge.get_regrid_methods
+      ~Recharge.is_clipping_supported
       ~Recharge.is_empty
       ~Recharge.is_grid_agnostic_package
       ~Recharge.is_regridding_supported
+      ~Recharge.is_splitting_supported
       ~Recharge.isel
       ~Recharge.mask
       ~Recharge.regrid_like
       ~Recharge.render
       ~Recharge.sel
-      ~Recharge.skip_masking_dataarray
+      ~Recharge.set_repeat_stress
       ~Recharge.to_netcdf
       ~Recharge.write
       ~Recharge.write_binary_griddata

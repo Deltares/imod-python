@@ -1,0 +1,6 @@
+imod.logging.logging\_decorators.init\_log\_decorator
+=====================================================
+
+.. currentmodule:: imod.logging.logging_decorators
+
+.. autofunction:: init_log_decorator

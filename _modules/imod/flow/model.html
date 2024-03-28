@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.flow.model &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>imod.flow.model &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -461,13 +461,11 @@ document.write(`
 <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
 
 <span class="kn">import</span> <span class="nn">imod</span>
-<span class="kn">import</span> <span class="nn">imod.util</span> <span class="k">as</span> <span class="nn">util</span>
 <span class="kn">from</span> <span class="nn">imod.flow.pkgbase</span> <span class="kn">import</span> <span class="n">BoundaryCondition</span>
 <span class="kn">from</span> <span class="nn">imod.flow.pkggroup</span> <span class="kn">import</span> <span class="n">PackageGroups</span>
 <span class="kn">from</span> <span class="nn">imod.flow.timeutil</span> <span class="kn">import</span> <span class="n">insert_unique_package_times</span>
-
-<span class="c1"># TODO: Merge time utilities, this is becoming a mess</span>
-<span class="kn">from</span> <span class="nn">imod.wq</span> <span class="kn">import</span> <span class="n">timeutil</span>
+<span class="kn">from</span> <span class="nn">imod.util.nested_dict</span> <span class="kn">import</span> <span class="n">append_nested_dict</span><span class="p">,</span> <span class="n">initialize_nested_dict</span>
+<span class="kn">from</span> <span class="nn">imod.util.time</span> <span class="kn">import</span> <span class="n">_compose_timestring</span><span class="p">,</span> <span class="n">timestep_duration</span><span class="p">,</span> <span class="n">to_datetime_internal</span>
 
 
 <span class="k">class</span> <span class="nc">IniFile</span><span class="p">(</span><span class="n">collections</span><span class="o">.</span><span class="n">UserDict</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
@@ -490,7 +488,7 @@ document.write(`
             <span class="k">if</span> <span class="n">timekey</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="c1"># If not string assume it is in some kind of datetime format</span>
                 <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">timekey</span><span class="p">])</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="p">[</span><span class="n">timekey</span><span class="p">]</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">_compose_timestring</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">timekey</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="n">timekey</span><span class="p">]</span> <span class="o">=</span> <span class="n">_compose_timestring</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">timekey</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_format_datetimes</span><span class="p">()</span>
@@ -709,7 +707,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">use_cftime</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="n">times</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">timeutil</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cftime</span><span class="p">)</span> <span class="k">for</span> <span class="n">time</span> <span class="ow">in</span> <span class="n">additional_times</span>
+            <span class="n">to_datetime_internal</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cftime</span><span class="p">)</span> <span class="k">for</span> <span class="n">time</span> <span class="ow">in</span> <span class="n">additional_times</span>
         <span class="p">]</span>
         <span class="n">times</span><span class="p">,</span> <span class="n">first_times</span> <span class="o">=</span> <span class="n">insert_unique_package_times</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">times</span><span class="p">)</span>
 
@@ -724,15 +722,15 @@ document.write(`
                     <span class="s2">&quot;time.&quot;</span>
                 <span class="p">)</span>
 
-        <span class="n">duration</span> <span class="o">=</span> <span class="n">timeutil</span><span class="o">.</span><span class="n">timestep_duration</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cftime</span><span class="p">)</span>
+        <span class="n">duration</span> <span class="o">=</span> <span class="n">timestep_duration</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cftime</span><span class="p">)</span>
         <span class="c1"># Generate time discretization, just rely on default arguments</span>
         <span class="c1"># Probably won&#39;t be used that much anyway?</span>
         <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
-        <span class="n">timestep_duration</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+        <span class="n">timestep_duration_da</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
             <span class="n">duration</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">times</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]},</span> <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">,)</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;time_discretization&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">TimeDiscretization</span><span class="p">(</span>
-            <span class="n">timestep_duration</span><span class="o">=</span><span class="n">timestep_duration</span><span class="p">,</span> <span class="n">endtime</span><span class="o">=</span><span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">timestep_duration</span><span class="o">=</span><span class="n">timestep_duration_da</span><span class="p">,</span> <span class="n">endtime</span><span class="o">=</span><span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_calc_n_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">composed_package</span><span class="p">,</span> <span class="n">is_boundary_condition</span><span class="p">):</span>
@@ -761,7 +759,7 @@ document.write(`
         <span class="p">)</span>
         <span class="n">time_composed</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
             <span class="p">[</span>
-                <span class="p">(</span><span class="n">timestep_nr</span><span class="p">,</span> <span class="n">util</span><span class="o">.</span><span class="n">_compose_timestring</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">time_format</span><span class="o">=</span><span class="n">time_format</span><span class="p">))</span>
+                <span class="p">(</span><span class="n">timestep_nr</span><span class="p">,</span> <span class="n">_compose_timestring</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">time_format</span><span class="o">=</span><span class="n">time_format</span><span class="p">))</span>
                 <span class="k">for</span> <span class="n">timestep_nr</span><span class="p">,</span> <span class="n">time</span> <span class="ow">in</span> <span class="n">time_composed</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
             <span class="p">]</span>
         <span class="p">)</span>
@@ -783,7 +781,7 @@ document.write(`
         <span class="n">time_format</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">-%m-%Y %H:%M:%S&quot;</span>
         <span class="n">periods_composed</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
             <span class="p">[</span>
-                <span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">util</span><span class="o">.</span><span class="n">_compose_timestring</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">time_format</span><span class="o">=</span><span class="n">time_format</span><span class="p">))</span>
+                <span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">_compose_timestring</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">time_format</span><span class="o">=</span><span class="n">time_format</span><span class="p">))</span>
                 <span class="k">for</span> <span class="n">time</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">periods</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
             <span class="p">]</span>
         <span class="p">)</span>
@@ -802,7 +800,7 @@ document.write(`
         <span class="n">bndkey</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_pkgkey</span><span class="p">(</span><span class="s2">&quot;bnd&quot;</span><span class="p">)</span>
         <span class="n">nlayer</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">bndkey</span><span class="p">][</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
 
-        <span class="n">composition</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">initialize_nested_dict</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">composition</span> <span class="o">=</span> <span class="n">initialize_nested_dict</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
 
         <span class="n">group_packages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_group</span><span class="p">()</span>
 
@@ -815,7 +813,7 @@ document.write(`
                 <span class="n">globaltimes</span><span class="p">,</span>
                 <span class="n">nlayer</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="n">util</span><span class="o">.</span><span class="n">append_nested_dict</span><span class="p">(</span><span class="n">composition</span><span class="p">,</span> <span class="n">group_composition</span><span class="p">)</span>
+            <span class="n">append_nested_dict</span><span class="p">(</span><span class="n">composition</span><span class="p">,</span> <span class="n">group_composition</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">package</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">package</span><span class="o">.</span><span class="n">_pkg_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">group_pkg_ids</span><span class="p">:</span>
@@ -824,7 +822,7 @@ document.write(`
                     <span class="n">globaltimes</span><span class="p">,</span>
                     <span class="n">nlayer</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="n">util</span><span class="o">.</span><span class="n">append_nested_dict</span><span class="p">(</span><span class="n">composition</span><span class="p">,</span> <span class="n">package_composition</span><span class="p">)</span>
+                <span class="n">append_nested_dict</span><span class="p">(</span><span class="n">composition</span><span class="p">,</span> <span class="n">package_composition</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">composition</span>
 

@@ -21,6 +21,7 @@ imod.logging.pythonlogger.PythonLogger
       ~PythonLogger.debug
       ~PythonLogger.error
       ~PythonLogger.info
+      ~PythonLogger.log
       ~PythonLogger.warning
    
    

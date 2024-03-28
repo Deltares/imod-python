@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.ims &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>imod.mf6.ims &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -451,6 +451,7 @@ document.write(`
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
 
+<span class="kn">from</span> <span class="nn">imod.logging</span> <span class="kn">import</span> <span class="n">init_log_decorator</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.package</span> <span class="kn">import</span> <span class="n">Package</span>
 <span class="kn">from</span> <span class="nn">imod.schemata</span> <span class="kn">import</span> <span class="n">DTypeSchema</span>
 
@@ -813,7 +814,8 @@ document.write(`
     <span class="p">}</span>
     <span class="n">_template</span> <span class="o">=</span> <span class="n">Package</span><span class="o">.</span><span class="n">_initialize_template</span><span class="p">(</span><span class="n">_pkg_id</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Solution.__init__"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Solution.html#imod.mf6.Solution.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="nd">@init_log_decorator</span><span class="p">()</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">modelnames</span><span class="p">,</span>
         <span class="n">outer_dvclose</span><span class="p">,</span>
@@ -876,7 +878,35 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="n">dict_dataset</span><span class="p">[</span><span class="s2">&quot;modelnames&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="n">modelnames</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dict_dataset</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">remove_model_from_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelname</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">models_in_solution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_models_in_solution</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">modelname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">models_in_solution</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;attempted to remove model </span><span class="si">{</span><span class="n">modelname</span><span class="si">}</span><span class="s2"> from solution, but it was not found.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">filtered_models</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">models_in_solution</span> <span class="k">if</span> <span class="n">m</span> <span class="o">!=</span> <span class="n">modelname</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filtered_models</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="s2">&quot;modelnames&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;modelnames&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="n">filtered_models</span><span class="p">)})</span>
+
+    <span class="k">def</span> <span class="nf">add_model_to_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelname</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">models_in_solution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_models_in_solution</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">modelname</span> <span class="ow">in</span> <span class="n">models_in_solution</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;attempted to add model </span><span class="si">{</span><span class="n">modelname</span><span class="si">}</span><span class="s2"> to solution, but it was already in it.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">models_in_solution</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">modelname</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;modelnames&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="n">models_in_solution</span><span class="p">)})</span>
+
+    <span class="k">def</span> <span class="nf">get_models_in_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="n">models_in_solution</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="s2">&quot;modelnames&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">models_in_solution</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;modelnames&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">models_in_solution</span></div>
 
 
 <div class="viewcode-block" id="SolutionPresetSimple"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.SolutionPresetSimple.html#imod.mf6.SolutionPresetSimple">[docs]</a><span class="k">def</span> <span class="nf">SolutionPresetSimple</span><span class="p">(</span>

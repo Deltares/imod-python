@@ -17,17 +17,20 @@
       ~HorizontalFlowBarrierHydraulicCharacteristic.clip_box
       ~HorizontalFlowBarrierHydraulicCharacteristic.copy
       ~HorizontalFlowBarrierHydraulicCharacteristic.from_file
+      ~HorizontalFlowBarrierHydraulicCharacteristic.get_non_grid_data
       ~HorizontalFlowBarrierHydraulicCharacteristic.get_period_varnames
       ~HorizontalFlowBarrierHydraulicCharacteristic.get_regrid_methods
+      ~HorizontalFlowBarrierHydraulicCharacteristic.is_clipping_supported
       ~HorizontalFlowBarrierHydraulicCharacteristic.is_empty
       ~HorizontalFlowBarrierHydraulicCharacteristic.is_grid_agnostic_package
       ~HorizontalFlowBarrierHydraulicCharacteristic.is_regridding_supported
+      ~HorizontalFlowBarrierHydraulicCharacteristic.is_splitting_supported
       ~HorizontalFlowBarrierHydraulicCharacteristic.isel
       ~HorizontalFlowBarrierHydraulicCharacteristic.mask
       ~HorizontalFlowBarrierHydraulicCharacteristic.regrid_like
       ~HorizontalFlowBarrierHydraulicCharacteristic.render
       ~HorizontalFlowBarrierHydraulicCharacteristic.sel
-      ~HorizontalFlowBarrierHydraulicCharacteristic.skip_masking_dataarray
+      ~HorizontalFlowBarrierHydraulicCharacteristic.set_repeat_stress
       ~HorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg
       ~HorizontalFlowBarrierHydraulicCharacteristic.to_netcdf
       ~HorizontalFlowBarrierHydraulicCharacteristic.write

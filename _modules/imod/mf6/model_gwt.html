@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.model_gwt &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>imod.mf6.model_gwt &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -452,7 +452,8 @@ document.write(`
 
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 
-<span class="kn">from</span> <span class="nn">imod.mf6.model</span> <span class="kn">import</span> <span class="n">Modflow6Model</span><span class="p">,</span> <span class="n">initialize_template</span>
+<span class="kn">from</span> <span class="nn">imod.logging</span> <span class="kn">import</span> <span class="n">init_log_decorator</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.model</span> <span class="kn">import</span> <span class="n">Modflow6Model</span>
 
 
 <div class="viewcode-block" id="GroundwaterTransportModel"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.GroundwaterTransportModel.html#imod.mf6.GroundwaterTransportModel">[docs]</a><span class="k">class</span> <span class="nc">GroundwaterTransportModel</span><span class="p">(</span><span class="n">Modflow6Model</span><span class="p">):</span>
@@ -463,8 +464,10 @@ document.write(`
 
     <span class="n">_mandatory_packages</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;mst&quot;</span><span class="p">,</span> <span class="s2">&quot;dsp&quot;</span><span class="p">,</span> <span class="s2">&quot;oc&quot;</span><span class="p">,</span> <span class="s2">&quot;ic&quot;</span><span class="p">)</span>
     <span class="n">_model_id</span> <span class="o">=</span> <span class="s2">&quot;gwt6&quot;</span>
+    <span class="n">_template</span> <span class="o">=</span> <span class="n">Modflow6Model</span><span class="o">.</span><span class="n">_initialize_template</span><span class="p">(</span><span class="s2">&quot;gwt-nam.j2&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="GroundwaterTransportModel.__init__"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.GroundwaterTransportModel.html#imod.mf6.GroundwaterTransportModel.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="nd">@init_log_decorator</span><span class="p">()</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">listing_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">print_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -477,9 +480,7 @@ document.write(`
             <span class="s2">&quot;print_input&quot;</span><span class="p">:</span> <span class="n">print_input</span><span class="p">,</span>
             <span class="s2">&quot;print_flows&quot;</span><span class="p">:</span> <span class="n">print_flows</span><span class="p">,</span>
             <span class="s2">&quot;save_flows&quot;</span><span class="p">:</span> <span class="n">save_flows</span><span class="p">,</span>
-        <span class="p">}</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_template</span> <span class="o">=</span> <span class="n">initialize_template</span><span class="p">(</span><span class="s2">&quot;gwt-nam.j2&quot;</span><span class="p">)</span></div></div>
+        <span class="p">}</span></div>
 </pre></div>
 
                 </article>

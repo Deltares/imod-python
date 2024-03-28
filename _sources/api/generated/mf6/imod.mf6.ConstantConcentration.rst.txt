@@ -17,17 +17,20 @@
       ~ConstantConcentration.clip_box
       ~ConstantConcentration.copy
       ~ConstantConcentration.from_file
+      ~ConstantConcentration.get_non_grid_data
       ~ConstantConcentration.get_period_varnames
       ~ConstantConcentration.get_regrid_methods
+      ~ConstantConcentration.is_clipping_supported
       ~ConstantConcentration.is_empty
       ~ConstantConcentration.is_grid_agnostic_package
       ~ConstantConcentration.is_regridding_supported
+      ~ConstantConcentration.is_splitting_supported
       ~ConstantConcentration.isel
       ~ConstantConcentration.mask
       ~ConstantConcentration.regrid_like
       ~ConstantConcentration.render
       ~ConstantConcentration.sel
-      ~ConstantConcentration.skip_masking_dataarray
+      ~ConstantConcentration.set_repeat_stress
       ~ConstantConcentration.to_netcdf
       ~ConstantConcentration.write
       ~ConstantConcentration.write_binary_griddata

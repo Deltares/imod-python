@@ -17,16 +17,18 @@
       ~AdvectionCentral.clip_box
       ~AdvectionCentral.copy
       ~AdvectionCentral.from_file
+      ~AdvectionCentral.get_non_grid_data
       ~AdvectionCentral.get_regrid_methods
+      ~AdvectionCentral.is_clipping_supported
       ~AdvectionCentral.is_empty
       ~AdvectionCentral.is_grid_agnostic_package
       ~AdvectionCentral.is_regridding_supported
+      ~AdvectionCentral.is_splitting_supported
       ~AdvectionCentral.isel
       ~AdvectionCentral.mask
       ~AdvectionCentral.regrid_like
       ~AdvectionCentral.render
       ~AdvectionCentral.sel
-      ~AdvectionCentral.skip_masking_dataarray
       ~AdvectionCentral.to_netcdf
       ~AdvectionCentral.write
       ~AdvectionCentral.write_binary_griddata

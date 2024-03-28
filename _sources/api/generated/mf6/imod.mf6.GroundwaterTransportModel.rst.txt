@@ -21,9 +21,14 @@
       ~GroundwaterTransportModel.from_file
       ~GroundwaterTransportModel.fromkeys
       ~GroundwaterTransportModel.get
+      ~GroundwaterTransportModel.has_key
+      ~GroundwaterTransportModel.is_clipping_supported
+      ~GroundwaterTransportModel.is_regridding_supported
+      ~GroundwaterTransportModel.is_splitting_supported
       ~GroundwaterTransportModel.is_use_newton
       ~GroundwaterTransportModel.items
       ~GroundwaterTransportModel.keys
+      ~GroundwaterTransportModel.mask_all_packages
       ~GroundwaterTransportModel.model_id
       ~GroundwaterTransportModel.pop
       ~GroundwaterTransportModel.popitem
@@ -32,6 +37,7 @@
       ~GroundwaterTransportModel.render
       ~GroundwaterTransportModel.setdefault
       ~GroundwaterTransportModel.update
+      ~GroundwaterTransportModel.validate
       ~GroundwaterTransportModel.values
       ~GroundwaterTransportModel.write
    

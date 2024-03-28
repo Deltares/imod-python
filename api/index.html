@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>API Reference &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>API Reference &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -125,8 +125,8 @@
     
     
     
-    <img src="../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -505,6 +505,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.transform.html">imod.util.transform</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.to_ugrid2d.html">imod.util.to_ugrid2d</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.mdal_compliant_ugrid2d.html">imod.util.mdal_compliant_ugrid2d</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.from_mdal_compliant_ugrid2d.html">imod.util.from_mdal_compliant_ugrid2d</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="logging.html">Logging</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -518,19 +519,24 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="generated/logging/imod.logging.ilogger.ILogger.html">imod.logging.ilogger.ILogger</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="generated/logging/imod.logging.loglevel.html">imod.logging.loglevel</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="generated/logging/imod.logging.logging_decorators.html">imod.logging.logging_decorators</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/logging/imod.logging.logging_decorators.init_log_decorator.html">imod.logging.logging_decorators.init_log_decorator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/logging/imod.logging.logging_decorators.standard_log_decorator.html">imod.logging.logging_decorators.standard_log_decorator</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="generated/logging/imod.logging.loglevel.html">imod.logging.loglevel</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-12"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="generated/logging/imod.logging.loglevel.LogLevel.html">imod.logging.loglevel.LogLevel</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="generated/logging/imod.logging.logurulogger.html">imod.logging.logurulogger</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-12"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="generated/logging/imod.logging.logurulogger.html">imod.logging.logurulogger</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-13"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="generated/logging/imod.logging.logurulogger.LoguruLogger.html">imod.logging.logurulogger.LoguruLogger</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="generated/logging/imod.logging.nulllogger.html">imod.logging.nulllogger</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-13"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="generated/logging/imod.logging.nulllogger.html">imod.logging.nulllogger</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-14"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="generated/logging/imod.logging.nulllogger.NullLogger.html">imod.logging.nulllogger.NullLogger</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="generated/logging/imod.logging.pythonlogger.html">imod.logging.pythonlogger</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-14"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="generated/logging/imod.logging.pythonlogger.html">imod.logging.pythonlogger</a><input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-15"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="generated/logging/imod.logging.pythonlogger.PythonLogger.html">imod.logging.pythonlogger.PythonLogger</a></li>
 </ul>
 </li>
@@ -538,7 +544,7 @@ document.write(`
 </li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="mf6.html">MODFLOW6</a><input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-15"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="mf6.html">MODFLOW6</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-16"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.open_hds.html">imod.mf6.open_hds</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.open_cbc.html">imod.mf6.open_cbc</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.read_cbc_headers.html">imod.mf6.read_cbc_headers</a></li>
@@ -554,7 +560,9 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.split.html">imod.mf6.Modflow6Simulation.split</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.regrid_like.html">imod.mf6.Modflow6Simulation.regrid_like</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.html">imod.mf6.GroundwaterFlowModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.mask_all_packages.html">imod.mf6.GroundwaterFlowModel.mask_all_packages</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterTransportModel.html">imod.mf6.GroundwaterTransportModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterTransportModel.mask_all_packages.html">imod.mf6.GroundwaterTransportModel.mask_all_packages</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.StructuredDiscretization.html">imod.mf6.StructuredDiscretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.VerticesDiscretization.html">imod.mf6.VerticesDiscretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.TimeDiscretization.html">imod.mf6.TimeDiscretization</a></li>
@@ -593,7 +601,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SourceSinkMixing.from_flow_model.html">imod.mf6.SourceSinkMixing.from_flow_model</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="wq.html">iMOD-WQ</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-16"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="wq.html">iMOD-WQ</a><input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-17"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.SeawatModel.html">imod.wq.SeawatModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.SeawatModel.create_time_discretization.html">imod.wq.SeawatModel.create_time_discretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.TimeDiscretization.html">imod.wq.TimeDiscretization</a></li>
@@ -627,7 +635,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="generated/wq/imod.wq.TimeVaryingConstantConcentration.html">imod.wq.TimeVaryingConstantConcentration</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="flow.html">iMODFLOW</a><input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-17"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="flow.html">iMODFLOW</a><input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-18"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="generated/flow/imod.flow.ImodflowModel.html">imod.flow.ImodflowModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/flow/imod.flow.ImodflowModel.create_time_discretization.html">imod.flow.ImodflowModel.create_time_discretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/flow/imod.flow.Boundary.html">imod.flow.Boundary</a></li>
@@ -652,7 +660,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="generated/flow/imod.flow.Well.html">imod.flow.Well</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="msw.html">MetaSWAP</a><input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-18"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="msw.html">MetaSWAP</a><input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-19"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.GridData.html">imod.msw.GridData</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.Infiltration.html">imod.msw.Infiltration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.Ponding.html">imod.msw.Ponding</a></li>
@@ -674,7 +682,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="generated/msw/imod.msw.MetaSwapModel.html">imod.msw.MetaSwapModel</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="metamod.html">MetaMod</a><input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-19"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="metamod.html">MetaMod</a><input class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-20"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="generated/metamod/imod.couplers.metamod.MetaMod.html">imod.couplers.metamod.MetaMod</a></li>
 </ul>
 </li>
@@ -837,6 +845,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.transform.html">imod.util.transform</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.to_ugrid2d.html">imod.util.to_ugrid2d</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.mdal_compliant_ugrid2d.html">imod.util.mdal_compliant_ugrid2d</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.from_mdal_compliant_ugrid2d.html">imod.util.from_mdal_compliant_ugrid2d</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a><ul>
@@ -893,29 +902,31 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id1">[0.15.2] - 2024-02-16</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id2">[0.15.1] - 2023-12-22</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id6">[0.15.0] - 2023-11-25</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id10">[0.14.1] - 2023-09-07</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id13">[0.14.0] - 2023-09-06</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id16">[0.13.2] - 2023-07-26</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id20">[0.13.1] - 2023-05-05</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id23">[0.13.0] - 2023-05-02</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id26">[0.12.0] - 2023-03-17</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id30">[0.11.6] - 2023-02-01</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id33">[0.11.5] - 2022-12-15</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id37">[0.11.4] - 2022-09-05</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id41">[0.11.1] - 2021-12-23</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id43">[0.11.0] - 2021-12-21</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id48">[0.10.1] - 2020-10-19</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id52">[0.10.0] - 2020-05-23</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id56">[0.9.0] - 2020-01-19</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id60">[0.8.0] - 2019-10-14</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id63">[0.7.1] - 2019-08-07</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id66">[0.7.0] - 2019-07-23</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id70">[0.6.1] - 2019-04-17</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id73">[0.6.0] - 2019-03-15</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id78">[0.5.0] - 2019-02-26</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id1">[0.16.0] - 2024-03-29</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id2">[0.15.3] - 2024-02-22</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id5">[0.15.2] - 2024-02-16</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id9">[0.15.1] - 2023-12-22</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id14">[0.15.0] - 2023-11-25</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id18">[0.14.1] - 2023-09-07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id21">[0.14.0] - 2023-09-06</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id24">[0.13.2] - 2023-07-26</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id28">[0.13.1] - 2023-05-05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id31">[0.13.0] - 2023-05-02</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id34">[0.12.0] - 2023-03-17</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id38">[0.11.6] - 2023-02-01</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id41">[0.11.5] - 2022-12-15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id45">[0.11.4] - 2022-09-05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id49">[0.11.1] - 2021-12-23</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id51">[0.11.0] - 2021-12-21</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id56">[0.10.1] - 2020-10-19</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id60">[0.10.0] - 2020-05-23</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id64">[0.9.0] - 2020-01-19</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id68">[0.8.0] - 2019-10-14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id71">[0.7.1] - 2019-08-07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id74">[0.7.0] - 2019-07-23</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id78">[0.6.1] - 2019-04-17</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id81">[0.6.0] - 2019-03-15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id86">[0.5.0] - 2019-02-26</a></li>
 </ul>
 </li>
 </ul>

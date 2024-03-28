@@ -21,6 +21,7 @@ imod.logging.logurulogger.LoguruLogger
       ~LoguruLogger.debug
       ~LoguruLogger.error
       ~LoguruLogger.info
+      ~LoguruLogger.log
       ~LoguruLogger.warning
    
    

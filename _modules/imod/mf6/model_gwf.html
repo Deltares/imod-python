@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.model_gwf &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>imod.mf6.model_gwf &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -455,18 +455,20 @@ document.write(`
 <span class="kn">import</span> <span class="nn">cftime</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
+<span class="kn">from</span> <span class="nn">imod.logging</span> <span class="kn">import</span> <span class="n">init_log_decorator</span>
 <span class="kn">from</span> <span class="nn">imod.mf6</span> <span class="kn">import</span> <span class="n">ConstantHead</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.clipped_boundary_condition_creator</span> <span class="kn">import</span> <span class="n">create_clipped_boundary</span>
-<span class="kn">from</span> <span class="nn">imod.mf6.model</span> <span class="kn">import</span> <span class="n">Modflow6Model</span><span class="p">,</span> <span class="n">initialize_template</span>
-<span class="kn">from</span> <span class="nn">imod.mf6.regridding_utils</span> <span class="kn">import</span> <span class="n">RegridderType</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.model</span> <span class="kn">import</span> <span class="n">Modflow6Model</span>
 <span class="kn">from</span> <span class="nn">imod.typing</span> <span class="kn">import</span> <span class="n">GridDataArray</span>
 
 
 <div class="viewcode-block" id="GroundwaterFlowModel"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.GroundwaterFlowModel.html#imod.mf6.GroundwaterFlowModel">[docs]</a><span class="k">class</span> <span class="nc">GroundwaterFlowModel</span><span class="p">(</span><span class="n">Modflow6Model</span><span class="p">):</span>
     <span class="n">_mandatory_packages</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;npf&quot;</span><span class="p">,</span> <span class="s2">&quot;ic&quot;</span><span class="p">,</span> <span class="s2">&quot;oc&quot;</span><span class="p">,</span> <span class="s2">&quot;sto&quot;</span><span class="p">)</span>
     <span class="n">_model_id</span> <span class="o">=</span> <span class="s2">&quot;gwf6&quot;</span>
+    <span class="n">_template</span> <span class="o">=</span> <span class="n">Modflow6Model</span><span class="o">.</span><span class="n">_initialize_template</span><span class="p">(</span><span class="s2">&quot;gwf-nam.j2&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="GroundwaterFlowModel.__init__"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.GroundwaterFlowModel.html#imod.mf6.GroundwaterFlowModel.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="nd">@init_log_decorator</span><span class="p">()</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">listing_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">print_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -484,33 +486,6 @@ document.write(`
             <span class="s2">&quot;newton&quot;</span><span class="p">:</span> <span class="n">newton</span><span class="p">,</span>
             <span class="s2">&quot;under_relaxation&quot;</span><span class="p">:</span> <span class="n">under_relaxation</span><span class="p">,</span>
         <span class="p">}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_template</span> <span class="o">=</span> <span class="n">initialize_template</span><span class="p">(</span><span class="s2">&quot;gwf-nam.j2&quot;</span><span class="p">)</span></div>
-
-    <span class="k">def</span> <span class="nf">_get_unique_regridder_types</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">RegridderType</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This function loops over the packages and  collects all regridder-types that are in use.</span>
-<span class="sd">        Differences in associated functions are ignored. It focusses only on the types. So if a</span>
-<span class="sd">        model uses both Overlap(mean) and Overlap(harmonic_mean), this function will return just one</span>
-<span class="sd">        Overlap regridder:  the first one found, in this case Overlap(mean)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">methods</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">RegridderType</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">pkg_name</span><span class="p">,</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">pkg</span><span class="o">.</span><span class="n">is_regridding_supported</span><span class="p">():</span>
-                <span class="n">pkg_methods</span> <span class="o">=</span> <span class="n">pkg</span><span class="o">.</span><span class="n">get_regrid_methods</span><span class="p">()</span>
-                <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">pkg_methods</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="p">(</span>
-                        <span class="n">variable</span> <span class="ow">in</span> <span class="n">pkg</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_vars</span>
-                        <span class="ow">and</span> <span class="n">pkg</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[()]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-                    <span class="p">):</span>
-                        <span class="n">regriddertype</span> <span class="o">=</span> <span class="n">pkg_methods</span><span class="p">[</span><span class="n">variable</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-                        <span class="k">if</span> <span class="n">regriddertype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">methods</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                            <span class="n">functiontype</span> <span class="o">=</span> <span class="n">pkg_methods</span><span class="p">[</span><span class="n">variable</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-                            <span class="n">methods</span><span class="p">[</span><span class="n">regriddertype</span><span class="p">]</span> <span class="o">=</span> <span class="n">functiontype</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;regridding is not implemented for package </span><span class="si">{</span><span class="n">pkg_name</span><span class="si">}</span><span class="s2"> of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">pkg</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span>
-        <span class="k">return</span> <span class="n">methods</span>
 
     <span class="k">def</span> <span class="nf">clip_box</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -581,7 +556,20 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;newton&quot;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">set_newton</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">is_newton</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;newton&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">is_newton</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s2">&quot;newton&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">is_newton</span>
+
+    <span class="k">def</span> <span class="nf">update_buoyancy_package</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transport_models_per_flow_model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If the simulation is partitioned, then the buoyancy package, if present,</span>
+<span class="sd">        must be updated for the renamed transport models.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">buoyancy_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_pkgkey</span><span class="p">(</span><span class="s2">&quot;buy&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">buoyancy_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">buoyancy_package</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">buoyancy_key</span><span class="p">]</span>
+        <span class="n">transport_models_old</span> <span class="o">=</span> <span class="n">buoyancy_package</span><span class="o">.</span><span class="n">get_transport_model_names</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">transport_models_old</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">transport_models_per_flow_model</span><span class="p">):</span>
+            <span class="n">buoyancy_package</span><span class="o">.</span><span class="n">update_transport_models</span><span class="p">(</span><span class="n">transport_models_per_flow_model</span><span class="p">)</span></div>
 </pre></div>
 
                 </article>

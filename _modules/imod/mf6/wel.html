@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.wel &#8212; iMOD Python 0.15.2 documentation</title>
+    <title>imod.mf6.wel &#8212; iMOD Python 0.16.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.15.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.15.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -461,6 +461,7 @@ document.write(`
 <span class="kn">import</span> <span class="nn">xugrid</span> <span class="k">as</span> <span class="nn">xu</span>
 
 <span class="kn">import</span> <span class="nn">imod</span>
+<span class="kn">from</span> <span class="nn">imod.logging</span> <span class="kn">import</span> <span class="n">init_log_decorator</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.boundary_condition</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">BoundaryCondition</span><span class="p">,</span>
     <span class="n">DisStructuredBoundaryCondition</span><span class="p">,</span>
@@ -469,10 +470,9 @@ document.write(`
 <span class="kn">from</span> <span class="nn">imod.mf6.interfaces.ipointdatapackage</span> <span class="kn">import</span> <span class="n">IPointDataPackage</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.mf6_wel_adapter</span> <span class="kn">import</span> <span class="n">Mf6Wel</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.package</span> <span class="kn">import</span> <span class="n">Package</span>
-<span class="kn">from</span> <span class="nn">imod.mf6.regridding_utils</span> <span class="kn">import</span> <span class="n">RegridderType</span>
-<span class="kn">from</span> <span class="nn">imod.mf6.utilities.clip</span> <span class="kn">import</span> <span class="n">clip_by_grid</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.utilities.dataset</span> <span class="kn">import</span> <span class="n">remove_inactive</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.utilities.grid</span> <span class="kn">import</span> <span class="n">create_layered_top</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.utilities.regrid</span> <span class="kn">import</span> <span class="n">RegridderType</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.validation</span> <span class="kn">import</span> <span class="n">validation_pkg_error_message</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.write_context</span> <span class="kn">import</span> <span class="n">WriteContext</span>
 <span class="kn">from</span> <span class="nn">imod.prepare</span> <span class="kn">import</span> <span class="n">assign_wells</span>
@@ -485,7 +485,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">imod.select.points</span> <span class="kn">import</span> <span class="n">points_indices</span><span class="p">,</span> <span class="n">points_values</span>
 <span class="kn">from</span> <span class="nn">imod.typing</span> <span class="kn">import</span> <span class="n">GridDataArray</span>
 <span class="kn">from</span> <span class="nn">imod.typing.grid</span> <span class="kn">import</span> <span class="n">is_spatial_2D</span><span class="p">,</span> <span class="n">ones_like</span>
-<span class="kn">from</span> <span class="nn">imod.util</span> <span class="kn">import</span> <span class="n">values_within_range</span>
+<span class="kn">from</span> <span class="nn">imod.util.structured</span> <span class="kn">import</span> <span class="n">values_within_range</span>
 
 
 <span class="k">def</span> <span class="nf">_assign_dims</span><span class="p">(</span><span class="n">arg</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span> <span class="o">|</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
@@ -528,23 +528,30 @@ document.write(`
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 
-<span class="sd">    screen_top: float or list of floats</span>
-<span class="sd">        is the top of the well screen.</span>
-<span class="sd">    screen_bottom: float or list of floats</span>
-<span class="sd">        is the bottom of the well screen.</span>
 <span class="sd">    y: float or list of floats</span>
 <span class="sd">        is the y location of the well.</span>
 <span class="sd">    x: float or list of floats</span>
 <span class="sd">        is the x location of the well.</span>
-<span class="sd">    rate: float or list of floats</span>
+<span class="sd">    screen_top: float or list of floats</span>
+<span class="sd">        is the top of the well screen.</span>
+<span class="sd">    screen_bottom: float or list of floats</span>
+<span class="sd">        is the bottom of the well screen.</span>
+<span class="sd">    rate: float, list of floats or xr.DataArray</span>
 <span class="sd">        is the volumetric well rate. A positive value indicates well</span>
 <span class="sd">        (injection) and a negative value indicates discharge (extraction) (q).</span>
+<span class="sd">        If provided as DataArray, an ``&quot;index&quot;`` dimension is required and an</span>
+<span class="sd">        optional ``&quot;time&quot;`` dimension and coordinate specify transient input.</span>
+<span class="sd">        In the latter case, it is important that dimensions are in the order:</span>
+<span class="sd">        ``(&quot;time&quot;, &quot;index&quot;)``</span>
 <span class="sd">    concentration: array of floats (xr.DataArray, optional)</span>
 <span class="sd">        if this flow package is used in simulations also involving transport, then this array is used</span>
 <span class="sd">        as the  concentration for inflow over this boundary.</span>
 <span class="sd">    concentration_boundary_type: ({&quot;AUX&quot;, &quot;AUXMIXED&quot;}, optional)</span>
 <span class="sd">        if this flow package is used in simulations also involving transport, then this keyword specifies</span>
 <span class="sd">        how outflow over this boundary is computed.</span>
+<span class="sd">    id: list of Any, optional</span>
+<span class="sd">        assign an identifier code to each well. if not provided, one will be generated</span>
+<span class="sd">        Must be convertible to string, and unique entries.</span>
 <span class="sd">    minimum_k: float, optional</span>
 <span class="sd">        on creating point wells, no point wells will be placed in cells with a lower horizontal conductivity than this</span>
 <span class="sd">    minimum_thickness: float, optional</span>
@@ -578,6 +585,26 @@ document.write(`
 <span class="sd">        value is the &quot;value&quot;. For the &quot;key&quot; datetime, the data of the &quot;value&quot;</span>
 <span class="sd">        datetime will be used. Can also be set with a dictionary using the</span>
 <span class="sd">        ``set_repeat_stress`` method.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    ---------</span>
+
+<span class="sd">    &gt;&gt;&gt; screen_top = [0.0, 0.0]</span>
+<span class="sd">    &gt;&gt;&gt; screen_bottom = [-2.0, -2.0]</span>
+<span class="sd">    &gt;&gt;&gt; y = [83.0, 77.0]</span>
+<span class="sd">    &gt;&gt;&gt; x = [81.0, 82.0]</span>
+<span class="sd">    &gt;&gt;&gt; rate = [1.0, 1.0]</span>
+
+<span class="sd">    &gt;&gt;&gt; imod.mf6.Well(x, y, screen_top, screen_bottom, rate)</span>
+
+<span class="sd">    For a transient well:</span>
+
+<span class="sd">    &gt;&gt;&gt; weltimes = pd.date_range(&quot;2000-01-01&quot;, &quot;2000-01-03&quot;)</span>
+
+<span class="sd">    &gt;&gt;&gt; rate_factor_time = xr.DataArray([0.5, 1.0], coords={&quot;time&quot;: weltimes}, dims=(&quot;time&quot;,))</span>
+<span class="sd">    &gt;&gt;&gt; rate_transient = rate_factor_time * xr.DataArray(rate, dims=(&quot;index&quot;,))</span>
+
+<span class="sd">    &gt;&gt;&gt; imod.mf6.Well(x, y, screen_top, screen_bottom, rate_transient)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@property</span>
@@ -610,16 +637,17 @@ document.write(`
 
     <span class="n">_regrid_method</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">RegridderType</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
 
-<div class="viewcode-block" id="Well.__init__"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Well.html#imod.mf6.Well.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="nd">@init_log_decorator</span><span class="p">()</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
         <span class="n">y</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
         <span class="n">screen_top</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
         <span class="n">screen_bottom</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
-        <span class="n">rate</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">rate</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
         <span class="n">concentration</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">concentration_boundary_type</span><span class="o">=</span><span class="s2">&quot;aux&quot;</span><span class="p">,</span>
-        <span class="nb">id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="nb">id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">minimum_k</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
         <span class="n">minimum_thickness</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
         <span class="n">print_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -630,8 +658,12 @@ document.write(`
         <span class="n">repeat_stress</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="nb">id</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span>
-
+            <span class="nb">id</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">set_id</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">set_id</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;id&#39;s must be unique&quot;</span><span class="p">)</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">id</span><span class="p">]</span>
         <span class="n">dict_dataset</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;screen_top&quot;</span><span class="p">:</span> <span class="n">_assign_dims</span><span class="p">(</span><span class="n">screen_top</span><span class="p">),</span>
             <span class="s2">&quot;screen_bottom&quot;</span><span class="p">:</span> <span class="n">_assign_dims</span><span class="p">(</span><span class="n">screen_bottom</span><span class="p">),</span>
@@ -653,7 +685,7 @@ document.write(`
         <span class="c1"># Set index as coordinate</span>
         <span class="n">index_coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index_coord</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">is_grid_agnostic_package</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -1009,20 +1041,11 @@ document.write(`
         <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="o">**</span><span class="n">ds_vars</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span>
 
         <span class="n">ds</span> <span class="o">=</span> <span class="n">remove_inactive</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">active</span><span class="p">)</span>
-
-        <span class="c1"># TODO: make options like &quot;save_flows&quot; configurable. Issue github #623</span>
-        <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;save_flows&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;save_flows&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;save_flows&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[()]</span>
+        <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;print_flows&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;print_flows&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[()]</span>
+        <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;print_input&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;print_input&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[()]</span>
 
         <span class="k">return</span> <span class="n">Mf6Wel</span><span class="p">(</span><span class="o">**</span><span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">regrid_like</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_grid</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Well</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        The regrid_like method is irrelevant for this package as it is</span>
-<span class="sd">        grid-agnostic, instead this method clips the package based on the grid</span>
-<span class="sd">        exterior.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">target_grid_2d</span> <span class="o">=</span> <span class="n">target_grid</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">missing_dims</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">clip_by_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_grid_2d</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Well</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1038,7 +1061,10 @@ document.write(`
         <span class="n">domain_2d</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">missing_dims</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span>
             <span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">mask_2D</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_2d</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">mask_2D</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_2d</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_regrid_methods</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">RegridderType</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regrid_method</span></div>
 
 
 <div class="viewcode-block" id="WellDisStructured"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.WellDisStructured.html#imod.mf6.WellDisStructured">[docs]</a><span class="k">class</span> <span class="nc">WellDisStructured</span><span class="p">(</span><span class="n">DisStructuredBoundaryCondition</span><span class="p">):</span>
@@ -1115,7 +1141,8 @@ document.write(`
 
     <span class="n">_write_schemata</span> <span class="o">=</span> <span class="p">{}</span>
 
-<div class="viewcode-block" id="WellDisStructured.__init__"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.WellDisStructured.html#imod.mf6.WellDisStructured.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="nd">@init_log_decorator</span><span class="p">()</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">layer</span><span class="p">,</span>
         <span class="n">row</span><span class="p">,</span>
@@ -1150,7 +1177,7 @@ document.write(`
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> is deprecated and will be removed in the v1.0 release.&quot;</span>
             <span class="s2">&quot;Please adapt your code to use the imod.mf6.Well package&quot;</span><span class="p">,</span>
             <span class="ne">DeprecationWarning</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">clip_box</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1274,7 +1301,8 @@ document.write(`
 
     <span class="n">_write_schemata</span> <span class="o">=</span> <span class="p">{}</span>
 
-<div class="viewcode-block" id="WellDisVertices.__init__"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.WellDisVertices.html#imod.mf6.WellDisVertices.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="nd">@init_log_decorator</span><span class="p">()</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">layer</span><span class="p">,</span>
         <span class="n">cell2d</span><span class="p">,</span>
@@ -1305,7 +1333,7 @@ document.write(`
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> is deprecated and will be removed in the v1.0 release.&quot;</span>
             <span class="s2">&quot;Please adapt your code to use the imod.mf6.Well package&quot;</span><span class="p">,</span>
             <span class="ne">DeprecationWarning</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">clip_box</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>

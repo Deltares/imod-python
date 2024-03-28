@@ -17,16 +17,18 @@
       ~AdvectionUpstream.clip_box
       ~AdvectionUpstream.copy
       ~AdvectionUpstream.from_file
+      ~AdvectionUpstream.get_non_grid_data
       ~AdvectionUpstream.get_regrid_methods
+      ~AdvectionUpstream.is_clipping_supported
       ~AdvectionUpstream.is_empty
       ~AdvectionUpstream.is_grid_agnostic_package
       ~AdvectionUpstream.is_regridding_supported
+      ~AdvectionUpstream.is_splitting_supported
       ~AdvectionUpstream.isel
       ~AdvectionUpstream.mask
       ~AdvectionUpstream.regrid_like
       ~AdvectionUpstream.render
       ~AdvectionUpstream.sel
-      ~AdvectionUpstream.skip_masking_dataarray
       ~AdvectionUpstream.to_netcdf
       ~AdvectionUpstream.write
       ~AdvectionUpstream.write_binary_griddata
