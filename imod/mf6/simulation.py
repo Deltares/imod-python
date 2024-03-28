@@ -912,6 +912,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             if isinstance(v, Modflow6Model) and (v.model_id() == modeltype)
         }
 
+    def get_models(self):
+        return {k: v for k, v in self.items() if isinstance(v, Modflow6Model)}
+
     def clip_box(
         self,
         time_min: Optional[cftime.datetime | np.datetime64 | str] = None,
@@ -962,6 +965,12 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             raise ValueError(
                 "Unable to clip simulation. Clipping can only be done on simulations that have a single flow model ."
             )
+        for model_name, model in self.get_models().items():
+            supported, error_with_object = model.is_clipping_supported()
+            if not supported:
+                raise ValueError(
+                    f"simulation cannot be clipped due to presence of package '{error_with_object}' in model '{model_name}'"
+                )
 
         clipped = type(self)(name=self.name)
         for key, value in self.items():
@@ -1006,7 +1015,14 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         if not any(flow_models) and not any(transport_models):
             raise ValueError("a simulation without any models cannot be split.")
 
-        original_models = get_models(self)
+        original_models = {**flow_models, **transport_models}
+        for model_name, model in original_models.items():
+            supported, error_with_object = model.is_splitting_supported()
+            if not supported:
+                raise ValueError(
+                    f"simulation cannot be split due to presence of package '{error_with_object}' in model '{model_name}'"
+                )
+
         original_packages = get_packages(self)
 
         partition_info = create_partition_info(submodel_labels)

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Tuple
 
 from imod.mf6.interfaces.idict import IDict
 from imod.mf6.statusinfo import StatusInfoBase
@@ -21,4 +21,7 @@ class IModel(IDict):
 
     @property
     def domain(self):
+        raise NotImplementedError
+
+    def is_regridding_supported(self) -> Tuple[bool, str]:
         raise NotImplementedError

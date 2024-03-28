@@ -473,6 +473,9 @@ class Package(PackageBase, IPackage, abc.ABC):
         -------
         clipped: Package
         """
+        if not self.is_clipping_supported():
+            raise ValueError("this package does not support clipping.")
+
         selection = self.dataset
         if "time" in selection:
             time = selection["time"].values
@@ -588,7 +591,13 @@ class Package(PackageBase, IPackage, abc.ABC):
         a package with the same options as this package, and with all the data-arrays regridded to another discretization,
         similar to the one used in input argument "target_grid"
         """
-        return _regrid_like(self, target_grid, regrid_context, regridder_types)
+        try:
+            result = _regrid_like(self, target_grid, regrid_context, regridder_types)
+        except ValueError as e:
+            raise e
+        except Exception:
+            raise ValueError("package could not be regridded.")
+        return result
 
     def _skip_masking_dataarray(self, array_name: str) -> bool:
         if hasattr(self, "_skip_mask_arrays"):
@@ -634,3 +643,12 @@ class Package(PackageBase, IPackage, abc.ABC):
             else:
                 result[name] = self.dataset[name].values[()]
         return result
+
+    def is_splitting_supported(self) -> bool:
+        return True
+
+    def is_regridding_supported(self) -> bool:
+        return True
+
+    def is_clipping_supported(self) -> bool:
+        return True
