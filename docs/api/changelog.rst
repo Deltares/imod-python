@@ -61,7 +61,7 @@ Fixed
   :func:`imod.prepare.spatial.round_extent` instead.
 - :meth'`imod.mf6.Modflow6Simulation.write` failed after splitting the
   simulation. This has been fixed.
-- modflow options like "print flow" , "save flow" and "print input" can now be
+- modflow options like "print flow", "save flow", and "print input" can now be
   set on :class:`imod.mf6.Well`
 - when regridding a :class:`imod.mf6.Modflow6Simulation`,
   :class:`imod.mf6.GroundwaterFlowModel`,
