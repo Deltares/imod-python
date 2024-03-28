@@ -7,14 +7,13 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
 
-[Unreleased]
-------------
+[0.16.3] - 2024-03-29
+---------------------
 
 Fixed
 ~~~~~
-- Incorrect validation error ``data values found at nodata values of
-  idomain`` for boundary condition packages with a scalar coordinate
-  not set as dimension.
+- Incorrect validation error ``data values found at nodata values of idomain``
+  for boundary condition packages with a scalar coordinate not set as dimension.
 - Fix issue where :func:`imod.idf.open_subdomains` and
   :func:`imod.mf6.Modflow6Simulation.open_head` (for split simulations) would
   return arrays with incorrect ``dx`` and ``dy`` coordinates for equidistant
@@ -24,12 +23,17 @@ Fixed
 - Made :func:`imod.util.round_extent` available again, as it was moved without
   notice. Function now throws a DeprecationWarning to use
   :func:`imod.prepare.spatial.round_extent` instead.
-- :meth'`imod.mf6.Modflow6Simulation.write` failed after splitting the simulation. This has been fixed.
-- modflow options like "print flow" , "save flow" and "print input" can now be set on
-  :class:`imod.mf6.Well`
-- when regridding a :class:`imod.mf6.Modflow6Simulation`, :class:`imod.mf6.GroundwaterFlowModel`,  :class:`imod.mf6.GroundwaterTransportModel`
-  or a :class:`imod.mf6.package`, regridding weights are now cached and can be re-used over the different objects that are regridded.
-  This improves performance considerably in most use cases: when regridding is applied over the same grid cells with the same regridder type, but with different values/methods, multiple times.
+- :meth'`imod.mf6.Modflow6Simulation.write` failed after splitting the
+  simulation. This has been fixed.
+- modflow options like "print flow" , "save flow" and "print input" can now be
+  set on :class:`imod.mf6.Well`
+- when regridding a :class:`imod.mf6.Modflow6Simulation`,
+  :class:`imod.mf6.GroundwaterFlowModel`,
+  :class:`imod.mf6.GroundwaterTransportModel` or a :class:`imod.mf6.package`,
+  regridding weights are now cached and can be re-used over the different
+  objects that are regridded. This improves performance considerably in most use
+  cases: when regridding is applied over the same grid cells with the same
+  regridder type, but with different values/methods, multiple times.
  
 Added
 ~~~~~
@@ -39,22 +43,27 @@ Added
 - Validation for incompatible settings in the :class:`imod.mf6.NodePropertyFlow`
   and :class:`imod.mf6.Dispersion` packages.
 - Checks that only one flow model is present in a simulation when calling
-  :func:`imod.mf6.Modflow6Simulation.regrid_like`, :func:`imod.mf6.Modflow6Simulation.clip_box` or  :func:`imod.mf6.Modflow6Simulation.split`
+  :func:`imod.mf6.Modflow6Simulation.regrid_like`,
+  :func:`imod.mf6.Modflow6Simulation.clip_box` or
+  :func:`imod.mf6.Modflow6Simulation.split`
 - Added support for coupling a GroundwaterFlowModel and Transport Model i.c.w.
-  the 6.4.3 release of MODFLOW. Using an older version of iMOD Python
-  with this version of MODFLOW will result in an error.
+  the 6.4.3 release of MODFLOW. Using an older version of iMOD Python with this
+  version of MODFLOW will result in an error.
 - :meth:`imod.mf6.Modflow6Simulation.split` supports splitting transport models,
   including multi-species simulations.
 - :meth:`imod.mf6.Modflow6Simulation.open_concentration` and
   :meth:`imod.mf6.Modflow6Simulation.open_transport_budget` support opening
   split multi-species simulations.
-  :meth:`imod.mf6.Modflow6Simulation.regrid_like` can now regrid simulations that have 1 or more transport models.
-- added logging to various initialization methods, write methods and dump methods. `See the
-  documentation <https://deltares.github.io/imod-python/api/generated/logging/imod.logging.html>`_
+  :meth:`imod.mf6.Modflow6Simulation.regrid_like` can now regrid simulations
+  that have 1 or more transport models.
+- added logging to various initialization methods, write methods and dump
+  methods. `See the documentation
+  <https://deltares.github.io/imod-python/api/generated/logging/imod.logging.html>`_
   how to activate logging.
 - added :func:`imod.data.hondsrug_simulation` and
   :func:`imod.data.hondsrug_crosssection` data.
-- simulations and models that include a lake package now raise an exception on clipping, partitioning or regridding. 
+- simulations and models that include a lake package now raise an exception on
+  clipping, partitioning or regridding. 
 
 Changed
 ~~~~~~~
