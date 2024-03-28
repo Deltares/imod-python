@@ -7,7 +7,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
 
-[0.16.3] - 2024-03-29
+[0.16.0] - 2024-03-29
 ---------------------
 
 Fixed
