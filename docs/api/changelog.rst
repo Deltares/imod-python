@@ -10,31 +10,6 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [0.16.0] - 2024-03-29
 ---------------------
 
-Fixed
-~~~~~
-- Incorrect validation error ``data values found at nodata values of idomain``
-  for boundary condition packages with a scalar coordinate not set as dimension.
-- Fix issue where :func:`imod.idf.open_subdomains` and
-  :func:`imod.mf6.Modflow6Simulation.open_head` (for split simulations) would
-  return arrays with incorrect ``dx`` and ``dy`` coordinates for equidistant
-  data.
-- Fix issue where :func:`imod.idf.open_subdomains` returned a flipped ``dy``
-  coordinate for nonequidistant data.
-- Made :func:`imod.util.round_extent` available again, as it was moved without
-  notice. Function now throws a DeprecationWarning to use
-  :func:`imod.prepare.spatial.round_extent` instead.
-- :meth'`imod.mf6.Modflow6Simulation.write` failed after splitting the
-  simulation. This has been fixed.
-- modflow options like "print flow" , "save flow" and "print input" can now be
-  set on :class:`imod.mf6.Well`
-- when regridding a :class:`imod.mf6.Modflow6Simulation`,
-  :class:`imod.mf6.GroundwaterFlowModel`,
-  :class:`imod.mf6.GroundwaterTransportModel` or a :class:`imod.mf6.package`,
-  regridding weights are now cached and can be re-used over the different
-  objects that are regridded. This improves performance considerably in most use
-  cases: when regridding is applied over the same grid cells with the same
-  regridder type, but with different values/methods, multiple times.
- 
 Added
 ~~~~~
 - The :func:`imod.mf6.model.mask_all_packages` now also masks the idomain array
@@ -71,6 +46,30 @@ Changed
   :meth:`imod.mf6.Modflow6Simulation.open_transport_budget` raise a
   ``ValueError`` if ``species_ls`` is provided with incorrect length.
 
+Fixed
+~~~~~
+- Incorrect validation error ``data values found at nodata values of idomain``
+  for boundary condition packages with a scalar coordinate not set as dimension.
+- Fix issue where :func:`imod.idf.open_subdomains` and
+  :func:`imod.mf6.Modflow6Simulation.open_head` (for split simulations) would
+  return arrays with incorrect ``dx`` and ``dy`` coordinates for equidistant
+  data.
+- Fix issue where :func:`imod.idf.open_subdomains` returned a flipped ``dy``
+  coordinate for nonequidistant data.
+- Made :func:`imod.util.round_extent` available again, as it was moved without
+  notice. Function now throws a DeprecationWarning to use
+  :func:`imod.prepare.spatial.round_extent` instead.
+- :meth'`imod.mf6.Modflow6Simulation.write` failed after splitting the
+  simulation. This has been fixed.
+- modflow options like "print flow" , "save flow" and "print input" can now be
+  set on :class:`imod.mf6.Well`
+- when regridding a :class:`imod.mf6.Modflow6Simulation`,
+  :class:`imod.mf6.GroundwaterFlowModel`,
+  :class:`imod.mf6.GroundwaterTransportModel` or a :class:`imod.mf6.package`,
+  regridding weights are now cached and can be re-used over the different
+  objects that are regridded. This improves performance considerably in most use
+  cases: when regridding is applied over the same grid cells with the same
+  regridder type, but with different values/methods, multiple times.
 
 [0.15.3] - 2024-02-22
 ---------------------
