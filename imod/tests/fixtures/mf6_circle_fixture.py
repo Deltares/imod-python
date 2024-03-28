@@ -112,7 +112,7 @@ def make_circle_model_flow_with_transport_data(species: list[str]):
     )
     constant_concentration = constant_concentration.expand_dims(species=species)
 
-    gwf_model = imod.mf6.GroundwaterFlowModel()
+    gwf_model = imod.mf6.GroundwaterFlowModel(save_flows=True)
     gwf_model["disv"] = imod.mf6.VerticesDiscretization(
         top=10.0, bottom=bottom, idomain=idomain
     )
@@ -138,7 +138,9 @@ def make_circle_model_flow_with_transport_data(species: list[str]):
         save_flows=False,
     )
     gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
-    gwf_model["rch"] = imod.mf6.Recharge(rch_rate, concentration=rch_concentration)
+    gwf_model["rch"] = imod.mf6.Recharge(
+        rch_rate, save_flows=True, concentration=rch_concentration
+    )
 
     simulation = imod.mf6.Modflow6Simulation("circle")
     simulation["GWF_1"] = gwf_model
@@ -287,9 +289,9 @@ def circle_model_transport():
         density_concentration_slope=[slope],
         species=["salinity"],
     )
-    transport_model = imod.mf6.GroundwaterTransportModel()
+    transport_model = imod.mf6.GroundwaterTransportModel(save_flows=True)
     transport_model["ssm"] = imod.mf6.SourceSinkMixing.from_flow_model(
-        gwf_model, "salinity"
+        gwf_model, "salinity", save_flows=True
     )
     transport_model["disv"] = gwf_model["disv"]
 
@@ -308,7 +310,7 @@ def circle_model_transport():
         xt3d_rhs=False,
     )
     transport_model["adv"] = imod.mf6.AdvectionUpstream()
-    transport_model["mst"] = imod.mf6.MobileStorageTransfer(porosity)
+    transport_model["mst"] = imod.mf6.MobileStorageTransfer(porosity, save_flows=True)
 
     # %%
     # Define the maximum concentration as the initial conditions, also output
@@ -357,7 +359,7 @@ def circle_model_transport_multispecies_variable_density():
     gwf_model = simulation["GWF_1"]
 
     for specie in species:
-        transport_model = imod.mf6.GroundwaterTransportModel()
+        transport_model = imod.mf6.GroundwaterTransportModel(save_flows=True)
         transport_model["ssm"] = imod.mf6.SourceSinkMixing.from_flow_model(
             gwf_model, specie, save_flows=True
         )

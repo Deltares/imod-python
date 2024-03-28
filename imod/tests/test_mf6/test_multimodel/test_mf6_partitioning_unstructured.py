@@ -155,11 +155,11 @@ def test_partitioning_unstructured(
     simulation.write(original_dir, binary=False)
     simulation.run()
 
-    original_head = simulation.open_head(
+    expected_head = simulation.open_head(
         simulation_start_time=np.datetime64("1999-01-01"),
         time_unit="d",
     )
-    original_flow_cbc = simulation.open_flow_budget(
+    expected_flow_cbc = simulation.open_flow_budget(
         simulation_start_time=np.datetime64("1999-01-01"),
         time_unit="d",
     )
@@ -169,17 +169,19 @@ def test_partitioning_unstructured(
 
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()  # %%
-    head = split_simulation.open_head(simulation_start_time="01-01-1999", time_unit="d")
-    head = head.ugrid.reindex_like(original_head)
+    actual_head = split_simulation.open_head(
+        simulation_start_time="01-01-1999", time_unit="d"
+    )
+    actual_head = actual_head.ugrid.reindex_like(expected_head)
 
-    flow_cbc = split_simulation.open_flow_budget(
+    actual_flow_cbc = split_simulation.open_flow_budget(
         simulation_start_time=np.datetime64("1999-01-01"), time_unit="d"
     )
-    flow_cbc = flow_cbc.ugrid.reindex_like(original_flow_cbc)
+    actual_flow_cbc = actual_flow_cbc.ugrid.reindex_like(expected_flow_cbc)
 
     # Compare the head result of the original simulation with the result of the partitioned simulation.
     np.testing.assert_allclose(
-        head["head"].values, original_head.values, rtol=1e-5, atol=1e-3
+        actual_head["head"].values, expected_head.values, rtol=1e-5, atol=1e-3
     )
     for key in ["flow-lower-face", "flow-horizontal-face"]:
         if partition_array["name"].values[()] == "concentric" and key in [
@@ -187,7 +189,10 @@ def test_partitioning_unstructured(
         ]:
             continue
         np.testing.assert_allclose(
-            flow_cbc[key].values, original_flow_cbc[key].values, rtol=1e-5, atol=1e-3
+            actual_flow_cbc[key].values,
+            expected_flow_cbc[key].values,
+            rtol=1e-5,
+            atol=1e-3,
         )
 
 
@@ -220,7 +225,7 @@ def test_partitioning_unstructured_with_inactive_cells(
 
     simulation.run()
 
-    original_head = simulation.open_head()
+    expected_head = simulation.open_head()
 
     # TODO: Fix issue 669
     #    original_cbc = imod.mf6.open_cbc(
@@ -234,13 +239,13 @@ def test_partitioning_unstructured_with_inactive_cells(
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()
 
-    head = split_simulation.open_head()
-    head = head.ugrid.reindex_like(original_head)
+    actual_head = split_simulation.open_head()
+    actual_head = actual_head.ugrid.reindex_like(expected_head)
     # _ = split_simulation.open_flow_budget()
 
     # Compare the head result of the original simulation with the result of the partitioned simulation
     np.testing.assert_allclose(
-        head["head"].values, original_head.values, rtol=1e-5, atol=1e-3
+        actual_head["head"].values, expected_head.values, rtol=1e-5, atol=1e-3
     )
 
 
@@ -265,8 +270,8 @@ def test_partitioning_unstructured_hfb(
     simulation.write(original_dir, binary=False)
     simulation.run()
 
-    original_head = simulation.open_head()
-    original_flow_cbc = simulation.open_flow_budget()
+    expected_head = simulation.open_head()
+    expected_flow_cbc = simulation.open_flow_budget()
 
     # Partition the simulation, run it, and save the (merged) results
     split_simulation = simulation.split(partition_array)
@@ -274,26 +279,28 @@ def test_partitioning_unstructured_hfb(
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()
 
-    head = split_simulation.open_head()
+    actual_head = split_simulation.open_head()
 
-    flow_cbc = split_simulation.open_flow_budget()
+    actual_flow_cbc = split_simulation.open_flow_budget()
 
-    head = head.ugrid.reindex_like(original_head)
-    flow_cbc = flow_cbc.ugrid.reindex_like(original_flow_cbc)
+    actual_head = actual_head.ugrid.reindex_like(expected_head)
+    actual_flow_cbc = actual_flow_cbc.ugrid.reindex_like(expected_flow_cbc)
 
     # Compare the head result of the original simulation with the result of the
     # partitioned simulation. Criteria are a bit looser than in other tests
     # because we are dealing with a problem with heads ranging roughly from 20
     # m to 0 m, and the HFB adds extra complexity to this.
-    np.testing.assert_allclose(head["head"].values, original_head.values, rtol=0.005)
+    np.testing.assert_allclose(
+        actual_head["head"].values, expected_head.values, rtol=0.005
+    )
     for key in ["flow-lower-face", "flow-horizontal-face"]:
         if partition_array["name"].values[()] == "concentric" and key in [
             "flow-horizontal-face"
         ]:
             continue
         np.testing.assert_allclose(
-            flow_cbc[key].values,
-            original_flow_cbc[key].values,
+            actual_flow_cbc[key].values,
+            expected_flow_cbc[key].values,
             rtol=1.0,
             atol=31.66250038,
         )
@@ -321,8 +328,8 @@ def test_partitioning_unstructured_with_well(
     simulation.write(original_dir, binary=False)
     simulation.run()
 
-    original_head = simulation.open_head()
-    original_flow_cbc = simulation.open_flow_budget()
+    expected_head = simulation.open_head()
+    expected_flow_cbc = simulation.open_flow_budget()
 
     # Partition the simulation, run it, and save the (merged) results
     split_simulation = simulation.split(partition_array)
@@ -330,21 +337,53 @@ def test_partitioning_unstructured_with_well(
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()
 
-    head = split_simulation.open_head()
-    head = head.ugrid.reindex_like(original_head)
-    # TODO:
-    # Uncomment when fixed: https://gitlab.com/deltares/imod/imod-python/-/issues/683
-    cbc = split_simulation.open_flow_budget()
-    cbc = cbc.ugrid.reindex_like(original_flow_cbc)
+    actual_head = split_simulation.open_head()
+    actual_head = actual_head.ugrid.reindex_like(expected_head)
+
+    actual_cbc = split_simulation.open_flow_budget()
+    actual_cbc = actual_cbc.ugrid.reindex_like(expected_flow_cbc)
     # Compare the head result of the original simulation with the result of the
     # partitioned simulation.
     np.testing.assert_allclose(
-        head["head"].values, original_head.values, rtol=1e-5, atol=1e-3
+        actual_head["head"].values, expected_head.values, rtol=1e-5, atol=1e-3
     )
     for key in ["flow-lower-face", "flow-horizontal-face"]:
         np.testing.assert_allclose(
-            cbc[key].values, original_flow_cbc[key].values, rtol=1, atol=0.01615156
+            actual_cbc[key].values,
+            expected_flow_cbc[key].values,
+            rtol=1,
+            atol=0.01615156,
         )
+
+
+def run_simulation(tmp_path, simulation, species):
+    simulation.write(tmp_path)
+    simulation.run()
+    head = simulation.open_head()
+    concentration = simulation.open_concentration()
+    flow_budget = simulation.open_flow_budget()
+    flow_budget = flow_budget.sel(time=364)
+    transport_budget = simulation.open_transport_budget(species)
+    transport_budget = transport_budget.sel(time=364)
+    return head, concentration, flow_budget, transport_budget
+
+
+def get_exchange_masks(actual_flow_budget, expected_flow_budget):
+    # create a cell-aray of booleans that is true on the exchange boundary cells and false in other locations
+    is_exchange_cell = actual_flow_budget["gwf-gwf"] != 0
+    is_exchange_cell = is_exchange_cell.sel(layer=1)
+
+    # create a edge-aray of booleans that is true on the exchange boundary edges and false in other locations
+    face_edge = is_exchange_cell.ugrid.grid.edge_face_connectivity
+    face_1 = is_exchange_cell.values[face_edge[:, 0]]
+    face_2 = is_exchange_cell.values[face_edge[:, 1]]
+    is_exchange_edge = (
+        zeros_like(expected_flow_budget["flow-horizontal-face"])
+        .sel(layer=1)
+        .astype(bool)
+    )
+    is_exchange_edge.values = face_1 & face_2
+    return is_exchange_cell, is_exchange_edge
 
 
 @pytest.mark.usefixtures("circle_model_transport")
@@ -354,21 +393,50 @@ def test_partition_transport(
     circle_model_transport: Modflow6Simulation,
     partition_array: xu.UgridDataArray,
 ):
-    circle_model_transport.write(tmp_path)
-    circle_model_transport.run()
-    concentration = circle_model_transport.open_concentration()
+    _, expected_concentration, expected_flow_budget, expected_transport_budget = (
+        run_simulation(tmp_path, circle_model_transport, ["salinity"])
+    )
 
     new_circle_model = circle_model_transport.split(partition_array)
-    new_circle_model.write(tmp_path / "split", binary=False)
-    new_circle_model.run()
-    new_concentration = new_circle_model.open_concentration()
-    new_concentration = new_concentration.ugrid.reindex_like(concentration)
+
+    _, actual_concentration, actual_flow_budget, actual_transport_budget = (
+        run_simulation(tmp_path, new_circle_model, ["salinity"])
+    )
+
+    actual_concentration = actual_concentration.ugrid.reindex_like(
+        expected_concentration
+    )
+    actual_flow_budget = actual_flow_budget.ugrid.reindex_like(expected_flow_budget)
+    actual_transport_budget = actual_transport_budget.ugrid.reindex_like(
+        expected_transport_budget
+    )
     np.testing.assert_allclose(
-        concentration.values,
-        new_concentration["concentration"].values,
+        expected_concentration.values,
+        actual_concentration["concentration"].values,
         rtol=7e-5,
         atol=3e-3,
     )
+
+    is_exchange_cell, is_exchange_edge = get_exchange_masks(
+        actual_flow_budget, expected_flow_budget
+    )
+
+    for budget_term in (
+        "ssm",
+        "flow-lower-face",
+        "storage-aqueous",
+        "flow-horizontal-face",
+    ):
+        marker = is_exchange_cell
+        if budget_term == "flow-horizontal-face":
+            marker = is_exchange_edge
+
+        np.testing.assert_allclose(
+            expected_transport_budget[budget_term].where(~marker, 0).values,
+            actual_transport_budget[budget_term].where(~marker, 0).values,
+            rtol=0.3,
+            atol=3e-3,
+        )
 
 
 @pytest.mark.usefixtures("circle_model_transport_multispecies_variable_density")
@@ -383,29 +451,64 @@ def test_partition_transport_multispecies(
     circle_model_transport_multispecies = (
         circle_model_transport_multispecies_variable_density
     )
-    circle_model_transport_multispecies.write(tmp_path / "original")
-    circle_model_transport_multispecies.run()
-    conc = circle_model_transport_multispecies.open_concentration()
-    head = circle_model_transport_multispecies.open_head()
+    expected_head, expected_conc, expected_flow_budget, expected_transport_budget = (
+        run_simulation(tmp_path, circle_model_transport_multispecies, ["salt", "temp"])
+    )
 
+    # split the simulation
     new_circle_model = circle_model_transport_multispecies.split(partition_array)
-    new_circle_model.write(tmp_path / "split")
-    new_circle_model.run()
-    conc_new = new_circle_model.open_concentration()
-    head_new = new_circle_model.open_head()
-    head_new = head_new.ugrid.reindex_like(head)
-    conc_new = conc_new.ugrid.reindex_like(conc)
 
-    np.testing.assert_allclose(
-        conc.values, conc_new["concentration"].values, rtol=4e-4, atol=5e-3
-    )
-    np.testing.assert_allclose(
-        head.values, head_new["head"].values, rtol=1e-5, atol=1e-3
+    # open results
+    actual_head, actual_conc, actual_flow_budget, actual_transport_budget = (
+        run_simulation(tmp_path, new_circle_model, ["salt", "temp"])
     )
 
-    # TODO: also compare budget results. For now just open them.
-    _ = new_circle_model.open_flow_budget()
-    _ = new_circle_model.open_transport_budget()
+    # reindex results
+    actual_head = actual_head.ugrid.reindex_like(expected_head)
+    actual_conc = actual_conc.ugrid.reindex_like(expected_conc)
+    actual_transport_budget = actual_transport_budget.ugrid.reindex_like(
+        expected_transport_budget
+    )
+    actual_flow_budget = actual_flow_budget.ugrid.reindex_like(expected_flow_budget)
+
+    # compare simulation results
+    np.testing.assert_allclose(
+        expected_conc.values, actual_conc["concentration"].values, rtol=4e-4, atol=5e-3
+    )
+    np.testing.assert_allclose(
+        expected_head.values, actual_head["head"].values, rtol=1e-5, atol=1e-3
+    )
+    # Compare the budgets.
+    # create a cell-aray of booleans that is true on the exchange boundary cells and false in other locations
+    is_exchange_cell, is_exchange_edge = get_exchange_masks(
+        actual_flow_budget, expected_flow_budget
+    )
+
+    for key in ["flow-lower-face", "flow-horizontal-face", "sto-ss", "rch"]:
+        marker = is_exchange_cell
+        if key == "flow-horizontal-face":
+            marker = is_exchange_edge
+
+        rtol = 0.3
+        atol = 3e-3
+        np.testing.assert_allclose(
+            expected_flow_budget[key].where(~marker, 0).values,
+            actual_flow_budget[key].where(~marker, 0).values,
+            rtol=rtol,
+            atol=atol,
+        )
+    for key in ["flow-lower-face", "flow-horizontal-face", "storage-aqueous", "ssm"]:
+        marker = is_exchange_cell
+        if key == "flow-horizontal-face":
+            marker = is_exchange_edge
+        rtol = 0.3
+        atol = 3e-3
+        np.testing.assert_allclose(
+            expected_transport_budget[key].where(~marker, 0).values,
+            actual_transport_budget[key].where(~marker, 0).values,
+            rtol=rtol,
+            atol=atol,
+        )
 
 
 @pytest.mark.usefixtures("circle_model")
