@@ -339,8 +339,7 @@ def test_partitioning_unstructured_with_well(
 
     actual_head = split_simulation.open_head()
     actual_head = actual_head.ugrid.reindex_like(expected_head)
-    # TODO:
-    # Uncomment when fixed: https://gitlab.com/deltares/imod/imod-python/-/issues/683
+
     actual_cbc = split_simulation.open_flow_budget()
     actual_cbc = actual_cbc.ugrid.reindex_like(expected_flow_cbc)
     # Compare the head result of the original simulation with the result of the
