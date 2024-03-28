@@ -380,9 +380,8 @@ def get_exchange_masks(actual_flow_budget, expected_flow_budget):
     face_2 = is_exchange_cell.values[face_edge[:, 1]]
     is_exchange_edge = zeros_like(expected_flow_budget["flow-horizontal-face"]).sel(
         layer=1
-    )
-    is_exchange_edge.values = np.where(face_1 & face_2, 1, 0)
-    is_exchange_edge = is_exchange_edge.astype(bool)
+    ).astype(bool)
+    is_exchange_edge.values = face_1 & face_2
     return is_exchange_cell, is_exchange_edge
 
 
