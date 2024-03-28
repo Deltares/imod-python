@@ -371,11 +371,7 @@ def run_simulation(tmp_path, simulation, species):
 
 def get_exchange_masks(actual_flow_budget, expected_flow_budget):
     # create a cell-aray of booleans that is true on the exchange boundary cells and false in other locations
-    is_exchange_cell = (
-        actual_flow_budget["gwf-gwf"]
-        .where(actual_flow_budget["gwf-gwf"] != 0)
-        .notnull()
-    )
+    is_exchange_cell = actual_flow_budget["gwf-gwf"] != 0
     is_exchange_cell = is_exchange_cell.sel(layer=1)
 
     # create a edge-aray of booleans that is true on the exchange boundary edges and false in other locations
