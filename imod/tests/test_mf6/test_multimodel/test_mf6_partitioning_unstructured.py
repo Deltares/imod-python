@@ -369,38 +369,24 @@ def run_simulation(tmp_path, simulation, species):
     return head, concentration, flow_budget, transport_budget
 
 
-def get_exchange_masks(actual_transport_budget, expected_transport_budget):
-    is_multispecies = "species" in actual_transport_budget.coords
-    species = ""
-    if is_multispecies:
-        species = actual_transport_budget.coords["species"][0]
+def get_exchange_masks(actual_flow_budget, expected_flow_budget):
     # create a cell-aray of booleans that is true on the exchange boundary cells and false in other locations
     is_exchange_cell = (
-        actual_transport_budget["gwt-gwt"]
-        .where(actual_transport_budget["gwt-gwt"] != 0)
+        actual_flow_budget["gwf-gwf"]
+        .where(actual_flow_budget["gwf-gwf"] != 0)
         .notnull()
     )
     is_exchange_cell = is_exchange_cell.sel(layer=1)
-    if is_multispecies:
-        is_exchange_cell = is_exchange_cell.sel(species=species)
-        is_exchange_cell = is_exchange_cell.drop_vars("species")
 
     # create a edge-aray of booleans that is true on the exchange boundary edges and false in other locations
     face_edge = is_exchange_cell.ugrid.grid.edge_face_connectivity
     face_1 = is_exchange_cell.values[face_edge[:, 0]]
     face_2 = is_exchange_cell.values[face_edge[:, 1]]
-    if is_multispecies:
-        is_exchange_edge = zeros_like(
-            expected_transport_budget["flow-horizontal-face"]
-        ).sel(layer=1, species=species)
-    else:
-        is_exchange_edge = zeros_like(
-            expected_transport_budget["flow-horizontal-face"]
-        ).sel(layer=1)
+    is_exchange_edge = zeros_like(expected_flow_budget["flow-horizontal-face"]).sel(
+        layer=1
+    )
     is_exchange_edge.values = np.where(face_1 & face_2, 1, 0)
     is_exchange_edge = is_exchange_edge.astype(bool)
-    if is_multispecies:
-        is_exchange_edge = is_exchange_edge.drop_vars("species")
     return is_exchange_cell, is_exchange_edge
 
 
@@ -411,20 +397,23 @@ def test_partition_transport(
     circle_model_transport: Modflow6Simulation,
     partition_array: xu.UgridDataArray,
 ):
-    _, expected_concentration, _, expected_budget = run_simulation(
-        tmp_path, circle_model_transport, ["salinity"]
+    _, expected_concentration, expected_flow_budget, expected_transport_budget = (
+        run_simulation(tmp_path, circle_model_transport, ["salinity"])
     )
 
     new_circle_model = circle_model_transport.split(partition_array)
 
-    _, actual_concentration, _, actual_budget = run_simulation(
-        tmp_path, new_circle_model, ["salinity"]
+    _, actual_concentration, actual_flow_budget, actual_transport_budget = (
+        run_simulation(tmp_path, new_circle_model, ["salinity"])
     )
 
     actual_concentration = actual_concentration.ugrid.reindex_like(
         expected_concentration
     )
-    actual_budget = actual_budget.ugrid.reindex_like(expected_budget)
+    actual_flow_budget = actual_flow_budget.ugrid.reindex_like(expected_flow_budget)
+    actual_transport_budget = actual_transport_budget.ugrid.reindex_like(
+        expected_transport_budget
+    )
     np.testing.assert_allclose(
         expected_concentration.values,
         actual_concentration["concentration"].values,
@@ -433,7 +422,7 @@ def test_partition_transport(
     )
 
     is_exchange_cell, is_exchange_edge = get_exchange_masks(
-        actual_budget, expected_budget
+        actual_flow_budget, expected_flow_budget
     )
 
     for budget_term in (
@@ -447,8 +436,8 @@ def test_partition_transport(
             marker = is_exchange_edge
 
         np.testing.assert_allclose(
-            expected_budget[budget_term].where(~marker, 0).values,
-            actual_budget[budget_term].where(~marker, 0).values,
+            expected_transport_budget[budget_term].where(~marker, 0).values,
+            actual_transport_budget[budget_term].where(~marker, 0).values,
             rtol=0.3,
             atol=3e-3,
         )
@@ -496,7 +485,7 @@ def test_partition_transport_multispecies(
     # Compare the budgets.
     # create a cell-aray of booleans that is true on the exchange boundary cells and false in other locations
     is_exchange_cell, is_exchange_edge = get_exchange_masks(
-        actual_transport_budget, expected_transport_budget
+        actual_flow_budget, expected_flow_budget
     )
 
     for key in ["flow-lower-face", "flow-horizontal-face", "sto-ss", "rch"]:
