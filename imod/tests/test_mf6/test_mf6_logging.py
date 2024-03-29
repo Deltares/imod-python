@@ -1,16 +1,21 @@
 import sys
 from io import StringIO
 from pathlib import Path
-
+import re
 import numpy as np
 import pytest
 import xarray as xr
-
+from time import sleep
 import imod
 from imod.logging import LoggerType, LogLevel
 from imod.mf6.write_context import WriteContext
+from imod.logging import standard_log_decorator
+from typing import Any
 
 out = StringIO()
+simple_real_number_regexp = (
+    "[0-9]*\.?[0-9]*"  # regexp for a real number without a sign and without exponents
+)
 
 
 @pytest.fixture(scope="function")
@@ -49,14 +54,23 @@ def test_write_package_is_logged(drainage, tmp_path):
     with open(logfile_path, "r") as log_file:
         log = log_file.read()
         assert "Initializing the Drainage package..." in log
-        assert "Successfully initialized the Drainage..." in log
+        assert (
+            re.search(
+                f"Successfully initialized the Drainage in {simple_real_number_regexp} seconds...",
+                log,
+            )
+            is not None
+        )
         assert (
             "Beginning execution of imod.mf6.package.write for object Drainage..."
             in log
         )
         assert (
-            "Finished execution of imod.mf6.package.write  for object Drainage..."
-            in log
+            re.search(
+                f"Finished execution of imod.mf6.package.write  for object Drainage in {simple_real_number_regexp} seconds...",
+                log,
+            )
+            is not None
         )
 
 
@@ -124,4 +138,34 @@ def test_write_simulation_is_logged(
         assert (
             "Finished execution of imod.mf6.simulation.write  for object Modflow6Simulation"
             in log
+        )
+
+
+def test_runtime_is_logged(drainage, tmp_path):
+    # arrange
+    @standard_log_decorator()
+    def procrastinate(_):
+        sleep(0.5)
+
+    logfile_path = tmp_path / "logfile.txt"
+
+    # act
+    with open(logfile_path, "w") as sys.stdout:
+        imod.logging.configure(
+            LoggerType.PYTHON,
+            log_level=LogLevel.DEBUG,
+            add_default_file_handler=False,
+            add_default_stream_handler=True,
+        )
+
+        procrastinate(
+            drainage
+        )  # the logger needs an imod-python object as the first function argument
+
+    # assert
+    with open(logfile_path, "r") as log_file:
+        log = log_file.read()
+
+        assert (
+            re.search(f"in 0.5{simple_real_number_regexp} seconds...", log) is not None
         )

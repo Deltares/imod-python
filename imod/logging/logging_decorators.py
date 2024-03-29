@@ -1,4 +1,5 @@
 from imod.logging.loglevel import LogLevel
+from time import time
 
 
 def standard_log_decorator(
@@ -12,12 +13,20 @@ def standard_log_decorator(
         def wrapper(*args, **kwargs):
             from imod.logging import logger
 
+            # anounce start of function
             object_name = str(type(args[0]).__name__)
             start_message = f"Beginning execution of {fun.__module__}.{fun.__name__} for object {object_name}..."
-            end_message = f"Finished execution of {fun.__module__}.{fun.__name__}  for object {object_name}..."
 
+            # anounce start of function
+            start_time = time()
             logger.log(loglevel=start_level, message=start_message, additional_depth=2)
+
+            # run function
             return_value = fun(*args, **kwargs)
+            end_time = time()
+
+            # anounce end of function
+            end_message = f"Finished execution of {fun.__module__}.{fun.__name__}  for object {object_name} in {end_time - start_time} seconds..."
             logger.log(loglevel=end_level, message=end_message, additional_depth=2)
             return return_value
 
@@ -37,12 +46,18 @@ def init_log_decorator(
         def wrapper(*args, **kwargs):
             from imod.logging import logger
 
+            # anounce start of function
             object_name = str(type(args[0]).__name__)
             start_message = f"Initializing the {object_name} package..."
-            end_message = f"Successfully initialized the {object_name}..."
-
+            start_time = time()
             logger.log(loglevel=start_level, message=start_message, additional_depth=2)
+
+            # run function
             return_value = fun(*args, **kwargs)
+            end_time = time()
+
+            # anounce end of function
+            end_message = f"Successfully initialized the {object_name} in {end_time - start_time} seconds..."
             logger.log(loglevel=end_level, message=end_message, additional_depth=2)
             return return_value
 
