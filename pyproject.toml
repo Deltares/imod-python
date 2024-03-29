@@ -83,8 +83,7 @@ ignore = [
     "C416",
     "C417",
     "C419",
-    "E501",
-    "F811",
+    "E501", # line-too-long. This rule can't be fullfilled by the ruff formatter. The same behavior as black.
     "PD002",
     "PD003",
     "PD004",

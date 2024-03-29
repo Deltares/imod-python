@@ -37,7 +37,7 @@ from imod.typing.grid import ones_like
     ],
 )
 @patch("imod.mf6.mf6_hfb_adapter.Mf6HorizontalFlowBarrier.__new__", autospec=True)
-def test_to_mf6_creates_mf6_adapter(
+def test_to_mf6_creates_mf6_adapter_init(
     mf6_flow_barrier_mock,
     dis,
     barrier_class,
