@@ -13,7 +13,7 @@ import xarray as xr
 
 def check_dtypes(das: List[xr.DataArray]) -> None:
     """Check whether the dtypes of all arrays are the same."""
-    dtypes = set(da.dtype for da in das)
+    dtypes = {da.dtype for da in das}
     if len(dtypes) != 1:
         raise TypeError(f"DataArrays do not match in dtype: {dtypes}")
     return
@@ -38,7 +38,7 @@ def check_sizes(sizes: DefaultDict[str, Set[int]], attribute: str) -> None:
 
 
 def check_dims(das: List[xr.DataArray]) -> None:
-    all_dims = set(da.dims for da in das)
+    all_dims = {da.dims for da in das}
     if len(all_dims) != 1:
         raise ValueError(
             f"All DataArrays should have exactly the same dimensions. Found: {all_dims}"

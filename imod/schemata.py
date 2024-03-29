@@ -127,7 +127,7 @@ class SchemaUnion:
     """
 
     def __init__(self, *args):
-        ntypes = len(set(type(arg) for arg in args))
+        ntypes = len({type(arg) for arg in args})
         if ntypes > 1:
             raise TypeError("schemata in a union should have the same type")
         self.schemata = tuple(args)
