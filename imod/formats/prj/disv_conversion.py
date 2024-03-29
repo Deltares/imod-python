@@ -59,7 +59,7 @@ class SingularTargetRegridderWeightsCache:
         methods = {}
         for pkgdict in projectfile_data.values():
             for variable, da in pkgdict.items():
-                xydims = set(("x", "y"))
+                xydims = {"x", "y"}
 
                 if isinstance(da, xr.DataArray) and xydims.issubset(da.dims):
                     # for initial condition, constant head, general head boundary
