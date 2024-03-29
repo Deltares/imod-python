@@ -307,12 +307,10 @@ class ImodflowModel(Model):
         time_composed = self["time_discretization"]._compose_values_time(
             "time", globaltimes
         )
-        time_composed = dict(
-            [
-                (timestep_nr, _compose_timestring(time, time_format=time_format))
-                for timestep_nr, time in time_composed.items()
-            ]
-        )
+        time_composed = {
+            timestep_nr: _compose_timestring(time, time_format=time_format)
+            for timestep_nr, time in time_composed.items()
+        }
         return time_composed
 
     def _compose_periods(self):
@@ -329,12 +327,10 @@ class ImodflowModel(Model):
         # Note that the timeformat for periods in the Projectfile is different
         # from that for stress periods
         time_format = "%d-%m-%Y %H:%M:%S"
-        periods_composed = dict(
-            [
-                (value, _compose_timestring(time, time_format=time_format))
-                for time, value in periods.items()
-            ]
-        )
+        periods_composed = {
+            value: _compose_timestring(time, time_format=time_format)
+            for time, value in periods.items()
+        }
         return periods_composed
 
     def _compose_all_packages(self, directory, globaltimes):
