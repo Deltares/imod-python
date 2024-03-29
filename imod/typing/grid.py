@@ -82,7 +82,7 @@ def _type_dispatch_functions_on_grid_sequence(
     start_type = type(first_object)
     homogeneous = all([isinstance(o, start_type) for o in objects])
     if not homogeneous:
-        unique_types = set([type(o) for o in objects])
+        unique_types = {type(o) for o in objects}
         raise TypeError(
             f"Only homogeneous sequences can be reduced, received sequence of {unique_types}"
         )

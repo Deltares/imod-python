@@ -74,7 +74,6 @@ exclude_lines = [
 [tool.ruff.lint]
 select = ["C4", "E", "F", "I", "PD"]
 ignore = [
-    "C403",
     "C404",
     "C405",
     "C408",

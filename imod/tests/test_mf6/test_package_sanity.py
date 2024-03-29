@@ -46,13 +46,11 @@ HIGH_LEVEL_PACKAGES = [
 
 
 def check_attributes(pkg_class):
-    class_attributes = set(
-        [
-            name
-            for name, member in inspect.getmembers(pkg_class)
-            if not name.startswith("__") and not callable(member)
-        ]
-    )
+    class_attributes = {
+        name
+        for name, member in inspect.getmembers(pkg_class)
+        if not name.startswith("__") and not callable(member)
+    }
 
     assert "_pkg_id" in class_attributes
     # TODO: check for metadata/schema

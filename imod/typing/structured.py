@@ -241,7 +241,7 @@ def merge_partitions(
 ) -> xr.Dataset:
     first_item = das[0]
     if isinstance(first_item, xr.Dataset):
-        unique_keys = set([key for da in das for key in da.keys()])
+        unique_keys = {key for da in das for key in da.keys()}
         merged_ls = []
         for key in unique_keys:
             merged_ls.append(_merge_partitions([da[key] for da in das]).rename(key))  # type: ignore
