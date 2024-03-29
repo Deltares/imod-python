@@ -68,7 +68,7 @@ class TestLineIterator:
         assert self.lines.count == -1
 
     def test_iter(self):
-        lines = [line for line in self.lines]
+        lines = list(self.lines)
         assert lines == [
             ["This", "is", "the", "first", "line"],
             ["this", "is", "the", "second"],
