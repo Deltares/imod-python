@@ -1,16 +1,16 @@
+import re
 import sys
 from io import StringIO
 from pathlib import Path
-import re
+from time import sleep
+
 import numpy as np
 import pytest
 import xarray as xr
-from time import sleep
+
 import imod
-from imod.logging import LoggerType, LogLevel
+from imod.logging import LoggerType, LogLevel, standard_log_decorator
 from imod.mf6.write_context import WriteContext
-from imod.logging import standard_log_decorator
-from typing import Any
 
 out = StringIO()
 simple_real_number_regexp = (

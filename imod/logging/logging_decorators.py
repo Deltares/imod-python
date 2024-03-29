@@ -1,5 +1,6 @@
-from imod.logging.loglevel import LogLevel
 from time import time
+
+from imod.logging.loglevel import LogLevel
 
 
 def standard_log_decorator(
