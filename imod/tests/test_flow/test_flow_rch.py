@@ -26,14 +26,14 @@ def test_recharge_no_time(three_days):
         nlayer,
     )
 
-    to_render = dict(
-        pkg_id=rch._pkg_id,
-        name=rch.__class__.__name__,
-        variable_order=rch._variable_order,
-        package_data=composition[rch._pkg_id],
-        n_entry=1,
-        times=time_composed,
-    )
+    to_render = {
+        "pkg_id": rch._pkg_id,
+        "name": rch.__class__.__name__,
+        "variable_order": rch._variable_order,
+        "package_data": composition[rch._pkg_id],
+        "n_entry": 1,
+        "times": time_composed,
+    }
 
     compare = (
         "0001, (rch), 1, Recharge, ['rate']\n"

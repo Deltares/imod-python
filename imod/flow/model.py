@@ -414,12 +414,12 @@ class ImodflowModel(Model):
             if (pkg_id in rendered) or (pkg_id in ignored):
                 continue  # Skip if already rendered (for groups) or not necessary to render
 
-            kwargs = dict(
-                pkg_id=pkg_id,
-                name=package.__class__.__name__,
-                variable_order=package._variable_order,
-                package_data=composition[pkg_id],
-            )
+            kwargs = {
+                "pkg_id": pkg_id,
+                "name": package.__class__.__name__,
+                "variable_order": package._variable_order,
+                "package_data": composition[pkg_id],
+            }
 
             if isinstance(package, BoundaryCondition):
                 kwargs["n_entry"] = self._calc_n_entry(composition[pkg_id], True)
@@ -618,13 +618,15 @@ class ImodflowModel(Model):
         outfilepath = directory / runfilepath
 
         RUNFILE_OPTIONS = {
-            "mf2005_namfile": dict(
-                sim_type=2, namfile_out=outfilepath.with_suffix(".nam")
-            ),
-            "runfile": dict(sim_type=1, runfile_out=outfilepath.with_suffix(".run")),
-            "mf6_namfile": dict(
-                sim_type=3, namfile_out=outfilepath.with_suffix(".nam")
-            ),
+            "mf2005_namfile": {
+                "sim_type": 2,
+                "namfile_out": outfilepath.with_suffix(".nam"),
+            },
+            "runfile": {"sim_type": 1, "runfile_out": outfilepath.with_suffix(".run")},
+            "mf6_namfile": {
+                "sim_type": 3,
+                "namfile_out": outfilepath.with_suffix(".nam"),
+            },
         }
 
         conversion_settings = RUNFILE_OPTIONS[convert_to]

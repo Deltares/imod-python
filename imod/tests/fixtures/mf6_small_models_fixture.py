@@ -45,7 +45,7 @@ def grid_data_structured_layered(
     nlayer = unstructured_grid_data.coords["layer"].max().values[()]
     for ilayer in range(1, nlayer + 1):
         layer_value = ilayer * value
-        unstructured_grid_data.loc[dict(layer=ilayer)] = layer_value
+        unstructured_grid_data.loc[{"layer": ilayer}] = layer_value
     return unstructured_grid_data
 
 

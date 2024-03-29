@@ -176,7 +176,7 @@ regridded_simulation["GWF"]["npf"]
 # Let's make a comparison plot of the hydraulic conductivities:
 
 fig, axes = plt.subplots(nrows=2, sharex=True)
-plot_kwargs = dict(colors="viridis", levels=np.linspace(0.0, 100.0, 21), fig=fig)
+plot_kwargs = {"colors": "viridis", "levels": np.linspace(0.0, 100.0, 21), "fig": fig}
 
 imod.visualize.spatial.plot_map(
     original_simulation["GWF"]["npf"]["k"].sel(layer=3), ax=axes[0], **plot_kwargs
@@ -337,7 +337,7 @@ hds_regridded
 # %%
 # Let's make a comparison plot of the regridded heads.
 fig, axes = plt.subplots(nrows=2, sharex=True)
-plot_kwargs = dict(colors="viridis", levels=np.linspace(0.0, 11.0, 12), fig=fig)
+plot_kwargs = {"colors": "viridis", "levels": np.linspace(0.0, 11.0, 12), "fig": fig}
 
 imod.visualize.spatial.plot_map(
     hds_original.isel(layer=6, time=-1), ax=axes[0], **plot_kwargs
