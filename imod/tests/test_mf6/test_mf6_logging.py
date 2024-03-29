@@ -144,7 +144,7 @@ def test_write_simulation_is_logged(
 def test_runtime_is_logged(drainage, tmp_path):
     # arrange
     @standard_log_decorator()
-    def procrastinate(_):
+    def sleep_half_a_second(_):
         sleep(0.5)
 
     logfile_path = tmp_path / "logfile.txt"
@@ -158,7 +158,7 @@ def test_runtime_is_logged(drainage, tmp_path):
             add_default_stream_handler=True,
         )
 
-        procrastinate(
+        sleep_half_a_second(
             drainage
         )  # the logger needs an imod-python object as the first function argument
 
