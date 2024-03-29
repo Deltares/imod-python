@@ -366,7 +366,7 @@ def join_lake_tables(lake_numbers, lakes):
     """
     nr_lakes = len(lakes)
 
-    any_lake_table = any([not da_is_none(lake["lake_table"]) for lake in lakes])
+    any_lake_table = any(not da_is_none(lake["lake_table"]) for lake in lakes)
     if not any_lake_table:
         return None
 
@@ -878,7 +878,7 @@ class Lake(BoundaryCondition):
         tables = self.dataset["lake_tables"].values[()]
         if tables is None:
             return False
-        if any([pd.api.types.is_numeric_dtype(t) for t in tables]):
+        if any(pd.api.types.is_numeric_dtype(t) for t in tables):
             return True
         return False
 

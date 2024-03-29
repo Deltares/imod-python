@@ -156,11 +156,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         >>> simulation["time_discretization"]["n_timesteps"] = 5
         """
         self.use_cftime = any(
-            [
-                model._use_cftime()
-                for model in self.values()
-                if isinstance(model, Modflow6Model)
-            ]
+            model._use_cftime()
+            for model in self.values()
+            if isinstance(model, Modflow6Model)
         )
 
         times = [

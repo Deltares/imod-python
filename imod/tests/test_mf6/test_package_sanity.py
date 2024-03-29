@@ -77,7 +77,7 @@ def test_render_twice(instance, tmp_path):
     modeldir = tmp_path / "testdir"
 
     sig = inspect.signature(instance.render)
-    if any([isinstance(instance, pack) for pack in HIGH_LEVEL_PACKAGES]):
+    if any(isinstance(instance, pack) for pack in HIGH_LEVEL_PACKAGES):
         with pytest.raises(NotImplementedError):
             instance.render(modeldir, "test", globaltimes, False)
         return

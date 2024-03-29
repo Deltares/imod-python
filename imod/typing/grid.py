@@ -80,7 +80,7 @@ def _type_dispatch_functions_on_grid_sequence(
     """
     first_object = _get_first_item(objects)
     start_type = type(first_object)
-    homogeneous = all([isinstance(o, start_type) for o in objects])
+    homogeneous = all(isinstance(o, start_type) for o in objects)
     if not homogeneous:
         unique_types = {type(o) for o in objects}
         raise TypeError(
@@ -126,10 +126,8 @@ def _type_dispatch_functions_on_dict(
     has_unstructured = xu.UgridDataArray in types
     # Test structured if xr.DataArray and spatial.
     has_structured_grid = any(
-        [
-            isinstance(arg, xr.DataArray) and is_spatial_2D(arg)
-            for arg in dict_of_objects.values()
-        ]
+        isinstance(arg, xr.DataArray) and is_spatial_2D(arg)
+        for arg in dict_of_objects.values()
     )
     if has_structured_grid and has_unstructured:
         raise TypeError(error_msg)
