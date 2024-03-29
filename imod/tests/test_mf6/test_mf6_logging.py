@@ -166,6 +166,4 @@ def test_runtime_is_logged(drainage, tmp_path):
     with open(logfile_path, "r") as log_file:
         log = log_file.read()
 
-        assert (
-            re.search("in 0.5[0-9]* seconds", log) is not None
-        )
+        assert re.search("in 0.5[0-9]* seconds", log) is not None
