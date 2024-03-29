@@ -216,7 +216,7 @@ def _dims_coordinates(header_coords, bounds, cellsizes, tops, bots, use_cftime):
         dims.insert(0, dim)
 
     # Deal with voxel idf top and bottom data
-    all_have_z = all(map(lambda v: v is not None, itertools.chain(tops, bots)))
+    all_have_z = all((v is not None for v in itertools.chain(tops, bots)))
     if all_have_z:
         if haslayer and coords["layer"].size > 1:
             coords = _array_z_coord(coords, tops, bots, unique_indices)

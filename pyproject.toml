@@ -74,7 +74,6 @@ exclude_lines = [
 [tool.ruff.lint]
 select = ["C4", "E", "F", "I", "PD"]
 ignore = [
-    "C417",
     "C419",
     "E501", # line-too-long. This rule can't be fullfilled by the ruff formatter. The same behavior as black.
     "PD002",
