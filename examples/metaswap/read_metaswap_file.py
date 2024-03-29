@@ -91,7 +91,7 @@ input_file = directory / "luse_svat.inp"
 # package. You can access it by calling <pkg>._metadata_dict. This function
 # returns stores your data in a dictionary.
 
-from imod.msw.fixed_format import fixed_format_parser
+from imod.msw.fixed_format import fixed_format_parser  # noqa: E402
 
 # Store the pkg in this variable for brevity
 pkg = imod.msw.LanduseOptions
@@ -136,7 +136,7 @@ ds["feddes_p3h"].plot.step(where="mid", xticks=xticks)
 # It is better to plot ordinal data on a bar chart. So in this case, we can
 # use matplotlib's bar function.
 #
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt  # noqa: E402
 
 plt.bar(xticks, ds["feddes_p3h"].values)
 plt.xticks(xticks)

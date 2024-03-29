@@ -105,7 +105,14 @@ same number of layers as the input array.
 # then we would do the following. First we'll load some example simulation.
 # There is a separate example contained in :doc:`/examples/mf6/hondsrug`
 # that you should look at if you are interested in the model building
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import xarray as xr
+
 import imod
+from imod.mf6.utilities.regrid import RegridderType, RegridderWeightsCache
+from imod.tests.fixtures.package_instance_creation import ALL_PACKAGE_INSTANCES
 
 tmpdir = imod.util.temporary_directory()
 
@@ -124,9 +131,7 @@ original_simulation["GWF"]["dis"]
 
 # %%
 # We want to regrid this to the following target grid:
-import xarray as xr
 
-import imod
 
 dx = 100
 dy = -100
@@ -169,8 +174,6 @@ regridded_simulation["GWF"]["npf"]
 
 # %%
 # Let's make a comparison plot of the hydraulic conductivities:
-import matplotlib.pyplot as plt
-import numpy as np
 
 fig, axes = plt.subplots(nrows=2, sharex=True)
 plot_kwargs = dict(colors="viridis", levels=np.linspace(0.0, 100.0, 21), fig=fig)
@@ -189,7 +192,6 @@ axes[1].set_ylabel("regridded")
 # Set up the input needed for custom regridding. Create a regridder
 # weight-cache. This object can (and should) be reused for all the packages that
 # undergo custom regridding at this stage.
-from imod.mf6.utilities.regrid import RegridderWeightsCache
 
 regrid_context = RegridderWeightsCache()
 
@@ -199,8 +201,6 @@ regrid_context
 # Regrid the recharge package with a custom regridder. In this case we opt
 # for the centroid locator regridder. This regridder is similar to using a
 # "nearest neighbour" lookup.
-from imod.mf6.utilities.regrid import RegridderType
-
 regridder_types = {"rate": (RegridderType.CENTROIDLOCATOR, None)}
 
 regridded_recharge = original_rch_package.regrid_like(
@@ -412,10 +412,6 @@ axes[1].set_ylabel("regridded")
 #
 # This code snippet prints all default methods:
 #
-import pandas as pd
-
-from imod.tests.fixtures.package_instance_creation import ALL_PACKAGE_INSTANCES
-
 regrid_method_setup = {
     "package name": [],
     "array name": [],

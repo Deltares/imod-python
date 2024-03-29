@@ -72,7 +72,7 @@ exclude_lines = [
 ]
 
 [tool.ruff.lint]
-select = ["C4", "E", "F", "I"]
+select = ["C4", "E", "F", "I", "PD"]
 ignore = [
     "C401",
     "C402",
@@ -83,12 +83,6 @@ ignore = [
     "C416",
     "C417",
     "C419",
-    "D202",
-    "D205",
-    "D206",
-    "D400",
-    "D404",
-    "E402",
     "E501",
     "E703",
     "E713",
@@ -100,6 +94,9 @@ ignore = [
     "PD003",
     "PD004",
     "PD901",
+    "PD011",
+    "PD013",
+    "PD015",
 ]
 ignore-init-module-imports = true
 
