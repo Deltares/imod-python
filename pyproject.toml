@@ -75,7 +75,6 @@ exclude_lines = [
 select = ["C4", "E", "F", "I", "PD"]
 ignore = [
     "E501", # line-too-long. This rule can't be fullfilled by the ruff formatter. The same behavior as black.
-    "PD002",
     "PD003",
     "PD004",
     "PD901",

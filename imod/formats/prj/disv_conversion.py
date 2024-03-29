@@ -665,7 +665,7 @@ def merge_hfbs(
     combined_dataset.coords["index"] = np.arange(combined_dataset.sizes["index"])
 
     combined_dataframe = cast(gpd.GeoDataFrame, combined_dataset.to_dataframe())
-    combined_dataframe.drop("print_input", axis=1, inplace=True)
+    combined_dataframe.drop("print_input", axis=1, inplace=True)  # noqa: PD002
 
     return imod.mf6.HorizontalFlowBarrierResistance(combined_dataframe)
 
