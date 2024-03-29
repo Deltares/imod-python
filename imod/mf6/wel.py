@@ -475,7 +475,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         # Find indices belonging to x, y coordinates
         indices_cell2d = points_indices(dst_grid, out_of_bounds="ignore", x=x, y=y)
         # Convert cell2d indices from 0-based to 1-based.
-        indices_cell2d = dict((dim, index + 1) for dim, index in indices_cell2d.items())
+        indices_cell2d = {dim: index + 1 for dim, index in indices_cell2d.items()}
         # Prepare layer indices, for later concatenation
 
         if isinstance(dst_grid, xu.UgridDataArray):
