@@ -877,7 +877,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         simulation = Modflow6Simulation(name=toml_path.stem)
         for key, entry in toml_content.items():
-            if not key in ["gwtgwf_exchanges", "split_exchanges"]:
+            if key not in ["gwtgwf_exchanges", "split_exchanges"]:
                 item_cls = classes[key]
                 for name, filename in entry.items():
                     path = toml_path.parent / filename

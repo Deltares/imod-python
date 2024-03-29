@@ -52,7 +52,7 @@ def get_scalar_variables(ds: GridDataArray) -> list[str]:
 def assign_datetime_coords(
     da: GridDataArray, simulation_start_time: np.datetime64, time_unit: str = "d"
 ) -> GridDataArray:
-    if not "time" in da.coords:
+    if "time" not in da.coords:
         raise ValueError(
             "cannot convert time column, because a time column could not be found"
         )

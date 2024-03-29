@@ -87,7 +87,7 @@ def align_other_obj_with_coords(
 
     """
     for coordname in obj.coords.keys():
-        if (coordname in other_obj.dims) and not (coordname in obj.dims):
+        if (coordname in other_obj.dims) and coordname not in obj.dims:
             obj = obj.expand_dims(coordname)
     # Note:
     # xr.align forces xu.UgridDataArray to xr.DataArray. Keep that in mind
