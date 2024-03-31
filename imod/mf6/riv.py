@@ -118,7 +118,7 @@ class River(BoundaryCondition, IRegridPackage):
         "bottom_elevation": [
             IdentityNoDataSchema("stage"),
             # Check river bottom above layer bottom, else Modflow throws error.
-            AllValueSchema(">", "bottom"),
+            AllValueSchema(">=", "bottom"),
         ],
         "concentration": [IdentityNoDataSchema("stage"), AllValueSchema(">=", 0.0)],
     }
