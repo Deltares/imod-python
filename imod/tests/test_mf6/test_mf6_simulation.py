@@ -71,15 +71,15 @@ def test_simulation_open_head(circle_model, tmp_path):
 
     assert isinstance(head_notime, xu.UgridDataArray)
     assert head_notime.dims == ("time", "layer", "mesh2d_nFaces")
-    assert head_notime.shape == (1, 2, 216)
+    assert head_notime.shape == (52, 2, 216)
 
     # open heads with time conversion.
     head = simulation.open_head(
         simulation_start_time=datetime(2013, 3, 11, 22, 0, 0), time_unit="w"
     )
     assert head.dims == ("time", "layer", "mesh2d_nFaces")
-    assert head.shape == (1, 2, 216)
-    assert str(head.coords["time"].values[()][0]) == "2013-03-18T22:00:00.000000000"
+    assert head.shape == (52, 2, 216)
+    assert str(head.coords["time"].values[()][0]) == "2013-04-29T22:00:00.000000000"
 
 
 @pytest.mark.usefixtures("circle_model")
@@ -100,7 +100,7 @@ def test_simulation_open_head_relative_path(circle_model, tmp_path):
 
     assert isinstance(head, xu.UgridDataArray)
     assert head.dims == ("time", "layer", "mesh2d_nFaces")
-    assert head.shape == (1, 2, 216)
+    assert head.shape == (52, 2, 216)
 
 
 @pytest.mark.usefixtures("circle_model")
