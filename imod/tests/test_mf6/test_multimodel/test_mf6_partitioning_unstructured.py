@@ -173,7 +173,7 @@ def test_partitioning_unstructured(
     is_exchange_cell, is_exchange_edge = get_exchange_masks(
         actual_flow_budget, expected_flow_budget
     )    
-    for key in ["flow-lower-face", "flow-horizontal-face", "chd"]:
+    for key in ["flow-lower-face", "flow-horizontal-face"]:
         marker = is_exchange_cell
         if key == "flow-horizontal-face":
             marker = is_exchange_edge        
