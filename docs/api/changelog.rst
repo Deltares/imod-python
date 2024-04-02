@@ -6,6 +6,13 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[Unreleased]
+------------
+
+Fixed
+~~~~~
+- No ``ValidationError`` thrown anymore in :class:`imod.mf6.River` when
+  ``bottom_elevation`` equals ``bottom`` in the model discretization.
 
 [0.16.0] - 2024-03-29
 ---------------------
