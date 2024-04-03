@@ -355,6 +355,8 @@ def test_partitioning_unstructured_with_well(
 
 
 def run_simulation(tmp_path, simulation, species=None):
+    # writes the simulation, runs it, and returns results including head,
+    # concentration, flow_budget and transport_budget
     has_transport = species is not None
     simulation.write(tmp_path)
     simulation.run()
