@@ -11,6 +11,10 @@ from imod.typing import GridDataArray
 
 
 class ALLOCATION_OPTION(Enum):
+    """
+    Enumerator for allocation settings. Numbers match the IDEFLAYER options in
+    iMOD 5.6.
+    """
     between_stage_and_riv_bottom = 0
     first_active = -1
     first_active_drn_above_stage = 1
