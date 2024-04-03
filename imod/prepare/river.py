@@ -44,21 +44,21 @@ def allocate_river_cells(
 ):
     match allocation_option:
         case ALLOCATION_OPTION.stage_to_riv_bot:
-            return allocate_cells__stage_to_riv_bot(
+            return _allocate_cells__stage_to_riv_bot(
                 top, bottom, stage, bottom_elevation
             )
         case ALLOCATION_OPTION.first_active_to_riv_bot:
-            return allocate_cells__first_active_to_riv_bot(
+            return _allocate_cells__first_active_to_riv_bot(
                 active, bottom, bottom_elevation
             )
         case ALLOCATION_OPTION.first_active_to_riv_bot__drn:
-            return allocate_cells__first_active_to_riv_bot__drn(
+            return _allocate_cells__first_active_to_riv_bot__drn(
                 active, top, bottom, stage, bottom_elevation
             )
         case ALLOCATION_OPTION.at_elevation:
-            return allocate_cells__at_elevation(top, bottom, bottom_elevation)
+            return _allocate_cells__at_elevation(top, bottom, bottom_elevation)
         case ALLOCATION_OPTION.at_first_active:
-            return allocate_cells__at_first_active(active)
+            return _allocate_cells__at_first_active(active)
 
 
 def allocate_drain_cells(
@@ -70,9 +70,9 @@ def allocate_drain_cells(
 ):
     match allocation_option:
         case ALLOCATION_OPTION.at_elevation:
-            return allocate_cells__at_elevation(top, bottom, elevation)
+            return _allocate_cells__at_elevation(top, bottom, elevation)
         case ALLOCATION_OPTION.at_first_active:
-            return allocate_cells__at_first_active(active)
+            return _allocate_cells__at_first_active(active)
         case _:
             raise ValueError(
                 "Received incompatible setting for drains, only"
@@ -91,9 +91,9 @@ def allocate_ghb_cells(
 ):
     match allocation_option:
         case ALLOCATION_OPTION.at_elevation:
-            return allocate_cells__at_elevation(top, bottom, head)
+            return _allocate_cells__at_elevation(top, bottom, head)
         case ALLOCATION_OPTION.at_first_active:
-            return allocate_cells__at_first_active(active)
+            return _allocate_cells__at_first_active(active)
         case _:
             raise ValueError(
                 "Received incompatible setting for drains, only"
@@ -109,7 +109,7 @@ def allocate_rch_cells(
 ):
     match allocation_option:
         case ALLOCATION_OPTION.at_first_active:
-            return allocate_cells__at_first_active(active)
+            return _allocate_cells__at_first_active(active)
         case _:
             raise ValueError(
                 "Received incompatible setting for drains, only"
@@ -122,7 +122,7 @@ def _is_layered(grid: GridDataArray):
     return "layer" in grid.sizes and grid.sizes["layer"] > 1
 
 
-def allocate_cells__stage_to_riv_bot(
+def _allocate_cells__stage_to_riv_bot(
     top: GridDataArray,
     bottom: GridDataArray,
     stage: GridDataArray,
@@ -162,7 +162,7 @@ def allocate_cells__stage_to_riv_bot(
     return (stage <= top_layered) & (bottom_elevation >= bottom)
 
 
-def allocate_cells__first_active_to_riv_bot(
+def _allocate_cells__first_active_to_riv_bot(
     active: GridDataArray, bottom: GridDataArray, bottom_elevation: GridDataArray
 ):
     """
@@ -194,7 +194,7 @@ def allocate_cells__first_active_to_riv_bot(
     return (layer >= upper_active_layer) & (bottom_elevation >= bottom)
 
 
-def allocate_cells__first_active_to_riv_bot__drn(
+def _allocate_cells__first_active_to_riv_bot__drn(
     active: GridDataArray,
     top: GridDataArray,
     bottom: GridDataArray,
@@ -248,7 +248,7 @@ def allocate_cells__first_active_to_riv_bot__drn(
     return riv_cells, drn_cells
 
 
-def allocate_cells__at_elevation(
+def _allocate_cells__at_elevation(
     top: GridDataArray, bottom: GridDataArray, elevation: GridDataArray
 ):
     """
@@ -282,7 +282,7 @@ def allocate_cells__at_elevation(
     return (elevation < top_layered) & (elevation >= bottom)
 
 
-def allocate_cells__at_first_active(active: GridDataArray):
+def _allocate_cells__at_first_active(active: GridDataArray):
     """
     Allocate cells inbetween first active layer and river bottom elevation.
     Compared to iMOD5.6, this is similar to setting IDEFFLAYER=-1 in the RUNFILE
