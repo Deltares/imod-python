@@ -34,5 +34,14 @@ from imod.prepare.spatial import (
     zonal_aggregate_polygons,
     zonal_aggregate_raster,
 )
+from imod.prepare.topsystem import (
+    ALLOCATION_OPTION,
+    allocate_drain_cells,
+    allocate_ghb_cells,
+    allocate_rch_cells,
+    allocate_river_cells,
+    c_leakage,
+    c_radial,
+)
 from imod.prepare.voxelize import Voxelizer
 from imod.prepare.wells import assign_wells

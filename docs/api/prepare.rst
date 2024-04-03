@@ -31,3 +31,11 @@ Prepare model input
     get_lower_active_layer_number
     get_upper_active_grid_cells
     get_upper_active_layer_number
+
+    ALLOCATION_OPTION
+    allocate_drain_cells
+    allocate_ghb_cells
+    allocate_rch_cells
+    allocate_river_cells
+    c_leakage
+    c_radial
