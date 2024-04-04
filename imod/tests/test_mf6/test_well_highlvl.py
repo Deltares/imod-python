@@ -262,3 +262,28 @@ def test_non_unique_ids(twri_simulation: imod.mf6.Modflow6Simulation):
             print_flows=True,
             validate=True,
         )
+
+
+def test_error_message_wells_outside_grid(
+    tmp_path: Path, twri_simulation: imod.mf6.Modflow6Simulation
+):
+
+    # define 2 wells oustide of the model domain
+    twri_simulation["GWF_1"]["well"] = imod.mf6.Well(
+        x=[1e5, 5e3],
+        y=[1e5, 5e3],
+        screen_top=[0.0, 0.0],
+        screen_bottom=[-400.0, -400],
+        rate=[1.0, 3.0],
+        print_flows=True,
+        validate=True,
+    )
+
+    asserted = False
+    try :
+        twri_simulation.write(tmp_path, binary=False)
+    except Exception as e:
+        asserted = True
+        assert "Not all wells could be assigned" in str(e)
+
+    assert asserted
