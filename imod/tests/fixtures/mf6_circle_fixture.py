@@ -161,7 +161,7 @@ def make_circle_model_flow_with_transport_data(species: list[str]):
         reordering_method=None,
         relaxation_factor=0.97,
     )
-    simtimes = pd.date_range(start="2000-01-01", end="2001-01-01", freq="W")    
+    simtimes = pd.date_range(start="2000-01-01", end="2001-01-01", freq="W")
     simulation.create_time_discretization(simtimes)
     return simulation
 
