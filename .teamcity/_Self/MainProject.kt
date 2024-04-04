@@ -18,7 +18,6 @@ object MainProject : Project({
     buildType(MyPy)
     buildType(UnitTests)
     buildType(Examples)
-    buildType(PipPython310)
     buildType(PipPython311)
     buildType(PipPython312)
     buildType(Tests)
