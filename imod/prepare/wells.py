@@ -68,7 +68,7 @@ def locate_wells(
         for ind in first["index"].values:
             if not ind in xy_bottom["index"]:
                 raise ValueError(
-                    f'well with index {ind} and x = {first["x"][ind]} and y = {first["y"][ind]} could not be mapped on the grid'
+                    f'well at x = {first["x"][ind]} and y = {first["y"][ind]} could not be mapped on the grid'
                 )
 
     if k is not None:
