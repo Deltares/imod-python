@@ -578,7 +578,7 @@ class Well(BoundaryCondition, IPointDataPackage):
 
         if nwells_df == 0:
             raise ValueError("No wells were assigned in package. None were present.")
-        # @TODO: reinstate this check. issue github #621.
+
         if not is_partitioned and nwells_df != nwells_assigned:
             raise ValueError(
                 "One or more well(s) are completely invalid due to minimum conductivity and thickness constraints."
