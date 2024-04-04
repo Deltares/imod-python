@@ -198,12 +198,11 @@ def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, lis
         if isinstance(pkg, IRegridPackage):
             pkg_methods = pkg.get_regrid_methods()
             for variable in pkg_methods:
-                if (
-                    variable in pkg.dataset.data_vars
-                    and pkg.dataset[variable].values[()] is not None
-                ):
+                if variable in pkg.dataset.data_vars:
+                    functiontype = None
                     regriddertype = pkg_methods[variable][0]
-                    functiontype = pkg_methods[variable][1]
+                    if len(pkg_methods[variable]) > 1:
+                        functiontype = pkg_methods[variable][1]
                     if functiontype not in methods[regriddertype]:
                         methods[regriddertype].append(functiontype)
     return methods
@@ -267,7 +266,10 @@ def _regrid_like(
         varname,
         regridder_type_and_function,
     ) in regridder_settings.items():
-        regridder_name, regridder_function = regridder_type_and_function
+        regridder_function = None
+        regridder_name = regridder_type_and_function[0]
+        if len(regridder_type_and_function) > 1:
+            regridder_function = regridder_type_and_function[1]
 
         # skip variables that are not in this dataset
         if varname not in package.dataset.keys():
