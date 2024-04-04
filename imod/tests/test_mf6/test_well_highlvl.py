@@ -8,6 +8,10 @@ import xarray as xr
 from pytest_cases import parametrize_with_cases
 
 import imod
+import imod.tests
+import imod.tests.fixtures
+import imod.tests.fixtures.mf6_circle_fixture
+import imod.tests.fixtures.mf6_twri_fixture
 from imod.mf6.write_context import WriteContext
 from imod.tests.fixtures.mf6_small_models_fixture import (
     grid_data_structured,
@@ -264,26 +268,32 @@ def test_non_unique_ids(twri_simulation: imod.mf6.Modflow6Simulation):
         )
 
 
-def test_error_message_wells_outside_grid(
-    tmp_path: Path, twri_simulation: imod.mf6.Modflow6Simulation
-):
+@pytest.mark.parametrize("fixture_name", ["twri_model", "circle_model"])
+def test_error_message_wells_outside_grid(tmp_path: Path, fixture_name: str, request):
+    simulation = request.getfixturevalue(fixture_name)
 
-    # define 2 wells oustide of the model domain
-    twri_simulation["GWF_1"]["well"] = imod.mf6.Well(
-        x=[1e5, 5e3],
-        y=[1e5, 5e3],
-        screen_top=[0.0, 0.0],
-        screen_bottom=[-400.0, -400],
-        rate=[1.0, 3.0],
+    # define a well oustide of the model domain
+    in_domain_wells = {0: {"x": 1.0, "y": 2.0}, 1: {"x": 4.0, "y": 5.0}}
+    out_of_domain_well = {"x": 500000, "y": 600000}
+    simulation["GWF_1"]["well"] = imod.mf6.Well(
+        x=[in_domain_wells[0]["x"], out_of_domain_well["x"], in_domain_wells[1]["x"]],
+        y=[in_domain_wells[0]["y"], out_of_domain_well["y"], in_domain_wells[1]["y"]],
+        screen_top=[0.0, 0.0, 0],
+        screen_bottom=[-1400.0, -1300, -400],
+        rate=[1.0, 2.0, 3.0],
         print_flows=True,
         validate=True,
     )
 
     asserted = False
-    try :
-        twri_simulation.write(tmp_path, binary=False)
+    try:
+        simulation.write(tmp_path, binary=False)
     except Exception as e:
         asserted = True
-        assert "Not all wells could be assigned" in str(e)
 
+        # ensure the coordinates of the offending well are present in the error message
+        assert str(out_of_domain_well["x"]) in str(e)
+        assert str(out_of_domain_well["y"]) in str(e)
+
+    # ensure a problem was detected
     assert asserted

@@ -62,6 +62,15 @@ def locate_wells(
 
     xy_top = imod.select.points_values(top, x=x, y=y, out_of_bounds="ignore")
     xy_bottom = imod.select.points_values(bottom, x=x, y=y, out_of_bounds="ignore")
+
+    # Raise exception if not all wells could be mapped onto the domain
+    if xy_bottom["index"].shape[0] < len(x):
+        for ind in first["index"].values:
+            if not ind in xy_bottom["index"]:
+                raise ValueError(
+                    f'well with index {ind} and x = {first["x"][ind]} and y = {first["y"][ind]} could not be mapped on the grid'
+                )
+
     if k is not None:
         xy_k = imod.select.points_values(k, x=x, y=y, out_of_bounds="ignore")
 
