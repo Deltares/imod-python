@@ -59,13 +59,16 @@ def test_regridded_simulation_has_required_packages(
 def test_regrid_with_methods_without_functions(circle_model, tmp_path):
     simulation = circle_model
     idomain = circle_model["GWF_1"].domain
-    # redefine the default regridding method for the constant head package
+    # redefine the default regridding method for the constant head package,
+    # assign a default method that does not have a function
     old_regrid_method = imod.mf6.ConstantHead._regrid_method
     imod.mf6.ConstantHead._regrid_method = {
         "head": (RegridderType.BARYCENTRIC,),
         "concentration": (RegridderType.BARYCENTRIC,),
     }
     regridding_succeeded = False
+
+    # try regridding the simulation with the new default method
     try:
         simulation.regrid_like("regridded", idomain)
         regridding_succeeded = True
