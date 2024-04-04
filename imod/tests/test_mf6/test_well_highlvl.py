@@ -272,7 +272,7 @@ def test_non_unique_ids(twri_simulation: imod.mf6.Modflow6Simulation):
 def test_error_message_wells_outside_grid(tmp_path: Path, fixture_name: str, request):
     simulation = request.getfixturevalue(fixture_name)
 
-    # define a well oustide of the model domain
+    # define wells inside the domain, and also  one outside
     in_domain_wells = {0: {"x": 1.0, "y": 2.0}, 1: {"x": 4.0, "y": 5.0}}
     out_of_domain_well = {"x": 500000, "y": 600000}
     simulation["GWF_1"]["well"] = imod.mf6.Well(
@@ -291,7 +291,7 @@ def test_error_message_wells_outside_grid(tmp_path: Path, fixture_name: str, req
     except Exception as e:
         asserted = True
 
-        # ensure the coordinates of the offending well are present in the error message
+        # ensure the coordinates of the first offending well are present in the error message
         assert str(out_of_domain_well["x"]) in str(e)
         assert str(out_of_domain_well["y"]) in str(e)
 
