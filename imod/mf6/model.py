@@ -359,7 +359,6 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         x_max: Optional[float] = None,
         y_min: Optional[float] = None,
         y_max: Optional[float] = None,
-        state_for_boundary: Optional[GridDataArray] = None,
     ):
         """
         Clip a model by a bounding box (time, layer, y, x).
@@ -400,7 +399,6 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             x_max,
             y_min,
             y_max,
-            state_for_boundary,
         )
 
         return clipped
