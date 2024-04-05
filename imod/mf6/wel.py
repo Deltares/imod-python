@@ -394,7 +394,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         wells_df = wells_df.reset_index()
 
         wells_assigned = assign_wells(
-            wells_df, top_3d, bottom, k, minimum_thickness, minimum_k
+            wells_df, top_3d, bottom, k, minimum_thickness, minimum_k, True
         )
         # Set multi-index again
         wells_assigned = wells_assigned.set_index(index_names).sort_index()
