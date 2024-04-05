@@ -47,7 +47,7 @@ def locate_wells(
     top: Union[xr.DataArray, xu.UgridDataArray],
     bottom: Union[xr.DataArray, xu.UgridDataArray],
     k: Union[xr.DataArray, xu.UgridDataArray, None],
-    throw_if_well_not_placed: bool = False
+    throw_if_well_not_placed: bool = False,
 ):
     if not isinstance(top, (xu.UgridDataArray, xr.DataArray)):
         raise TypeError(
@@ -65,12 +65,12 @@ def locate_wells(
     xy_bottom = imod.select.points_values(bottom, x=x, y=y, out_of_bounds="ignore")
 
     # Raise exception if not all wells could be mapped onto the domain
-    if  throw_if_well_not_placed and len(x) > len(xy_top["index"]):
-        inside = imod.select.points_in_bounds(top, x=x,y=y)
-        out = np.where(inside ==False)
+    if throw_if_well_not_placed and len(x) > len(xy_top["index"]):
+        inside = imod.select.points_in_bounds(top, x=x, y=y)
+        out = np.where(~inside)
         raise ValueError(
-            f'well at x = {x[out[0]]} and y = {y[out[0]]} could not be mapped on the grid'
-        )       
+            f"well at x = {x[out[0]]} and y = {y[out[0]]} could not be mapped on the grid"
+        )
 
     if k is not None:
         xy_k = imod.select.points_values(k, x=x, y=y, out_of_bounds="ignore")
@@ -93,7 +93,7 @@ def assign_wells(
     k: Optional[Union[xr.DataArray, xu.UgridDataArray]] = None,
     minimum_thickness: Optional[float] = 0.05,
     minimum_k: Optional[float] = 1.0,
-    throw_if_well_not_placed: bool = False    
+    throw_if_well_not_placed: bool = False,
 ) -> pd.DataFrame:
     """
     Distribute well pumping rate according to filter length when ``k=None``, or
@@ -137,7 +137,9 @@ def assign_wells(
             f"received: {members}"
         )
 
-    id_in_bounds, xy_top, xy_bottom, xy_k = locate_wells(wells, top, bottom, k, throw_if_well_not_placed)
+    id_in_bounds, xy_top, xy_bottom, xy_k = locate_wells(
+        wells, top, bottom, k, throw_if_well_not_placed
+    )
     wells_in_bounds = wells.set_index("id").loc[id_in_bounds].reset_index()
     first = wells_in_bounds.groupby("id").first()
     overlap = compute_overlap(first, xy_top, xy_bottom)
