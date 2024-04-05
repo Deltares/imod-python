@@ -116,7 +116,8 @@ def assign_wells(
     minimum_thickness: float, optional, default: 0.01
     minimum_k: float, optional, default: 1.0
         Minimum conductivity
-
+    throw_if_well_not_placed: bool
+        raise an excpetion if one of the wells is not in the domain
     Returns
     -------
     placed_wells: pd.DataFrame
