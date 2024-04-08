@@ -36,7 +36,6 @@ class GWFGWT(ExchangeBase):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-        state_for_boundary: Optional[GridDataArray] = None,
     ) -> Package:
         """
         The GWF-GWT exchange does not have any spatial coordinates that can be clipped.

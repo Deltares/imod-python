@@ -559,7 +559,6 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-        state_for_boundary: Optional[GridDataArray] = None,
     ) -> "HorizontalFlowBarrierBase":
         """
         Clip a package by a bounding box (time, layer, y, x).
@@ -585,7 +584,6 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         y_max: optional, float
         top: optional, GridDataArray
         bottom: optional, GridDataArray
-        state_for_boundary: optional, GridDataArray
 
         Returns
         -------

@@ -87,7 +87,6 @@ class GWTGWT(ExchangeBase):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-        state_for_boundary: Optional[GridDataArray] = None,
     ) -> Package:
         raise NotImplementedError("this package cannot be clipped")
 
