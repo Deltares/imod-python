@@ -201,8 +201,8 @@ def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, lis
                 if variable in pkg.dataset.data_vars:
                     functiontype = None
                     regriddertype = regrid_method[0]
-                    if len(pkg_methods[variable]) > 1:
-                        functiontype = pkg_methods[variable][1]
+                    if len(regrid_method) > 1:
+                        functiontype = regrid_method[1]
                     if functiontype not in methods[regriddertype]:
                         methods[regriddertype].append(functiontype)
     return methods
