@@ -354,7 +354,16 @@ def enforce_dim_order(grid: xu.UgridDataArray) -> xu.UgridDataArray:
 
 
 def preserve_gridtype(func):
-    """ "Decorator to preserve gridtype"""
+    """
+    Decorator to preserve gridtype, this is to work around the following xugrid
+    behavior:
+
+    UgridDataArray * DataArray -> UgridDataArray
+    DataArray * UgridDataArray -> DataArray
+
+    with this decorator:
+    DataArray * UgridDataArray -> UgridDataArray
+    """
 
     def decorator(*args, **kwargs):
         unstructured = False
