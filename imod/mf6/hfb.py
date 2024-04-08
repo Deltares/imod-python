@@ -584,7 +584,6 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         y_max: optional, float
         top: optional, GridDataArray
         bottom: optional, GridDataArray
-        state_for_boundary: optional, GridDataArray
 
         Returns
         -------
