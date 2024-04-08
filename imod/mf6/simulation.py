@@ -977,18 +977,31 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             state_for_boundary = (
                 None if states_for_boundary is None else states_for_boundary.get(key)
             )
-
-            clipped[key] = value.clip_box(
-                time_min=time_min,
-                time_max=time_max,
-                layer_min=layer_min,
-                layer_max=layer_max,
-                x_min=x_min,
-                x_max=x_max,
-                y_min=y_min,
-                y_max=y_max,
-                state_for_boundary=state_for_boundary,
-            )
+            if isinstance(value, Modflow6Model):
+                clipped[key] = value.clip_box(
+                    time_min=time_min,
+                    time_max=time_max,
+                    layer_min=layer_min,
+                    layer_max=layer_max,
+                    x_min=x_min,
+                    x_max=x_max,
+                    y_min=y_min,
+                    y_max=y_max,
+                    state_for_boundary=state_for_boundary,
+                )
+            elif isinstance(value, Package):
+                clipped[key] = value.clip_box(
+                    time_min=time_min,
+                    time_max=time_max,
+                    layer_min=layer_min,
+                    layer_max=layer_max,
+                    x_min=x_min,
+                    x_max=x_max,
+                    y_min=y_min,
+                    y_max=y_max,
+                )
+            else:
+                raise ValueError(f"object of type {type(value)} cannot be clipped.")
         return clipped
 
     def split(self, submodel_labels: GridDataArray) -> Modflow6Simulation:

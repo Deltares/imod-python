@@ -541,7 +541,7 @@ def test_slice_and_run_with_state(transient_twri_model, tmp_path):
     transient_twri_model.run()
     head = transient_twri_model.open_head()
 
-    #set the boundary to  recognizable value, in this case 1.23
+    # set the boundary to  recognizable value, in this case 1.23
     state_for_boundary = {"GWF_1": 1.23 * ones_like(head)}
     clipped_simulation = transient_twri_model.clip_box(
         time_min="2000-01-10",
@@ -555,7 +555,7 @@ def test_slice_and_run_with_state(transient_twri_model, tmp_path):
         states_for_boundary=state_for_boundary,
     )
 
-    #check that the value 1.23 occurrs in the chd_clipped package of the clipped simulation
+    # check that the value 1.23 occurrs in the chd_clipped package of the clipped simulation
     clipped_boundary = clipped_simulation["GWF_1"]["chd_clipped"].dataset.sel(
         time=2, layer=1
     )

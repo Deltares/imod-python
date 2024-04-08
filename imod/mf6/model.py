@@ -359,6 +359,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         x_max: Optional[float] = None,
         y_min: Optional[float] = None,
         y_max: Optional[float] = None,
+        state_for_boundary: Optional[GridDataArray] = None,
     ):
         """
         Clip a model by a bounding box (time, layer, y, x).
@@ -382,7 +383,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         x_max: optional, float
         y_min: optional, float
         y_max: optional, float
-        state_for_boundary :
+        state_for_boundary: optional, float
         """
         supported, error_with_object = self.is_clipping_supported()
         if not supported:
@@ -413,7 +414,6 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         x_max: Optional[float] = None,
         y_min: Optional[float] = None,
         y_max: Optional[float] = None,
-        state_for_boundary: Optional[GridDataArray] = None,
     ):
         """
         Clip a model by a bounding box (time, layer, y, x).
@@ -458,7 +458,6 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 y_max=y_max,
                 top=top,
                 bottom=bottom,
-                state_for_boundary=state_for_boundary,
             )
 
         return clipped

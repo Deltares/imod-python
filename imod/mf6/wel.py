@@ -253,7 +253,6 @@ class Well(BoundaryCondition, IPointDataPackage):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-        state_for_boundary: Optional[GridDataArray] = None,
     ) -> Package:
         """
         Clip a package by a bounding box (time, layer, y, x).
@@ -741,7 +740,6 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-        state_for_boundary: Optional[GridDataArray] = None,
     ) -> Package:
         """
         Clip a package by a bounding box (time, layer, y, x).
@@ -897,7 +895,6 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-        state_for_boundary: Optional[GridDataArray] = None,
     ) -> Package:
         """
         Clip a package by a bounding box (time, layer, y, x).
