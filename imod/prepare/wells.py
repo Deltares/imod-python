@@ -47,7 +47,7 @@ def locate_wells(
     top: Union[xr.DataArray, xu.UgridDataArray],
     bottom: Union[xr.DataArray, xu.UgridDataArray],
     k: Union[xr.DataArray, xu.UgridDataArray, None],
-    throw_if_well_not_placed: bool = False,
+    validate: bool = False,
 ):
     if not isinstance(top, (xu.UgridDataArray, xr.DataArray)):
         raise TypeError(
@@ -65,7 +65,7 @@ def locate_wells(
     xy_bottom = imod.select.points_values(bottom, x=x, y=y, out_of_bounds="ignore")
 
     # Raise exception if not all wells could be mapped onto the domain
-    if throw_if_well_not_placed and len(x) > len(xy_top["index"]):
+    if validate and len(x) > len(xy_top["index"]):
         inside = imod.select.points_in_bounds(top, x=x, y=y)
         out = np.where(~inside)
         raise ValueError(
@@ -93,7 +93,7 @@ def assign_wells(
     k: Optional[Union[xr.DataArray, xu.UgridDataArray]] = None,
     minimum_thickness: Optional[float] = 0.05,
     minimum_k: Optional[float] = 1.0,
-    throw_if_well_not_placed: bool = False,
+    validate: bool = False,
 ) -> pd.DataFrame:
     """
     Distribute well pumping rate according to filter length when ``k=None``, or
@@ -116,7 +116,7 @@ def assign_wells(
     minimum_thickness: float, optional, default: 0.01
     minimum_k: float, optional, default: 1.0
         Minimum conductivity
-    throw_if_well_not_placed: bool
+    validate: bool
         raise an excpetion if one of the wells is not in the domain
     Returns
     -------
@@ -139,7 +139,7 @@ def assign_wells(
         )
 
     id_in_bounds, xy_top, xy_bottom, xy_k = locate_wells(
-        wells, top, bottom, k, throw_if_well_not_placed
+        wells, top, bottom, k, validate
     )
     wells_in_bounds = wells.set_index("id").loc[id_in_bounds].reset_index()
     first = wells_in_bounds.groupby("id").first()
