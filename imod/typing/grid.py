@@ -7,8 +7,8 @@ import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
 
-from imod.prepare import polygonize
 from imod.typing import GridDataArray, GridDataset, structured
+from imod.util.spatial import _polygonize
 
 
 @typedispatch
@@ -228,7 +228,7 @@ def merge_with_dictionary(
 def bounding_polygon(active: xr.DataArray):
     """Return bounding polygon of active cells"""
     to_polygonize = active.where(active, other=np.nan)
-    polygons_gdf = polygonize(to_polygonize)
+    polygons_gdf = _polygonize(to_polygonize)
     # Filter polygons with inactive values (NaN)
     is_active_polygon = polygons_gdf["value"] == 1.0
     return polygons_gdf.loc[is_active_polygon]

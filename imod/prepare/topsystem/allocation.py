@@ -4,8 +4,8 @@ This module contains all kinds of utilities to prepare rivers
 
 from enum import Enum
 
-from imod.mf6.utilities.grid import create_layered_top
 from imod.prepare.layer import (
+    create_layered_top,
     get_upper_active_grid_cells,
     get_upper_active_layer_number,
 )
