@@ -25,6 +25,7 @@ except ImportError:
 if TYPE_CHECKING:
     import geopandas as gpd
 
+
 def round_extent(extent, cellsize):
     """Increases the extent until all sides lie on a coordinate
     divisible by cellsize."""

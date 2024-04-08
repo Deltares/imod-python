@@ -39,6 +39,7 @@ else:
     except ImportError:
         gpd = MissingOptionalModule("geopandas")
 
+
 def _xycoords(bounds, cellsizes) -> Dict[str, Any]:
     """Based on bounds and cellsizes, construct coords with spatial information"""
     # unpack tuples
