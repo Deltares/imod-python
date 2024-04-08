@@ -358,11 +358,13 @@ def preserve_gridtype(func):
     Decorator to preserve gridtype, this is to work around the following xugrid
     behavior:
 
-    UgridDataArray * DataArray -> UgridDataArray
-    DataArray * UgridDataArray -> DataArray
+    >>> UgridDataArray() * DataArray() -> UgridDataArray
+    >>> DataArray() * UgridDataArray() -> DataArray
 
     with this decorator:
-    DataArray * UgridDataArray -> UgridDataArray
+    
+    >>> UgridDataArray() * DataArray() -> UgridDataArray
+    >>> DataArray() * UgridDataArray() -> UgridDataArray
     """
 
     def decorator(*args, **kwargs):
