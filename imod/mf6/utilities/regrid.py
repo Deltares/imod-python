@@ -197,7 +197,7 @@ def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, lis
     for _, pkg in model.items():
         if isinstance(pkg, IRegridPackage):
             pkg_methods = pkg.get_regrid_methods()
-            for variable in pkg_methods:
+            for variable, regrid_method in pkg_methods.items():
                 if variable in pkg.dataset.data_vars:
                     functiontype = None
                     regriddertype = pkg_methods[variable][0]
