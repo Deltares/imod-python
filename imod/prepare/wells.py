@@ -77,9 +77,9 @@ def locate_wells(
 
     # Discard out-of-bounds wells.
     index = xy_top["index"]
-    if not np.array_equal(xy_bottom["index"], index):
+    if validate and not np.array_equal(xy_bottom["index"], index):
         raise ValueError("bottom grid does not match top grid")
-    if k is not None and not np.array_equal(xy_k["index"], index):
+    if validate and k is not None and not np.array_equal(xy_k["index"], index):
         raise ValueError("k grid does not match top grid")
     id_in_bounds = first.index[index]
 
