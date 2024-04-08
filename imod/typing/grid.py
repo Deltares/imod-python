@@ -362,7 +362,7 @@ def preserve_gridtype(func):
     >>> DataArray() * UgridDataArray() -> DataArray
 
     with this decorator:
-    
+
     >>> UgridDataArray() * DataArray() -> UgridDataArray
     >>> DataArray() * UgridDataArray() -> UgridDataArray
     """
