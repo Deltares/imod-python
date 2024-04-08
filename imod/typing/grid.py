@@ -336,3 +336,41 @@ def get_grid_geometry_hash(grid: xu.UgridDataArray) -> int:
 @typedispatch
 def get_grid_geometry_hash(grid: object) -> int:
     raise ValueError("get_grid_geometry_hash not supported for this object.")
+
+
+@typedispatch
+def enforce_dim_order(grid: xr.DataArray) -> xr.DataArray:
+    """Enforce dimension order to iMOD Python standard"""
+    return grid.transpose("species", "time", "layer", "y", "x", missing_dims="ignore")
+
+
+@typedispatch
+def enforce_dim_order(grid: xu.UgridDataArray) -> xu.UgridDataArray:
+    """Enforce dimension order to iMOD Python standard"""
+    face_dimension = grid.ugrid.grid.face_dimension
+    return grid.transpose(
+        "species", "time", "layer", face_dimension, missing_dims="ignore"
+    )
+
+
+def preserve_gridtype(func):
+    """ "Decorator to preserve gridtype"""
+
+    def decorator(*args, **kwargs):
+        unstructured = False
+        grid = None
+        for arg in args:
+            if is_unstructured(arg):
+                unstructured = True
+                grid = arg.ugrid.grid
+
+        x = func(*args, **kwargs)
+
+        if unstructured:
+            # Multiple grids returned
+            if isinstance(x, tuple):
+                return tuple(xu.UgridDataArray(i, grid) for i in x)
+            return xu.UgridDataArray(x, grid)
+        return x
+
+    return decorator
