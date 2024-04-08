@@ -73,6 +73,9 @@ def test_regrid_with_methods_without_functions(circle_model, tmp_path):
         simulation.regrid_like("regridded", idomain)
         regridding_succeeded = True
     finally:
+        # Set the regrid_method back to its old value. It is a class variable
+        # and not an instance variable, so if we don't put it back all chd
+        # packages will be affected in the next tests
         imod.mf6.ConstantHead._regrid_method = old_regrid_method
 
     assert regridding_succeeded
