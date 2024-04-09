@@ -9,6 +9,15 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Added
+~~~~~
+- Added functions to allocate planar grids over layers for the topsystem in
+  :func:`imod.prepare.allocate_drn_cells`,
+  :func:`imod.prepare.allocate_ghb_cells`,
+  :func:`imod.prepare.allocate_rch_cells`,
+  :func:`imod.prepare.allocate_riv_cells`, for this multiple options can be
+  selected, available in :func:`imod.prepare.ALLOCATION_OPTION`.
+
 Fixed
 ~~~~~
 - No ``ValidationError`` thrown anymore in :class:`imod.mf6.River` when
