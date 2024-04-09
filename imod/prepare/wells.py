@@ -47,7 +47,7 @@ def locate_wells(
     top: Union[xr.DataArray, xu.UgridDataArray],
     bottom: Union[xr.DataArray, xu.UgridDataArray],
     k: Union[xr.DataArray, xu.UgridDataArray, None],
-    validate: bool = False,
+    validate: bool = True,
 ):
     if not isinstance(top, (xu.UgridDataArray, xr.DataArray)):
         raise TypeError(
@@ -93,7 +93,7 @@ def assign_wells(
     k: Optional[Union[xr.DataArray, xu.UgridDataArray]] = None,
     minimum_thickness: Optional[float] = 0.05,
     minimum_k: Optional[float] = 1.0,
-    validate: bool = False,
+    validate: bool = True,
 ) -> pd.DataFrame:
     """
     Distribute well pumping rate according to filter length when ``k=None``, or

@@ -1,3 +1,4 @@
+from typing import Any
 import numpy as np
 import pandas as pd
 import pytest
@@ -5,7 +6,7 @@ import xarray as xr
 
 import imod.prepare.wells as prepwel
 from imod.testing import assert_frame_equal
-
+from pytest_cases import parametrize_with_cases
 
 def test_vectorized_overlap():
     bounds_a = np.array(
@@ -50,10 +51,13 @@ def test_compute_overlap():
     expected = np.array([1.0, 2.0, 3.0, 0.0, 0.0, 1.0])
     assert np.allclose(actual, expected)
 
+class AssignWellCases:
 
-class TestAssignWell:
-    @pytest.fixture(autouse=True)
-    def setup(self):
+
+    def case_mix_wells(self):
+        # This is a testcase where NOT all the wells are in the domain, but most
+        # are. It can be used to verify that validation erros will not occurr if
+        # validation is off
         ones = xr.DataArray(
             data=np.ones((2, 3, 3)),
             coords={"layer": [1, 2], "y": [2.5, 1.5, 0.5], "x": [0.5, 1.5, 2.5]},
@@ -79,62 +83,97 @@ class TestAssignWell:
                 "rate": [1.0, 10.0, 100.0, 0.0],
             }
         )
+        return wells, top, bottom, k
 
-        self.wells = wells
-        self.top = top
-        self.bottom = bottom
-        self.k = k
+    def case_all_in_domain(self):
+        # This is a testcase where all where all the wells are in the domain and
+        # have valid tops and bottoms
+        ones = xr.DataArray(
+            data=np.ones((2, 3, 3)),
+            coords={"layer": [1, 2], "y": [2.5, 1.5, 0.5], "x": [0.5, 1.5, 2.5]},
+            dims=["layer", "y", "x"],
+        )
+        top = ones.copy()
+        top[0] = 10.0
+        top[1] = 0.0
+        bottom = ones.copy()
+        bottom[0] = 0.0
+        bottom[1] = -10.0
+        k = ones.copy()
+        k[0] = 10.0
+        k[1] = 20.0
 
-    def test_locate_wells__no_kh(self):
+        wells = pd.DataFrame(
+            {
+                "x": [0.6, 1.1, 2.3, 2.6],
+                "y": [0.6, 1.1, 2.3, 2.6],
+                "id": [1, 2, 3, 4],
+                "top": [5.0, 4.0, 3.0, 0.0],
+                "bottom": [4.0, 2.0, -1.0, 0.0],
+                "rate": [1.0, 10.0, 100.0, 0.0],
+            }
+        )
+
+        return wells, top, bottom, k
+    
+
+class TestAssignWell:
+
+    @parametrize_with_cases("wells, top, bottom, k", cases=AssignWellCases.case_all_in_domain)
+    def test_locate_wells__no_kh(self, wells, top, bottom, k):
         id_in_bounds, xy_top, xy_bottom, xy_kh = prepwel.locate_wells(
-            wells=self.wells,
-            top=self.top,
-            bottom=self.bottom,
+            wells=wells,
+            top=top,
+            bottom=bottom,
             k=None,
         )
 
-        assert np.array_equal(id_in_bounds, [1, 2, 3])
-        assert np.allclose(xy_top, [[10.0, 10.0, 10.0], [0.0, 0.0, 0.0]])
-        assert np.allclose(xy_bottom, [[0.0, 0.0, 0.0], [-10.0, -10.0, -10.0]])
+        assert np.array_equal(id_in_bounds, [1, 2, 3, 4])
+        assert np.allclose(xy_top, [[10.0, 10.0, 10.0, 10], [0.0, 0.0, 0.0, 0.0]])
+        assert np.allclose(xy_bottom, [[0.0, 0.0, 0.0, 0.0], [-10.0, -10.0, -10.0, -10.0]])
         assert xy_kh == 1.0
 
-    def test_locate_wells(self):
+    @parametrize_with_cases("wells, top, bottom, k", cases=AssignWellCases.case_all_in_domain)
+    def test_locate_wells(self, wells, top, bottom, k):
         id_in_bounds, xy_top, xy_bottom, xy_kh = prepwel.locate_wells(
-            wells=self.wells,
-            top=self.top,
-            bottom=self.bottom,
-            k=self.k,
+            wells=wells,
+            top=top,
+            bottom=bottom,
+            k=k,
         )
 
-        assert np.array_equal(id_in_bounds, [1, 2, 3])
-        assert np.allclose(xy_top, [[10.0, 10.0, 10.0], [0.0, 0.0, 0.0]])
-        assert np.allclose(xy_bottom, [[0.0, 0.0, 0.0], [-10.0, -10.0, -10.0]])
-        assert np.allclose(xy_kh, [[10.0, 10.0, 10.0], [20.0, 20.0, 20.0]])
+        assert np.array_equal(id_in_bounds, [1, 2, 3, 4])
+        assert np.allclose(xy_top, [[10.0, 10.0, 10.0, 10], [0.0, 0.0, 0.0, 0.0]])
+        assert np.allclose(xy_bottom, [[0.0, 0.0, 0.0, 0.0], [-10.0, -10.0, -10.0, -10.0]])
+        assert np.allclose(xy_kh, [[10.0, 10.0, 10.0, 10.0], [20.0, 20.0, 20.0, 20.0]])
 
-    def test_locate_wells_errors(self):
+    @parametrize_with_cases("wells, top, bottom, k", cases=AssignWellCases.case_all_in_domain)
+    def test_locate_wells_errors(self, wells, top, bottom, k):
         with pytest.raises(TypeError, match="top and bottom"):
-            prepwel.locate_wells(self.wells, self.top.values, self.bottom, None)
+            prepwel.locate_wells(wells, top.values, bottom, None)
         with pytest.raises(ValueError, match="bottom grid does not match"):
-            small_bottom = self.bottom.sel(y=slice(2.0, 0.0))
-            prepwel.locate_wells(self.wells, self.top, small_bottom, None)
+            small_bottom = bottom.sel(y=slice(2.0, 0.0))
+            prepwel.locate_wells(wells, top, small_bottom, None)
         with pytest.raises(ValueError, match="k grid does not match"):
-            small_kh = self.k.sel(y=slice(2.0, 0.0))
-            prepwel.locate_wells(self.wells, self.top, self.bottom, small_kh)
+            small_kh = k.sel(y=slice(2.0, 0.0))
+            prepwel.locate_wells(wells, top, bottom, small_kh)
 
-    def test_assign_wells_errors(self):
+    @parametrize_with_cases("wells, top, bottom, k", cases=AssignWellCases.case_all_in_domain)
+    def test_assign_wells_errors(self, wells, top, bottom, k):
         with pytest.raises(ValueError, match="Columns are missing"):
-            wells = pd.DataFrame({"id": [1], "x": [1.0], "y": [1.0]})
-            prepwel.assign_wells(wells, self.top, self.bottom, self.k)
+            faulty_wells = pd.DataFrame({"id": [1], "x": [1.0], "y": [1.0]})
+            prepwel.assign_wells(faulty_wells, top, bottom,k)
         with pytest.raises(TypeError, match="top, bottom, and optionally"):
-            prepwel.assign_wells(self.wells, self.top, self.bottom.values)
+            prepwel.assign_wells(wells,top, bottom.values)
         with pytest.raises(TypeError, match="top, bottom, and optionally"):
-            prepwel.assign_wells(self.wells, self.top.values, self.bottom, self.k)
+            prepwel.assign_wells(wells, top.values,bottom, k)
 
-    def test_assign_wells__no_kh(self):
+    @parametrize_with_cases("wells, top, bottom, k", cases=AssignWellCases.case_all_in_domain)
+    def test_assign_wells__no_kh(self, wells, top, bottom, k):
         actual = prepwel.assign_wells(
-            wells=self.wells,
-            top=self.top,
-            bottom=self.bottom,
+            wells=wells,
+            top=top,
+            bottom=bottom,
         )
         assert isinstance(actual, pd.DataFrame)
         expected = pd.DataFrame(
@@ -154,12 +193,13 @@ class TestAssignWell:
         )
         assert_frame_equal(actual, expected, check_like=True)
 
-    def test_assign_wells(self):
+    @parametrize_with_cases("wells, top, bottom, k", cases=AssignWellCases.case_all_in_domain)
+    def test_assign_wells(self,  wells, top, bottom, k):
         actual = prepwel.assign_wells(
-            wells=self.wells,
-            top=self.top,
-            bottom=self.bottom,
-            k=self.k,
+            wells=wells,
+            top=top,
+            bottom=bottom,
+            k=k,
         )
         assert isinstance(actual, pd.DataFrame)
         expected = pd.DataFrame(
@@ -179,12 +219,13 @@ class TestAssignWell:
         )
         assert_frame_equal(actual, expected, check_like=True)
 
-    def test_assign_wells_minimum_thickness(self):
+    @parametrize_with_cases("wells, top, bottom, k", cases=AssignWellCases.case_all_in_domain)
+    def test_assign_wells_minimum_thickness(self,  wells, top, bottom, k):
         actual = prepwel.assign_wells(
-            wells=self.wells,
-            top=self.top,
-            bottom=self.bottom,
-            k=self.k,
+            wells=wells,
+            top=top,
+            bottom=bottom,
+            k=k,
             minimum_thickness=1.01,
         )
         assert isinstance(actual, pd.DataFrame)
@@ -205,8 +246,9 @@ class TestAssignWell:
         )
         assert_frame_equal(actual, expected, check_like=True)
 
-    def test_assign_wells_transient_rate(self):
-        wells_xr = self.wells.to_xarray()
+    @parametrize_with_cases("wells, top, bottom, k", cases=AssignWellCases.case_all_in_domain)
+    def test_assign_wells_transient_rate(self,  wells, top, bottom, k):
+        wells_xr = wells.to_xarray()
         multiplier = xr.DataArray(
             data=np.arange(1.0, 6.0),
             coords={"time": pd.date_range("2000-01-01", "2000-01-05")},
@@ -217,17 +259,60 @@ class TestAssignWell:
 
         actual = prepwel.assign_wells(
             wells=transient_wells,
-            top=self.top,
-            bottom=self.bottom,
-            k=self.k,
+            top=top,
+            bottom=bottom,
+            k=k,
         )
         assert np.array_equal(actual["id"], np.repeat([1, 2, 3, 3], 5))
 
         actual = prepwel.assign_wells(
             wells=transient_wells,
-            top=self.top,
-            bottom=self.bottom,
-            k=self.k,
-            minimum_thickness=1.01,
+            top=top,
+            bottom=bottom,
+            k=k,
+            minimum_thickness=1.01,         
         )
         assert np.array_equal(actual["id"], np.repeat([2, 3], 5))
+
+    @parametrize_with_cases("wells, top, bottom, k", cases=AssignWellCases.case_mix_wells)
+    def test_assign_wells_out_of_domain(self,  wells, top, bottom, k):
+        wells_xr = wells.to_xarray()
+        multiplier = xr.DataArray(
+            data=np.arange(1.0, 6.0),
+            coords={"time": pd.date_range("2000-01-01", "2000-01-05")},
+            dims=["time"],
+        )
+        wells_xr["rate"] = multiplier * wells_xr["rate"]
+        transient_wells = wells_xr.to_dataframe().reset_index()
+
+        actual = prepwel.assign_wells(
+            wells=transient_wells,
+            top=top,
+            bottom=bottom,
+            k=k,
+            validate = False            
+        )
+        assert np.array_equal(actual["id"], np.repeat([1, 2, 3, 3], 5))
+
+        actual = prepwel.assign_wells(
+            wells=transient_wells,
+            top=top,
+            bottom=bottom,
+            k=k,
+            minimum_thickness=1.01,
+            validate=False            
+        )
+        assert np.array_equal(actual["id"], np.repeat([2, 3], 5))
+
+
+    @parametrize_with_cases("wells, top, bottom, k", cases=AssignWellCases.case_mix_wells)
+    def test_assign_wells_out_of_domain(self,  wells, top, bottom, k):
+
+        with pytest.raises(ValueError, match="could not be mapped on the grid"):
+            _ = prepwel.assign_wells(
+                wells=wells,
+                top=top,
+                bottom=bottom,
+                k=k,
+            )
+        
