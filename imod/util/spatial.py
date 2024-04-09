@@ -636,7 +636,7 @@ def is_divisor(numerator: FloatArray, denominator: float) -> bool:
     return (np.isclose(remainder, 0.0) | np.isclose(remainder, denominator)).all()
 
 
-def _polygonize(da: xr.DataArray) -> gpd.GeoDataFrame:
+def _polygonize(da: xr.DataArray) -> "gpd.GeoDataFrame":
     """
     Polygonize a 2D-DataArray into a GeoDataFrame of polygons.
 
