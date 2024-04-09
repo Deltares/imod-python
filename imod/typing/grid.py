@@ -353,6 +353,11 @@ def enforce_dim_order(grid: xu.UgridDataArray) -> xu.UgridDataArray:
     )
 
 
+def _enforce_unstructured(obj: GridDataArray, ugrid2d = xu.Ugrid2d) -> xu.UgridDataArray:
+    """Force obj to unstructured"""
+    return xu.UgridDataArray(xr.DataArray(obj), ugrid2d)
+
+
 def preserve_gridtype(func):
     """
     Decorator to preserve gridtype, this is to work around the following xugrid
@@ -380,8 +385,8 @@ def preserve_gridtype(func):
         if unstructured:
             # Multiple grids returned
             if isinstance(x, tuple):
-                return tuple(xu.UgridDataArray(i, grid) for i in x)
-            return xu.UgridDataArray(x, grid)
+                return tuple(_enforce_unstructured(i, grid) for i in x)
+            return _enforce_unstructured(x, grid)
         return x
 
     return decorator
