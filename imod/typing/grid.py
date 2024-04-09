@@ -353,7 +353,7 @@ def enforce_dim_order(grid: xu.UgridDataArray) -> xu.UgridDataArray:
     )
 
 
-def _enforce_unstructured(obj: GridDataArray, ugrid2d = xu.Ugrid2d) -> xu.UgridDataArray:
+def _enforce_unstructured(obj: GridDataArray, ugrid2d=xu.Ugrid2d) -> xu.UgridDataArray:
     """Force obj to unstructured"""
     return xu.UgridDataArray(xr.DataArray(obj), ugrid2d)
 
