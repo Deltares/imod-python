@@ -111,7 +111,7 @@ def allocate_rch_cells(
 ) -> GridDataArray:
     match allocation_option:
         case ALLOCATION_OPTION.at_first_active:
-            return _allocate_cells__at_first_active(active)
+            return _allocate_cells__at_first_active(active)[0]
         case _:
             raise ValueError(
                 "Received incompatible setting for drains, only"
