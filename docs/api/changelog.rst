@@ -13,6 +13,8 @@ Fixed
 ~~~~~
 - No ``ValidationError`` thrown anymore in :class:`imod.mf6.River` when
   ``bottom_elevation`` equals ``bottom`` in the model discretization.
+- When wells outside of the domain are added, an exception is raised with an 
+  error message stating a well is outside of the domain.
 
 [0.16.0] - 2024-03-29
 ---------------------
