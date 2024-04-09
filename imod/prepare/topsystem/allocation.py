@@ -36,7 +36,7 @@ PLANAR_GRID = (
 )
 
 
-def allocate_river_cells(
+def allocate_riv_cells(
     allocation_option: ALLOCATION_OPTION,
     active: GridDataArray,
     top: GridDataArray,
@@ -63,7 +63,7 @@ def allocate_river_cells(
             return _allocate_cells__at_first_active(active)
 
 
-def allocate_drain_cells(
+def allocate_drn_cells(
     allocation_option: ALLOCATION_OPTION,
     active: GridDataArray,
     top: GridDataArray,

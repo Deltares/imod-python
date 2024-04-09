@@ -3,10 +3,10 @@ from pytest_cases import parametrize_with_cases
 
 from imod.prepare.topsystem import (
     ALLOCATION_OPTION,
-    allocate_drain_cells,
+    allocate_drn_cells,
     allocate_ghb_cells,
     allocate_rch_cells,
-    allocate_river_cells,
+    allocate_riv_cells,
 )
 from imod.typing import GridDataArray
 from imod.typing.grid import is_unstructured, zeros_like
@@ -163,7 +163,7 @@ class AllocationOptionRechargeCases:
 def test_riv_allocation(
     active, top, bottom, stage, bottom_elevation, option, expected_riv, expected_drn
 ):
-    actual_riv_da, actual_drn_da = allocate_river_cells(
+    actual_riv_da, actual_drn_da = allocate_riv_cells(
         option, active, top, bottom, stage, bottom_elevation
     )
 
@@ -184,7 +184,7 @@ def test_riv_allocation(
 )
 @parametrize_with_cases(argnames="option,expected", cases=AllocationOptionDrainCases)
 def test_drn_allocation(active, top, bottom, drn_elevation, option, expected):
-    actual_da = allocate_drain_cells(option, active, top, bottom, drn_elevation)
+    actual_da = allocate_drn_cells(option, active, top, bottom, drn_elevation)
 
     actual = take_first_planar_cell(actual_da)
 
