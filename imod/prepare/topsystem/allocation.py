@@ -61,7 +61,16 @@ def allocate_riv_cells(
             return _allocate_cells__at_elevation(top, bottom, bottom_elevation)
         case ALLOCATION_OPTION.at_first_active:
             return _allocate_cells__at_first_active(active)
-
+        case _:
+            raise ValueError(
+                "Received incompatible setting for rivers, only"
+                f"'{ALLOCATION_OPTION.stage_to_riv_bot.name}' and"
+                f"'{ALLOCATION_OPTION.first_active_to_riv_bot.name}' and"
+                f"'{ALLOCATION_OPTION.first_active_to_riv_bot__drn.name}' and"
+                f"'{ALLOCATION_OPTION.at_elevation.name}' and"
+                f"'{ALLOCATION_OPTION.at_first_active.name}' supported."
+                f"got: '{allocation_option.name}'"
+            )
 
 def allocate_drn_cells(
     allocation_option: ALLOCATION_OPTION,
