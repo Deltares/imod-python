@@ -107,7 +107,7 @@ def allocate_ghb_cells(
             return _allocate_cells__at_first_active(active)[0]
         case _:
             raise ValueError(
-                "Received incompatible setting for drains, only"
+                "Received incompatible setting for general head boundary, only"
                 f"'{ALLOCATION_OPTION.at_elevation.name}' and"
                 f"'{ALLOCATION_OPTION.at_first_active.name}' supported."
                 f"got: '{allocation_option.name}'"
@@ -123,7 +123,7 @@ def allocate_rch_cells(
             return _allocate_cells__at_first_active(active)[0]
         case _:
             raise ValueError(
-                "Received incompatible setting for drains, only"
+                "Received incompatible setting for recharge, only"
                 f"'{ALLOCATION_OPTION.at_first_active.name}' supported."
                 f"got: '{allocation_option.name}'"
             )
