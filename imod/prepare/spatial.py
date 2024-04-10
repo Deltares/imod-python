@@ -1,5 +1,5 @@
 import pathlib
-from typing import Callable, Union
+from typing import TYPE_CHECKING, Callable, Union
 
 import dask
 import numba
@@ -11,6 +11,7 @@ import xarray as xr
 import imod
 from imod.prepare import common, pcg
 from imod.util.imports import MissingOptionalModule
+from imod.util.spatial import _polygonize
 
 # since rasterio is a big dependency that is sometimes hard to install
 # and not always required, we made this an optional dependency
@@ -20,6 +21,9 @@ try:
     import rasterio.warp
 except ImportError:
     rasterio = MissingOptionalModule("rasterio")
+
+if TYPE_CHECKING:
+    import geopandas as gpd
 
 
 def round_extent(extent, cellsize):
@@ -252,7 +256,7 @@ def rasterize(geodataframe, like, column=None, fill=np.nan, **kwargs):
     return xr.DataArray(raster, like.coords, like.dims)
 
 
-def polygonize(da):
+def polygonize(da: xr.DataArray) -> "gpd.GeoDataFrame":
     """
     Polygonize a 2D-DataArray into a GeoDataFrame of polygons.
 
@@ -264,28 +268,7 @@ def polygonize(da):
     -------
     polygonized : geopandas.GeoDataFrame
     """
-    import geopandas as gpd
-    import shapely.geometry as sg
-
-    if da.dims != ("y", "x"):
-        raise ValueError('Dimensions must be ("y", "x")')
-
-    values = da.values
-    if values.dtype == np.float64:
-        values = values.astype(np.float32)
-
-    transform = imod.util.spatial.transform(da)
-    shapes = rasterio.features.shapes(values, transform=transform)
-
-    geometries = []
-    colvalues = []
-    for geom, colval in shapes:
-        geometries.append(sg.Polygon(geom["coordinates"][0]))
-        colvalues.append(colval)
-
-    gdf = gpd.GeoDataFrame({"value": colvalues, "geometry": geometries})
-    gdf.crs = da.attrs.get("crs")
-    return gdf
+    return _polygonize(da)
 
 
 def _handle_dtype(dtype, nodata):
