@@ -72,6 +72,7 @@ def allocate_riv_cells(
                 f"got: '{allocation_option.name}'"
             )
 
+
 def allocate_drn_cells(
     allocation_option: ALLOCATION_OPTION,
     active: GridDataArray,

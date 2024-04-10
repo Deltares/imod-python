@@ -86,7 +86,7 @@ def create_layered_top(bottom: GridDataArray, top: GridDataArray) -> GridDataArr
         Bottoms with layer dimension
     top: {DataArray, UgridDataArray}
         Top, without layer dimension
-    
+
     Returns
     -------
     new_top: {DataArray, UgridDataArray}
