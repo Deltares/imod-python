@@ -584,10 +584,8 @@ def _open_package_idf(
             header["name"] = variable
             header["dims"] = ["layer"]
             header["layer"] = entry["layer"]
-            if "addition" in entry.keys():
-                header["addition"] = entry["addition"]
-            if "factor" in entry.keys():
-                header["factor"] = entry["factor"]
+            header["addition"] = entry["addition"]
+            header["factor"] = entry["factor"]
             paths.append(path)
             headers.append(header)
             values.append(value)
