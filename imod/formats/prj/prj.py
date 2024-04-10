@@ -576,7 +576,7 @@ def _open_package_idf(
             if "addition" in entry.keys():
                 header["addition"] = entry["addition"]
             if "factor" in entry.keys():
-                 header["factor"] = entry["factor"]               
+                header["factor"] = entry["factor"]
             paths.append(path)
             headers.append(header)
             values.append(value)

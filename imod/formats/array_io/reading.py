@@ -278,7 +278,7 @@ def _dask(path, attrs=None, pattern=None, _read=None, header=None):
     if "factor" in attrs.keys():
         x = x * attrs["factor"]
     if "addition" in attrs.keys():
-        x = x + attrs["addition"]        
+        x = x + attrs["addition"]
     return x, attrs
 
 
