@@ -275,10 +275,6 @@ def _dask(path, attrs=None, pattern=None, _read=None, header=None):
     # dask.delayed requires currying
     a = dask.delayed(_read)(abspath, headersize, nrow, ncol, nodata, dtype)
     x = dask.array.from_delayed(a, shape=(nrow, ncol), dtype=dtype)
-    if "factor" in attrs.keys():
-        x = x * attrs["factor"]
-    if "addition" in attrs.keys():
-        x = x + attrs["addition"]
     return x, attrs
 
 

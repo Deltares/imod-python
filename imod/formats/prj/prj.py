@@ -556,8 +556,18 @@ def _create_dataarray(
     elif values_valid:
         da = _create_dataarray_from_values(values_valid, headers_values)
 
+    da = apply_factor_and_addition(headers, da)
     return da
 
+
+def apply_factor_and_addition(headers, da):
+    nlayers = len(da.coords["layer"])
+    for ilayer in range (nlayers):
+        factor = headers[ilayer]["factor"]
+        addition = headers[ilayer]["addition"]
+        da.isel(layer= ilayer).values*=factor
+        da.isel(layer= ilayer).values+=addition
+    return da
 
 def _open_package_idf(
     block_content: Dict[str, Any], variables: Sequence[str]
