@@ -1,7 +1,15 @@
 import numpy as np
 
+from imod.typing import GridDataArray
 
-def c_radial(L, kh, kv, B, D):
+
+def c_radial(
+    L: GridDataArray,
+    kh: GridDataArray,
+    kv: GridDataArray,
+    B: GridDataArray,
+    D: GridDataArray,
+) -> GridDataArray:
     """
     Ernst's radial resistance term to a drain.
 
@@ -33,7 +41,17 @@ def c_radial(L, kh, kv, B, D):
     return c
 
 
-def c_leakage(kh, kv, D, c0, c1, B, length, dx, dy):
+def c_leakage(
+    kh: GridDataArray,
+    kv: GridDataArray,
+    D: GridDataArray,
+    c0: GridDataArray,
+    c1: GridDataArray,
+    B: GridDataArray,
+    length: GridDataArray,
+    dx: GridDataArray,
+    dy: GridDataArray,
+) -> GridDataArray:
     """
     Computes the phreatic leakage resistance.
 
