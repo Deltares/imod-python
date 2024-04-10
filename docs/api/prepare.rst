@@ -31,6 +31,7 @@ Prepare model input
     get_lower_active_layer_number
     get_upper_active_grid_cells
     get_upper_active_layer_number
+    create_layered_top
 
     ALLOCATION_OPTION
     allocate_drn_cells
