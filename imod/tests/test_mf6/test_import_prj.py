@@ -15,6 +15,10 @@ REGISTRY = pooch.create(
     env="IMOD_DATA_DIR",
 )
 
+with importlib.resources.files("imod.data") as pkg_dir:
+    REGISTRY.load_registry(pkg_dir / "registry.txt")
+fname_model = REGISTRY.fetch("iMOD5_model.zip")
+
 
 def snippet_constant_kh(factor: float, addition: float, init: float):
     return f"""
@@ -26,9 +30,6 @@ def snippet_constant_kh(factor: float, addition: float, init: float):
 
 
 def test_import_constants(tmp_path):
-    with importlib.resources.files("imod.data") as pkg_dir:
-        REGISTRY.load_registry(pkg_dir / "registry.txt")
-    fname_model = REGISTRY.fetch("iMOD5_model.zip")
     with ZipFile(fname_model) as archive:
         archive.extractall(tmp_path)
 
@@ -67,9 +68,6 @@ def snippet_idf_import_kh(factor: float, addition: float):
 
 
 def test_import_idf(tmp_path):
-    with importlib.resources.files("imod.data") as pkg_dir:
-        REGISTRY.load_registry(pkg_dir / "registry.txt")
-    fname_model = REGISTRY.fetch("iMOD5_model.zip")
     with ZipFile(fname_model) as archive:
         archive.extractall(tmp_path)
 
@@ -108,9 +106,6 @@ def snippet_gen_import_hfb(factor: float, addition: float):
 
 
 def test_import_gen(tmp_path):
-    with importlib.resources.files("imod.data") as pkg_dir:
-        REGISTRY.load_registry(pkg_dir / "registry.txt")
-    fname_model = REGISTRY.fetch("iMOD5_model.zip")
     with ZipFile(fname_model) as archive:
         archive.extractall(tmp_path)
 
