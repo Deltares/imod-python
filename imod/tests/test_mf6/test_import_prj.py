@@ -116,7 +116,7 @@ def test_import_gen(tmp_path):
     file1.close()
     result_snippet_1 = open_projectfile_data(projects_file)
 
-    # the final multiplier is the product of the factor and the addition, apparently
+    # the final multiplier is the product of the factor and the addition
     assert np.all(result_snippet_1[0]["hfb-1"]["geodataframe"]["multiplier"] == 2 * 1.3)
 
 
