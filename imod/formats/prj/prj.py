@@ -562,12 +562,13 @@ def _create_dataarray(
 
 def apply_factor_and_addition(headers, da):
     nlayers = len(da.coords["layer"])
-    for ilayer in range (nlayers):
+    for ilayer in range(nlayers):
         factor = headers[ilayer]["factor"]
         addition = headers[ilayer]["addition"]
-        da.isel(layer= ilayer).values*=factor
-        da.isel(layer= ilayer).values+=addition
+        da.isel(layer=ilayer).values *= factor
+        da.isel(layer=ilayer).values += addition
     return da
+
 
 def _open_package_idf(
     block_content: Dict[str, Any], variables: Sequence[str]
@@ -750,6 +751,8 @@ def _read_package_ipf(
         timestring = entry["time"]
         layer = entry["layer"]
         time = periods.get(timestring)
+        factor = entry["factor"]
+        addition = entry["addition"]
         if time is None:
             time = _process_time(timestring)
         else:
@@ -782,6 +785,7 @@ def _read_package_ipf(
                     df_assoc["bottom"] = row[5]
                 dfs.append(df_assoc)
             df = pd.concat(dfs, ignore_index=True, sort=False)
+        df["rate"] = df["rate"] * factor + addition
 
         d = {
             "dataframe": df,
@@ -789,7 +793,6 @@ def _read_package_ipf(
             "time": time,
         }
         out.append(d)
-
     repeats = sorted(repeats)
     return out, repeats
 
