@@ -135,9 +135,6 @@ def snippet_gen_import_ipf(
 
 
 def test_import_ipf(tmp_path):
-    with importlib.resources.files("imod.data") as pkg_dir:
-        REGISTRY.load_registry(pkg_dir / "registry.txt")
-    fname_model = REGISTRY.fetch("iMOD5_model.zip")
     with ZipFile(fname_model) as archive:
         archive.extractall(tmp_path)
 
