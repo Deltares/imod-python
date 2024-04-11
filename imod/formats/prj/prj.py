@@ -566,8 +566,8 @@ def apply_factor_and_addition(headers, da):
         layer = da.coords["layer"][ilayer].values[()]
         factor = headers[ilayer]["factor"]
         addition = headers[ilayer]["addition"]
-        da.loc[{"layer":layer}] = da.sel(layer=layer).values * factor
-        da.loc[{"layer":layer}] = da.sel(layer=layer).values +  addition     
+        da.loc[{"layer": layer}] = da.sel(layer=layer).values * factor
+        da.loc[{"layer": layer}] = da.sel(layer=layer).values + addition
     return da
 
 

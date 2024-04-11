@@ -1,17 +1,16 @@
-import importlib
 from textwrap import dedent
 from zipfile import ZipFile
 
 import numpy as np
-import pooch
 from numpy.testing import assert_allclose
 
-from imod.formats.prj import open_projectfile_data
 from imod.data.sample_data import create_pooch_registry, load_pooch_registry
+from imod.formats.prj import open_projectfile_data
 
 registry = create_pooch_registry()
 registry = load_pooch_registry(registry)
 fname_model = registry.fetch("iMOD5_model.zip")
+
 
 def snippet_constant_kh(factor: float, addition: float, init: float):
     return dedent(f"""\
@@ -159,6 +158,7 @@ def test_import_ipf(tmp_path):
         == 2 * result_snippet_0[0]["wel-2"]["dataframe"]["rate"] + 1.3
     )
 
+
 def snippet_boundary_condition(factor: float, addition: float):
     return dedent(f"""\
         0001,(CHD),1, Constant Head
@@ -168,6 +168,7 @@ def snippet_boundary_condition(factor: float, addition: float):
         1,2,2,{factor},{addition},-999.99, './Database/SHD/VERSION_1/STATIONAIR/25/HEAD_STEADY-STATE_L2.IDF' >>> (SHD) Starting Heads (IDF) <<<
         """)
 
+
 def test_import_idf_boundary_condition(tmp_path):
     with ZipFile(fname_model) as archive:
         archive.extractall(tmp_path)
@@ -175,16 +176,12 @@ def test_import_idf_boundary_condition(tmp_path):
     projects_file = tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj"
 
     file1 = open(projects_file, "w")
-    file1.write(
-        snippet_boundary_condition(factor=1.0, addition=0.0)
-    )
+    file1.write(snippet_boundary_condition(factor=1.0, addition=0.0))
     file1.close()
     result_snippet_0 = open_projectfile_data(projects_file)
 
     file1 = open(projects_file, "w")
-    file1.write(
-        snippet_boundary_condition(factor=2.0, addition=3.3)
-    )
+    file1.write(snippet_boundary_condition(factor=2.0, addition=3.3))
     file1.close()
     result_snippet_1 = open_projectfile_data(projects_file)
 
@@ -195,4 +192,4 @@ def test_import_idf_boundary_condition(tmp_path):
     assert np.all(
         result_snippet_1[0]["chd-2"]["head"]
         == 2 * result_snippet_0[0]["chd-2"]["head"] + 3.3
-    )       
+    )

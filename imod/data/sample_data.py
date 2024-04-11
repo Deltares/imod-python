@@ -23,7 +23,7 @@ except ImportError:
     gpd = MissingOptionalModule("geopandas")
 
 
-def create_pooch_registry()-> pooch.core.Pooch:
+def create_pooch_registry() -> pooch.core.Pooch:
     registry = pooch.create(
         path=pooch.os_cache("imod"),
         base_url="https://github.com/Deltares/imod-artifacts/raw/main/",
@@ -32,14 +32,17 @@ def create_pooch_registry()-> pooch.core.Pooch:
         env="IMOD_DATA_DIR",
     )
     return registry
-    
-def load_pooch_registry(registry: pooch.core.Pooch )-> pooch.core.Pooch:
+
+
+def load_pooch_registry(registry: pooch.core.Pooch) -> pooch.core.Pooch:
     with importlib.resources.files("imod.data") as pkg_dir:
         registry.load_registry(pkg_dir / "registry.txt")
     return registry
 
+
 registry = create_pooch_registry()
 registry = load_pooch_registry(registry)
+
 
 def twri_output(path: Union[str, Path]) -> None:
     fname_twri = registry.fetch("ex01-twri-output.zip")
