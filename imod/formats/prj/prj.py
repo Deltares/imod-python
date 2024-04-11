@@ -563,10 +563,11 @@ def _create_dataarray(
 def apply_factor_and_addition(headers, da):
     nlayers = len(da.coords["layer"])
     for ilayer in range(nlayers):
+        layer = da.coords["layer"][ilayer].values[()]
         factor = headers[ilayer]["factor"]
         addition = headers[ilayer]["addition"]
-        da.isel(layer=ilayer).values *= factor
-        da.isel(layer=ilayer).values += addition
+        da.loc[{"layer":layer}] = da.sel(layer=layer).values * factor
+        da.loc[{"layer":layer}] = da.sel(layer=layer).values +  addition     
     return da
 
 
