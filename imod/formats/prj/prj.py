@@ -664,7 +664,8 @@ def _process_boundary_condition_entry(entry: Dict, periods: Dict[str, datetime])
         path = entry["path"]
         header = imod.idf.header(path, pattern="{name}")
         value = None
-
+    header["addition"] = entry["addition"]
+    header["factor"] = entry["factor"]
     header["dims"] = dims
     if layer is not None:
         header["layer"] = layer

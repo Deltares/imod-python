@@ -7,19 +7,11 @@ import pooch
 from numpy.testing import assert_allclose
 
 from imod.formats.prj import open_projectfile_data
+from imod.data.sample_data import create_pooch_registry, load_pooch_registry
 
-REGISTRY = pooch.create(
-    path=pooch.os_cache("imod"),
-    base_url="https://github.com/Deltares/imod-artifacts/raw/main/",
-    version=None,
-    version_dev="main",
-    env="IMOD_DATA_DIR",
-)
-
-with importlib.resources.files("imod.data") as pkg_dir:
-    REGISTRY.load_registry(pkg_dir / "registry.txt")
-fname_model = REGISTRY.fetch("iMOD5_model.zip")
-
+registry = create_pooch_registry()
+registry = load_pooch_registry(registry)
+fname_model = registry.fetch("iMOD5_model.zip")
 
 def snippet_constant_kh(factor: float, addition: float, init: float):
     return dedent(f"""\
