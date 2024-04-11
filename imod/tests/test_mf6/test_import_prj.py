@@ -1,4 +1,5 @@
 import importlib
+from textwrap import dedent
 from zipfile import ZipFile
 
 import numpy as np
@@ -21,12 +22,12 @@ fname_model = REGISTRY.fetch("iMOD5_model.zip")
 
 
 def snippet_constant_kh(factor: float, addition: float, init: float):
-    return f"""
-0001,(KHV),1, Horizontal Permeability
-001,2
-1,1,1,{factor},{addition},{init}   >>> (KHV) Horizontal Permeability (IDF) <<<
-1,1,2,{factor},{addition},{init}   >>> (KHV) Horizontal Permeability (IDF) <<<
-"""
+    return dedent(f"""\
+        0001,(KHV),1, Horizontal Permeability
+        001,2
+        1,1,1,{factor},{addition},{init}   >>> (KHV) Horizontal Permeability (IDF) <<<
+        1,1,2,{factor},{addition},{init}   >>> (KHV) Horizontal Permeability (IDF) <<<
+        """)
 
 
 def test_import_constants(tmp_path):
@@ -59,12 +60,12 @@ def test_import_constants(tmp_path):
 
 
 def snippet_idf_import_kh(factor: float, addition: float):
-    return f"""
-0001,(KHV),1, Horizontal Permeability
-001,2
-1,1,1,{factor},{addition},-999.99, '.\Database\KHV\VERSION_1\IPEST_KHV_L1.IDF' >>> (KHV) Horizontal Permeability (IDF) <<<
-1,1,2,{factor},{addition},-999.99, '.\Database\KHV\VERSION_1\IPEST_KHV_L2.IDF' >>> (KHV) Horizontal Permeability (IDF) <<<
-"""
+    return dedent(f"""\
+        0001,(KHV),1, Horizontal Permeability
+        001,2
+        1,1,1,{factor},{addition},-999.99, '.\Database\KHV\VERSION_1\IPEST_KHV_L1.IDF' >>> (KHV) Horizontal Permeability (IDF) <<<
+        1,1,2,{factor},{addition},-999.99, '.\Database\KHV\VERSION_1\IPEST_KHV_L2.IDF' >>> (KHV) Horizontal Permeability (IDF) <<<
+        """)
 
 
 def test_import_idf(tmp_path):
@@ -97,12 +98,12 @@ def test_import_idf(tmp_path):
 
 
 def snippet_gen_import_hfb(factor: float, addition: float):
-    return f"""\
-0001,(HFB),1, Horizontal Flow Barrier
-001,2
- 1,2, 003,{factor},{addition},  -999.9900    ,'.\Database\HFB\VERSION_1\IBV2_HOOFDBREUKEN_BX.GEN' >>> (HFB) Horizontal Barrier Flow (GEN) <<<
- 1,2, 005,{factor},{addition},  -999.9900    ,'.\Database\HFB\VERSION_1\IBV2_HOOFDBREUKEN_SY.GEN' >>> (HFB) Horizontal Barrier Flow (GEN) <<<
-"""
+    return dedent(f"""\
+        0001,(HFB),1, Horizontal Flow Barrier
+        001,2
+        1,2, 003,{factor},{addition},  -999.9900    ,'.\Database\HFB\VERSION_1\IBV2_HOOFDBREUKEN_BX.GEN' >>> (HFB) Horizontal Barrier Flow (GEN) <<<
+        1,2, 005,{factor},{addition},  -999.9900    ,'.\Database\HFB\VERSION_1\IBV2_HOOFDBREUKEN_SY.GEN' >>> (HFB) Horizontal Barrier Flow (GEN) <<<
+        """)
 
 
 def test_import_gen(tmp_path):
@@ -123,14 +124,14 @@ def test_import_gen(tmp_path):
 def snippet_gen_import_ipf(
     factor1: float, addition1: float, factor2: float, addition2: float
 ):
-    return f"""\
-0001,(WEL),1, Wells
-STEADY-STATE
-001,003
-1,2,5,{factor1},{addition1},-999.99,                                       '.\Database\WEL\VERSION_1\WELLS_L3.IPF' >>> (WRA) Well Rate (IPF) <<<
-1,2,7,{factor2},{addition2},-999.99,                                       '.\Database\WEL\VERSION_1\WELLS_L4.IPF' >>> (WRA) Well Rate (IPF) <<<
-1,2,9,{factor1},{addition1},-999.99,                                       '.\Database\WEL\VERSION_1\WELLS_L5.IPF' >>> (WRA) Well Rate (IPF) <<<
-"""
+    return dedent(f"""\
+        0001,(WEL),1, Wells
+        STEADY-STATE
+        001,003
+        1,2,5,{factor1},{addition1},-999.99,                                       '.\Database\WEL\VERSION_1\WELLS_L3.IPF' >>> (WRA) Well Rate (IPF) <<<
+        1,2,7,{factor2},{addition2},-999.99,                                       '.\Database\WEL\VERSION_1\WELLS_L4.IPF' >>> (WRA) Well Rate (IPF) <<<
+        1,2,9,{factor1},{addition1},-999.99,                                       '.\Database\WEL\VERSION_1\WELLS_L5.IPF' >>> (WRA) Well Rate (IPF) <<<
+        """)
 
 
 def test_import_ipf(tmp_path):
