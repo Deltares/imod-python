@@ -193,3 +193,40 @@ def test_import_idf_boundary_condition(tmp_path):
         result_snippet_1[0]["chd-2"]["head"]
         == 2 * result_snippet_0[0]["chd-2"]["head"] + 3.3
     )
+
+
+def snippet_idf_without_layer_dim(factor: float, addition: float):
+    return dedent(f"""\
+        0001,(RIV),1, Rivers
+        STEADY-STATE
+        004,001
+        1,2,0,{factor},{addition},-999.99,'.\Database\RIV\VERSION_1\RIVER_PRIMAIR\IPEST_RIVER_PRIMAIR_COND_GEMIDDELD.IDF' >>> (CON) Conductance (IDF) <<<
+        1,2,0,{factor},{addition},-999.99,     '.\Database\RIV\VERSION_1\RIVER_PRIMAIR\RIVER_PRIMAIR_STAGE_GEMIDDELD.IDF' >>> (RST) River Stage (IDF) <<<
+        1,2,0,{factor},{addition},-999.99,                             '.\Database\RIV\VERSION_1\MAAS\BOTTOM19912011.IDF' >>> (RBT) River Bottom (IDF) <<<        
+        1,2,0,{factor},{addition},-999.99,    '.\Database\RIV\VERSION_1\RIVER_PRIMAIR\RIVER_PRIMAIR_INFFCT_GEMIDDELD.IDF' >>> (RIF) Infiltration Factor (IDF) <<<        
+        """)
+
+
+def test_import_no_layer(tmp_path):
+    with ZipFile(fname_model) as archive:
+        archive.extractall(tmp_path)
+
+    projects_file = tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj"
+
+    file1 = open(projects_file, "w")
+    file1.write(snippet_idf_without_layer_dim(factor=1.0, addition=0.0))
+    file1.close()
+    result_snippet_0 = open_projectfile_data(projects_file)
+
+    file1 = open(projects_file, "w")
+    file1.write(snippet_idf_without_layer_dim(factor=2.0, addition=3.3))
+    file1.close()
+    result_snippet_1 = open_projectfile_data(projects_file)
+
+    for key in ("stage", "conductance", "bottom_elevation", "infiltration_factor"):
+        actual = result_snippet_1[0]["riv"][key].compute().values
+        actual = actual[~np.isnan(actual)]
+        expected = 2 * result_snippet_0[0]["riv"][key].compute().values + 3.3
+        expected = expected[~np.isnan(expected)]
+        assert abs((actual - expected).min()) < 1e-6
+        assert abs((actual - expected).max()) < 1e-6
