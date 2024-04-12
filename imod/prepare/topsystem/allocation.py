@@ -134,6 +134,13 @@ def _is_layered(grid: GridDataArray):
     return "layer" in grid.sizes and grid.sizes["layer"] > 1
 
 
+def _enforce_layered_top(top: GridDataArray, bottom: GridDataArray):
+    if _is_layered(top):
+        return top
+    else:
+        return create_layered_top(bottom, top)
+
+
 @enforced_dim_order
 def _allocate_cells__stage_to_riv_bot(
     top: GridDataArray,
@@ -167,10 +174,7 @@ def _allocate_cells__stage_to_riv_bot(
     PLANAR_GRID.validate(stage)
     PLANAR_GRID.validate(bottom_elevation)
 
-    if _is_layered(top):
-        top_layered = top
-    else:
-        top_layered = create_layered_top(bottom, top)
+    top_layered = _enforce_layered_top(top, bottom)
 
     riv_cells = (stage > bottom) & (bottom_elevation < top_layered)
 
@@ -212,10 +216,7 @@ def _allocate_cells__first_active_to_riv_bot(
     upper_active_layer = get_upper_active_layer_number(active)
     layer = active.coords["layer"]
 
-    if _is_layered(top):
-        top_layered = top
-    else:
-        top_layered = create_layered_top(bottom, top)
+    top_layered = _enforce_layered_top(top, bottom)
 
     riv_cells = (upper_active_layer <= layer) & (bottom_elevation < top_layered)
 
@@ -262,10 +263,7 @@ def _allocate_cells__first_active_to_riv_bot__drn(
     PLANAR_GRID.validate(stage)
     PLANAR_GRID.validate(bottom_elevation)
 
-    if _is_layered(top):
-        top_layered = top
-    else:
-        top_layered = create_layered_top(bottom, top)
+    top_layered = _enforce_layered_top(top, bottom)
 
     upper_active_layer = get_upper_active_layer_number(active)
     layer = active.coords["layer"]
@@ -304,10 +302,7 @@ def _allocate_cells__at_elevation(
 
     PLANAR_GRID.validate(elevation)
 
-    if _is_layered(top):
-        top_layered = top
-    else:
-        top_layered = create_layered_top(bottom, top)
+    top_layered = _enforce_layered_top(top, bottom)
 
     riv_cells = (elevation < top_layered) & (elevation >= bottom)
 
