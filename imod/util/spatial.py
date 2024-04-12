@@ -7,7 +7,7 @@ used internally, but are not private since they may be useful to users as well.
 
 import collections
 import re
-from typing import Any, Dict, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, Sequence, Tuple, Union
 
 import affine
 import numpy as np
@@ -16,6 +16,28 @@ import xarray as xr
 import xugrid as xu
 
 from imod.typing import FloatArray, GridDataset, IntArray
+from imod.util.imports import MissingOptionalModule
+
+# since rasterio, shapely, and geopandas are a big dependencies that are
+# sometimes hard to install and not always required, we made this an optional
+# dependency
+try:
+    import rasterio
+except ImportError:
+    rasterio = MissingOptionalModule("rasterio")
+
+try:
+    import shapely
+except ImportError:
+    shapely = MissingOptionalModule("shapely")
+
+if TYPE_CHECKING:
+    import geopandas as gpd
+else:
+    try:
+        import geopandas as gpd
+    except ImportError:
+        gpd = MissingOptionalModule("geopandas")
 
 
 def _xycoords(bounds, cellsizes) -> Dict[str, Any]:
@@ -612,3 +634,31 @@ def is_divisor(numerator: FloatArray, denominator: float) -> bool:
     denominator = abs(denominator)
     remainder = np.abs(numerator) % denominator
     return (np.isclose(remainder, 0.0) | np.isclose(remainder, denominator)).all()
+
+
+def _polygonize(da: xr.DataArray) -> "gpd.GeoDataFrame":
+    """
+    Polygonize a 2D-DataArray into a GeoDataFrame of polygons.
+
+    Private method located in util.spatial to work around circular imports.
+    """
+
+    if da.dims != ("y", "x"):
+        raise ValueError('Dimensions must be ("y", "x")')
+
+    values = da.values
+    if values.dtype == np.float64:
+        values = values.astype(np.float32)
+
+    affine_transform = transform(da)
+    shapes = rasterio.features.shapes(values, transform=affine_transform)
+
+    geometries = []
+    colvalues = []
+    for geom, colval in shapes:
+        geometries.append(shapely.geometry.Polygon(geom["coordinates"][0]))
+        colvalues.append(colval)
+
+    gdf = gpd.GeoDataFrame({"value": colvalues, "geometry": geometries})
+    gdf.crs = da.attrs.get("crs")
+    return gdf

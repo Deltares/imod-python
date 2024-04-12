@@ -7,8 +7,8 @@ import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
 
-from imod.prepare import polygonize
 from imod.typing import GridDataArray, GridDataset, structured
+from imod.util.spatial import _polygonize
 
 
 @typedispatch
@@ -228,7 +228,7 @@ def merge_with_dictionary(
 def bounding_polygon(active: xr.DataArray):
     """Return bounding polygon of active cells"""
     to_polygonize = active.where(active, other=np.nan)
-    polygons_gdf = polygonize(to_polygonize)
+    polygons_gdf = _polygonize(to_polygonize)
     # Filter polygons with inactive values (NaN)
     is_active_polygon = polygons_gdf["value"] == 1.0
     return polygons_gdf.loc[is_active_polygon]
@@ -336,3 +336,57 @@ def get_grid_geometry_hash(grid: xu.UgridDataArray) -> int:
 @typedispatch
 def get_grid_geometry_hash(grid: object) -> int:
     raise ValueError("get_grid_geometry_hash not supported for this object.")
+
+
+@typedispatch
+def enforce_dim_order(grid: xr.DataArray) -> xr.DataArray:
+    """Enforce dimension order to iMOD Python standard"""
+    return grid.transpose("species", "time", "layer", "y", "x", missing_dims="ignore")
+
+
+@typedispatch
+def enforce_dim_order(grid: xu.UgridDataArray) -> xu.UgridDataArray:
+    """Enforce dimension order to iMOD Python standard"""
+    face_dimension = grid.ugrid.grid.face_dimension
+    return grid.transpose(
+        "species", "time", "layer", face_dimension, missing_dims="ignore"
+    )
+
+
+def _enforce_unstructured(obj: GridDataArray, ugrid2d=xu.Ugrid2d) -> xu.UgridDataArray:
+    """Force obj to unstructured"""
+    return xu.UgridDataArray(xr.DataArray(obj), ugrid2d)
+
+
+def preserve_gridtype(func):
+    """
+    Decorator to preserve gridtype, this is to work around the following xugrid
+    behavior:
+
+    >>> UgridDataArray() * DataArray() -> UgridDataArray
+    >>> DataArray() * UgridDataArray() -> DataArray
+
+    with this decorator:
+
+    >>> UgridDataArray() * DataArray() -> UgridDataArray
+    >>> DataArray() * UgridDataArray() -> UgridDataArray
+    """
+
+    def decorator(*args, **kwargs):
+        unstructured = False
+        grid = None
+        for arg in args:
+            if is_unstructured(arg):
+                unstructured = True
+                grid = arg.ugrid.grid
+
+        x = func(*args, **kwargs)
+
+        if unstructured:
+            # Multiple grids returned
+            if isinstance(x, tuple):
+                return tuple(_enforce_unstructured(i, grid) for i in x)
+            return _enforce_unstructured(x, grid)
+        return x
+
+    return decorator

@@ -7,6 +7,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.prepare.layer import create_layered_top
 from imod.typing import GridDataArray
 from imod.typing.grid import zeros_like
 from imod.util.spatial import spatial_reference
@@ -46,17 +47,6 @@ def broadcast_to_full_domain(
     )
 
     return top, bottom
-
-
-def create_layered_top(bottom: GridDataArray, top: GridDataArray) -> GridDataArray:
-    """
-    Create a top array with layers from a single top array and a full bottom array
-    """
-    new_top = zeros_like(bottom)
-    new_top[0] = top
-    new_top[1:] = bottom[0:-1].values
-
-    return new_top
 
 
 def to_cell_idx(idomain: xr.DataArray) -> xr.DataArray:
