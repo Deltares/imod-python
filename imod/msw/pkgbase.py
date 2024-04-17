@@ -7,7 +7,8 @@ import pandas as pd
 import xarray as xr
 
 from imod.msw.fixed_format import format_fixed_width
-
+from typing import Any
+from imod.typing.grid import GridDataset
 
 class MetaSwapPackage(abc.ABC):
     """
@@ -27,6 +28,15 @@ class MetaSwapPackage(abc.ABC):
 
     def __setitem__(self, key, value):
         self.dataset.__setitem__(key, value)
+
+    @property
+    def dataset(self) -> GridDataset:
+        return self._dataset   
+
+    @dataset.setter
+    def dataset(self, value):
+        self._dataset = value
+
 
     def isel(self):
         raise NotImplementedError(
@@ -131,3 +141,18 @@ class MetaSwapPackage(abc.ABC):
                     f"Variable '{var}' in {self.__class__} should not "
                     "contain 'subunit' coordinate"
                 )
+            
+
+    def _valid(self, value):
+        return True
+
+
+    def get_non_grid_data(self, grid_names: list[str]) -> dict[str, Any]:
+        return {}
+
+    @property
+    def auxiliary_data_fields(self) -> dict[str, str]:
+        return {}
+
+    def is_regridding_supported(self) -> bool:
+        return True

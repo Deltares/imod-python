@@ -2,9 +2,16 @@ import xarray as xr
 
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 
-
-class Infiltration(MetaSwapPackage):
+from imod.mf6.utilities.regrid import (
+    RegridderType,
+    RegridderWeightsCache,
+    _regrid_like,
+)
+from imod.typing.grid import GridDataset, GridDataArray
+from typing import Optional, Tuple
+class Infiltration(MetaSwapPackage, IRegridPackage):
     """
     This contains the infiltration data.
 
@@ -54,6 +61,21 @@ class Infiltration(MetaSwapPackage):
     )
     _to_fill = ()
 
+    _regrid_method = {
+        "infiltration_capacity": (RegridderType.OVERLAP, "mean"),
+        "downward_resistance": (RegridderType.OVERLAP, "mean"),
+        "upward_resistance": (
+            RegridderType.OVERLAP,
+            "mean",
+        ),
+        "longitudinal_vertical": (
+            RegridderType.OVERLAP,
+            "mean",
+        ),
+        "bottom_resistance": (RegridderType.OVERLAP, "mean"),
+        "extra_storage_coefficient": (RegridderType.OVERLAP, "mean"),
+    }    
+
     def __init__(
         self,
         infiltration_capacity: xr.DataArray,
@@ -70,3 +92,20 @@ class Infiltration(MetaSwapPackage):
         self.dataset["extra_storage_coefficient"] = extra_storage_coefficient
 
         self._pkgcheck()
+
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method
+    
+    def regrid_like(
+        self,
+        target_grid: GridDataArray,
+        regrid_context: RegridderWeightsCache,
+        regridder_types: Optional[dict[str, Tuple[RegridderType, str]]] = None,
+        ) -> "Package":
+        try:
+            result = _regrid_like(self, target_grid, regrid_context, regridder_types)
+        except ValueError as e:
+            raise e
+        except Exception as e:
+            raise ValueError(f"package could not be regridded:{e}")
+        return result
