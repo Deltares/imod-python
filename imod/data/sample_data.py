@@ -40,43 +40,43 @@ def load_pooch_registry(registry: pooch.core.Pooch) -> pooch.core.Pooch:
     return registry
 
 
-registry = create_pooch_registry()
-registry = load_pooch_registry(registry)
+REGISTRY = create_pooch_registry()
+REGISTRY = load_pooch_registry(REGISTRY)
 
 
 def twri_output(path: Union[str, Path]) -> None:
-    fname_twri = registry.fetch("ex01-twri-output.zip")
+    fname_twri = REGISTRY.fetch("ex01-twri-output.zip")
     with ZipFile(fname_twri) as archive:
         archive.extractall(path)
 
 
 def hondsrug_initial() -> xr.Dataset:
-    fname = registry.fetch("hondsrug-initial.nc")
+    fname = REGISTRY.fetch("hondsrug-initial.nc")
     return xr.open_dataset(fname)
 
 
 def hondsrug_layermodel() -> xr.Dataset:
-    fname = registry.fetch("hondsrug-layermodel.nc")
+    fname = REGISTRY.fetch("hondsrug-layermodel.nc")
     return xr.open_dataset(fname)
 
 
 def hondsrug_meteorology() -> xr.Dataset:
-    fname = registry.fetch("hondsrug-meteorology.nc")
+    fname = REGISTRY.fetch("hondsrug-meteorology.nc")
     return xr.open_dataset(fname)
 
 
 def hondsrug_river() -> xr.Dataset:
-    fname = registry.fetch("hondsrug-river.nc")
+    fname = REGISTRY.fetch("hondsrug-river.nc")
     return xr.open_dataset(fname)
 
 
 def hondsrug_drainage() -> xr.Dataset:
-    fname = registry.fetch("hondsrug-drainage.nc")
+    fname = REGISTRY.fetch("hondsrug-drainage.nc")
     return xr.open_dataset(fname)
 
 
 def head_observations() -> pd.DataFrame:
-    fname = registry.fetch("head-observations.csv")
+    fname = REGISTRY.fetch("head-observations.csv")
     df = pd.read_csv(fname)
     # Manually convert time column to datetime type because pandas >2.0 doesn't
     # do this automatically anymore upon reading.
@@ -85,25 +85,25 @@ def head_observations() -> pd.DataFrame:
 
 
 def fluxes() -> xr.Dataset:
-    fname = registry.fetch("fluxes.nc")
+    fname = REGISTRY.fetch("fluxes.nc")
     return xr.open_dataset(fname)
 
 
 def ahn() -> xr.Dataset:
-    fname = registry.fetch("ahn.nc")
+    fname = REGISTRY.fetch("ahn.nc")
     return xr.open_dataset(fname)
 
 
 def lakes_shp(path: Union[str, Path]) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
-    fname_lakes_shp = registry.fetch("lakes_shp.zip")
+    fname_lakes_shp = REGISTRY.fetch("lakes_shp.zip")
     with ZipFile(fname_lakes_shp) as archive:
         archive.extractall(path)
     return gpd.read_file(Path(path) / "lakes.shp")
 
 
 def circle() -> xu.Ugrid2d:
-    fname_nodes = registry.fetch("circle-nodes.txt")
-    fname_triangles = registry.fetch("circle-triangles.txt")
+    fname_nodes = REGISTRY.fetch("circle-nodes.txt")
+    fname_triangles = REGISTRY.fetch("circle-triangles.txt")
 
     nodes = np.loadtxt(fname_nodes)
     triangles = np.loadtxt(fname_triangles).astype(np.int32)
@@ -112,7 +112,7 @@ def circle() -> xu.Ugrid2d:
 
 
 def imod5_projectfile_data(path: Union[str, Path]) -> dict:
-    fname_model = registry.fetch("iMOD5_model.zip")
+    fname_model = REGISTRY.fetch("iMOD5_model.zip")
 
     with ZipFile(fname_model) as archive:
         archive.extractall(path)
@@ -121,7 +121,7 @@ def imod5_projectfile_data(path: Union[str, Path]) -> dict:
 
 
 def hondsrug_simulation(path: Union[str, Path]) -> Modflow6Simulation:
-    fname_simulation = registry.fetch("hondsrug-simulation.zip")
+    fname_simulation = REGISTRY.fetch("hondsrug-simulation.zip")
 
     with ZipFile(fname_simulation) as archive:
         archive.extractall(path)
@@ -130,7 +130,7 @@ def hondsrug_simulation(path: Union[str, Path]) -> Modflow6Simulation:
 
 
 def hondsrug_crosssection(path: Union[str, Path]) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
-    fname_simulation = registry.fetch("hondsrug-crosssection.zip")
+    fname_simulation = REGISTRY.fetch("hondsrug-crosssection.zip")
 
     with ZipFile(fname_simulation) as archive:
         archive.extractall(path)
