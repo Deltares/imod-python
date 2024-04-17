@@ -567,10 +567,16 @@ def apply_factor_and_addition(headers, da):
         da = da * factor
         da = da + addition
     else:
-        layer, addition_values = list(zip(*[(i+1, header["addition"]) for i, header in enumerate(headers)]))
+        layer, addition_values = list(
+            zip(*[(i + 1, header["addition"]) for i, header in enumerate(headers)])
+        )
         factor_values = [header["factor"] for header in headers]
-        addition = xr.DataArray(list(addition_values), coords = {"layer" : list(layer)}, dims=("layer"))
-        factor = xr.DataArray(factor_values, coords = {"layer" : list(layer)}, dims=("layer",))
+        addition = xr.DataArray(
+            list(addition_values), coords={"layer": list(layer)}, dims=("layer")
+        )
+        factor = xr.DataArray(
+            factor_values, coords={"layer": list(layer)}, dims=("layer",)
+        )
         da = da * factor + addition
     return da
 
