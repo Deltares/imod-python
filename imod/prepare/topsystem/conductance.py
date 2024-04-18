@@ -101,8 +101,14 @@ def distribute_riv_conductance(
 
     Examples
     --------
-    >>> allocated = imod.prepare.allocate_riv_cells()
-
+    >>> from imod.prepare import allocate_riv_cells, distribute_riv_conductance, ALLOCATION_OPTION, DISTRIBUTING_OPTION
+    >>> allocated = allocate_riv_cells(
+        ALLOCATION_OPTION.stage_to_riv_bot, active, top, bottom, stage, bottom_elevation
+        )
+    >>> conductances_distributed = distribute_riv_conductance(
+            DISTRIBUTING_OPTION.by_corrected_transmissivity, allocated, 
+            conductance, top, bottom, stage, bottom_elevation, k
+        )
     """
     PLANAR_GRID.validate(conductance)
 
@@ -176,6 +182,17 @@ def distribute_drn_conductance(
     Returns
     -------
     Conductances distributed over depth.
+
+    Examples
+    --------
+    >>> from imod.prepare import allocate_drn_cells, distribute_drn_conductance, ALLOCATION_OPTION, DISTRIBUTING_OPTION
+    >>> allocated = allocate_drn_cells(
+        ALLOCATION_OPTION.at_elevation, active, top, bottom, drain_elevation
+        )
+    >>> conductances_distributed = distribute_drn_conductance(
+            DISTRIBUTING_OPTION.by_layer_transmissivity, allocated, 
+            conductance, top, bottom, k
+        )
     """
     PLANAR_GRID.validate(conductance)
 
@@ -235,6 +252,17 @@ def distribute_ghb_conductance(
     Returns
     -------
     Conductances distributed over depth.
+
+    Examples
+    --------
+    >>> from imod.prepare import allocate_ghb_cells, distribute_drn_conductance, ALLOCATION_OPTION, DISTRIBUTING_OPTION
+    >>> allocated = allocate_ghb_cells(
+        ALLOCATION_OPTION.at_elevation, active, top, bottom, ghb_head
+        )
+    >>> conductances_distributed = distribute_ghb_conductance(
+            DISTRIBUTING_OPTION.by_layer_transmissivity, allocated, 
+            conductance, top, bottom, k
+        )
     """
     match distributing_option:
         case DISTRIBUTING_OPTION.equally:
