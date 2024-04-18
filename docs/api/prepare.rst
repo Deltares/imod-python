@@ -34,9 +34,13 @@ Prepare model input
     create_layered_top
 
     ALLOCATION_OPTION
+    DISTRIBUTION_OPTION
     allocate_drn_cells
     allocate_ghb_cells
     allocate_rch_cells
     allocate_riv_cells
     c_leakage
     c_radial
+    distribute_drn_conductance
+    distribute_ghb_conductance
+    distribute_riv_conductance
