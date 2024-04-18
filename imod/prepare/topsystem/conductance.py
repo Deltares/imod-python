@@ -191,6 +191,13 @@ def _distribute_weights__by_corrected_transmissivity(
     bottom_elevation: GridDataArray,
     k: GridDataArray,
 ):
+    """
+    Distribute conductances according to default method in iMOD 5.6, as
+    described page 690 of the iMOD 5.6 manual (but then to distribute WEL
+    rates). The method uses crosscut thicknesses to compute transmissivities.
+    Furthermore it corrects distribution weights for the mismatch between the
+    midpoints of crosscut areas and layer midpoints.
+    """
     PLANAR_GRID.validate(stage)
     PLANAR_GRID.validate(bottom_elevation)
 
@@ -219,8 +226,9 @@ def _distribute_weights__by_corrected_transmissivity(
 
 
 def _distribute_weights__equally(allocated: GridDataArray):
+    """Compute weights over layers equally."""
     weights = 1.0 / allocated.sum(dim="layer")
-    return allocated * weights
+    return weights
 
 
 def _distribute_weights__by_layer_thickness(
@@ -228,6 +236,7 @@ def _distribute_weights__by_layer_thickness(
     top: GridDataArray,
     bottom: GridDataArray,
 ):
+    """Compute weights based on layer thickness"""
     layer_thickness = _compute_layer_thickness(allocated, top, bottom)
 
     weights = layer_thickness / layer_thickness.sum(dim="layer")
@@ -242,6 +251,7 @@ def _distribute_weights__by_crosscut_thickness(
     stage: GridDataArray,
     bottom_elevation: GridDataArray,
 ):
+    """Compute weights based on crosscut thickness"""
     PLANAR_GRID.validate(stage)
     PLANAR_GRID.validate(bottom_elevation)
 
@@ -258,6 +268,7 @@ def _distribute_weights__by_layer_transmissivity(
     bottom: GridDataArray,
     k: GridDataArray,
 ):
+    """Compute weights based on layer transmissivity"""
     layer_thickness = _compute_layer_thickness(allocated, top, bottom)
     transmissivity = layer_thickness * k
 
@@ -272,6 +283,7 @@ def _distribute_weights__by_crosscut_transmissivity(
     bottom_elevation: GridDataArray,
     k: GridDataArray,
 ):
+    """Compute weights based on crosscut transmissivity"""
     PLANAR_GRID.validate(stage)
     PLANAR_GRID.validate(bottom_elevation)
 
@@ -284,6 +296,7 @@ def _distribute_weights__by_crosscut_transmissivity(
 
 
 def _distribute_weights__by_conductivity(allocated: GridDataArray, k: GridDataArray):
+    """Compute weights based on hydraulic conductivity"""
     k_allocated = allocated * k
 
     return k_allocated / k_allocated.sum(dim="layer")
