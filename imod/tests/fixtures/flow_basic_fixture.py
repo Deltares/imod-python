@@ -36,13 +36,15 @@ def make_basic_dis(dz, nrow, ncol):
 
     return ibound, top, bottom
 
+
 @pytest.fixture(scope="module")
 def basic_dis():
     return make_basic_dis(dz=[5, 30, 100], nrow=9, ncol=9)
 
+
 @pytest.fixture(scope="function")
 def basic_dis__topsystem():
-    return make_basic_dis(dz=[1., 2., 4., 10.], nrow=9, ncol=9)
+    return make_basic_dis(dz=[1.0, 2.0, 4.0, 10.0], nrow=9, ncol=9)
 
 
 class BasicDisSettings(NamedTuple):

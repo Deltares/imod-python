@@ -258,10 +258,7 @@ def _distribute_weights__by_layer_transmissivity(
     bottom: GridDataArray,
     k: GridDataArray,
 ):
-
-    layer_thickness = _compute_layer_thickness(
-        allocated, top, bottom
-    )
+    layer_thickness = _compute_layer_thickness(allocated, top, bottom)
     transmissivity = layer_thickness * k
 
     return transmissivity / transmissivity.sum(dim="layer")
@@ -281,7 +278,7 @@ def _distribute_weights__by_crosscut_transmissivity(
     crosscut_thickness = _compute_crosscut_thickness(
         allocated, top, bottom, stage, bottom_elevation
     )
-    transmissivity = (crosscut_thickness * k)
+    transmissivity = crosscut_thickness * k
 
     return transmissivity / transmissivity.sum(dim="layer")
 

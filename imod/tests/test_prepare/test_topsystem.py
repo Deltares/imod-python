@@ -23,7 +23,6 @@ def take_first_planar_cell(grid: GridDataArray):
         return grid.values[:, 0, 0]
 
 
-
 @parametrize_with_cases(
     argnames="active,top,bottom,stage,bottom_elevation",
     prefix="riv_",
@@ -99,17 +98,21 @@ def test_rch_allocation(active, option, expected, _):
     prefix="riv_",
 )
 @parametrize_with_cases(
-    argnames="option,allocated_layer,expected",
-    prefix="distribution_",
-    has_tag="riv"
+    argnames="option,allocated_layer,expected", prefix="distribution_", has_tag="riv"
 )
-def test_distribute_riv_conductance(active, top, bottom, stage, bottom_elevation, option, allocated_layer, expected):
+def test_distribute_riv_conductance(
+    active, top, bottom, stage, bottom_elevation, option, allocated_layer, expected
+):
     allocated = enforce_dim_order(active & allocated_layer)
-    k = xr.DataArray([2.0, 2.0, 1.0, 1.0], coords={"layer": [1,2,3,4]}, dims=("layer",))
+    k = xr.DataArray(
+        [2.0, 2.0, 1.0, 1.0], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
 
     conductance = zeros_like(bottom_elevation) + 1.0
 
-    actual_da = distribute_riv_conductance(option, allocated, conductance, top, bottom, stage, bottom_elevation, k)
+    actual_da = distribute_riv_conductance(
+        option, allocated, conductance, top, bottom, stage, bottom_elevation, k
+    )
     actual = take_first_planar_cell(actual_da)
 
     np.testing.assert_equal(actual, expected)
@@ -120,17 +123,21 @@ def test_distribute_riv_conductance(active, top, bottom, stage, bottom_elevation
     prefix="drn_",
 )
 @parametrize_with_cases(
-    argnames="option,allocated_layer,expected",
-    prefix="distribution_",
-    has_tag="drn"
+    argnames="option,allocated_layer,expected", prefix="distribution_", has_tag="drn"
 )
-def test_distribute_drn_conductance(active, top, bottom, elevation, option, allocated_layer, expected):
+def test_distribute_drn_conductance(
+    active, top, bottom, elevation, option, allocated_layer, expected
+):
     allocated = enforce_dim_order(active & allocated_layer)
-    k = xr.DataArray([2.0, 2.0, 1.0, 1.0], coords={"layer": [1,2,3,4]}, dims=("layer",))
+    k = xr.DataArray(
+        [2.0, 2.0, 1.0, 1.0], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
 
     conductance = zeros_like(elevation) + 1.0
 
-    actual_da = distribute_drn_conductance(option, allocated, conductance, top, bottom, k)
+    actual_da = distribute_drn_conductance(
+        option, allocated, conductance, top, bottom, k
+    )
     actual = take_first_planar_cell(actual_da)
 
     np.testing.assert_equal(actual, expected)
@@ -141,17 +148,21 @@ def test_distribute_drn_conductance(active, top, bottom, elevation, option, allo
     prefix="ghb_",
 )
 @parametrize_with_cases(
-    argnames="option,allocated_layer,expected",
-    prefix="distribution_",
-    has_tag="ghb"
+    argnames="option,allocated_layer,expected", prefix="distribution_", has_tag="ghb"
 )
-def test_distribute_ghb_conductance(active, top, bottom, elevation, option, allocated_layer, expected):
+def test_distribute_ghb_conductance(
+    active, top, bottom, elevation, option, allocated_layer, expected
+):
     allocated = enforce_dim_order(active & allocated_layer)
-    k = xr.DataArray([2.0, 2.0, 1.0, 1.0], coords={"layer": [1,2,3,4]}, dims=("layer",))
+    k = xr.DataArray(
+        [2.0, 2.0, 1.0, 1.0], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
 
     conductance = zeros_like(elevation) + 1.0
 
-    actual_da = distribute_ghb_conductance(option, allocated, conductance, top, bottom, k)
+    actual_da = distribute_ghb_conductance(
+        option, allocated, conductance, top, bottom, k
+    )
     actual = take_first_planar_cell(actual_da)
 
     np.testing.assert_equal(actual, expected)
