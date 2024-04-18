@@ -3,8 +3,6 @@ import xarray as xr
 from pytest_cases import parametrize_with_cases
 
 from imod.prepare.topsystem import (
-    ALLOCATION_OPTION,
-    DISTRIBUTING_OPTION,
     allocate_drn_cells,
     allocate_ghb_cells,
     allocate_rch_cells,

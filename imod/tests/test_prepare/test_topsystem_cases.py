@@ -1,7 +1,5 @@
 import numpy as np
-import pytest
 import xarray as xr
-import xugrid as xu
 from pytest_cases import case
 
 from imod.prepare.topsystem import (
