@@ -6,15 +6,15 @@ import pytest
 import xarray as xr
 
 
-@pytest.fixture(scope="module")
-def basic_dis():
+def make_basic_dis(dz, nrow, ncol):
     """Basic model discretization"""
-
-    shape = nlay, nrow, ncol = 3, 9, 9
-
     dx = 10.0
     dy = -10.0
-    dz = np.array([5, 30, 100])
+
+    nlay = len(dz)
+
+    shape = nlay, nrow, ncol
+
     xmin = 0.0
     xmax = dx * ncol
     ymin = 0.0
@@ -35,6 +35,14 @@ def basic_dis():
     top = xr.DataArray(interfaces[:-1], coords={"layer": layer}, dims="layer")
 
     return ibound, top, bottom
+
+@pytest.fixture(scope="module")
+def basic_dis():
+    return make_basic_dis(dz=[5, 30, 100], nrow=9, ncol=9)
+
+@pytest.fixture(scope="function")
+def basic_dis__topsystem():
+    return make_basic_dis(dz=[1., 2., 4., 10.], nrow=9, ncol=9)
 
 
 class BasicDisSettings(NamedTuple):
