@@ -14,7 +14,33 @@ from imod.typing import GridDataArray
 class DISTRIBUTING_OPTION(Enum):
     """
     Enumerator for conductance distribution settings. Numbers match the
-    DISTRCOND options in iMOD 5.6.
+    DISTRCOND options in iMOD 5.6. The following settings are available:
+
+    * *by_corrected_transmissivity*: Distribute the conductance by corrected
+      transmissivities. Crosscut thicknesses are used to compute
+      transmissivities. The crosscut thicknesses is computed based on the
+      overlap of bottom_elevation over the bottom allocated layer. Same holds
+      for the stage and top allocated layer. Furthermore the method corrects
+      distribution weights for the mismatch between the midpoints of crosscut
+      areas and model layer midpoints. This is the default method in iMOD 5.6,
+      thus DISTRCOND = 0.
+    * *equally*: Distribute conductances equally over layers. This matches iMOD
+      5.6 DISTRCOND = 1 option.
+    * *by_crosscut_thickness*: Distribute the conductance by crosscut
+      thicknesses. The crosscut thicknesses is computed based on the overlap of
+      bottom_elevation over the bottom allocated layer. Same holds for the stage
+      and top allocated layer. This matches iMOD 5.6 DISTRCOND = 2 option.
+    * *by_layer_thickness*: Distribute the conductance by model layer thickness.
+      This matches iMOD 5.6 DISTRCOND = 3 option.
+    * *by_crosscut_transmissivity*: Distribute the conductance by crosscut
+      transmissivity. Crosscut thicknesses are used to compute transmissivities.
+      The crosscut thicknesses is computed based on the overlap of
+      bottom_elevation over the bottom allocated layer. Same holds for the stage
+      and top allocated layer. This matches iMOD 5.6 DISTRCOND = 4 option.
+    * *by_conductivity*: Distribute the conductance weighted by model layer
+      hydraulic conductivities. This matches iMOD 5.6 DISTRCOND = 5 option.
+    * *by_layer_transmissivity*: Distribute the conductance by model layer
+      transmissivity. This has no equivalent in iMOD 5.6.
     """
 
     by_corrected_transmissivity = 0
@@ -44,6 +70,40 @@ def distribute_riv_conductance(
     bottom_elevation: GridDataArray,
     k: GridDataArray,
 ) -> GridDataArray:
+    """
+    Function to distribute 2D conductance over vertical layer for the RIV
+    package. Multiple options are available, which need to be selected in the
+    DISTRIBUTING_OPTION enumerator.
+
+    Parameters
+    ----------
+    distributing_option : DISTRIBUTING_OPTION
+        Distributing option available in the DISTRIBUTING_OPTION enumerator.
+    allocated: DataArray | UgridDataArray
+        3D boolean array with river cell locations. This can be made with the
+        :func:`imod.prepare.allocate_riv_cells` function.
+    conductance: DataArray | UgridDataArray
+        Planar grid with conductances that need to be distributed over layers.
+    top: DataArray | UgridDataArray
+        Model top
+    bottom: DataArray | UgridDataArray
+        Model layer bottoms
+    stage: DataArray | UgridDataArray
+        Planar grid with river stages
+    bottom_elevation: DataArray | UgridDataArray
+        Planar grid with river bottom elevations
+    k: DataArray | UgridDataArray
+        Hydraulic conductivities
+    
+    Returns
+    -------
+    Conductances distributed over depth.
+
+    Examples
+    --------
+    >>> allocated = imod.prepare.allocate_riv_cells()
+
+    """
     PLANAR_GRID.validate(conductance)
 
     match distributing_option:
@@ -92,6 +152,31 @@ def distribute_drn_conductance(
     bottom: GridDataArray,
     k: GridDataArray,
 ) -> GridDataArray:
+    """
+    Function to distribute 2D conductance over vertical layer for the DRN
+    package. Multiple options are available, which need to be selected in the
+    DISTRIBUTING_OPTION enumerator.
+
+    Parameters
+    ----------
+    distributing_option : DISTRIBUTING_OPTION
+        Distributing option available in the DISTRIBUTING_OPTION enumerator.
+    allocated: DataArray | UgridDataArray
+        3D boolean array with drain cell locations. This can be made with the
+        :func:`imod.prepare.allocate_drn_cells` function.
+    conductance: DataArray | UgridDataArray
+        Planar grid with conductances that need to be distributed over layers.
+    top: DataArray | UgridDataArray
+        Model top
+    bottom: DataArray | UgridDataArray
+        Model layer bottoms
+    k: DataArray | UgridDataArray
+        Hydraulic conductivities
+    
+    Returns
+    -------
+    Conductances distributed over depth.
+    """
     PLANAR_GRID.validate(conductance)
 
     match distributing_option:
@@ -126,7 +211,31 @@ def distribute_ghb_conductance(
     k: GridDataArray,
 ) -> GridDataArray:
     PLANAR_GRID.validate(conductance)
+    """
+    Function to distribute 2D conductance over vertical layer for the GHB
+    package. Multiple options are available, which need to be selected in the
+    DISTRIBUTING_OPTION enumerator.
 
+    Parameters
+    ----------
+    distributing_option : DISTRIBUTING_OPTION
+        Distributing option available in the DISTRIBUTING_OPTION enumerator.
+    allocated: DataArray | UgridDataArray
+        3D boolean array with GHB cell locations. This can be made with the
+        :func:`imod.prepare.allocate_ghb_cells` function.
+    conductance: DataArray | UgridDataArray
+        Planar grid with conductances that need to be distributed over layers.
+    top: DataArray | UgridDataArray
+        Model top
+    bottom: DataArray | UgridDataArray
+        Model layer bottoms
+    k: DataArray | UgridDataArray
+        Hydraulic conductivities
+    
+    Returns
+    -------
+    Conductances distributed over depth.
+    """
     match distributing_option:
         case DISTRIBUTING_OPTION.equally:
             weights = _distribute_weights__equally(allocated)
