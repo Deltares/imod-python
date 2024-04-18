@@ -94,7 +94,7 @@ def distribute_riv_conductance(
         Planar grid with river bottom elevations
     k: DataArray | UgridDataArray
         Hydraulic conductivities
-    
+
     Returns
     -------
     Conductances distributed over depth.
@@ -106,7 +106,7 @@ def distribute_riv_conductance(
         ALLOCATION_OPTION.stage_to_riv_bot, active, top, bottom, stage, bottom_elevation
         )
     >>> conductances_distributed = distribute_riv_conductance(
-            DISTRIBUTING_OPTION.by_corrected_transmissivity, allocated, 
+            DISTRIBUTING_OPTION.by_corrected_transmissivity, allocated,
             conductance, top, bottom, stage, bottom_elevation, k
         )
     """
@@ -178,7 +178,7 @@ def distribute_drn_conductance(
         Model layer bottoms
     k: DataArray | UgridDataArray
         Hydraulic conductivities
-    
+
     Returns
     -------
     Conductances distributed over depth.
@@ -190,7 +190,7 @@ def distribute_drn_conductance(
         ALLOCATION_OPTION.at_elevation, active, top, bottom, drain_elevation
         )
     >>> conductances_distributed = distribute_drn_conductance(
-            DISTRIBUTING_OPTION.by_layer_transmissivity, allocated, 
+            DISTRIBUTING_OPTION.by_layer_transmissivity, allocated,
             conductance, top, bottom, k
         )
     """
