@@ -1,5 +1,7 @@
 from enum import Enum
 
+import numpy as np
+
 from imod.prepare.layer import (
     get_lower_active_grid_cells,
     get_upper_active_grid_cells,
@@ -79,7 +81,7 @@ def distribute_riv_conductance(
                 f"'{DISTRIBUTING_OPTION.by_conductivity.name}' supported."
                 f"got: '{distributing_option.name}'"
             )
-    return weights * conductance
+    return (weights * conductance).where(allocated)
 
 
 def distribute_drn_conductance(
@@ -112,7 +114,7 @@ def distribute_drn_conductance(
                 f"'{DISTRIBUTING_OPTION.by_conductivity.name}' supported."
                 f"got: '{distributing_option.name}'"
             )
-    return weights * conductance
+    return (weights * conductance).where(allocated)
 
 
 def distribute_ghb_conductance(
@@ -145,7 +147,7 @@ def distribute_ghb_conductance(
                 f"'{DISTRIBUTING_OPTION.by_conductivity.name}' supported."
                 f"got: '{distributing_option.name}'"
             )
-    return weights * conductance
+    return (weights * conductance).where(allocated)
 
 
 def _compute_layer_thickness(allocated, top, bottom):
@@ -175,7 +177,7 @@ def _compute_crosscut_thickness(allocated, top, bottom, stage, bottom_elevation)
         ~upper_layer_allocated, thickness - (top_layered - stage)
     )
     thickness = thickness.where(
-        ~lower_layer_allocated, thickness - (bottom - bottom_elevation)
+        ~lower_layer_allocated, thickness - (bottom_elevation - bottom)
     )
 
     return thickness
@@ -196,7 +198,6 @@ def _distribute_weights__by_corrected_transmissivity(
         allocated, top, bottom, stage, bottom_elevation
     )
     transmissivity = crosscut_thickness * k
-    weights = transmissivity / transmissivity.sum(dim="layer")
 
     top_layered = _enforce_layered_top(top, bottom)
 
@@ -211,9 +212,10 @@ def _distribute_weights__by_corrected_transmissivity(
     Fc = Fc.where(~lower_layer_allocated, (top_layered + bottom_elevation) / 2)
     # Correction factor for mismatch between midpoints of crosscut layers and
     # layer midpoints.
-    F = 1.0 - (midpoints - Fc).abs() / (layer_thickness * 0.5)
+    F = 1.0 - np.abs(midpoints - Fc) / (layer_thickness * 0.5)
 
-    return weights * F
+    transmissivity_corrected = transmissivity * F
+    return transmissivity_corrected / transmissivity_corrected.sum(dim="layer")
 
 
 def _distribute_weights__equally(allocated: GridDataArray):
@@ -254,15 +256,11 @@ def _distribute_weights__by_layer_transmissivity(
     allocated: GridDataArray,
     top: GridDataArray,
     bottom: GridDataArray,
-    stage: GridDataArray,
-    bottom_elevation: GridDataArray,
     k: GridDataArray,
 ):
-    PLANAR_GRID.validate(stage)
-    PLANAR_GRID.validate(bottom_elevation)
 
     layer_thickness = _compute_layer_thickness(
-        allocated, top, bottom, stage, bottom_elevation
+        allocated, top, bottom
     )
     transmissivity = layer_thickness * k
 
@@ -283,7 +281,7 @@ def _distribute_weights__by_crosscut_transmissivity(
     crosscut_thickness = _compute_crosscut_thickness(
         allocated, top, bottom, stage, bottom_elevation
     )
-    transmissivity = crosscut_thickness * k
+    transmissivity = (crosscut_thickness * k)
 
     return transmissivity / transmissivity.sum(dim="layer")
 
