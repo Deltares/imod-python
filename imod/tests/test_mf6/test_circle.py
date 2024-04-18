@@ -45,11 +45,11 @@ def test_simulation_write_and_run(circle_model, tmp_path):
     )
     assert isinstance(head, xu.UgridDataArray)
     assert np.all(
-        head["time"].values
-        == np.array(datetime(1999, 1, 1, 0, 0, 1), dtype="datetime64[ns]")
+        head["time"].values[0]
+        == np.array(datetime(1999, 1, 1, 0, 0, 7), dtype="datetime64[ns]")
     )
     assert head.dims == ("time", "layer", "mesh2d_nFaces")
-    assert head.shape == (1, 2, 216)
+    assert head.shape == (52, 2, 216)
 
 
 @pytest.mark.usefixtures("circle_model")
@@ -102,7 +102,7 @@ def test_simulation_write_and_run_evt(circle_model_evt, tmp_path):
     )
     assert isinstance(head, xu.UgridDataArray)
     assert head.dims == ("time", "layer", "mesh2d_nFaces")
-    assert head.shape == (1, 2, 216)
+    assert head.shape == (52, 2, 216)
 
 
 @pytest.mark.usefixtures("circle_model_evt")

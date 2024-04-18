@@ -253,7 +253,6 @@ class Well(BoundaryCondition, IPointDataPackage):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-        state_for_boundary: Optional[GridDataArray] = None,
     ) -> Package:
         """
         Clip a package by a bounding box (time, layer, y, x).
@@ -394,7 +393,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         wells_df = wells_df.reset_index()
 
         wells_assigned = assign_wells(
-            wells_df, top_3d, bottom, k, minimum_thickness, minimum_k
+            wells_df, top_3d, bottom, k, minimum_thickness, minimum_k, True
         )
         # Set multi-index again
         wells_assigned = wells_assigned.set_index(index_names).sort_index()
@@ -578,7 +577,7 @@ class Well(BoundaryCondition, IPointDataPackage):
 
         if nwells_df == 0:
             raise ValueError("No wells were assigned in package. None were present.")
-        # @TODO: reinstate this check. issue github #621.
+
         if not is_partitioned and nwells_df != nwells_assigned:
             raise ValueError(
                 "One or more well(s) are completely invalid due to minimum conductivity and thickness constraints."
@@ -741,7 +740,6 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-        state_for_boundary: Optional[GridDataArray] = None,
     ) -> Package:
         """
         Clip a package by a bounding box (time, layer, y, x).
@@ -897,7 +895,6 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-        state_for_boundary: Optional[GridDataArray] = None,
     ) -> Package:
         """
         Clip a package by a bounding box (time, layer, y, x).
