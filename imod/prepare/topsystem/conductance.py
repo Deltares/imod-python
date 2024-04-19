@@ -9,6 +9,7 @@ from imod.prepare.layer import (
 from imod.prepare.topsystem.allocation import _enforce_layered_top
 from imod.schemata import DimsSchema
 from imod.typing import GridDataArray
+from imod.typing.grid import ones_like
 
 
 class DISTRIBUTING_OPTION(Enum):
@@ -364,8 +365,7 @@ def _distribute_weights__by_corrected_transmissivity(
 
 def _distribute_weights__equally(allocated: GridDataArray):
     """Compute weights over layers equally."""
-    weights = 1.0 / allocated.sum(dim="layer")
-    return weights
+    return ones_like(allocated) / allocated.sum(dim="layer")
 
 
 def _distribute_weights__by_layer_thickness(
@@ -376,9 +376,7 @@ def _distribute_weights__by_layer_thickness(
     """Compute weights based on layer thickness"""
     layer_thickness = _compute_layer_thickness(allocated, top, bottom)
 
-    weights = layer_thickness / layer_thickness.sum(dim="layer")
-
-    return weights
+    return layer_thickness / layer_thickness.sum(dim="layer")
 
 
 def _distribute_weights__by_crosscut_thickness(
