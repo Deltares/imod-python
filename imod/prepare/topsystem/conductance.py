@@ -11,34 +11,36 @@ from imod.util.dims import enforced_dim_order
 
 class DISTRIBUTING_OPTION(Enum):
     """
-    Enumerator for conductance distribution settings. Numbers match the
-    DISTRCOND options in iMOD 5.6. The following settings are available:
+    Enumerator containing settings to distribute 2D conductance grids over
+    vertical layers for the RIV, DRN or GHB package.
 
-    * ``by_corrected_transmissivity``: Distribute the conductance by corrected
-      transmissivities. Crosscut thicknesses are used to compute
+    * ``by_corrected_transmissivity``: RIV. Distribute the conductance by
+      corrected transmissivities. Crosscut thicknesses are used to compute
       transmissivities. The crosscut thicknesses is computed based on the
       overlap of bottom_elevation over the bottom allocated layer. Same holds
       for the stage and top allocated layer. Furthermore the method corrects
       distribution weights for the mismatch between the midpoints of crosscut
       areas and model layer midpoints. This is the default method in iMOD 5.6,
-      thus DISTRCOND = 0.
-    * ``equally``: Distribute conductances equally over layers. This matches iMOD
-      5.6 DISTRCOND = 1 option.
-    * ``by_crosscut_thickness``: Distribute the conductance by crosscut
+      thus DISTRCOND = 0. 
+    * ``equally``: RIV, DRN, GHB. Distribute conductances equally over layers.
+      This matches iMOD 5.6 DISTRCOND = 1 option. 
+    * ``by_crosscut_thickness``: RIV. Distribute the conductance by crosscut
       thicknesses. The crosscut thicknesses is computed based on the overlap of
       bottom_elevation over the bottom allocated layer. Same holds for the stage
       and top allocated layer. This matches iMOD 5.6 DISTRCOND = 2 option.
-    * ``by_layer_thickness``: Distribute the conductance by model layer thickness.
-      This matches iMOD 5.6 DISTRCOND = 3 option.
-    * ``by_crosscut_transmissivity``: Distribute the conductance by crosscut
-      transmissivity. Crosscut thicknesses are used to compute transmissivities.
-      The crosscut thicknesses is computed based on the overlap of
-      bottom_elevation over the bottom allocated layer. Same holds for the stage
-      and top allocated layer. This matches iMOD 5.6 DISTRCOND = 4 option.
-    * ``by_conductivity``: Distribute the conductance weighted by model layer
-      hydraulic conductivities. This matches iMOD 5.6 DISTRCOND = 5 option.
-    * ``by_layer_transmissivity``: Distribute the conductance by model layer
-      transmissivity. This has no equivalent in iMOD 5.6.
+    * ``by_layer_thickness``: RIV, DRN, GHB. Distribute the conductance by model
+      layer thickness. This matches iMOD 5.6 DISTRCOND = 3 option.
+    * ``by_crosscut_transmissivity``: RIV. Distribute the conductance by
+      crosscut transmissivity. Crosscut thicknesses are used to compute
+      transmissivities. The crosscut thicknesses is computed based on the
+      overlap of bottom_elevation over the bottom allocated layer. Same holds
+      for the stage and top allocated layer. This matches iMOD 5.6 DISTRCOND = 4
+      option.
+    * ``by_conductivity``: RIV, DRN, GHB. Distribute the conductance weighted by
+      model layer hydraulic conductivities. This matches iMOD 5.6 DISTRCOND = 5
+      option.
+    * ``by_layer_transmissivity``: RIV, DRN, GHB. Distribute the conductance by
+      model layer transmissivity. This has no equivalent in iMOD 5.6.
     """
 
     by_corrected_transmissivity = 0
@@ -70,7 +72,7 @@ def distribute_riv_conductance(
     k: GridDataArray,
 ) -> GridDataArray:
     """
-    Function to distribute 2D conductance over vertical layer for the RIV
+    Function to distribute 2D conductance over vertical layers for the RIV
     package. Multiple options are available, which need to be selected in the
     DISTRIBUTING_OPTION enumerator.
 
@@ -162,7 +164,7 @@ def distribute_drn_conductance(
     k: GridDataArray,
 ) -> GridDataArray:
     """
-    Function to distribute 2D conductance over vertical layer for the DRN
+    Function to distribute 2D conductance over vertical layers for the DRN
     package. Multiple options are available, which need to be selected in the
     DISTRIBUTING_OPTION enumerator.
 
@@ -234,7 +236,7 @@ def distribute_ghb_conductance(
 ) -> GridDataArray:
     PLANAR_GRID.validate(conductance)
     """
-    Function to distribute 2D conductance over vertical layer for the GHB
+    Function to distribute 2D conductance over vertical layers for the GHB
     package. Multiple options are available, which need to be selected in the
     DISTRIBUTING_OPTION enumerator.
 
