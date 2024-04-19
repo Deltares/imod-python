@@ -84,15 +84,18 @@ def distribute_riv_conductance(
         3D boolean array with river cell locations. This can be made with the
         :func:`imod.prepare.allocate_riv_cells` function.
     conductance: DataArray | UgridDataArray
-        Planar grid with conductances that need to be distributed over layers.
+        Planar grid with conductances that need to be distributed over layers,
+        so grid cannot contain a layer dimension. Can contain a time dimension.
     top: DataArray | UgridDataArray
         Model top
     bottom: DataArray | UgridDataArray
         Model layer bottoms
     stage: DataArray | UgridDataArray
-        Planar grid with river stages
+        Planar grid with river stages, cannot contain a layer dimension. Can
+        contain a time dimension.
     bottom_elevation: DataArray | UgridDataArray
-        Planar grid with river bottom elevations
+        Planar grid with river bottom elevations, cannot contain a layer
+        dimension. Can contain a time dimension.
     k: DataArray | UgridDataArray
         Hydraulic conductivities
 
@@ -172,7 +175,8 @@ def distribute_drn_conductance(
         3D boolean array with drain cell locations. This can be made with the
         :func:`imod.prepare.allocate_drn_cells` function.
     conductance: DataArray | UgridDataArray
-        Planar grid with conductances that need to be distributed over layers.
+        Planar grid with conductances that need to be distributed over layers,
+        so grid cannot contain a layer dimension. Can contain a time dimension.
     top: DataArray | UgridDataArray
         Model top
     bottom: DataArray | UgridDataArray
@@ -242,7 +246,8 @@ def distribute_ghb_conductance(
         3D boolean array with GHB cell locations. This can be made with the
         :func:`imod.prepare.allocate_ghb_cells` function.
     conductance: DataArray | UgridDataArray
-        Planar grid with conductances that need to be distributed over layers.
+        Planar grid with conductances that need to be distributed over layers,
+        so grid cannot contain a layer dimension. Can contain a time dimension.
     top: DataArray | UgridDataArray
         Model top
     bottom: DataArray | UgridDataArray
