@@ -17,8 +17,34 @@ from imod.util.dims import enforced_dim_order
 
 class ALLOCATION_OPTION(Enum):
     """
-    Enumerator for allocation settings. Numbers match the IDEFLAYER options in
-    iMOD 5.6.
+    Enumerator for settings to allocate planar grid with RIV, DRN, GHB, or RCH
+    cells over the vertical layer dimensions. Numbers match the IDEFLAYER
+    options in iMOD 5.6.
+
+    * ``stage_to_riv_bot``: RIV. Allocate cells spanning from the river stage up
+      to the river bottom elevation. This matches the iMOD 5.6 IDEFLAYER = 0
+      option.
+    * ``first_active_to_riv_bot``: RIV. Allocate cells spanning from first upper
+      active cell up to the river bottom elevation. This matches the iMOD 5.6
+      IDEFLAYER = -1 option.
+    * ``first_active_to_riv_bot__drn``: RIV. Allocate cells spanning from first
+      upper active cell up to the river bottom elevation. Method returns both
+      allocated cells for a river package as well as a drain package. Cells
+      above river stage are allocated as drain cells, cells below are as river
+      cells. This matches the iMOD 5.6 IDEFLAYER = 1 option.
+    * ``at_elevation``: RIV, DRN, GHB. Allocate cells containing the river
+      bottom elevation, drain elevation, or head respectively for river, drain
+      and general head boundary. This matches the iMOD 5.6 IDEFLAYER = 2
+      option.
+    * ``at_first_active``: RIV, DRN, GHB, RCH. Allocate cells at the upper
+      active cells. This has no equivalent option in iMOD 5.6.
+    
+    Examples
+    --------
+    
+    >>> from imod.prepare.topsystem import ALLOCATION_OPTION
+    >>> setting = ALLOCATION_OPTION.at_first_active
+    >>> allocated = allocate_rch_cells(setting, active)
     """
 
     stage_to_riv_bot = 0
@@ -44,6 +70,43 @@ def allocate_riv_cells(
     stage: GridDataArray,
     bottom_elevation: GridDataArray,
 ) -> tuple[GridDataArray, Optional[GridDataArray]]:
+    """
+    Allocate river cells from a planar grid across the vertical dimension.
+    Multiple options are available, which can be selected in ALLOCATION_OPTION. 
+
+    Parameters
+    ----------
+    allocation_option: ALLOCATION_OPTION
+        Chosen allocation option, can be selected using the ALLOCATION_OPTION
+        enumerator.
+    active: DataArray | UgridDatarray
+        Boolean array containing active model cells. For Modflow 6, this is the
+        equivalent of ``idomain == 1``.
+    top: DataArray | UgridDatarray
+        Grid containing tops of model layers. If has no layer dimension, is
+        assumed as top of upper layer and the other layers are padded with
+        bottom values of the overlying model layer.
+    bottom: DataArray | UgridDatarray
+        Grid containing bottoms of model layers.
+    stage: DataArray | UgridDatarray
+        Planar grid containing river stages. Is not allowed to have a layer
+        dimension.
+    bottom_elevation: DataArray | UgridDatarray
+        Planar grid containing river bottom elevations. Is not allowed to have a
+        layer dimension.
+    
+    Returns
+    -------
+    DataArray | UgridDatarray
+        Allocated river cells
+        
+    Examples
+    --------
+
+    >>> from imod.prepare.topsystem import ALLOCATION_OPTION, allocate_riv_cells
+    >>> setting = ALLOCATION_OPTION.stage_to_riv_bot
+    >>> allocated = allocate_riv_cells(setting, active, top, bottom, stage, bottom_elevation)
+    """
     match allocation_option:
         case ALLOCATION_OPTION.stage_to_riv_bot:
             return _allocate_cells__stage_to_riv_bot(
@@ -80,6 +143,40 @@ def allocate_drn_cells(
     bottom: GridDataArray,
     elevation: GridDataArray,
 ) -> GridDataArray:
+    """
+    Allocate drain cells from a planar grid across the vertical dimension.
+    Multiple options are available, which can be selected in ALLOCATION_OPTION. 
+
+    Parameters
+    ----------
+    allocation_option: ALLOCATION_OPTION
+        Chosen allocation option, can be selected using the ALLOCATION_OPTION
+        enumerator.
+    active: DataArray | UgridDatarray
+        Boolean array containing active model cells. For Modflow 6, this is the
+        equivalent of ``idomain == 1``.
+    top: DataArray | UgridDatarray
+        Grid containing tops of model layers. If has no layer dimension, is
+        assumed as top of upper layer and the other layers are padded with
+        bottom values of the overlying model layer.
+    bottom: DataArray | UgridDatarray
+        Grid containing bottoms of model layers.
+    elevation: DataArray | UgridDatarray
+        Planar grid containing drain elevation. Is not allowed to have a layer
+        dimension.
+    
+    Returns
+    -------
+    DataArray | UgridDatarray
+        Allocated drain cells
+        
+    Examples
+    --------
+
+    >>> from imod.prepare.topsystem import ALLOCATION_OPTION, allocate_drn_cells
+    >>> setting = ALLOCATION_OPTION.at_elevation
+    >>> allocated = allocate_drn_cells(setting, active, top, bottom, stage, drain_elevation)
+    """
     match allocation_option:
         case ALLOCATION_OPTION.at_elevation:
             return _allocate_cells__at_elevation(top, bottom, elevation)[0]
@@ -101,6 +198,41 @@ def allocate_ghb_cells(
     bottom: GridDataArray,
     head: GridDataArray,
 ) -> GridDataArray:
+    """
+    Allocate general head boundary (GHB) cells from a planar grid across the
+    vertical dimension. Multiple options are available, which can be selected in
+    ALLOCATION_OPTION. 
+
+    Parameters
+    ----------
+    allocation_option: ALLOCATION_OPTION
+        Chosen allocation option, can be selected using the ALLOCATION_OPTION
+        enumerator.
+    active: DataArray | UgridDatarray
+        Boolean array containing active model cells. For Modflow 6, this is the
+        equivalent of ``idomain == 1``.
+    top: DataArray | UgridDatarray
+        Grid containing tops of model layers. If has no layer dimension, is
+        assumed as top of upper layer and the other layers are padded with
+        bottom values of the overlying model layer.
+    bottom: DataArray | UgridDatarray
+        Grid containing bottoms of model layers.
+    head: DataArray | UgridDatarray
+        Planar grid containing general head boundary's head. Is not allowed to
+        have a layer dimension.
+    
+    Returns
+    -------
+    DataArray | UgridDatarray
+        Allocated general head boundary cells
+        
+    Examples
+    --------
+
+    >>> from imod.prepare.topsystem import ALLOCATION_OPTION, allocate_ghb_cells
+    >>> setting = ALLOCATION_OPTION.at_elevation
+    >>> allocated = allocate_ghb_cells(setting, active, top, bottom, head)
+    """
     match allocation_option:
         case ALLOCATION_OPTION.at_elevation:
             return _allocate_cells__at_elevation(top, bottom, head)[0]
@@ -119,6 +251,31 @@ def allocate_rch_cells(
     allocation_option: ALLOCATION_OPTION,
     active: GridDataArray,
 ) -> GridDataArray:
+    """
+    Allocate recharge cells from a planar grid across the vertical dimension.
+    Multiple options are available, which can be selected in ALLOCATION_OPTION. 
+
+    Parameters
+    ----------
+    allocation_option: ALLOCATION_OPTION
+        Chosen allocation option, can be selected using the ALLOCATION_OPTION
+        enumerator.
+    active: DataArray | UgridDatarray
+        Boolean array containing active model cells. For Modflow 6, this is the
+        equivalent of ``idomain == 1``.
+    
+    Returns
+    -------
+    DataArray | UgridDatarray
+        Allocated recharge cells
+        
+    Examples
+    --------
+
+    >>> from imod.prepare.topsystem import ALLOCATION_OPTION, allocate_rch_cells
+    >>> setting = ALLOCATION_OPTION.at_first_active
+    >>> allocated = allocate_rch_cells(setting, active)
+    """
     match allocation_option:
         case ALLOCATION_OPTION.at_first_active:
             return _allocate_cells__at_first_active(active)[0]
