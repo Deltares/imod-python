@@ -17,7 +17,7 @@ class DISTRIBUTING_OPTION(Enum):
     Enumerator for conductance distribution settings. Numbers match the
     DISTRCOND options in iMOD 5.6. The following settings are available:
 
-    * *by_corrected_transmissivity*: Distribute the conductance by corrected
+    * ``by_corrected_transmissivity``: Distribute the conductance by corrected
       transmissivities. Crosscut thicknesses are used to compute
       transmissivities. The crosscut thicknesses is computed based on the
       overlap of bottom_elevation over the bottom allocated layer. Same holds
@@ -25,22 +25,22 @@ class DISTRIBUTING_OPTION(Enum):
       distribution weights for the mismatch between the midpoints of crosscut
       areas and model layer midpoints. This is the default method in iMOD 5.6,
       thus DISTRCOND = 0.
-    * *equally*: Distribute conductances equally over layers. This matches iMOD
+    * ``equally``: Distribute conductances equally over layers. This matches iMOD
       5.6 DISTRCOND = 1 option.
-    * *by_crosscut_thickness*: Distribute the conductance by crosscut
+    * ``by_crosscut_thickness``: Distribute the conductance by crosscut
       thicknesses. The crosscut thicknesses is computed based on the overlap of
       bottom_elevation over the bottom allocated layer. Same holds for the stage
       and top allocated layer. This matches iMOD 5.6 DISTRCOND = 2 option.
-    * *by_layer_thickness*: Distribute the conductance by model layer thickness.
+    * ``by_layer_thickness``: Distribute the conductance by model layer thickness.
       This matches iMOD 5.6 DISTRCOND = 3 option.
-    * *by_crosscut_transmissivity*: Distribute the conductance by crosscut
+    * ``by_crosscut_transmissivity``: Distribute the conductance by crosscut
       transmissivity. Crosscut thicknesses are used to compute transmissivities.
       The crosscut thicknesses is computed based on the overlap of
       bottom_elevation over the bottom allocated layer. Same holds for the stage
       and top allocated layer. This matches iMOD 5.6 DISTRCOND = 4 option.
-    * *by_conductivity*: Distribute the conductance weighted by model layer
+    * ``by_conductivity``: Distribute the conductance weighted by model layer
       hydraulic conductivities. This matches iMOD 5.6 DISTRCOND = 5 option.
-    * *by_layer_transmissivity*: Distribute the conductance by model layer
+    * ``by_layer_transmissivity``: Distribute the conductance by model layer
       transmissivity. This has no equivalent in iMOD 5.6.
     """
 
