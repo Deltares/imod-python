@@ -187,7 +187,6 @@ def distribution_by_crosscut_transmissivity__third_only():
     return option, allocated_layer, expected
 
 
-
 @case(tags=["riv"])
 def distribution_by_crosscut_thickness():
     option = DISTRIBUTING_OPTION.by_crosscut_thickness
@@ -300,7 +299,6 @@ def distribution_by_layer_transmissivity__third_only():
     return option, allocated_layer, expected
 
 
-
 @case(tags=["riv", "drn", "ghb"])
 def distribution_equally():
     option = DISTRIBUTING_OPTION.equally
@@ -317,7 +315,7 @@ def distribution_equally__first_active():
     allocated_layer = xr.DataArray(
         [True, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
     )
-    expected = [(1/3), (1/3), (1/3), np.nan]
+    expected = [(1 / 3), (1 / 3), (1 / 3), np.nan]
     return option, allocated_layer, expected
 
 
@@ -329,4 +327,3 @@ def distribution_equally__third_only():
     )
     expected = [np.nan, np.nan, 1.0, np.nan]
     return option, allocated_layer, expected
-

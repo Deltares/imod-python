@@ -316,7 +316,9 @@ def _compute_crosscut_thickness(allocated, top, bottom, stage, bottom_elevation)
     thickness = _compute_layer_thickness(allocated, top, bottom)
 
     upper_layer_allocated = (stage < top_layered) & (stage > bottom)
-    lower_layer_allocated = (bottom_elevation < top_layered) & (bottom_elevation > bottom)
+    lower_layer_allocated = (bottom_elevation < top_layered) & (
+        bottom_elevation > bottom
+    )
     outside = (stage < bottom) | (bottom_elevation > top_layered)
 
     thickness = thickness.where(
@@ -328,6 +330,7 @@ def _compute_crosscut_thickness(allocated, top, bottom, stage, bottom_elevation)
     thickness = thickness.where(~outside, 0.0)
 
     return thickness
+
 
 def _distribute_weights__by_corrected_transmissivity(
     allocated: GridDataArray,
@@ -355,7 +358,9 @@ def _distribute_weights__by_corrected_transmissivity(
     top_layered = _enforce_layered_top(top, bottom)
 
     upper_layer_allocated = (stage < top_layered) & (stage > bottom)
-    lower_layer_allocated = (bottom_elevation < top_layered) & (bottom_elevation > bottom)
+    lower_layer_allocated = (bottom_elevation < top_layered) & (
+        bottom_elevation > bottom
+    )
 
     layer_thickness = _compute_layer_thickness(allocated, top, bottom)
     midpoints = (top_layered + bottom) / 2
