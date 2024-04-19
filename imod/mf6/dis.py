@@ -151,3 +151,7 @@ class StructuredDiscretization(Package, IRegridPackage):
 
     def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
         return self._regrid_method
+
+    @classmethod
+    def from_imod5_package(cls, data):
+        pass
