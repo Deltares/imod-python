@@ -21,9 +21,9 @@ class DISTRIBUTING_OPTION(Enum):
       for the stage and top allocated layer. Furthermore the method corrects
       distribution weights for the mismatch between the midpoints of crosscut
       areas and model layer midpoints. This is the default method in iMOD 5.6,
-      thus DISTRCOND = 0. 
+      thus DISTRCOND = 0.
     * ``equally``: RIV, DRN, GHB. Distribute conductances equally over layers.
-      This matches iMOD 5.6 DISTRCOND = 1 option. 
+      This matches iMOD 5.6 DISTRCOND = 1 option.
     * ``by_crosscut_thickness``: RIV. Distribute the conductance by crosscut
       thicknesses. The crosscut thicknesses is computed based on the overlap of
       bottom_elevation over the bottom allocated layer. Same holds for the stage

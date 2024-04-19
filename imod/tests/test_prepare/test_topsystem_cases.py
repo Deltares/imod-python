@@ -196,6 +196,7 @@ def distribution_by_crosscut_transmissivity__third_only():
     expected = [np.nan, np.nan, 1.0, np.nan]
     return option, allocated_layer, expected
 
+
 @case(tags=["riv"])
 def distribution_by_crosscut_transmissivity__TFTF():
     """Third layer active only, while stage in second layer"""
@@ -279,13 +280,14 @@ def distribution_by_conductivity__third_only():
     expected = [np.nan, np.nan, 1.0, np.nan]
     return option, allocated_layer, expected
 
+
 @case(tags=["riv", "drn", "ghb"])
 def distribution_by_conductivity__TFTF():
     option = DISTRIBUTING_OPTION.by_conductivity
     allocated_layer = xr.DataArray(
         [True, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
     )
-    expected = [(2/3), np.nan, (1/3), np.nan]
+    expected = [(2 / 3), np.nan, (1 / 3), np.nan]
     return option, allocated_layer, expected
 
 
@@ -367,7 +369,6 @@ def distribution_by_layer_transmissivity__TFTF():
     )
     expected = [(1 / 3), np.nan, (2 / 3), np.nan]
     return option, allocated_layer, expected
-
 
 
 @case(tags=["riv", "drn", "ghb"])
