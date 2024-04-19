@@ -2,14 +2,11 @@ from enum import Enum
 
 import numpy as np
 
-from imod.prepare.layer import (
-    get_lower_active_grid_cells,
-    get_upper_active_grid_cells,
-)
 from imod.prepare.topsystem.allocation import _enforce_layered_top
 from imod.schemata import DimsSchema
 from imod.typing import GridDataArray
-from imod.typing.grid import ones_like
+from imod.typing.grid import ones_like, preserve_gridtype
+from imod.util.dims import enforced_dim_order
 
 
 class DISTRIBUTING_OPTION(Enum):
@@ -61,6 +58,7 @@ PLANAR_GRID = (
 )
 
 
+@enforced_dim_order
 def distribute_riv_conductance(
     distributing_option: DISTRIBUTING_OPTION,
     allocated: GridDataArray,
@@ -154,6 +152,7 @@ def distribute_riv_conductance(
     return (weights * conductance).where(allocated)
 
 
+@enforced_dim_order
 def distribute_drn_conductance(
     distributing_option: DISTRIBUTING_OPTION,
     allocated: GridDataArray,
@@ -224,6 +223,7 @@ def distribute_drn_conductance(
     return (weights * conductance).where(allocated)
 
 
+@enforced_dim_order
 def distribute_ghb_conductance(
     distributing_option: DISTRIBUTING_OPTION,
     allocated: GridDataArray,
@@ -293,6 +293,7 @@ def distribute_ghb_conductance(
     return (weights * conductance).where(allocated)
 
 
+@preserve_gridtype
 def _compute_layer_thickness(allocated, top, bottom):
     """
     Compute 3D grid of thicknesses in allocated cells
@@ -300,9 +301,10 @@ def _compute_layer_thickness(allocated, top, bottom):
     top_layered = _enforce_layered_top(top, bottom)
 
     thickness = top_layered - bottom
-    return allocated * thickness
+    return thickness.where(allocated)
 
 
+@preserve_gridtype
 def _compute_crosscut_thickness(allocated, top, bottom, stage, bottom_elevation):
     """
     Compute 3D grid of thicknesses crosscut by river in allocated cells. So the
@@ -313,8 +315,9 @@ def _compute_crosscut_thickness(allocated, top, bottom, stage, bottom_elevation)
 
     thickness = _compute_layer_thickness(allocated, top, bottom)
 
-    upper_layer_allocated = get_upper_active_grid_cells(allocated)
-    lower_layer_allocated = get_lower_active_grid_cells(allocated)
+    upper_layer_allocated = (stage < top_layered) & (stage > bottom)
+    lower_layer_allocated = (bottom_elevation < top_layered) & (bottom_elevation > bottom)
+    outside = (stage < bottom) | (bottom_elevation > top_layered)
 
     thickness = thickness.where(
         ~upper_layer_allocated, thickness - (top_layered - stage)
@@ -322,9 +325,9 @@ def _compute_crosscut_thickness(allocated, top, bottom, stage, bottom_elevation)
     thickness = thickness.where(
         ~lower_layer_allocated, thickness - (bottom_elevation - bottom)
     )
+    thickness = thickness.where(~outside, 0.0)
 
     return thickness
-
 
 def _distribute_weights__by_corrected_transmissivity(
     allocated: GridDataArray,
@@ -351,8 +354,8 @@ def _distribute_weights__by_corrected_transmissivity(
 
     top_layered = _enforce_layered_top(top, bottom)
 
-    upper_layer_allocated = get_upper_active_grid_cells(allocated)
-    lower_layer_allocated = get_lower_active_grid_cells(allocated)
+    upper_layer_allocated = (stage < top_layered) & (stage > bottom)
+    lower_layer_allocated = (bottom_elevation < top_layered) & (bottom_elevation > bottom)
 
     layer_thickness = _compute_layer_thickness(allocated, top, bottom)
     midpoints = (top_layered + bottom) / 2
@@ -397,9 +400,9 @@ def _distribute_weights__by_crosscut_thickness(
 
     crosscut_thickness = _compute_crosscut_thickness(
         allocated, top, bottom, stage, bottom_elevation
-    )
+    ).where(allocated)
 
-    return crosscut_thickness / (stage - bottom_elevation)
+    return crosscut_thickness / crosscut_thickness.sum(dim="layer")
 
 
 def _distribute_weights__by_layer_transmissivity(
