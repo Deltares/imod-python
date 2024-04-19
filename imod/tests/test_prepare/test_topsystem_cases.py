@@ -134,6 +134,28 @@ def distribution_by_corrected_transmissivity():
 
 
 @case(tags=["riv"])
+def distribution_by_corrected_transmissivity__first_active():
+    """First active cell allocated, while stage in second layer"""
+    option = DISTRIBUTING_OPTION.by_corrected_transmissivity
+    allocated_layer = xr.DataArray(
+        [True, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [0.0, (4 / 5), (1 / 5), np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["riv"])
+def distribution_by_corrected_transmissivity__third_only():
+    """Third layer active only, while stage in second layer"""
+    option = DISTRIBUTING_OPTION.by_corrected_transmissivity
+    allocated_layer = xr.DataArray(
+        [False, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [np.nan, np.nan, 1.0, np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["riv"])
 def distribution_by_crosscut_transmissivity():
     option = DISTRIBUTING_OPTION.by_crosscut_transmissivity
     allocated_layer = xr.DataArray(
@@ -144,12 +166,57 @@ def distribution_by_crosscut_transmissivity():
 
 
 @case(tags=["riv"])
+def distribution_by_crosscut_transmissivity__first_active():
+    """First active cell allocated, while stage in second layer"""
+    option = DISTRIBUTING_OPTION.by_crosscut_transmissivity
+    allocated_layer = xr.DataArray(
+        [True, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [0.0, (2 / 3), (1 / 3), np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["riv"])
+def distribution_by_crosscut_transmissivity__third_only():
+    """Third layer active only, while stage in second layer"""
+    option = DISTRIBUTING_OPTION.by_crosscut_transmissivity
+    allocated_layer = xr.DataArray(
+        [False, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [np.nan, np.nan, 1.0, np.nan]
+    return option, allocated_layer, expected
+
+
+
+@case(tags=["riv"])
 def distribution_by_crosscut_thickness():
     option = DISTRIBUTING_OPTION.by_crosscut_thickness
     allocated_layer = xr.DataArray(
         [False, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
     )
     expected = [np.nan, 0.5, 0.5, np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["riv"])
+def distribution_by_crosscut_thickness__first_active():
+    """First active cell allocated, while stage in second layer"""
+    option = DISTRIBUTING_OPTION.by_crosscut_thickness
+    allocated_layer = xr.DataArray(
+        [True, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [0.0, 0.5, 0.5, np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["riv"])
+def distribution_by_crosscut_thickness__third_only():
+    """Third layer active only, while stage in second layer"""
+    option = DISTRIBUTING_OPTION.by_crosscut_thickness
+    allocated_layer = xr.DataArray(
+        [False, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [np.nan, np.nan, 1.0, np.nan]
     return option, allocated_layer, expected
 
 
@@ -164,12 +231,42 @@ def distribution_by_conductivity():
 
 
 @case(tags=["riv", "drn", "ghb"])
+def distribution_by_conductivity__first_active():
+    option = DISTRIBUTING_OPTION.by_conductivity
+    allocated_layer = xr.DataArray(
+        [True, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [(2 / 5), (2 / 5), (1 / 5), np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["riv", "drn", "ghb"])
 def distribution_by_layer_thickness():
     option = DISTRIBUTING_OPTION.by_layer_thickness
     allocated_layer = xr.DataArray(
         [False, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
     )
     expected = [np.nan, (1 / 3), (2 / 3), np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["riv", "drn", "ghb"])
+def distribution_by_layer_thickness__first_active():
+    option = DISTRIBUTING_OPTION.by_layer_thickness
+    allocated_layer = xr.DataArray(
+        [True, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [(1 / 7), (2 / 7), (4 / 7), np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["riv", "drn", "ghb"])
+def distribution_by_layer_thickness__third_only():
+    option = DISTRIBUTING_OPTION.by_layer_thickness
+    allocated_layer = xr.DataArray(
+        [False, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [np.nan, np.nan, 1.0, np.nan]
     return option, allocated_layer, expected
 
 
@@ -184,6 +281,27 @@ def distribution_by_layer_transmissivity():
 
 
 @case(tags=["riv", "drn", "ghb"])
+def distribution_by_layer_transmissivity__first_active():
+    option = DISTRIBUTING_OPTION.by_layer_transmissivity
+    allocated_layer = xr.DataArray(
+        [True, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [0.2, 0.4, 0.4, np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["riv", "drn", "ghb"])
+def distribution_by_layer_transmissivity__third_only():
+    option = DISTRIBUTING_OPTION.by_layer_transmissivity
+    allocated_layer = xr.DataArray(
+        [False, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [np.nan, np.nan, 1.0, np.nan]
+    return option, allocated_layer, expected
+
+
+
+@case(tags=["riv", "drn", "ghb"])
 def distribution_equally():
     option = DISTRIBUTING_OPTION.equally
     allocated_layer = xr.DataArray(
@@ -191,3 +309,24 @@ def distribution_equally():
     )
     expected = [np.nan, 0.5, 0.5, np.nan]
     return option, allocated_layer, expected
+
+
+@case(tags=["riv", "drn", "ghb"])
+def distribution_equally__first_active():
+    option = DISTRIBUTING_OPTION.equally
+    allocated_layer = xr.DataArray(
+        [True, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [(1/3), (1/3), (1/3), np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["riv", "drn", "ghb"])
+def distribution_equally__third_only():
+    option = DISTRIBUTING_OPTION.equally
+    allocated_layer = xr.DataArray(
+        [False, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [np.nan, np.nan, 1.0, np.nan]
+    return option, allocated_layer, expected
+
