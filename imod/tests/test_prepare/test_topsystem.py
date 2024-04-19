@@ -16,7 +16,7 @@ from imod.typing.grid import is_unstructured, zeros_like
 from imod.util.dims import enforce_dim_order
 
 
-def take_first_planar_cell(grid: GridDataArray):
+def take_first_cell_in_xy_plane(grid: GridDataArray) -> GridDataArray:
     if is_unstructured(grid):
         return grid.values[:, 0]
     else:
@@ -37,12 +37,12 @@ def test_riv_allocation(
         option, active, top, bottom, stage, bottom_elevation
     )
 
-    actual_riv = take_first_planar_cell(actual_riv_da)
+    actual_riv = take_first_cell_in_xy_plane(actual_riv_da)
 
     if actual_drn_da is None:
         actual_drn = actual_drn_da
     else:
-        actual_drn = take_first_planar_cell(actual_drn_da)
+        actual_drn = take_first_cell_in_xy_plane(actual_drn_da)
 
     np.testing.assert_equal(actual_riv, expected_riv)
     np.testing.assert_equal(actual_drn, expected_drn)
@@ -58,7 +58,7 @@ def test_riv_allocation(
 def test_drn_allocation(active, top, bottom, drn_elevation, option, expected, _):
     actual_da = allocate_drn_cells(option, active, top, bottom, drn_elevation)
 
-    actual = take_first_planar_cell(actual_da)
+    actual = take_first_cell_in_xy_plane(actual_da)
 
     np.testing.assert_equal(actual, expected)
 
@@ -73,7 +73,7 @@ def test_drn_allocation(active, top, bottom, drn_elevation, option, expected, _)
 def test_ghb_allocation(active, top, bottom, head, option, expected, _):
     actual_da = allocate_ghb_cells(option, active, top, bottom, head)
 
-    actual = take_first_planar_cell(actual_da)
+    actual = take_first_cell_in_xy_plane(actual_da)
 
     np.testing.assert_equal(actual, expected)
 
@@ -88,7 +88,7 @@ def test_ghb_allocation(active, top, bottom, head, option, expected, _):
 def test_rch_allocation(active, option, expected, _):
     actual_da = allocate_rch_cells(option, active)
 
-    actual = take_first_planar_cell(actual_da)
+    actual = take_first_cell_in_xy_plane(actual_da)
 
     np.testing.assert_equal(actual, expected)
 
@@ -113,7 +113,7 @@ def test_distribute_riv_conductance(
     actual_da = distribute_riv_conductance(
         option, allocated, conductance, top, bottom, stage, bottom_elevation, k
     )
-    actual = take_first_planar_cell(actual_da)
+    actual = take_first_cell_in_xy_plane(actual_da)
 
     np.testing.assert_equal(actual, expected)
 
@@ -138,7 +138,7 @@ def test_distribute_drn_conductance(
     actual_da = distribute_drn_conductance(
         option, allocated, conductance, top, bottom, k
     )
-    actual = take_first_planar_cell(actual_da)
+    actual = take_first_cell_in_xy_plane(actual_da)
 
     np.testing.assert_equal(actual, expected)
 
@@ -163,6 +163,6 @@ def test_distribute_ghb_conductance(
     actual_da = distribute_ghb_conductance(
         option, allocated, conductance, top, bottom, k
     )
-    actual = take_first_planar_cell(actual_da)
+    actual = take_first_cell_in_xy_plane(actual_da)
 
     np.testing.assert_equal(actual, expected)
