@@ -162,9 +162,11 @@ def _allocate_cells__stage_to_riv_bot(
     bottom: GridDataArray
         bottom of model layers
     stage: GridDataArray
-        river stage
+        river stage, cannot contain a layer dimension. Can contain a time
+        dimension.
     bottom_elevation: GridDataArray
-        river bottom elevation
+        river bottom elevation, cannot contain a layer dimension. Can contain a
+        time dimension.
 
     Returns
     -------
@@ -204,7 +206,8 @@ def _allocate_cells__first_active_to_riv_bot(
     bottom: GridDataArray
         bottom of model layers
     bottom_elevation: GridDataArray
-        river bottom elevation
+        river bottom elevation, cannot contain a layer dimension. Can contain a
+        time dimension.
 
     Returns
     -------
@@ -248,9 +251,11 @@ def _allocate_cells__first_active_to_riv_bot__drn(
     bottom: GridDataArray
         bottom of model layers
     stage: GridDataArray
-        river stage
+        river stage, cannot contain a layer dimension. Can contain a time
+        dimension.
     bottom_elevation: GridDataArray
-        river bottom elevation
+        river bottom elevation, cannot contain a layer dimension. Can contain a
+        time dimension.
 
     Returns
     -------
@@ -292,7 +297,8 @@ def _allocate_cells__at_elevation(
     bottom: GridDataArray
         bottom of model layers
     elevation: GridDataArray
-        elevation. Can be river bottom, drain elevation or head of GHB.
+        elevation. Can be river bottom, drain elevation or head of GHB. Cannot
+        contain a layer dimension. Can contain a time dimension.
 
     Returns
     -------
