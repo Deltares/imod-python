@@ -564,8 +564,7 @@ def apply_factor_and_addition(headers, da):
     if not ("layer" in da.coords or "time" in da.dims):
         factor = headers[0]["factor"]
         addition = headers[0]["addition"]
-        da = da * factor
-        da = da + addition
+        da = da * factor + addition
     elif "layer" in da.coords and "time" not in da.dims:
         da = apply_factor_and_addition_per_layer(headers, da)
     else:
