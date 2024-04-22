@@ -17,8 +17,7 @@ class InitialConditionsEquilibrium(MetaSwapPackage, IRegridPackage):
     """
 
 
-    _regrid_method = {
-        "infiltration_capacity": (RegridderType.OVERLAP, "mean"),    }
+    _regrid_method = {}
 
     _file_name = "init_svat.inp"
     _option = "Equilibrium"
@@ -48,7 +47,7 @@ class InitialConditionsRootzonePressureHead(MetaSwapPackage, IRegridPackage):
     _metadata_dict = {
         "initial_pF": VariableMetaData(6, 0.0, 6.0, float),
     }
-
+    _regrid_method = {}
     def __init__(self, initial_pF=2.2):
         super().__init__()
         self.dataset["initial_pF"] = initial_pF
@@ -76,6 +75,7 @@ class InitialConditionsPercolation(MetaSwapPackage, IRegridPackage):
     _file_name = "init_svat.inp"
     _option = "MeteoInputP"
     _metadata_dict = {}
+    _regrid_method = {}
 
     def __init__(self):
         super().__init__()

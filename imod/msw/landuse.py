@@ -1,8 +1,13 @@
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
+from imod.mf6.utilities.regrid import (
+    RegridderType,
+    RegridderWeightsCache,
+    _regrid_like,
+)
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 
-
-class LanduseOptions(MetaSwapPackage):
+class LanduseOptions(MetaSwapPackage, IRegridPackage):
     """
     Land use options. This object is responsible for luse_svat.inp
 
@@ -115,6 +120,8 @@ class LanduseOptions(MetaSwapPackage):
     }
 
     _file_name = "luse_svat.inp"
+
+    _regrid_method = { }    
 
     def __init__(
         self,
