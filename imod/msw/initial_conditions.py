@@ -4,13 +4,21 @@ import shutil
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-
+from imod.mf6.utilities.regrid import (
+    RegridderType,
+    RegridderWeightsCache,
+    _regrid_like,
+)
 class InitialConditionsEquilibrium(MetaSwapPackage, IRegridPackage):
     """
     Use an equilibrium profile to initialize the model.
 
     This class is responsible for the file `init_svat.inp`
     """
+
+
+    _regrid_method = {
+        "infiltration_capacity": (RegridderType.OVERLAP, "mean"),    }
 
     _file_name = "init_svat.inp"
     _option = "Equilibrium"
@@ -76,7 +84,7 @@ class InitialConditionsPercolation(MetaSwapPackage, IRegridPackage):
         file.write(self._option + "\n")
 
 
-class InitialConditionsSavedState(MetaSwapPackage, IRegridPackage):
+class InitialConditionsSavedState(MetaSwapPackage):
     """
     Use saved state of a previous MetaSWAP run as initial condition.
 

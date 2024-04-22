@@ -93,19 +93,6 @@ class Infiltration(MetaSwapPackage, IRegridPackage):
 
         self._pkgcheck()
 
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method
+
     
-    def regrid_like(
-        self,
-        target_grid: GridDataArray,
-        regrid_context: RegridderWeightsCache,
-        regridder_types: Optional[dict[str, Tuple[RegridderType, str]]] = None,
-        ) -> "Package":
-        try:
-            result = _regrid_like(self, target_grid, regrid_context, regridder_types)
-        except ValueError as e:
-            raise e
-        except Exception as e:
-            raise ValueError(f"package could not be regridded:{e}")
-        return result
+

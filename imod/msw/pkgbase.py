@@ -8,7 +8,13 @@ import xarray as xr
 
 from imod.msw.fixed_format import format_fixed_width
 from typing import Any
-from imod.typing.grid import GridDataset
+from imod.typing.grid import GridDataset, GridDataArray
+from imod.mf6.utilities.regrid import (
+    RegridderType,
+    RegridderWeightsCache,
+    _regrid_like,
+)
+from typing import Optional, Tuple
 
 class MetaSwapPackage(abc.ABC):
     """
@@ -155,4 +161,23 @@ class MetaSwapPackage(abc.ABC):
         return {}
 
     def is_regridding_supported(self) -> bool:
-        return True
+        return 
+    
+
+    def regrid_like(
+        self,
+        target_grid: GridDataArray,
+        regrid_context: RegridderWeightsCache,
+        regridder_types: Optional[dict[str, Tuple[RegridderType, str]]] = None,
+        ) -> "Package":
+        try:
+            result = _regrid_like(self, target_grid, regrid_context, regridder_types)
+        except ValueError as e:
+            raise e
+        except Exception as e:
+            raise ValueError(f"package could not be regridded:{e}")
+        return result
+    
+
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method

@@ -9,7 +9,12 @@ from imod.msw import (
     InitialConditionsRootzonePressureHead,
     InitialConditionsSavedState,
 )
-
+from imod.mf6.utilities.regrid import (
+    RegridderType,
+    RegridderWeightsCache,
+    _regrid_like,
+)
+import xarray as xr
 
 def test_initial_conditions_equilibrium():
     ic = InitialConditionsEquilibrium()
@@ -24,6 +29,28 @@ def test_initial_conditions_equilibrium():
 
     assert lines == ["Equilibrium\n"]
 
+def test_initial_conditions_regrid():
+    ic = InitialConditionsEquilibrium()
+    dummy = None, None
+
+    x = [1.0, 1.5, 2.0, 2.5, 3.0]
+    y = [3.0, 2.5, 2.0, 1.5, 1.0]
+    subunit = [0, 1]
+    dx = 0.5
+    dy = 0.5
+    # fmt: off
+    new_grid = xr.DataArray(
+        dims=("subunit", "y", "x"),
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
+    )
+    new_grid.values[:,:,:] = 1
+
+
+    regrid_context = RegridderWeightsCache(new_grid, new_grid)
+    regridded =     ic.regrid_like(new_grid, regrid_context )
+    
+
+    assert True
 
 def test_initial_conditions_percolation():
     ic = InitialConditionsPercolation()
