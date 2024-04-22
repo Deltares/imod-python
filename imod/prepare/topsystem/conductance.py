@@ -188,7 +188,7 @@ def distribute_drn_conductance(
         Hydraulic conductivities
     elevation: DataArray | UgridDataArray
         Drain elevation
-        
+
     Returns
     -------
     Conductances distributed over depth.
@@ -367,8 +367,8 @@ def _distribute_weights__by_corrected_transmissivity(
     top: GridDataArray,
     bottom: GridDataArray,
     k: GridDataArray,
-    bc_top: Optional[GridDataArray]=None,
-    bc_bottom: Optional[GridDataArray]=None,
+    bc_top: Optional[GridDataArray] = None,
+    bc_bottom: Optional[GridDataArray] = None,
 ):
     """
     Distribute conductances according to default method in iMOD 5.6, as
