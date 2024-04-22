@@ -5,4 +5,10 @@ from imod.prepare.topsystem.allocation import (
     allocate_rch_cells,
     allocate_riv_cells,
 )
+from imod.prepare.topsystem.conductance import (
+    DISTRIBUTING_OPTION,
+    distribute_drn_conductance,
+    distribute_ghb_conductance,
+    distribute_riv_conductance,
+)
 from imod.prepare.topsystem.resistance import c_leakage, c_radial
