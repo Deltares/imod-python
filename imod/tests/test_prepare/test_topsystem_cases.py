@@ -193,7 +193,8 @@ def distribution_by_corrected_transmissivity__third_only__drn():
     allocated_layer = xr.DataArray(
         [False, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
     )
-    expected = [np.nan, np.nan, 0.0, np.nan]
+    # xarray turns 0.0 / 0.0 into np.nan, so third element should also be np.nan
+    expected = [np.nan, np.nan, np.nan, np.nan]
     return option, allocated_layer, expected
 
 
@@ -250,6 +251,50 @@ def distribution_by_crosscut_transmissivity__TFTF():
     return option, allocated_layer, expected
 
 
+@case(tags=["drn"])
+def distribution_by_crosscut_transmissivity__drn():
+    option = DISTRIBUTING_OPTION.by_crosscut_transmissivity
+    allocated_layer = xr.DataArray(
+        [False, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [np.nan, 1.0, 0.0, np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["drn"])
+def distribution_by_crosscut_transmissivity__first_active__drn():
+    """First active cell allocated, while drain elevation in second layer"""
+    option = DISTRIBUTING_OPTION.by_crosscut_transmissivity
+    allocated_layer = xr.DataArray(
+        [True, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [0.5, 0.5, 0.0, np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["drn"])
+def distribution_by_crosscut_transmissivity__third_only__drn():
+    """Third layer active only, while drain elevation in second layer"""
+    option = DISTRIBUTING_OPTION.by_crosscut_transmissivity
+    allocated_layer = xr.DataArray(
+        [False, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    # xarray turns 0.0 / 0.0 into np.nan, so third element should also be np.nan
+    expected = [np.nan, np.nan, np.nan, np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["drn"])
+def distribution_by_crosscut_transmissivity__TFTF__drn():
+    """First and third layer active, while drain elevation in second layer"""
+    option = DISTRIBUTING_OPTION.by_crosscut_transmissivity
+    allocated_layer = xr.DataArray(
+        [True, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [1.0, np.nan, 0.0, np.nan]
+    return option, allocated_layer, expected
+
+
 @case(tags=["riv"])
 def distribution_by_crosscut_thickness():
     option = DISTRIBUTING_OPTION.by_crosscut_thickness
@@ -290,6 +335,50 @@ def distribution_by_crosscut_thickness__TFTF():
         [True, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
     )
     expected = [0.0, np.nan, 1.0, np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["drn"])
+def distribution_by_crosscut_thickness__drn():
+    option = DISTRIBUTING_OPTION.by_crosscut_thickness
+    allocated_layer = xr.DataArray(
+        [False, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [np.nan, 1.0, 0.0, np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["drn"])
+def distribution_by_crosscut_thickness__first_active__drn():
+    """First active cell allocated, while drain elevation in second layer"""
+    option = DISTRIBUTING_OPTION.by_crosscut_thickness
+    allocated_layer = xr.DataArray(
+        [True, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [0.5, 0.5, 0.0, np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["drn"])
+def distribution_by_crosscut_thickness__third_only__drn():
+    """Third layer active only, while drain elevation in second layer"""
+    option = DISTRIBUTING_OPTION.by_crosscut_thickness
+    allocated_layer = xr.DataArray(
+        [False, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    # xarray turns 0.0 / 0.0 into np.nan, so third element should also be np.nan
+    expected = [np.nan, np.nan, np.nan, np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["drn"])
+def distribution_by_crosscut_thickness__TFTF__drn():
+    """First and third layer active, while drain elevation in second layer"""
+    option = DISTRIBUTING_OPTION.by_crosscut_thickness
+    allocated_layer = xr.DataArray(
+        [True, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [1.0, np.nan, 0.0, np.nan]
     return option, allocated_layer, expected
 
 
