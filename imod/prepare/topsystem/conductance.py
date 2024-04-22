@@ -6,7 +6,7 @@ import numpy as np
 from imod.prepare.topsystem.allocation import _enforce_layered_top
 from imod.schemata import DimsSchema
 from imod.typing import GridDataArray
-from imod.typing.grid import ones_like, preserve_gridtype
+from imod.typing.grid import ones_like, preserve_gridtype, zeros_like
 from imod.util.dims import enforced_dim_order
 
 
@@ -219,15 +219,15 @@ def distribute_drn_conductance(
             weights = _distribute_weights__by_conductivity(allocated, k)
         case DISTRIBUTING_OPTION.by_crosscut_thickness:
             weights = _distribute_weights__by_crosscut_thickness(
-                allocated, top, bottom, bc_top=elevation
+                allocated, top, bottom, bc_bottom=elevation
             )
         case DISTRIBUTING_OPTION.by_crosscut_transmissivity:
             weights = _distribute_weights__by_crosscut_transmissivity(
-                allocated, top, bottom, k, bc_top=elevation
+                allocated, top, bottom, k, bc_bottom=elevation
             )
         case DISTRIBUTING_OPTION.by_corrected_transmissivity:
             weights = _distribute_weights__by_corrected_transmissivity(
-                allocated, top, bottom, k, bc_top=elevation
+                allocated, top, bottom, k, bc_bottom=elevation
             )
         case _:
             raise ValueError(
@@ -345,7 +345,7 @@ def _compute_crosscut_thickness(
 
     top_layered = _enforce_layered_top(top, bottom)
     thickness = _compute_layer_thickness(allocated, top, bottom)
-    outside = ones_like(allocated).astype(bool)
+    outside = zeros_like(allocated).astype(bool)
 
     if bc_top is not None:
         upper_layer_bc = (bc_top < top_layered) & (bc_top > bottom)
@@ -367,8 +367,8 @@ def _distribute_weights__by_corrected_transmissivity(
     top: GridDataArray,
     bottom: GridDataArray,
     k: GridDataArray,
-    bc_top: Optional[GridDataArray],
-    bc_bottom: Optional[GridDataArray],
+    bc_top: Optional[GridDataArray]=None,
+    bc_bottom: Optional[GridDataArray]=None,
 ):
     """
     Distribute conductances according to default method in iMOD 5.6, as

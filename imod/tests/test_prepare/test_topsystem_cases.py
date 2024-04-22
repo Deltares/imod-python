@@ -165,6 +165,48 @@ def distribution_by_corrected_transmissivity__TFTF():
     return option, allocated_layer, expected
 
 
+@case(tags=["drn"])
+def distribution_by_corrected_transmissivity__drn():
+    option = DISTRIBUTING_OPTION.by_corrected_transmissivity
+    allocated_layer = xr.DataArray(
+        [False, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [np.nan, 1.0, 0.0, np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["drn"])
+def distribution_by_corrected_transmissivity__first_active__drn():
+    """First active cell allocated, while stage in second layer"""
+    option = DISTRIBUTING_OPTION.by_corrected_transmissivity
+    allocated_layer = xr.DataArray(
+        [True, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [(2 / 3), (1 / 3), 0.0, np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["drn"])
+def distribution_by_corrected_transmissivity__third_only__drn():
+    """Third layer active only, while stage in second layer"""
+    option = DISTRIBUTING_OPTION.by_corrected_transmissivity
+    allocated_layer = xr.DataArray(
+        [False, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [np.nan, np.nan, 0.0, np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["drn"])
+def distribution_by_corrected_transmissivity__TFTF__drn():
+    option = DISTRIBUTING_OPTION.by_corrected_transmissivity
+    allocated_layer = xr.DataArray(
+        [True, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [1.0, np.nan, 0.0, np.nan]
+    return option, allocated_layer, expected
+
+
 @case(tags=["riv"])
 def distribution_by_crosscut_transmissivity():
     option = DISTRIBUTING_OPTION.by_crosscut_transmissivity
