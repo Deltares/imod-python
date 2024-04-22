@@ -3,9 +3,9 @@ import shutil
 
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 
-
-class InitialConditionsEquilibrium(MetaSwapPackage):
+class InitialConditionsEquilibrium(MetaSwapPackage, IRegridPackage):
     """
     Use an equilibrium profile to initialize the model.
 
@@ -23,7 +23,7 @@ class InitialConditionsEquilibrium(MetaSwapPackage):
         file.write(self._option + "\n")
 
 
-class InitialConditionsRootzonePressureHead(MetaSwapPackage):
+class InitialConditionsRootzonePressureHead(MetaSwapPackage, IRegridPackage):
     """
     Use the pF-value of the root zone pressure head as initial condition.
 
@@ -53,7 +53,7 @@ class InitialConditionsRootzonePressureHead(MetaSwapPackage):
         self.write_dataframe_fixed_width(file, dataframe)
 
 
-class InitialConditionsPercolation(MetaSwapPackage):
+class InitialConditionsPercolation(MetaSwapPackage, IRegridPackage):
     """
     The precipitation intensity at the starting time (iybg, tdbg in
     PARA_SIM.INP) is used for initializing the percolation flux in the profiles.
@@ -76,7 +76,7 @@ class InitialConditionsPercolation(MetaSwapPackage):
         file.write(self._option + "\n")
 
 
-class InitialConditionsSavedState(MetaSwapPackage):
+class InitialConditionsSavedState(MetaSwapPackage, IRegridPackage):
     """
     Use saved state of a previous MetaSWAP run as initial condition.
 
