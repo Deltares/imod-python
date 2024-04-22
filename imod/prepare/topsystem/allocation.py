@@ -38,10 +38,10 @@ class ALLOCATION_OPTION(Enum):
       option.
     * ``at_first_active``: RIV, DRN, GHB, RCH. Allocate cells at the upper
       active cells. This has no equivalent option in iMOD 5.6.
-    
+
     Examples
     --------
-    
+
     >>> from imod.prepare.topsystem import ALLOCATION_OPTION
     >>> setting = ALLOCATION_OPTION.at_first_active
     >>> allocated = allocate_rch_cells(setting, active)
@@ -72,7 +72,7 @@ def allocate_riv_cells(
 ) -> tuple[GridDataArray, Optional[GridDataArray]]:
     """
     Allocate river cells from a planar grid across the vertical dimension.
-    Multiple options are available, which can be selected in ALLOCATION_OPTION. 
+    Multiple options are available, which can be selected in ALLOCATION_OPTION.
 
     Parameters
     ----------
@@ -94,12 +94,12 @@ def allocate_riv_cells(
     bottom_elevation: DataArray | UgridDatarray
         Planar grid containing river bottom elevations. Is not allowed to have a
         layer dimension.
-    
+
     Returns
     -------
     DataArray | UgridDatarray
         Allocated river cells
-        
+
     Examples
     --------
 
@@ -145,7 +145,7 @@ def allocate_drn_cells(
 ) -> GridDataArray:
     """
     Allocate drain cells from a planar grid across the vertical dimension.
-    Multiple options are available, which can be selected in ALLOCATION_OPTION. 
+    Multiple options are available, which can be selected in ALLOCATION_OPTION.
 
     Parameters
     ----------
@@ -164,12 +164,12 @@ def allocate_drn_cells(
     elevation: DataArray | UgridDatarray
         Planar grid containing drain elevation. Is not allowed to have a layer
         dimension.
-    
+
     Returns
     -------
     DataArray | UgridDatarray
         Allocated drain cells
-        
+
     Examples
     --------
 
@@ -201,7 +201,7 @@ def allocate_ghb_cells(
     """
     Allocate general head boundary (GHB) cells from a planar grid across the
     vertical dimension. Multiple options are available, which can be selected in
-    ALLOCATION_OPTION. 
+    ALLOCATION_OPTION.
 
     Parameters
     ----------
@@ -220,12 +220,12 @@ def allocate_ghb_cells(
     head: DataArray | UgridDatarray
         Planar grid containing general head boundary's head. Is not allowed to
         have a layer dimension.
-    
+
     Returns
     -------
     DataArray | UgridDatarray
         Allocated general head boundary cells
-        
+
     Examples
     --------
 
@@ -253,7 +253,7 @@ def allocate_rch_cells(
 ) -> GridDataArray:
     """
     Allocate recharge cells from a planar grid across the vertical dimension.
-    Multiple options are available, which can be selected in ALLOCATION_OPTION. 
+    Multiple options are available, which can be selected in ALLOCATION_OPTION.
 
     Parameters
     ----------
@@ -263,12 +263,12 @@ def allocate_rch_cells(
     active: DataArray | UgridDatarray
         Boolean array containing active model cells. For Modflow 6, this is the
         equivalent of ``idomain == 1``.
-    
+
     Returns
     -------
     DataArray | UgridDatarray
         Allocated recharge cells
-        
+
     Examples
     --------
 
