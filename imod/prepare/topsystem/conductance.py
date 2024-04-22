@@ -307,28 +307,30 @@ def _compute_layer_thickness(allocated, top, bottom):
 
 
 @preserve_gridtype
-def _compute_crosscut_thickness(allocated, top, bottom, stage, bottom_elevation):
+def _compute_crosscut_thickness(allocated, top, bottom, bc_top=None, bc_bottom=None):
     """
-    Compute 3D grid of thicknesses crosscut by river in allocated cells. So the
-    upper allocated layer thickness is stage - bottom, the lower allocated layer
-    is top - river_bottom_elevation.
+    Compute 3D grid of thicknesses crosscut by boundary condition (river/drain)
+    in allocated cells. So the thickness in the upper allocated layer thickness
+    is stage - bottom, the lower allocated layer is top -
+    river_bottom_elevation.
     """
+    if (bc_top is None) & (bc_bottom is None):
+        raise ValueError("`bc_top` and `bc_bottom` cannot both be None.")
+
     top_layered = _enforce_layered_top(top, bottom)
-
     thickness = _compute_layer_thickness(allocated, top, bottom)
+    outside = ones_like(allocated).astype(bool)
 
-    upper_layer_allocated = (stage < top_layered) & (stage > bottom)
-    lower_layer_allocated = (bottom_elevation < top_layered) & (
-        bottom_elevation > bottom
-    )
-    outside = (stage < bottom) | (bottom_elevation > top_layered)
+    if bc_top is not None:
+        upper_layer_bc = (bc_top < top_layered) & (bc_top > bottom)
+        outside = outside | (bc_top < bottom)
+        thickness = thickness.where(~upper_layer_bc, thickness - (top_layered - bc_top))
 
-    thickness = thickness.where(
-        ~upper_layer_allocated, thickness - (top_layered - stage)
-    )
-    thickness = thickness.where(
-        ~lower_layer_allocated, thickness - (bottom_elevation - bottom)
-    )
+    if bc_bottom is not None:
+        lower_layer_bc = (bc_bottom < top_layered) & (bc_bottom > bottom)
+        outside = outside | (bc_bottom > top_layered)
+        thickness = thickness.where(~lower_layer_bc, thickness - (bc_bottom - bottom))
+
     thickness = thickness.where(~outside, 0.0)
 
     return thickness
