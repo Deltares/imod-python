@@ -583,7 +583,7 @@ def apply_factor_and_addition(headers, da):
 
 
 def apply_factor_and_addition_per_layer(headers, da):
-    layer = da["layer"].values
+    layer = da.coords["layer"].values
     header_per_layer = {}
     for header in headers:
         if header["layer"] in header_per_layer.keys():
