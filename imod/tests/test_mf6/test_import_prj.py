@@ -65,9 +65,9 @@ def test_import_idf(tmp_path):
 
     projects_file = tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj"
 
-    file1 = open(projects_file, "w")
-    file1.write(snippet_idf_import_kh(factor=1.0, addition=0.0))
-    file1.close()
+    file0 = open(projects_file, "w")
+    file0.write(snippet_idf_import_kh(factor=1.0, addition=0.0))
+    file0.close()
     result_snippet_0 = open_projectfile_data(projects_file)
 
     file1 = open(projects_file, "w")
@@ -75,9 +75,9 @@ def test_import_idf(tmp_path):
     file1.close()
     result_snippet_1 = open_projectfile_data(projects_file)
 
-    file1 = open(projects_file, "w")
-    file1.write(snippet_idf_import_kh(factor=4.0, addition=3.0))
-    file1.close()
+    file2 = open(projects_file, "w")
+    file2.write(snippet_idf_import_kh(factor=4.0, addition=3.0))
+    file2.close()
     result_snippet_2 = open_projectfile_data(projects_file)
 
     assert_allclose(
@@ -87,6 +87,37 @@ def test_import_idf(tmp_path):
         result_snippet_2[0]["khv"]["kh"], result_snippet_0[0]["khv"]["kh"] * 4 + 3
     )
 
+
+
+def snippet_idf_import_transient(factor1: float, addition1: float, factor2: float, addition2: float):
+    return dedent(f"""\
+        0002, (chd), 1, ConstantHead, ['head']
+        2018-01-01 00:00:00                  
+        001, 001
+        1, 2, 001,{factor1},{addition1}, -9999., '.\Database\KHV\VERSION_1\IPEST_KHV_L1.IDF'
+        2018-02-01 00:00:00
+        001, 001
+        1, 2, 001, {factor2},{addition2}, -9999., '.\Database\KHV\VERSION_1\IPEST_KHV_L1.IDF'
+        """)
+
+
+def test_import_idf_transient(tmp_path):
+    with ZipFile(fname_model) as archive:
+        archive.extractall(tmp_path)
+
+    projects_file = tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj"
+
+    file0 = open(projects_file, "w")
+    file0.write(snippet_idf_import_transient(factor1=1.0, addition1=0.0, factor2=3.0, addition2=2.0))
+    file0.close()
+    result_snippet_0 = open_projectfile_data(projects_file)
+
+    values_at_time_0 =result_snippet_0[0]["chd"]["head"].isel(time=0)
+    values_at_time_1 =result_snippet_0[0]["chd"]["head"].isel(time=1)
+
+    assert_allclose(
+        values_at_time_0*3 + 2.0, values_at_time_1, rtol = 1e-5, atol= 1e-5
+    )
 
 def snippet_gen_import_hfb(factor: float, addition: float):
     return dedent(f"""\
