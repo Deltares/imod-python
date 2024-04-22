@@ -15,6 +15,14 @@ def basic_unstructured_dis(basic_dis):
     return idomain_ugrid, top_mf6, bottom
 
 
+@pytest.fixture(scope="function")
+def basic_disv__topsystem(basic_dis__topsystem):
+    ibound, top, bottom = basic_dis__topsystem
+    idomain_ugrid = xu.UgridDataArray.from_structured(ibound)
+
+    return idomain_ugrid, top, bottom
+
+
 @pytest.fixture(scope="module")
 def circle_dis():
     """Basic model discretization"""
