@@ -577,7 +577,7 @@ def apply_factor_and_addition(headers, da):
 
         for time in da.coords["time"]:
             da.loc[{"time": time}] = apply_factor_and_addition(
-                header_per_time[np.datetime64(time.values)], da.sel(time=time)
+                header_per_time[np.datetime64(time.values)], da.sel(time=time, drop=True)
             )
     return da
 
