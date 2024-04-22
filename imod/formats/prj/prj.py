@@ -556,6 +556,44 @@ def _create_dataarray(
     elif values_valid:
         da = _create_dataarray_from_values(values_valid, headers_values)
 
+    da = apply_factor_and_addition(headers, da)
+    return da
+
+
+def apply_factor_and_addition(headers, da):
+    if not ("layer" in da.coords or "time" in da.dims):
+        factor = headers[0]["factor"]
+        addition = headers[0]["addition"]
+        da = da * factor + addition
+    elif "layer" in da.coords and "time" not in da.dims:
+        da = apply_factor_and_addition_per_layer(headers, da)
+    else:
+        header_per_time = defaultdict(list)
+        for time in da.coords["time"].values:
+            for header in headers:
+                if np.datetime64(header["time"]) == time:
+                    header_per_time[time].append(header)
+
+        for time in da.coords["time"]:
+            da.loc[{"time": time}] = apply_factor_and_addition(
+                header_per_time[np.datetime64(time.values)],
+                da.sel(time=time, drop=True),
+            )
+    return da
+
+
+def apply_factor_and_addition_per_layer(headers, da):
+    layer = da.coords["layer"].values
+    header_per_layer = {}
+    for header in headers:
+        if header["layer"] in header_per_layer.keys():
+            raise ValueError("error in project file: layer repetition")
+        header_per_layer[header["layer"]] = header
+    addition_values = [header_per_layer[lay]["addition"] for lay in layer]
+    factor_values = [header_per_layer[lay]["factor"] for lay in layer]
+    addition = xr.DataArray(addition_values, coords={"layer": layer}, dims=("layer"))
+    factor = xr.DataArray(factor_values, coords={"layer": layer}, dims=("layer",))
+    da = da * factor + addition
     return da
 
 
@@ -573,6 +611,8 @@ def _open_package_idf(
             header["name"] = variable
             header["dims"] = ["layer"]
             header["layer"] = entry["layer"]
+            header["addition"] = entry["addition"]
+            header["factor"] = entry["factor"]
             paths.append(path)
             headers.append(header)
             values.append(value)
@@ -651,7 +691,8 @@ def _process_boundary_condition_entry(entry: Dict, periods: Dict[str, datetime])
         path = entry["path"]
         header = imod.idf.header(path, pattern="{name}")
         value = None
-
+    header["addition"] = entry["addition"]
+    header["factor"] = entry["factor"]
     header["dims"] = dims
     if layer is not None:
         header["layer"] = layer
@@ -736,6 +777,8 @@ def _read_package_ipf(
         timestring = entry["time"]
         layer = entry["layer"]
         time = periods.get(timestring)
+        factor = entry["factor"]
+        addition = entry["addition"]
         if time is None:
             time = _process_time(timestring)
         else:
@@ -768,6 +811,7 @@ def _read_package_ipf(
                     df_assoc["bottom"] = row[5]
                 dfs.append(df_assoc)
             df = pd.concat(dfs, ignore_index=True, sort=False)
+        df["rate"] = df["rate"] * factor + addition
 
         d = {
             "dataframe": df,
@@ -775,7 +819,6 @@ def _read_package_ipf(
             "time": time,
         }
         out.append(d)
-
     repeats = sorted(repeats)
     return out, repeats
 

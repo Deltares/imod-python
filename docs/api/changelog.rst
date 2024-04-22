@@ -30,7 +30,9 @@ Fixed
   ``bottom_elevation`` equals ``bottom`` in the model discretization.
 - When wells outside of the domain are added, an exception is raised with an 
   error message stating a well is outside of the domain.
-
+- When importing data from a .prj file, the multipliers and additions specified for
+  ipf and idf files are now applied
+  
 [0.16.0] - 2024-03-29
 ---------------------
 

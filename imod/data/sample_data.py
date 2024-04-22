@@ -22,15 +22,26 @@ try:
 except ImportError:
     gpd = MissingOptionalModule("geopandas")
 
-REGISTRY = pooch.create(
-    path=pooch.os_cache("imod"),
-    base_url="https://github.com/Deltares/imod-artifacts/raw/main/",
-    version=None,
-    version_dev="main",
-    env="IMOD_DATA_DIR",
-)
-with importlib.resources.files("imod.data") as pkg_dir:
-    REGISTRY.load_registry(pkg_dir / "registry.txt")
+
+def create_pooch_registry() -> pooch.core.Pooch:
+    registry = pooch.create(
+        path=pooch.os_cache("imod"),
+        base_url="https://github.com/Deltares/imod-artifacts/raw/main/",
+        version=None,
+        version_dev="main",
+        env="IMOD_DATA_DIR",
+    )
+    return registry
+
+
+def load_pooch_registry(registry: pooch.core.Pooch) -> pooch.core.Pooch:
+    with importlib.resources.files("imod.data") as pkg_dir:
+        registry.load_registry(pkg_dir / "registry.txt")
+    return registry
+
+
+REGISTRY = create_pooch_registry()
+REGISTRY = load_pooch_registry(REGISTRY)
 
 
 def twri_output(path: Union[str, Path]) -> None:
