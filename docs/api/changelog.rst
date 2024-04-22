@@ -17,6 +17,12 @@ Added
   :func:`imod.prepare.allocate_rch_cells`,
   :func:`imod.prepare.allocate_riv_cells`, for this multiple options can be
   selected, available in :func:`imod.prepare.ALLOCATION_OPTION`.
+- Added functions to distribute conductances of planar grids over layers for the
+  topsystem in :func:`imod.prepare.distribute_riv_conductance`,
+  :func:`imod.prepare.distribute_drn_conductance`,
+  :func:`imod.prepare.distribute_ghb_conductance`, for this multiple options can
+  be selected, available in :func:`imod.prepare.DISTRIBUTION_OPTION`.
+
 
 Fixed
 ~~~~~
