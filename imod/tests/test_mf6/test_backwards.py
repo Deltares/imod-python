@@ -25,7 +25,6 @@ import imod
 
 
 def test_backwards():
-
     # %%
     # Read data
     # ---------
@@ -96,7 +95,9 @@ def test_backwards():
 
     for pkgname in ["wel-1", "wel-2"]:
         rates = mf6_model[pkgname].dataset.isel(time=[1])["rate"].values
-        mf6_model[pkgname].dataset = mf6_model[pkgname].dataset.sel(index=[1], drop=False)
+        mf6_model[pkgname].dataset = mf6_model[pkgname].dataset.sel(
+            index=[1], drop=False
+        )
         # Assign varying rates through to time to dataset
         mf6_model[pkgname].dataset["rate"].values = rates.T
 
@@ -121,7 +122,6 @@ def test_backwards():
     endtime = np.datetime64("2013-04-01T00:00:00.000000000")
 
     mf6_sim.create_time_discretization(additional_times=[endtime])
-
 
     # %%
     # Write modflow 6 data

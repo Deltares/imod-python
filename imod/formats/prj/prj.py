@@ -561,23 +561,39 @@ def _create_dataarray(
 
 
 def apply_factor_and_addition(headers, da):
-    if not "layer" in da.coords:
+    if not ("layer" in da.coords or "time" in da.dims):
         factor = headers[0]["factor"]
         addition = headers[0]["addition"]
         da = da * factor
         da = da + addition
+    elif "layer" in da.coords and "time" not in da.dims:
+        da = apply_factor_and_addition_per_layer(headers, da)
     else:
-        layer, addition_values = list(
-            zip(*[(i + 1, header["addition"]) for i, header in enumerate(headers)])
-        )
-        factor_values = [header["factor"] for header in headers]
-        addition = xr.DataArray(
-            list(addition_values), coords={"layer": list(layer)}, dims=("layer")
-        )
-        factor = xr.DataArray(
-            factor_values, coords={"layer": list(layer)}, dims=("layer",)
-        )
-        da = da * factor + addition
+        header_per_time = defaultdict(list)
+        for time in da.coords["time"].values:
+            for header in headers:
+                if np.datetime64(header["time"]) == time:
+                    header_per_time[time].append(header)
+
+        for time in da.coords["time"]:
+            da.loc[{"time": time}] = apply_factor_and_addition(
+                header_per_time[np.datetime64(time.values)], da.sel(time=time)
+            )
+    return da
+
+
+def apply_factor_and_addition_per_layer(headers, da):
+    layer = da["layer"].values
+    header_per_layer = {}
+    for header in headers:
+        if header["layer"] in header_per_layer.keys():
+            raise ValueError("error in project file: layer repetition")
+        header_per_layer[header["layer"]] = header
+    addition_values = [header_per_layer[lay]["addition"] for lay in layer]
+    factor_values = [header_per_layer[lay]["factor"] for lay in layer]
+    addition = xr.DataArray(addition_values, coords={"layer": layer}, dims=("layer"))
+    factor = xr.DataArray(factor_values, coords={"layer": layer}, dims=("layer",))
+    da = da * factor + addition
     return da
 
 
