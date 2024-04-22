@@ -16,6 +16,87 @@ from imod.mf6.utilities.regrid import (
     _regrid_like,
 )
 
+def setup_infiltration_package( subunit, y, x, dy, dx):
+    infiltration_capacity = xr.DataArray(
+        np.array(
+            [
+                [[0.5, 0.5, 0.5],
+                 [nan, nan, nan],
+                 [1.0, 1.0, 1.0]],
+
+                [[0.5, 0.5, 0.5],
+                 [1.0, 1.0, 1.0],
+                 [nan, nan, nan]],
+            ]
+        ),
+        dims=("subunit", "y", "x"),
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
+    )
+
+    downward_resistance = xr.DataArray(
+        np.array(
+            [[1.0, 2.0, 3.0],
+             [4.0, 5.0, 6.0],
+             [7.0, 8.0, 9.0]]),
+        dims=("y", "x"),
+        coords={"y": y, "x": x, "dx": dx, "dy": dy}
+    )
+
+    upward_resistance = xr.DataArray(
+        np.array(
+            [[1.0, 2.0, 3.0],
+             [4.0, 5.0, 6.0],
+             [7.0, 8.0, 9.0]]),
+        dims=("y", "x"),
+        coords={"y": y, "x": x, "dx": dx, "dy": dy}
+    )
+
+    bottom_resistance = xr.DataArray(
+        np.array(
+            [[1.0, 2.0, 3.0],
+             [4.0, 5.0, 6.0],
+             [7.0, 8.0, 9.0]]),
+        dims=("y", "x"),
+        coords={"y": y, "x": x, "dx": dx, "dy": dy}
+    )
+
+    extra_storage_coefficient = xr.DataArray(
+        np.array(
+            [[0.1, 0.2, 0.3],
+             [0.4, 0.5, 0.6],
+             [0.7, 0.8, 0.9]]),
+        dims=("y", "x"),
+        coords={"y": y, "x": x, "dx": dx, "dy": dy}
+    )
+
+    svat = xr.DataArray(
+        np.array(
+            [
+                [[0, 1, 0],
+                 [0, 0, 0],
+                 [0, 2, 0]],
+
+                [[0, 3, 0],
+                 [0, 4, 0],
+                 [0, 0, 0]],
+            ]
+        ),
+        dims=("subunit", "y", "x"),
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
+    )
+    # fmt: on
+    index = (svat != 0).values.ravel()
+
+    infiltration = Infiltration(
+        infiltration_capacity,
+        downward_resistance,
+        upward_resistance,
+        bottom_resistance,
+        extra_storage_coefficient,
+    )  
+
+    return infiltration, svat, index
+
 @given(
     floats(
         Infiltration._metadata_dict["infiltration_capacity"].min_value,
@@ -38,6 +119,9 @@ from imod.mf6.utilities.regrid import (
         Infiltration._metadata_dict["extra_storage_coefficient"].max_value,
     ),
 )
+
+
+
 @settings(deadline=None)
 def test_write(
     fixed_format_parser,
@@ -123,83 +207,7 @@ def test_simple_model(fixed_format_parser):
     dx = 1.0
     dy = 1.0
     # fmt: off
-    infiltration_capacity = xr.DataArray(
-        np.array(
-            [
-                [[0.5, 0.5, 0.5],
-                 [nan, nan, nan],
-                 [1.0, 1.0, 1.0]],
-
-                [[0.5, 0.5, 0.5],
-                 [1.0, 1.0, 1.0],
-                 [nan, nan, nan]],
-            ]
-        ),
-        dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
-    )
-
-    downward_resistance = xr.DataArray(
-        np.array(
-            [[1.0, 2.0, 3.0],
-             [4.0, 5.0, 6.0],
-             [7.0, 8.0, 9.0]]),
-        dims=("y", "x"),
-        coords={"y": y, "x": x, "dx": dx, "dy": dy}
-    )
-
-    upward_resistance = xr.DataArray(
-        np.array(
-            [[1.0, 2.0, 3.0],
-             [4.0, 5.0, 6.0],
-             [7.0, 8.0, 9.0]]),
-        dims=("y", "x"),
-        coords={"y": y, "x": x, "dx": dx, "dy": dy}
-    )
-
-    bottom_resistance = xr.DataArray(
-        np.array(
-            [[1.0, 2.0, 3.0],
-             [4.0, 5.0, 6.0],
-             [7.0, 8.0, 9.0]]),
-        dims=("y", "x"),
-        coords={"y": y, "x": x, "dx": dx, "dy": dy}
-    )
-
-    extra_storage_coefficient = xr.DataArray(
-        np.array(
-            [[0.1, 0.2, 0.3],
-             [0.4, 0.5, 0.6],
-             [0.7, 0.8, 0.9]]),
-        dims=("y", "x"),
-        coords={"y": y, "x": x, "dx": dx, "dy": dy}
-    )
-
-    svat = xr.DataArray(
-        np.array(
-            [
-                [[0, 1, 0],
-                 [0, 0, 0],
-                 [0, 2, 0]],
-
-                [[0, 3, 0],
-                 [0, 4, 0],
-                 [0, 0, 0]],
-            ]
-        ),
-        dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
-    )
-    # fmt: on
-    index = (svat != 0).values.ravel()
-
-    infiltration = Infiltration(
-        infiltration_capacity,
-        downward_resistance,
-        upward_resistance,
-        bottom_resistance,
-        extra_storage_coefficient,
-    )
+    infiltration, svat, index = setup_infiltration_package(subunit, y, x, dy, dx)
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
@@ -229,85 +237,8 @@ def test_regrid(
     subunit = [0, 1]
     dx = 1.0
     dy = 1.0
-    # fmt: off
-    infiltration_capacity = xr.DataArray(
-        np.array(
-            [
-                [[0.5, 0.5, 0.5],
-                 [nan, nan, nan],
-                 [1.0, 1.0, 1.0]],
 
-                [[0.5, 0.5, 0.5],
-                 [1.0, 1.0, 1.0],
-                 [nan, nan, nan]],
-            ]
-        ),
-        dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
-    )
-
-    downward_resistance = xr.DataArray(
-        np.array(
-            [[1.0, 2.0, 3.0],
-             [4.0, 5.0, 6.0],
-             [7.0, 8.0, 9.0]]),
-        dims=("y", "x"),
-        coords={"y": y, "x": x, "dx": dx, "dy": dy}
-    )
-
-    upward_resistance = xr.DataArray(
-        np.array(
-            [[1.0, 2.0, 3.0],
-             [4.0, 5.0, 6.0],
-             [7.0, 8.0, 9.0]]),
-        dims=("y", "x"),
-        coords={"y": y, "x": x, "dx": dx, "dy": dy}
-    )
-
-    bottom_resistance = xr.DataArray(
-        np.array(
-            [[1.0, 2.0, 3.0],
-             [4.0, 5.0, 6.0],
-             [7.0, 8.0, 9.0]]),
-        dims=("y", "x"),
-        coords={"y": y, "x": x, "dx": dx, "dy": dy}
-    )
-
-    extra_storage_coefficient = xr.DataArray(
-        np.array(
-            [[0.1, 0.2, 0.3],
-             [0.4, 0.5, 0.6],
-             [0.7, 0.8, 0.9]]),
-        dims=("y", "x"),
-        coords={"y": y, "x": x, "dx": dx, "dy": dy}
-    )
-
-    svat = xr.DataArray(
-        np.array(
-            [
-                [[0, 1, 0],
-                 [0, 0, 0],
-                 [0, 2, 0]],
-
-                [[0, 3, 0],
-                 [0, 4, 0],
-                 [0, 0, 0]],
-            ]
-        ),
-        dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
-    )
-    # fmt: on
-    index = (svat != 0).values.ravel()
-
-    infiltration = Infiltration(
-        infiltration_capacity,
-        downward_resistance,
-        upward_resistance,
-        bottom_resistance,
-        extra_storage_coefficient,
-    )
-
+    infiltration, _, _ = setup_infiltration_package(subunit, y, x, dy, dx)
 
     x = [1.0, 1.5, 2.0, 2.5, 3.0]
     y = [3.0, 2.5, 2.0, 1.5, 1.0]
@@ -321,6 +252,7 @@ def test_regrid(
     )
     new_grid.values[:,:,:] = 1
 
-    regrid_context = RegridderWeightsCache(infiltration_capacity, new_grid)
+    regrid_context = RegridderWeightsCache(infiltration.dataset["infiltration_capacity"], new_grid)
     regridded = infiltration.regrid_like(new_grid, regrid_context )
-    assert regridded
+    assert_almost_equal(regridded.dataset.coords["x"].values, x)
+    assert_almost_equal(regridded.dataset.coords["y"].values, y)    
