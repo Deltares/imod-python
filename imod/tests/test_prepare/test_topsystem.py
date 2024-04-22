@@ -111,7 +111,7 @@ def test_distribute_riv_conductance(
     conductance = zeros_like(bottom_elevation) + 1.0
 
     actual_da = distribute_riv_conductance(
-        option, allocated, conductance, top, bottom, stage, bottom_elevation, k
+        option, allocated, conductance, top, bottom, k, stage, bottom_elevation
     )
     actual = take_first_cell_in_xy_plane(actual_da)
 
@@ -136,7 +136,7 @@ def test_distribute_drn_conductance(
     conductance = zeros_like(elevation) + 1.0
 
     actual_da = distribute_drn_conductance(
-        option, allocated, conductance, top, bottom, k
+        option, allocated, conductance, top, bottom, k, elevation
     )
     actual = take_first_cell_in_xy_plane(actual_da)
 
