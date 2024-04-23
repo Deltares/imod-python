@@ -154,7 +154,23 @@ class MetaSwapPackage(abc.ABC):
 
 
     def get_non_grid_data(self, grid_names: list[str]) -> dict[str, Any]:
-        return {}
+        """
+        This function copies the attributes of a dataset that are scalars, such as options.
+
+        parameters
+        ----------
+        grid_names: list of str
+            the names of the attribbutes of a dataset that are grids.
+        """
+        result = {}
+        all_non_grid_data = list(self.dataset.keys())
+        for name in (
+            gridname for gridname in grid_names if gridname in all_non_grid_data
+        ):
+            all_non_grid_data.remove(name)
+        for name in all_non_grid_data:
+            result[name] = self.dataset[name]
+        return result
 
     @property
     def auxiliary_data_fields(self) -> dict[str, str]:

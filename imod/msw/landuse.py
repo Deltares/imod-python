@@ -144,8 +144,10 @@ class LanduseOptions(MetaSwapPackage, IRegridPackage):
         start_sprinkling_season,
         end_sprinkling_season,
         interception_option,
-        interception_capacity_per_LAI,
-        interception_intercept,
+        interception_capacity_per_LAI = None,
+        interception_capacity_per_LAI_Rutter= None,        
+        interception_capacity_per_LAI_VonHoyningen= None,        
+        interception_intercept = None,
     ):
         super().__init__()
         self.dataset["landuse_name"] = landuse_name
@@ -167,12 +169,22 @@ class LanduseOptions(MetaSwapPackage, IRegridPackage):
         self.dataset["start_sprinkling_season"] = start_sprinkling_season
         self.dataset["end_sprinkling_season"] = end_sprinkling_season
         self.dataset["interception_option"] = interception_option
-        self.dataset["interception_capacity_per_LAI_Rutter"] = (
-            interception_capacity_per_LAI
-        )
-        self.dataset["interception_capacity_per_LAI_VonHoyningen"] = (
-            interception_capacity_per_LAI
-        )
+        if interception_capacity_per_LAI is not None:
+            self.dataset["interception_capacity_per_LAI_Rutter"] = (
+                interception_capacity_per_LAI
+            )
+        else:
+             self.dataset["interception_capacity_per_LAI_Rutter"] = (
+                interception_capacity_per_LAI_Rutter
+            )   
+        if interception_capacity_per_LAI is not None:                     
+            self.dataset["interception_capacity_per_LAI_VonHoyningen"] = (
+                interception_capacity_per_LAI
+            )
+        else:
+             self.dataset["interception_capacity_per_LAI_VonHoyningen"] = (
+                interception_capacity_per_LAI_VonHoyningen
+            )               
         self.dataset["interception_intercept"] = interception_intercept
 
         self._pkgcheck()
