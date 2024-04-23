@@ -2,9 +2,13 @@ import pandas as pd
 
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
-
-
-class Ponding(MetaSwapPackage):
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
+from imod.mf6.utilities.regrid import (
+    RegridderType,
+    RegridderWeightsCache,
+    _regrid_like,
+)
+class Ponding(MetaSwapPackage, IRegridPackage):
     """
     Set ponding related parameters for MetaSWAP. This class is responsible for
     the svat2swnr_roff.inp file. Currently, we do not support ponds coupled to
@@ -38,6 +42,15 @@ class Ponding(MetaSwapPackage):
     _with_subunit = ("ponding_depth", "runoff_resistance", "runon_resistance")
     _without_subunit = ()
     _to_fill = ()
+
+    _regrid_method = {
+        "ponding_depth": (RegridderType.OVERLAP, "mean"),
+        "runon_resistance": (RegridderType.OVERLAP, "mean"),
+        "runoff_resistance": (
+            RegridderType.OVERLAP,
+            "mean",
+        ),
+    }        
 
     def __init__(self, ponding_depth, runon_resistance, runoff_resistance) -> None:
         super().__init__()
