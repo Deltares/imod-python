@@ -80,3 +80,22 @@ def create_geometric_grid_info(active: xr.DataArray) -> pd.DataFrame:
             "dy": dy.flatten(),
         }
     )
+
+
+def get_smallest_target_grid(*grids):
+    """
+    Return smallest target grid from multiple grids. The grid with smallest
+    extent and finest grid.
+    """
+    dx_ls, xmin_ls, xmax_ls, dy_ls, ymin_ls, ymax_ls = zip(*[
+            imod.util.spatial.spatial_reference(grid) for grid in grids
+        ])
+
+    dx = min(dx_ls)
+    xmin = max(xmin_ls)
+    xmax = min(xmax_ls)
+    dy = max(dy_ls)
+    ymax = min(ymax_ls)
+    ymin = max(ymin_ls)
+
+    return imod.spatial.grid.emtpy_2d(dx, xmin, xmax, dy, ymin, ymax)
