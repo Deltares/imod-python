@@ -21,6 +21,7 @@ from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.interfaces.isimulation import ISimulation
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.utilities.clip import clip_by_grid
+from imod.mf6.utilities.package import is_valid
 from imod.mf6.utilities.regridding_types import RegridderType
 from imod.schemata import ValidationError
 from imod.typing.grid import GridDataArray, get_grid_geometry_hash, ones_like
@@ -135,55 +136,53 @@ def assign_coord_if_present(
 
 
 def _regrid_array(
-    package: IRegridPackage,
-    varname: str,
+    da: GridDataArray,
     regridder_collection: RegridderWeightsCache,
     regridder_name: str,
     regridder_function: str,
     target_grid: GridDataArray,
 ) -> Optional[GridDataArray]:
     """
-    Regrids a data_array. The array is specified by its key in the dataset.
-    Each data-array can represent:
-    -a scalar value, valid for the whole grid
-    -an array of a different scalar per layer
-    -an array with a value per grid block
-    -None
+    Regrids a GridDataArray. Each DataArray can represent:
+    - a scalar value, valid for the whole grid
+    - an array of a different scalar per layer
+    - an array with a value per grid block
+    - None
     """
 
     # skip regridding for arrays with no valid values (such as "None")
-    if not package._valid(package.dataset[varname].values[()]):
+    if not is_valid(da.values[()]):
         return None
 
     # the dataarray might be a scalar. If it is, then it does not need regridding.
-    if is_scalar(package.dataset[varname]):
-        return package.dataset[varname].values[()]
+    if is_scalar(da):
+        return da.values[()]
 
-    if isinstance(package.dataset[varname], xr.DataArray):
-        coords = package.dataset[varname].coords
+    if isinstance(da, xr.DataArray):
+        coords = da.coords
         # if it is an xr.DataArray it may be layer-based; then no regridding is needed
         if not ("x" in coords and "y" in coords):
-            return package.dataset[varname]
+            return da
 
         # if it is an xr.DataArray it needs the dx, dy coordinates for regridding, which are otherwise not mandatory
         if not ("dx" in coords and "dy" in coords):
             raise ValueError(
-                f"DataArray {varname} does not have both a dx and dy coordinates"
+                f"GridDataArray {da.name} does not have both a dx and dy coordinates"
             )
 
     # obtain an instance of a regridder for the chosen method
     regridder = regridder_collection.get_regridder(
-        package.dataset[varname],
+        da,
         target_grid,
         regridder_name,
         regridder_function,
     )
 
     # store original dtype of data
-    original_dtype = package.dataset[varname].dtype
+    original_dtype = da.dtype
 
     # regrid data array
-    regridded_array = regridder.regrid(package.dataset[varname])
+    regridded_array = regridder.regrid(da)
 
     # reconvert the result to the same dtype as the original
     return regridded_array.astype(original_dtype)
@@ -277,8 +276,7 @@ def _regrid_like(
 
         # regrid the variable
         new_package_data[varname] = _regrid_array(
-            package,
-            varname,
+            package.dataset[varname],
             regrid_context,
             regridder_name,
             regridder_function,

@@ -23,6 +23,7 @@ from imod.mf6.pkgbase import (
     PackageBase,
 )
 from imod.mf6.utilities.mask import _mask
+from imod.mf6.utilities.package import is_valid
 from imod.mf6.utilities.regrid import (
     RegridderType,
     RegridderWeightsCache,
@@ -78,24 +79,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         )
 
     def _valid(self, value):
-        """
-        Filters values that are None, False, or a numpy.bool_ False.
-        Needs to be this specific, since 0.0 and 0 are valid values, but are
-        equal to a boolean False.
-        """
-        # Test singletons
-        if value is False or value is None:
-            return False
-        # Test numpy bool (not singleton)
-        elif isinstance(value, np.bool_) and not value:
-            return False
-        # When dumping to netCDF and reading back, None will have been
-        # converted into a NaN. Only check NaN if it's a floating type to avoid
-        # TypeErrors.
-        elif np.issubdtype(type(value), np.floating) and np.isnan(value):
-            return False
-        else:
-            return True
+        is_valid(value)
 
     @staticmethod
     def _number_format(dtype: type):
