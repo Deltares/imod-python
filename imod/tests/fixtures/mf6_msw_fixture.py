@@ -1,10 +1,12 @@
-from imod import mf6
+import numpy as np
+import pandas as pd
 import pytest_cases
 import xarray as xr
-import numpy as np
-from numpy.typing import NDArray
-import pandas as pd
 from numpy import float64, int_
+from numpy.typing import NDArray
+
+from imod import mf6
+
 
 def grid_sizes() -> (
     tuple[
@@ -26,6 +28,7 @@ def grid_sizes() -> (
 
     return x, y, layer, dx, dy, dz
 
+
 @pytest_cases.fixture(scope="function")
 def coupled_mf6_model_storage_coefficient(
     active_idomain: xr.DataArray,
@@ -38,6 +41,7 @@ def coupled_mf6_model_storage_coefficient(
     coupled_mf6_model["GWF_1"] = gwf_model
 
     return coupled_mf6_model
+
 
 def make_coupled_mf6_model(idomain: xr.DataArray) -> mf6.Modflow6Simulation:
     _, nrow, ncol = idomain.shape
@@ -54,6 +58,7 @@ def make_coupled_mf6_model(idomain: xr.DataArray) -> mf6.Modflow6Simulation:
 
     simulation = make_mf6_simulation(gwf_model)
     return simulation
+
 
 def make_mf6_model(idomain: xr.DataArray) -> mf6.GroundwaterFlowModel:
     _, _, layer, _, _, dz = grid_sizes()
@@ -88,6 +93,7 @@ def make_mf6_model(idomain: xr.DataArray) -> mf6.GroundwaterFlowModel:
     gwf_model["oc"] = mf6.OutputControl(save_head="last", save_budget="last")
     return gwf_model
 
+
 def convert_storage_package(
     gwf_model: mf6.GroundwaterFlowModel,
 ) -> mf6.GroundwaterFlowModel:
@@ -114,6 +120,7 @@ def convert_storage_package(
     gwf_model["sto"] = mf6.StorageCoefficient(**sto_ds)
     return gwf_model
 
+
 def make_recharge_pkg(idomain: xr.DataArray) -> mf6.Recharge:
     idomain_l1 = idomain.sel(layer=1)
     recharge = xr.zeros_like(idomain_l1, dtype=float)
@@ -122,6 +129,7 @@ def make_recharge_pkg(idomain: xr.DataArray) -> mf6.Recharge:
     recharge = recharge.where(idomain_l1)
 
     return mf6.Recharge(recharge)
+
 
 def create_wells(
     nrow: int, ncol: int, idomain: xr.DataArray, wel_layer: int | None = None
@@ -178,6 +186,7 @@ def make_mf6_simulation(gwf_model: mf6.GroundwaterFlowModel) -> mf6.Modflow6Simu
     )
     simulation.create_time_discretization(additional_times=times)
     return simulation
+
 
 def get_times() -> pd.DatetimeIndex:
     freq = "D"

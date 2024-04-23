@@ -8,81 +8,58 @@ from hypothesis.strategies import floats
 from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
 
+from imod.mf6.utilities.regrid import (
+    RegridderWeightsCache,
+)
 from imod.msw import Infiltration
 from imod.msw.fixed_format import format_fixed_width
-from imod.mf6.utilities.regrid import (
-    RegridderType,
-    RegridderWeightsCache,
-    _regrid_like,
-)
 
-def setup_infiltration_package( subunit, y, x, dy, dx):
+
+def setup_infiltration_package(subunit, y, x, dy, dx):
     infiltration_capacity = xr.DataArray(
         np.array(
             [
-                [[0.5, 0.5, 0.5],
-                 [nan, nan, nan],
-                 [1.0, 1.0, 1.0]],
-
-                [[0.5, 0.5, 0.5],
-                 [1.0, 1.0, 1.0],
-                 [nan, nan, nan]],
+                [[0.5, 0.5, 0.5], [nan, nan, nan], [1.0, 1.0, 1.0]],
+                [[0.5, 0.5, 0.5], [1.0, 1.0, 1.0], [nan, nan, nan]],
             ]
         ),
         dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy},
     )
 
     downward_resistance = xr.DataArray(
-        np.array(
-            [[1.0, 2.0, 3.0],
-             [4.0, 5.0, 6.0],
-             [7.0, 8.0, 9.0]]),
+        np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]),
         dims=("y", "x"),
-        coords={"y": y, "x": x, "dx": dx, "dy": dy}
+        coords={"y": y, "x": x, "dx": dx, "dy": dy},
     )
 
     upward_resistance = xr.DataArray(
-        np.array(
-            [[1.0, 2.0, 3.0],
-             [4.0, 5.0, 6.0],
-             [7.0, 8.0, 9.0]]),
+        np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]),
         dims=("y", "x"),
-        coords={"y": y, "x": x, "dx": dx, "dy": dy}
+        coords={"y": y, "x": x, "dx": dx, "dy": dy},
     )
 
     bottom_resistance = xr.DataArray(
-        np.array(
-            [[1.0, 2.0, 3.0],
-             [4.0, 5.0, 6.0],
-             [7.0, 8.0, 9.0]]),
+        np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]),
         dims=("y", "x"),
-        coords={"y": y, "x": x, "dx": dx, "dy": dy}
+        coords={"y": y, "x": x, "dx": dx, "dy": dy},
     )
 
     extra_storage_coefficient = xr.DataArray(
-        np.array(
-            [[0.1, 0.2, 0.3],
-             [0.4, 0.5, 0.6],
-             [0.7, 0.8, 0.9]]),
+        np.array([[0.1, 0.2, 0.3], [0.4, 0.5, 0.6], [0.7, 0.8, 0.9]]),
         dims=("y", "x"),
-        coords={"y": y, "x": x, "dx": dx, "dy": dy}
+        coords={"y": y, "x": x, "dx": dx, "dy": dy},
     )
 
     svat = xr.DataArray(
         np.array(
             [
-                [[0, 1, 0],
-                 [0, 0, 0],
-                 [0, 2, 0]],
-
-                [[0, 3, 0],
-                 [0, 4, 0],
-                 [0, 0, 0]],
+                [[0, 1, 0], [0, 0, 0], [0, 2, 0]],
+                [[0, 3, 0], [0, 4, 0], [0, 0, 0]],
             ]
         ),
         dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy},
     )
     # fmt: on
     index = (svat != 0).values.ravel()
@@ -93,9 +70,10 @@ def setup_infiltration_package( subunit, y, x, dy, dx):
         upward_resistance,
         bottom_resistance,
         extra_storage_coefficient,
-    )  
+    )
 
     return infiltration, svat, index
+
 
 @given(
     floats(
@@ -119,9 +97,6 @@ def setup_infiltration_package( subunit, y, x, dy, dx):
         Infiltration._metadata_dict["extra_storage_coefficient"].max_value,
     ),
 )
-
-
-
 @settings(deadline=None)
 def test_write(
     fixed_format_parser,
@@ -229,9 +204,7 @@ def test_simple_model(fixed_format_parser):
     )
 
 
-def test_regrid(
-
-):
+def test_regrid():
     x = [1.0, 2.0, 3.0]
     y = [3.0, 2.0, 1.0]
     subunit = [0, 1]
@@ -255,4 +228,4 @@ def test_regrid(
     regrid_context = RegridderWeightsCache(infiltration.dataset["infiltration_capacity"], new_grid)
     regridded = infiltration.regrid_like(new_grid, regrid_context )
     assert_almost_equal(regridded.dataset.coords["x"].values, x)
-    assert_almost_equal(regridded.dataset.coords["y"].values, y)    
+    assert_almost_equal(regridded.dataset.coords["y"].values, y)

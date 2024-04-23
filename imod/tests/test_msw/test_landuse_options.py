@@ -5,12 +5,12 @@ import numpy as np
 import xarray as xr
 from numpy.testing import assert_almost_equal, assert_equal
 
-from imod.msw import LanduseOptions
 from imod.mf6.utilities.regrid import (
-    RegridderType,
     RegridderWeightsCache,
-    _regrid_like,
 )
+from imod.msw import LanduseOptions
+
+
 def create_landuse_dict():
     landuse_index = np.arange(1, 4)
     names = ["grassland", "maize", "potatoes"]
@@ -91,14 +91,10 @@ def test_landuse_options(fixed_format_parser):
             assert_equal(results[option], value.values)
 
 
-
 def test_landuse_options_regrid():
-
     new_grid = get_new_grid()
     options = create_landuse_dict()
     lu_options = LanduseOptions(**options)
 
     regrid_context = RegridderWeightsCache(new_grid, new_grid)
-    regridded = lu_options.regrid_like(new_grid, regrid_context )
-
-    
+    regridded = lu_options.regrid_like(new_grid, regrid_context)

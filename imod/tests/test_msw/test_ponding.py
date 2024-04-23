@@ -6,12 +6,11 @@ import xarray as xr
 from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
 
-from imod.msw import Ponding
 from imod.mf6.utilities.regrid import (
-    RegridderType,
     RegridderWeightsCache,
-    _regrid_like,
 )
+from imod.msw import Ponding
+
 
 def setup_ponding():
     x = [1.0, 2.0, 3.0]
@@ -77,6 +76,7 @@ def setup_ponding():
     )
     return ponding, index, svat
 
+
 def get_new_grid():
     x = [1.0, 1.5, 2.0, 2.5, 3.0]
     y = [3.0, 2.5, 2.0, 1.5, 1.0]
@@ -91,8 +91,8 @@ def get_new_grid():
     new_grid.values[:,:,:] = 1
     return new_grid
 
-def test_simple_model(fixed_format_parser):
 
+def test_simple_model(fixed_format_parser):
     ponding, index, svat = setup_ponding()
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
@@ -113,7 +113,7 @@ def test_regrid_ponding():
     ponding, index, svat = setup_ponding()
     new_grid = get_new_grid()
 
-    old_grid = ponding.dataset["ponding_depth"].isel(subunit = 0)
+    old_grid = ponding.dataset["ponding_depth"].isel(subunit=0)
     regrid_context = RegridderWeightsCache(old_grid, new_grid)
 
     regridded_ponding = ponding.regrid_like(new_grid, regrid_context)

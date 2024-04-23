@@ -1,11 +1,7 @@
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
-from imod.mf6.utilities.regrid import (
-    RegridderType,
-    RegridderWeightsCache,
-    _regrid_like,
-)
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
+
 
 class LanduseOptions(MetaSwapPackage, IRegridPackage):
     """
@@ -121,7 +117,7 @@ class LanduseOptions(MetaSwapPackage, IRegridPackage):
 
     _file_name = "luse_svat.inp"
 
-    _regrid_method = { }    
+    _regrid_method = {}
 
     def __init__(
         self,
@@ -144,10 +140,10 @@ class LanduseOptions(MetaSwapPackage, IRegridPackage):
         start_sprinkling_season,
         end_sprinkling_season,
         interception_option,
-        interception_capacity_per_LAI = None,
-        interception_capacity_per_LAI_Rutter= None,        
-        interception_capacity_per_LAI_VonHoyningen= None,        
-        interception_intercept = None,
+        interception_capacity_per_LAI=None,
+        interception_capacity_per_LAI_Rutter=None,
+        interception_capacity_per_LAI_VonHoyningen=None,
+        interception_intercept=None,
     ):
         super().__init__()
         self.dataset["landuse_name"] = landuse_name
@@ -174,17 +170,17 @@ class LanduseOptions(MetaSwapPackage, IRegridPackage):
                 interception_capacity_per_LAI
             )
         else:
-             self.dataset["interception_capacity_per_LAI_Rutter"] = (
+            self.dataset["interception_capacity_per_LAI_Rutter"] = (
                 interception_capacity_per_LAI_Rutter
-            )   
-        if interception_capacity_per_LAI is not None:                     
+            )
+        if interception_capacity_per_LAI is not None:
             self.dataset["interception_capacity_per_LAI_VonHoyningen"] = (
                 interception_capacity_per_LAI
             )
         else:
-             self.dataset["interception_capacity_per_LAI_VonHoyningen"] = (
+            self.dataset["interception_capacity_per_LAI_VonHoyningen"] = (
                 interception_capacity_per_LAI_VonHoyningen
-            )               
+            )
         self.dataset["interception_intercept"] = interception_intercept
 
         self._pkgcheck()

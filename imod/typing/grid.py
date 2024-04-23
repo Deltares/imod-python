@@ -391,12 +391,12 @@ def preserve_gridtype(func):
 
     return decorator
 
+
 @typedispatch
-def is_empty( object: xr.DataArray | xr.Dataset) -> bool:
-    return len(object.keys()) == 0 
+def is_empty(object: xr.DataArray | xr.Dataset) -> bool:
+    return len(object.keys()) == 0
+
 
 @typedispatch
 def is_empty(object: object) -> bool:
     return False
-
-

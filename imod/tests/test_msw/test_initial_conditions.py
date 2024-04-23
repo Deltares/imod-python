@@ -2,20 +2,19 @@ import tempfile
 from pathlib import Path
 
 import pytest
+import xarray as xr
 
+from imod.mf6.utilities.regrid import (
+    RegridderWeightsCache,
+)
 from imod.msw import (
     InitialConditionsEquilibrium,
     InitialConditionsPercolation,
     InitialConditionsRootzonePressureHead,
     InitialConditionsSavedState,
 )
-from imod.mf6.utilities.regrid import (
-    RegridderType,
-    RegridderWeightsCache,
-    _regrid_like,
-)
 from imod.typing.grid import is_empty
-import xarray as xr
+
 
 def get_new_grid():
     x = [1.0, 1.5, 2.0, 2.5, 3.0]
@@ -31,6 +30,7 @@ def get_new_grid():
     new_grid.values[:,:,:] = 1
     return new_grid
 
+
 def test_initial_conditions_equilibrium():
     ic = InitialConditionsEquilibrium()
     dummy = None, None
@@ -44,16 +44,18 @@ def test_initial_conditions_equilibrium():
 
     assert lines == ["Equilibrium\n"]
 
+
 def test_initial_conditions_equilibrium_regrid():
     ic = InitialConditionsEquilibrium()
-    dummy = None, None
+
     # fmt: off
     new_grid = get_new_grid()
 
     regrid_context = RegridderWeightsCache(new_grid, new_grid)
     regridded = ic.regrid_like(new_grid, regrid_context )
-    
+
     assert is_empty(regridded.dataset)
+
 
 def test_initial_conditions_percolation():
     ic = InitialConditionsPercolation()
@@ -68,14 +70,16 @@ def test_initial_conditions_percolation():
 
     assert lines == ["MeteoInputP\n"]
 
+
 def test_initial_conditions_percolation_regrid():
     ic = InitialConditionsPercolation()
 
     new_grid = get_new_grid()
 
     regrid_context = RegridderWeightsCache(new_grid, new_grid)
-    regridded = ic.regrid_like(new_grid, regrid_context )
-    assert is_empty(regridded.dataset)    
+    regridded = ic.regrid_like(new_grid, regrid_context)
+    assert is_empty(regridded.dataset)
+
 
 def test_initial_conditions_rootzone_pressure_head():
     ic = InitialConditionsRootzonePressureHead(2.2)
@@ -90,14 +94,16 @@ def test_initial_conditions_rootzone_pressure_head():
 
     assert lines == ["Rootzone_pF\n", " 2.200\n"]
 
+
 def test_initial_conditions_rootzone_regrid():
     ic = InitialConditionsRootzonePressureHead(2.2)
 
     new_grid = get_new_grid()
 
     regrid_context = RegridderWeightsCache(new_grid, new_grid)
-    regridded = ic.regrid_like(new_grid, regrid_context )
+    regridded = ic.regrid_like(new_grid, regrid_context)
     assert regridded.dataset["initial_pF"] == 2.2
+
 
 def test_initial_conditions_saved_state():
     dummy = None, None
@@ -122,10 +128,10 @@ def test_initial_conditions_saved_state_no_file():
         with pytest.raises(FileNotFoundError):
             ic.write(output_dir, *dummy)
 
+
 def test_initial_conditions_saved_state_regrid():
-    
     with tempfile.TemporaryDirectory() as output_dir:
-        output_dir = Path(output_dir)    
+        output_dir = Path(output_dir)
         ic = InitialConditionsSavedState(output_dir / "foo.out")
 
         assert not ic.is_regridding_supported()

@@ -1,21 +1,17 @@
 import pathlib
 import shutil
 
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
-from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.utilities.regrid import (
-    RegridderType,
-    RegridderWeightsCache,
-    _regrid_like,
-)
+
+
 class InitialConditionsEquilibrium(MetaSwapPackage, IRegridPackage):
     """
     Use an equilibrium profile to initialize the model.
 
     This class is responsible for the file `init_svat.inp`
     """
-
 
     _regrid_method = {}
 
@@ -48,6 +44,7 @@ class InitialConditionsRootzonePressureHead(MetaSwapPackage, IRegridPackage):
         "initial_pF": VariableMetaData(6, 0.0, 6.0, float),
     }
     _regrid_method = {}
+
     def __init__(self, initial_pF=2.2):
         super().__init__()
         self.dataset["initial_pF"] = initial_pF

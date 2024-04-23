@@ -1,13 +1,13 @@
 import pandas as pd
 
-from imod.msw.fixed_format import VariableMetaData
-from imod.msw.pkgbase import MetaSwapPackage
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.utilities.regrid import (
     RegridderType,
-    RegridderWeightsCache,
-    _regrid_like,
 )
+from imod.msw.fixed_format import VariableMetaData
+from imod.msw.pkgbase import MetaSwapPackage
+
+
 class Ponding(MetaSwapPackage, IRegridPackage):
     """
     Set ponding related parameters for MetaSWAP. This class is responsible for
@@ -50,7 +50,7 @@ class Ponding(MetaSwapPackage, IRegridPackage):
             RegridderType.OVERLAP,
             "mean",
         ),
-    }        
+    }
 
     def __init__(self, ponding_depth, runon_resistance, runoff_resistance) -> None:
         super().__init__()

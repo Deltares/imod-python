@@ -6,12 +6,12 @@ import xarray as xr
 from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
 
-from imod.msw import ScalingFactors
 from imod.mf6.utilities.regrid import (
-    RegridderType,
     RegridderWeightsCache,
-    _regrid_like,
 )
+from imod.msw import ScalingFactors
+
+
 def setup_scaling_factor():
     x = [1.0, 2.0, 3.0]
     y = [1.0, 2.0, 3.0]
@@ -72,6 +72,7 @@ def setup_scaling_factor():
 
     return scaling_factors, index, svat
 
+
 def get_new_grid():
     x = [1.0, 1.5, 2.0, 2.5, 3.0]
     y = [3.0, 2.5, 2.0, 1.5, 1.0]
@@ -86,8 +87,9 @@ def get_new_grid():
     new_grid.values[:,:,:] = 1
     return new_grid
 
+
 def test_simple_model(fixed_format_parser):
-    scaling_factors, index, svat =  setup_scaling_factor()
+    scaling_factors, index, svat = setup_scaling_factor()
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
@@ -107,11 +109,12 @@ def test_simple_model(fixed_format_parser):
         results["depth_perched_water_table"], np.array([0.5, 1.0, 0.5, 0.7])
     )
 
+
 def test_regrid_scaling_factor(fixed_format_parser):
-    scaling_factors, index, svat =  setup_scaling_factor()
+    scaling_factors, index, svat = setup_scaling_factor()
     new_grid = get_new_grid()
 
-    old_grid = scaling_factors.dataset["scale_soil_moisture"].isel(subunit = 0)
+    old_grid = scaling_factors.dataset["scale_soil_moisture"].isel(subunit=0)
     regrid_context = RegridderWeightsCache(old_grid, new_grid)
 
     regridded_scaling_factors = scaling_factors.regrid_like(new_grid, regrid_context)

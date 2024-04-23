@@ -1,11 +1,10 @@
-from imod.msw.fixed_format import VariableMetaData
-from imod.msw.pkgbase import MetaSwapPackage
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.utilities.regrid import (
     RegridderType,
-    RegridderWeightsCache,
-    _regrid_like,
 )
+from imod.msw.fixed_format import VariableMetaData
+from imod.msw.pkgbase import MetaSwapPackage
+
 
 class ScalingFactors(MetaSwapPackage, IRegridPackage):
     """
@@ -63,7 +62,6 @@ class ScalingFactors(MetaSwapPackage, IRegridPackage):
     _without_subunit = ("depth_perched_water_table",)
     _to_fill = ()
 
-
     _regrid_method = {
         "scale_soil_moisture": (RegridderType.OVERLAP, "mean"),
         "scale_hydraulic_conductivity": (RegridderType.OVERLAP, "mean"),
@@ -75,11 +73,8 @@ class ScalingFactors(MetaSwapPackage, IRegridPackage):
             RegridderType.OVERLAP,
             "mean",
         ),
-    }    
-               
-      
-              
-         
+    }
+
     def __init__(
         self,
         scale_soil_moisture,
