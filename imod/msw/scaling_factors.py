@@ -1,8 +1,13 @@
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
+from imod.mf6.utilities.regrid import (
+    RegridderType,
+    RegridderWeightsCache,
+    _regrid_like,
+)
 
-
-class ScalingFactors(MetaSwapPackage):
+class ScalingFactors(MetaSwapPackage, IRegridPackage):
     """
     This package allows you to do three things:
         1. Set scaling factors for some inputs in the soil physical database,
@@ -58,6 +63,23 @@ class ScalingFactors(MetaSwapPackage):
     _without_subunit = ("depth_perched_water_table",)
     _to_fill = ()
 
+
+    _regrid_method = {
+        "scale_soil_moisture": (RegridderType.OVERLAP, "mean"),
+        "scale_hydraulic_conductivity": (RegridderType.OVERLAP, "mean"),
+        "scale_pressure_head": (
+            RegridderType.OVERLAP,
+            "mean",
+        ),
+        "depth_perched_water_table": (
+            RegridderType.OVERLAP,
+            "mean",
+        ),
+    }    
+               
+      
+              
+         
     def __init__(
         self,
         scale_soil_moisture,
