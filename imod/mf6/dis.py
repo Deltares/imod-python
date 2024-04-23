@@ -7,7 +7,13 @@ import imod
 from imod.logging import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
-from imod.mf6.utilities.regrid import RegridderType
+from imod.mf6.utilities.grid import get_smallest_target_grid
+from imod.mf6.utilities.regrid import (
+    RegridderType,
+    RegridderWeightsCache,
+    _regrid_array,
+    assign_coord_if_present,
+)
 from imod.mf6.validation import DisBottomSchema
 from imod.schemata import (
     ActiveCellsConnectedSchema,
@@ -153,5 +159,59 @@ class StructuredDiscretization(Package, IRegridPackage):
         return self._regrid_method
 
     @classmethod
-    def from_imod5_package(cls, data):
-        pass
+    def from_imod5_data(cls, imod5_data):
+        data = {
+            "idomain": imod5_data["bnd"]["ibound"].astype(np.int16),
+            "top": imod5_data["top"]["top"],
+            "bottom": imod5_data["bot"]["bottom"],
+        }
+        target_grid = get_smallest_target_grid(*data.values())
+
+        regridder_settings = cls._regrid_method
+        # if regridder_types is not None:
+        #     regridder_settings.update(regridder_types)
+
+        # TODO: are grids really used in RegridderWeightsCache? Don't really seem to be...
+        regrid_context = RegridderWeightsCache(data["idomain"], target_grid)
+
+        new_package_data = {}
+
+        for (
+            varname,
+            regridder_type_and_function,
+        ) in regridder_settings.items():
+            regridder_function = None
+            regridder_name = regridder_type_and_function[0]
+            if len(regridder_type_and_function) > 1:
+                regridder_function = regridder_type_and_function[1]
+
+            # regrid the variable
+            new_package_data[varname] = _regrid_array(
+                data[varname],
+                regrid_context,
+                regridder_name,
+                regridder_function,
+                target_grid,
+            )
+            # set dx and dy if present in target_grid
+            new_package_data[varname] = assign_coord_if_present(
+                "dx", target_grid, new_package_data[varname]
+            )
+            new_package_data[varname] = assign_coord_if_present(
+                "dy", target_grid, new_package_data[varname]
+            )
+
+        # Convert IBOUND to IDOMAIN
+        # -1 to 1, these will have to be filled with
+        # CHD cells.
+        new_package_data["idomain"] = np.abs(new_package_data["idomain"])
+
+        # Thickness <= 0 -> IDOMAIN = -1
+        thickness = new_package_data["top"] - new_package_data["bottom"]
+        new_package_data["idomain"] = new_package_data["idomain"].where(thickness > 0, -1)
+
+        # TOP 3D -> TOP 2D
+        # Assume iMOD5 data provided as fully 3D and not Quasi-3D
+        new_package_data["top"] = new_package_data["top"].sel(layer=1, drop=True)
+
+        return cls(**new_package_data)

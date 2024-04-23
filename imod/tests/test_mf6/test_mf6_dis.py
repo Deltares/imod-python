@@ -189,3 +189,15 @@ def test_write_ascii_griddata_2d_3d(idomain_and_bottom, tmp_path):
     with open(directory / "dis/botm.dat") as f:
         bottom_content = f.readlines()
     assert len(bottom_content) == 1
+
+
+def test_from_imod5_data(tmp_path):
+    data = imod.data.imod5_projectfile_data(tmp_path)
+    imod5_data = data[0]
+    # For debugging purposes, load everything in memory
+    for pkg in imod5_data.values():
+        for vardata in pkg.values():
+            if isinstance(vardata, xr.DataArray):
+              vardata.load()
+    
+    dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_data)
