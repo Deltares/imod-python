@@ -54,6 +54,12 @@ class LanduseOptions(MetaSwapPackage, IRegridPackage):
         Hoyningen.
     interception_intercept: array of floats (xr.DataArray)
         Intercept of the interception evaporation curve. Pun unintended.
+    interception_capacity_per_LAI_Rutter: this initializer argument is for
+        internal use only. Users can ignore it and should only provide
+        interception_capacity_per_LAI
+    interception_capacity_per_LAI_VonHoyningen: this initializer argument is for
+        internal use only. Users can ignore it and should only provide
+        interception_capacity_per_LAI
 
     Notes
     -----
