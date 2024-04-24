@@ -158,8 +158,8 @@ class StructuredDiscretization(Package, IRegridPackage):
     def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
         return self._regrid_method
 
-    @standard_log_decorator
     @classmethod
+    @standard_log_decorator()
     def from_imod5_data(
         cls, 
         imod5_data: dict[str, dict[str, GridDataArray]], 
