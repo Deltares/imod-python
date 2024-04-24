@@ -97,4 +97,4 @@ def test_landuse_options_regrid():
     lu_options = LanduseOptions(**options)
 
     regrid_context = RegridderWeightsCache(new_grid, new_grid)
-    regridded = lu_options.regrid_like(new_grid, regrid_context)
+    _ = lu_options.regrid_like(new_grid, regrid_context)

@@ -116,5 +116,4 @@ def test_regrid_ponding():
     old_grid = ponding.dataset["ponding_depth"].isel(subunit=0)
     regrid_context = RegridderWeightsCache(old_grid, new_grid)
 
-    regridded_ponding = ponding.regrid_like(new_grid, regrid_context)
-    pass
+    _ = ponding.regrid_like(new_grid, regrid_context)
