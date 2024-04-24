@@ -97,4 +97,9 @@ def test_landuse_options_regrid():
     lu_options = LanduseOptions(**options)
 
     regrid_context = RegridderWeightsCache(new_grid, new_grid)
-    _ = lu_options.regrid_like(new_grid, regrid_context)
+    regridded_land_use = lu_options.regrid_like(new_grid, regrid_context)
+
+    assert len(regridded_land_use.dataset.coords.keys()) == 1
+    assert np.all(
+        regridded_land_use.dataset.coords["landuse_index"].values == np.array([1, 2, 3])
+    )

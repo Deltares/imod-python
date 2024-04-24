@@ -116,4 +116,7 @@ def test_regrid_ponding():
     old_grid = ponding.dataset["ponding_depth"].isel(subunit=0)
     regrid_context = RegridderWeightsCache(old_grid, new_grid)
 
-    _ = ponding.regrid_like(new_grid, regrid_context)
+    regridded_ponding = ponding.regrid_like(new_grid, regrid_context)
+
+    assert np.all(regridded_ponding.dataset["x"].values == new_grid["x"].values)
+    assert np.all(regridded_ponding.dataset["y"].values == new_grid["y"].values)

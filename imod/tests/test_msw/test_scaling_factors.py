@@ -117,4 +117,7 @@ def test_regrid_scaling_factor(fixed_format_parser):
     old_grid = scaling_factors.dataset["scale_soil_moisture"].isel(subunit=0)
     regrid_context = RegridderWeightsCache(old_grid, new_grid)
 
-    _ = scaling_factors.regrid_like(new_grid, regrid_context)
+    regridded_scaling_factor = scaling_factors.regrid_like(new_grid, regrid_context)
+
+    assert np.all(regridded_scaling_factor.dataset["x"].values == new_grid["x"].values)
+    assert np.all(regridded_scaling_factor.dataset["y"].values == new_grid["y"].values)
