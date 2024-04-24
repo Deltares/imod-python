@@ -4,15 +4,14 @@ from typing import Optional, Tuple
 import numpy as np
 
 import imod
-from imod.logging import init_log_decorator
+from imod.logging import init_log_decorator, standard_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.utilities.grid import get_smallest_target_grid
 from imod.mf6.utilities.regrid import (
     RegridderType,
     RegridderWeightsCache,
-    _regrid_array,
-    assign_coord_if_present,
+    _regrid_package_data,
 )
 from imod.mf6.validation import DisBottomSchema
 from imod.schemata import (
@@ -24,6 +23,7 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
 )
+from imod.typing.grid import GridDataArray
 
 
 class StructuredDiscretization(Package, IRegridPackage):
@@ -158,8 +158,39 @@ class StructuredDiscretization(Package, IRegridPackage):
     def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
         return self._regrid_method
 
+    @standard_log_decorator
     @classmethod
-    def from_imod5_data(cls, imod5_data):
+    def from_imod5_data(
+        cls, 
+        imod5_data: dict[str, dict[str, GridDataArray]], 
+        regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
+    ) -> "StructuredDiscretization":
+        """
+        Construct package from iMOD5 data, loaded with the
+        :func:`imod.formats.prj.open_projectfile_data` function.
+
+        Method regrids all variables to a target grid with the smallest extent
+        and smallest cellsize available in all the grids. Consequently it
+        converts iMODFLOW data to MODFLOW 6 data. 
+
+        .. note::
+
+            The method expects the iMOD5 model to be fully 3D, not quasi-3D.
+
+        Parameters
+        ----------
+        imod5_data: dict
+            Dictionary with iMOD5 data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
+        regridder_types: dict, optional
+            Optional dictionary with regridder types for a specific variable.
+            Use this to override default regridding methods.
+
+        Returns
+        -------
+        Modflow 6 StructuredDiscretization package.
+
+        """
         data = {
             "idomain": imod5_data["bnd"]["ibound"].astype(np.int16),
             "top": imod5_data["top"]["top"],
@@ -168,38 +199,14 @@ class StructuredDiscretization(Package, IRegridPackage):
         target_grid = get_smallest_target_grid(*data.values())
 
         regridder_settings = cls._regrid_method
-        # if regridder_types is not None:
-        #     regridder_settings.update(regridder_types)
+        if regridder_types is not None:
+            regridder_settings.update(regridder_types)
 
-        # TODO: are grids really used in RegridderWeightsCache? Don't really seem to be...
+        # TODO: are grid arguments really used in RegridderWeightsCache after
+        #   initialization? Don't really seem to be...
         regrid_context = RegridderWeightsCache(data["idomain"], target_grid)
 
-        new_package_data = {}
-
-        for (
-            varname,
-            regridder_type_and_function,
-        ) in regridder_settings.items():
-            regridder_function = None
-            regridder_name = regridder_type_and_function[0]
-            if len(regridder_type_and_function) > 1:
-                regridder_function = regridder_type_and_function[1]
-
-            # regrid the variable
-            new_package_data[varname] = _regrid_array(
-                data[varname],
-                regrid_context,
-                regridder_name,
-                regridder_function,
-                target_grid,
-            )
-            # set dx and dy if present in target_grid
-            new_package_data[varname] = assign_coord_if_present(
-                "dx", target_grid, new_package_data[varname]
-            )
-            new_package_data[varname] = assign_coord_if_present(
-                "dy", target_grid, new_package_data[varname]
-            )
+        new_package_data = _regrid_package_data(data, target_grid, regridder_settings, regrid_context)
 
         # Convert IBOUND to IDOMAIN
         # -1 to 1, these will have to be filled with
