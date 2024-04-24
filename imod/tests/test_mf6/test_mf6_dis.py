@@ -15,7 +15,8 @@ def _load_imod5_data_in_memory(imod5_data):
     for pkg in imod5_data.values():
         for vardata in pkg.values():
             if isinstance(vardata, xr.DataArray):
-              vardata.load()
+                vardata.load()
+
 
 @pytest.fixture(scope="function")
 def idomain_and_bottom():
@@ -202,18 +203,20 @@ def test_from_imod5_data__idomain_values(tmp_path):
     data = imod.data.imod5_projectfile_data(tmp_path)
     imod5_data = data[0]
     _load_imod5_data_in_memory(imod5_data)
-    
+
     dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_data)
 
     # Test if idomain has appropriate values
     ibound = imod5_data["bnd"]["ibound"]
     expected_idomain_min1_count = 548512
-    expected_idomain_1_count = ((ibound == 1) | (ibound == -1)).sum() - expected_idomain_min1_count
-    expected_idomain_0 = (ibound == 0)
+    expected_idomain_1_count = (
+        (ibound == 1) | (ibound == -1)
+    ).sum() - expected_idomain_min1_count
+    expected_idomain_0 = ibound == 0
 
-    actual_idomain_min1_count = (dis["idomain"]==-1).sum()
-    actual_idomain_0 = dis["idomain"]==0
-    actual_idomain_1_count = (dis["idomain"]==1).sum()
+    actual_idomain_min1_count = (dis["idomain"] == -1).sum()
+    actual_idomain_0 = dis["idomain"] == 0
+    actual_idomain_1_count = (dis["idomain"] == 1).sum()
 
     assert actual_idomain_min1_count == expected_idomain_min1_count
     assert np.all(actual_idomain_0 == expected_idomain_0)
@@ -224,7 +227,7 @@ def test_from_imod5_data__grid_extent(tmp_path):
     data = imod.data.imod5_projectfile_data(tmp_path)
     imod5_data = data[0]
     _load_imod5_data_in_memory(imod5_data)
-    
+
     dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_data)
 
     # Test if regridded to smallest grid resolution

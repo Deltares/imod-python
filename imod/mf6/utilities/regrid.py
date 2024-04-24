@@ -192,12 +192,13 @@ def _regrid_array(
     # reconvert the result to the same dtype as the original
     return regridded_array.astype(original_dtype)
 
+
 def _regrid_package_data(
-    package_data: dict[str, GridDataArray]|GridDataset, 
-    target_grid: GridDataArray, 
-    regridder_settings: dict[str, tuple[RegridderType, str]], 
-    regrid_context: RegridderWeightsCache, 
-    new_package_data: Optional[dict[str, GridDataArray]]={}
+    package_data: dict[str, GridDataArray] | GridDataset,
+    target_grid: GridDataArray,
+    regridder_settings: dict[str, tuple[RegridderType, str]],
+    regrid_context: RegridderWeightsCache,
+    new_package_data: Optional[dict[str, GridDataArray]] = {},
 ) -> dict[str, GridDataArray]:
     """
     Regrid package data. Loops over regridder settings to regrid variables one
@@ -234,6 +235,7 @@ def _regrid_package_data(
             "dy", target_grid, new_package_data[varname]
         )
     return new_package_data
+
 
 def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, list[str]]:
     """
@@ -308,7 +310,11 @@ def _regrid_like(
 
     new_package_data = package.get_non_grid_data(list(regridder_settings.keys()))
     new_package_data = _regrid_package_data(
-        package.dataset, target_grid, regridder_settings, regrid_context, new_package_data=new_package_data
+        package.dataset,
+        target_grid,
+        regridder_settings,
+        regrid_context,
+        new_package_data=new_package_data,
     )
 
     if hasattr(package, "auxiliary_data_fields"):

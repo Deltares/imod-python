@@ -161,8 +161,8 @@ class StructuredDiscretization(Package, IRegridPackage):
     @classmethod
     @standard_log_decorator()
     def from_imod5_data(
-        cls, 
-        imod5_data: dict[str, dict[str, GridDataArray]], 
+        cls,
+        imod5_data: dict[str, dict[str, GridDataArray]],
         regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
     ) -> "StructuredDiscretization":
         """
@@ -171,7 +171,7 @@ class StructuredDiscretization(Package, IRegridPackage):
 
         Method regrids all variables to a target grid with the smallest extent
         and smallest cellsize available in all the grids. Consequently it
-        converts iMODFLOW data to MODFLOW 6 data. 
+        converts iMODFLOW data to MODFLOW 6 data.
 
         .. note::
 
@@ -206,7 +206,9 @@ class StructuredDiscretization(Package, IRegridPackage):
         #   initialization? Don't really seem to be...
         regrid_context = RegridderWeightsCache(data["idomain"], target_grid)
 
-        new_package_data = _regrid_package_data(data, target_grid, regridder_settings, regrid_context)
+        new_package_data = _regrid_package_data(
+            data, target_grid, regridder_settings, regrid_context
+        )
 
         # Convert IBOUND to IDOMAIN
         # -1 to 1, these will have to be filled with
@@ -215,7 +217,9 @@ class StructuredDiscretization(Package, IRegridPackage):
 
         # Thickness <= 0 -> IDOMAIN = -1
         thickness = new_package_data["top"] - new_package_data["bottom"]
-        new_package_data["idomain"] = new_package_data["idomain"].where(thickness > 0, -1)
+        new_package_data["idomain"] = new_package_data["idomain"].where(
+            thickness > 0, -1
+        )
 
         # TOP 3D -> TOP 2D
         # Assume iMOD5 data provided as fully 3D and not Quasi-3D

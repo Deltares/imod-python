@@ -87,9 +87,9 @@ def get_smallest_target_grid(*grids: GridDataArray) -> GridDataArray:
     Return smallest target grid from multiple grids. The grid with smallest
     extent and finest grid.
     """
-    dx_ls, xmin_ls, xmax_ls, dy_ls, ymin_ls, ymax_ls = zip(*[
-            imod.util.spatial.spatial_reference(grid) for grid in grids
-        ])
+    dx_ls, xmin_ls, xmax_ls, dy_ls, ymin_ls, ymax_ls = zip(
+        *[imod.util.spatial.spatial_reference(grid) for grid in grids]
+    )
 
     dx = min(dx_ls)
     xmin = max(xmin_ls)
