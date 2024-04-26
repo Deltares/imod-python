@@ -138,6 +138,7 @@ def test_precipitation_mapping_negative_dy_meteo(fixed_format_parser):
     assert_equal(results["row"], np.array([3, 2, 3, 2, 2, 2]))
     assert_equal(results["column"], np.array([2, 2, 2, 2, 2, 3]))
 
+
 def test_precipitation_mapping_negative_dy_meteo_svat(fixed_format_parser):
     x_meteo = [-0.5, 1.5, 3.5]
     y_meteo = [4.5, 2.5, 0.5]
