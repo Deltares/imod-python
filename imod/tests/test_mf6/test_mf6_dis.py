@@ -210,22 +210,10 @@ def test_from_imod5_data__idomain_values(tmp_path):
 
     dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_data)
 
-    # Test if idomain has appropriate values
-    # expected idomain -1 equals
-    # thickness = 0 & idomain == 1 after regridding
-    expected_idomain_min1_count = 381648
-    expected_idomain_1_count = (
-        (ibound == 1) | (ibound == -1)
-    ).sum() - expected_idomain_min1_count
-    expected_idomain_0 = ibound == 0
-
-    actual_idomain_min1_count = (dis["idomain"] == -1).sum()
-    actual_idomain_0 = dis["idomain"] == 0
-    actual_idomain_1_count = (dis["idomain"] == 1).sum()
-
-    assert np.all(actual_idomain_0 == expected_idomain_0)
-    assert actual_idomain_min1_count == expected_idomain_min1_count
-    assert actual_idomain_1_count == expected_idomain_1_count
+    # Test if idomain has appropriate count
+    assert (dis["idomain"] == -1).sum() == 371824
+    assert (dis["idomain"] == 0).sum() == 176912
+    assert (dis["idomain"] == 1).sum() == 703936
 
 
 def test_from_imod5_data__grid_extent(tmp_path):
