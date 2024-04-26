@@ -42,6 +42,16 @@ def nan_like(grid: xu.UgridDataArray, dtype=np.float32, *args, **kwargs):
 
 
 @typedispatch
+def full_like(grid: xr.DataArray, fill_value, *args, **kwargs):
+    return xr.full_like(grid, fill_value * args, **kwargs)
+
+
+@typedispatch
+def full_like(grid: xu.UgridDataArray, fill_value, *args, **kwargs):
+    return xu.full_like(grid, fill_value, *args, **kwargs)
+
+
+@typedispatch
 def is_unstructured(grid: xu.UgridDataArray | xu.UgridDataset) -> bool:
     return True
 
