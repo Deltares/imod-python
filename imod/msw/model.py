@@ -20,7 +20,6 @@ from imod.msw.landuse import LanduseOptions
 from imod.msw.meteo_grid import MeteoGrid
 from imod.msw.meteo_mapping import EvapotranspirationMapping, PrecipitationMapping
 from imod.msw.output_control import TimeOutputControl
-from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.timeutil import to_metaswap_timeformat
 from imod.msw.vegetation import AnnualCropFactors
 

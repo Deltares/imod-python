@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -6,7 +8,7 @@ from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.wel import WellDisStructured
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
-from typing import Optional
+
 
 class CouplerMapping(MetaSwapPackage):
     """

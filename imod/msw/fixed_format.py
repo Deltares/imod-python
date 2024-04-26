@@ -1,15 +1,16 @@
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import  Union, Optional
+from typing import Optional, Union
+
 import numpy as np
 
 
 @dataclass
 class VariableMetaData:
     column_width: int
-    min_value:  Optional[Union[int, float]]
-    max_value:   Optional[Union[int, float]]
+    min_value: Optional[Union[int, float]]
+    max_value: Optional[Union[int, float]]
     dtype: type
 
 
@@ -43,7 +44,7 @@ def fixed_format_parser(
         Dictionary with the VariableMetaData. Access this dictionary in a
         package by calling <pkg>._metadata_dict
     """
-    results: dict[str,list]= {}
+    results: dict[str, list] = {}
     for key in metadata_dict:
         results[key] = []
 
