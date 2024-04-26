@@ -8,6 +8,7 @@ from imod.logging import init_log_decorator, standard_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.utilities.grid import get_smallest_target_grid
+from imod.mf6.utilities.imod5_converter import convert_ibound_to_idomain
 from imod.mf6.utilities.regrid import (
     RegridderType,
     RegridderWeightsCache,
@@ -200,6 +201,7 @@ class StructuredDiscretization(Package, IRegridPackage):
         # It is possible that top and bottom grids are on different grids, then
         # this doesn't work:
         # assert np.all(imod5_data["top"]["top"][1:].data == imod5_data["bot"]["bottom"][:-1].data)
+        # assert np.isin(np.unique(imod5_data["bnd"]["ibound"]), [-1, 0, 1])
 
         target_grid = get_smallest_target_grid(*data.values())
 
@@ -215,21 +217,9 @@ class StructuredDiscretization(Package, IRegridPackage):
             data, target_grid, regridder_settings, regrid_context
         )
 
-        # Convert IBOUND to IDOMAIN
-        # -1 to 1, these will have to be filled with
-        # CHD cells.
-        new_package_data["idomain"] = np.abs(new_package_data["idomain"])
-
-        # Thickness <= 0 -> IDOMAIN = -1
         thickness = new_package_data["top"] - new_package_data["bottom"]
-        # TODO: Check create_idomain in disv_conversion.py.
-        # Don't make cells at top or bottom vpt, these should be inactive.
-        active_and_zero_thickness = (thickness <= 0) & (
-            new_package_data["idomain"] == 1
-        )
-
-        new_package_data["idomain"] = new_package_data["idomain"].where(
-            ~active_and_zero_thickness, -1
+        new_package_data["idomain"] = convert_ibound_to_idomain(
+            new_package_data["idomain"], thickness
         )
 
         # TOP 3D -> TOP 2D
