@@ -1,17 +1,15 @@
 import warnings
 from dataclasses import dataclass
-from numbers import Number
 from pathlib import Path
 from typing import Dict, Union
-
 import numpy as np
 
 
 @dataclass
 class VariableMetaData:
     column_width: int
-    min_value: Number
-    max_value: Number
+    min_value:  Union[int, float]
+    max_value:  Union[int, float]
     dtype: type
 
 
@@ -45,7 +43,7 @@ def fixed_format_parser(
         Dictionary with the VariableMetaData. Access this dictionary in a
         package by calling <pkg>._metadata_dict
     """
-    results = {}
+    results: Dict[str,list]= {}
     for key in metadata_dict:
         results[key] = []
 

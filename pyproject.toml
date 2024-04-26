@@ -115,6 +115,7 @@ convention = "numpy"
 [tool.mypy]
 files = [
     "imod/mf6/**.py",
+    "imod/msw/**.py",    
     "imod/logging/**.py",
 ]
 follow_imports = "silent"
