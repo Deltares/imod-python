@@ -494,7 +494,6 @@ class UniqueValuesSchema(BaseSchema):
             )
 
 
-
 def _notnull(obj):
     """
     Helper function; does the same as xr.DataArray.notnull. This function is to

@@ -221,8 +221,12 @@ class StructuredDiscretization(Package, IRegridPackage):
 
         # Validate iMOD5 data
         UniqueValuesSchema([-1, 0, 1]).validate(imod5_data["bnd"]["ibound"])
-        if not np.all(new_package_data["top"][1:].data == new_package_data["bottom"][:-1].data):
-            raise ValidationError("Model discretization not fully 3D. Make sure TOP[n+1] matches BOT[n]")
+        if not np.all(
+            new_package_data["top"][1:].data == new_package_data["bottom"][:-1].data
+        ):
+            raise ValidationError(
+                "Model discretization not fully 3D. Make sure TOP[n+1] matches BOT[n]"
+            )
 
         thickness = new_package_data["top"] - new_package_data["bottom"]
         new_package_data["idomain"] = convert_ibound_to_idomain(
