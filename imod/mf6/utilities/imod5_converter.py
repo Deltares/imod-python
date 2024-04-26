@@ -14,8 +14,8 @@ def convert_ibound_to_idomain(ibound: GridDataArray, thickness: GridDataArray):
     # Don't make cells at top or bottom vpt, these should be inactive.
     # First, set all potential vpts to nan to be able to utilize ffill and bfill
     idomain_float = idomain.where(~active_and_zero_thickness)
-    passthrough = (
-        idomain_float.ffill("layer").notnull() & idomain_float.bfill("layer").notnull()
+    passthrough = (idomain_float.ffill("layer") == 1) & (
+        idomain_float.bfill("layer") == 1
     )
     # Then fill nans where passthrough with -1
     idomain_float = idomain_float.combine_first(
