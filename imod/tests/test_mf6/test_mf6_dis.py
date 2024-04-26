@@ -219,6 +219,10 @@ def test_from_imod5_data__idomain_values(tmp_path):
 def test_from_imod5_data__grid_extent(tmp_path):
     data = imod.data.imod5_projectfile_data(tmp_path)
     imod5_data = data[0]
+    ibound = imod5_data["bnd"]["ibound"]
+    # Fix data, as it contains floating values like 0.34, 0.25 etc.
+    ibound = ibound.where(ibound <= 0, 1)
+    imod5_data["bnd"]["ibound"] = ibound
     _load_imod5_data_in_memory(imod5_data)
 
     dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_data)
@@ -239,6 +243,10 @@ def test_from_imod5_data__grid_extent(tmp_path):
 def test_from_imod5_data__write(tmp_path):
     data = imod.data.imod5_projectfile_data(tmp_path)
     imod5_data = data[0]
+    ibound = imod5_data["bnd"]["ibound"]
+    # Fix data, as it contains floating values like 0.34, 0.25 etc.
+    ibound = ibound.where(ibound <= 0, 1)
+    imod5_data["bnd"]["ibound"] = ibound
     _load_imod5_data_in_memory(imod5_data)
 
     directory = tmp_path / "dis_griddata"
@@ -253,3 +261,13 @@ def test_from_imod5_data__write(tmp_path):
     # Assert if files written
     assert (directory / "dis/top.dat").exists()
     assert (directory / "dis/botm.dat").exists()
+
+
+def test_from_imod5_data__validation_error(tmp_path):
+    data = imod.data.imod5_projectfile_data(tmp_path)
+    imod5_data = data[0]
+
+    _load_imod5_data_in_memory(imod5_data)
+
+    with pytest.raises(ValidationError):
+        imod.mf6.StructuredDiscretization.from_imod5_data(imod5_data)

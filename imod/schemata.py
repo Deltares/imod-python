@@ -479,6 +479,22 @@ class AnyValueSchema(ValueSchema):
             )
 
 
+class UniqueValuesSchema(BaseSchema):
+    def __init__(self, other_value: list) -> None:
+        """
+        Validate if unique values in other values list
+        """
+        self.other_value = other_value
+
+    def validate(self, obj: GridDataArray, **kwargs) -> None:
+        unique_values = np.unique(obj)
+        if not np.all(np.isin(unique_values, self.other_value)):
+            raise ValidationError(
+                f"Unique values not matching: {self.other_value}, got unique values: {unique_values}"
+            )
+
+
+
 def _notnull(obj):
     """
     Helper function; does the same as xr.DataArray.notnull. This function is to
