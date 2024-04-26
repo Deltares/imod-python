@@ -222,7 +222,7 @@ class StructuredDiscretization(Package, IRegridPackage):
 
         # Thickness <= 0 -> IDOMAIN = -1
         thickness = new_package_data["top"] - new_package_data["bottom"]
-        # TODO: Check create_idomain in disv_conversion.py. 
+        # TODO: Check create_idomain in disv_conversion.py.
         # Don't make cells at top or bottom vpt, these should be inactive.
         active_and_zero_thickness = (thickness <= 0) & (
             new_package_data["idomain"] == 1

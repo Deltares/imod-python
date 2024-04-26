@@ -209,10 +209,10 @@ def test_from_imod5_data__idomain_values(tmp_path):
     _load_imod5_data_in_memory(imod5_data)
 
     dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_data)
-    
-    # Test if idomain has appropriate values 
+
+    # Test if idomain has appropriate values
     # expected idomain -1 equals
-    # thickness = 0 & idomain == 1 after regridding 
+    # thickness = 0 & idomain == 1 after regridding
     expected_idomain_min1_count = 381648
     expected_idomain_1_count = (
         (ibound == 1) | (ibound == -1)
