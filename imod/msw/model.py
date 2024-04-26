@@ -194,7 +194,7 @@ class MetaSwapModel(Model):
 
         return year, time_since_start_year
 
-    def _get_pkg_key(self, pkg_type: MetaSwapPackage, optional_package: bool = False):
+    def _get_pkg_key(self, pkg_type: type, optional_package: bool = False):
         for pkg_key, pkg in self.items():
             if isinstance(pkg, pkg_type):
                 return pkg_key

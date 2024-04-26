@@ -6,7 +6,7 @@ from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.wel import WellDisStructured
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
-
+from typing import Optional
 
 class CouplerMapping(MetaSwapPackage):
     """
@@ -39,7 +39,7 @@ class CouplerMapping(MetaSwapPackage):
     def __init__(
         self,
         modflow_dis: StructuredDiscretization,
-        well: WellDisStructured = None,
+        well: Optional[WellDisStructured] = None,
     ):
         super().__init__()
 
