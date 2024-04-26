@@ -117,7 +117,8 @@ files = [
     "imod/mf6/**.py",
     "imod/msw/**.py",    
     "imod/logging/**.py",
-    "imod/prepare/**.py",        
+    "imod/prepare/**.py",  
+    "imod/util/**.py",           
 ]
 follow_imports = "silent"
 warn_unused_configs = true
