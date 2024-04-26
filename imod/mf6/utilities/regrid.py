@@ -21,7 +21,7 @@ from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.interfaces.isimulation import ISimulation
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.utilities.clip import clip_by_grid
-from imod.mf6.utilities.package import is_valid
+from imod.mf6.utilities.package import _is_valid
 from imod.mf6.utilities.regridding_types import RegridderType
 from imod.schemata import ValidationError
 from imod.typing.grid import (
@@ -156,7 +156,7 @@ def _regrid_array(
     """
 
     # skip regridding for arrays with no valid values (such as "None")
-    if not is_valid(da.values[()]):
+    if not _is_valid(da.values[()]):
         return None
 
     # the dataarray might be a scalar. If it is, then it does not need regridding.

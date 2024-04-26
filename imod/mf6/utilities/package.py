@@ -27,7 +27,7 @@ def get_repeat_stress(times) -> xr.DataArray:
     )
 
 
-def is_valid(value):
+def _is_valid(value):
     """
     Filters values that are None, False, or a numpy.bool_ False.
     Needs to be this specific, since 0.0 and 0 are valid values, but are

@@ -23,7 +23,7 @@ from imod.mf6.pkgbase import (
     PackageBase,
 )
 from imod.mf6.utilities.mask import _mask
-from imod.mf6.utilities.package import is_valid
+from imod.mf6.utilities.package import _is_valid
 from imod.mf6.utilities.regrid import (
     RegridderType,
     RegridderWeightsCache,
@@ -79,7 +79,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         )
 
     def _valid(self, value):
-        is_valid(value)
+        return _is_valid(value)
 
     @staticmethod
     def _number_format(dtype: type):
