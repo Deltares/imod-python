@@ -202,13 +202,18 @@ def test_write_ascii_griddata_2d_3d(idomain_and_bottom, tmp_path):
 def test_from_imod5_data__idomain_values(tmp_path):
     data = imod.data.imod5_projectfile_data(tmp_path)
     imod5_data = data[0]
+    ibound = imod5_data["bnd"]["ibound"]
+    # Fix data, as it contains floating values like 0.34, 0.25 etc.
+    ibound = ibound.where(ibound <= 0, 1)
+    imod5_data["bnd"]["ibound"] = ibound
     _load_imod5_data_in_memory(imod5_data)
 
     dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_data)
-
-    # Test if idomain has appropriate values
-    ibound = imod5_data["bnd"]["ibound"]
-    expected_idomain_min1_count = 548512
+    
+    # Test if idomain has appropriate values 
+    # expected idomain -1 equals
+    # thickness = 0 & idomain == 1 after regridding 
+    expected_idomain_min1_count = 381648
     expected_idomain_1_count = (
         (ibound == 1) | (ibound == -1)
     ).sum() - expected_idomain_min1_count
@@ -218,8 +223,8 @@ def test_from_imod5_data__idomain_values(tmp_path):
     actual_idomain_0 = dis["idomain"] == 0
     actual_idomain_1_count = (dis["idomain"] == 1).sum()
 
-    assert actual_idomain_min1_count == expected_idomain_min1_count
     assert np.all(actual_idomain_0 == expected_idomain_0)
+    assert actual_idomain_min1_count == expected_idomain_min1_count
     assert actual_idomain_1_count == expected_idomain_1_count
 
 

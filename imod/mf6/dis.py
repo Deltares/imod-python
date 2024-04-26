@@ -94,7 +94,7 @@ class StructuredDiscretization(Package, IRegridPackage):
     _regrid_method = {
         "top": (RegridderType.OVERLAP, "mean"),
         "bottom": (RegridderType.OVERLAP, "mean"),
-        "idomain": (RegridderType.OVERLAP, "mode"),
+        "idomain": (RegridderType.OVERLAP, "sum"),
     }
 
     _skip_mask_arrays = ["bottom"]
@@ -192,10 +192,15 @@ class StructuredDiscretization(Package, IRegridPackage):
 
         """
         data = {
-            "idomain": imod5_data["bnd"]["ibound"].astype(np.int16),
+            "idomain": imod5_data["bnd"]["ibound"].astype(np.int32),
             "top": imod5_data["top"]["top"],
             "bottom": imod5_data["bot"]["bottom"],
         }
+        # TODO: Add validation
+        # It is possible that top and bottom grids are on different grids, then
+        # this doesn't work:
+        # assert np.all(imod5_data["top"]["top"][1:].data == imod5_data["bot"]["bottom"][:-1].data)
+
         target_grid = get_smallest_target_grid(*data.values())
 
         regridder_settings = cls._regrid_method
@@ -217,8 +222,14 @@ class StructuredDiscretization(Package, IRegridPackage):
 
         # Thickness <= 0 -> IDOMAIN = -1
         thickness = new_package_data["top"] - new_package_data["bottom"]
+        # TODO: Check create_idomain in disv_conversion.py. 
+        # Don't make cells at top or bottom vpt, these should be inactive.
+        active_and_zero_thickness = (thickness <= 0) & (
+            new_package_data["idomain"] == 1
+        )
+
         new_package_data["idomain"] = new_package_data["idomain"].where(
-            thickness > 0, -1
+            ~active_and_zero_thickness, -1
         )
 
         # TOP 3D -> TOP 2D
