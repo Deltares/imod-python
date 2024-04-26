@@ -620,11 +620,11 @@ def _time(time: Any) -> Any:
     return pd.to_datetime(time)
 
 
-def is_divisor(numerator: FloatArray, denominator: float) -> bool:
+def is_divisor(numerator: Union[float,FloatArray], denominator: float) -> bool:
     """
     Parameters
     ----------
-    numerator: np.array of floats
+    numerator: np.array of floats or float
     denominator: float
 
     Returns

@@ -9,7 +9,7 @@ values.
 import cftime
 import numba
 import numpy as np
-
+from typing import Any
 import imod
 
 
@@ -607,7 +607,7 @@ def max_overlap(values, weights):
     return v
 
 
-METHODS = {
+METHODS: dict[str, Any] = {
     "nearest": "nearest",
     "multilinear": "multilinear",
     "mean": mean,

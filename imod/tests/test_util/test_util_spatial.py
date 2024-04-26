@@ -92,6 +92,9 @@ def test_is_divisor():
     assert not imod.util.spatial.is_divisor(-a, b)
     assert not imod.util.spatial.is_divisor(a, -b)
     assert not imod.util.spatial.is_divisor(-a, -b)
+    a=3
+    b=1.5
+    assert imod.util.spatial.is_divisor(-a, -b)
 
 
 def test_empty():
