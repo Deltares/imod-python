@@ -119,6 +119,7 @@ files = [
     "imod/logging/**.py",
     "imod/prepare/**.py",  
     "imod/select/**.py",
+    "imod/typing/**.py",    
     "imod/util/**.py",          
 ]
 follow_imports = "silent"
