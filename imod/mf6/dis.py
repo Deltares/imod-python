@@ -199,11 +199,6 @@ class StructuredDiscretization(Package, IRegridPackage):
             "top": imod5_data["top"]["top"],
             "bottom": imod5_data["bot"]["bottom"],
         }
-        # TODO: Add validation
-        # It is possible that top and bottom grids are on different grids, then
-        # this doesn't work:
-        # assert np.all(imod5_data["top"]["top"][1:].data == imod5_data["bot"]["bottom"][:-1].data)
-        # assert np.isin(np.unique(imod5_data["bnd"]["ibound"]), [-1, 0, 1])
 
         target_grid = get_smallest_target_grid(*data.values())
 
