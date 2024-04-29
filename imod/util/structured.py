@@ -98,7 +98,7 @@ def replace(da: xr.DataArray, to_replace: Any, value: Any) -> xr.DataArray:
         out[replaceable] = value[indices[replaceable]]
         return out.reshape(a.shape)
 
-    if is_scalar(to_replace):
+    if isinstance(to_replace, int|float):
         if not is_scalar(value):
             raise TypeError("if to_replace is scalar, then value must be a scalar")
         if np.isnan(to_replace):
