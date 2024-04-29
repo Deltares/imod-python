@@ -39,9 +39,9 @@ def _groupdict(stem: str, pattern: Optional[str | Pattern]) -> Dict:
         if isinstance(pattern, Pattern):
             match = pattern.match(stem)
             if match is not None:
-                d=match.groupdict()
+                d = match.groupdict()
             else:
-                d={}
+                d = {}
         else:
             re_pattern = _custom_pattern_to_regex_pattern(pattern)
             # Use it to get the required variables

@@ -92,8 +92,8 @@ def test_is_divisor():
     assert not imod.util.spatial.is_divisor(-a, b)
     assert not imod.util.spatial.is_divisor(a, -b)
     assert not imod.util.spatial.is_divisor(-a, -b)
-    a=3
-    b=1.5
+    a = 3
+    b = 1.5
     assert imod.util.spatial.is_divisor(-a, -b)
 
 
@@ -109,10 +109,11 @@ def test_empty():
     assert np.allclose(da["y"], [11.5, 10.5])
 
     # array-like dx and dy
-    da_irregular = imod.util.spatial.empty_2d(np.array([1,2]), 0.0, 2.0,np.array([1,2]), 10.0, 12.0)
+    da_irregular = imod.util.spatial.empty_2d(
+        np.array([1, 2]), 0.0, 2.0, np.array([1, 2]), 10.0, 12.0
+    )
     assert np.allclose(da_irregular["x"], [0.5, 2.0])
     assert np.allclose(da_irregular["y"], [11.5, 10.0])
-
 
     with pytest.raises(ValueError, match="layer must be 1d"):
         imod.util.spatial.empty_3d(1.0, 0.0, 2.0, -1.0, 10.0, 12.0, [[1, 2]])

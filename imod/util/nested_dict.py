@@ -27,7 +27,9 @@ def initialize_nested_dict(depth: int) -> collections.defaultdict:
     if depth == 0 or depth == 1:
         return collections.defaultdict(dict)
     else:
-        d: functools.partial[collections.defaultdict]= functools.partial(collections.defaultdict, dict)
+        d: functools.partial[collections.defaultdict] = functools.partial(
+            collections.defaultdict, dict
+        )
         for _ in range(depth - 2):
             d = functools.partial(collections.defaultdict, d)
         return collections.defaultdict(d)

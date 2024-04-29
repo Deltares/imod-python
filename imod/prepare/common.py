@@ -6,10 +6,12 @@ xarray.DataArrays, as well as aggregation methods operating on weights and
 values.
 """
 
+from typing import Any
+
 import cftime
 import numba
 import numpy as np
-from typing import Any
+
 import imod
 
 

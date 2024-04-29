@@ -45,7 +45,7 @@ _RegridInfo = namedtuple(
         "dst_da_coords",
         "src_coords_regrid",
         "dst_coords_regrid",
-    ]
+    ],
 )
 
 

@@ -1,9 +1,10 @@
+from typing import Any
+
 import numba
 import numpy as np
 import xarray as xr
 
 from imod.prepare import common
-from typing import Any
 
 # Voxelize does not support conductance method, nearest, or linear
 METHODS: dict[str, Any] = common.METHODS.copy()

@@ -51,7 +51,7 @@ def _xycoords(bounds, cellsizes) -> Dict[str, Any]:
         coords["x"] = np.arange(xmin + dx / 2.0, xmax, dx)
         coords["y"] = np.arange(ymax + dy / 2.0, ymin, dy)
         coords["dx"] = np.array(float(dx))
-        coords["dy"] =  np.array(float(dy))
+        coords["dy"] = np.array(float(dy))
     else:  # nonequidistant
         # even though IDF may store them as float32, we always convert them to float64
         dx = dx.astype(np.float64)
@@ -620,7 +620,7 @@ def _time(time: Any) -> Any:
     return pd.to_datetime(time)
 
 
-def is_divisor(numerator: Union[float,FloatArray], denominator: float) -> bool:
+def is_divisor(numerator: Union[float, FloatArray], denominator: float) -> bool:
     """
     Parameters
     ----------
@@ -633,7 +633,7 @@ def is_divisor(numerator: Union[float,FloatArray], denominator: float) -> bool:
     """
     denominator = np.abs(denominator)
     remainder = np.abs(numerator) % denominator
-    return bool (np.all(np.isclose(remainder, 0.0) | np.isclose(remainder, denominator)))
+    return bool(np.all(np.isclose(remainder, 0.0) | np.isclose(remainder, denominator)))
 
 
 def _polygonize(da: xr.DataArray) -> "gpd.GeoDataFrame":
