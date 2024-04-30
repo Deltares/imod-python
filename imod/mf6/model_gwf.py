@@ -43,7 +43,7 @@ class GroundwaterFlowModel(Modflow6Model):
     under_relaxation: bool = False,
         indicates whether the groundwater head in a cell will be under-relaxed when
         water levels fall below the bottom of the model below any given cell. By
-        default, Newton-Raphson UNDER_RELAXATION is not applied.        
+        default, Newton-Raphson UNDER_RELAXATION is not applied.
     """
 
     _mandatory_packages = ("npf", "ic", "oc", "sto")
