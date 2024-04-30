@@ -230,7 +230,7 @@ def unstack_dim_into_variable(dataset: GridDataset, dim: str) -> GridDataset:
 
     for variable in variables_containing_dim:
         stacked = unstacked[variable]
-        unstacked = unstacked.drop_vars(variable)
+        unstacked = unstacked.drop_vars(variable)  # type: ignore
         for index in stacked[dim].values:
             unstacked[f"{variable}_{dim}_{index}"] = stacked.sel(
                 indexers={dim: index}, drop=True
@@ -337,7 +337,7 @@ def from_mdal_compliant_ugrid2d(dataset: xu.UgridDataset):
     # Next group by name, which will be the output dataset variable name.
     grouped = collections.defaultdict(list)
     for variable, match in matches:
-        name, layer = match.groups()
+        name, layer = match.groups()  # type: ignore
         da = ds[variable]
         grouped[name].append(da.assign_coords(layer=int(layer)))
 
