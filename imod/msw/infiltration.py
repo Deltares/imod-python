@@ -1,10 +1,14 @@
 import xarray as xr
 
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
+from imod.mf6.utilities.regrid import (
+    RegridderType,
+)
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 
 
-class Infiltration(MetaSwapPackage):
+class Infiltration(MetaSwapPackage, IRegridPackage):
     """
     This contains the infiltration data.
 
@@ -53,6 +57,21 @@ class Infiltration(MetaSwapPackage):
         "extra_storage_coefficient",
     )
     _to_fill = ()
+
+    _regrid_method = {
+        "infiltration_capacity": (RegridderType.OVERLAP, "mean"),
+        "downward_resistance": (RegridderType.OVERLAP, "mean"),
+        "upward_resistance": (
+            RegridderType.OVERLAP,
+            "mean",
+        ),
+        "longitudinal_vertical": (
+            RegridderType.OVERLAP,
+            "mean",
+        ),
+        "bottom_resistance": (RegridderType.OVERLAP, "mean"),
+        "extra_storage_coefficient": (RegridderType.OVERLAP, "mean"),
+    }
 
     def __init__(
         self,

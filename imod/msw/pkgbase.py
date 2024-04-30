@@ -1,12 +1,18 @@
 import abc
 from pathlib import Path
-from typing import Union
+from typing import Any, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
 import xarray as xr
 
+from imod.mf6.utilities.regrid import (
+    RegridderType,
+    RegridderWeightsCache,
+    _regrid_like,
+)
 from imod.msw.fixed_format import format_fixed_width
+from imod.typing.grid import GridDataArray, GridDataset
 
 
 class MetaSwapPackage(abc.ABC):
@@ -27,6 +33,14 @@ class MetaSwapPackage(abc.ABC):
 
     def __setitem__(self, key, value):
         self.dataset.__setitem__(key, value)
+
+    @property
+    def dataset(self) -> GridDataset:
+        return self._dataset
+
+    @dataset.setter
+    def dataset(self, value):
+        self._dataset = value
 
     def isel(self):
         raise NotImplementedError(
@@ -131,3 +145,49 @@ class MetaSwapPackage(abc.ABC):
                     f"Variable '{var}' in {self.__class__} should not "
                     "contain 'subunit' coordinate"
                 )
+
+    def _valid(self, value):
+        return True
+
+    def get_non_grid_data(self, grid_names: list[str]) -> dict[str, Any]:
+        """
+        This function copies the attributes of a dataset that are scalars, such as options.
+
+        parameters
+        ----------
+        grid_names: list of str
+            the names of the attribbutes of a dataset that are grids.
+        """
+        result = {}
+        all_non_grid_data = list(self.dataset.keys())
+        for name in (
+            gridname for gridname in grid_names if gridname in all_non_grid_data
+        ):
+            all_non_grid_data.remove(name)
+        for name in all_non_grid_data:
+            result[name] = self.dataset[name]
+        return result
+
+    @property
+    def auxiliary_data_fields(self) -> dict[str, str]:
+        return {}
+
+    def is_regridding_supported(self) -> bool:
+        return
+
+    def regrid_like(
+        self,
+        target_grid: GridDataArray,
+        regrid_context: RegridderWeightsCache,
+        regridder_types: Optional[dict[str, Tuple[RegridderType, str]]] = None,
+    ) -> "MetaSwapPackage":
+        try:
+            result = _regrid_like(self, target_grid, regrid_context, regridder_types)
+        except ValueError as e:
+            raise e
+        except Exception as e:
+            raise ValueError(f"package could not be regridded:{e}")
+        return result
+
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method
