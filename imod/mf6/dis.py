@@ -100,7 +100,7 @@ class StructuredDiscretization(Package, IRegridPackage):
         "bottom": (RegridderType.OVERLAP, "mean"),
         "idomain": (
             RegridderType.OVERLAP,
-            "sum",
+            "median",
         ),  # TODO: Change back to 'mode' when xugrid 0.9.1 released
     }
 
