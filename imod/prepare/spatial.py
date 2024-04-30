@@ -1031,7 +1031,7 @@ def zonal_aggregate_polygons(
     like: xr.DataArray,
     resolution: float,
     method: Union[str, Callable],
-    chunksize: int = 10_000
+    chunksize: int = 10_000,
 ) -> pd.DataFrame:
     """
     Compute a zonal aggregate of polygon data for (other) polygon geometries,
