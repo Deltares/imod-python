@@ -83,7 +83,7 @@ def to_datetime_internal(
         return np.datetime64(time, "ns")
 
 
-def timestep_duration(times: np.array, use_cftime: bool):
+def timestep_duration(times: np.ndarray, use_cftime: bool):
     """
     Generates dictionary containing stress period time discretization data.
 
@@ -108,7 +108,7 @@ def timestep_duration(times: np.array, use_cftime: bool):
     return np.array(timestep_duration)
 
 
-def forcing_starts_ends(package_times: np.array, globaltimes: np.array):
+def forcing_starts_ends(package_times: np.ndarray, globaltimes: np.ndarray):
     """
     Determines the stress period numbers for start and end for a forcing defined
     at a starting time, until the next starting time.
@@ -142,7 +142,7 @@ def forcing_starts_ends(package_times: np.array, globaltimes: np.array):
     return starts_ends
 
 
-def _convert_datetimes(times: np.array, use_cftime: bool):
+def _convert_datetimes(times: np.ndarray, use_cftime: bool):
     """
     Return times as np.datetime64[ns] or cftime.DatetimeProlepticGregorian
     depending on whether the dates fall within the inclusive bounds of
@@ -189,7 +189,7 @@ def _compose_timestring(
     types of available time objects.
     """
     if time == "steady-state":
-        return time
+        return str(time)  # the conversion to str is for mypy
     else:
         if isinstance(time, np.datetime64):
             # The following line is because numpy.datetime64[ns] does not

@@ -14,7 +14,7 @@ class InitialConditionsEquilibrium(MetaSwapPackage):
 
     _file_name = "init_svat.inp"
     _option = "Equilibrium"
-    _metadata_dict = {}
+    _metadata_dict: dict = {}
 
     def __init__(self):
         super().__init__()
@@ -67,7 +67,7 @@ class InitialConditionsPercolation(MetaSwapPackage):
 
     _file_name = "init_svat.inp"
     _option = "MeteoInputP"
-    _metadata_dict = {}
+    _metadata_dict: dict = {}
 
     def __init__(self):
         super().__init__()
@@ -92,7 +92,7 @@ class InitialConditionsSavedState(MetaSwapPackage):
 
     _file_name = "init_svat.inp"
     _option = "Saved_State"
-    _metadata_dict = {}
+    _metadata_dict: dict = {}
 
     def __init__(self, saved_state):
         super().__init__()
