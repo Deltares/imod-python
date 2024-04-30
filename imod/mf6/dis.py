@@ -7,7 +7,7 @@ import imod
 from imod.logging import init_log_decorator, standard_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
-from imod.mf6.utilities.grid import get_smallest_target_grid
+from imod.mf6.utilities.grid import create_smallest_target_grid
 from imod.mf6.utilities.imod5_converter import convert_ibound_to_idomain
 from imod.mf6.utilities.regrid import (
     RegridderType,
@@ -203,7 +203,7 @@ class StructuredDiscretization(Package, IRegridPackage):
             "bottom": imod5_data["bot"]["bottom"],
         }
 
-        target_grid = get_smallest_target_grid(*data.values())
+        target_grid = create_smallest_target_grid(*data.values())
 
         regridder_settings = cls._regrid_method
         if regridder_types is not None:
