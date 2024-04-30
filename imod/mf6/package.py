@@ -78,7 +78,8 @@ class Package(PackageBase, IPackage, abc.ABC):
             f"{__class__.__name__}(**{self._pkg_id}.dataset.sel(**selection))"
         )
 
-    def _valid(self, value):
+    @staticmethod
+    def _valid(value: Any) -> bool:
         return _is_valid(value)
 
     @staticmethod
