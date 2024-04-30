@@ -948,7 +948,7 @@ def zonal_aggregate_raster(
     raster: xr.DataArray,
     resolution: float,
     method: Union[str, Callable],
-    chunksize: int = int(1e4),
+    chunksize: int = 10_000,
 ) -> pd.DataFrame:
     """
     Compute a zonal aggregate of raster data for polygon geometries, e.g. a mean,
