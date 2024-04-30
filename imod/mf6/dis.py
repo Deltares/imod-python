@@ -1,4 +1,5 @@
 import pathlib
+from copy import deepcopy
 from typing import Optional, Tuple
 
 import numpy as np
@@ -205,7 +206,9 @@ class StructuredDiscretization(Package, IRegridPackage):
 
         target_grid = create_smallest_target_grid(*data.values())
 
-        regridder_settings = cls._regrid_method
+        # For some reason ``get_regrid_methods`` cannot be called in a
+        # classmethod.
+        regridder_settings = deepcopy(cls._regrid_method)
         if regridder_types is not None:
             regridder_settings.update(regridder_types)
 
