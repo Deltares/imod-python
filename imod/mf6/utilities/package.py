@@ -1,3 +1,5 @@
+from typing import Any
+
 import numpy as np
 import xarray as xr
 
@@ -27,7 +29,7 @@ def get_repeat_stress(times) -> xr.DataArray:
     )
 
 
-def _is_valid(value):
+def _is_valid(value: Any) -> bool:
     """
     Filters values that are None, False, or a numpy.bool_ False.
     Needs to be this specific, since 0.0 and 0 are valid values, but are
