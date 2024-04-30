@@ -2,7 +2,7 @@
 
 import itertools
 from collections import defaultdict
-from typing import Any, DefaultDict, Dict, List, Set, Tuple
+from typing import DefaultDict, List, Set, Tuple
 
 import dask
 import numpy as np
@@ -60,11 +60,11 @@ def check_dim_sizes(das: List[xr.DataArray]) -> None:
 
 
 def check_coords(das: List[xr.DataArray]):
-    def drop_xy(coords) -> Dict[str, Any]:
+    def drop_xy(coords) -> xr.Coordinates:
         coords = dict(coords)
         coords.pop("y")
         coords.pop("x")
-        return xr.Coordinates(coords)  # type: ignore
+        return xr.Coordinates(coords)
 
     first_coords = drop_xy(das[0].coords)
     disjoint = [
