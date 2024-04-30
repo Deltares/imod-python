@@ -1,9 +1,12 @@
 import numpy as np
+import xarray as xr
 
-from imod.typing.grid import GridDataArray, full_like
+from imod.typing.grid import full_like
 
 
-def convert_ibound_to_idomain(ibound: GridDataArray, thickness: GridDataArray):
+def convert_ibound_to_idomain(
+    ibound: xr.DataArray, thickness: xr.DataArray
+) -> xr.DataArray:
     # Convert IBOUND to IDOMAIN
     # -1 to 1, these will have to be filled with
     # CHD cells.
