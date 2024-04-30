@@ -17,7 +17,7 @@ xugrid will compute a regridded array based on
 -a regridding method
 
 More information on the available regridding methods can be found in the xugrid documentation
-TODO: Add link to xugrid documentation page
+https://deltares.github.io/xugrid/user_guide.html
 
 The regridding method that should be used depends on the property being
 regridded. For example a thermodynamically intensive property (whose value do
@@ -29,7 +29,12 @@ to reflect that. Finally regridding methods for conductivity-like properties
 follow the rules for parallel or serial resistors- at least when the tensor rotation angles
 are constant or comparable in the involved gridblocks.
 
-Note that the different regridding methods may have a different output domain when regridding. 
+Note that the different regridding methods may have a different output domain
+when regridding: if the original array has no-data values in some cells, then
+the output array may have no-data values as well, and where these end up depends
+on the chosen regridding method. Also note that regridding is only possible in
+the xy-plane, and not across the layer dimension. THe output array will have the
+same number of layers as the input array. 
 
 
 
@@ -42,7 +47,7 @@ that all cells that are inactictive or VPT in idomain are excluded from the
 package as well. An example is the npf package: cells that are inactive or VPT
 in idomain, should not have conductivity data in the npf package. Therefore at
 the end of the regridding process, a final step consists in enforcing
-consistency between those idomain and all the packages. This is a 2-step
+consistency between those of idomain and all the packages. This is a 2-step
 process:
 
 1) for cells that do not have inputs in crucial packages like npf or storage, idomain will be set to inactive.
@@ -109,7 +114,7 @@ regridded_simulation["GWF_1]["leak"] = regridded_leakage
 
 
 Regridding boundary conditions
- ============================== 
+============================== 
 Special care must be taken when regridding boundary conditions, and it is
 recommended that users verify the balance output of a regridded simulation and
 compare it to the original model. If the regridded simulation is a good
@@ -130,19 +135,13 @@ following rules:
   without recharge then the averaging will take the zero-recharge cells into
   account and the regridded recharge will be the same as the source recharge.
 
-
-
-If we have a recharge package containing only those cells
-that receive recharge and we regrid it with default methods, then cells in the target grid will get a
-different amount of recharge
-
-"""
-
-"""
 We created this code snippet to print all default methods
 """
 
-# From imod.mf6 import ALL_PACKAGES
-# for pkg in ALL_PACKAGES:
-#    print(pkg._regrid_methods)
+from imod.tests.fixtures.package_instance_creation import ALL_PACKAGE_INSTANCES
+for pkg in ALL_PACKAGE_INSTANCES:
+   if hasattr(pkg, "_regrid_method"):
+      regrid_methods = pkg._regrid_method
+      for arrayname in regrid_methods.keys():
+         print( arrayname)
 
