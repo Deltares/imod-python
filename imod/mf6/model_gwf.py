@@ -24,7 +24,7 @@ class GroundwaterFlowModel(Modflow6Model):
     listing_file: Optional[str] = None
         name of the listing file to create for this GWF model. If not specified,
         then the name of the list file will be the basename of the GWF model
-        name file and the ‘.lst’ extension.
+        name file and the 'lst' extension.
     print_input: bool = False
         keyword to indicate that the list of all model stress package
         information will be written to the listing file immediately after it is
@@ -32,10 +32,10 @@ class GroundwaterFlowModel(Modflow6Model):
     print_flows: bool = False
         keyword to indicate that the list of all model package flow rates will
         be printed to the listing file for every stress period time step in
-        which “BUDGET PRINT” is specified in Output Control.
+        which "BUDGET PRINT" is specified in Output Control.
     save_flows: bool = False
         indicate that all model package flow terms will be written to the file
-        specified with “BUDGET FILEOUT” in Output Control.
+        specified with "BUDGET FILEOUT" in Output Control.
     newton: bool = False
         activates the Newton-Raphson formulation for groundwater flow between
         connected, convertible groundwater cells and stress packages that
@@ -43,7 +43,7 @@ class GroundwaterFlowModel(Modflow6Model):
     under_relaxation: bool = False,
         indicates whether the groundwater head in a cell will be under-relaxed when
         water levels fall below the bottom of the model below any given cell. By
-        default, Newton-Raphson UNDER_RELAXATION is not applied.
+        default, Newton-Raphson UNDER_RELAXATION is not applied.        
     """
 
     _mandatory_packages = ("npf", "ic", "oc", "sto")
