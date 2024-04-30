@@ -189,7 +189,7 @@ def _compose_timestring(
     types of available time objects.
     """
     if time == "steady-state":
-        return str(time)
+        return str(time)  # the conversion to str is for mypy
     else:
         if isinstance(time, np.datetime64):
             # The following line is because numpy.datetime64[ns] does not
