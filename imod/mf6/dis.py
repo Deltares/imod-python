@@ -97,7 +97,10 @@ class StructuredDiscretization(Package, IRegridPackage):
     _regrid_method = {
         "top": (RegridderType.OVERLAP, "mean"),
         "bottom": (RegridderType.OVERLAP, "mean"),
-        "idomain": (RegridderType.OVERLAP, "sum"),
+        "idomain": (
+            RegridderType.OVERLAP,
+            "sum",
+        ),  # TODO: Change back to 'mode' when xugrid 0.9.1 released
     }
 
     _skip_mask_arrays = ["bottom"]
@@ -206,8 +209,6 @@ class StructuredDiscretization(Package, IRegridPackage):
         if regridder_types is not None:
             regridder_settings.update(regridder_types)
 
-        # TODO: are grid arguments really used in RegridderWeightsCache after
-        #   initialization? Don't really seem to be...
         regrid_context = RegridderWeightsCache(data["idomain"], target_grid)
 
         new_package_data = _regrid_package_data(
