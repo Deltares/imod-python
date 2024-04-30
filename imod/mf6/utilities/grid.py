@@ -82,10 +82,10 @@ def create_geometric_grid_info(active: xr.DataArray) -> pd.DataFrame:
     )
 
 
-def get_smallest_target_grid(*grids: GridDataArray) -> GridDataArray:
+def create_smallest_target_grid(*grids: xr.DataArray) -> xr.DataArray:
     """
-    Return smallest target grid from multiple grids. The grid with smallest
-    extent and finest grid.
+    Create smallest target grid from multiple structured grids. This is the grid
+    with smallest extent and finest resolution amongst all provided grids.
     """
     dx_ls, xmin_ls, xmax_ls, dy_ls, ymin_ls, ymax_ls = zip(
         *[imod.util.spatial.spatial_reference(grid) for grid in grids]
