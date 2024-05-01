@@ -574,7 +574,8 @@ def _celltable(
         Example DataArray of where the cells will be located. Used only for the
         coordinates.
     dtype: numpy.dtype
-        Datatype of raster
+        datatype of data referred to with "column", defaults to 32-bit integer.
+
     Returns
     -------
     cell_table : pandas.DataFrame
@@ -726,7 +727,7 @@ def celltable(
         Example DataArray of where the cells will be located. Used only for the
         coordinates.
     dtype: DtypeLike, optional
-        Data type, defaults to 32-bit integer.
+        datatype of data referred to with "column", defaults to 32-bit integer.
     chunksize : int, optional
         The size of the chunksize. Used for both x and y dimension.
 
