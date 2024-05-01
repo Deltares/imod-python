@@ -6,6 +6,8 @@ xarray.DataArrays, as well as aggregation methods operating on weights and
 values.
 """
 
+from typing import Any
+
 import cftime
 import numba
 import numpy as np
@@ -607,7 +609,7 @@ def max_overlap(values, weights):
     return v
 
 
-METHODS = {
+METHODS: dict[str, Any] = {
     "nearest": "nearest",
     "multilinear": "multilinear",
     "mean": mean,

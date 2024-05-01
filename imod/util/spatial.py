@@ -45,13 +45,13 @@ def _xycoords(bounds, cellsizes) -> Dict[str, Any]:
     # unpack tuples
     xmin, xmax, ymin, ymax = bounds
     dx, dy = cellsizes
-    coords = collections.OrderedDict()
+    coords: collections.OrderedDict[str, Any] = collections.OrderedDict()
     # from cell size to x and y coordinates
-    if isinstance(dx, (int, float)):  # equidistant
+    if isinstance(dx, (int, float, np.int_)):  # equidistant
         coords["x"] = np.arange(xmin + dx / 2.0, xmax, dx)
         coords["y"] = np.arange(ymax + dy / 2.0, ymin, dy)
-        coords["dx"] = float(dx)
-        coords["dy"] = float(dy)
+        coords["dx"] = np.array(float(dx))
+        coords["dy"] = np.array(float(dy))
     else:  # nonequidistant
         # even though IDF may store them as float32, we always convert them to float64
         dx = dx.astype(np.float64)
@@ -59,8 +59,8 @@ def _xycoords(bounds, cellsizes) -> Dict[str, Any]:
         coords["x"] = xmin + np.cumsum(dx) - 0.5 * dx
         coords["y"] = ymax + np.cumsum(dy) - 0.5 * dy
         if np.allclose(dx, dx[0]) and np.allclose(dy, dy[0]):
-            coords["dx"] = float(dx[0])
-            coords["dy"] = float(dy[0])
+            coords["dx"] = np.array(float(dx[0]))
+            coords["dy"] = np.array(float(dy[0]))
         else:
             coords["dx"] = ("x", dx)
             coords["dy"] = ("y", dy)
@@ -230,7 +230,7 @@ def unstack_dim_into_variable(dataset: GridDataset, dim: str) -> GridDataset:
 
     for variable in variables_containing_dim:
         stacked = unstacked[variable]
-        unstacked = unstacked.drop_vars(variable)
+        unstacked = unstacked.drop_vars(variable)  # type: ignore
         for index in stacked[dim].values:
             unstacked[f"{variable}_{dim}_{index}"] = stacked.sel(
                 indexers={dim: index}, drop=True
@@ -337,7 +337,7 @@ def from_mdal_compliant_ugrid2d(dataset: xu.UgridDataset):
     # Next group by name, which will be the output dataset variable name.
     grouped = collections.defaultdict(list)
     for variable, match in matches:
-        name, layer = match.groups()
+        name, layer = match.groups()  # type: ignore
         da = ds[variable]
         grouped[name].append(da.assign_coords(layer=int(layer)))
 
@@ -437,7 +437,7 @@ def empty_2d(
         Filled with NaN.
     """
     bounds = (xmin, xmax, ymin, ymax)
-    cellsizes = (abs(dx), -abs(dy))
+    cellsizes = (np.abs(dx), -np.abs(dy))
     coords = _xycoords(bounds, cellsizes)
     nrow = coords["y"].size
     ncol = coords["x"].size
@@ -484,7 +484,7 @@ def empty_3d(
         Filled with NaN.
     """
     bounds = (xmin, xmax, ymin, ymax)
-    cellsizes = (abs(dx), -abs(dy))
+    cellsizes = (np.abs(dx), -np.abs(dy))
     coords = _xycoords(bounds, cellsizes)
     nrow = coords["y"].size
     ncol = coords["x"].size
@@ -537,7 +537,7 @@ def empty_2d_transient(
         Filled with NaN.
     """
     bounds = (xmin, xmax, ymin, ymax)
-    cellsizes = (abs(dx), -abs(dy))
+    cellsizes = (np.abs(dx), -np.abs(dy))
     coords = _xycoords(bounds, cellsizes)
     nrow = coords["y"].size
     ncol = coords["x"].size
@@ -591,7 +591,7 @@ def empty_3d_transient(
         Filled with NaN.
     """
     bounds = (xmin, xmax, ymin, ymax)
-    cellsizes = (abs(dx), -abs(dy))
+    cellsizes = (np.abs(dx), -np.abs(dy))
     coords = _xycoords(bounds, cellsizes)
     nrow = coords["y"].size
     ncol = coords["x"].size
@@ -620,20 +620,20 @@ def _time(time: Any) -> Any:
     return pd.to_datetime(time)
 
 
-def is_divisor(numerator: FloatArray, denominator: float) -> bool:
+def is_divisor(numerator: Union[float, FloatArray], denominator: float) -> bool:
     """
     Parameters
     ----------
-    numerator: np.array of floats
+    numerator: np.array of floats or float
     denominator: float
 
     Returns
     -------
     is_divisor: bool
     """
-    denominator = abs(denominator)
+    denominator = np.abs(denominator)
     remainder = np.abs(numerator) % denominator
-    return (np.isclose(remainder, 0.0) | np.isclose(remainder, denominator)).all()
+    return bool(np.all(np.isclose(remainder, 0.0) | np.isclose(remainder, denominator)))
 
 
 def _polygonize(da: xr.DataArray) -> "gpd.GeoDataFrame":

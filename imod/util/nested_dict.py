@@ -24,12 +24,12 @@ def initialize_nested_dict(depth: int) -> collections.defaultdict:
     # c = partial(defaultdict, b)
     # d = defaultdict(c)
     # This can obviously be done iteratively.
-    if depth == 0:
-        return {}
-    elif depth == 1:
+    if depth == 0 or depth == 1:
         return collections.defaultdict(dict)
     else:
-        d = functools.partial(collections.defaultdict, dict)
+        d: functools.partial[collections.defaultdict] = functools.partial(
+            collections.defaultdict, dict
+        )
         for _ in range(depth - 2):
             d = functools.partial(collections.defaultdict, d)
         return collections.defaultdict(d)
@@ -89,7 +89,7 @@ def append_nested_dict(dict1: Dict, dict2: Dict) -> None:
             dict1[key] = val
 
 
-def sorted_nested_dict(d: Dict) -> Dict:
+def sorted_nested_dict(d: Dict) -> list:
     """
     Sorts a variably nested dict (of dicts) by keys.
 
