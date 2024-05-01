@@ -542,7 +542,7 @@ def _cell_count(src, values, frequencies, nodata, *inds_weights):
     return row_i_arr, col_i_arr, value_arr, count_arr
 
 
-def _celltable(path, column, resolution, like, rowstart=0, colstart=0):
+def _celltable(path, column, resolution, like, dtype, rowstart=0, colstart=0):
     """
     Returns a table of cell indices (row, column) with feature ID, and feature
     area within cell. Essentially returns a COO sparse matrix, but with
@@ -564,7 +564,8 @@ def _celltable(path, column, resolution, like, rowstart=0, colstart=0):
     like : xarray.DataArray
         Example DataArray of where the cells will be located. Used only for the
         coordinates.
-
+    dtype: numpy.dtype
+        Datatype of raster
     Returns
     -------
     cell_table : pandas.DataFrame
@@ -578,7 +579,7 @@ def _celltable(path, column, resolution, like, rowstart=0, colstart=0):
     spatial_reference = {"bounds": (xmin, xmax, ymin, ymax), "cellsizes": (dx, dy)}
 
     rasterized = gdal_rasterize(
-        path, column, nodata=nodata, dtype=np.int32, spatial_reference=spatial_reference
+        path, column, nodata=nodata, dtype=dtype, spatial_reference=spatial_reference
     )
 
     # Make sure the coordinates are increasing.
@@ -666,7 +667,7 @@ def _create_chunks(like, resolution, chunksize):
     return chunks, rowstarts, colstarts
 
 
-def celltable(path, column, resolution, like, chunksize=1e4):
+def celltable(path, column, resolution, like, dtype=np.int32, chunksize=1e4):
     r"""
     Process area of features by rasterizing in a chunkwise manner to limit
     memory usage.
@@ -777,7 +778,7 @@ def celltable(path, column, resolution, like, chunksize=1e4):
 
     like_chunks, rowstarts, colstarts = _create_chunks(like, resolution, chunksize)
     collection = [
-        dask.delayed(_celltable)(path, column, resolution, chunk, rowstart, colstart)
+        dask.delayed(_celltable)(path, column, resolution, chunk, dtype, rowstart, colstart)
         for chunk, rowstart, colstart in zip(like_chunks, rowstarts, colstarts)
     ]
     result = dask.compute(collection)[0]
