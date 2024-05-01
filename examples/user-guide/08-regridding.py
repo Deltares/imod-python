@@ -1,3 +1,36 @@
+
+
+from imod.tests.fixtures.package_instance_creation import ALL_PACKAGE_INSTANCES
+from pandas import DataFrame
+from examples.mf6.example_models import create_twri_simulation
+from imod.mf6.utilities.regrid import RegridderType, RegridderWeightsCache
+import numpy as np
+import xarray as xr
+
+
+def get_target_grid():
+   # this is a helper function we'll use later on.
+   # it creates a grid. 
+   nlay = 3
+   nrow = 21
+   ncol = 12
+   shape = (nlay, nrow, ncol)
+
+   dx = 6251
+   dy = -3572
+   xmin = 0.0
+   xmax = dx * ncol
+   ymin = 0.0
+   ymax = abs(dy) * nrow
+   dims = ("layer", "y", "x")
+
+   layer = np.array([1, 2, 3])
+   y = np.arange(ymax, ymin, dy) + 0.5 * dy
+   x = np.arange(xmin, xmax, dx) + 0.5 * dx
+   coords = {"layer": layer, "y": y, "x": x, "dx": dx, "dy": dy}
+   return  xr.DataArray(np.ones(shape, dtype=int), coords=coords, dims=dims)
+
+
 """
 Regridding
 ==========
@@ -80,40 +113,63 @@ The regrid_like function is available on packages, models and simulations.
 When the default methods are acceptable, regridding the whole simulation is the most convenient 
 from a user-perspective. 
 
+
 Regridding using non-default methods
 ====================================
-When non-default methods are used for one or more packages,  these should be regridded separately.
-In that case, the most convenient approach is likely:
--pop the packages that should use non-default methods from the source simulation 
-(except if it are packages that are required for the simulation to be regridded)
+
+When non-default methods are used for one or more packages, these should be
+regridded separately. In that case, the most convenient approach is likely:
+-pop the packages that should use non-default methods from the source simulation (the
+ popping is optional, and is only recommended for packages whose presence is not
+ mandatory for validation.) 
 -regrid the source simulation: this takes care of all the packages that should use default methods. 
--regrid the package(s) where you want to use non-standard rergridding methods indivudually
-starting from the packages in the source simulation
--insert the custom-regridded packages to the regridded simulation
+-regrid the package(s) where you want to use non-standard rergridding methods indivudually starting from the
+ packages in the source simulation 
+-insert the custom-regridded packages to the
+ regridded simulation (or replace the package regridded with default methods with
+ the one you just regridded with non-default methods if it was not popped) 
 
-in code, consider an example where we want to regrid the leakage package using non default methods:
+In code, consider an example where we want to regrid the recharge package using non default methods:
 then we would do the following:
+"""
+original_simulation = create_twri_simulation()
+target_grid = get_target_grid()
 
-# remove the leakage package from the model, and obtain it as a variable
-original_leakage_package = original_simulation["GWF_1"].pop("leakage") 
+# remove the recharge package from the model, and obtain it as a variable
+original_recharge_package = original_simulation["GWF_1"].pop("rch") 
 
 # regrid the simulation(without leakage)
-regridded_simulation = original_simulation.regrid_like("regridded!", new_grid)
+regridded_simulation = original_simulation.regrid_like("regridded!", target_grid)
 
-# regrid the leakage package
-regridder_types = {"k": (RegridderType.CENTROIDLOCATOR, None)}
-old_grid = original_leakage_package ["head"]  # just take any array of the package to use as the old grid
-regrid_context = RegridderWeightsCache(original_leakage_package["k"], new_grid)
-regridded_leakage = original_leakage_package.regrid_like(new_grid)
-    new_grid,
+# set up the input needed for custom regridding including the method and the old grid. 
+regridder_types = {"rate": (RegridderType.CENTROIDLOCATOR, None)}
+old_grid = original_recharge_package ["rate"]  # just take any array of the package to use as the old grid
+
+# create a regridder weight-cache. This object can (and should) be reused for all the packages
+# that undergo custom regridding at this stage. 
+regrid_context = RegridderWeightsCache(original_recharge_package["rate"], target_grid)
+
+# regrid the recharge package
+regridded_recharge = original_recharge_package.regrid_like(target_grid,
     regrid_context=regrid_context,
     regridder_types=regridder_types,
 )
 
-# add the leakage package to the regridded simulation
-regridded_simulation["GWF_1]["leak"] = regridded_leakage
+# add the recharge package to the regridded simulation
+regridded_simulation["GWF_1"]["rch"] = regridded_recharge
 
 
+"""
+
+A note on regridding conductivity
+================================= 
+In the npf package, it is possible to use 1 array (K), 2(K and K22) or 3 (K,
+K22, K33) for definining the conductivity tensor. If 1 array is given the tensor
+is called isotropic. Defining only K gives the same behavior as specifying K,
+K22 and K33 with the same value. When regridding, K33 has a default method
+different from that of K and K22, but it can only be applied if K33 exists in
+the source model in the first place. So it is recommended to introduce K33 as a
+separate array in the source model even if it is isotropic.
 
 Regridding boundary conditions
 ============================== 
@@ -122,7 +178,7 @@ recommended that users verify the balance output of a regridded simulation and
 compare it to the original model. If the regridded simulation is a good
 representation of the original simulation, the mass contributions on the balance
 by the different boundary conditions should be comparable in both simulations.
-To achieve this, it may be nevessary to tweak the input or the regridding
+To achieve this, it may be necessary to tweak the input or the regridding
 methods. An example of this is upscaling recharge (so the target grid has
 coarser cells than the source grid). Its default method is averaging, with the
 following rules:
@@ -137,11 +193,9 @@ following rules:
   without recharge then the averaging will take the zero-recharge cells into
   account and the regridded recharge will be the same as the source recharge.
 
-We created this code snippet to print all default methods
+This  code snippet prints all default methods:
 """
 
-from imod.tests.fixtures.package_instance_creation import ALL_PACKAGE_INSTANCES
-from pandas import DataFrame
 
 regrid_method_setup = {'package name': [], 'array name ': [] , "method name": [], "function name": []}
 regrid_method_table = DataFrame(regrid_method_setup)
