@@ -170,6 +170,9 @@ K22 and K33 with the same value. When regridding, K33 has a default method
 different from that of K and K22, but it can only be applied if K33 exists in
 the source model in the first place. So it is recommended to introduce K33 as a
 separate array in the source model even if it is isotropic.
+Also note that default regridding methods were chosen assuming that K and K22 
+are roughly horizontal and K33 roughly vertical. But this may not be the case
+if the input arrays angle2 and angle3 have large values. 
 
 Regridding boundary conditions
 ============================== 
