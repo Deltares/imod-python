@@ -32,7 +32,7 @@ Fixed
   error message stating a well is outside of the domain.
 - When importing data from a .prj file, the multipliers and additions specified for
   ipf and idf files are now applied
-- Compute correct indices for svat - meteogrid mapping, in imod.msw.MeteoMapping
+- Fix bug where y-coords were flipped in :class:`imod.msw.MeteoMapping`
   
 [0.16.0] - 2024-03-29
 ---------------------
