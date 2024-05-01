@@ -1,34 +1,33 @@
-
-
-from imod.tests.fixtures.package_instance_creation import ALL_PACKAGE_INSTANCES
-from pandas import DataFrame
-from examples.mf6.example_models import create_twri_simulation
-from imod.mf6.utilities.regrid import RegridderType, RegridderWeightsCache
 import numpy as np
 import xarray as xr
+from pandas import DataFrame
+
+from examples.mf6.example_models import create_twri_simulation
+from imod.mf6.utilities.regrid import RegridderType, RegridderWeightsCache
+from imod.tests.fixtures.package_instance_creation import ALL_PACKAGE_INSTANCES
 
 
 def get_target_grid():
-   # this is a helper function we'll use later on.
-   # it creates a grid. 
-   nlay = 3
-   nrow = 21
-   ncol = 12
-   shape = (nlay, nrow, ncol)
+    # this is a helper function we'll use later on.
+    # it creates a grid.
+    nlay = 3
+    nrow = 21
+    ncol = 12
+    shape = (nlay, nrow, ncol)
 
-   dx = 6251
-   dy = -3572
-   xmin = 0.0
-   xmax = dx * ncol
-   ymin = 0.0
-   ymax = abs(dy) * nrow
-   dims = ("layer", "y", "x")
+    dx = 6251
+    dy = -3572
+    xmin = 0.0
+    xmax = dx * ncol
+    ymin = 0.0
+    ymax = abs(dy) * nrow
+    dims = ("layer", "y", "x")
 
-   layer = np.array([1, 2, 3])
-   y = np.arange(ymax, ymin, dy) + 0.5 * dy
-   x = np.arange(xmin, xmax, dx) + 0.5 * dx
-   coords = {"layer": layer, "y": y, "x": x, "dx": dx, "dy": dy}
-   return  xr.DataArray(np.ones(shape, dtype=int), coords=coords, dims=dims)
+    layer = np.array([1, 2, 3])
+    y = np.arange(ymax, ymin, dy) + 0.5 * dy
+    x = np.arange(xmin, xmax, dx) + 0.5 * dx
+    coords = {"layer": layer, "y": y, "x": x, "dx": dx, "dy": dy}
+    return xr.DataArray(np.ones(shape, dtype=int), coords=coords, dims=dims)
 
 
 """
@@ -136,21 +135,24 @@ original_simulation = create_twri_simulation()
 target_grid = get_target_grid()
 
 # remove the recharge package from the model, and obtain it as a variable
-original_recharge_package = original_simulation["GWF_1"].pop("rch") 
+original_recharge_package = original_simulation["GWF_1"].pop("rch")
 
-# regrid the simulation(without leakage)
+# regrid the simulation (without recharge)
 regridded_simulation = original_simulation.regrid_like("regridded!", target_grid)
 
-# set up the input needed for custom regridding including the method and the old grid. 
+# set up the input needed for custom regridding including the method and the old grid.
 regridder_types = {"rate": (RegridderType.CENTROIDLOCATOR, None)}
-old_grid = original_recharge_package ["rate"]  # just take any array of the package to use as the old grid
+old_grid = original_recharge_package[
+    "rate"
+]  # just take any array of the package to use as the old grid
 
 # create a regridder weight-cache. This object can (and should) be reused for all the packages
-# that undergo custom regridding at this stage. 
+# that undergo custom regridding at this stage.
 regrid_context = RegridderWeightsCache(original_recharge_package["rate"], target_grid)
 
 # regrid the recharge package
-regridded_recharge = original_recharge_package.regrid_like(target_grid,
+regridded_recharge = original_recharge_package.regrid_like(
+    target_grid,
     regrid_context=regrid_context,
     regridder_types=regridder_types,
 )
@@ -172,7 +174,7 @@ the source model in the first place. So it is recommended to introduce K33 as a
 separate array in the source model even if it is isotropic.
 Also note that default regridding methods were chosen assuming that K and K22 
 are roughly horizontal and K33 roughly vertical. But this may not be the case
-if the input arrays angle2 and angle3 have large values. 
+if the input arrays angle2 and/or angle3 have large values. 
 
 Regridding boundary conditions
 ============================== 
@@ -200,20 +202,29 @@ This  code snippet prints all default methods:
 """
 
 
-regrid_method_setup = {'package name': [], 'array name ': [] , "method name": [], "function name": []}
+regrid_method_setup = {
+    "package name": [],
+    "array name ": [],
+    "method name": [],
+    "function name": [],
+}
 regrid_method_table = DataFrame(regrid_method_setup)
 
 counter = 0
 for pkg in ALL_PACKAGE_INSTANCES:
-   if hasattr(pkg, "_regrid_method"):
-      package_name = type(pkg).__name__
-      regrid_methods = pkg._regrid_method
-      for array_name in regrid_methods.keys():
-         method_name = regrid_methods[array_name][0].name
-         function_name = ""
-         if len( regrid_methods[array_name]) > 0:
-            function_name = regrid_methods[array_name][1]
-         regrid_method_table.loc[counter] = (package_name,array_name,method_name, function_name)
-         counter = counter + 1 
+    if hasattr(pkg, "_regrid_method"):
+        package_name = type(pkg).__name__
+        regrid_methods = pkg._regrid_method
+        for array_name in regrid_methods.keys():
+            method_name = regrid_methods[array_name][0].name
+            function_name = ""
+            if len(regrid_methods[array_name]) > 0:
+                function_name = regrid_methods[array_name][1]
+            regrid_method_table.loc[counter] = (
+                package_name,
+                array_name,
+                method_name,
+                function_name,
+            )
+            counter = counter + 1
 print(regrid_method_table.to_string())
-
