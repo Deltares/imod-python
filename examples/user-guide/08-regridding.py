@@ -198,6 +198,25 @@ following rules:
   without recharge then the averaging will take the zero-recharge cells into
   account and the regridded recharge will be the same as the source recharge.
 
+  
+A note on regridding transport
+============================== 
+Transport simulations can be unstable if constraints related to the grid Peclet
+number and the courant number are exceeded. This can easily happen when
+regridding. It may be necessary to reduce the simulation's time step size
+especially when downscaling, to prevent numerical issues. Increasing
+dispersivities or the molecular diffusion constant can also help to stabilize
+the simulation. Inversely, when upscaling, a larger time step size can be acceptable.
+
+  
+Unsupported packages
+====================
+Some packages cannot be regridded. This includes the Lake package and the UZF
+package. Such packages should be removed from the simulation before regridding,
+and then new packages should be created by the user and then added to the
+regridded simulation. 
+
+
 This  code snippet prints all default methods:
 """
 
