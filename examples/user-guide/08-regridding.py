@@ -33,7 +33,7 @@ Note that the different regridding methods may have a different output domain
 when regridding: if the original array has no-data values in some cells, then
 the output array may have no-data values as well, and where these end up depends
 on the chosen regridding method. Also note that regridding is only possible in
-the xy-plane, and not across the layer dimension. THe output array will have the
+the xy-plane, and not across the layer dimension. The output array will have the
 same number of layers as the input array. 
 
 
@@ -50,8 +50,10 @@ the end of the regridding process, a final step consists in enforcing
 consistency between those of idomain and all the packages. This is a 2-step
 process:
 
-1) for cells that do not have inputs in crucial packages like npf or storage, idomain will be set to inactive.
-2) for cells that are marked as inactive or VPT in idomain, all package inputs will be removed from all the packages
+1) for cells that do not have inputs in crucial packages like npf or storage,
+   idomain will be set to inactive.
+2) for cells that are marked as inactive or VPT in idomain, all package inputs
+   will be removed from all the packages
  
 This synchronization step between idomain and the packages is automated, and it
 is carried out when calling regrid_like on the simulation object or the model
@@ -139,9 +141,22 @@ We created this code snippet to print all default methods
 """
 
 from imod.tests.fixtures.package_instance_creation import ALL_PACKAGE_INSTANCES
+from pandas import DataFrame
+
+regrid_method_setup = {'package name': [], 'array name ': [] , "method name": [], "function name": []}
+regrid_method_table = DataFrame(regrid_method_setup)
+
+counter = 0
 for pkg in ALL_PACKAGE_INSTANCES:
    if hasattr(pkg, "_regrid_method"):
+      package_name = type(pkg).__name__
       regrid_methods = pkg._regrid_method
-      for arrayname in regrid_methods.keys():
-         print( arrayname)
+      for array_name in regrid_methods.keys():
+         method_name = regrid_methods[array_name][0].name
+         function_name = ""
+         if len( regrid_methods[array_name]) > 0:
+            function_name = regrid_methods[array_name][1]
+         regrid_method_table.loc[counter] = (package_name,array_name,method_name, function_name)
+         counter = counter + 1 
+print(regrid_method_table.to_string())
 
