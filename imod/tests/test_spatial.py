@@ -16,6 +16,7 @@ from imod.testing import assert_frame_equal
 def geom():
     return sg.Polygon([(0.0, 0.0), (1.1, 0.0), (1.1, 1.1), (0.0, 1.1)])
 
+
 class ShapefileCases:
     def case_integer(self, tmp_path_factory, geom):
         tmp_dir = tmp_path_factory.mktemp("testvector")
@@ -24,7 +25,7 @@ class ShapefileCases:
         value = 2
         gdf["values"] = value
         gdf.to_file(tmp_dir / "shape_int.shp")
-        return tmp_dir / "shape_int.shp", value   
+        return tmp_dir / "shape_int.shp", value
 
     def case_float(self, tmp_path_factory, geom):
         tmp_dir = tmp_path_factory.mktemp("testvector")
@@ -148,7 +149,7 @@ def test_handle_dtype():
         imod.prepare.spatial._handle_dtype(np.int64, -1)
 
 
-@parametrize_with_cases("shapefile, expected_value", cases = ShapefileCases)
+@parametrize_with_cases("shapefile, expected_value", cases=ShapefileCases)
 def test_gdal_rasterize(shapefile, expected_value):
     coords = {"y": [1.5, 0.5], "x": [0.5, 1.5]}
     dims = ("y", "x")
@@ -202,7 +203,7 @@ def test_gdal_rasterize(shapefile, expected_value):
     assert actual.identical(expected)
 
 
-@parametrize_with_cases("shapefile, expected_value", cases = ShapefileCases)
+@parametrize_with_cases("shapefile, expected_value", cases=ShapefileCases)
 def test_private_celltable(shapefile, expected_value):
     coords = {"y": [1.5, 0.5], "x": [0.5, 1.5]}
     dims = ("y", "x")
@@ -218,7 +219,7 @@ def test_private_celltable(shapefile, expected_value):
     assert_frame_equal(actual, expected, check_dtype=True)
 
 
-@parametrize_with_cases("shapefile, expected_value", cases = ShapefileCases)
+@parametrize_with_cases("shapefile, expected_value", cases=ShapefileCases)
 def test_celltable(shapefile, expected_value):
     coords = {"y": [1.5, 0.5], "x": [0.5, 1.5]}
     dims = ("y", "x")
