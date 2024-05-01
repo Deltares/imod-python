@@ -215,7 +215,9 @@ def test_private_celltable(shapefile, expected_value):
     expected["values"] = [expected_value]
     expected["area"] = [1.0]
 
-    actual = imod.prepare.spatial._celltable(shapefile, "values", 1.0, like)
+    actual = imod.prepare.spatial._celltable(
+        shapefile, "values", 1.0, like, type(expected_value)
+    )
     assert_frame_equal(actual, expected, check_dtype=True)
 
 
@@ -231,7 +233,9 @@ def test_celltable(shapefile, expected_value):
     expected["values"] = [expected_value]
     expected["area"] = [1.0]
 
-    actual = imod.prepare.spatial.celltable(shapefile, "values", 1.0, like)
+    actual = imod.prepare.spatial.celltable(
+        shapefile, "values", 1.0, like, dtype=type(expected_value)
+    )
     assert_frame_equal(actual, expected, check_dtype=True)
 
     # test resolution error:

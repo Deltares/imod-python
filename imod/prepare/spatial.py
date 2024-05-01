@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import scipy.ndimage
 import xarray as xr
+from numpy.typing import DTypeLike
 
 import imod
 from imod.prepare import common, pcg
@@ -542,7 +543,15 @@ def _cell_count(src, values, frequencies, nodata, *inds_weights):
     return row_i_arr, col_i_arr, value_arr, count_arr
 
 
-def _celltable(path, column, resolution, like, dtype, rowstart=0, colstart=0):
+def _celltable(
+    path: str | pathlib.Path,
+    column: str,
+    resolution: int,
+    like: xr.DataArray,
+    dtype: DTypeLike,
+    rowstart: int = 0,
+    colstart: int = 0,
+) -> pd.DataFrame:
     """
     Returns a table of cell indices (row, column) with feature ID, and feature
     area within cell. Essentially returns a COO sparse matrix, but with
@@ -600,8 +609,8 @@ def _celltable(path, column, resolution, like, dtype, rowstart=0, colstart=0):
         alloc_len *= size
 
     # Pre-allocate work arrays
-    values = np.full(alloc_len, 0)
-    frequencies = np.full(alloc_len, 0)
+    values = np.full(alloc_len, 0, dtype=dtype)
+    frequencies = np.full(alloc_len, 0, dtype=dtype)
     rows, cols, values, counts = _cell_count(
         rasterized.values, values, frequencies, nodata, *inds_weights
     )
@@ -667,7 +676,14 @@ def _create_chunks(like, resolution, chunksize):
     return chunks, rowstarts, colstarts
 
 
-def celltable(path, column, resolution, like, dtype=np.int32, chunksize=1e4):
+def celltable(
+    path: str | pathlib.Path,
+    column: str,
+    resolution: int,
+    like: xr.DataArray,
+    dtype: DTypeLike = np.int32,
+    chunksize: int = 10_000,
+):
     r"""
     Process area of features by rasterizing in a chunkwise manner to limit
     memory usage.
@@ -709,6 +725,8 @@ def celltable(path, column, resolution, like, dtype=np.int32, chunksize=1e4):
     like : xarray.DataArray
         Example DataArray of where the cells will be located. Used only for the
         coordinates.
+    dtype: DtypeLike, optional
+        Data type, defaults to 32-bit integer.
     chunksize : int, optional
         The size of the chunksize. Used for both x and y dimension.
 
@@ -778,7 +796,9 @@ def celltable(path, column, resolution, like, dtype=np.int32, chunksize=1e4):
 
     like_chunks, rowstarts, colstarts = _create_chunks(like, resolution, chunksize)
     collection = [
-        dask.delayed(_celltable)(path, column, resolution, chunk, dtype, rowstart, colstart)
+        dask.delayed(_celltable)(
+            path, column, resolution, chunk, dtype, rowstart, colstart
+        )
         for chunk, rowstart, colstart in zip(like_chunks, rowstarts, colstarts)
     ]
     result = dask.compute(collection)[0]
