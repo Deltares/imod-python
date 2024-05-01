@@ -8,7 +8,7 @@ import datetime
 import pathlib
 import re
 import tempfile
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import cftime
 import numpy as np
@@ -34,10 +34,14 @@ def _custom_pattern_to_regex_pattern(pattern: str):
     return re.compile(simple_regex)
 
 
-def _groupdict(stem: str, pattern: str | Pattern) -> Dict:
+def _groupdict(stem: str, pattern: Optional[str | Pattern]) -> Dict:
     if pattern is not None:
         if isinstance(pattern, Pattern):
-            d = pattern.match(stem).groupdict()
+            match = pattern.match(stem)
+            if match is not None:
+                d = match.groupdict()
+            else:
+                d = {}
         else:
             re_pattern = _custom_pattern_to_regex_pattern(pattern)
             # Use it to get the required variables
@@ -67,7 +71,7 @@ def _groupdict(stem: str, pattern: str | Pattern) -> Dict:
     return d
 
 
-def decompose(path, pattern: str = None) -> Dict[str, Any]:
+def decompose(path, pattern: Optional[str] = None) -> Dict[str, Any]:
     r"""
     Parse a path, returning a dict of the parts, following the iMOD conventions.
 
@@ -114,7 +118,6 @@ def decompose(path, pattern: str = None) -> Dict[str, Any]:
     path = pathlib.Path(path)
     # We'll ignore upper case
     stem = path.stem.lower()
-
     d = _groupdict(stem, pattern)
     dims = list(d.keys())
     # If name is not provided, generate one from other fields

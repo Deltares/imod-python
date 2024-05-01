@@ -35,8 +35,8 @@ import xarray as xr
 from imod.prepare import common, interpolate
 
 _RegridInfo = namedtuple(
-    typename="_RegridInfo",
-    field_names=[
+    "_RegridInfo",
+    [
         "matching_dims",
         "regrid_dims",
         "add_dims",
