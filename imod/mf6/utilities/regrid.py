@@ -21,9 +21,15 @@ from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.interfaces.isimulation import ISimulation
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.utilities.clip import clip_by_grid
+from imod.mf6.utilities.package import _is_valid
 from imod.mf6.utilities.regridding_types import RegridderType
 from imod.schemata import ValidationError
-from imod.typing.grid import GridDataArray, get_grid_geometry_hash, ones_like
+from imod.typing.grid import (
+    GridDataArray,
+    GridDataset,
+    get_grid_geometry_hash,
+    ones_like,
+)
 
 
 class RegridderWeightsCache:
@@ -135,58 +141,100 @@ def assign_coord_if_present(
 
 
 def _regrid_array(
-    package: IRegridPackage,
-    varname: str,
+    da: GridDataArray,
     regridder_collection: RegridderWeightsCache,
     regridder_name: str,
     regridder_function: str,
     target_grid: GridDataArray,
 ) -> Optional[GridDataArray]:
     """
-    Regrids a data_array. The array is specified by its key in the dataset.
-    Each data-array can represent:
-    -a scalar value, valid for the whole grid
-    -an array of a different scalar per layer
-    -an array with a value per grid block
-    -None
+    Regrids a GridDataArray. Each DataArray can represent:
+    - a scalar value, valid for the whole grid
+    - an array of a different scalar per layer
+    - an array with a value per grid block
+    - None
     """
 
     # skip regridding for arrays with no valid values (such as "None")
-    if not package._valid(package.dataset[varname].values[()]):
+    if not _is_valid(da.values[()]):
         return None
 
     # the dataarray might be a scalar. If it is, then it does not need regridding.
-    if is_scalar(package.dataset[varname]):
-        return package.dataset[varname].values[()]
+    if is_scalar(da):
+        return da.values[()]
 
-    if isinstance(package.dataset[varname], xr.DataArray):
-        coords = package.dataset[varname].coords
+    if isinstance(da, xr.DataArray):
+        coords = da.coords
         # if it is an xr.DataArray it may be layer-based; then no regridding is needed
         if not ("x" in coords and "y" in coords):
-            return package.dataset[varname]
+            return da
 
         # if it is an xr.DataArray it needs the dx, dy coordinates for regridding, which are otherwise not mandatory
         if not ("dx" in coords and "dy" in coords):
             raise ValueError(
-                f"DataArray {varname} does not have both a dx and dy coordinates"
+                f"GridDataArray {da.name} does not have both a dx and dy coordinates"
             )
 
     # obtain an instance of a regridder for the chosen method
     regridder = regridder_collection.get_regridder(
-        package.dataset[varname],
+        da,
         target_grid,
         regridder_name,
         regridder_function,
     )
 
     # store original dtype of data
-    original_dtype = package.dataset[varname].dtype
+    original_dtype = da.dtype
 
     # regrid data array
-    regridded_array = regridder.regrid(package.dataset[varname])
+    regridded_array = regridder.regrid(da)
 
     # reconvert the result to the same dtype as the original
     return regridded_array.astype(original_dtype)
+
+
+def _regrid_package_data(
+    package_data: dict[str, GridDataArray] | GridDataset,
+    target_grid: GridDataArray,
+    regridder_settings: dict[str, tuple[RegridderType, str]],
+    regrid_context: RegridderWeightsCache,
+    new_package_data: Optional[dict[str, GridDataArray]] = {},
+) -> dict[str, GridDataArray]:
+    """
+    Regrid package data. Loops over regridder settings to regrid variables one
+    by one. Variables not existent in the package data are skipped. Regridded
+    package data is added to a dictionary, which can optionally be provided as
+    argument to extend.
+    """
+    for (
+        varname,
+        regridder_type_and_function,
+    ) in regridder_settings.items():
+        regridder_function = None
+        regridder_name = regridder_type_and_function[0]
+        if len(regridder_type_and_function) > 1:
+            regridder_function = regridder_type_and_function[1]
+
+        # skip variables that are not in this dataset
+        if varname not in package_data.keys():
+            continue
+
+        # regrid the variable
+        new_package_data[varname] = _regrid_array(
+            package_data[varname],
+            regrid_context,
+            regridder_name,
+            regridder_function,
+            target_grid,
+        )
+        # set dx and dy if present in target_grid
+        new_package_data[varname] = assign_coord_if_present(
+            "dx", target_grid, new_package_data[varname]
+        )
+        new_package_data[varname] = assign_coord_if_present(
+            "dy", target_grid, new_package_data[varname]
+        )
+    return new_package_data
 
 
 def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, list[str]]:
@@ -261,36 +309,14 @@ def _regrid_like(
         regridder_settings.update(regridder_types)
 
     new_package_data = package.get_non_grid_data(list(regridder_settings.keys()))
+    new_package_data = _regrid_package_data(
+        package.dataset,
+        target_grid,
+        regridder_settings,
+        regrid_context,
+        new_package_data=new_package_data,
+    )
 
-    for (
-        varname,
-        regridder_type_and_function,
-    ) in regridder_settings.items():
-        regridder_function = None
-        regridder_name = regridder_type_and_function[0]
-        if len(regridder_type_and_function) > 1:
-            regridder_function = regridder_type_and_function[1]
-
-        # skip variables that are not in this dataset
-        if varname not in package.dataset.keys():
-            continue
-
-        # regrid the variable
-        new_package_data[varname] = _regrid_array(
-            package,
-            varname,
-            regrid_context,
-            regridder_name,
-            regridder_function,
-            target_grid,
-        )
-        # set dx and dy if present in target_grid
-        new_package_data[varname] = assign_coord_if_present(
-            "dx", target_grid, new_package_data[varname]
-        )
-        new_package_data[varname] = assign_coord_if_present(
-            "dy", target_grid, new_package_data[varname]
-        )
     if hasattr(package, "auxiliary_data_fields"):
         expand_transient_auxiliary_variables(package)
 

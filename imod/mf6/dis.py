@@ -1,13 +1,20 @@
 import pathlib
+from copy import deepcopy
 from typing import Optional, Tuple
 
 import numpy as np
 
 import imod
-from imod.logging import init_log_decorator
+from imod.logging import init_log_decorator, standard_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
-from imod.mf6.utilities.regrid import RegridderType
+from imod.mf6.utilities.grid import create_smallest_target_grid
+from imod.mf6.utilities.imod5_converter import convert_ibound_to_idomain
+from imod.mf6.utilities.regrid import (
+    RegridderType,
+    RegridderWeightsCache,
+    _regrid_package_data,
+)
 from imod.mf6.validation import DisBottomSchema
 from imod.schemata import (
     ActiveCellsConnectedSchema,
@@ -17,7 +24,10 @@ from imod.schemata import (
     DTypeSchema,
     IdentityNoDataSchema,
     IndexesSchema,
+    UniqueValuesSchema,
+    ValidationError,
 )
+from imod.typing.grid import GridDataArray
 
 
 class StructuredDiscretization(Package, IRegridPackage):
@@ -88,7 +98,10 @@ class StructuredDiscretization(Package, IRegridPackage):
     _regrid_method = {
         "top": (RegridderType.OVERLAP, "mean"),
         "bottom": (RegridderType.OVERLAP, "mean"),
-        "idomain": (RegridderType.OVERLAP, "mode"),
+        "idomain": (
+            RegridderType.OVERLAP,
+            "median",
+        ),  # TODO: Change back to 'mode' when xugrid 0.9.1 released
     }
 
     _skip_mask_arrays = ["bottom"]
@@ -151,3 +164,76 @@ class StructuredDiscretization(Package, IRegridPackage):
 
     def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
         return self._regrid_method
+
+    @classmethod
+    @standard_log_decorator()
+    def from_imod5_data(
+        cls,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
+    ) -> "StructuredDiscretization":
+        """
+        Construct package from iMOD5 data, loaded with the
+        :func:`imod.formats.prj.open_projectfile_data` function.
+
+        Method regrids all variables to a target grid with the smallest extent
+        and smallest cellsize available in all the grids. Consequently it
+        converts iMODFLOW data to MODFLOW 6 data.
+
+        .. note::
+
+            The method expects the iMOD5 model to be fully 3D, not quasi-3D.
+
+        Parameters
+        ----------
+        imod5_data: dict
+            Dictionary with iMOD5 data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
+        regridder_types: dict, optional
+            Optional dictionary with regridder types for a specific variable.
+            Use this to override default regridding methods.
+
+        Returns
+        -------
+        Modflow 6 StructuredDiscretization package.
+
+        """
+        data = {
+            "idomain": imod5_data["bnd"]["ibound"].astype(np.int32),
+            "top": imod5_data["top"]["top"],
+            "bottom": imod5_data["bot"]["bottom"],
+        }
+
+        target_grid = create_smallest_target_grid(*data.values())
+
+        # For some reason ``get_regrid_methods`` cannot be called in a
+        # classmethod.
+        regridder_settings = deepcopy(cls._regrid_method)
+        if regridder_types is not None:
+            regridder_settings.update(regridder_types)
+
+        regrid_context = RegridderWeightsCache(data["idomain"], target_grid)
+
+        new_package_data = _regrid_package_data(
+            data, target_grid, regridder_settings, regrid_context
+        )
+
+        # Validate iMOD5 data
+        UniqueValuesSchema([-1, 0, 1]).validate(imod5_data["bnd"]["ibound"])
+        if not np.all(
+            new_package_data["top"][1:].data == new_package_data["bottom"][:-1].data
+        ):
+            raise ValidationError(
+                "Model discretization not fully 3D. Make sure TOP[n+1] matches BOT[n]"
+            )
+
+        thickness = new_package_data["top"] - new_package_data["bottom"]
+        new_package_data["idomain"] = convert_ibound_to_idomain(
+            new_package_data["idomain"], thickness
+        )
+
+        # TOP 3D -> TOP 2D
+        # Assume iMOD5 data provided as fully 3D and not Quasi-3D
+        new_package_data["top"] = new_package_data["top"].sel(layer=1, drop=True)
+
+        return cls(**new_package_data)

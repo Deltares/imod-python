@@ -10,6 +10,14 @@ from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 
 
+def _load_imod5_data_in_memory(imod5_data):
+    """For debugging purposes, load everything in memory"""
+    for pkg in imod5_data.values():
+        for vardata in pkg.values():
+            if isinstance(vardata, xr.DataArray):
+                vardata.load()
+
+
 @pytest.fixture(scope="function")
 def idomain_and_bottom():
     nlay = 3
@@ -189,3 +197,77 @@ def test_write_ascii_griddata_2d_3d(idomain_and_bottom, tmp_path):
     with open(directory / "dis/botm.dat") as f:
         bottom_content = f.readlines()
     assert len(bottom_content) == 1
+
+
+def test_from_imod5_data__idomain_values(tmp_path):
+    data = imod.data.imod5_projectfile_data(tmp_path)
+    imod5_data = data[0]
+    ibound = imod5_data["bnd"]["ibound"]
+    # Fix data, as it contains floating values like 0.34, 0.25 etc.
+    ibound = ibound.where(ibound <= 0, 1)
+    imod5_data["bnd"]["ibound"] = ibound
+    _load_imod5_data_in_memory(imod5_data)
+
+    dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_data)
+
+    # Test if idomain has appropriate count
+    assert (dis["idomain"] == -1).sum() == 371824
+    assert (dis["idomain"] == 0).sum() == 176912
+    assert (dis["idomain"] == 1).sum() == 703936
+
+
+def test_from_imod5_data__grid_extent(tmp_path):
+    data = imod.data.imod5_projectfile_data(tmp_path)
+    imod5_data = data[0]
+    ibound = imod5_data["bnd"]["ibound"]
+    # Fix data, as it contains floating values like 0.34, 0.25 etc.
+    ibound = ibound.where(ibound <= 0, 1)
+    imod5_data["bnd"]["ibound"] = ibound
+    _load_imod5_data_in_memory(imod5_data)
+
+    dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_data)
+
+    # Test if regridded to smallest grid resolution
+    assert dis["top"].dx == 25.0
+    assert dis["top"].dy == -25.0
+    assert (dis.dataset.coords["x"][1] - dis.dataset.coords["x"][0]) == 25.0
+    assert (dis.dataset.coords["y"][1] - dis.dataset.coords["y"][0]) == -25.0
+
+    # Test extent
+    assert dis.dataset.coords["y"].min() == 360712.5
+    assert dis.dataset.coords["y"].max() == 365287.5
+    assert dis.dataset.coords["x"].min() == 194712.5
+    assert dis.dataset.coords["x"].max() == 199287.5
+
+
+def test_from_imod5_data__write(tmp_path):
+    data = imod.data.imod5_projectfile_data(tmp_path)
+    imod5_data = data[0]
+    ibound = imod5_data["bnd"]["ibound"]
+    # Fix data, as it contains floating values like 0.34, 0.25 etc.
+    ibound = ibound.where(ibound <= 0, 1)
+    imod5_data["bnd"]["ibound"] = ibound
+    _load_imod5_data_in_memory(imod5_data)
+
+    directory = tmp_path / "dis_griddata"
+    directory.mkdir()
+    write_context = WriteContext(simulation_directory=directory)
+
+    dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_data)
+
+    # Test if package written without ValidationError
+    dis.write(pkgname="dis", globaltimes=[], write_context=write_context)
+
+    # Assert if files written
+    assert (directory / "dis/top.dat").exists()
+    assert (directory / "dis/botm.dat").exists()
+
+
+def test_from_imod5_data__validation_error(tmp_path):
+    data = imod.data.imod5_projectfile_data(tmp_path)
+    imod5_data = data[0]
+
+    _load_imod5_data_in_memory(imod5_data)
+
+    with pytest.raises(ValidationError):
+        imod.mf6.StructuredDiscretization.from_imod5_data(imod5_data)
