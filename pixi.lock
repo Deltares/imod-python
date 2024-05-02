@@ -457,7 +457,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/xorg-xextproto-7.3.0-h0b41bf4_1003.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/xorg-xf86vidmodeproto-2.3.1-h7f98852_1002.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/linux-64/xorg-xproto-7.0.31-h7f98852_1007.tar.bz2
-      - conda: https://conda.anaconda.org/conda-forge/noarch/xugrid-0.9.0-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/xugrid-0.10.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/xyzservices-2024.4.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/xz-5.2.6-h166bdaf_0.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/linux-64/yaml-0.2.5-h7f98852_2.tar.bz2
@@ -877,7 +877,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-64/xorg-renderproto-0.11.1-h0d85af4_1002.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/osx-64/xorg-xextproto-7.3.0-hb7f2c08_1003.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/xorg-xproto-7.0.31-h35c211d_1007.tar.bz2
-      - conda: https://conda.anaconda.org/conda-forge/noarch/xugrid-0.9.0-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/xugrid-0.10.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/xyzservices-2024.4.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/xz-5.2.6-h775f41a_0.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/osx-64/yaml-0.2.5-h0d85af4_2.tar.bz2
@@ -1297,7 +1297,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/xorg-renderproto-0.11.1-h27ca646_1002.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/xorg-xextproto-7.3.0-h1a8c8d9_1003.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/xorg-xproto-7.0.31-h27ca646_1007.tar.bz2
-      - conda: https://conda.anaconda.org/conda-forge/noarch/xugrid-0.9.0-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/xugrid-0.10.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/xyzservices-2024.4.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/xz-5.2.6-h57fd34a_0.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/yaml-0.2.5-h3422bc3_2.tar.bz2
@@ -1684,7 +1684,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/xorg-renderproto-0.11.1-hcd874cb_1002.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/win-64/xorg-xextproto-7.3.0-hcd874cb_1003.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/xorg-xproto-7.0.31-hcd874cb_1007.tar.bz2
-      - conda: https://conda.anaconda.org/conda-forge/noarch/xugrid-0.9.0-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/xugrid-0.10.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/xyzservices-2024.4.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/xz-5.2.6-h8d14728_0.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/win-64/yaml-0.2.5-h8ffe710_2.tar.bz2
@@ -2242,7 +2242,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/xorg-xextproto-7.3.0-h0b41bf4_1003.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/xorg-xf86vidmodeproto-2.3.1-h7f98852_1002.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/linux-64/xorg-xproto-7.0.31-h7f98852_1007.tar.bz2
-      - conda: https://conda.anaconda.org/conda-forge/noarch/xugrid-0.9.0-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/xugrid-0.10.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/xyzservices-2024.4.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/xz-5.2.6-h166bdaf_0.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/linux-64/yaml-0.2.5-h7f98852_2.tar.bz2
@@ -2756,7 +2756,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-64/xorg-renderproto-0.11.1-h0d85af4_1002.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/osx-64/xorg-xextproto-7.3.0-hb7f2c08_1003.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/xorg-xproto-7.0.31-h35c211d_1007.tar.bz2
-      - conda: https://conda.anaconda.org/conda-forge/noarch/xugrid-0.9.0-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/xugrid-0.10.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/xyzservices-2024.4.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/xz-5.2.6-h775f41a_0.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/osx-64/yaml-0.2.5-h0d85af4_2.tar.bz2
@@ -3270,7 +3270,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/xorg-renderproto-0.11.1-h27ca646_1002.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/xorg-xextproto-7.3.0-h1a8c8d9_1003.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/xorg-xproto-7.0.31-h27ca646_1007.tar.bz2
-      - conda: https://conda.anaconda.org/conda-forge/noarch/xugrid-0.9.0-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/xugrid-0.10.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/xyzservices-2024.4.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/xz-5.2.6-h57fd34a_0.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/yaml-0.2.5-h3422bc3_2.tar.bz2
@@ -3749,7 +3749,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/xorg-renderproto-0.11.1-hcd874cb_1002.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/win-64/xorg-xextproto-7.3.0-hcd874cb_1003.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/xorg-xproto-7.0.31-hcd874cb_1007.tar.bz2
-      - conda: https://conda.anaconda.org/conda-forge/noarch/xugrid-0.9.0-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/xugrid-0.10.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/xyzservices-2024.4.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/xz-5.2.6-h8d14728_0.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/win-64/yaml-0.2.5-h8ffe710_2.tar.bz2
@@ -29974,13 +29974,13 @@ packages:
   timestamp: 1607292254607
 - kind: conda
   name: xugrid
-  version: 0.9.0
+  version: 0.10.0
   build: pyhd8ed1ab_0
   subdir: noarch
   noarch: python
-  url: https://conda.anaconda.org/conda-forge/noarch/xugrid-0.9.0-pyhd8ed1ab_0.conda
-  sha256: 0757cdbf0f92e68a3134588027511ea4c4f49002d397619c59bd73ab85ad4165
-  md5: d6ef5b0239c439c99a37142f93b2c98b
+  url: https://conda.anaconda.org/conda-forge/noarch/xugrid-0.10.0-pyhd8ed1ab_0.conda
+  sha256: cf9b0c63b573405d5ac34a35819d98c10884abb0d49b19af0fc7414f8f44fa00
+  md5: 7ef2f388e3b2adcecfed74591bff2451
   depends:
   - dask
   - geopandas
@@ -29997,8 +29997,8 @@ packages:
   license_family: MIT
   purls:
   - pkg:pypi/xugrid
-  size: 93360
-  timestamp: 1707992771856
+  size: 94214
+  timestamp: 1714580639671
 - kind: conda
   name: xyzservices
   version: 2024.4.0
