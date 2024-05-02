@@ -450,7 +450,11 @@ for pkg in ALL_PACKAGE_INSTANCES:
 
 # Set multi index to group with packages
 regrid_method_table = regrid_method_table.set_index(["package name", "array name"])
-
-print(regrid_method_table.to_string())
+# Pandas by default displays at max 60 rows, which this table exceeds.
+nrows = regrid_method_table.shape[0]
+# Configure pandas to increase the max amount of displayable rows.
+pd.set_option("display.max_rows", nrows+1)
+# Display rows:
+regrid_method_table
 
 # %%
