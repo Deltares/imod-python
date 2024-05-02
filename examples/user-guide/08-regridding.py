@@ -286,4 +286,7 @@ for pkg in ALL_PACKAGE_INSTANCES:
             )
             counter = counter + 1
 
+# Set multi index to group with packages
+regrid_method_table = regrid_method_table.set_index(["package name", "array name"])
+
 print(regrid_method_table.to_string())
