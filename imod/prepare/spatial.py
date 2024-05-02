@@ -574,7 +574,7 @@ def _celltable(
         Example DataArray of where the cells will be located. Used only for the
         coordinates.
     dtype: numpy.dtype
-        datatype of data referred to with "column", defaults to 32-bit integer.
+        datatype of data referred to with "column".
 
     Returns
     -------
@@ -684,7 +684,7 @@ def celltable(
     like: xr.DataArray,
     dtype: DTypeLike = np.int32,
     chunksize: int = 10_000,
-):
+) -> pd.DataFrame:
     r"""
     Process area of features by rasterizing in a chunkwise manner to limit
     memory usage.
