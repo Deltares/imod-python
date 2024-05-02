@@ -80,6 +80,13 @@ class Solution(Package):
         SolutionPresetSimple: "cg"
         SolutionPresetModerate: "bicgstab"
         SolutionPresetComplex: "bicgstab"
+    complexity: str, optional
+        options: {"None", "simple", "moderate", "complex"}
+        is an optional keyword that defines default non-linear and linear 
+        solver parameters. Simple works well for nearly linear models,
+        moderate for moderate non linear models and complex for highly nonlinear 
+        models
+        Default value: None
     under_relaxation: str, optional
         options: {"None", "simple", "cooley", "bdb"}
         is an optional keyword that defines the nonlinear relative_rclose
@@ -374,6 +381,7 @@ class Solution(Package):
         inner_dvclose,
         inner_rclose,
         linear_acceleration,
+        complexity: str | None = None,
         under_relaxation=None,
         under_relaxation_theta=None,
         under_relaxation_kappa=None,
@@ -412,6 +420,7 @@ class Solution(Package):
             "inner_rclose": inner_rclose,
             "rclose_option": rclose_option,
             "linear_acceleration": linear_acceleration,
+            "complexity": complexity,
             "relaxation_factor": relaxation_factor,
             "preconditioner_levels": preconditioner_levels,
             "preconditioner_drop_tolerance": preconditioner_drop_tolerance,

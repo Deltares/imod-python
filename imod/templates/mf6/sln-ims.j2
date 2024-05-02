@@ -1,10 +1,13 @@
 begin options
 {% if print_option is defined %}  print_option {{print_option}}
 {% endif %}
+{% if complexity is defined %}  complexity {{complexity}}
+{% endif %}
 {%- if csv_output_filerecord is defined %}  csv_output fileout {{csvfile}}
 {% endif %}
 {%- if no_ptcrecord is defined %}  no_ptc {% if no_ptc_option is defined %}{{no_ptc_option}}{% endif %}
 {% endif -%}
+
 end options
 
 begin nonlinear
