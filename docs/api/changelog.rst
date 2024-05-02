@@ -22,6 +22,8 @@ Added
   :func:`imod.prepare.distribute_drn_conductance`,
   :func:`imod.prepare.distribute_ghb_conductance`, for this multiple options can
   be selected, available in :func:`imod.prepare.DISTRIBUTION_OPTION`.
+- :func:`imod.prepare.celltable` supports an optional ``dtype`` argument. This
+  can be used, for example, to create celltables of float values.
 
 
 Fixed
@@ -32,6 +34,7 @@ Fixed
   error message stating a well is outside of the domain.
 - When importing data from a .prj file, the multipliers and additions specified for
   ipf and idf files are now applied
+- Fix bug where y-coords were flipped in :class:`imod.msw.MeteoMapping`
   
 [0.16.0] - 2024-03-29
 ---------------------

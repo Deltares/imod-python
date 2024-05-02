@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -39,7 +41,7 @@ class CouplerMapping(MetaSwapPackage):
     def __init__(
         self,
         modflow_dis: StructuredDiscretization,
-        well: WellDisStructured = None,
+        well: Optional[WellDisStructured] = None,
     ):
         super().__init__()
 
