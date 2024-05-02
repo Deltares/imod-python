@@ -181,7 +181,8 @@ regrid_context
 
 # %% 
 # Regrid the recharge package with a custom regridder. In this case we opt
-# for the centroid locator regridder. You can 
+# for the centroid locator regridder. This regridder is similar to using a
+# "nearest neighbour" lookup.
 from imod.mf6.utilities.regrid import RegridderType
 
 regridder_types = {"rate": (RegridderType.CENTROIDLOCATOR, None)}
