@@ -112,11 +112,6 @@ tmpdir = imod.util.temporary_directory()
 original_simulation = imod.data.hondsrug_simulation(tmpdir / "hondsrug_saved")
 
 # %%
-# The model was written before the xt3d_option and rhs_option arguments were
-# added to iMOD Python. Set missing options to False.
-original_simulation["GWF"]["npf"].set_xt3d_option(is_xt3d_used=False, is_rhs=False)
-
-# %%
 # To reduce computational overhead for this example, we are going to clip off
 # most of the timesteps.
 
