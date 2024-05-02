@@ -129,9 +129,8 @@ xmin = 0.0
 xmax = dx * ncol
 ymin = 0.0
 ymax = abs(dy) * nrow
-layer = [1,2,3]
 
-target_grid = imod.util.empty_3d(dx=dx, dy=dy, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, layer=layer)
+target_grid = imod.util.empty_2d(dx=dx, dy=dy, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)
 
 target_grid
 
