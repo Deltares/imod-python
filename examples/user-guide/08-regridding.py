@@ -2,7 +2,7 @@
 Regridding
 ==========
 
-Most MF6 packages have spatial data arrays as input. These arrays 
+Most MF6 packages have spatial data arrays as input. These arrays
 are discrete: they are defined over the simulation grid and contain
 values associated to each cell.
 
@@ -12,7 +12,7 @@ the values in these new arrays should be, is done by xugrid.
 
 xugrid will compute a regridded array based on:
 
-- the original array 
+- the original array
 - the original discretization (this is described in the coordinates of the original arry)
 - the new discretization
 - a regridding method
@@ -42,8 +42,8 @@ same number of layers as the input array.
 
 # %%
 # Obtaining the final (i)domain
-# ============================= 
-# 
+# =============================
+#
 # In many real-world models, some cells will be inactive or marked as "vertical
 # passthrough" (VPT) in the idomain array of the simulation. Some packages require
 # that all cells that are inactictive or VPT in idomain are excluded from the
@@ -52,16 +52,16 @@ same number of layers as the input array.
 # the end of the regridding process, a final step consists in enforcing
 # consistency between those of idomain and all the packages. This is a 2-step
 # process:
-# 
+#
 # 1) for cells that do not have inputs in crucial packages like npf or storage,
 #    idomain will be set to inactive.
 # 2) for cells that are marked as inactive or VPT in idomain, all package inputs
 #    will be removed from all the packages
-#  
+#
 # This synchronization step between idomain and the packages is automated, and it
 # is carried out when calling regrid_like on the simulation object or the model
 # object. There are 2 caveats:
-# 
+#
 # 1) the synchronization between idomain and the package domains is done on the
 #    model-level. If we have a simulation containing both a flow model and a
 #    transport model then idomain for flow is determined independent from that for
@@ -75,32 +75,32 @@ same number of layers as the input array.
 #    model, and when regridding a model it will use default methods for all the
 #    packages. So if you have regridded some packages yourself with non-default
 #    methods, then these are not taken into account during this synchonization
-#    step. 
-# 
+#    step.
+#
 # Regridding using default methods
 # ================================
-# 
+#
 # The regrid_like function is available on packages, models and simulations.
-# When the default methods are acceptable, regridding the whole simulation is the most convenient 
-# from a user-perspective. 
-# 
-# 
+# When the default methods are acceptable, regridding the whole simulation is the most convenient
+# from a user-perspective.
+#
+#
 # Regridding using non-default methods
 # ====================================
-# 
+#
 # When non-default methods are used for one or more packages, these should be
 # regridded separately. In that case, the most convenient approach is likely:
-# 
+#
 # - pop the packages that should use non-default methods from the source simulation (the
 #   popping is optional, and is only recommended for packages whose presence is not
-#   mandatory for validation.) 
-# - regrid the source simulation: this takes care of all the packages that should use default methods. 
+#   mandatory for validation.)
+# - regrid the source simulation: this takes care of all the packages that should use default methods.
 # - regrid the package(s) where you want to use non-standard rergridding methods indivudually starting from the
-#   packages in the source simulation 
+#   packages in the source simulation
 # - insert the custom-regridded packages to the
 #   regridded simulation (or replace the package regridded with default methods with
-#   the one you just regridded with non-default methods if it was not popped) 
-# 
+#   the one you just regridded with non-default methods if it was not popped)
+#
 # In code, consider an example where we want to regrid the recharge package using non default methods
 # then we would do the following. First we'll load some example simulation.
 # There is a separate example contained in :doc:`/examples/mf6/hondsrug`
@@ -116,7 +116,7 @@ original_simulation = imod.data.hondsrug_simulation(tmpdir / "hondsrug_saved")
 # added to iMOD Python. Set missing options to False.
 original_simulation["GWF"]["npf"].set_xt3d_option(is_xt3d_used=False, is_rhs=False)
 
-# %% 
+# %%
 # To reduce computational overhead for this example, we are going to clip off
 # most of the timesteps.
 
@@ -139,18 +139,20 @@ xmin = 237500.0
 xmax = 250000.0
 ymin = 559000.0
 ymax = 564000.0
-target_grid = imod.util.empty_2d(dx=dx, dy=dy, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)
+target_grid = imod.util.empty_2d(
+    dx=dx, dy=dy, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax
+)
 
 target_grid
 
-# %% 
+# %%
 # This is a grid of nans, and we require a grid of ones, which can create with
 # xarray:
 target_grid = xr.ones_like(target_grid)
 
 target_grid
 
-#%%
+# %%
 # Next, we'll remove the recharge package and obtain it as a variable:
 
 original_rch_package = original_simulation["GWF"].pop("rch")
@@ -161,7 +163,7 @@ original_rch_package
 # Now regrid the simulation (without recharge):
 regridded_simulation = original_simulation.regrid_like("regridded", target_grid)
 
-# %% 
+# %%
 # Let's look at the discretization again:
 regridded_simulation["GWF"]["dis"]
 
@@ -178,8 +180,12 @@ import numpy as np
 fig, axes = plt.subplots(nrows=2, sharex=True)
 plot_kwargs = dict(colors="viridis", levels=np.linspace(0.0, 100.0, 21), fig=fig)
 
-imod.visualize.spatial.plot_map(original_simulation["GWF"]["npf"]["k"].sel(layer=3), ax=axes[0], **plot_kwargs)
-imod.visualize.spatial.plot_map(regridded_simulation["GWF"]["npf"]["k"].sel(layer=3), ax=axes[1], **plot_kwargs)
+imod.visualize.spatial.plot_map(
+    original_simulation["GWF"]["npf"]["k"].sel(layer=3), ax=axes[0], **plot_kwargs
+)
+imod.visualize.spatial.plot_map(
+    regridded_simulation["GWF"]["npf"]["k"].sel(layer=3), ax=axes[1], **plot_kwargs
+)
 
 axes[0].set_ylabel("original")
 axes[1].set_ylabel("regridded")
@@ -191,7 +197,7 @@ plt.show()
 from imod.mf6.utilities.regrid import RegridderWeightsCache
 
 # just take any array of the package to use as the old grid
-old_grid = original_rch_package["rate"]  
+old_grid = original_rch_package["rate"]
 
 old_grid
 
@@ -202,7 +208,7 @@ regrid_context = RegridderWeightsCache(original_rch_package["rate"], target_grid
 
 regrid_context
 
-# %% 
+# %%
 # Regrid the recharge package with a custom regridder. In this case we opt
 # for the centroid locator regridder. This regridder is similar to using a
 # "nearest neighbour" lookup.
@@ -234,9 +240,8 @@ original_simulation["GWF"]["rch"] = original_rch_package
 # many input parameters are regridded with a ``mean`` method. This means that their input
 # range is reduced, which can be seen in tailings in the histograms becoming shorter
 
-def plot_histograms_side_by_side(
-    array_original, array_regridded, title
-):
+
+def plot_histograms_side_by_side(array_original, array_regridded, title):
     """This function creates a plot of normalized histograms of the 2 input
     DataArray. It plots a title above each histogram."""
     _, (ax0, ax1) = plt.subplots(1, 2, sharex=True, sharey=True, tight_layout=True)
@@ -245,6 +250,7 @@ def plot_histograms_side_by_side(
     ax0.title.set_text(f"{title} (original)")
     ax1.title.set_text(f"{title} (regridded)")
     plt.show()
+
 
 # %%
 # Compare constant head arrays.
@@ -347,8 +353,12 @@ hds_regridded
 fig, axes = plt.subplots(nrows=2, sharex=True)
 plot_kwargs = dict(colors="viridis", levels=np.linspace(0.0, 11.0, 12), fig=fig)
 
-imod.visualize.spatial.plot_map(hds_original.isel(layer=6, time=-1), ax=axes[0], **plot_kwargs)
-imod.visualize.spatial.plot_map(hds_regridded.isel(layer=6, time=-1), ax=axes[1], **plot_kwargs)
+imod.visualize.spatial.plot_map(
+    hds_original.isel(layer=6, time=-1), ax=axes[0], **plot_kwargs
+)
+imod.visualize.spatial.plot_map(
+    hds_regridded.isel(layer=6, time=-1), ax=axes[1], **plot_kwargs
+)
 
 axes[0].set_ylabel("original")
 axes[1].set_ylabel("regridded")
@@ -357,25 +367,25 @@ plt.show()
 
 # %%
 # A note on regridding conductivity
-# ================================= 
+# =================================
 # In the npf package, it is possible to use for definining the conductivity tensor:
 #
-# - 1 array (K) 
-# - 2 arrays (K and K22) 
-# - 3 arrays (K, K22, K33) 
-# 
+# - 1 array (K)
+# - 2 arrays (K and K22)
+# - 3 arrays (K, K22, K33)
+#
 # If 1 array is given the tensor
 # is called isotropic. Defining only K gives the same behavior as specifying K,
 # K22 and K33 with the same value. When regridding, K33 has a default method
 # different from that of K and K22, but it can only be applied if K33 exists in
 # the source model in the first place. So it is recommended to introduce K33 as a
 # separate array in the source model even if it is isotropic.
-# Also note that default regridding methods were chosen assuming that K and K22 
+# Also note that default regridding methods were chosen assuming that K and K22
 # are roughly horizontal and K33 roughly vertical. But this may not be the case
-# if the input arrays angle2 and/or angle3 have large values. 
-# 
+# if the input arrays angle2 and/or angle3 have large values.
+#
 # Regridding boundary conditions
-# ============================== 
+# ==============================
 # Special care must be taken when regridding boundary conditions, and it is
 # recommended that users verify the balance output of a regridded simulation and
 # compare it to the original model. If the regridded simulation is a good
@@ -396,26 +406,26 @@ plt.show()
 # - but we do the same regridding this time assigning a zero recharge to cells
 #   without recharge then the averaging will take the zero-recharge cells into
 #   account and the regridded recharge will be the same as the source recharge.
-# 
-#   
+#
+#
 # A note on regridding transport
-# ============================== 
+# ==============================
 # Transport simulations can be unstable if constraints related to the grid Peclet
 # number and the courant number are exceeded. This can easily happen when
 # regridding. It may be necessary to reduce the simulation's time step size
 # especially when downscaling, to prevent numerical issues. Increasing
 # dispersivities or the molecular diffusion constant can also help to stabilize
 # the simulation. Inversely, when upscaling, a larger time step size can be acceptable.
-# 
-#   
+#
+#
 # Unsupported packages
 # ====================
 # Some packages cannot be regridded. This includes the Lake package and the UZF
 # package. Such packages should be removed from the simulation before regridding,
 # and then new packages should be created by the user and then added to the
-# regridded simulation. 
-# 
-# 
+# regridded simulation.
+#
+#
 # This code snippet prints all default methods:
 #
 import pandas as pd
@@ -453,7 +463,7 @@ regrid_method_table = regrid_method_table.set_index(["package name", "array name
 # Pandas by default displays at max 60 rows, which this table exceeds.
 nrows = regrid_method_table.shape[0]
 # Configure pandas to increase the max amount of displayable rows.
-pd.set_option("display.max_rows", nrows+1)
+pd.set_option("display.max_rows", nrows + 1)
 # Display rows:
 regrid_method_table
 
