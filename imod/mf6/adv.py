@@ -10,15 +10,17 @@ robust alternative.
 """
 
 from copy import deepcopy
+from typing import Optional, Tuple
 
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.utilities.regrid import RegridderType
 
 
-class Advection(Package):
+class Advection(Package, IRegridPackage):
     _pkg_id = "adv"
     _template = Package._initialize_template(_pkg_id)
-    _regrid_method: dict[str, tuple[RegridderType, str]] = {}   
+    _regrid_method: dict[str, tuple[RegridderType, str]] = {}
 
     def __init__(self, scheme: str):
         dict_dataset = {"scheme": scheme}
@@ -35,6 +37,9 @@ class Advection(Package):
         """
         return deepcopy(self)
 
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method
+
 
 class AdvectionUpstream(Advection):
     """
@@ -45,8 +50,10 @@ class AdvectionUpstream(Advection):
     """
 
     def __init__(self, scheme: str = "upstream"):
-        if not scheme  =="upstream":
-            raise ValueError("error in scheme parameter. Should be 'upstream' if present.")
+        if not scheme == "upstream":
+            raise ValueError(
+                "error in scheme parameter. Should be 'upstream' if present."
+            )
         super().__init__(scheme="upstream")
 
 
@@ -62,9 +69,11 @@ class AdvectionCentral(Advection):
     Note: all constructor arguments will be ignored
     """
 
-    def __init__(self,  scheme: str = "central"):
-        if not scheme  =="central":
-            raise ValueError("error in scheme parameter. Should be 'central' if present.")        
+    def __init__(self, scheme: str = "central"):
+        if not scheme == "central":
+            raise ValueError(
+                "error in scheme parameter. Should be 'central' if present."
+            )
         super().__init__(scheme="central")
 
 
@@ -75,7 +84,7 @@ class AdvectionTVD(Advection):
     Note: all constructor arguments will be ignored
     """
 
-    def __init__(self,  scheme: str = "TVD"):
-        if not scheme  =="TVD":
-            raise ValueError("error in scheme parameter. Should be 'TVD' if present.")              
+    def __init__(self, scheme: str = "TVD"):
+        if not scheme == "TVD":
+            raise ValueError("error in scheme parameter. Should be 'TVD' if present.")
         super().__init__(scheme="TVD")

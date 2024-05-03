@@ -46,7 +46,8 @@ def locate_wells(
     wells: pd.DataFrame,
     top: Union[xr.DataArray, xu.UgridDataArray],
     bottom: Union[xr.DataArray, xu.UgridDataArray],
-    k: Union[xr.DataArray, xu.UgridDataArray, None],
+    k: Optional[Union[xr.DataArray, xu.UgridDataArray]],
+    validate: bool = True,
 ):
     if not isinstance(top, (xu.UgridDataArray, xr.DataArray)):
         raise TypeError(
@@ -62,14 +63,23 @@ def locate_wells(
 
     xy_top = imod.select.points_values(top, x=x, y=y, out_of_bounds="ignore")
     xy_bottom = imod.select.points_values(bottom, x=x, y=y, out_of_bounds="ignore")
+
+    # Raise exception if not all wells could be mapped onto the domain
+    if validate and len(x) > len(xy_top["index"]):
+        inside = imod.select.points_in_bounds(top, x=x, y=y)
+        out = np.where(~inside)
+        raise ValueError(
+            f"well at x = {x[out[0]]} and y = {y[out[0]]} could not be mapped on the grid"
+        )
+
     if k is not None:
         xy_k = imod.select.points_values(k, x=x, y=y, out_of_bounds="ignore")
 
     # Discard out-of-bounds wells.
     index = xy_top["index"]
-    if not np.array_equal(xy_bottom["index"], index):
+    if validate and not np.array_equal(xy_bottom["index"], index):
         raise ValueError("bottom grid does not match top grid")
-    if k is not None and not np.array_equal(xy_k["index"], index):
+    if validate and k is not None and not np.array_equal(xy_k["index"], index):  # type: ignore
         raise ValueError("k grid does not match top grid")
     id_in_bounds = first.index[index]
 
@@ -83,6 +93,7 @@ def assign_wells(
     k: Optional[Union[xr.DataArray, xu.UgridDataArray]] = None,
     minimum_thickness: Optional[float] = 0.05,
     minimum_k: Optional[float] = 1.0,
+    validate: bool = True,
 ) -> pd.DataFrame:
     """
     Distribute well pumping rate according to filter length when ``k=None``, or
@@ -105,7 +116,8 @@ def assign_wells(
     minimum_thickness: float, optional, default: 0.01
     minimum_k: float, optional, default: 1.0
         Minimum conductivity
-
+    validate: bool
+        raise an excpetion if one of the wells is not in the domain
     Returns
     -------
     placed_wells: pd.DataFrame
@@ -126,7 +138,9 @@ def assign_wells(
             f"received: {members}"
         )
 
-    id_in_bounds, xy_top, xy_bottom, xy_k = locate_wells(wells, top, bottom, k)
+    id_in_bounds, xy_top, xy_bottom, xy_k = locate_wells(
+        wells, top, bottom, k, validate
+    )
     wells_in_bounds = wells.set_index("id").loc[id_in_bounds].reset_index()
     first = wells_in_bounds.groupby("id").first()
     overlap = compute_overlap(first, xy_top, xy_bottom)

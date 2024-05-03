@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import abc
-import copy
-import numbers
 import pathlib
 from collections import defaultdict
 from typing import Any, Mapping, Optional, Tuple, Union
@@ -12,13 +10,11 @@ import jinja2
 import numpy as np
 import xarray as xr
 import xugrid as xu
-from xarray.core.utils import is_scalar
 
 import imod
+from imod.logging import standard_log_decorator
 from imod.mf6.auxiliary_variables import (
-    expand_transient_auxiliary_variables,
     get_variable_names,
-    remove_expanded_auxiliary_variables_from_dataset,
 )
 from imod.mf6.interfaces.ipackage import IPackage
 from imod.mf6.pkgbase import (
@@ -26,11 +22,11 @@ from imod.mf6.pkgbase import (
     TRANSPORT_PACKAGES,
     PackageBase,
 )
+from imod.mf6.utilities.mask import _mask
 from imod.mf6.utilities.regrid import (
-    RegridderInstancesCollection,
     RegridderType,
-    assign_coord_if_present,
-    get_non_grid_data,
+    RegridderWeightsCache,
+    _regrid_like,
 )
 from imod.mf6.utilities.schemata import filter_schemata_dict
 from imod.mf6.validation import validation_pkg_error_message
@@ -190,7 +186,13 @@ class Package(PackageBase, IPackage, abc.ABC):
             else:
                 np.savetxt(fname=f, X=da.values, fmt=fmt)
 
-    def _get_render_dictionary(self, directory: pathlib.Path, pkgname: str, globaltimes: Union[list[np.datetime64], np.ndarray], binary: bool) ->dict[str,Any]:
+    def _get_render_dictionary(
+        self,
+        directory: pathlib.Path,
+        pkgname: str,
+        globaltimes: Union[list[np.datetime64], np.ndarray],
+        binary: bool,
+    ) -> dict[str, Any]:
         d = {}
         if directory is None:
             pkg_directory = pkgname
@@ -214,9 +216,9 @@ class Package(PackageBase, IPackage, abc.ABC):
         if (hasattr(self, "_auxiliary_data")) and (names := get_variable_names(self)):
             d["auxiliary"] = names
         return d
-    
+
     def render(self, directory, pkgname, globaltimes, binary):
-        d = self._get_render_dictionary( directory, pkgname, globaltimes, binary)
+        d = self._get_render_dictionary(directory, pkgname, globaltimes, binary)
         return self._template.render(d)
 
     @staticmethod
@@ -264,6 +266,7 @@ class Package(PackageBase, IPackage, abc.ABC):
 
         return layered, values
 
+    @standard_log_decorator()
     def write(
         self,
         pkgname: str,
@@ -289,6 +292,7 @@ class Package(PackageBase, IPackage, abc.ABC):
                             path = pkgdirectory / f"{key}.dat"
                             self.write_text_griddata(path, da, dtype)
 
+    @standard_log_decorator()
     def _validate(self, schemata: dict, **kwargs) -> dict[str, list[ValidationError]]:
         errors = defaultdict(list)
         for variable, var_schemata in schemata.items():
@@ -436,7 +440,6 @@ class Package(PackageBase, IPackage, abc.ABC):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-        state_for_boundary: Optional[GridDataArray] = None,
     ) -> Package:
         """
         Clip a package by a bounding box (time, layer, y, x).
@@ -469,6 +472,9 @@ class Package(PackageBase, IPackage, abc.ABC):
         -------
         clipped: Package
         """
+        if not self.is_clipping_supported():
+            raise ValueError("this package does not support clipping.")
+
         selection = self.dataset
         if "time" in selection:
             time = selection["time"].values
@@ -534,7 +540,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         Parameters
         ----------
         mask: xr.DataArray, xu.UgridDataArray of ints
-            idomain-like integer array. 1 sets cells to active, 0 sets cells to inactive, 
+            idomain-like integer array. 1 sets cells to active, 0 sets cells to inactive,
             -1 sets cells to vertical passthrough
 
         Returns
@@ -543,126 +549,12 @@ class Package(PackageBase, IPackage, abc.ABC):
             The package with part masked.
         """
 
-        masked = {}
-        if hasattr(self,"auxiliary_data_fields"):
-            remove_expanded_auxiliary_variables_from_dataset(self)
-        for var in self.dataset.data_vars.keys():
-            if self._skip_masking_variable(var, self.dataset[var]):
-                masked[var] = self.dataset[var]
-            else:
-                masked[var] = self._mask_spatial_var(var, mask)
-        if hasattr(self,"auxiliary_data_fields"):
-            expand_transient_auxiliary_variables(self)
-        return type(self)(**masked)
-
-    def _skip_masking_variable(self, var: str, da: GridDataArray)->bool: 
-        if self._skip_masking_dataarray(var) or len(da.dims) == 0 or set(da.coords).issubset(["layer"]):
-            return True
-        if is_scalar(da.values[()]):
-            return True
-        spatial_dims = ["x", "y", "mesh2d_nFaces", "layer"]
-        if not np.any( [coord in spatial_dims for coord in da.coords]):
-            return True
-        return False
-
-    def _mask_spatial_var(self, var: str, mask: GridDataArray)->GridDataArray:
-        da = self.dataset[var]
-        array_mask = self._adjust_mask_for_unlayered_data(da, mask)
-
-        if issubclass(da.dtype.type, numbers.Integral):
-            if var == "idomain":
-                return da.where(array_mask > 0, other=array_mask)
-            else:
-                return da.where(array_mask > 0, other=0)
-        elif issubclass(da.dtype.type, numbers.Real):
-            return da.where(array_mask > 0)
-        else:
-            raise TypeError(
-                f"Expected dtype float or integer. Received instead: {da.dtype}"
-            )
-
-    def _adjust_mask_for_unlayered_data(self, da: GridDataArray, mask: GridDataArray)->GridDataArray:
-        '''
-        Some arrays are not layered while the mask is layered (for example the
-        top array in dis or disv packaged). In that case we use the top layer of
-        the mask to perform the masking. If layer is not a dataset dimension,
-        but still a dataset coordinate, we limit the mask to the relevant layer
-        coordinate(s). 
-        '''
-        array_mask  = mask
-        if "layer" in da.coords and "layer" not in da.dims:
-            array_mask = mask.sel(layer=da.coords["layer"])        
-        if "layer" not in da.coords and "layer" in array_mask.coords:
-            array_mask = mask.isel(layer=0)
-
-        return array_mask              
-
-    def is_regridding_supported(self) -> bool:
-        """
-        returns true if package supports regridding.
-        """
-        return hasattr(self, "_regrid_method")
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        if hasattr(self, "_regrid_method"):
-            return self._regrid_method
-        return None
-
-    def _regrid_array(
-        self,
-        varname: str,
-        regridder_collection: RegridderInstancesCollection,
-        regridder_name: str,
-        regridder_function: str,
-        target_grid: GridDataArray,
-    ) -> Optional[GridDataArray]:
-        """
-        Regrids a data_array. The array is specified by its key in the dataset.
-        Each data-array can represent:
-        -a scalar value, valid for the whole grid
-        -an array of a different scalar per layer
-        -an array with a value per grid block
-        -None
-        """
-
-        # skip regridding for arrays with no valid values (such as "None")
-        if not self._valid(self.dataset[varname].values[()]):
-            return None
-
-        # the dataarray might be a scalar. If it is, then it does not need regridding.
-        if is_scalar(self.dataset[varname]):
-            return self.dataset[varname].values[()]
-
-        if isinstance(self.dataset[varname], xr.DataArray):
-            coords = self.dataset[varname].coords
-            # if it is an xr.DataArray it may be layer-based; then no regridding is needed
-            if not ("x" in coords and "y" in coords):
-                return self.dataset[varname]
-
-            # if it is an xr.DataArray it needs the dx, dy coordinates for regridding, which are otherwise not mandatory
-            if not ("dx" in coords and "dy" in coords):
-                raise ValueError(
-                    f"DataArray {varname} does not have both a dx and dy coordinates"
-                )
-
-        # obtain an instance of a regridder for the chosen method
-        regridder = regridder_collection.get_regridder(
-            regridder_name,
-            regridder_function,
-        )
-
-        # store original dtype of data
-        original_dtype = self.dataset[varname].dtype
-
-        # regrid data array
-        regridded_array = regridder.regrid(self.dataset[varname])
-
-        # reconvert the result to the same dtype as the original
-        return regridded_array.astype(original_dtype)
+        return _mask(self, mask)
 
     def regrid_like(
         self,
         target_grid: GridDataArray,
+        regrid_context: RegridderWeightsCache,
         regridder_types: Optional[dict[str, Tuple[RegridderType, str]]] = None,
     ) -> "Package":
         """
@@ -689,59 +581,22 @@ class Package(PackageBase, IPackage, abc.ABC):
         regridder_types: dict(str->(regridder type,str))
            dictionary mapping arraynames (str) to a tuple of regrid type (a specialization class of BaseRegridder) and function name (str)
             this dictionary can be used to override the default mapping method.
+        regrid_context: Optional RegridderWeightsCache
+            stores regridder weights for different regridders. Can be used to speed up regridding,
+            if the same regridders are used several times for regridding different arrays.
 
         Returns
         -------
         a package with the same options as this package, and with all the data-arrays regridded to another discretization,
         similar to the one used in input argument "target_grid"
         """
-        if not hasattr(self, "_regrid_method"):
-            raise NotImplementedError(
-                f"Package {type(self).__name__} does not support regridding"
-            )
-        
-        if hasattr(self,"auxiliary_data_fields"):
-            remove_expanded_auxiliary_variables_from_dataset(self)
-
-        regridder_collection = RegridderInstancesCollection(
-            self.dataset, target_grid=target_grid
-        )
-
-        regridder_settings = copy.deepcopy(self._regrid_method)
-        if regridder_types is not None:
-            regridder_settings.update(regridder_types)
-
-        new_package_data = get_non_grid_data(self, list(regridder_settings.keys()))
-
-        for (
-            varname,
-            regridder_type_and_function,
-        ) in regridder_settings.items():
-            regridder_name, regridder_function = regridder_type_and_function
-
-            # skip variables that are not in this dataset
-            if varname not in self.dataset.keys():
-                continue
-
-            # regrid the variable
-            new_package_data[varname] = self._regrid_array(
-                varname,
-                regridder_collection,
-                regridder_name,
-                regridder_function,
-                target_grid,
-            )
-            # set dx and dy if present in target_grid
-            new_package_data[varname] = assign_coord_if_present(
-                "dx", target_grid, new_package_data[varname]
-            )
-            new_package_data[varname] = assign_coord_if_present(
-                "dy", target_grid, new_package_data[varname]
-            )
-        if hasattr(self,"auxiliary_data_fields"):
-            expand_transient_auxiliary_variables(self)
-
-        return self.__class__(**new_package_data)
+        try:
+            result = _regrid_like(self, target_grid, regrid_context, regridder_types)
+        except ValueError as e:
+            raise e
+        except Exception:
+            raise ValueError("package could not be regridded.")
+        return result
 
     def _skip_masking_dataarray(self, array_name: str) -> bool:
         if hasattr(self, "_skip_mask_arrays"):
@@ -765,3 +620,34 @@ class Package(PackageBase, IPackage, abc.ABC):
         if hasattr(self, "_auxiliary_data"):
             return self._auxiliary_data
         return {}
+
+    def get_non_grid_data(self, grid_names: list[str]) -> dict[str, Any]:
+        """
+        This function copies the attributes of a dataset that are scalars, such as options.
+
+        parameters
+        ----------
+        grid_names: list of str
+            the names of the attribbutes of a dataset that are grids.
+        """
+        result = {}
+        all_non_grid_data = list(self.dataset.keys())
+        for name in (
+            gridname for gridname in grid_names if gridname in all_non_grid_data
+        ):
+            all_non_grid_data.remove(name)
+        for name in all_non_grid_data:
+            if "time" in self.dataset[name].coords:
+                result[name] = self.dataset[name]
+            else:
+                result[name] = self.dataset[name].values[()]
+        return result
+
+    def is_splitting_supported(self) -> bool:
+        return True
+
+    def is_regridding_supported(self) -> bool:
+        return True
+
+    def is_clipping_supported(self) -> bool:
+        return True

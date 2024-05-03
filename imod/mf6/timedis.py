@@ -1,6 +1,7 @@
 import cftime
 import numpy as np
 
+from imod.logging import init_log_decorator
 from imod.mf6.package import Package
 from imod.schemata import DimsSchema, DTypeSchema
 
@@ -54,6 +55,7 @@ class TimeDiscretization(Package):
 
     _write_schemata = {}
 
+    @init_log_decorator()
     def __init__(
         self,
         timestep_duration,

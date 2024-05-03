@@ -5,7 +5,7 @@ import xarray as xr
 
 class IPackageBase(ABC):
     """
-    The base methods and attributes available in all packages
+    Interface for imod.mf6.pkgbase.PackageBase
     """
 
     @property

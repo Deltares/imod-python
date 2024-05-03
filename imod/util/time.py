@@ -18,11 +18,11 @@ DATETIME_FORMATS = {
 def to_datetime(s: str) -> datetime.datetime:
     """
     Convert string to datetime. Part of the public API for backwards
-    compatibility reasons. 
-    
+    compatibility reasons.
+
     Fast performance is important, as this function is used to parse IDF names,
     so it being called 100,000 times is a common usecase. Function stored
-    previously under imod.util.to_datetime. 
+    previously under imod.util.to_datetime.
     """
     try:
         time = datetime.datetime.strptime(s, DATETIME_FORMATS[len(s)])
@@ -44,14 +44,14 @@ def _check_year(year: int) -> None:
 
 
 def to_datetime_internal(
-        time: cftime.datetime | np.datetime64 | str, use_cftime: bool
-    ) -> np.datetime64 | cftime.datetime:
+    time: cftime.datetime | np.datetime64 | str, use_cftime: bool
+) -> np.datetime64 | cftime.datetime:
     """
     Check whether time is cftime object, else convert to datetime64 series.
 
     cftime currently has no pd.to_datetime equivalent: a method that accepts a
     lot of different input types. Function stored previously under
-    imod.wq.timeutil.to_datetime. 
+    imod.wq.timeutil.to_datetime.
 
     Parameters
     ----------
@@ -83,7 +83,7 @@ def to_datetime_internal(
         return np.datetime64(time, "ns")
 
 
-def timestep_duration(times: np.array, use_cftime: bool):
+def timestep_duration(times: np.ndarray, use_cftime: bool):
     """
     Generates dictionary containing stress period time discretization data.
 
@@ -108,7 +108,7 @@ def timestep_duration(times: np.array, use_cftime: bool):
     return np.array(timestep_duration)
 
 
-def forcing_starts_ends(package_times: np.array, globaltimes: np.array):
+def forcing_starts_ends(package_times: np.ndarray, globaltimes: np.ndarray):
     """
     Determines the stress period numbers for start and end for a forcing defined
     at a starting time, until the next starting time.
@@ -142,7 +142,7 @@ def forcing_starts_ends(package_times: np.array, globaltimes: np.array):
     return starts_ends
 
 
-def _convert_datetimes(times: np.array, use_cftime: bool):
+def _convert_datetimes(times: np.ndarray, use_cftime: bool):
     """
     Return times as np.datetime64[ns] or cftime.DatetimeProlepticGregorian
     depending on whether the dates fall within the inclusive bounds of
@@ -161,7 +161,7 @@ def _convert_datetimes(times: np.array, use_cftime: bool):
         ]
     else:
         for time in times:
-            try: 
+            try:
                 _check_year(time.year)
             except ValueError:
                 out_of_bounds = True
@@ -182,14 +182,14 @@ def _convert_datetimes(times: np.array, use_cftime: bool):
 
 
 def _compose_timestring(
-        time: np.datetime64 | cftime.datetime, time_format: str="%Y%m%d%H%M%S"
-    ) -> str:
+    time: np.datetime64 | cftime.datetime, time_format: str = "%Y%m%d%H%M%S"
+) -> str:
     """
     Compose timestring from time. Function takes care of different
     types of available time objects.
     """
     if time == "steady-state":
-        return time
+        return str(time)  # the conversion to str is for mypy
     else:
         if isinstance(time, np.datetime64):
             # The following line is because numpy.datetime64[ns] does not

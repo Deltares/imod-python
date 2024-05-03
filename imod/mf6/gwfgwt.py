@@ -4,6 +4,7 @@ from typing import Optional
 import cftime
 import numpy as np
 
+from imod.logging import init_log_decorator
 from imod.mf6.exchangebase import ExchangeBase
 from imod.mf6.package import Package
 from imod.typing import GridDataArray
@@ -11,8 +12,10 @@ from imod.typing import GridDataArray
 
 class GWFGWT(ExchangeBase):
     _pkg_id = "gwfgwt"
+
     _template = Package._initialize_template(_pkg_id)
 
+    @init_log_decorator()
     def __init__(self, model_id1: str, model_id2: str):
         dict_dataset = {
             "model_name_1": model_id1,
@@ -33,7 +36,6 @@ class GWFGWT(ExchangeBase):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-        state_for_boundary: Optional[GridDataArray] = None,
     ) -> Package:
         """
         The GWF-GWT exchange does not have any spatial coordinates that can be clipped.

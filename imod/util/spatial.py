@@ -7,7 +7,7 @@ used internally, but are not private since they may be useful to users as well.
 
 import collections
 import re
-from typing import Any, Dict, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, Sequence, Tuple, Union
 
 import affine
 import numpy as np
@@ -16,6 +16,28 @@ import xarray as xr
 import xugrid as xu
 
 from imod.typing import FloatArray, GridDataset, IntArray
+from imod.util.imports import MissingOptionalModule
+
+# since rasterio, shapely, and geopandas are a big dependencies that are
+# sometimes hard to install and not always required, we made this an optional
+# dependency
+try:
+    import rasterio
+except ImportError:
+    rasterio = MissingOptionalModule("rasterio")
+
+try:
+    import shapely
+except ImportError:
+    shapely = MissingOptionalModule("shapely")
+
+if TYPE_CHECKING:
+    import geopandas as gpd
+else:
+    try:
+        import geopandas as gpd
+    except ImportError:
+        gpd = MissingOptionalModule("geopandas")
 
 
 def _xycoords(bounds, cellsizes) -> Dict[str, Any]:
@@ -23,13 +45,13 @@ def _xycoords(bounds, cellsizes) -> Dict[str, Any]:
     # unpack tuples
     xmin, xmax, ymin, ymax = bounds
     dx, dy = cellsizes
-    coords = collections.OrderedDict()
+    coords: collections.OrderedDict[str, Any] = collections.OrderedDict()
     # from cell size to x and y coordinates
-    if isinstance(dx, (int, float)):  # equidistant
+    if isinstance(dx, (int, float, np.int_)):  # equidistant
         coords["x"] = np.arange(xmin + dx / 2.0, xmax, dx)
         coords["y"] = np.arange(ymax + dy / 2.0, ymin, dy)
-        coords["dx"] = float(dx)
-        coords["dy"] = float(dy)
+        coords["dx"] = np.array(float(dx))
+        coords["dy"] = np.array(float(dy))
     else:  # nonequidistant
         # even though IDF may store them as float32, we always convert them to float64
         dx = dx.astype(np.float64)
@@ -37,12 +59,13 @@ def _xycoords(bounds, cellsizes) -> Dict[str, Any]:
         coords["x"] = xmin + np.cumsum(dx) - 0.5 * dx
         coords["y"] = ymax + np.cumsum(dy) - 0.5 * dy
         if np.allclose(dx, dx[0]) and np.allclose(dy, dy[0]):
-            coords["dx"] = float(dx[0])
-            coords["dy"] = float(dy[0])
+            coords["dx"] = np.array(float(dx[0]))
+            coords["dy"] = np.array(float(dy[0]))
         else:
             coords["dx"] = ("x", dx)
             coords["dy"] = ("y", dy)
     return coords
+
 
 def coord_reference(da_coord) -> Tuple[float, float, float]:
     """
@@ -195,9 +218,7 @@ def ugrid2d_data(da: xr.DataArray, face_dim: str) -> xr.DataArray:
     )
 
 
-def unstack_dim_into_variable(
-    dataset: GridDataset, dim: str
-) -> GridDataset:
+def unstack_dim_into_variable(dataset: GridDataset, dim: str) -> GridDataset:
     """
     Unstack each variable containing ``dim`` into separate variables.
     """
@@ -209,7 +230,7 @@ def unstack_dim_into_variable(
 
     for variable in variables_containing_dim:
         stacked = unstacked[variable]
-        unstacked = unstacked.drop_vars(variable)
+        unstacked = unstacked.drop_vars(variable)  # type: ignore
         for index in stacked[dim].values:
             unstacked[f"{variable}_{dim}_{index}"] = stacked.sel(
                 indexers={dim: index}, drop=True
@@ -316,7 +337,7 @@ def from_mdal_compliant_ugrid2d(dataset: xu.UgridDataset):
     # Next group by name, which will be the output dataset variable name.
     grouped = collections.defaultdict(list)
     for variable, match in matches:
-        name, layer = match.groups()
+        name, layer = match.groups()  # type: ignore
         da = ds[variable]
         grouped[name].append(da.assign_coords(layer=int(layer)))
 
@@ -379,6 +400,7 @@ def to_ugrid2d(data: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
         ds[data.name] = ugrid2d_data(data, grid.face_dimension)
     return mdal_compliant_ugrid2d(ds)
 
+
 def empty_2d(
     dx: Union[float, FloatArray],
     xmin: float,
@@ -415,7 +437,7 @@ def empty_2d(
         Filled with NaN.
     """
     bounds = (xmin, xmax, ymin, ymax)
-    cellsizes = (abs(dx), -abs(dy))
+    cellsizes = (np.abs(dx), -np.abs(dy))
     coords = _xycoords(bounds, cellsizes)
     nrow = coords["y"].size
     ncol = coords["x"].size
@@ -462,7 +484,7 @@ def empty_3d(
         Filled with NaN.
     """
     bounds = (xmin, xmax, ymin, ymax)
-    cellsizes = (abs(dx), -abs(dy))
+    cellsizes = (np.abs(dx), -np.abs(dy))
     coords = _xycoords(bounds, cellsizes)
     nrow = coords["y"].size
     ncol = coords["x"].size
@@ -515,7 +537,7 @@ def empty_2d_transient(
         Filled with NaN.
     """
     bounds = (xmin, xmax, ymin, ymax)
-    cellsizes = (abs(dx), -abs(dy))
+    cellsizes = (np.abs(dx), -np.abs(dy))
     coords = _xycoords(bounds, cellsizes)
     nrow = coords["y"].size
     ncol = coords["x"].size
@@ -569,7 +591,7 @@ def empty_3d_transient(
         Filled with NaN.
     """
     bounds = (xmin, xmax, ymin, ymax)
-    cellsizes = (abs(dx), -abs(dy))
+    cellsizes = (np.abs(dx), -np.abs(dy))
     coords = _xycoords(bounds, cellsizes)
     nrow = coords["y"].size
     ncol = coords["x"].size
@@ -582,6 +604,7 @@ def empty_3d_transient(
         coords=coords,
         dims=["time", "layer", "y", "x"],
     )
+
 
 def _layer(layer: Union[int, Sequence[int], IntArray]) -> IntArray:
     layer = np.atleast_1d(layer)
@@ -597,18 +620,45 @@ def _time(time: Any) -> Any:
     return pd.to_datetime(time)
 
 
-def is_divisor(numerator: FloatArray, denominator: float) -> bool:
+def is_divisor(numerator: Union[float, FloatArray], denominator: float) -> bool:
     """
     Parameters
     ----------
-    numerator: np.array of floats
+    numerator: np.array of floats or float
     denominator: float
 
     Returns
     -------
     is_divisor: bool
     """
-    denominator = abs(denominator)
+    denominator = np.abs(denominator)
     remainder = np.abs(numerator) % denominator
-    return (np.isclose(remainder, 0.0) | np.isclose(remainder, denominator)).all()
+    return bool(np.all(np.isclose(remainder, 0.0) | np.isclose(remainder, denominator)))
 
+
+def _polygonize(da: xr.DataArray) -> "gpd.GeoDataFrame":
+    """
+    Polygonize a 2D-DataArray into a GeoDataFrame of polygons.
+
+    Private method located in util.spatial to work around circular imports.
+    """
+
+    if da.dims != ("y", "x"):
+        raise ValueError('Dimensions must be ("y", "x")')
+
+    values = da.values
+    if values.dtype == np.float64:
+        values = values.astype(np.float32)
+
+    affine_transform = transform(da)
+    shapes = rasterio.features.shapes(values, transform=affine_transform)
+
+    geometries = []
+    colvalues = []
+    for geom, colval in shapes:
+        geometries.append(shapely.geometry.Polygon(geom["coordinates"][0]))
+        colvalues.append(colval)
+
+    gdf = gpd.GeoDataFrame({"value": colvalues, "geometry": geometries})
+    gdf.crs = da.attrs.get("crs")
+    return gdf

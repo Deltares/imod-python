@@ -14,6 +14,7 @@ import xarray as xr
 import xugrid as xu
 
 from imod.formats.prj import open_projectfile_data
+from imod.mf6 import Modflow6Simulation
 from imod.util.imports import MissingOptionalModule
 
 try:
@@ -21,15 +22,26 @@ try:
 except ImportError:
     gpd = MissingOptionalModule("geopandas")
 
-REGISTRY = pooch.create(
-    path=pooch.os_cache("imod"),
-    base_url="https://github.com/Deltares/imod-artifacts/raw/main/",
-    version=None,
-    version_dev="main",
-    env="IMOD_DATA_DIR",
-)
-with importlib.resources.files("imod.data") as pkg_dir:
-    REGISTRY.load_registry(pkg_dir / "registry.txt")
+
+def create_pooch_registry() -> pooch.core.Pooch:
+    registry = pooch.create(
+        path=pooch.os_cache("imod"),
+        base_url="https://github.com/Deltares/imod-artifacts/raw/main/",
+        version=None,
+        version_dev="main",
+        env="IMOD_DATA_DIR",
+    )
+    return registry
+
+
+def load_pooch_registry(registry: pooch.core.Pooch) -> pooch.core.Pooch:
+    with importlib.resources.files("imod.data") as pkg_dir:
+        registry.load_registry(pkg_dir / "registry.txt")
+    return registry
+
+
+REGISTRY = create_pooch_registry()
+REGISTRY = load_pooch_registry(REGISTRY)
 
 
 def twri_output(path: Union[str, Path]) -> None:
@@ -106,3 +118,26 @@ def imod5_projectfile_data(path: Union[str, Path]) -> dict:
         archive.extractall(path)
 
     return open_projectfile_data(Path(path) / "iMOD5_model_pooch" / "iMOD5_model.prj")
+
+
+def hondsrug_simulation(path: Union[str, Path]) -> Modflow6Simulation:
+    fname_simulation = REGISTRY.fetch("hondsrug-simulation.zip")
+
+    with ZipFile(fname_simulation) as archive:
+        archive.extractall(path)
+
+    simulation = Modflow6Simulation.from_file(Path(path) / "mf6-hondsrug-example.toml")
+    # The model was written before the xt3d_option and rhs_option arguments were
+    # added to iMOD Python. Set missing options to False.
+    simulation["GWF"]["npf"].set_xt3d_option(is_xt3d_used=False, is_rhs=False)
+
+    return simulation
+
+
+def hondsrug_crosssection(path: Union[str, Path]) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
+    fname_simulation = REGISTRY.fetch("hondsrug-crosssection.zip")
+
+    with ZipFile(fname_simulation) as archive:
+        archive.extractall(path)
+
+    return gpd.read_file(Path(path) / "crosssection.shp")

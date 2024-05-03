@@ -11,6 +11,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import (
     BoundaryCondition,
     DisStructuredBoundaryCondition,
@@ -19,13 +20,12 @@ from imod.mf6.boundary_condition import (
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
-from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.dataset import remove_inactive
-from imod.mf6.utilities.grid import create_layered_top
 from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
+from imod.prepare.layer import create_layered_top
 from imod.schemata import (
     AnyNoDataSchema,
     DTypeSchema,
@@ -90,7 +90,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         is the volumetric well rate. A positive value indicates well
         (injection) and a negative value indicates discharge (extraction) (q).
         If provided as DataArray, an ``"index"`` dimension is required and an
-        optional ``"time"`` dimension and coordinate specify transient input. 
+        optional ``"time"`` dimension and coordinate specify transient input.
         In the latter case, it is important that dimensions are in the order:
         ``("time", "index")``
     concentration: array of floats (xr.DataArray, optional)
@@ -100,8 +100,8 @@ class Well(BoundaryCondition, IPointDataPackage):
         if this flow package is used in simulations also involving transport, then this keyword specifies
         how outflow over this boundary is computed.
     id: list of Any, optional
-        assign an identifier code to each well. if not provided, one will be generated 
-        Must be convertible to string, and unique entries.  
+        assign an identifier code to each well. if not provided, one will be generated
+        Must be convertible to string, and unique entries.
     minimum_k: float, optional
         on creating point wells, no point wells will be placed in cells with a lower horizontal conductivity than this
     minimum_thickness: float, optional
@@ -148,13 +148,13 @@ class Well(BoundaryCondition, IPointDataPackage):
     >>> imod.mf6.Well(x, y, screen_top, screen_bottom, rate)
 
     For a transient well:
-    
+
     >>> weltimes = pd.date_range("2000-01-01", "2000-01-03")
 
     >>> rate_factor_time = xr.DataArray([0.5, 1.0], coords={"time": weltimes}, dims=("time",))
     >>> rate_transient = rate_factor_time * xr.DataArray(rate, dims=("index",))
 
-    >>> imod.mf6.Well(x, y, screen_top, screen_bottom, rate_transient)        
+    >>> imod.mf6.Well(x, y, screen_top, screen_bottom, rate_transient)
     """
 
     @property
@@ -187,13 +187,14 @@ class Well(BoundaryCondition, IPointDataPackage):
 
     _regrid_method: dict[str, Tuple[RegridderType, str]] = {}
 
+    @init_log_decorator()
     def __init__(
         self,
         x: list[float],
         y: list[float],
         screen_top: list[float],
         screen_bottom: list[float],
-        rate: list[float]| xr.DataArray,
+        rate: list[float] | xr.DataArray,
         concentration: Optional[list[float] | xr.DataArray] = None,
         concentration_boundary_type="aux",
         id: Optional[list[Any]] = None,
@@ -212,7 +213,7 @@ class Well(BoundaryCondition, IPointDataPackage):
             set_id = set(id)
             if len(id) != len(set_id):
                 raise ValueError("id's must be unique")
-            id = [ str(i) for i in id]                
+            id = [str(i) for i in id]
         dict_dataset = {
             "screen_top": _assign_dims(screen_top),
             "screen_bottom": _assign_dims(screen_bottom),
@@ -252,7 +253,6 @@ class Well(BoundaryCondition, IPointDataPackage):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-        state_for_boundary: Optional[GridDataArray] = None,
     ) -> Package:
         """
         Clip a package by a bounding box (time, layer, y, x).
@@ -393,7 +393,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         wells_df = wells_df.reset_index()
 
         wells_assigned = assign_wells(
-            wells_df, top_3d, bottom, k, minimum_thickness, minimum_k
+            wells_df, top_3d, bottom, k, minimum_thickness, minimum_k, True
         )
         # Set multi-index again
         wells_assigned = wells_assigned.set_index(index_names).sort_index()
@@ -577,7 +577,7 @@ class Well(BoundaryCondition, IPointDataPackage):
 
         if nwells_df == 0:
             raise ValueError("No wells were assigned in package. None were present.")
-        # @TODO: reinstate this check. issue github #621.
+
         if not is_partitioned and nwells_df != nwells_assigned:
             raise ValueError(
                 "One or more well(s) are completely invalid due to minimum conductivity and thickness constraints."
@@ -590,20 +590,11 @@ class Well(BoundaryCondition, IPointDataPackage):
         ds = ds.assign(**ds_vars.data_vars)
 
         ds = remove_inactive(ds, active)
-
-        # TODO: make options like "save_flows" configurable. Issue github #623
-        ds["save_flows"] = True
+        ds["save_flows"] = self["save_flows"].values[()]
+        ds["print_flows"] = self["print_flows"].values[()]
+        ds["print_input"] = self["print_input"].values[()]
 
         return Mf6Wel(**ds.data_vars)
-
-    def regrid_like(self, target_grid: GridDataArray, *_) -> Well:
-        """
-        The regrid_like method is irrelevant for this package as it is
-        grid-agnostic, instead this method clips the package based on the grid
-        exterior.
-        """
-        target_grid_2d = target_grid.isel(layer=0, drop=True, missing_dims="ignore")
-        return clip_by_grid(self, target_grid_2d)
 
     def mask(self, domain: GridDataArray) -> Well:
         """
@@ -620,6 +611,9 @@ class Well(BoundaryCondition, IPointDataPackage):
             "layer", errors="ignore"
         )
         return mask_2D(self, domain_2d)
+
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method
 
 
 class WellDisStructured(DisStructuredBoundaryCondition):
@@ -696,6 +690,7 @@ class WellDisStructured(DisStructuredBoundaryCondition):
 
     _write_schemata = {}
 
+    @init_log_decorator()
     def __init__(
         self,
         layer,
@@ -745,7 +740,6 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-        state_for_boundary: Optional[GridDataArray] = None,
     ) -> Package:
         """
         Clip a package by a bounding box (time, layer, y, x).
@@ -855,6 +849,7 @@ class WellDisVertices(DisVerticesBoundaryCondition):
 
     _write_schemata = {}
 
+    @init_log_decorator()
     def __init__(
         self,
         layer,
@@ -900,7 +895,6 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-        state_for_boundary: Optional[GridDataArray] = None,
     ) -> Package:
         """
         Clip a package by a bounding box (time, layer, y, x).

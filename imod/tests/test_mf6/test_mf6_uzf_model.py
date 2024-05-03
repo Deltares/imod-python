@@ -111,6 +111,8 @@ def uzf_model():
     ).where(ones_shape_time.layer == 1)
     uds["extinction_depth"] = (ones_shape_time * -10.0).where(ones_shape_time.layer == 1)
 
+    uds["simulate_groundwater_seepage"] = (
+        False  # Model doesn't converge if set to True....
     uds[
         "simulate_groundwater_seepage"
     ] = True 

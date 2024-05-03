@@ -10,6 +10,7 @@ import xarray as xr
 import imod
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
+from imod.typing.grid import ones_like
 
 
 @pytest.mark.usefixtures("twri_model")
@@ -529,6 +530,37 @@ def test_slice_and_run(transient_twri_model, tmp_path):
     modeldir = tmp_path / "ex01-twri-transient-slice"
     simulation.write(modeldir, binary=True)
     simulation.run()
+
+
+@pytest.mark.usefixtures("transient_twri_model")
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
+def test_slice_and_run_with_state(transient_twri_model, tmp_path):
+    # TODO: bring back well once slicing is implemented...
+    transient_twri_model["GWF_1"].pop("wel")
+    transient_twri_model.write(tmp_path, False, True, False)
+    transient_twri_model.run()
+    head = transient_twri_model.open_head()
+
+    # set the boundary to  recognizable value, in this case 1.23
+    state_for_boundary = {"GWF_1": 1.23 * ones_like(head)}
+    clipped_simulation = transient_twri_model.clip_box(
+        time_min="2000-01-10",
+        time_max="2000-01-20",
+        layer_min=1,
+        layer_max=2,
+        x_min=None,
+        x_max=65_000.0,
+        y_min=10_000.0,
+        y_max=65_000.0,
+        states_for_boundary=state_for_boundary,
+    )
+
+    # check that the value 1.23 occurrs in the chd_clipped package of the clipped simulation
+    clipped_boundary = clipped_simulation["GWF_1"]["chd_clipped"].dataset.sel(
+        time=2, layer=1
+    )
+    np_array = clipped_boundary["head"].values
+    assert (np_array == 1.23).sum() == 33
 
 
 @pytest.mark.usefixtures("transient_twri_model")

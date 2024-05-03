@@ -1,5 +1,5 @@
 import pathlib
-from typing import Callable, Union
+from typing import TYPE_CHECKING, Callable, Union
 
 import dask
 import numba
@@ -7,10 +7,12 @@ import numpy as np
 import pandas as pd
 import scipy.ndimage
 import xarray as xr
+from numpy.typing import DTypeLike
 
 import imod
 from imod.prepare import common, pcg
 from imod.util.imports import MissingOptionalModule
+from imod.util.spatial import _polygonize
 
 # since rasterio is a big dependency that is sometimes hard to install
 # and not always required, we made this an optional dependency
@@ -20,6 +22,9 @@ try:
     import rasterio.warp
 except ImportError:
     rasterio = MissingOptionalModule("rasterio")
+
+if TYPE_CHECKING:
+    import geopandas as gpd
 
 
 def round_extent(extent, cellsize):
@@ -252,7 +257,7 @@ def rasterize(geodataframe, like, column=None, fill=np.nan, **kwargs):
     return xr.DataArray(raster, like.coords, like.dims)
 
 
-def polygonize(da):
+def polygonize(da: xr.DataArray) -> "gpd.GeoDataFrame":
     """
     Polygonize a 2D-DataArray into a GeoDataFrame of polygons.
 
@@ -264,28 +269,7 @@ def polygonize(da):
     -------
     polygonized : geopandas.GeoDataFrame
     """
-    import geopandas as gpd
-    import shapely.geometry as sg
-
-    if da.dims != ("y", "x"):
-        raise ValueError('Dimensions must be ("y", "x")')
-
-    values = da.values
-    if values.dtype == np.float64:
-        values = values.astype(np.float32)
-
-    transform = imod.util.spatial.transform(da)
-    shapes = rasterio.features.shapes(values, transform=transform)
-
-    geometries = []
-    colvalues = []
-    for geom, colval in shapes:
-        geometries.append(sg.Polygon(geom["coordinates"][0]))
-        colvalues.append(colval)
-
-    gdf = gpd.GeoDataFrame({"value": colvalues, "geometry": geometries})
-    gdf.crs = da.attrs.get("crs")
-    return gdf
+    return _polygonize(da)
 
 
 def _handle_dtype(dtype, nodata):
@@ -559,7 +543,15 @@ def _cell_count(src, values, frequencies, nodata, *inds_weights):
     return row_i_arr, col_i_arr, value_arr, count_arr
 
 
-def _celltable(path, column, resolution, like, rowstart=0, colstart=0):
+def _celltable(
+    path: str | pathlib.Path,
+    column: str,
+    resolution: int,
+    like: xr.DataArray,
+    dtype: DTypeLike,
+    rowstart: int = 0,
+    colstart: int = 0,
+) -> pd.DataFrame:
     """
     Returns a table of cell indices (row, column) with feature ID, and feature
     area within cell. Essentially returns a COO sparse matrix, but with
@@ -581,6 +573,8 @@ def _celltable(path, column, resolution, like, rowstart=0, colstart=0):
     like : xarray.DataArray
         Example DataArray of where the cells will be located. Used only for the
         coordinates.
+    dtype: numpy.dtype
+        datatype of data referred to with "column".
 
     Returns
     -------
@@ -595,7 +589,7 @@ def _celltable(path, column, resolution, like, rowstart=0, colstart=0):
     spatial_reference = {"bounds": (xmin, xmax, ymin, ymax), "cellsizes": (dx, dy)}
 
     rasterized = gdal_rasterize(
-        path, column, nodata=nodata, dtype=np.int32, spatial_reference=spatial_reference
+        path, column, nodata=nodata, dtype=dtype, spatial_reference=spatial_reference
     )
 
     # Make sure the coordinates are increasing.
@@ -616,8 +610,8 @@ def _celltable(path, column, resolution, like, rowstart=0, colstart=0):
         alloc_len *= size
 
     # Pre-allocate work arrays
-    values = np.full(alloc_len, 0)
-    frequencies = np.full(alloc_len, 0)
+    values = np.full(alloc_len, 0, dtype=dtype)
+    frequencies = np.full(alloc_len, 0, dtype=dtype)
     rows, cols, values, counts = _cell_count(
         rasterized.values, values, frequencies, nodata, *inds_weights
     )
@@ -683,7 +677,14 @@ def _create_chunks(like, resolution, chunksize):
     return chunks, rowstarts, colstarts
 
 
-def celltable(path, column, resolution, like, chunksize=1e4):
+def celltable(
+    path: str | pathlib.Path,
+    column: str,
+    resolution: int,
+    like: xr.DataArray,
+    dtype: DTypeLike = np.int32,
+    chunksize: int = 10_000,
+) -> pd.DataFrame:
     r"""
     Process area of features by rasterizing in a chunkwise manner to limit
     memory usage.
@@ -725,6 +726,8 @@ def celltable(path, column, resolution, like, chunksize=1e4):
     like : xarray.DataArray
         Example DataArray of where the cells will be located. Used only for the
         coordinates.
+    dtype: DtypeLike, optional
+        datatype of data referred to with "column", defaults to 32-bit integer.
     chunksize : int, optional
         The size of the chunksize. Used for both x and y dimension.
 
@@ -794,7 +797,9 @@ def celltable(path, column, resolution, like, chunksize=1e4):
 
     like_chunks, rowstarts, colstarts = _create_chunks(like, resolution, chunksize)
     collection = [
-        dask.delayed(_celltable)(path, column, resolution, chunk, rowstart, colstart)
+        dask.delayed(_celltable)(
+            path, column, resolution, chunk, dtype, rowstart, colstart
+        )
         for chunk, rowstart, colstart in zip(like_chunks, rowstarts, colstarts)
     ]
     result = dask.compute(collection)[0]
@@ -862,7 +867,9 @@ def _zonal_aggregate_raster(
     * Sample the raster at the rasterized polygon cells
     * Store both in a dataframe, groupby and aggregate according to `method`
     """
-    data_dx, xmin, xmax, data_dy, ymin, ymax = imod.util.spatial.spatial_reference(raster)
+    data_dx, xmin, xmax, data_dy, ymin, ymax = imod.util.spatial.spatial_reference(
+        raster
+    )
     dx = resolution
     dy = -dx
     nodata = -1
@@ -963,7 +970,7 @@ def zonal_aggregate_raster(
     raster: xr.DataArray,
     resolution: float,
     method: Union[str, Callable],
-    chunksize: int = 1e4,
+    chunksize: int = 10_000,
 ) -> pd.DataFrame:
     """
     Compute a zonal aggregate of raster data for polygon geometries, e.g. a mean,
@@ -1046,7 +1053,7 @@ def zonal_aggregate_polygons(
     like: xr.DataArray,
     resolution: float,
     method: Union[str, Callable],
-    chunksize: int = 1e4,
+    chunksize: int = 10_000,
 ) -> pd.DataFrame:
     """
     Compute a zonal aggregate of polygon data for (other) polygon geometries,

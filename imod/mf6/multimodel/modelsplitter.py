@@ -2,6 +2,7 @@ from typing import List, NamedTuple
 
 import numpy as np
 
+from imod.logging import logger
 from imod.mf6.auxiliary_variables import (
     expand_transient_auxiliary_variables,
     remove_expanded_auxiliary_variables_from_dataset,
@@ -102,8 +103,7 @@ def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6
         if not sliced_package.is_empty():
             new_model[pkg_name] = sliced_package
         else:
-            # TODO: Add this to logger
-            print(
+            logger.info(
                 f"package {pkg_name} removed in partition {partition_info.id}, because all empty"
             )
 

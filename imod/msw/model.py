@@ -20,7 +20,6 @@ from imod.msw.landuse import LanduseOptions
 from imod.msw.meteo_grid import MeteoGrid
 from imod.msw.meteo_mapping import EvapotranspirationMapping, PrecipitationMapping
 from imod.msw.output_control import TimeOutputControl
-from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.timeutil import to_metaswap_timeformat
 from imod.msw.vegetation import AnnualCropFactors
 
@@ -100,9 +99,9 @@ class MetaSwapModel(Model):
         super().__init__()
 
         self.simulation_settings = copy(DEFAULT_SETTINGS)
-        self.simulation_settings[
-            "unsa_svat_path"
-        ] = self._render_unsaturated_database_path(unsaturated_database)
+        self.simulation_settings["unsa_svat_path"] = (
+            self._render_unsaturated_database_path(unsaturated_database)
+        )
 
     def _render_unsaturated_database_path(self, unsaturated_database):
         # Force to Path object
@@ -194,7 +193,7 @@ class MetaSwapModel(Model):
 
         return year, time_since_start_year
 
-    def _get_pkg_key(self, pkg_type: MetaSwapPackage, optional_package: bool = False):
+    def _get_pkg_key(self, pkg_type: type, optional_package: bool = False):
         for pkg_key, pkg in self.items():
             if isinstance(pkg, pkg_type):
                 return pkg_key

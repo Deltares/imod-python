@@ -1,8 +1,11 @@
 import pathlib
+from typing import Optional, Tuple
 
 import numpy as np
 
 import imod
+from imod.logging import init_log_decorator
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import DisBottomSchema
@@ -17,7 +20,7 @@ from imod.schemata import (
 )
 
 
-class StructuredDiscretization(Package):
+class StructuredDiscretization(Package, IRegridPackage):
     """
     Discretization information for structered grids is specified using the file.
     (DIS6) Only one discretization input file (DISU6, DISV6 or DIS6) can be
@@ -90,6 +93,7 @@ class StructuredDiscretization(Package):
 
     _skip_mask_arrays = ["bottom"]
 
+    @init_log_decorator()
     def __init__(self, top, bottom, idomain, validate: bool = True):
         dict_dataset = {
             "idomain": idomain,
@@ -144,3 +148,6 @@ class StructuredDiscretization(Package):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
+
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method

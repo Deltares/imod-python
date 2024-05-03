@@ -1,4 +1,3 @@
-
 def test_public_api():
     """
     Test if functions previously in imod.util.py are still available under same

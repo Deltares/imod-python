@@ -92,6 +92,9 @@ def test_is_divisor():
     assert not imod.util.spatial.is_divisor(-a, b)
     assert not imod.util.spatial.is_divisor(a, -b)
     assert not imod.util.spatial.is_divisor(-a, -b)
+    a = 3
+    b = 1.5
+    assert imod.util.spatial.is_divisor(-a, -b)
 
 
 def test_empty():
@@ -104,6 +107,13 @@ def test_empty():
     da = imod.util.spatial.empty_2d(-1.0, 0.0, 2.0, 1.0, 10.0, 12.0)
     assert np.allclose(da["x"], [0.5, 1.5])
     assert np.allclose(da["y"], [11.5, 10.5])
+
+    # array-like dx and dy
+    da_irregular = imod.util.spatial.empty_2d(
+        np.array([1, 2]), 0.0, 2.0, np.array([1, 2]), 10.0, 12.0
+    )
+    assert np.allclose(da_irregular["x"], [0.5, 2.0])
+    assert np.allclose(da_irregular["y"], [11.5, 10.0])
 
     with pytest.raises(ValueError, match="layer must be 1d"):
         imod.util.spatial.empty_3d(1.0, 0.0, 2.0, -1.0, 10.0, 12.0, [[1, 2]])
@@ -118,15 +128,20 @@ def test_empty():
     with pytest.raises(ValueError, match="time must be 1d"):
         imod.util.spatial.empty_2d_transient(1.0, 0.0, 2.0, -1.0, 10.0, 12.0, [times])
 
-    da2dt = imod.util.spatial.empty_2d_transient(1.0, 0.0, 2.0, -1.0, 10.0, 12.0, times[0])
+    da2dt = imod.util.spatial.empty_2d_transient(
+        1.0, 0.0, 2.0, -1.0, 10.0, 12.0, times[0]
+    )
     assert da2dt.ndim == 3
     da2dt = imod.util.spatial.empty_2d_transient(1.0, 0.0, 2.0, -1.0, 10.0, 12.0, times)
     assert isinstance(da2dt["time"].values[0], np.datetime64)
     assert da2dt.dims == ("time", "y", "x")
 
-    da3dt = imod.util.spatial.empty_3d_transient(1.0, 0.0, 2.0, -1.0, 10.0, 12.0, [0, 1], times)
+    da3dt = imod.util.spatial.empty_3d_transient(
+        1.0, 0.0, 2.0, -1.0, 10.0, 12.0, [0, 1], times
+    )
     assert da3dt.ndim == 4
     assert da3dt.dims == ("time", "layer", "y", "x")
+
 
 def test_compliant_ugrid2d(ugrid_ds, write=False):
     uds = imod.util.spatial.mdal_compliant_ugrid2d(ugrid_ds)

@@ -17,6 +17,7 @@ from imod.mf6 import (
     LayeredHorizontalFlowBarrierResistance,
 )
 from imod.mf6.hfb import to_connected_cells_dataset
+from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
 from imod.typing.grid import ones_like
 
@@ -136,7 +137,11 @@ def test_to_mf6_creates_mf6_adapter(
     else:
         idomain_clipped = idomain.sel(x=slice(None, 54.0))
 
-    hfb_clipped = hfb.regrid_like(idomain_clipped.sel(layer=1))
+    regrid_context = RegridderWeightsCache(
+        idomain.sel(layer=1), idomain_clipped.sel(layer=1)
+    )
+
+    hfb_clipped = hfb.regrid_like(idomain_clipped.sel(layer=1), regrid_context)
 
     # Assert
     x, y = hfb_clipped.dataset["geometry"].values[0].xy
@@ -302,9 +307,9 @@ def test_to_mf6_remove_invalid_edges(
 ):
     # Arrange.
     idomain, top, bottom = parameterizable_basic_dis
-    idomain.loc[
-        {"x": idomain.coords["x"][-1]}
-    ] = inactivity_marker  # make cells inactive
+    idomain.loc[{"x": idomain.coords["x"][-1]}] = (
+        inactivity_marker  # make cells inactive
+    )
     k = ones_like(top)
 
     barrier_y = [0.0, 2.0]
@@ -411,3 +416,29 @@ def test_is_empty():
 
     hfb = HorizontalFlowBarrierResistance(geometry)
     assert not hfb.is_empty()
+
+
+@pytest.mark.parametrize(
+    "parameterizable_basic_dis",
+    [BasicDisSettings(nlay=2, nrow=3, ncol=3, xstart=0, xstop=3)],
+    indirect=True,
+)
+@pytest.mark.parametrize("print_input", [True, False])
+def test_set_options(print_input, parameterizable_basic_dis):
+    idomain, top, bottom = parameterizable_basic_dis
+    hfb = HorizontalFlowBarrierResistance(
+        geometry=gpd.GeoDataFrame(
+            geometry=[
+                shapely.linestrings([-1000.0, 1000.0], [0.3, 0.3]),
+            ],
+            data={
+                "resistance": [1e3],
+                "ztop": [10.0],
+                "zbottom": [0.0],
+            },
+        ),
+        print_input=print_input,
+    )
+    k = ones_like(top)
+    mf6_package = hfb.to_mf6_pkg(idomain, top, bottom, k)
+    assert mf6_package.dataset["print_input"].values[()] == print_input

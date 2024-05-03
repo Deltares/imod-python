@@ -101,7 +101,7 @@ def replace(da: xr.DataArray, to_replace: Any, value: Any) -> xr.DataArray:
     if is_scalar(to_replace):
         if not is_scalar(value):
             raise TypeError("if to_replace is scalar, then value must be a scalar")
-        if np.isnan(to_replace):
+        if np.isnan(to_replace):  # type: ignore
             return da.fillna(value)
         else:
             return da.where(da != to_replace, other=value)
@@ -165,4 +165,3 @@ def values_within_range(
         return True
     else:
         return da == da.clip(min=min, max=max)
-

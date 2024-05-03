@@ -6,25 +6,38 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
-
 [Unreleased]
 ------------
 
+Added
+~~~~~
+- Added functions to allocate planar grids over layers for the topsystem in
+  :func:`imod.prepare.allocate_drn_cells`,
+  :func:`imod.prepare.allocate_ghb_cells`,
+  :func:`imod.prepare.allocate_rch_cells`,
+  :func:`imod.prepare.allocate_riv_cells`, for this multiple options can be
+  selected, available in :func:`imod.prepare.ALLOCATION_OPTION`.
+- Added functions to distribute conductances of planar grids over layers for the
+  topsystem in :func:`imod.prepare.distribute_riv_conductance`,
+  :func:`imod.prepare.distribute_drn_conductance`,
+  :func:`imod.prepare.distribute_ghb_conductance`, for this multiple options can
+  be selected, available in :func:`imod.prepare.DISTRIBUTION_OPTION`.
+- :func:`imod.prepare.celltable` supports an optional ``dtype`` argument. This
+  can be used, for example, to create celltables of float values.
+
+
 Fixed
 ~~~~~
-- Incorrect validation error ``data values found at nodata values of
-  idomain`` for boundary condition packages with a scalar coordinate
-  not set as dimension.
-- Fix issue where :func:`imod.idf.open_subdomains` and
-  :func:`imod.mf6.Modflow6Simulation.open_head` (for split simulations) would
-  return arrays with incorrect ``dx`` and ``dy`` coordinates for equidistant
-  data.
-- Fix issue where :func:`imod.idf.open_subdomains` returned a flipped ``dy``
-  coordinate for nonequidistant data.
-- Made :func:`imod.util.round_extent` available again, as it was moved without
-  notice. Function now throws a DeprecationWarning to use
-  :func:`imod.prepare.spatial.round_extent` instead.
-- :meth'`imod.mf6.Modflow6Simulation.write` failed after splitting the simulation. This has been fixed.
+- No ``ValidationError`` thrown anymore in :class:`imod.mf6.River` when
+  ``bottom_elevation`` equals ``bottom`` in the model discretization.
+- When wells outside of the domain are added, an exception is raised with an 
+  error message stating a well is outside of the domain.
+- When importing data from a .prj file, the multipliers and additions specified for
+  ipf and idf files are now applied
+- Fix bug where y-coords were flipped in :class:`imod.msw.MeteoMapping`
+  
+[0.16.0] - 2024-03-29
+---------------------
 
 Added
 ~~~~~
@@ -34,16 +47,27 @@ Added
 - Validation for incompatible settings in the :class:`imod.mf6.NodePropertyFlow`
   and :class:`imod.mf6.Dispersion` packages.
 - Checks that only one flow model is present in a simulation when calling
-:func:`imod.mf6.Modflow6Simulation.regrid_like`, :func:`imod.mf6.Modflow6Simulation.clip_box` or  :func:`imod.mf6.Modflow6Simulation.split` 
+  :func:`imod.mf6.Modflow6Simulation.regrid_like`,
+  :func:`imod.mf6.Modflow6Simulation.clip_box` or
+  :func:`imod.mf6.Modflow6Simulation.split`
 - Added support for coupling a GroundwaterFlowModel and Transport Model i.c.w.
-  the 6.4.3 release of MODFLOW. Using an older version of iMOD Python
-  with this version of MODFLOW will result in an error.
+  the 6.4.3 release of MODFLOW. Using an older version of iMOD Python with this
+  version of MODFLOW will result in an error.
 - :meth:`imod.mf6.Modflow6Simulation.split` supports splitting transport models,
   including multi-species simulations.
 - :meth:`imod.mf6.Modflow6Simulation.open_concentration` and
   :meth:`imod.mf6.Modflow6Simulation.open_transport_budget` support opening
   split multi-species simulations.
-  :meth:`imod.mf6.Modflow6Simulation.regrid_like` can now regrid simulations that have 1 or more transport models.
+  :meth:`imod.mf6.Modflow6Simulation.regrid_like` can now regrid simulations
+  that have 1 or more transport models.
+- added logging to various initialization methods, write methods and dump
+  methods. `See the documentation
+  <https://deltares.github.io/imod-python/api/generated/logging/imod.logging.html>`_
+  how to activate logging.
+- added :func:`imod.data.hondsrug_simulation` and
+  :func:`imod.data.hondsrug_crosssection` data.
+- simulations and models that include a lake package now raise an exception on
+  clipping, partitioning or regridding. 
 
 Changed
 ~~~~~~~
@@ -51,6 +75,30 @@ Changed
   :meth:`imod.mf6.Modflow6Simulation.open_transport_budget` raise a
   ``ValueError`` if ``species_ls`` is provided with incorrect length.
 
+Fixed
+~~~~~
+- Incorrect validation error ``data values found at nodata values of idomain``
+  for boundary condition packages with a scalar coordinate not set as dimension.
+- Fix issue where :func:`imod.idf.open_subdomains` and
+  :func:`imod.mf6.Modflow6Simulation.open_head` (for split simulations) would
+  return arrays with incorrect ``dx`` and ``dy`` coordinates for equidistant
+  data.
+- Fix issue where :func:`imod.idf.open_subdomains` returned a flipped ``dy``
+  coordinate for nonequidistant data.
+- Made :func:`imod.util.round_extent` available again, as it was moved without
+  notice. Function now throws a DeprecationWarning to use
+  :func:`imod.prepare.spatial.round_extent` instead.
+- :meth'`imod.mf6.Modflow6Simulation.write` failed after splitting the
+  simulation. This has been fixed.
+- modflow options like "print flow", "save flow", and "print input" can now be
+  set on :class:`imod.mf6.Well`
+- when regridding a :class:`imod.mf6.Modflow6Simulation`,
+  :class:`imod.mf6.GroundwaterFlowModel`,
+  :class:`imod.mf6.GroundwaterTransportModel` or a :class:`imod.mf6.package`,
+  regridding weights are now cached and can be re-used over the different
+  objects that are regridded. This improves performance considerably in most use
+  cases: when regridding is applied over the same grid cells with the same
+  regridder type, but with different values/methods, multiple times.
 
 [0.15.3] - 2024-02-22
 ---------------------
@@ -148,6 +196,9 @@ Added
 - The GWF-GWF exchange options are derived from user created packages (NPF, OC) and
   set automatically.
 - Added the ``simulation_start_time`` and ``time_unit`` arguments. To the ``Modflow6Simulation.open_`` methods, and ``imod.mf6.out.open_`` functions. This converts the ``"time"`` coordinate to datetimes.
+- added :meth:`imod.mf6.Modflow6Simulation.mask_all_models`  to apply a mask to all models under a simulation,
+provided the simulation is not split and the models use the same discretization. 
+
 
 Changed
 ~~~~~~~
@@ -489,7 +540,7 @@ Fixed
   if ``top_source`` or ``bottom_source`` are NaN.
 - :func:`imod.gen.write` no longer errors on dataframes with empty columns.
 - :func:`imod.mf6.BoundaryCondition.set_repeat_stress` reinstated. This is  
- a temporary measure, it gives a deprecation warning.
+  a temporary measure, it gives a deprecation warning.
 
 Changed
 ~~~~~~~

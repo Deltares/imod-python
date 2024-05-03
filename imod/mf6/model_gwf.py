@@ -5,6 +5,7 @@ from typing import Optional
 import cftime
 import numpy as np
 
+from imod.logging import init_log_decorator
 from imod.mf6 import ConstantHead
 from imod.mf6.clipped_boundary_condition_creator import create_clipped_boundary
 from imod.mf6.model import Modflow6Model
@@ -12,10 +13,44 @@ from imod.typing import GridDataArray
 
 
 class GroundwaterFlowModel(Modflow6Model):
+    """
+    The GroundwaterFlowModel (GWF) simulates flow of (liquid) groundwater.
+    More information can be found here:
+    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.4.2.pdf#page=27
+
+    Parameters
+    ----------
+
+    listing_file: Optional[str] = None
+        name of the listing file to create for this GWF model. If not specified,
+        then the name of the list file will be the basename of the GWF model
+        name file and the 'lst' extension.
+    print_input: bool = False
+        keyword to indicate that the list of all model stress package
+        information will be written to the listing file immediately after it is
+        read.
+    print_flows: bool = False
+        keyword to indicate that the list of all model package flow rates will
+        be printed to the listing file for every stress period time step in
+        which "BUDGET PRINT" is specified in Output Control.
+    save_flows: bool = False
+        indicate that all model package flow terms will be written to the file
+        specified with "BUDGET FILEOUT" in Output Control.
+    newton: bool = False
+        activates the Newton-Raphson formulation for groundwater flow between
+        connected, convertible groundwater cells and stress packages that
+        support calculation of Newton-Raphson terms for groundwater exchanges.
+    under_relaxation: bool = False,
+        indicates whether the groundwater head in a cell will be under-relaxed when
+        water levels fall below the bottom of the model below any given cell. By
+        default, Newton-Raphson UNDER_RELAXATION is not applied.
+    """
+
     _mandatory_packages = ("npf", "ic", "oc", "sto")
     _model_id = "gwf6"
     _template = Modflow6Model._initialize_template("gwf-nam.j2")
 
+    @init_log_decorator()
     def __init__(
         self,
         listing_file: Optional[str] = None,
@@ -34,7 +69,6 @@ class GroundwaterFlowModel(Modflow6Model):
             "newton": newton,
             "under_relaxation": under_relaxation,
         }
-
 
     def clip_box(
         self,
@@ -107,11 +141,11 @@ class GroundwaterFlowModel(Modflow6Model):
     def set_newton(self, is_newton: bool) -> None:
         self._options["newton"] = is_newton
 
-    def update_buoyancy_package(self, transport_models_per_flow_model)->None:
-        '''
-        If the simulation is partitioned, then the buoyancy package, if present, 
+    def update_buoyancy_package(self, transport_models_per_flow_model) -> None:
+        """
+        If the simulation is partitioned, then the buoyancy package, if present,
         must be updated for the renamed transport models.
-        '''
+        """
         buoyancy_key = self._get_pkgkey("buy")
         if buoyancy_key is None:
             return
@@ -119,7 +153,3 @@ class GroundwaterFlowModel(Modflow6Model):
         transport_models_old = buoyancy_package.get_transport_model_names()
         if len(transport_models_old) == len(transport_models_per_flow_model):
             buoyancy_package.update_transport_models(transport_models_per_flow_model)
-        
-
-
-            

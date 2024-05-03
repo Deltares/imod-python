@@ -36,14 +36,13 @@ class MeteoMapping(MetaSwapPackage):
 
     @staticmethod
     def grid_mapping(svat: xr.DataArray, meteo_grid: xr.DataArray) -> pd.DataFrame:
-        flip_svat_x = svat.indexes["x"].is_monotonic_decreasing
-        flip_svat_y = svat.indexes["y"].is_monotonic_decreasing
         flip_meteo_x = meteo_grid.indexes["x"].is_monotonic_decreasing
         flip_meteo_y = meteo_grid.indexes["y"].is_monotonic_decreasing
         nrow = meteo_grid["y"].size
         ncol = meteo_grid["x"].size
 
         # Convert to cell boundaries for the meteo grid
+        # Method always returns monotonic increasing edges
         meteo_x = common._coord(meteo_grid, "x")
         meteo_y = common._coord(meteo_grid, "y")
 
@@ -62,10 +61,10 @@ class MeteoMapping(MetaSwapPackage):
         if (row == 0).any() or (row > nrow).any():
             raise ValueError("Some values are out of bounds for row")
 
-        # Flip axis if necessary
-        if flip_meteo_y ^ flip_svat_y:
+        # Flip axis when meteofile bound are flipped, relative to the coords
+        if flip_meteo_y:
             row = (nrow + 1) - row
-        if flip_meteo_x ^ flip_svat_x:
+        if flip_meteo_x:
             column = (ncol + 1) - column
 
         n_subunit = svat["subunit"].size

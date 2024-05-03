@@ -1,10 +1,12 @@
 import collections
 import os
 from pathlib import Path
-from typing import Tuple, Union
+from typing import Optional, Tuple, Union
 
 import numpy as np
 
+from imod.logging import init_log_decorator
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.utilities.dataset import is_dataarray_none
 from imod.mf6.utilities.regrid import RegridderType
@@ -18,7 +20,7 @@ OUTPUT_EXT_MAPPING = {
 }
 
 
-class OutputControl(Package):
+class OutputControl(Package, IRegridPackage):
     """
     The Output Control Option determines how and when heads, budgets and/or
     concentrations are printed to the listing file and/or written to a separate
@@ -82,6 +84,7 @@ class OutputControl(Package):
     _write_schemata = {}
     _regrid_method: dict[str, Tuple[RegridderType, str]] = {}
 
+    @init_log_decorator()
     def __init__(
         self,
         save_head=None,
@@ -206,3 +209,6 @@ class OutputControl(Package):
     @property
     def is_budget_output(self) -> bool:
         return self.dataset["save_budget"].values[()] is not None
+
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method

@@ -42,7 +42,7 @@ dependencies = [
     "tomli_w",
     "toolz",
     "tqdm",
-    "xarray >=2023.04.0",
+    "xarray >=2023.08.0",
     "xugrid >=0.9.0",
 ]
 
@@ -101,7 +101,6 @@ ignore = [
     "PD004",
     "PD901",
 ]
-fixable = ["I"]
 ignore-init-module-imports = true
 
 [tool.ruff.lint.pydocstyle]
@@ -114,12 +113,20 @@ convention = "numpy"
 "test_examples.py" = ["F401"]
 
 [tool.mypy]
-files = ["imod/mf6/**.py"]
+files = [
+    "imod/mf6/**.py",
+    "imod/msw/**.py",    
+    "imod/logging/**.py",
+    "imod/prepare/**.py",  
+    "imod/select/**.py",
+    "imod/typing/**.py",    
+    "imod/util/**.py",          
+]
 follow_imports = "silent"
 warn_unused_configs = true
 
 [[tool.mypy.overrides]]
-module = 'mf6'
+module = ['mf6', 'logging']
 follow_imports = "normal"
 
 [[tool.mypy.overrides]]

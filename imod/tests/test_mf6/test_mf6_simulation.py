@@ -71,15 +71,15 @@ def test_simulation_open_head(circle_model, tmp_path):
 
     assert isinstance(head_notime, xu.UgridDataArray)
     assert head_notime.dims == ("time", "layer", "mesh2d_nFaces")
-    assert head_notime.shape == (1, 2, 216)
+    assert head_notime.shape == (52, 2, 216)
 
     # open heads with time conversion.
     head = simulation.open_head(
         simulation_start_time=datetime(2013, 3, 11, 22, 0, 0), time_unit="w"
     )
     assert head.dims == ("time", "layer", "mesh2d_nFaces")
-    assert head.shape == (1, 2, 216)
-    assert str(head.coords["time"].values[()][0]) == "2013-03-18T22:00:00.000000000"
+    assert head.shape == (52, 2, 216)
+    assert str(head.coords["time"].values[()][0]) == "2013-04-29T22:00:00.000000000"
 
 
 @pytest.mark.usefixtures("circle_model")
@@ -100,7 +100,7 @@ def test_simulation_open_head_relative_path(circle_model, tmp_path):
 
     assert isinstance(head, xu.UgridDataArray)
     assert head.dims == ("time", "layer", "mesh2d_nFaces")
-    assert head.shape == (1, 2, 216)
+    assert head.shape == (52, 2, 216)
 
 
 @pytest.mark.usefixtures("circle_model")
@@ -128,19 +128,20 @@ def test_simulation_open_flow_budget(circle_model, tmp_path):
     ]
     assert isinstance(budget["chd_chd"], xu.UgridDataArray)
 
-def test_write_circle_model_twice(circle_model, tmp_path):  
-    
+
+def test_write_circle_model_twice(circle_model, tmp_path):
     simulation = circle_model
 
     # write simulation, then write the simulation a second time
-    simulation.write(tmp_path/ "first_time", binary=False)
-    simulation.write(tmp_path/ "second_time", binary=False)
+    simulation.write(tmp_path / "first_time", binary=False)
+    simulation.write(tmp_path / "second_time", binary=False)
 
-    #check that text output is the same
-    diff = dircmp(tmp_path/"first_time", tmp_path/"second_time")
+    # check that text output is the same
+    diff = dircmp(tmp_path / "first_time", tmp_path / "second_time")
     assert len(diff.diff_files) == 0
     assert len(diff.left_only) == 0
-    assert len(diff.right_only) == 0    
+    assert len(diff.right_only) == 0
+
 
 @pytest.mark.usefixtures("circle_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
@@ -297,19 +298,23 @@ class TestModflow6Simulation:
         # Arrange.
         active = structured_flow_simulation_2_flow_models["flow"].domain.sel(layer=1)
         submodel_labels = xr.zeros_like(active)
-        submodel_labels.values[:,3:] = 1
+        submodel_labels.values[:, 3:] = 1
 
         # Act
         with pytest.raises(ValueError):
             _ = structured_flow_simulation_2_flow_models.split(submodel_labels)
 
-    def test_regrid_multiple_flow_models(self, structured_flow_simulation_2_flow_models):
+    def test_regrid_multiple_flow_models(
+        self, structured_flow_simulation_2_flow_models
+    ):
         # Arrange
         finer_idomain = grid_data_structured(np.int32, 1, 0.4)
 
         # Act
         with pytest.raises(ValueError):
-            _ = structured_flow_simulation_2_flow_models.regrid_like("regridded_model", finer_idomain, False)
+            _ = structured_flow_simulation_2_flow_models.regrid_like(
+                "regridded_model", finer_idomain, False
+            )
 
     def test_clip_multiple_flow_models(self, structured_flow_simulation_2_flow_models):
         # Arrange
@@ -320,9 +325,8 @@ class TestModflow6Simulation:
         # Act/Assert
         with pytest.raises(ValueError):
             _ = structured_flow_simulation_2_flow_models.clip_box(
-                    y_min= grid_y_min,
-                    y_max = grid_y_max/2                
-                )
+                y_min=grid_y_min, y_max=grid_y_max / 2
+            )
 
     @pytest.mark.usefixtures("transient_twri_model")
     def test_exchanges_in_simulation_file(self, transient_twri_model, tmp_path):
@@ -399,11 +403,9 @@ class TestModflow6Simulation:
         with pytest.raises(RuntimeError):
             _ = split_simulation.clip_box()
 
-    def test_deepcopy(
-        split_transient_twri_model
-    ):
-        # test  making a deepcopy will not crash 
-        _ = deepcopy( split_transient_twri_model)           
+    def test_deepcopy(split_transient_twri_model):
+        # test  making a deepcopy will not crash
+        _ = deepcopy(split_transient_twri_model)
 
     @pytest.mark.usefixtures("split_transient_twri_model")
     def test_prevent_regrid_like_after_split(
@@ -415,7 +417,9 @@ class TestModflow6Simulation:
 
         # Act/Assert
         with pytest.raises(RuntimeError):
-            _ = split_simulation.regrid_like(None, None)
+            _ = split_simulation.regrid_like(
+                "new_simulation", split_transient_twri_model["GWF_1_2"].domain
+            )
 
 
 def compare_submodel_partition_info(first: PartitionInfo, second: PartitionInfo):

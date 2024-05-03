@@ -74,11 +74,11 @@ def test_logging_calls_forwarded_to_loggers(logger_type, patched_logger):
 
         # Assert.
         logger_instance = MockClass.return_value
-        logger_instance.debug.assert_called_with("debug message")
-        logger_instance.info.assert_called_with("info message")
-        logger_instance.warning.assert_called_with("warning message")
-        logger_instance.error.assert_called_with("error message")
-        logger_instance.critical.assert_called_with("critical message")
+        logger_instance.debug.assert_called_with("debug message", 0)
+        logger_instance.info.assert_called_with("info message", 0)
+        logger_instance.warning.assert_called_with("warning message", 0)
+        logger_instance.error.assert_called_with("error message", 0)
+        logger_instance.critical.assert_called_with("critical message", 0)
 
 
 @pytest.mark.parametrize(

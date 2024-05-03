@@ -2,6 +2,7 @@ import pytest
 
 from .fixtures.flow_basic_fixture import (
     basic_dis,
+    basic_dis__topsystem,
     get_render_dict,
     horizontal_flow_barrier_gdf,
     metaswap_dict,
@@ -10,7 +11,11 @@ from .fixtures.flow_basic_fixture import (
     two_days,
     well_df,
 )
-from .fixtures.flow_basic_unstructured_fixture import basic_unstructured_dis, circle_dis
+from .fixtures.flow_basic_unstructured_fixture import (
+    basic_disv__topsystem,
+    basic_unstructured_dis,
+    circle_dis,
+)
 from .fixtures.flow_example_fixture import imodflow_model
 from .fixtures.flow_transport_simulation_fixture import flow_transport_simulation
 from .fixtures.mf6_circle_fixture import (
@@ -45,6 +50,7 @@ from .fixtures.mf6_lake_package_fixture import (
     lake_table,
     naardermeer,
 )
+from .fixtures.mf6_rectangle_with_lakes import rectangle_with_lakes
 from .fixtures.mf6_small_models_fixture import (
     solution_settings,
     structured_flow_model,

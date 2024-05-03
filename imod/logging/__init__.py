@@ -61,6 +61,7 @@ If you want to integrate imod-python logging into your own logging framework
 from imod.logging._loggerholder import _LoggerHolder
 from imod.logging.config import LoggerType, configure
 from imod.logging.ilogger import ILogger  # noqa: I001
+from imod.logging.logging_decorators import init_log_decorator, standard_log_decorator
 from imod.logging.loglevel import LogLevel
 
 logger = _LoggerHolder()

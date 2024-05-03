@@ -5,10 +5,12 @@ import cftime
 import numpy as np
 import xarray as xr
 
+from imod.logging import init_log_decorator
 from imod.mf6.auxiliary_variables import expand_transient_auxiliary_variables
 from imod.mf6.exchangebase import ExchangeBase
 from imod.mf6.package import Package
 from imod.typing import GridDataArray
+from imod.typing.grid import ones_like
 
 
 class GWTGWT(ExchangeBase):
@@ -23,6 +25,7 @@ class GWTGWT(ExchangeBase):
     _pkg_id = "gwtgwt"
     _template = Package._initialize_template(_pkg_id)
 
+    @init_log_decorator()
     def __init__(
         self,
         transport_model_id1: str,
@@ -46,7 +49,7 @@ class GWTGWT(ExchangeBase):
             "model_name_2": transport_model_id2,
             "flow_model_name_1": flow_model_id1,
             "flow_model_name_2": flow_model_id2,
-            "ihc": xr.DataArray(np.ones_like(cl1, dtype=int)),
+            "ihc": ones_like(cl1, dtype=int),
             "cl1": cl1,
             "cl2": cl2,
             "hwva": hwva,
@@ -84,10 +87,16 @@ class GWTGWT(ExchangeBase):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-        state_for_boundary: Optional[GridDataArray] = None,
     ) -> Package:
         raise NotImplementedError("this package cannot be clipped")
 
-
-    def render(self, directory: Path, pkgname: str, globaltimes: Union[list[np.datetime64], np.ndarray], binary: bool) -> str:
-        return self.render_with_geometric_constants(directory, pkgname, globaltimes, binary)
+    def render(
+        self,
+        directory: Path,
+        pkgname: str,
+        globaltimes: Union[list[np.datetime64], np.ndarray],
+        binary: bool,
+    ) -> str:
+        return self.render_with_geometric_constants(
+            directory, pkgname, globaltimes, binary
+        )

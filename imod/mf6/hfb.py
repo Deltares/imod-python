@@ -12,11 +12,11 @@ import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
 
+from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
-from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.grid import broadcast_to_full_domain
 from imod.mf6.utilities.regrid import RegridderType
 from imod.schemata import EmptyIndexesSchema
@@ -35,6 +35,7 @@ try:
     import shapely
 except ImportError:
     shapely = MissingOptionalModule("shapely")
+
 
 @typedispatch  # type: ignore[no-redef]
 def _derive_connected_cell_ids(
@@ -297,6 +298,9 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
         self.line_data = geometry
 
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method
+
     def _get_variable_names_for_gdf(self) -> list[str]:
         return [
             self._get_variable_name(),
@@ -555,7 +559,6 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         y_max: Optional[float] = None,
         top: Optional[GridDataArray] = None,
         bottom: Optional[GridDataArray] = None,
-        state_for_boundary: Optional[GridDataArray] = None,
     ) -> "HorizontalFlowBarrierBase":
         """
         Clip a package by a bounding box (time, layer, y, x).
@@ -581,7 +584,6 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         y_max: optional, float
         top: optional, GridDataArray
         bottom: optional, GridDataArray
-        state_for_boundary: optional, GridDataArray
 
         Returns
         -------
@@ -591,16 +593,6 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         new = cls.__new__(cls)
         new.dataset = copy.deepcopy(self.dataset)
         return new
-
-    def regrid_like(
-        self, target_grid: GridDataArray, *_
-    ) -> "HorizontalFlowBarrierBase":
-        """
-        The regrid_like method is irrelevant for this package as it is
-        grid-agnostic, instead this method clips the package based on the grid
-        exterior.
-        """
-        return clip_by_grid(self, target_grid)
 
     def mask(self, _) -> Package:
         """
@@ -730,6 +722,7 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
 
     """
 
+    @init_log_decorator()
     def __init__(
         self,
         geometry: "gpd.GeoDataFrame",
@@ -790,6 +783,7 @@ class LayeredHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierB
 
     """
 
+    @init_log_decorator()
     def __init__(
         self,
         geometry: "gpd.GeoDataFrame",
@@ -856,6 +850,7 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
 
     """
 
+    @init_log_decorator()
     def __init__(
         self,
         geometry: "gpd.GeoDataFrame",
@@ -921,6 +916,7 @@ class LayeredHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
 
     """
 
+    @init_log_decorator()
     def __init__(
         self,
         geometry: "gpd.GeoDataFrame",
@@ -1006,6 +1002,7 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
 
     """
 
+    @init_log_decorator()
     def __init__(
         self,
         geometry: "gpd.GeoDataFrame",
@@ -1067,6 +1064,7 @@ class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
 
     """
 
+    @init_log_decorator()
     def __init__(
         self,
         geometry: "gpd.GeoDataFrame",

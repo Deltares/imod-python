@@ -55,6 +55,8 @@ class Mf6Wel(BoundaryCondition):
         concentration=None,
         concentration_boundary_type="aux",
         save_flows: Optional[bool] = None,
+        print_flows: Optional[bool] = None,
+        print_input: Optional[bool] = None,
         validate: bool = True,
     ):
         dict_dataset = {
@@ -63,6 +65,8 @@ class Mf6Wel(BoundaryCondition):
             "concentration": concentration,
             "concentration_boundary_type": concentration_boundary_type,
             "save_flows": save_flows,
+            "print_flows": print_flows,
+            "print_input": print_input,
         }
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)

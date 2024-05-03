@@ -47,7 +47,7 @@ from imod.mf6.src import MassSourceLoading
 from imod.mf6.ssm import SourceSinkMixing
 from imod.mf6.sto import SpecificStorage, Storage, StorageCoefficient
 from imod.mf6.timedis import TimeDiscretization
-from imod.mf6.utilities.regrid import RegridderInstancesCollection, RegridderType
+from imod.mf6.utilities.regrid import RegridderType, RegridderWeightsCache
 from imod.mf6.uzf import UnsaturatedZoneFlow
 from imod.mf6.wel import Well, WellDisStructured, WellDisVertices
 from imod.mf6.write_context import WriteContext

@@ -1,10 +1,11 @@
-from typing import Tuple
+from typing import Optional, Tuple
 
 import numpy as np
 
-from imod.logging import logger
+from imod.logging import init_log_decorator, logger
 from imod.mf6 import GroundwaterFlowModel
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.utilities.regrid import RegridderType
 from imod.schemata import DTypeSchema
 
@@ -17,7 +18,7 @@ def with_index_dim(array_like):
     return ("index", arr1d)
 
 
-class SourceSinkMixing(BoundaryCondition):
+class SourceSinkMixing(BoundaryCondition, IRegridPackage):
     """
     Parameters
     ----------
@@ -44,6 +45,7 @@ class SourceSinkMixing(BoundaryCondition):
 
     _regrid_method: dict[str, Tuple[RegridderType, str]] = {}
 
+    @init_log_decorator()
     def __init__(
         self,
         package_names,
@@ -169,3 +171,6 @@ class SourceSinkMixing(BoundaryCondition):
             save_flows=save_flows,
             validate=validate,
         )
+
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return self._regrid_method

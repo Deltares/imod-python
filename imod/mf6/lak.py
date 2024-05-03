@@ -15,6 +15,7 @@ import pandas as pd
 import xarray as xr
 
 from imod import mf6
+from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.package import Package
 from imod.mf6.pkgbase import PackageBase
@@ -678,6 +679,7 @@ class Lake(BoundaryCondition):
         "outlet_width": [AllValueSchema(">", 0)],
     }
 
+    @init_log_decorator()
     def __init__(
         # lake
         self,
@@ -1206,3 +1208,12 @@ class Lake(BoundaryCondition):
         f.write(trimmedblock)
         f.write(f"end {title}\n")
         return
+
+    def is_splitting_supported(self) -> bool:
+        return False
+
+    def is_regridding_supported(self) -> bool:
+        return False
+
+    def is_clipping_supported(self) -> bool:
+        return False

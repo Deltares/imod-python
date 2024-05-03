@@ -21,7 +21,9 @@ def test_datetime_conversion__withinbounds():
 def test_datetime_conversion__outofbounds():
     times = [datetime.datetime(y, 1, 1) for y in range(1670, 1680)]
     with pytest.warns(UserWarning):
-        converted, use_cftime = imod.util.time._convert_datetimes(times, use_cftime=False)
+        converted, use_cftime = imod.util.time._convert_datetimes(
+            times, use_cftime=False
+        )
     assert use_cftime is True
     assert all(type(t) is cftime.DatetimeProlepticGregorian for t in converted)
     assert converted[0] == cftime.DatetimeProlepticGregorian(1670, 1, 1)

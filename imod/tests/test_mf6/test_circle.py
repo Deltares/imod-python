@@ -1,5 +1,6 @@
 import sys
 import textwrap
+from copy import deepcopy
 from datetime import datetime
 
 import numpy as np
@@ -7,12 +8,19 @@ import pytest
 import xugrid as xu
 
 import imod
+from imod.logging import LoggerType, LogLevel
 from imod.mf6.write_context import WriteContext
 
 
 @pytest.mark.usefixtures("circle_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_write_and_run(circle_model, tmp_path):
+    imod.logging.configure(
+        LoggerType.PYTHON,
+        log_level=LogLevel.DEBUG,
+        add_default_file_handler=True,
+        add_default_stream_handler=True,
+    )
     simulation = circle_model
 
     with pytest.raises(
@@ -21,6 +29,11 @@ def test_simulation_write_and_run(circle_model, tmp_path):
         circle_model.run()
 
     modeldir = tmp_path / "circle"
+
+    mask = deepcopy(circle_model["GWF_1"].domain)
+    mask.values[:, 133] = -1
+    simulation.mask_all_models(mask)
+
     simulation.write(modeldir, binary=False, use_absolute_paths=True)
     simulation.run()
 
@@ -32,11 +45,11 @@ def test_simulation_write_and_run(circle_model, tmp_path):
     )
     assert isinstance(head, xu.UgridDataArray)
     assert np.all(
-        head["time"].values
-        == np.array(datetime(1999, 1, 1, 0, 0, 1), dtype="datetime64[ns]")
+        head["time"].values[0]
+        == np.array(datetime(1999, 1, 1, 0, 0, 7), dtype="datetime64[ns]")
     )
     assert head.dims == ("time", "layer", "mesh2d_nFaces")
-    assert head.shape == (1, 2, 216)
+    assert head.shape == (52, 2, 216)
 
 
 @pytest.mark.usefixtures("circle_model")
@@ -89,7 +102,7 @@ def test_simulation_write_and_run_evt(circle_model_evt, tmp_path):
     )
     assert isinstance(head, xu.UgridDataArray)
     assert head.dims == ("time", "layer", "mesh2d_nFaces")
-    assert head.shape == (1, 2, 216)
+    assert head.shape == (52, 2, 216)
 
 
 @pytest.mark.usefixtures("circle_model_evt")
