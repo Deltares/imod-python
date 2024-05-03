@@ -185,8 +185,6 @@ imod.visualize.spatial.plot_map(
 axes[0].set_ylabel("original")
 axes[1].set_ylabel("regridded")
 
-plt.show()
-
 # %%
 # Set up the input needed for custom regridding including the method and the old grid.
 from imod.mf6.utilities.regrid import RegridderWeightsCache
@@ -244,7 +242,6 @@ def plot_histograms_side_by_side(array_original, array_regridded, title):
     array_regridded.plot.hist(ax=ax1, bins=25, density=True)
     ax0.title.set_text(f"{title} (original)")
     ax1.title.set_text(f"{title} (regridded)")
-    plt.show()
 
 
 # %%
@@ -357,8 +354,6 @@ imod.visualize.spatial.plot_map(
 
 axes[0].set_ylabel("original")
 axes[1].set_ylabel("regridded")
-
-plt.show()
 
 # %%
 # A note on regridding conductivity
