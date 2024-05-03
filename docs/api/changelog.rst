@@ -24,6 +24,8 @@ Added
   be selected, available in :func:`imod.prepare.DISTRIBUTION_OPTION`.
 - :func:`imod.prepare.celltable` supports an optional ``dtype`` argument. This
   can be used, for example, to create celltables of float values.
+- Added fixed_cell option in
+  :func:`imod.mf6.recharge`,
 
 
 Fixed
