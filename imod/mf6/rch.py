@@ -69,7 +69,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
         datetime will be used. Can also be set with a dictionary using the
         ``set_repeat_stress`` method.
     fixed_cell: ({True, False}, optional)
-        indicates that recharge will not be reassigned to a cell underlying the 
+        indicates that recharge will not be reassigned to a cell underlying the
         cell specified in the list if the specified cell is inactive.
     """
 

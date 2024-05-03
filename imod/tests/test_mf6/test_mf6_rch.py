@@ -95,7 +95,7 @@ def test_render_fixed_cell(rch_dict):
         """
     )
     assert actual == expected
-    
+
 
 def test_render_transient(rch_dict_transient):
     rch = imod.mf6.Recharge(**rch_dict_transient)
