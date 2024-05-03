@@ -502,7 +502,12 @@ def test_partition_transport_multispecies(
             rtol=rtol,
             atol=atol,
         )
-    for key in ["flow-lower-face", "flow-horizontal-face", "storage-aqueous", "source-sink mix_ssm"]:
+    for key in [
+        "flow-lower-face",
+        "flow-horizontal-face",
+        "storage-aqueous",
+        "source-sink mix_ssm",
+    ]:
         marker = is_exchange_cell
         if key == "flow-horizontal-face":
             marker = is_exchange_edge
