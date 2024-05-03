@@ -73,6 +73,30 @@ def test_render(rch_dict):
     assert actual == expected
 
 
+def test_render_fixed_cell(rch_dict):
+    rch_dict["fixed_cell"] = True
+    rch = imod.mf6.Recharge(**rch_dict)
+    directory = pathlib.Path("mymodel")
+    globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
+    actual = rch.render(directory, "recharge", globaltimes, True)
+    expected = textwrap.dedent(
+        """\
+        begin options
+          fixed_cell
+        end options
+
+        begin dimensions
+          maxbound 8
+        end dimensions
+
+        begin period 1
+          open/close mymodel/recharge/rch.bin (binary)
+        end period
+        """
+    )
+    assert actual == expected
+    
+
 def test_render_transient(rch_dict_transient):
     rch = imod.mf6.Recharge(**rch_dict_transient)
     directory = pathlib.Path("mymodel")

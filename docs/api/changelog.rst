@@ -24,7 +24,10 @@ Added
   be selected, available in :func:`imod.prepare.DISTRIBUTION_OPTION`.
 - :func:`imod.prepare.celltable` supports an optional ``dtype`` argument. This
   can be used, for example, to create celltables of float values.
-- Added fixed_cell option in
+- Added fixed_cell option. This option is relevant for phreatic models, not using 
+  the Newton formulation and model cells can become inactive. The prefered method 
+  for phreatic models is to use the Newton formulation, where cells remain active, 
+  and this option irrelevant. Option Added in
   :func:`imod.mf6.recharge`,
 
 
