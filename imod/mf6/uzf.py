@@ -4,7 +4,7 @@ import xarray as xr
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import AdvancedBoundaryCondition, BoundaryCondition
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
-from imod.prepare.layer import get_upper_active_layer_number
+from imod.prepare.layer import get_upper_active_grid_cells
 from imod.schemata import (
     AllInsideNoDataSchema,
     AllNoDataSchema,
@@ -231,8 +231,8 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         print_input=False,
         print_flows=False,
         save_flows=False,
-        budget_fileout = None,
-        budgetcsv_fileout = None,
+        budget_fileout=None,
+        budgetcsv_fileout=None,
         observations=None,
         water_mover=None,
         timeseries=None,
@@ -354,12 +354,12 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
 
     def _create_uzf_numbers(self, landflag):
         """Create unique UZF ID's. Inactive cells equal 0"""
-        active_nodes = xr.ones_like(landflag).where(landflag.notnull(), other =0.0)
+        active_nodes = landflag.notnull().astype(np.int8)
         return np.nancumsum(active_nodes).reshape(landflag.shape) * active_nodes
 
     def _determine_landflag(self, kv_sat):
-        """ returns the landflag for uzf-model. Landflag == 1 for top active UZF-nodes """
-        land_nodes = xr.ones_like(kv_sat,dtype = np.int32).where(kv_sat.layer == get_upper_active_layer_number(kv_sat),other = 0)
+        """returns the landflag for uzf-model. Landflag == 1 for top active UZF-nodes"""
+        land_nodes = get_upper_active_grid_cells(kv_sat).astype(np.int32)
         return land_nodes.where(kv_sat.notnull())
 
     def _determine_vertical_connection(self, uzf_number):
@@ -392,7 +392,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         recarr_new[field_names] = recarr
 
         return recarr_new
-    
+
     def render(self, directory, pkgname, globaltimes, binary):
         """Render fills in the template only, doesn't write binary data"""
         d = {}
@@ -407,7 +407,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         path = directory / pkgname / f"{self._pkg_id}-pkgdata.dat"
         d["packagedata"] = path.as_posix()
         # max uzf-cells for which time period data will be supplied
-        d["nuzfcells"] =  np.count_nonzero(np.isfinite(d['landflag'])) 
+        d["nuzfcells"] = np.count_nonzero(np.isfinite(d["landflag"]))
         return self._template.render(d)
 
     def _to_struct_array(self, arrdict, layer):

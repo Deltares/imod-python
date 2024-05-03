@@ -21,11 +21,11 @@ def _to_nan(a: FloatArray, dry_nan: bool) -> FloatArray:
     return a
 
 
-def get_header_advanced_package(
+def get_first_header_advanced_package(
     headers: Dict[str, List[Any]],
 ) -> Any:
-    for key, header in headers.items():
+    for key, header_list in headers.items():
         # multimodels have a gwf-gwf budget for flow-ja-face between domains
         if not "flow-ja-face" in key and "gwf_" in key:
-            return header[0]
+            return header_list[0]
     return None

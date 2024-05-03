@@ -60,7 +60,7 @@ def test_landflag(test_data):
     expected[1:2, :, :] = 0
     expected[:, 0, 0] = np.nan
     uzf = imod.mf6.UnsaturatedZoneFlow(**test_data)
-    np.testing.assert_equal(uzf["landflag"].values,expected)
+    np.testing.assert_equal(uzf["landflag"].values, expected)
 
 
 def test_iuzno(test_data):

@@ -11,7 +11,13 @@ import imod
 from imod.mf6.utilities.dataset import assign_datetime_coords
 
 from . import cbc
-from .common import FilePath, FloatArray, IntArray, _to_nan, get_header_advanced_package
+from .common import (
+    FilePath,
+    FloatArray,
+    IntArray,
+    _to_nan,
+    get_first_header_advanced_package,
+)
 
 
 # Binary Grid File / DIS Grids
@@ -197,7 +203,7 @@ def open_imeth6_budgets(
     grb_content: dict,
     header_list: List[cbc.Imeth6Header],
     return_variable: str = "budget",
-    return_id: np.ndarray | None = None,
+    indices: np.ndarray | None = None,
 ) -> xr.DataArray:
     """
     Open the data for an imeth==6 budget section.
@@ -230,7 +236,14 @@ def open_imeth6_budgets(
     for i, header in enumerate(header_list):
         time[i] = header.totim
         a = dask.delayed(cbc.read_imeth6_budgets_dense)(
-            cbc_path, header.nlist, dtype, header.pos, size, shape, return_variable, return_id
+            cbc_path,
+            header.nlist,
+            dtype,
+            header.pos,
+            size,
+            shape,
+            return_variable,
+            indices,
         )
         x = dask.array.from_delayed(a, shape=shape, dtype=np.float64)
         dask_list.append(x)
@@ -414,7 +427,7 @@ def open_cbc(
 ) -> Dict[str, xr.DataArray]:
     headers = cbc.read_cbc_headers(cbc_path)
     indices = None
-    header_advanced_package = get_header_advanced_package(headers)
+    header_advanced_package = get_first_header_advanced_package(headers)
     if header_advanced_package is not None:
         # For advanced packages the id2 column of variable gwf contains the MF6 id's.
         # Get id's eager from first stress period.
@@ -422,7 +435,9 @@ def open_cbc(
             [("id1", np.int32), ("id2", np.int32), ("budget", np.float64)]
             + [(name, np.float64) for name in header_advanced_package.auxtxt]
         )
-        table = cbc.read_imeth6_budgets(cbc_path, header_advanced_package.nlist, dtype, header_advanced_package.pos)
+        table = cbc.read_imeth6_budgets(
+            cbc_path, header_advanced_package.nlist, dtype, header_advanced_package.pos
+        )
         indices = table["id2"] - 1  # Convert to 0 based index
     cbc_content = {}
     for key, header_list in headers.items():
@@ -452,11 +467,15 @@ def open_cbc(
                     for return_variable in header_list[0].auxtxt:
                         key_aux = header_list[0].txt2id1 + "-" + return_variable
                         cbc_content[key_aux] = open_imeth6_budgets(
-                            cbc_path, grb_content, header_list, return_variable = return_variable, return_id = indices
+                            cbc_path,
+                            grb_content,
+                            header_list,
+                            return_variable=return_variable,
+                            indices=indices,
                         )
                 else:
                     cbc_content[key] = open_imeth6_budgets(
-                        cbc_path, grb_content, header_list, return_id = indices
+                        cbc_path, grb_content, header_list, indices=indices
                     )
     if simulation_start_time is not None:
         for cbc_name, cbc_array in cbc_content.items():

@@ -24,7 +24,16 @@ Added
   be selected, available in :func:`imod.prepare.DISTRIBUTION_OPTION`.
 - :func:`imod.prepare.celltable` supports an optional ``dtype`` argument. This
   can be used, for example, to create celltables of float values.
-
+- Budget arrays now contain np.nan for cells where budget variables are not defined. 
+  Based on new budget output a disquisition between active cells but zero flow and 
+  inactive cells can be made. Changes affect:  
+  :func:`imod.mf6.open_cbc`
+- Package type added to return budget names of CBC-output. New format is 
+  "package type"-"optional package variable"_"package name". E.g. a River package 
+  named ``primary-sys`` will get a budget name ``riv_primary-sys``. An UZF package 
+  with name ``uzf-sys1`` will get a budget name ``uzf-gwrch_uzf-sys1`` for the 
+  groundwater recharge budget from the UZF-CBC. Changes affect: 
+  :func:`imod.mf6.open_cbc`
 
 Fixed
 ~~~~~

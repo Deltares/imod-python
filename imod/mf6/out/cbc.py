@@ -132,10 +132,14 @@ def read_cbc_headers(
                 # key-format: "package type"-"optional_package_variable"_"package name"
                 # for river output: riv_sys1
                 # for uzf output: uzf-gwrch_uzf_sys1
-                key = header["text"] + '_' + imeth6_header["txt2id2"]
+                key = header["text"] + "_" + imeth6_header["txt2id2"]
                 # npf-key can be present multiple times in cases of saved saturation + specific discharge
                 if header["text"].startswith("data-"):
-                    key = imeth6_header["txt2id2"] + "_" + header["text"].replace("data-", "")
+                    key = (
+                        imeth6_header["txt2id2"]
+                        + "_"
+                        + header["text"].replace("data-", "")
+                    )
                 headers[key].append(Imeth6Header(**header, **imeth6_header))
             else:
                 raise ValueError(
@@ -264,7 +268,7 @@ def read_imeth6_budgets_dense(
     size: int,
     shape: tuple,
     return_variable: str,
-    return_id: np.ndarray | None
+    indices: np.ndarray | None,
 ) -> FloatArray:
     """
     Read the data for an imeth==6 budget section.
@@ -287,8 +291,8 @@ def read_imeth6_budgets_dense(
     shape: tuple[int, int, int]
         Shape (nlayer, nrow, ncolumn) of entire model domain.
     return_variable: str
-        variable name to return from budget table 
-    return_id: np.ndarray | None
+        variable name to return from budget table
+    indices: np.ndarray | None
         optional array that contains the indices to map return_variable to model topology
 
     Returns
@@ -298,7 +302,7 @@ def read_imeth6_budgets_dense(
     # Allocates a dense array for the entire domain
     out = np.full(size, np.nan, dtype=np.float64)
     table = read_imeth6_budgets(cbc_path, count, dtype, pos)
-    if return_id is None:
-        return_id = table["id1"] - 1  # Convert to 0 based index
-    out[return_id] = table[return_variable]
+    if indices is None:
+        indices = table["id1"] - 1  # Convert to 0 based index
+    out[indices] = table[return_variable]
     return out.reshape(shape)
