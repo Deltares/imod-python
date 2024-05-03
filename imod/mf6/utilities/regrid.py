@@ -4,7 +4,6 @@ from collections import defaultdict
 from typing import Any, Optional, Union
 
 import xarray as xr
-import xugrid as xu
 from fastcore.dispatch import typedispatch
 from xarray.core.utils import is_scalar
 from xugrid.regrid.regridder import BaseRegridder
@@ -383,8 +382,6 @@ def _regrid_like(
         raise ValueError(
             "Unable to regrid simulation. Regridding can only be done on simulations that have a single flow model."
         )
-    flow_models = simulation.get_models_of_type("gwf6")
-    old_grid = list(flow_models.values())[0].domain
     regrid_context = RegridderWeightsCache()
 
     models = simulation.get_models()
