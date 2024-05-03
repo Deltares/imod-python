@@ -34,7 +34,7 @@ Prepare model input
     create_layered_top
 
     ALLOCATION_OPTION
-    DISTRIBUTION_OPTION
+    DISTRIBUTING_OPTION
     allocate_drn_cells
     allocate_ghb_cells
     allocate_rch_cells
