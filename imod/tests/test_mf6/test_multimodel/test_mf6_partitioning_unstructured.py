@@ -427,7 +427,7 @@ def test_partition_transport(
     )
 
     for budget_term in (
-        "ssm",
+        "source-sink mix_ssm",
         "flow-lower-face",
         "storage-aqueous",
         "flow-horizontal-face",
@@ -489,7 +489,7 @@ def test_partition_transport_multispecies(
         actual_flow_budget, expected_flow_budget
     )
 
-    for key in ["flow-lower-face", "flow-horizontal-face", "sto-ss", "rch"]:
+    for key in ["flow-lower-face", "flow-horizontal-face", "sto-ss", "rch_rch"]:
         marker = is_exchange_cell
         if key == "flow-horizontal-face":
             marker = is_exchange_edge
@@ -502,7 +502,7 @@ def test_partition_transport_multispecies(
             rtol=rtol,
             atol=atol,
         )
-    for key in ["flow-lower-face", "flow-horizontal-face", "storage-aqueous", "ssm"]:
+    for key in ["flow-lower-face", "flow-horizontal-face", "storage-aqueous", "source-sink mix_ssm"]:
         marker = is_exchange_cell
         if key == "flow-horizontal-face":
             marker = is_exchange_edge
