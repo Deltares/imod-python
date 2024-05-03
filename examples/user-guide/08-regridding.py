@@ -197,7 +197,7 @@ old_grid
 # %%
 # Create a regridder weight-cache. This object can (and should) be reused for all the packages
 # that undergo custom regridding at this stage.
-regrid_context = RegridderWeightsCache(original_rch_package["rate"], target_grid)
+regrid_context = RegridderWeightsCache()
 
 regrid_context
 
