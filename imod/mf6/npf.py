@@ -1,12 +1,18 @@
 import warnings
-from typing import Optional, Tuple
+from copy import deepcopy
+from typing import Optional, Tuple, Union
 
 import numpy as np
+import xarray as xr
 
 from imod.logging import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
-from imod.mf6.utilities.regrid import RegridderType
+from imod.mf6.utilities.regrid import (
+    RegridderType,
+    RegridderWeightsCache,
+    _regrid_package_data,
+)
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
@@ -17,6 +23,7 @@ from imod.schemata import (
     IndexesSchema,
 )
 from imod.typing import GridDataArray
+from imod.typing.grid import zeros_like
 
 
 def _dataarray_to_bool(griddataarray: GridDataArray) -> bool:
@@ -461,3 +468,85 @@ class NodePropertyFlow(Package, IRegridPackage):
 
     def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
         return self._regrid_method
+
+    @classmethod
+    def from_imod5_data(
+        cls,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        target_grid: GridDataArray,
+        regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
+    ) -> "NodePropertyFlow":
+        """
+        Construct package from iMOD5 data, loaded with the
+        :func:`imod.formats.prj.open_projectfile_data` function.
+
+        Method regrids all variables to a target grid with the smallest extent
+        and smallest cellsize available in all the grids. Consequently it
+        converts iMODFLOW data to MODFLOW 6 data.
+
+        .. note::
+
+            The method expects the iMOD5 model to be fully 3D, not quasi-3D.
+
+        Parameters
+        ----------
+        imod5_data: dict
+            Dictionary with iMOD5 data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
+        regridder_types: dict, optional
+            Optional dictionary with regridder types for a specific variable.
+            Use this to override default regridding methods.
+
+        Returns
+        -------
+        Modflow 6 StructuredDiscretization package.
+
+        """
+
+        data = {
+            "k": imod5_data["khv"]["kh"],
+        }
+        has_vertical_anisotropy = (
+            "kva" in imod5_data.keys()
+            and "vertical_anisotropy" in imod5_data["kva"].keys()
+        )
+        has_horizontal_anisotropy = "ani" in imod5_data.keys()
+
+        if has_vertical_anisotropy:
+            data["k33"] = data["k"] * imod5_data["kva"]["vertical_anisotropy"]
+        if has_horizontal_anisotropy:
+            if not np.all(np.isnan(imod5_data["ani"]["factor"].values)):
+                factor = imod5_data["ani"]["factor"]
+                factor = fill_missing_layers(factor, data["k"], 1)
+                data["k22"] = data["k"] * factor
+            if not np.all(np.isnan(imod5_data["ani"]["angle"].values)):
+                angle1 = imod5_data["ani"]["angle"]
+                angle1 = 90.0 - angle1
+                angle1 = xr.where(angle1 < 0, 360.0 + angle1, angle1)
+                angle1 = fill_missing_layers(angle1, data["k"], 0)
+                data["angle1"] = angle1
+
+        icelltype = zeros_like(target_grid, dtype=int)
+
+        regridder_settings = deepcopy(cls._regrid_method)
+        if regridder_types is not None:
+            regridder_settings.update(regridder_types)
+
+        regrid_context = RegridderWeightsCache(data["k"], target_grid)
+
+        new_package_data = _regrid_package_data(
+            data, target_grid, regridder_settings, regrid_context
+        )
+        new_package_data["icelltype"] = icelltype
+
+        return NodePropertyFlow(**new_package_data)
+
+
+def fill_missing_layers(
+    source: xr.DataArray, full: xr.DataArray, fillvalue: Union[float | int]
+):
+    result = zeros_like(full)
+    result.values[:, :, :] = fillvalue
+    for l in source.coords["layer"].values:
+        result.loc[l, :, :] = source.sel({"layer": l})
+    return result

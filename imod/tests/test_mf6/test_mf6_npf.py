@@ -8,6 +8,7 @@ import xarray as xr
 
 import imod
 from imod.schemata import ValidationError
+from imod.tests.test_mf6.test_mf6_dis import _load_imod5_data_in_memory
 
 
 def test_render():
@@ -208,3 +209,94 @@ def test_configure_xt3d(tmp_path):
     assert "xt3d" not in rendered
     assert "rhs" not in rendered
     assert not npf.get_xt3d_option()
+
+
+def test_npf_from_imod5_isotropic(tmp_path):
+    data = imod.data.imod5_projectfile_data(tmp_path)
+    imod5_data = data[0]
+    # throw out kva (=vertical anisotropy array) and ani (=horizontal anisotropy array)
+    imod5_data.pop("kva")
+    imod5_data.pop("ani")
+
+    _load_imod5_data_in_memory(imod5_data)
+    target_grid = data[0]["khv"]["kh"]
+    npf = imod.mf6.NodePropertyFlow.from_imod5_data(imod5_data, target_grid)
+
+    # Test array values are the same  for k ( disregarding the locations where k == np.nan)
+    k_nan_removed = xr.where(np.isnan(npf.dataset["k"]), 0, npf.dataset["k"])
+    np.testing.assert_allclose(k_nan_removed, data[0]["khv"]["kh"].values)
+
+    rendered_npf = npf.render(tmp_path, "npf", None, None)
+    assert "k22" not in rendered_npf
+    assert "k33" not in rendered_npf
+    assert "angle1" not in rendered_npf
+    assert "angle2" not in rendered_npf
+    assert "angle3" not in rendered_npf
+
+
+def test_npf_from_imod5_horizontal_aniotropy(tmp_path):
+    data = imod.data.imod5_projectfile_data(tmp_path)
+    imod5_data = data[0]
+    # throw out kva (=vertical anisotropy array)
+    imod5_data.pop("kva")
+
+    _load_imod5_data_in_memory(imod5_data)
+    target_grid = data[0]["khv"]["kh"]
+    imod5_data["ani"]["angle"].values[:, :, :] = 135.0
+    imod5_data["ani"]["factor"].values[:, :, :] = 0.1
+    npf = imod.mf6.NodePropertyFlow.from_imod5_data(imod5_data, target_grid)
+
+    # Test array values  for k22 and angle1
+    for layer in npf.dataset["k"].coords["layer"].values:
+        k_layer = npf.dataset["k"].sel({"layer": layer})
+        k22_layer = npf.dataset["k22"].sel({"layer": layer})
+        angle1_layer = npf.dataset["angle1"].sel({"layer": layer})
+
+        k_layer = xr.where(np.isnan(k_layer), 0.0, k_layer)
+        k22_layer = xr.where(np.isnan(k22_layer), 0.0, k22_layer)
+        angle1_layer = xr.where(np.isnan(angle1_layer), 0.0, angle1_layer)
+
+        if layer in imod5_data["ani"]["factor"].coords["layer"].values:
+            np.testing.assert_allclose(
+                k_layer.values * 0.1, k22_layer.values, atol=1e-10
+            )
+            assert np.all(angle1_layer.values == 315.0)
+        else:
+            assert np.all(k_layer.values == k22_layer.values)
+            assert np.all(angle1_layer.values == 0.0)
+
+    rendered_npf = npf.render(tmp_path, "npf", None, None)
+    assert "k22" in rendered_npf
+    assert "k33" not in rendered_npf
+    assert "angle1" in rendered_npf
+    assert "angle2" not in rendered_npf
+    assert "angle3" not in rendered_npf
+
+
+def test_npf_from_imod5_vertical_aniotropy(tmp_path):
+    data = imod.data.imod5_projectfile_data(tmp_path)
+    imod5_data = data[0]
+    # throw out ani (=horizontal anisotropy array)
+    imod5_data.pop("ani")
+
+    _load_imod5_data_in_memory(imod5_data)
+    imod5_data["kva"]["vertical_anisotropy"].values[:] = 0.1
+    target_grid = data[0]["khv"]["kh"]
+
+    npf = imod.mf6.NodePropertyFlow.from_imod5_data(imod5_data, target_grid)
+
+    # Test array values  for k33
+    for layer in npf.dataset["k"].coords["layer"].values:
+        k_layer = npf.dataset["k"].sel({"layer": layer})
+        k33_layer = npf.dataset["k33"].sel({"layer": layer})
+
+        k_layer = xr.where(np.isnan(k_layer), 0.0, k_layer)
+        k33_layer = xr.where(np.isnan(k33_layer), 0.0, k33_layer)
+        np.testing.assert_allclose(k_layer.values * 0.1, k33_layer.values, atol=1e-10)
+
+    rendered_npf = npf.render(tmp_path, "npf", None, None)
+    assert "k22" not in rendered_npf
+    assert "k33" in rendered_npf
+    assert "angle1" not in rendered_npf
+    assert "angle2" not in rendered_npf
+    assert "angle3" not in rendered_npf
