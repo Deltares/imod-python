@@ -112,9 +112,6 @@ riv_allocated, _ = allocate_riv_cells(
 import geopandas as gpd
 from shapely.geometry import LineString
 
-# geometry = LineString([[246500,560500],[249900, 563900]])
-# geometry = LineString([[238000,559100],[239300, 563900], [242000,563000]])
-# geometry = LineString([[239300, 563500], [242000,563000]])
 geometry = LineString([[238000, 562200], [242000, 559800]])
 
 # Define overlay
