@@ -253,9 +253,9 @@ def test_npf_from_imod5_horizontal_anisotropy(imod5_dataset, tmp_path):
         k22_layer = npf.dataset["k22"].sel({"layer": layer})
         angle1_layer = npf.dataset["angle1"].sel({"layer": layer})
 
-        k_layer = xr.where(np.isnan(k_layer), 0.0, k_layer)
-        k22_layer = xr.where(np.isnan(k22_layer), 0.0, k22_layer)
-        angle1_layer = xr.where(np.isnan(angle1_layer), 0.0, angle1_layer)
+        k_layer = k_layer.fillna(0.0)
+        k22_layer = k22_layer.fillna(0.0)
+        angle1_layer = k22_layer.fillna(0.0)
 
         if layer in data["ani"]["factor"].coords["layer"].values:
             np.testing.assert_allclose(
