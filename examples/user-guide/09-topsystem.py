@@ -24,56 +24,17 @@ Robin-like boundary conditions over model layers.
 
 import imod
 
-layer_model = imod.data.hondsrug_layermodel()
+layer_model = imod.data.hondsrug_layermodel_topsystem()
 
 # %%
-# Make layer model more interesting for this example by subdividing layers
-# into n_new layers.
-import numpy as np
-import xarray as xr
-
-n_new = 4
-n_max_old = 5
-
-new_ds_ls = []
-for i in range(n_max_old):
-    sub_iter = np.arange(n_new) + 1
-    layer_coord = sub_iter + i * (n_max_old - 1)
-    distribution_factors = 1 / n_new * sub_iter
-    da_distribution = xr.DataArray(
-        distribution_factors, coords={"layer": layer_coord}, dims=("layer",)
-    )
-    layer_model_sel = layer_model.sel(layer=i + 1, drop=True)
-    D = layer_model_sel["top"] - layer_model_sel["bottom"]
-
-    new_ds = xr.Dataset()
-    new_ds["k"] = xr.ones_like(da_distribution) * layer_model_sel["k"]
-    new_ds["idomain"] = xr.ones_like(da_distribution) * layer_model_sel["idomain"]
-    # Put da_distribution in front of equation to enforce dims as (layer, y, x)
-    new_ds["top"] = (da_distribution - 1 / n_new) * -D + layer_model_sel["top"]
-    new_ds["bottom"] = da_distribution * -D + layer_model_sel["top"]
-
-    new_ds_ls.append(new_ds)
-
-
-new_layer_model = xr.concat(new_ds_ls, dim="layer")
-
 
 # %%
 # Furthermore we have planar grid of river, containing a river stage, bed
 # elevation and conductance.
-planar_river = imod.data.hondsrug_river().max(dim="layer")
+planar_river = imod.data.hondsrug_planar_river()
 
 planar_river
 
-
-# %% 
-# Let's adapt the river stages to make them closer to the top, this makes for
-# more interesting data in this example to show.
-
-planar_river["stage"] = (
-    new_layer_model["top"].sel(layer=1) - planar_river["stage"]
-) / 2 + planar_river["stage"]
 
 # %%
 # Let's plot the top elevation of the model on a map. You can see we have a
@@ -81,7 +42,7 @@ planar_river["stage"] = (
 import numpy as np
 
 imod.visualize.plot_map(
-    new_layer_model["top"].sel(layer=1), "viridis", np.linspace(1, 20, 11)
+    layer_model["top"].sel(layer=1), "viridis", np.linspace(1, 20, 11)
 )
 
 # %%
@@ -98,9 +59,9 @@ from imod.prepare import ALLOCATION_OPTION, allocate_riv_cells
 
 riv_allocated, _ = allocate_riv_cells(
     allocation_option=ALLOCATION_OPTION.at_elevation,
-    active=new_layer_model["idomain"] == 1,
-    top=new_layer_model["top"],
-    bottom=new_layer_model["bottom"],
+    active=layer_model["idomain"] == 1,
+    top=layer_model["top"],
+    bottom=layer_model["bottom"],
     stage=planar_river["stage"],
     bottom_elevation=planar_river["bottom"],
 )
@@ -128,8 +89,8 @@ imod.visualize.plot_map(
 #
 # Select a cross section. The plot also requires top and bottom information
 # which we will add first as coordinates before selecting.
-riv_allocated.coords["top"] = new_layer_model["top"]
-riv_allocated.coords["bottom"] = new_layer_model["bottom"]
+riv_allocated.coords["top"] = layer_model["top"]
+riv_allocated.coords["bottom"] = layer_model["bottom"]
 
 xsection_allocated = imod.select.cross_section_linestring(riv_allocated, geometry)
 
@@ -160,9 +121,9 @@ ax.scatter(x_line, stage_bottom.values, marker=6, c="k")
 # can identify where model layers are located.
 import xarray as xr
 
-layer_grid = new_layer_model.layer * xr.ones_like(new_layer_model["top"])
-layer_grid.coords["top"] = new_layer_model["top"]
-layer_grid.coords["bottom"] = new_layer_model["bottom"]
+layer_grid = layer_model.layer * xr.ones_like(layer_model["top"])
+layer_grid.coords["top"] = layer_model["top"]
+layer_grid.coords["bottom"] = layer_model["bottom"]
 xsection_layer_nr = imod.select.cross_section_linestring(layer_grid, geometry)
 
 imod.visualize.cross_section(xsection_layer_nr, "viridis", np.arange(21))
@@ -207,14 +168,14 @@ ax.set_title("stage and bottom elevation")
 for i, option in enumerate(ALLOCATION_OPTION, start=1):
     riv_allocated, _ = allocate_riv_cells(
         allocation_option=option,
-        active=new_layer_model["idomain"] == 1,
-        top=new_layer_model["top"],
-        bottom=new_layer_model["bottom"],
+        active=layer_model["idomain"] == 1,
+        top=layer_model["top"],
+        bottom=layer_model["bottom"],
         stage=planar_river["stage"],
         bottom_elevation=planar_river["bottom"],
     )
-    riv_allocated.coords["top"] = new_layer_model["top"]
-    riv_allocated.coords["bottom"] = new_layer_model["bottom"]
+    riv_allocated.coords["top"] = layer_model["top"]
+    riv_allocated.coords["bottom"] = layer_model["bottom"]
 
     xsection_allocated = imod.select.cross_section_linestring(riv_allocated, geometry)
     ax = axes[i]
@@ -262,9 +223,9 @@ imod.visualize.plot_map(planar_river["conductance"], "viridis", np.logspace(-2, 
 
 riv_allocated, _ = allocate_riv_cells(
     allocation_option=ALLOCATION_OPTION.stage_to_riv_bot,
-    active=new_layer_model["idomain"] == 1,
-    top=new_layer_model["top"],
-    bottom=new_layer_model["bottom"],
+    active=layer_model["idomain"] == 1,
+    top=layer_model["top"],
+    bottom=layer_model["bottom"],
     stage=planar_river["stage"],
     bottom_elevation=planar_river["bottom"],
 )
@@ -287,9 +248,9 @@ for option in DISTRIBUTING_OPTION:
 distributing_data = dict(
     allocated=riv_allocated,
     conductance=planar_river["conductance"],
-    top=new_layer_model["top"],
-    bottom=new_layer_model["bottom"],
-    k=new_layer_model["k"],
+    top=layer_model["top"],
+    bottom=layer_model["bottom"],
+    k=layer_model["k"],
     stage=planar_river["stage"],
     bottom_elevation=planar_river["bottom"]
     )
@@ -302,8 +263,8 @@ riv_conductance = distribute_riv_conductance(
     distributing_option=DISTRIBUTING_OPTION.by_layer_thickness, **distributing_data
 
 )
-riv_conductance.coords["top"] = new_layer_model["top"]
-riv_conductance.coords["bottom"] = new_layer_model["bottom"]
+riv_conductance.coords["top"] = layer_model["top"]
+riv_conductance.coords["bottom"] = layer_model["bottom"]
 
 # %%
 # Lets repeat the earlier process to produce a nice cross-section plot.
@@ -329,8 +290,8 @@ fig, axes = plt.subplots(4, 2, figsize=[11, 15], sharex=True, sharey=True)
 axes = np.ravel(axes)
 
 k = distributing_data["k"].copy()
-k.coords["top"] = new_layer_model["top"]
-k.coords["bottom"] = new_layer_model["bottom"]
+k.coords["top"] = layer_model["top"]
+k.coords["bottom"] = layer_model["bottom"]
 
 xsection_k = imod.select.cross_section_linestring(k, geometry)
 
@@ -344,8 +305,8 @@ for i, option in enumerate(DISTRIBUTING_OPTION, start=1):
         distributing_option=option, **distributing_data
 
     )
-    riv_conductance.coords["top"] = new_layer_model["top"]
-    riv_conductance.coords["bottom"] = new_layer_model["bottom"]
+    riv_conductance.coords["top"] = layer_model["top"]
+    riv_conductance.coords["bottom"] = layer_model["bottom"]
 
     xsection_distributed = imod.select.cross_section_linestring(riv_conductance, geometry)
 

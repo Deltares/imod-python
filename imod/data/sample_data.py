@@ -141,3 +141,64 @@ def hondsrug_crosssection(path: Union[str, Path]) -> "geopandas.GeoDataFrame":  
         archive.extractall(path)
 
     return gpd.read_file(Path(path) / "crosssection.shp")
+
+def hondsrug_layermodel_topsystem() -> xr.Dataset:
+    """
+    This is a modified version of the hondsrug_layermodel, used for the
+    topsystem example in the user guide. n_max_old original layers are
+    taken and subdivided into n_new layers. This makes for more layers around
+    the topsystem.
+    """
+    fname = REGISTRY.fetch("hondsrug-layermodel.nc")
+    layer_model = xr.open_dataset(fname)
+    # Make layer model more interesting for this example by subdividing layers
+    # into n_new layers.
+    n_new = 4
+    n_max_old = 5
+
+    # Loop over original layers until n_max_old and subdivide each into n_new
+    # layers.
+    new_ds_ls = []
+    for i in range(n_max_old):
+        sub_iter = np.arange(n_new) + 1
+        layer_coord = sub_iter + i * (n_max_old - 1)
+        distribution_factors = 1 / n_new * sub_iter
+        da_distribution = xr.DataArray(
+            distribution_factors, coords={"layer": layer_coord}, dims=("layer",)
+        )
+        layer_model_sel = layer_model.sel(layer=i + 1, drop=True)
+        # Compute thickness
+        D = layer_model_sel["top"] - layer_model_sel["bottom"]
+
+        new_ds = xr.Dataset()
+        new_ds["k"] = xr.ones_like(da_distribution) * layer_model_sel["k"]
+        new_ds["idomain"] = xr.ones_like(da_distribution) * layer_model_sel["idomain"]
+        # Put da_distribution in front of equation to enforce dims as (layer, y, x)
+        new_ds["top"] = (da_distribution - 1 / n_new) * -D + layer_model_sel["top"]
+        new_ds["bottom"] = da_distribution * -D + layer_model_sel["top"]
+
+        new_ds_ls.append(new_ds)
+
+    return xr.concat(new_ds_ls, dim="layer")
+
+
+def hondsrug_planar_river() -> xr.Dataset:
+    """
+    This is the hondsrug river dataset with the following modifications:
+
+    1) Aggregated over layer dimension to create planar grid.
+    2) Stages raised towards the top of the model, as the original stages are
+       most of the time laying at bottom elevation, making for boring examples.
+        
+    """
+    fname = REGISTRY.fetch("hondsrug-river.nc")
+    planar_river = xr.open_dataset(fname).max(dim="layer")
+
+    fname = REGISTRY.fetch("hondsrug-layermodel.nc")
+    top = xr.open_dataset(fname)["top"].sel(layer=1)
+
+    planar_river["stage"] = (
+        top - planar_river["stage"]
+    ) / 2 + planar_river["stage"]
+
+    return planar_river
