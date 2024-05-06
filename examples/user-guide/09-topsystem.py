@@ -67,8 +67,9 @@ planar_river = imod.data.hondsrug_river().max(dim="layer")
 planar_river
 
 
-# %%
-# Let's adapt the river stages to make them closer to the top.
+# %% 
+# Let's adapt the river stages to make them closer to the top, this makes for
+# more interesting data in this example to show.
 
 planar_river["stage"] = (
     new_layer_model["top"].sel(layer=1) - planar_river["stage"]
@@ -168,8 +169,19 @@ imod.visualize.cross_section(xsection_layer_nr, "viridis", np.arange(21))
 
 
 # %% 
-# There are multiple options available to allocate rivers. Let's make plots
-# for each option to visualize the effect of each choice.
+# Overview allocation options
+# ---------------------------
+#
+# There are multiple options available to allocate rivers. For a full
+# description of all options, see the documentation of
+# :func:`imod.prepare.ALLOCATION_OPTION`. We can print all possible options as
+# follows:
+
+for option in ALLOCATION_OPTION:
+    print(option.name)
+
+# %% 
+# Let's make plots for each option to visualize the effect of each choice.
 
 # Create grid for plots
 fig, axes = plt.subplots(3, 2, sharex=True, sharey=True, figsize=(11, 11))
@@ -221,9 +233,135 @@ for i, option in enumerate(ALLOCATION_OPTION, start=1):
         fig=fig,
         ax=ax,
     )
-    ax.set_title(option.name)
+    ax.set_title(f"option: {option.name}")
 
 # Enforce tight layout to remove whitespace inbetween plots.
+plt.tight_layout()
+
+
+# %%
+# Distribute conductance
+# ----------------------
+#
+# Next, we'll take a look at distributing conductances, as there are multiple
+# ways to distribute conductances over layers. For example, it is possible to
+# distribute conductances equally across layers, weighted by layer thickness, or
+# by transmissivity.
+
+from imod.prepare import DISTRIBUTING_OPTION, distribute_riv_conductance
+
+# %%
+# Here's a map of how the conductances are distributed in our dataset.
+
+imod.visualize.plot_map(planar_river["conductance"], "viridis", np.logspace(-2, 3, 6), overlays)
+
+
+# %%
+# First compute the allocated river cells for stage to river bottom elevation
+# again. This time we'll use the ``stage_to_riv_bot`` option.
+
+riv_allocated, _ = allocate_riv_cells(
+    allocation_option=ALLOCATION_OPTION.stage_to_riv_bot,
+    active=new_layer_model["idomain"] == 1,
+    top=new_layer_model["top"],
+    bottom=new_layer_model["bottom"],
+    stage=planar_river["stage"],
+    bottom_elevation=planar_river["bottom"],
+)
+
+riv_allocated
+
+# %%
+# Distribute river conductance over model layers. There are multiple options
+# available, which are fully described in
+# :func:`imod.prepare.DISTRIBUTING_OPTION`. We can print all possible options as
+# follows:
+
+for option in DISTRIBUTING_OPTION:
+    print(option.name)
+
+# %% 
+# To reduce duplicate code, we are going to store all input data in this
+# dictionary which we can provide further as keyword arguments.
+
+distributing_data = dict(
+    allocated=riv_allocated,
+    conductance=planar_river["conductance"],
+    top=new_layer_model["top"],
+    bottom=new_layer_model["bottom"],
+    k=new_layer_model["k"],
+    stage=planar_river["stage"],
+    bottom_elevation=planar_river["bottom"]
+    )
+
+# %%
+# Let's keep things simple first and distribute conductances across layers
+# equally.
+
+riv_conductance = distribute_riv_conductance(
+    distributing_option=DISTRIBUTING_OPTION.by_layer_thickness, **distributing_data
+
+)
+riv_conductance.coords["top"] = new_layer_model["top"]
+riv_conductance.coords["bottom"] = new_layer_model["bottom"]
+
+# %%
+# Lets repeat the earlier process to produce a nice cross-section plot.
+
+# Select the conductance over the cross section again.
+xsection_distributed = imod.select.cross_section_linestring(riv_conductance, geometry)
+
+fig, ax = plt.subplots()
+
+# Plot grey background of active cells
+is_active = ~np.isnan(xsection_distributed.coords["top"])
+imod.visualize.cross_section(is_active, "Greys", [0,1,2], kwargs_colorbar = dict(plot_colorbar=False), fig=fig, ax=ax)
+# Plot conductances
+imod.visualize.cross_section(xsection_distributed, "viridis", np.logspace(-2, 3, 6), fig=fig, ax=ax)
+
+# %%
+# Let's compare the results of all possible options visually. On the top left
+# we'll plot the hydraulic conductivity, as we haven't looked at that yet. The
+# other plots show the effects of different settings. Again, distributing
+# options are described in more detail in :func:`imod.prepare.DISTRIBUTING_OPTION`
+
+fig, axes = plt.subplots(4, 2, figsize=[11, 15], sharex=True, sharey=True)
+axes = np.ravel(axes)
+
+k = distributing_data["k"].copy()
+k.coords["top"] = new_layer_model["top"]
+k.coords["bottom"] = new_layer_model["bottom"]
+
+xsection_k = imod.select.cross_section_linestring(k, geometry)
+
+ax = axes[0]
+imod.visualize.cross_section(xsection_k, "viridis", np.logspace(-2, 3, 11), kwargs_colorbar = dict(plot_colorbar=False), fig=fig, ax=ax)
+ax.set_title("hydraulic conductivity")
+
+for i, option in enumerate(DISTRIBUTING_OPTION, start=1):
+    ax = axes[i]
+    riv_conductance = distribute_riv_conductance(
+        distributing_option=option, **distributing_data
+
+    )
+    riv_conductance.coords["top"] = new_layer_model["top"]
+    riv_conductance.coords["bottom"] = new_layer_model["bottom"]
+
+    xsection_distributed = imod.select.cross_section_linestring(riv_conductance, geometry)
+
+    if (i % 2) == 0:
+        kwargs_colorbar = dict(plot_colorbar=False)
+    else:
+        kwargs_colorbar = dict(plot_colorbar=True)
+
+    # Plot grey background of active cells
+    is_active = ~np.isnan(xsection_distributed.coords["top"])
+    imod.visualize.cross_section(is_active, "Greys", [0,1,2], kwargs_colorbar = dict(plot_colorbar=False), fig=fig, ax=ax)
+    # Plot conductances
+    imod.visualize.cross_section(xsection_distributed, "viridis", np.logspace(-2, 3, 11), kwargs_colorbar = kwargs_colorbar, fig=fig, ax=ax)
+
+    ax.set_title(f"option: {option.name}")
+
 plt.tight_layout()
 
 # %%
