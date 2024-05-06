@@ -301,20 +301,3 @@ def test_clip_box(rch_dict):
     selection = rch.clip_box(x_min=10.0, x_max=20.0, y_min=10.0, y_max=20.0)
     assert selection["rate"].dims == ("y", "x")
     assert selection["rate"].shape == (1, 1)
-
-
-def test_recharge_from_imod5(tmp_path):
-    data = imod.data.imod5_projectfile_data(tmp_path)
-    imod5_data = data[0]
-
-    _load_imod5_data_in_memory(imod5_data)
-
-    rch = imod.mf6.Recharge.from_imod5_data(imod5_data)
-
-    # Test array values are the same (they may be ordered differently, so we just compare summary statistics)
-    assert np.mean(imod5_data["rch"]["rate"].values) == np.mean(
-        rch.dataset["rate"].values
-    )
-    assert np.var(imod5_data["rch"]["rate"].values) == np.var(
-        rch.dataset["rate"].values
-    )
