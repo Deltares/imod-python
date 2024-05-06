@@ -1,17 +1,11 @@
-from copy import deepcopy
 from typing import Optional, Tuple
 
 import numpy as np
 
 from imod.logging import init_log_decorator
-from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.utilities.regrid import (
-    RegridderType,
-    RegridderWeightsCache,
-    _regrid_package_data,
-)
+from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -24,7 +18,6 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
-from imod.typing import GridDataArray
 
 
 class Recharge(BoundaryCondition, IRegridPackage):
@@ -154,56 +147,3 @@ class Recharge(BoundaryCondition, IRegridPackage):
 
     def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
         return self._regrid_method
-
-    @classmethod
-    @standard_log_decorator()
-    def from_imod5_data(
-        cls,
-        imod5_data: dict[str, dict[str, GridDataArray]],
-        regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
-    ) -> "Recharge":
-        """
-        Construct package from iMOD5 data, loaded with the
-        :func:`imod.formats.prj.open_projectfile_data` function.
-
-        Method regrids all variables to a target grid with the smallest extent
-        and smallest cellsize available in all the grids. Consequently it
-        converts iMODFLOW data to MODFLOW 6 data.
-
-        .. note::
-
-            The method expects the iMOD5 model to be fully 3D, not quasi-3D.
-
-        Parameters
-        ----------
-        imod5_data: dict
-            Dictionary with iMOD5 data. This can be constructed from the
-            :func:`imod.formats.prj.open_projectfile_data` method.
-        regridder_types: dict, optional
-            Optional dictionary with regridder types for a specific variable.
-            Use this to override default regridding methods.
-
-        Returns
-        -------
-        Modflow 6 StructuredDiscretization package.
-
-        """
-        data = {
-            "rate": imod5_data["rch"]["rate"],
-        }
-
-        target_grid = data["rate"]
-
-        # For some reason ``get_regrid_methods`` cannot be called in a
-        # classmethod.
-        regridder_settings = deepcopy(cls._regrid_method)
-        if regridder_types is not None:
-            regridder_settings.update(regridder_types)
-
-        regrid_context = RegridderWeightsCache(data["rate"], target_grid)
-
-        new_package_data = _regrid_package_data(
-            data, target_grid, regridder_settings, regrid_context
-        )
-
-        return cls(**new_package_data)
