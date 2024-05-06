@@ -477,12 +477,8 @@ class NodePropertyFlow(Package, IRegridPackage):
         regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
     ) -> "NodePropertyFlow":
         """
-        Construct package from iMOD5 data, loaded with the
+        Construct an npf-package from iMOD5 data, loaded with the
         :func:`imod.formats.prj.open_projectfile_data` function.
-
-        Method regrids all variables to a target grid with the smallest extent
-        and smallest cellsize available in all the grids. Consequently it
-        converts iMODFLOW data to MODFLOW 6 data.
 
         .. note::
 
@@ -493,13 +489,16 @@ class NodePropertyFlow(Package, IRegridPackage):
         imod5_data: dict
             Dictionary with iMOD5 data. This can be constructed from the
             :func:`imod.formats.prj.open_projectfile_data` method.
+        target_grid: GridDataArray
+            The grid that should be used for the new package. Does not
+            need to be identical to one of the input grids.
         regridder_types: dict, optional
             Optional dictionary with regridder types for a specific variable.
             Use this to override default regridding methods.
 
         Returns
         -------
-        Modflow 6 StructuredDiscretization package.
+        Modflow 6 npf package.
 
         """
 
