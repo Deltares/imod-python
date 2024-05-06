@@ -535,7 +535,7 @@ class NodePropertyFlow(Package, IRegridPackage):
         regrid_context = RegridderWeightsCache(data["k"], target_grid)
 
         new_package_data = _regrid_package_data(
-            data, target_grid, regridder_settings, regrid_context
+            data, target_grid, regridder_settings, regrid_context, {}
         )
         new_package_data["icelltype"] = icelltype
 

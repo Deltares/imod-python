@@ -1,6 +1,7 @@
 import pathlib
 import re
 import textwrap
+from copy import deepcopy
 
 import numpy as np
 import pytest
@@ -211,20 +212,20 @@ def test_configure_xt3d(tmp_path):
     assert not npf.get_xt3d_option()
 
 
-def test_npf_from_imod5_isotropic(tmp_path):
-    data = imod.data.imod5_projectfile_data(tmp_path)
-    imod5_data = data[0]
+@pytest.mark.usefixtures("imod5_dataset")
+def test_npf_from_imod5_isotropic(imod5_dataset, tmp_path):
+    data = deepcopy(imod5_dataset[0])
     # throw out kva (=vertical anisotropy array) and ani (=horizontal anisotropy array)
-    imod5_data.pop("kva")
-    imod5_data.pop("ani")
+    data.pop("kva")
+    data.pop("ani")
 
-    _load_imod5_data_in_memory(imod5_data)
-    target_grid = data[0]["khv"]["kh"]
-    npf = imod.mf6.NodePropertyFlow.from_imod5_data(imod5_data, target_grid)
+    _load_imod5_data_in_memory(data)
+    target_grid = data["khv"]["kh"]
+    npf = imod.mf6.NodePropertyFlow.from_imod5_data(data, target_grid)
 
     # Test array values are the same  for k ( disregarding the locations where k == np.nan)
     k_nan_removed = xr.where(np.isnan(npf.dataset["k"]), 0, npf.dataset["k"])
-    np.testing.assert_allclose(k_nan_removed, data[0]["khv"]["kh"].values)
+    np.testing.assert_allclose(k_nan_removed, data["khv"]["kh"].values)
 
     rendered_npf = npf.render(tmp_path, "npf", None, None)
     assert "k22" not in rendered_npf
@@ -234,17 +235,17 @@ def test_npf_from_imod5_isotropic(tmp_path):
     assert "angle3" not in rendered_npf
 
 
-def test_npf_from_imod5_horizontal_aniotropy(tmp_path):
-    data = imod.data.imod5_projectfile_data(tmp_path)
-    imod5_data = data[0]
+@pytest.mark.usefixtures("imod5_dataset")
+def test_npf_from_imod5_horizontal_anisotropy(imod5_dataset, tmp_path):
+    data = deepcopy(imod5_dataset[0])
     # throw out kva (=vertical anisotropy array)
-    imod5_data.pop("kva")
+    data.pop("kva")
 
-    _load_imod5_data_in_memory(imod5_data)
-    target_grid = data[0]["khv"]["kh"]
-    imod5_data["ani"]["angle"].values[:, :, :] = 135.0
-    imod5_data["ani"]["factor"].values[:, :, :] = 0.1
-    npf = imod.mf6.NodePropertyFlow.from_imod5_data(imod5_data, target_grid)
+    _load_imod5_data_in_memory(data)
+    target_grid = data["khv"]["kh"]
+    data["ani"]["angle"].values[:, :, :] = 135.0
+    data["ani"]["factor"].values[:, :, :] = 0.1
+    npf = imod.mf6.NodePropertyFlow.from_imod5_data(data, target_grid)
 
     # Test array values  for k22 and angle1
     for layer in npf.dataset["k"].coords["layer"].values:
@@ -256,7 +257,7 @@ def test_npf_from_imod5_horizontal_aniotropy(tmp_path):
         k22_layer = xr.where(np.isnan(k22_layer), 0.0, k22_layer)
         angle1_layer = xr.where(np.isnan(angle1_layer), 0.0, angle1_layer)
 
-        if layer in imod5_data["ani"]["factor"].coords["layer"].values:
+        if layer in data["ani"]["factor"].coords["layer"].values:
             np.testing.assert_allclose(
                 k_layer.values * 0.1, k22_layer.values, atol=1e-10
             )
@@ -273,17 +274,17 @@ def test_npf_from_imod5_horizontal_aniotropy(tmp_path):
     assert "angle3" not in rendered_npf
 
 
-def test_npf_from_imod5_vertical_aniotropy(tmp_path):
-    data = imod.data.imod5_projectfile_data(tmp_path)
-    imod5_data = data[0]
+@pytest.mark.usefixtures("imod5_dataset")
+def test_npf_from_imod5_vertical_anisotropy(imod5_dataset, tmp_path):
+    data = deepcopy(imod5_dataset[0])
     # throw out ani (=horizontal anisotropy array)
-    imod5_data.pop("ani")
+    data.pop("ani")
 
-    _load_imod5_data_in_memory(imod5_data)
-    imod5_data["kva"]["vertical_anisotropy"].values[:] = 0.1
-    target_grid = data[0]["khv"]["kh"]
+    _load_imod5_data_in_memory(data)
+    data["kva"]["vertical_anisotropy"].values[:] = 0.1
+    target_grid = data["khv"]["kh"]
 
-    npf = imod.mf6.NodePropertyFlow.from_imod5_data(imod5_data, target_grid)
+    npf = imod.mf6.NodePropertyFlow.from_imod5_data(data, target_grid)
 
     # Test array values  for k33
     for layer in npf.dataset["k"].coords["layer"].values:

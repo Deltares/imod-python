@@ -198,7 +198,7 @@ def _regrid_package_data(
     target_grid: GridDataArray,
     regridder_settings: dict[str, tuple[RegridderType, str]],
     regrid_context: RegridderWeightsCache,
-    new_package_data: Optional[dict[str, GridDataArray]] = {},
+    new_package_data: dict[str, GridDataArray] = {},
 ) -> dict[str, GridDataArray]:
     """
     Regrid package data. Loops over regridder settings to regrid variables one
