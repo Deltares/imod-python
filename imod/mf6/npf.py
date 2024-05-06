@@ -544,8 +544,6 @@ class NodePropertyFlow(Package, IRegridPackage):
 def fill_missing_layers(
     source: xr.DataArray, full: xr.DataArray, fillvalue: Union[float | int]
 ):
-    result = zeros_like(full)
-    result.values[:, :, :] = fillvalue
-    for l in source.coords["layer"].values:
-        result.loc[l, :, :] = source.sel({"layer": l})
+    layer = target_grid.coords["layer"]
+    result = source.reindex(layer=layer, fillvalue=fillvalue)
     return result
