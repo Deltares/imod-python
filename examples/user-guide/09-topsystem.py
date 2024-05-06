@@ -26,6 +26,8 @@ import imod
 
 layer_model = imod.data.hondsrug_layermodel_topsystem()
 
+layer_model
+
 # %%
 
 # %%
