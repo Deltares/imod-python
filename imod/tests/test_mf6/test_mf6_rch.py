@@ -10,7 +10,6 @@ import xarray as xr
 import imod
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
-from imod.tests.test_mf6.test_mf6_dis import _load_imod5_data_in_memory
 
 
 @pytest.fixture(scope="function")
