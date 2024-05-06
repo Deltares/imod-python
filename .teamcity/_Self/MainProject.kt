@@ -172,9 +172,7 @@ object Tests : BuildType({
         pullRequests {
             vcsRootExtId = "${DslContext.settingsRoot.id}"
             provider = github {
-                authType = token {
-                    token = "%github_deltares-service-account_access_token%"
-                }
+                authType = vcsRoot()
                 filterAuthorRole = PullRequests.GitHubRoleFilter.MEMBER
             }
         }
