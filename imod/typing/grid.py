@@ -343,7 +343,7 @@ def enforce_dim_order(grid: xr.DataArray) -> xr.DataArray:
 
 
 @typedispatch  # type: ignore [no-redef]
-def enforce_dim_order(grid: xu.UgridDataArray) -> xu.UgridDataArray:
+def enforce_dim_order(grid: xu.UgridDataArray) -> xu.UgridDataArray:  # noqa: F811
     """Enforce dimension order to iMOD Python standard"""
     face_dimension = grid.ugrid.grid.face_dimension
     return grid.transpose(
