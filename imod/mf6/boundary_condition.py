@@ -303,7 +303,7 @@ class BoundaryCondition(Package, abc.ABC):
         if hasattr(self, "_auxiliary_data"):
             result.extend(get_variable_names(self))
 
-        return result
+        return [var for var in result if var in self.dataset.data_vars]
 
 
 class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
