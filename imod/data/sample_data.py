@@ -142,6 +142,7 @@ def hondsrug_crosssection(path: Union[str, Path]) -> "geopandas.GeoDataFrame":  
 
     return gpd.read_file(Path(path) / "crosssection.shp")
 
+
 def hondsrug_layermodel_topsystem() -> xr.Dataset:
     """
     This is a modified version of the hondsrug_layermodel, used for the
@@ -189,7 +190,7 @@ def hondsrug_planar_river() -> xr.Dataset:
     1) Aggregated over layer dimension to create planar grid.
     2) Stages raised towards the top of the model, as the original stages are
        most of the time laying at bottom elevation, making for boring examples.
-        
+
     """
     fname = REGISTRY.fetch("hondsrug-river.nc")
     planar_river = xr.open_dataset(fname).max(dim="layer")
@@ -197,8 +198,6 @@ def hondsrug_planar_river() -> xr.Dataset:
     fname = REGISTRY.fetch("hondsrug-layermodel.nc")
     top = xr.open_dataset(fname)["top"].sel(layer=1)
 
-    planar_river["stage"] = (
-        top - planar_river["stage"]
-    ) / 2 + planar_river["stage"]
+    planar_river["stage"] = (top - planar_river["stage"]) / 2 + planar_river["stage"]
 
     return planar_river

@@ -131,7 +131,7 @@ xsection_layer_nr = imod.select.cross_section_linestring(layer_grid, geometry)
 imod.visualize.cross_section(xsection_layer_nr, "viridis", np.arange(21))
 
 
-# %% 
+# %%
 # Overview allocation options
 # ---------------------------
 #
@@ -143,7 +143,7 @@ imod.visualize.cross_section(xsection_layer_nr, "viridis", np.arange(21))
 for option in ALLOCATION_OPTION:
     print(option.name)
 
-# %% 
+# %%
 # Let's make plots for each option to visualize the effect of each choice.
 
 # Create grid for plots
@@ -157,7 +157,7 @@ imod.visualize.cross_section(
     xsection_layer_nr,
     "viridis",
     np.arange(21),
-    kwargs_colorbar = dict(plot_colorbar=False),
+    kwargs_colorbar=dict(plot_colorbar=False),
     fig=fig,
     ax=ax,
 )
@@ -216,7 +216,9 @@ from imod.prepare import DISTRIBUTING_OPTION, distribute_riv_conductance
 # %%
 # Here's a map of how the conductances are distributed in our dataset.
 
-imod.visualize.plot_map(planar_river["conductance"], "viridis", np.logspace(-2, 3, 6), overlays)
+imod.visualize.plot_map(
+    planar_river["conductance"], "viridis", np.logspace(-2, 3, 6), overlays
+)
 
 
 # %%
@@ -243,7 +245,7 @@ riv_allocated
 for option in DISTRIBUTING_OPTION:
     print(option.name)
 
-# %% 
+# %%
 # To reduce duplicate code, we are going to store all input data in this
 # dictionary which we can provide further as keyword arguments.
 
@@ -254,8 +256,8 @@ distributing_data = dict(
     bottom=layer_model["bottom"],
     k=layer_model["k"],
     stage=planar_river["stage"],
-    bottom_elevation=planar_river["bottom"]
-    )
+    bottom_elevation=planar_river["bottom"],
+)
 
 # %%
 # Let's keep things simple first and distribute conductances across layers
@@ -263,7 +265,6 @@ distributing_data = dict(
 
 riv_conductance = distribute_riv_conductance(
     distributing_option=DISTRIBUTING_OPTION.by_layer_thickness, **distributing_data
-
 )
 riv_conductance.coords["top"] = layer_model["top"]
 riv_conductance.coords["bottom"] = layer_model["bottom"]
@@ -278,9 +279,18 @@ fig, ax = plt.subplots()
 
 # Plot grey background of active cells
 is_active = ~np.isnan(xsection_distributed.coords["top"])
-imod.visualize.cross_section(is_active, "Greys", [0,1,2], kwargs_colorbar = dict(plot_colorbar=False), fig=fig, ax=ax)
+imod.visualize.cross_section(
+    is_active,
+    "Greys",
+    [0, 1, 2],
+    kwargs_colorbar=dict(plot_colorbar=False),
+    fig=fig,
+    ax=ax,
+)
 # Plot conductances
-imod.visualize.cross_section(xsection_distributed, "viridis", np.logspace(-2, 3, 6), fig=fig, ax=ax)
+imod.visualize.cross_section(
+    xsection_distributed, "viridis", np.logspace(-2, 3, 6), fig=fig, ax=ax
+)
 
 # %%
 # Let's compare the results of all possible options visually. On the top left
@@ -298,19 +308,27 @@ k.coords["bottom"] = layer_model["bottom"]
 xsection_k = imod.select.cross_section_linestring(k, geometry)
 
 ax = axes[0]
-imod.visualize.cross_section(xsection_k, "viridis", np.logspace(-2, 3, 11), kwargs_colorbar = dict(plot_colorbar=False), fig=fig, ax=ax)
+imod.visualize.cross_section(
+    xsection_k,
+    "viridis",
+    np.logspace(-2, 3, 11),
+    kwargs_colorbar=dict(plot_colorbar=False),
+    fig=fig,
+    ax=ax,
+)
 ax.set_title("hydraulic conductivity")
 
 for i, option in enumerate(DISTRIBUTING_OPTION, start=1):
     ax = axes[i]
     riv_conductance = distribute_riv_conductance(
         distributing_option=option, **distributing_data
-
     )
     riv_conductance.coords["top"] = layer_model["top"]
     riv_conductance.coords["bottom"] = layer_model["bottom"]
 
-    xsection_distributed = imod.select.cross_section_linestring(riv_conductance, geometry)
+    xsection_distributed = imod.select.cross_section_linestring(
+        riv_conductance, geometry
+    )
 
     if (i % 2) == 0:
         kwargs_colorbar = dict(plot_colorbar=False)
@@ -319,9 +337,23 @@ for i, option in enumerate(DISTRIBUTING_OPTION, start=1):
 
     # Plot grey background of active cells
     is_active = ~np.isnan(xsection_distributed.coords["top"])
-    imod.visualize.cross_section(is_active, "Greys", [0,1,2], kwargs_colorbar = dict(plot_colorbar=False), fig=fig, ax=ax)
+    imod.visualize.cross_section(
+        is_active,
+        "Greys",
+        [0, 1, 2],
+        kwargs_colorbar=dict(plot_colorbar=False),
+        fig=fig,
+        ax=ax,
+    )
     # Plot conductances
-    imod.visualize.cross_section(xsection_distributed, "viridis", np.logspace(-2, 3, 11), kwargs_colorbar = kwargs_colorbar, fig=fig, ax=ax)
+    imod.visualize.cross_section(
+        xsection_distributed,
+        "viridis",
+        np.logspace(-2, 3, 11),
+        kwargs_colorbar=kwargs_colorbar,
+        fig=fig,
+        ax=ax,
+    )
 
     ax.set_title(f"option: {option.name}")
 
