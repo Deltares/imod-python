@@ -8,14 +8,9 @@ import xarray as xr
 import imod
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
-
-
-def _load_imod5_data_in_memory(imod5_data):
-    """For debugging purposes, load everything in memory"""
-    for pkg in imod5_data.values():
-        for vardata in pkg.values():
-            if isinstance(vardata, xr.DataArray):
-                vardata.load()
+from imod.tests.fixtures.backward_compatibility_fixture import (
+    _load_imod5_data_in_memory,
+)
 
 
 @pytest.fixture(scope="function")

@@ -9,7 +9,6 @@ import xarray as xr
 
 import imod
 from imod.schemata import ValidationError
-from imod.tests.test_mf6.test_mf6_dis import _load_imod5_data_in_memory
 
 
 def test_render():
@@ -214,12 +213,11 @@ def test_configure_xt3d(tmp_path):
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_npf_from_imod5_isotropic(imod5_dataset, tmp_path):
-    data = deepcopy(imod5_dataset[0])
+    data = deepcopy(imod5_dataset)
     # throw out kva (=vertical anisotropy array) and ani (=horizontal anisotropy array)
     data.pop("kva")
     data.pop("ani")
 
-    _load_imod5_data_in_memory(data)
     target_grid = data["khv"]["kh"]
     npf = imod.mf6.NodePropertyFlow.from_imod5_data(data, target_grid)
 
@@ -237,11 +235,10 @@ def test_npf_from_imod5_isotropic(imod5_dataset, tmp_path):
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_npf_from_imod5_horizontal_anisotropy(imod5_dataset, tmp_path):
-    data = deepcopy(imod5_dataset[0])
+    data = deepcopy(imod5_dataset)
     # throw out kva (=vertical anisotropy array)
     data.pop("kva")
 
-    _load_imod5_data_in_memory(data)
     target_grid = data["khv"]["kh"]
     data["ani"]["angle"].values[:, :, :] = 135.0
     data["ani"]["factor"].values[:, :, :] = 0.1
@@ -249,22 +246,18 @@ def test_npf_from_imod5_horizontal_anisotropy(imod5_dataset, tmp_path):
 
     # Test array values  for k22 and angle1
     for layer in npf.dataset["k"].coords["layer"].values:
-        k_layer = npf.dataset["k"].sel({"layer": layer})
-        k22_layer = npf.dataset["k22"].sel({"layer": layer})
-        angle1_layer = npf.dataset["angle1"].sel({"layer": layer})
+        ds_layer = npf.dataset.sel({"layer": layer})
 
-        k_layer = k_layer.fillna(0.0)
-        k22_layer = k22_layer.fillna(0.0)
-        angle1_layer = k22_layer.fillna(0.0)
+        ds_layer = ds_layer.fillna(0.0)
 
         if layer in data["ani"]["factor"].coords["layer"].values:
             np.testing.assert_allclose(
-                k_layer.values * 0.1, k22_layer.values, atol=1e-10
+                ds_layer["k"].values * 0.1, ds_layer["k22"].values, atol=1e-10
             )
-            assert np.all(angle1_layer.values == 315.0)
+            assert np.all(ds_layer["angle1"].values == 315.0)
         else:
-            assert np.all(k_layer.values == k22_layer.values)
-            assert np.all(angle1_layer.values == 0.0)
+            assert np.all(ds_layer["k"].values == ds_layer["k22"].values)
+            assert np.all(ds_layer["angle1"].values == 0.0)
 
     rendered_npf = npf.render(tmp_path, "npf", None, None)
     assert "k22" in rendered_npf
@@ -276,11 +269,10 @@ def test_npf_from_imod5_horizontal_anisotropy(imod5_dataset, tmp_path):
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_npf_from_imod5_vertical_anisotropy(imod5_dataset, tmp_path):
-    data = deepcopy(imod5_dataset[0])
+    data = deepcopy(imod5_dataset)
     # throw out ani (=horizontal anisotropy array)
     data.pop("ani")
 
-    _load_imod5_data_in_memory(data)
     data["kva"]["vertical_anisotropy"].values[:] = 0.1
     target_grid = data["khv"]["kh"]
 
