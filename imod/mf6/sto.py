@@ -17,6 +17,7 @@ from imod.schemata import (
     IndexesSchema,
 )
 from imod.typing import GridDataArray
+from imod.typing.grid import zeros_like
 
 
 class Storage(Package):
@@ -196,6 +197,59 @@ class SpecificStorage(StorageBase):
         return self._regrid_method
 
 
+    @classmethod
+    def from_imod5_data(
+        cls,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        target_grid: GridDataArray,
+        regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
+    ) -> "SpecificStorage":
+        """
+        Construct a SpecificStorage-package from iMOD5 data, loaded with the
+        :func:`imod.formats.prj.open_projectfile_data` function.
+
+        .. note::
+
+            The method expects the iMOD5 model to be fully 3D, not quasi-3D.
+
+        Parameters
+        ----------
+        imod5_data: dict
+            Dictionary with iMOD5 data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
+        target_grid: GridDataArray
+            The grid that should be used for the new package. Does not
+            need to be identical to one of the input grids.
+        regridder_types: dict, optional
+            Optional dictionary with regridder types for a specific variable.
+            Use this to override default regridding methods.
+
+        Returns
+        -------
+        Modflow 6 SpecificStorage package. Its specific yield is 0 and it's transient if any specific_storage
+             is larger than 0. All cells are set to inconvertible (they stay confined throughout the simulation)
+        """
+
+        data = {
+            "specific_storage": imod5_data["sto"]["storage_coefficient"],
+        }
+
+        regridder_settings = deepcopy(cls._regrid_method)
+        if regridder_types is not None:
+            regridder_settings.update(regridder_types)
+
+        regrid_context = RegridderWeightsCache(data["specific_storage"], target_grid)
+
+        new_package_data = _regrid_package_data(
+            data, target_grid, regridder_settings, regrid_context, {}
+        )
+
+        new_package_data["convertible"] = zeros_like(new_package_data["specific_storage"], dtype=int)
+        new_package_data["transient"] = np.any(new_package_data["specific_storage"].values >= 0)
+        new_package_data["specific_yield"] = None
+
+        return SpecificStorage(**new_package_data)
+
 class StorageCoefficient(StorageBase):
     """
     Storage Package with a storage coefficient.  Be careful,
@@ -333,56 +387,3 @@ class StorageCoefficient(StorageBase):
 
     def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
         return self._regrid_method
-
-
-
-    @classmethod
-    def from_imod5_data(
-        cls,
-        imod5_data: dict[str, dict[str, GridDataArray]],
-        target_grid: GridDataArray,
-        regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
-    ) -> "StorageCoefficient":
-        """
-        Construct an npf-package from iMOD5 data, loaded with the
-        :func:`imod.formats.prj.open_projectfile_data` function.
-
-        .. note::
-
-            The method expects the iMOD5 model to be fully 3D, not quasi-3D.
-
-        Parameters
-        ----------
-        imod5_data: dict
-            Dictionary with iMOD5 data. This can be constructed from the
-            :func:`imod.formats.prj.open_projectfile_data` method.
-        target_grid: GridDataArray
-            The grid that should be used for the new package. Does not
-            need to be identical to one of the input grids.
-        regridder_types: dict, optional
-            Optional dictionary with regridder types for a specific variable.
-            Use this to override default regridding methods.
-
-        Returns
-        -------
-        Modflow 6 npf package.
-
-        """
-
-        data = {
-            "sto": imod5_data["sto"]["sto"],
-        }
-
-        regridder_settings = deepcopy(cls._regrid_method)
-        if regridder_types is not None:
-            regridder_settings.update(regridder_types)
-
-        regrid_context = RegridderWeightsCache(data["k"], target_grid)
-
-        new_package_data = _regrid_package_data(
-            data, target_grid, regridder_settings, regrid_context, {}
-        )
-
-
-        return StorageCoefficient(**new_package_data)
-
