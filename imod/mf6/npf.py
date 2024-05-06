@@ -1,6 +1,6 @@
 import warnings
 from copy import deepcopy
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple
 
 import numpy as np
 import xarray as xr
@@ -8,6 +8,7 @@ import xarray as xr
 from imod.logging import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
+from imod.mf6.utilities.imod5_converter import fill_missing_layers
 from imod.mf6.utilities.regrid import (
     RegridderType,
     RegridderWeightsCache,
@@ -516,13 +517,13 @@ class NodePropertyFlow(Package, IRegridPackage):
         if has_horizontal_anisotropy:
             if not np.all(np.isnan(imod5_data["ani"]["factor"].values)):
                 factor = imod5_data["ani"]["factor"]
-                factor = fill_missing_layers(factor, data["k"], 1)
+                factor = fill_missing_layers(factor, target_grid, 1)
                 data["k22"] = data["k"] * factor
             if not np.all(np.isnan(imod5_data["ani"]["angle"].values)):
                 angle1 = imod5_data["ani"]["angle"]
                 angle1 = 90.0 - angle1
                 angle1 = xr.where(angle1 < 0, 360.0 + angle1, angle1)
-                angle1 = fill_missing_layers(angle1, data["k"], 0)
+                angle1 = fill_missing_layers(angle1, target_grid, 0)
                 data["angle1"] = angle1
 
         icelltype = zeros_like(target_grid, dtype=int)
@@ -539,13 +540,3 @@ class NodePropertyFlow(Package, IRegridPackage):
         new_package_data["icelltype"] = icelltype
 
         return NodePropertyFlow(**new_package_data)
-
-
-def fill_missing_layers(
-    source: xr.DataArray, full: xr.DataArray, fillvalue: Union[float | int]
-):
-    result = zeros_like(full)
-    result.values[:, :, :] = fillvalue
-    for l in source.coords["layer"].values:
-        result.loc[l, :, :] = source.sel({"layer": l})
-    return result
