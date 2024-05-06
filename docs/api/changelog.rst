@@ -40,7 +40,13 @@ Fixed
 - When importing data from a .prj file, the multipliers and additions specified for
   ipf and idf files are now applied
 - Fix bug where y-coords were flipped in :class:`imod.msw.MeteoMapping`
-  
+
+Changed
+~~~~~~~
+- Removed constructor arguments `source` and `target` from
+  :class:`imod.mf6.utilities.regrid.RegridderWeightsCache`, as they were not
+  used.
+
 [0.16.0] - 2024-03-29
 ---------------------
 

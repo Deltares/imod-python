@@ -30,7 +30,7 @@ def test_regridders_weight_cache_returns_similar_instance_when_enum_and_method_m
     grid, _, _ = basic_unstructured_dis
     new_grid = copy.deepcopy(grid)
 
-    collection = RegridderWeightsCache(grid, new_grid)
+    collection = RegridderWeightsCache()
 
     first_instance = collection.get_regridder(
         grid, new_grid, RegridderType.OVERLAP, "harmonic_mean"
@@ -48,7 +48,7 @@ def test_regridders_weight_cache_combining_different_instantiation_parmeters(
     grid, _, _ = basic_unstructured_dis
     new_grid = copy.deepcopy(grid)
 
-    collection = RegridderWeightsCache(grid, new_grid)
+    collection = RegridderWeightsCache()
 
     first_instance = collection.get_regridder(
         grid, new_grid, RegridderType.OVERLAP, "harmonic_mean"
@@ -66,7 +66,7 @@ def test_regridders_weight_cache_returns_different_instance_when_name_does_not_m
     grid, _, _ = basic_unstructured_dis
     new_grid = copy.deepcopy(grid)
 
-    collection = RegridderWeightsCache(grid, new_grid)
+    collection = RegridderWeightsCache()
 
     first_instance = collection.get_regridder(
         grid, new_grid, RegridderType.CENTROIDLOCATOR
@@ -84,7 +84,7 @@ def test_non_regridder_cannot_be_instantiated(
     grid, _, _ = basic_unstructured_dis
     new_grid = copy.deepcopy(grid)
 
-    collection = RegridderWeightsCache(grid, new_grid)
+    collection = RegridderWeightsCache()
 
     # we create a class with the same constructor-signature as a regridder has, but it is not a regridder
     # still, it is an abc.ABCMeta
@@ -102,7 +102,7 @@ def test_regridders_weight_cache_grows_up_to_size_limit(
     grid, _, _ = basic_unstructured_dis
     new_grid = copy.deepcopy(grid)
     cache_size = 3
-    collection = RegridderWeightsCache(grid, new_grid, cache_size)
+    collection = RegridderWeightsCache(cache_size)
 
     _ = collection.get_regridder(grid, new_grid, RegridderType.OVERLAP, "harmonic_mean")
     _ = collection.get_regridder(grid, new_grid, RegridderType.BARYCENTRIC)
@@ -118,7 +118,7 @@ def test_error_messages(basic_unstructured_dis):
     grid, _, _ = basic_unstructured_dis
     new_grid = copy.deepcopy(grid)
 
-    collection = RegridderWeightsCache(grid, new_grid)
+    collection = RegridderWeightsCache()
     with pytest.raises(TypeError):
         _ = collection.get_regridder(
             grid,
@@ -142,7 +142,7 @@ def test_create_regridder_from_class_not_enum(
     grid, _, _ = basic_unstructured_dis
     new_grid = copy.deepcopy(grid)
 
-    collection = RegridderWeightsCache(grid, new_grid)
+    collection = RegridderWeightsCache()
     regridder = collection.get_regridder(
         grid, new_grid, OverlapRegridder, "harmonic_mean"
     )
