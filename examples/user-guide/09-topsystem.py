@@ -128,7 +128,7 @@ layer_grid.coords["top"] = layer_model["top"]
 layer_grid.coords["bottom"] = layer_model["bottom"]
 xsection_layer_nr = imod.select.cross_section_linestring(layer_grid, geometry)
 
-imod.visualize.cross_section(xsection_layer_nr, "viridis", np.arange(21))
+imod.visualize.cross_section(xsection_layer_nr, "tab20", np.arange(21))
 
 
 # %%
@@ -155,7 +155,7 @@ axes = np.ravel(axes)
 ax = axes[0]
 imod.visualize.cross_section(
     xsection_layer_nr,
-    "viridis",
+    "tab20",
     np.arange(21),
     kwargs_colorbar=dict(plot_colorbar=False),
     fig=fig,
@@ -185,10 +185,10 @@ for i, option in enumerate(ALLOCATION_OPTION, start=1):
         kwargs_colorbar = dict(plot_colorbar=False)
     else:
         kwargs_colorbar = dict(plot_colorbar=True)
-    kwargs_aquitards = {"hatch": "/", "edgecolor": "k"}
+    kwargs_aquitards = {"edgecolor": "k", "facecolor": "grey"}
     imod.visualize.cross_section(
         xsection_layer_nr,
-        "viridis",
+        "tab20",
         np.arange(21),
         aquitards=xsection_allocated,
         kwargs_aquitards=kwargs_aquitards,
@@ -217,7 +217,7 @@ from imod.prepare import DISTRIBUTING_OPTION, distribute_riv_conductance
 # Here's a map of how the conductances are distributed in our dataset.
 
 imod.visualize.plot_map(
-    planar_river["conductance"], "viridis", np.logspace(-2, 3, 6), overlays
+    planar_river["conductance"], "magma", np.logspace(-2, 3, 11), overlays
 )
 
 
@@ -282,14 +282,14 @@ is_active = ~np.isnan(xsection_distributed.coords["top"])
 imod.visualize.cross_section(
     is_active,
     "Greys",
-    [0, 1, 2],
+    [0, 1, 2, 3],
     kwargs_colorbar=dict(plot_colorbar=False),
     fig=fig,
     ax=ax,
 )
 # Plot conductances
 imod.visualize.cross_section(
-    xsection_distributed, "viridis", np.logspace(-2, 3, 6), fig=fig, ax=ax
+    xsection_distributed, "magma", np.logspace(-2, 3, 11), fig=fig, ax=ax
 )
 
 # %%
@@ -310,7 +310,7 @@ xsection_k = imod.select.cross_section_linestring(k, geometry)
 ax = axes[0]
 imod.visualize.cross_section(
     xsection_k,
-    "viridis",
+    "magma",
     np.logspace(-2, 3, 11),
     kwargs_colorbar=dict(plot_colorbar=False),
     fig=fig,
@@ -340,7 +340,7 @@ for i, option in enumerate(DISTRIBUTING_OPTION, start=1):
     imod.visualize.cross_section(
         is_active,
         "Greys",
-        [0, 1, 2],
+        [0, 1, 2, 3],
         kwargs_colorbar=dict(plot_colorbar=False),
         fig=fig,
         ax=ax,
@@ -348,7 +348,7 @@ for i, option in enumerate(DISTRIBUTING_OPTION, start=1):
     # Plot conductances
     imod.visualize.cross_section(
         xsection_distributed,
-        "viridis",
+        "magma",
         np.logspace(-2, 3, 11),
         kwargs_colorbar=kwargs_colorbar,
         fig=fig,
@@ -358,5 +358,23 @@ for i, option in enumerate(DISTRIBUTING_OPTION, start=1):
     ax.set_title(f"option: {option.name}")
 
 plt.tight_layout()
+
+# %% 
+# You can see quite some wildly varying conductances with depth. First, the most
+# simple algorithm ``equally`` keeps conductance constant with depth. Second,
+# correcting by (hydraulic) conductivity decreases the conductance in the
+# deepest layer where rivers occur in the centre of the plot, as conductivity is
+# lower over there. Correcting by layer thickness, however, increases
+# conductance in this deep layer, as this is a thicker layer. These differences
+# even out when we correct by layer transmissivity (k * thickness). The crosscut
+# thickness algorithm accounts for how far the river bottom penetrates a layer.
+# You can see this reduces conductance in the deep layer compared to
+# distributing ``by_layer_thickness``. ``by_crosscut_transmissivity`` uses the
+# crosscut thickness instead of the layer thickness and therefore shows a lower
+# conductance in the deeper layer compared to ``by_layer_transmissivity``.
+# Finally ``by_corrected_transmissivity`` also corrects for the displacement of
+# the midpoint over the length where crosscut transmissivity is computed over
+# (layer top - river bottom) compared to the model cell centre. This further
+# reduces the conductance in de deeper layer.
 
 # %%
