@@ -376,21 +376,23 @@ for i, option in enumerate(DISTRIBUTING_OPTION, start=1):
 plt.tight_layout()
 
 # %% 
+#
 # You can see quite some wildly varying conductances with depth. First, the most
 # simple algorithm ``equally`` keeps conductance constant with depth. Second,
-# correcting by (hydraulic) conductivity decreases the conductance in the
+# correcting ``by_conductivity`` (hydraulic) decreases the conductance in the
 # deepest layer where rivers occur in the centre of the plot, as conductivity is
-# lower over there. Correcting by layer thickness, however, increases
+# lower over there. Correcting ``by_layer_thickness``, however, increases
 # conductance in this deep layer, as this is a thicker layer. These differences
-# even out when we correct by layer transmissivity (k * thickness). The crosscut
-# thickness algorithm accounts for how far the river bottom penetrates a layer.
-# You can see this reduces conductance in the deep layer compared to
-# distributing ``by_layer_thickness``. ``by_crosscut_transmissivity`` uses the
-# crosscut thickness instead of the layer thickness and therefore shows a lower
-# conductance in the deeper layer compared to ``by_layer_transmissivity``.
-# Finally ``by_corrected_transmissivity`` also corrects for the displacement of
-# the midpoint over the length where crosscut transmissivity is computed over
-# (layer top - river bottom) compared to the model cell centre. This further
-# reduces the conductance in de deeper layer.
+# even out when we correct ``by_layer_transmissivity`` (k * thickness). The
+# ``by_crosscut_thickness`` algorithm accounts for how far the river bottom
+# penetrates a layer. You can see this reduces conductance in the deep layer
+# compared to distributing ``by_layer_thickness``.
+# ``by_crosscut_transmissivity`` uses the crosscut thickness instead of the
+# layer thickness and therefore shows a lower conductance in the deeper layer
+# compared to ``by_layer_transmissivity``. Finally
+# ``by_corrected_transmissivity`` also corrects for the displacement of the
+# midpoint over the length where crosscut transmissivity is computed over
+# (``[layer top - river bottom]/2``) compared to the model cell centre. This
+# further reduces the conductance in the deeper layer.
 
 # %%
