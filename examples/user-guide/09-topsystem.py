@@ -201,7 +201,7 @@ for i, option in enumerate(ALLOCATION_OPTION, start=1):
 # Enforce tight layout to remove whitespace inbetween plots.
 plt.tight_layout()
 
-# %% 
+# %%
 #
 # You can see the chosen option matters quite a lot. ``at_elevation`` allocates
 # cells in the model layer containing the river bottom elevation.
@@ -375,7 +375,7 @@ for i, option in enumerate(DISTRIBUTING_OPTION, start=1):
 
 plt.tight_layout()
 
-# %% 
+# %%
 #
 # You can see quite some wildly varying conductances with depth. First, the most
 # simple algorithm ``equally`` keeps conductance constant with depth. Second,
