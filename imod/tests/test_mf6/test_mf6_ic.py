@@ -1,3 +1,4 @@
+from copy import deepcopy
 import pathlib
 import textwrap
 
@@ -5,6 +6,7 @@ import pytest
 
 import imod
 from imod.schemata import ValidationError
+from imod.tests.test_mf6.test_mf6_dis import _load_imod5_data_in_memory
 
 
 def test_render():
@@ -40,3 +42,22 @@ def test_validate_false():
 def test_wrong_arguments():
     with pytest.raises(ValueError):
         imod.mf6.InitialConditions(head=0.0, start=1.0)
+
+@pytest.mark.usefixtures("imod5_dataset")
+def test_from_imod5( imod5_dataset, tmp_path):
+    data = deepcopy(imod5_dataset[0])
+
+    _load_imod5_data_in_memory(data)
+    target_grid = data["khv"]["kh"]
+
+    sto = imod.mf6.InitialConditions.from_imod5_data(data, target_grid)
+
+
+    assert not sto.dataset["save_flows"]
+    assert sto.dataset["transient"] 
+    assert sto.dataset["specific_storage"].values[0] == 0.15
+    assert np.all(sto.dataset["specific_storage"].values[1:] == 1e-5 )
+    assert sto.dataset["specific_yield"].values[()] is None
+
+    rendered_sto = sto.render(tmp_path, "sto", None, False)
+    assert "ss" in rendered_sto

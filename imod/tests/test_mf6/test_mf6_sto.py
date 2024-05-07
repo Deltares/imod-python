@@ -449,4 +449,3 @@ def test_from_imod5( imod5_dataset, tmp_path):
 
     rendered_sto = sto.render(tmp_path, "sto", None, False)
     assert "ss" in rendered_sto
-    assert ""
