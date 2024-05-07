@@ -40,8 +40,4 @@ def fill_missing_layers(
     source for the layers that are in the source. For the other layers, the
     fillvalue is assigned.
     """
-    result = zeros_like(full)
-    result.values[:, :, :] = fillvalue
-    for l in source.coords["layer"].values:
-        result.loc[l, :, :] = source.sel({"layer": l})
-    return result
+    return source.reindex_like(full, fill_value=fillvalue)
