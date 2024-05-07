@@ -3,7 +3,7 @@ from typing import Union
 import numpy as np
 import xarray as xr
 
-from imod.typing.grid import full_like, zeros_like
+from imod.typing.grid import full_like
 
 
 def convert_ibound_to_idomain(
