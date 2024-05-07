@@ -27,7 +27,7 @@ class ALLOCATION_OPTION(Enum):
     * ``first_active_to_elevation``: RIV, DRN, GHB. Allocate cells spanning from
       first upper active cell up to the river bottom elevation. This matches the
       iMOD 5.6 IDEFLAYER = -1 option.
-    * ``first_active_to_riv_bot__drn``: RIV. Allocate cells spanning from first
+    * ``stage_to_riv_bot_drn_above``: RIV. Allocate cells spanning from first
       upper active cell up to the river bottom elevation. Method returns both
       allocated cells for a river package as well as a drain package. Cells
       above river stage are allocated as drain cells, cells below are as river
@@ -49,7 +49,7 @@ class ALLOCATION_OPTION(Enum):
 
     stage_to_riv_bot = 0
     first_active_to_elevation = -1
-    first_active_to_riv_bot__drn = 1
+    stage_to_riv_bot_drn_above = 1
     at_elevation = 2
     at_first_active = 9  # Not an iMOD 5.6 option
 
@@ -116,8 +116,8 @@ def allocate_riv_cells(
             return _allocate_cells__first_active_to_elevation(
                 active, top, bottom, bottom_elevation
             )
-        case ALLOCATION_OPTION.first_active_to_riv_bot__drn:
-            return _allocate_cells__first_active_to_riv_bot__drn(
+        case ALLOCATION_OPTION.stage_to_riv_bot_drn_above:
+            return _allocate_cells__stage_to_riv_bot_drn_above(
                 active, top, bottom, stage, bottom_elevation
             )
         case ALLOCATION_OPTION.at_elevation:
@@ -129,7 +129,7 @@ def allocate_riv_cells(
                 "Received incompatible setting for rivers, only"
                 f"'{ALLOCATION_OPTION.stage_to_riv_bot.name}' and"
                 f"'{ALLOCATION_OPTION.first_active_to_elevation.name}' and"
-                f"'{ALLOCATION_OPTION.first_active_to_riv_bot__drn.name}' and"
+                f"'{ALLOCATION_OPTION.stage_to_riv_bot_drn_above.name}' and"
                 f"'{ALLOCATION_OPTION.at_elevation.name}' and"
                 f"'{ALLOCATION_OPTION.at_first_active.name}' supported."
                 f"got: '{allocation_option.name}'"
@@ -394,7 +394,7 @@ def _allocate_cells__first_active_to_elevation(
 
 
 @enforced_dim_order
-def _allocate_cells__first_active_to_riv_bot__drn(
+def _allocate_cells__stage_to_riv_bot_drn_above(
     active: GridDataArray,
     top: GridDataArray,
     bottom: GridDataArray,

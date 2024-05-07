@@ -91,8 +91,8 @@ def allocation_first_active_to_elevation():
 
 
 @case(tags=["riv"])
-def allocation_first_active_to_riv_bot__drn():
-    option = ALLOCATION_OPTION.first_active_to_riv_bot__drn
+def allocation_stage_to_riv_bot_drn_above():
+    option = ALLOCATION_OPTION.stage_to_riv_bot_drn_above
     expected = [False, True, True, False]
     expected__drn = [True, False, False, False]
 
