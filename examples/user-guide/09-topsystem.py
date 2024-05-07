@@ -201,7 +201,8 @@ for i, option in enumerate(ALLOCATION_OPTION, start=1):
 # Enforce tight layout to remove whitespace inbetween plots.
 plt.tight_layout()
 
-# %%
+# %% 
+#
 # You can see the chosen option matters quite a lot. ``at_elevation`` allocates
 # cells in the model layer containing the river bottom elevation.
 # ``at_first_active`` allocates only at the first active model layer.
@@ -209,10 +210,10 @@ plt.tight_layout()
 # the model layer containing the river bottom elevation. ``stage_to_riv_bot``
 # allocates cells from the model layer containing river stage up until the model
 # layer containing bottom elevation. Finally ``first_active_to_riv_bot__drn``
-# allocates *river* cells from the model layer containing river stage to the model
-# layer containing the river bottom elevation and allocates *drain* cells from the
-# first active model layer to the model layer containing the river stage
-# elevation.
+# allocates *river* cells from the model layer containing river stage to the
+# model layer containing the river bottom elevation and allocates *drain* cells
+# from the first active model layer to the model layer containing the river
+# stage elevation. The allocated *drain* cells are not shown in the plot.
 
 
 # %%
