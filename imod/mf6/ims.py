@@ -285,9 +285,6 @@ class Solution(Package):
         scaling method in Hill (1992).
         l2norm - symmetric matrix scaling using the L2 norm.
         Default value: None
-        SolutionPresetSimple: None
-        SolutionPresetModerate: None
-        SolutionPresetComplex: None
     reordering_method: str
         options: {"None", "rcm", "md"}
         an optional keyword that defines the matrix reordering approach used. By
@@ -296,9 +293,6 @@ class Solution(Package):
         rcm - reverse Cuthill McKee ordering.
         md - minimum degree ordering
         Default value: None
-        SolutionPresetSimple: None
-        SolutionPresetModerate: None
-        SolutionPresetComplex: None
     print_option: str
         options: {"None", "summary", "all"}
         is a flag that controls printing of convergence information from the
@@ -311,17 +305,15 @@ class Solution(Package):
         convergence information to each model listing file in addition to
         SUMMARY information.
         Default value: "summary"
-        SolutionPresetSimple: No Default
-        SolutionPresetModerate: No Default
-        SolutionPresetComplex: No Default
-    csv_output: str, optional
-        False if no csv is to be written for the output, enter str of filename
+    outer_csvfile: str, optional
+        None if no csv is to be written for the output, str of filename
         if csv is to be written.
-        Default value: False
-        SolutionPresetSimple: No Default
-        SolutionPresetModerate: No Default
-        SolutionPresetComplex: No Default
-    no_ptc: ({True, False}, optional)
+        Default value: None
+    inner_csvfile: str, optional
+        None if no csv is to be written for the output, str of filename
+        if csv is to be written.
+        Default value: None
+    no_ptc: str, optional, either None, "all", or "first".
         is a flag that is used to disable pseudo-transient continuation (PTC).
         Option only applies to steady-state stress periods for models using the
         Newton-Raphson formulation. For many problems, PTC can significantly
@@ -333,10 +325,22 @@ class Solution(Package):
         PTC option should be used to deactivate PTC. This NO PTC option should
         also be used in order to compare convergence behavior with other MODFLOW
         versions, as PTC is only available in MODFLOW 6.
-        Default value: False
-        SolutionPresetSimple: No Default
-        SolutionPresetModerate: No Default
-        SolutionPresetComplex: No Default
+    ats_outer_maximum_fraction: float, optional.
+        real value defining the fraction of the maximum allowable outer iterations
+        used with the Adaptive Time Step (ATS) capability if it is active. If this
+        value is set to zero by the user, then this solution will have no effect
+        on ATS behavior. This value must be greater than or equal to zero and less
+        than or equal to 0.5 or the program will terminate with an error. If it is
+        not specified by the user, then it is assigned a default value of one
+        third. When the number of outer iterations for this solution is less than
+        the product of this value and the maximum allowable outer iterations, then
+        ATS will increase the time step length by a factor of DTADJ in the ATS
+        input file. When the number of outer iterations for this solution is
+        greater than the maximum allowable outer iterations minus the product of
+        this value and the maximum allowable outer iterations, then the ATS (if
+        active) will decrease the time step length by a factor of 1 / DTADJ.   
+
+        Default value is None.
     validate: {True, False}
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
@@ -391,8 +395,10 @@ class Solution(Package):
         scaling_method=None,
         reordering_method=None,
         print_option="summary",
-        csv_output=False,
-        no_ptc=False,
+        outer_csvfile=None,
+        inner_csvfile=None,
+        no_ptc=None,
+        ats_outer_maximum_fraction=None,
         validate: bool = True,
     ):
         dict_dataset = {
@@ -419,7 +425,9 @@ class Solution(Package):
             "scaling_method": scaling_method,
             "reordering_method": reordering_method,
             "print_option": print_option,
-            "csv_output": csv_output,
+            "outer_csvfile": outer_csvfile,
+            "inner_csvfile": inner_csvfile,
+            "ats_outer_maximum_fraction": ats_outer_maximum_fraction,
             "no_ptc": no_ptc,
         }
         # Make sure the modelnames are set as a variable rather than dimension:
@@ -460,12 +468,17 @@ class Solution(Package):
 
 
 def SolutionPresetSimple(
-    modelnames, print_option="summary", csv_output=False, no_ptc=False
+    modelnames,
+    print_option="summary",
+    outer_csvfile=None,
+    inner_csvfile=None,
+    no_ptc=None,
 ):
     solution = Solution(
         modelnames=modelnames,
         print_option=print_option,
-        csv_output=csv_output,
+        outer_csvfile=outer_csvfile,
+        inner_csvfile=inner_csvfile,
         no_ptc=no_ptc,
         outer_dvclose=0.001,
         outer_maximum=25,
@@ -487,19 +500,22 @@ def SolutionPresetSimple(
         preconditioner_levels=0,
         preconditioner_drop_tolerance=0,
         number_orthogonalizations=0,
-        scaling_method=None,
-        reordering_method=None,
     )
     return solution
 
 
 def SolutionPresetModerate(
-    modelnames, print_option="summary", csv_output=False, no_ptc=False
+    modelnames,
+    print_option="summary",
+    outer_csvfile=None,
+    inner_csvfile=None,
+    no_ptc=None,
 ):
     solution = Solution(
         modelnames=modelnames,
         print_option=print_option,
-        csv_output=csv_output,
+        outer_csvfile=outer_csvfile,
+        inner_csvfile=inner_csvfile,
         no_ptc=no_ptc,
         outer_dvclose=0.01,
         outer_maximum=50,
@@ -521,19 +537,22 @@ def SolutionPresetModerate(
         preconditioner_levels=0,
         preconditioner_drop_tolerance=0.0,
         number_orthogonalizations=0,
-        scaling_method=None,
-        reordering_method=None,
     )
     return solution
 
 
 def SolutionPresetComplex(
-    modelnames, print_option="summary", csv_output=False, no_ptc=False
+    modelnames,
+    print_option="summary",
+    outer_csvfile=None,
+    inner_csvfile=None,
+    no_ptc=None,
 ):
     solution = Solution(
         modelnames=modelnames,
         print_option=print_option,
-        csv_output=csv_output,
+        outer_csvfile=outer_csvfile,
+        inner_csvfile=inner_csvfile,
         no_ptc=no_ptc,
         outer_dvclose=0.1,
         outer_maximum=100,
@@ -555,7 +574,5 @@ def SolutionPresetComplex(
         preconditioner_levels=5,
         preconditioner_drop_tolerance=0.0001,
         number_orthogonalizations=2,
-        scaling_method=None,
-        reordering_method=None,
     )
     return solution

@@ -164,8 +164,6 @@ def solution_settings() -> imod.mf6.Solution:
     return imod.mf6.Solution(
         modelnames=["flow"],
         print_option="summary",
-        csv_output=False,
-        no_ptc=True,
         outer_dvclose=1.0e-4,
         outer_maximum=500,
         under_relaxation=None,

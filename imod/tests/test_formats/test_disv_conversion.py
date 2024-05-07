@@ -49,8 +49,6 @@ def test_convert_to_disv(imodflow_model, tmp_path, create_grid):
     simulation["solver"] = imod.mf6.Solution(
         modelnames=["gwf"],
         print_option="summary",
-        csv_output=False,
-        no_ptc=True,
         outer_dvclose=1.0e-4,
         outer_maximum=500,
         under_relaxation=None,
