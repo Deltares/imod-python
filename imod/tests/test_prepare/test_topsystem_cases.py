@@ -64,14 +64,16 @@ def ghb_unstructured(basic_disv__topsystem):
 
 def rch_structured(basic_dis__topsystem):
     ibound, _, _ = basic_dis__topsystem
+    rate = zeros_like(ibound.sel(layer=1)) + 0.001
     active = ibound == 1
-    return active
+    return active, rate
 
 
 def rch_unstructured(basic_disv__topsystem):
     ibound, _, _ = basic_disv__topsystem
+    rate = zeros_like(ibound.sel(layer=1)) + 0.001
     active = ibound == 1
-    return active
+    return active, rate
 
 
 @case(tags=["riv"])

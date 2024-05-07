@@ -79,14 +79,14 @@ def test_ghb_allocation(active, top, bottom, head, option, expected, _):
 
 
 @parametrize_with_cases(
-    argnames="active",
+    argnames="active,rate",
     prefix="rch_",
 )
 @parametrize_with_cases(
     argnames="option,expected,_", prefix="allocation_", has_tag="rch"
 )
-def test_rch_allocation(active, option, expected, _):
-    actual_da = allocate_rch_cells(option, active)
+def test_rch_allocation(active, rate, option, expected, _):
+    actual_da = allocate_rch_cells(option, active, rate)
 
     actual = take_first_cell_in_xy_plane(actual_da)
 
