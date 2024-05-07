@@ -338,7 +338,7 @@ class Solution(Package):
         input file. When the number of outer iterations for this solution is
         greater than the maximum allowable outer iterations minus the product of
         this value and the maximum allowable outer iterations, then the ATS (if
-        active) will decrease the time step length by a factor of 1 / DTADJ.   
+        active) will decrease the time step length by a factor of 1 / DTADJ.
 
         Default value is None.
     validate: {True, False}

@@ -106,7 +106,7 @@ def test_ims_options():
     Ensure inner/outer csvfile, no_ptc, and ats_outer_maximum_fraction are
     written.
     """
-    ims = imod.mf6.Solution( 
+    ims = imod.mf6.Solution(
         modelnames=["GWF_1"],
         outer_dvclose=0.001,
         outer_maximum=20,
