@@ -50,14 +50,10 @@ def test_from_imod5( imod5_dataset, tmp_path):
     _load_imod5_data_in_memory(data)
     target_grid = data["khv"]["kh"]
 
-    sto = imod.mf6.InitialConditions.from_imod5_data(data, target_grid)
+    ic = imod.mf6.InitialConditions.from_imod5_data(data, target_grid)
+
+    ic._validate_init_schemata(True)
 
 
-    assert not sto.dataset["save_flows"]
-    assert sto.dataset["transient"] 
-    assert sto.dataset["specific_storage"].values[0] == 0.15
-    assert np.all(sto.dataset["specific_storage"].values[1:] == 1e-5 )
-    assert sto.dataset["specific_yield"].values[()] is None
-
-    rendered_sto = sto.render(tmp_path, "sto", None, False)
-    assert "ss" in rendered_sto
+    rendered_ic = ic.render(tmp_path, "ic", None, False)
+    assert "strt" in rendered_ic
