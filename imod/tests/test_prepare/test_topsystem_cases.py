@@ -163,7 +163,7 @@ def distribution_by_corrected_transmissivity__drn():
     allocated_layer = xr.DataArray(
         [False, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
     )
-    expected = [np.nan, (16/17), (1/17), np.nan]
+    expected = [np.nan, (16 / 17), (1 / 17), np.nan]
     return option, allocated_layer, expected
 
 
@@ -174,7 +174,7 @@ def distribution_by_corrected_transmissivity__first_active__drn():
     allocated_layer = xr.DataArray(
         [True, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
     )
-    expected = [(8 / 25), (16 / 25), (1/25), np.nan]
+    expected = [(8 / 25), (16 / 25), (1 / 25), np.nan]
     return option, allocated_layer, expected
 
 
@@ -184,7 +184,7 @@ def distribution_by_corrected_transmissivity__TFTF__drn():
     allocated_layer = xr.DataArray(
         [True, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
     )
-    expected = [(8/9), np.nan, (1/9), np.nan]
+    expected = [(8 / 9), np.nan, (1 / 9), np.nan]
     return option, allocated_layer, expected
 
 
@@ -237,7 +237,7 @@ def distribution_by_crosscut_transmissivity__drn():
     allocated_layer = xr.DataArray(
         [False, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
     )
-    expected = [np.nan, (4/5), (1/5), np.nan]
+    expected = [np.nan, (4 / 5), (1 / 5), np.nan]
     return option, allocated_layer, expected
 
 
@@ -248,7 +248,7 @@ def distribution_by_crosscut_transmissivity__first_active__drn():
     allocated_layer = xr.DataArray(
         [True, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
     )
-    expected = [(2/7), (4/7), (1/7), np.nan]
+    expected = [(2 / 7), (4 / 7), (1 / 7), np.nan]
     return option, allocated_layer, expected
 
 
@@ -259,7 +259,7 @@ def distribution_by_crosscut_transmissivity__TFTF__drn():
     allocated_layer = xr.DataArray(
         [True, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
     )
-    expected = [(2/3), np.nan, (1/3), np.nan]
+    expected = [(2 / 3), np.nan, (1 / 3), np.nan]
     return option, allocated_layer, expected
 
 
@@ -312,7 +312,7 @@ def distribution_by_crosscut_thickness__drn():
     allocated_layer = xr.DataArray(
         [False, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
     )
-    expected = [np.nan, (2/3), (1/3), np.nan]
+    expected = [np.nan, (2 / 3), (1 / 3), np.nan]
     return option, allocated_layer, expected
 
 
