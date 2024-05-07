@@ -6,7 +6,7 @@ iMOD Python has multiple features to help you define the topsystem of the
 groundwater system. With "topsystem" we mean all forcings which act on the top
 of the groundwater system. These are usually either meteorological
 (precipitation & evapotranspiration) or hydrological (rivers, ditches, lakes,
-sea) in nature. This data is always provided as planar grids (x, y) without any
+sea) in nature. This data is usually provided as planar grids (x, y) without any
 vertical dimension. This user guide will show you how to allocate these forcings
 across model layers to grid cells and how to distribute conductances for
 Robin-like boundary conditions over model layers.
