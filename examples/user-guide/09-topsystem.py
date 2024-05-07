@@ -316,6 +316,8 @@ imod.visualize.cross_section(
     fig=fig,
     ax=ax,
 )
+ax.scatter(x_line, stage_line.values, s=32.0, marker=7, c="k", linewidths=0)
+ax.scatter(x_line, stage_bottom.values, s=32.0, marker=6, c="k", linewidths=0)
 ax.set_title("hydraulic conductivity")
 
 for i, option in enumerate(DISTRIBUTING_OPTION, start=1):
