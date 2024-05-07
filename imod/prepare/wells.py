@@ -46,7 +46,7 @@ def locate_wells(
     wells: pd.DataFrame,
     top: Union[xr.DataArray, xu.UgridDataArray],
     bottom: Union[xr.DataArray, xu.UgridDataArray],
-    k: Union[xr.DataArray, xu.UgridDataArray, None],
+    k: Optional[Union[xr.DataArray, xu.UgridDataArray]],
     validate: bool = True,
 ):
     if not isinstance(top, (xu.UgridDataArray, xr.DataArray)):
@@ -79,7 +79,7 @@ def locate_wells(
     index = xy_top["index"]
     if validate and not np.array_equal(xy_bottom["index"], index):
         raise ValueError("bottom grid does not match top grid")
-    if validate and k is not None and not np.array_equal(xy_k["index"], index):
+    if validate and k is not None and not np.array_equal(xy_k["index"], index):  # type: ignore
         raise ValueError("k grid does not match top grid")
     id_in_bounds = first.index[index]
 

@@ -1,5 +1,5 @@
 begin options
-{% if fixed_cell is defined %}  fixed_cell
+{% if fixed_cell%}  fixed_cell
 {% endif %}
 {%- if auxiliary is defined %}  auxiliary{% for aux in auxiliary %} {{aux}}{% endfor %}
 {% endif %}

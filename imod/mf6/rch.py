@@ -68,6 +68,9 @@ class Recharge(BoundaryCondition, IRegridPackage):
         value is the "value". For the "key" datetime, the data of the "value"
         datetime will be used. Can also be set with a dictionary using the
         ``set_repeat_stress`` method.
+    fixed_cell: ({True, False}, optional)
+        indicates that recharge will not be reassigned to a cell underlying the
+        cell specified in the list if the specified cell is inactive.
     """
 
     _pkg_id = "rch"
@@ -124,6 +127,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
         observations=None,
         validate: bool = True,
         repeat_stress=None,
+        fixed_cell: bool = False,
     ):
         dict_dataset = {
             "rate": rate,
@@ -134,6 +138,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
             "save_flows": save_flows,
             "observations": observations,
             "repeat_stress": repeat_stress,
+            "fixed_cell": fixed_cell,
         }
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
