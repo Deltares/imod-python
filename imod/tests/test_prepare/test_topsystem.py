@@ -21,7 +21,7 @@ def take_nth_cell_in_xy_plane(grid: GridDataArray, n: int) -> GridDataArray:
         return grid.values[:, n]
     else:
         return grid.values[:, n, n]
-    
+
 
 @parametrize_with_cases(
     argnames="active,top,bottom,stage,bottom_elevation",
