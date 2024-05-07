@@ -16,12 +16,12 @@ from imod.typing.grid import is_unstructured, zeros_like
 from imod.util.dims import enforce_dim_order
 
 
-def take_first_cell_in_xy_plane(grid: GridDataArray) -> GridDataArray:
+def take_nth_cell_in_xy_plane(grid: GridDataArray, n: int) -> GridDataArray:
     if is_unstructured(grid):
-        return grid.values[:, 0]
+        return grid.values[:, n]
     else:
-        return grid.values[:, 0, 0]
-
+        return grid.values[:, n, n]
+    
 
 @parametrize_with_cases(
     argnames="active,top,bottom,stage,bottom_elevation",
@@ -37,15 +37,21 @@ def test_riv_allocation(
         option, active, top, bottom, stage, bottom_elevation
     )
 
-    actual_riv = take_first_cell_in_xy_plane(actual_riv_da)
+    actual_riv = take_nth_cell_in_xy_plane(actual_riv_da, 0)
+    empty_riv = take_nth_cell_in_xy_plane(actual_riv_da, 1)
 
     if actual_drn_da is None:
         actual_drn = actual_drn_da
+        empty_drn = None
     else:
-        actual_drn = take_first_cell_in_xy_plane(actual_drn_da)
+        actual_drn = take_nth_cell_in_xy_plane(actual_drn_da, 0)
+        empty_drn = take_nth_cell_in_xy_plane(actual_drn_da, 1)
 
     np.testing.assert_equal(actual_riv, expected_riv)
     np.testing.assert_equal(actual_drn, expected_drn)
+    assert np.all(~empty_riv)
+    if empty_drn is not None:
+        assert np.all(~empty_drn)
 
 
 @parametrize_with_cases(
@@ -58,9 +64,11 @@ def test_riv_allocation(
 def test_drn_allocation(active, top, bottom, drn_elevation, option, expected, _):
     actual_da = allocate_drn_cells(option, active, top, bottom, drn_elevation)
 
-    actual = take_first_cell_in_xy_plane(actual_da)
+    actual = take_nth_cell_in_xy_plane(actual_da, 0)
+    empty = take_nth_cell_in_xy_plane(actual_da, 1)
 
     np.testing.assert_equal(actual, expected)
+    assert np.all(~empty)
 
 
 @parametrize_with_cases(
@@ -73,9 +81,11 @@ def test_drn_allocation(active, top, bottom, drn_elevation, option, expected, _)
 def test_ghb_allocation(active, top, bottom, head, option, expected, _):
     actual_da = allocate_ghb_cells(option, active, top, bottom, head)
 
-    actual = take_first_cell_in_xy_plane(actual_da)
+    actual = take_nth_cell_in_xy_plane(actual_da, 0)
+    empty = take_nth_cell_in_xy_plane(actual_da, 1)
 
     np.testing.assert_equal(actual, expected)
+    assert np.all(~empty)
 
 
 @parametrize_with_cases(
@@ -88,9 +98,11 @@ def test_ghb_allocation(active, top, bottom, head, option, expected, _):
 def test_rch_allocation(active, rate, option, expected, _):
     actual_da = allocate_rch_cells(option, active, rate)
 
-    actual = take_first_cell_in_xy_plane(actual_da)
+    actual = take_nth_cell_in_xy_plane(actual_da, 0)
+    empty = take_nth_cell_in_xy_plane(actual_da, 1)
 
     np.testing.assert_equal(actual, expected)
+    assert np.all(~empty)
 
 
 @parametrize_with_cases(
@@ -113,7 +125,7 @@ def test_distribute_riv_conductance(
     actual_da = distribute_riv_conductance(
         option, allocated, conductance, top, bottom, k, stage, bottom_elevation
     )
-    actual = take_first_cell_in_xy_plane(actual_da)
+    actual = take_nth_cell_in_xy_plane(actual_da, 0)
 
     np.testing.assert_equal(actual, expected)
 
@@ -138,7 +150,7 @@ def test_distribute_drn_conductance(
     actual_da = distribute_drn_conductance(
         option, allocated, conductance, top, bottom, k, elevation
     )
-    actual = take_first_cell_in_xy_plane(actual_da)
+    actual = take_nth_cell_in_xy_plane(actual_da, 0)
 
     np.testing.assert_equal(actual, expected)
 
@@ -163,6 +175,6 @@ def test_distribute_ghb_conductance(
     actual_da = distribute_ghb_conductance(
         option, allocated, conductance, top, bottom, k
     )
-    actual = take_first_cell_in_xy_plane(actual_da)
+    actual = take_nth_cell_in_xy_plane(actual_da, 0)
 
     np.testing.assert_equal(actual, expected)
