@@ -12,7 +12,9 @@ from imod.typing.grid import zeros_like
 def riv_structured(basic_dis__topsystem):
     ibound, top, bottom = basic_dis__topsystem
     top = top.sel(layer=1)
-    elevation = zeros_like(ibound.sel(layer=1))
+    elevation = zeros_like(ibound.sel(layer=1), dtype=np.float64)
+    # Deactivate second cell
+    elevation[1, 1] = np.nan
     stage = elevation - 2.0
     bottom_elevation = elevation - 4.0
     active = ibound == 1
@@ -21,7 +23,9 @@ def riv_structured(basic_dis__topsystem):
 
 def riv_unstructured(basic_disv__topsystem):
     ibound, top, bottom = basic_disv__topsystem
-    elevation = zeros_like(ibound.sel(layer=1))
+    elevation = zeros_like(ibound.sel(layer=1), dtype=np.float64)
+    # Deactivate second cell
+    elevation[1] = np.nan
     stage = elevation - 2.0
     bottom_elevation = elevation - 4.0
     active = ibound == 1
@@ -31,7 +35,9 @@ def riv_unstructured(basic_disv__topsystem):
 def drn_structured(basic_dis__topsystem):
     ibound, top, bottom = basic_dis__topsystem
     top = top.sel(layer=1)
-    elevation = zeros_like(ibound.sel(layer=1))
+    elevation = zeros_like(ibound.sel(layer=1), dtype=np.float64)
+    # Deactivate second cell
+    elevation[1, 1] = np.nan
     drain_elevation = elevation - 4.0
     active = ibound == 1
     return active, top, bottom, drain_elevation
@@ -39,7 +45,9 @@ def drn_structured(basic_dis__topsystem):
 
 def drn_unstructured(basic_disv__topsystem):
     ibound, top, bottom = basic_disv__topsystem
-    elevation = zeros_like(ibound.sel(layer=1))
+    elevation = zeros_like(ibound.sel(layer=1), dtype=np.float64)
+    # Deactivate second cell
+    elevation[1] = np.nan
     drain_elevation = elevation - 4.0
     active = ibound == 1
     return active, top, bottom, drain_elevation
@@ -48,7 +56,9 @@ def drn_unstructured(basic_disv__topsystem):
 def ghb_structured(basic_dis__topsystem):
     ibound, top, bottom = basic_dis__topsystem
     top = top.sel(layer=1)
-    elevation = zeros_like(ibound.sel(layer=1))
+    elevation = zeros_like(ibound.sel(layer=1), dtype=np.float64)
+    # Deactivate second cell
+    elevation[1, 1] = np.nan
     head = elevation - 4.0
     active = ibound == 1
     return active, top, bottom, head
@@ -56,7 +66,9 @@ def ghb_structured(basic_dis__topsystem):
 
 def ghb_unstructured(basic_disv__topsystem):
     ibound, top, bottom = basic_disv__topsystem
-    elevation = zeros_like(ibound.sel(layer=1))
+    elevation = zeros_like(ibound.sel(layer=1), dtype=np.float64)
+    # Deactivate second cell
+    elevation[1] = np.nan
     head = elevation - 4.0
     active = ibound == 1
     return active, top, bottom, head
@@ -64,14 +76,22 @@ def ghb_unstructured(basic_disv__topsystem):
 
 def rch_structured(basic_dis__topsystem):
     ibound, _, _ = basic_dis__topsystem
+    elevation = zeros_like(ibound.sel(layer=1), dtype=np.float64)
+    rate = elevation + 0.001
+    # Deactivate second cell
+    rate[1, 1] = np.nan
     active = ibound == 1
-    return active
+    return active, rate
 
 
 def rch_unstructured(basic_disv__topsystem):
     ibound, _, _ = basic_disv__topsystem
+    elevation = zeros_like(ibound.sel(layer=1), dtype=np.float64)
+    rate = elevation + 0.001
+    # Deactivate second cell
+    rate[1] = np.nan
     active = ibound == 1
-    return active
+    return active, rate
 
 
 @case(tags=["riv"])
