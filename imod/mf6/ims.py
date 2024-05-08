@@ -216,7 +216,7 @@ class Solution(Package):
         inner_rclose represents a relative L-2 Norm reduction closure criteria
         instead of a infinity-Norm (absolute convergence criteria). When
         relative_rclose is specified, a reasonable initial inner_rclose value is
-        1.0 × 10−4 and convergence is achieved for a given inner (linear)
+        1.0 * 10-4 and convergence is achieved for a given inner (linear)
         iteration when ∆h ≤ inner_dvclose and the current L-2 Norm is ≤ the
         product of the relativ_rclose and the initial L-2 Norm for the current
         inner (linear) iteration. If rclose_option is not specified, an absolute
@@ -294,7 +294,7 @@ class Solution(Package):
         md - minimum degree ordering
         Default value: None
     print_option: str
-        options: {None, "summary", "all"}
+        options: {"none", "summary", "all"}
         is a flag that controls printing of convergence information from the
         solver.
         None - means print nothing.
@@ -370,7 +370,7 @@ class Solution(Package):
         "number_orthogonalizations": [DTypeSchema(np.integer)],
         "scaling_method": [OptionSchema(("diagonal", "l2norm"))],
         "reordering_method": [OptionSchema(("rcm", "md"))],
-        "print_option": [OptionSchema(("summary", "all"))],
+        "print_option": [OptionSchema(("none", "summary", "all"))],
         "no_ptc": [OptionSchema(("first", "all"))],
         "ats_outer_maximum_fraction": [
             DTypeSchema(np.floating),
