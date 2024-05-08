@@ -157,7 +157,7 @@ imod.visualize.cross_section(
     xsection_layer_nr,
     "tab20",
     np.arange(21),
-    kwargs_colorbar=dict(plot_colorbar=False),
+    kwargs_colorbar={"plot_colorbar": False},
     fig=fig,
     ax=ax,
 )
@@ -182,9 +182,9 @@ for i, option in enumerate(ALLOCATION_OPTION, start=1):
     xsection_allocated = imod.select.cross_section_linestring(riv_allocated, geometry)
     ax = axes[i]
     if (i % 2) == 0:
-        kwargs_colorbar = dict(plot_colorbar=False)
+        kwargs_colorbar = {"plot_colorbar": False}
     else:
-        kwargs_colorbar = dict(plot_colorbar=True)
+        kwargs_colorbar = {"plot_colorbar": True}
     kwargs_aquitards = {"edgecolor": "k", "facecolor": "grey"}
     imod.visualize.cross_section(
         xsection_layer_nr,
@@ -263,15 +263,15 @@ for option in DISTRIBUTING_OPTION:
 # To reduce duplicate code, we are going to store all input data in this
 # dictionary which we can provide further as keyword arguments.
 
-distributing_data = dict(
-    allocated=riv_allocated,
-    conductance=planar_river["conductance"],
-    top=layer_model["top"],
-    bottom=layer_model["bottom"],
-    k=layer_model["k"],
-    stage=planar_river["stage"],
-    bottom_elevation=planar_river["bottom"],
-)
+distributing_data = {
+    "allocated": riv_allocated,
+    "conductance": planar_river["conductance"],
+    "top": layer_model["top"],
+    "bottom": layer_model["bottom"],
+    "k": layer_model["k"],
+    "stage": planar_river["stage"],
+    "bottom_elevation": planar_river["bottom"],
+}
 
 # %%
 # Let's keep things simple first and distribute conductances across layers
@@ -297,7 +297,7 @@ imod.visualize.cross_section(
     is_active,
     "Greys",
     [0, 1, 2, 3],
-    kwargs_colorbar=dict(plot_colorbar=False),
+    kwargs_colorbar={"plot_colorbar": False},
     fig=fig,
     ax=ax,
 )
@@ -326,7 +326,7 @@ imod.visualize.cross_section(
     xsection_k,
     "magma",
     np.logspace(-2, 3, 11),
-    kwargs_colorbar=dict(plot_colorbar=False),
+    kwargs_colorbar={"plot_colorbar": False},
     fig=fig,
     ax=ax,
 )
@@ -347,9 +347,9 @@ for i, option in enumerate(DISTRIBUTING_OPTION, start=1):
     )
 
     if (i % 2) == 0:
-        kwargs_colorbar = dict(plot_colorbar=False)
+        kwargs_colorbar = {"plot_colorbar": False}
     else:
-        kwargs_colorbar = dict(plot_colorbar=True)
+        kwargs_colorbar = {"plot_colorbar": True}
 
     # Plot grey background of active cells
     is_active = ~np.isnan(xsection_distributed.coords["top"])
@@ -357,7 +357,7 @@ for i, option in enumerate(DISTRIBUTING_OPTION, start=1):
         is_active,
         "Greys",
         [0, 1, 2, 3],
-        kwargs_colorbar=dict(plot_colorbar=False),
+        kwargs_colorbar={"plot_colorbar": False},
         fig=fig,
         ax=ax,
     )
