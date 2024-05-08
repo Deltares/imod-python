@@ -1,5 +1,6 @@
 import pathlib
 import textwrap
+from copy import deepcopy
 
 import numpy as np
 import pytest
@@ -428,3 +429,32 @@ def test_check_nan_in_active_cell(sy_layered, convertible, dis):
 
     for var, error in errors.items():
         assert var == "storage_coefficient"
+
+
+@pytest.mark.usefixtures("imod5_dataset")
+def test_from_imod5(imod5_dataset, tmp_path):
+    data = deepcopy(imod5_dataset)
+
+    target_grid = data["khv"]["kh"]
+
+    sto = imod.mf6.StorageCoefficient.from_imod5_data(data, target_grid)
+
+    assert not sto.dataset["save_flows"]
+    assert sto.dataset["transient"]
+    assert sto.dataset["storage_coefficient"].values[0] == 0.15
+    assert np.all(sto.dataset["storage_coefficient"].values[1:] == 1e-5)
+    assert sto.dataset["specific_yield"].values[()] is None
+
+    rendered_sto = sto.render(tmp_path, "sto", None, False)
+    assert "ss" in rendered_sto
+
+
+@pytest.mark.usefixtures("imod5_dataset")
+def test_from_imod5_steady_state(imod5_dataset):
+    data = deepcopy(imod5_dataset)
+    data["sto"]["storage_coefficient"].values[:] = 0
+    target_grid = data["khv"]["kh"]
+
+    sto = imod.mf6.StorageCoefficient.from_imod5_data(data, target_grid)
+
+    assert not sto.dataset["transient"]
