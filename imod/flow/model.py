@@ -37,7 +37,7 @@ class IniFile(collections.UserDict, abc.ABC):
         for timekey in ["sdate", "edate"]:
             if timekey in self.keys():
                 # If not string assume it is in some kind of datetime format
-                if type(self[timekey]) is not str:
+                if not isinstance(self[timekey], str):
                     self[timekey] = _compose_timestring(self[timekey])
 
     def render(self):
@@ -307,12 +307,10 @@ class ImodflowModel(Model):
         time_composed = self["time_discretization"]._compose_values_time(
             "time", globaltimes
         )
-        time_composed = dict(
-            [
-                (timestep_nr, _compose_timestring(time, time_format=time_format))
-                for timestep_nr, time in time_composed.items()
-            ]
-        )
+        time_composed = {
+            timestep_nr: _compose_timestring(time, time_format=time_format)
+            for timestep_nr, time in time_composed.items()
+        }
         return time_composed
 
     def _compose_periods(self):
@@ -329,12 +327,10 @@ class ImodflowModel(Model):
         # Note that the timeformat for periods in the Projectfile is different
         # from that for stress periods
         time_format = "%d-%m-%Y %H:%M:%S"
-        periods_composed = dict(
-            [
-                (value, _compose_timestring(time, time_format=time_format))
-                for time, value in periods.items()
-            ]
-        )
+        periods_composed = {
+            value: _compose_timestring(time, time_format=time_format)
+            for time, value in periods.items()
+        }
         return periods_composed
 
     def _compose_all_packages(self, directory, globaltimes):
@@ -418,12 +414,12 @@ class ImodflowModel(Model):
             if (pkg_id in rendered) or (pkg_id in ignored):
                 continue  # Skip if already rendered (for groups) or not necessary to render
 
-            kwargs = dict(
-                pkg_id=pkg_id,
-                name=package.__class__.__name__,
-                variable_order=package._variable_order,
-                package_data=composition[pkg_id],
-            )
+            kwargs = {
+                "pkg_id": pkg_id,
+                "name": package.__class__.__name__,
+                "variable_order": package._variable_order,
+                "package_data": composition[pkg_id],
+            }
 
             if isinstance(package, BoundaryCondition):
                 kwargs["n_entry"] = self._calc_n_entry(composition[pkg_id], True)
@@ -622,13 +618,15 @@ class ImodflowModel(Model):
         outfilepath = directory / runfilepath
 
         RUNFILE_OPTIONS = {
-            "mf2005_namfile": dict(
-                sim_type=2, namfile_out=outfilepath.with_suffix(".nam")
-            ),
-            "runfile": dict(sim_type=1, runfile_out=outfilepath.with_suffix(".run")),
-            "mf6_namfile": dict(
-                sim_type=3, namfile_out=outfilepath.with_suffix(".nam")
-            ),
+            "mf2005_namfile": {
+                "sim_type": 2,
+                "namfile_out": outfilepath.with_suffix(".nam"),
+            },
+            "runfile": {"sim_type": 1, "runfile_out": outfilepath.with_suffix(".run")},
+            "mf6_namfile": {
+                "sim_type": 3,
+                "namfile_out": outfilepath.with_suffix(".nam"),
+            },
         }
 
         conversion_settings = RUNFILE_OPTIONS[convert_to]

@@ -16,8 +16,8 @@ repository = "https://github.com/Deltares/imod-python.git"
 docs =  { cmd = "make html", depends_on = ["install"], cwd = "docs" }
 install = "python -m pip install --no-deps --editable ."
 install_with_deps = "python -m pip install --editable ."
-format = { depends_on = ["ruff_linter_fix", "ruff_formater_format"] }
-lint = { depends_on = ["ruff_linter_check", "ruff_formater_check"] }
+format = "ruff check --fix .; ruff format ."
+lint = "ruff check . ; ruff format --check ."
 tests = { depends_on = ["unittests", "examples"] }
 unittests = { cmd = [
     "NUMBA_DISABLE_JIT=1",
@@ -49,11 +49,7 @@ pypi-publish = { cmd = "rm --recursive --force dist && python -m build && twine 
 mypy_lint = { cmd ="mypy", depends_on = ["install"]}
 mypy_report = { cmd ="mypy | mypy2junit > mypy-report.xml", depends_on = ["install"]}
 
-ruff_linter_check = "ruff check ."
-ruff_linter_fix = "ruff check --fix ."
 
-ruff_formater_check = "ruff format --check ."
-ruff_formater_format = "ruff format ."
 
 
 [dependencies]

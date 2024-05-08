@@ -104,9 +104,7 @@ class OutputControl(Package):
 
     def _compose_oc_configuration(self, nlayer):
         # Create mapping to convert e.g. 'save_ghb' to 'saveghb'
-        conf_mapping = dict(
-            [(var, var.replace("_", "")) for var in self._variable_order]
-        )
+        conf_mapping = {var: var.replace("_", "") for var in self._variable_order}
         conf_mapping["save_head"] = "saveshd"
         conf_mapping["save_flux"] = "saveflx"
 

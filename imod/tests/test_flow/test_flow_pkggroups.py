@@ -61,14 +61,14 @@ def test_group_rendered_no_time(constant_head_no_time, three_days):
 
     pkg_id = chd1._pkg_id
 
-    to_render = dict(
-        pkg_id=pkg_id,
-        name="ConstantHead",
-        variable_order=chd1._variable_order,
-        package_data=group_composition[pkg_id],
-        times=time_composed,
-        n_entry=6,
-    )
+    to_render = {
+        "pkg_id": pkg_id,
+        "name": "ConstantHead",
+        "variable_order": chd1._variable_order,
+        "package_data": group_composition[pkg_id],
+        "times": time_composed,
+        "n_entry": 6,
+    }
 
     rendered = chd1._render_projectfile(**to_render)
 
@@ -111,14 +111,14 @@ def test_group_rendered_mixed_time_no_time(
 
     pkg_id = chd1._pkg_id
 
-    to_render = dict(
-        pkg_id=pkg_id,
-        name="ConstantHead",
-        variable_order=chd1._variable_order,
-        package_data=group_composition[pkg_id],
-        times=time_composed,
-        n_entry=6,
-    )
+    to_render = {
+        "pkg_id": pkg_id,
+        "name": "ConstantHead",
+        "variable_order": chd1._variable_order,
+        "package_data": group_composition[pkg_id],
+        "times": time_composed,
+        "n_entry": 6,
+    }
 
     rendered = chd1._render_projectfile(**to_render)
 
@@ -175,14 +175,14 @@ def test_group_rendered(constant_head, three_days):
 
     pkg_id = chd1._pkg_id
 
-    to_render = dict(
-        pkg_id=pkg_id,
-        name="ConstantHead",
-        variable_order=chd1._variable_order,
-        package_data=group_composition[pkg_id],
-        times=time_composed,
-        n_entry=6,
-    )
+    to_render = {
+        "pkg_id": pkg_id,
+        "name": "ConstantHead",
+        "variable_order": chd1._variable_order,
+        "package_data": group_composition[pkg_id],
+        "times": time_composed,
+        "n_entry": 6,
+    }
 
     rendered = chd1._render_projectfile(**to_render)
 
@@ -239,14 +239,14 @@ def test_group_synchronize_times_rendered(constant_head, three_days):
 
     pkg_id = chd1._pkg_id
 
-    to_render = dict(
-        pkg_id=pkg_id,
-        name="ConstantHead",
-        variable_order=chd1._variable_order,
-        package_data=group_composition[pkg_id],
-        times=time_composed,
-        n_entry=6,
-    )
+    to_render = {
+        "pkg_id": pkg_id,
+        "name": "ConstantHead",
+        "variable_order": chd1._variable_order,
+        "package_data": group_composition[pkg_id],
+        "times": time_composed,
+        "n_entry": 6,
+    }
 
     rendered = chd1._render_projectfile(**to_render)
 
@@ -303,14 +303,14 @@ def test_two_wels(well_df, three_days, get_render_dict):
         "3": "2018-01-03 00:00:00",
     }
 
-    to_render = dict(
-        pkg_id=pkg_id,
-        name="Well",
-        variable_order=well._variable_order,
-        package_data=group_composition[pkg_id],
-        times=time_composed,
-        n_entry=2,
-    )
+    to_render = {
+        "pkg_id": pkg_id,
+        "name": "Well",
+        "variable_order": well._variable_order,
+        "package_data": group_composition[pkg_id],
+        "times": time_composed,
+        "n_entry": 2,
+    }
 
     compare = textwrap.dedent(
         f"""\

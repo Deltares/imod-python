@@ -24,6 +24,11 @@ Added
   be selected, available in :func:`imod.prepare.DISTRIBUTION_OPTION`.
 - :func:`imod.prepare.celltable` supports an optional ``dtype`` argument. This
   can be used, for example, to create celltables of float values.
+- Added fixed_cell option. This option is relevant for phreatic models, not using 
+  the Newton formulation and model cells can become inactive. The prefered method 
+  for phreatic models is to use the Newton formulation, where cells remain active, 
+  and this option irrelevant. Option Added in
+  :func:`imod.mf6.recharge`,
 
 
 Fixed
@@ -35,7 +40,13 @@ Fixed
 - When importing data from a .prj file, the multipliers and additions specified for
   ipf and idf files are now applied
 - Fix bug where y-coords were flipped in :class:`imod.msw.MeteoMapping`
-  
+
+Changed
+~~~~~~~
+- Removed constructor arguments `source` and `target` from
+  :class:`imod.mf6.utilities.regrid.RegridderWeightsCache`, as they were not
+  used.
+
 [0.16.0] - 2024-03-29
 ---------------------
 

@@ -127,7 +127,7 @@ class LakeData(LakeApi_Base):
         for _, timeseries in timeseries_dict.items():
             if timeseries is not None:
                 if "time" in timeseries.coords:
-                    times.extend([x for x in timeseries.coords["time"].values])
+                    times.extend(list(timeseries.coords["time"].values))
         times = sorted(set(times))
         self.dataset.assign_coords({"time": times})
         for ts_name, ts_object in timeseries_dict.items():
@@ -366,7 +366,7 @@ def join_lake_tables(lake_numbers, lakes):
     """
     nr_lakes = len(lakes)
 
-    any_lake_table = any([not da_is_none(lake["lake_table"]) for lake in lakes])
+    any_lake_table = any(not da_is_none(lake["lake_table"]) for lake in lakes)
     if not any_lake_table:
         return None
 
@@ -844,9 +844,7 @@ class Lake(BoundaryCondition):
         aligned_timeseries = xr.align(
             *(package_content[ts_var] for ts_var in assigned_ts_vars), join="outer"
         )
-        package_content.update(
-            {ts_var: ts for ts_var, ts in zip(assigned_ts_vars, aligned_timeseries)}
-        )
+        package_content.update(dict(zip(assigned_ts_vars, aligned_timeseries)))
 
         if outlets is not None:
             outlet_data = create_outlet_data(outlets, name_to_number)
@@ -880,7 +878,7 @@ class Lake(BoundaryCondition):
         tables = self.dataset["lake_tables"].values[()]
         if tables is None:
             return False
-        if any([pd.api.types.is_numeric_dtype(t) for t in tables]):
+        if any(pd.api.types.is_numeric_dtype(t) for t in tables):
             return True
         return False
 
@@ -1038,7 +1036,7 @@ class Lake(BoundaryCondition):
 
         period_data_list = []
 
-        period_data_name_list = [tssname for tssname in self._period_data]
+        period_data_name_list = list(self._period_data)
         timeseries_dataset = self.dataset[period_data_name_list]
         timeseries_times = self.dataset.coords["time"]
         iperiods = np.searchsorted(globaltimes, timeseries_times) + 1

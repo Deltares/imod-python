@@ -85,7 +85,7 @@ class VariableOutputControl(MetaSwapPackage):
             *[(var, self.dataset[var].values) for var in self.dataset.data_vars]
         )
 
-        dataframe = pd.DataFrame(data=dict(variable=variable, option=option))
+        dataframe = pd.DataFrame(data={"variable": variable, "option": option})
 
         self._check_range(dataframe)
 
@@ -122,7 +122,7 @@ class TimeOutputControl(MetaSwapPackage):
         year, time_since_start_year = to_metaswap_timeformat(self.dataset["times"])
 
         dataframe = pd.DataFrame(
-            data=dict(time_since_start_year=time_since_start_year, year=year)
+            data={"time_since_start_year": time_since_start_year, "year": year}
         )
 
         dataframe["time_since_start_year"] += 1

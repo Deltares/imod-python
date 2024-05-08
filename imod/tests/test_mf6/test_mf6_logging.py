@@ -30,7 +30,7 @@ def drainage():
     )
     conductance = elevation.copy()
 
-    drn = dict(elevation=elevation, conductance=conductance)
+    drn = {"elevation": elevation, "conductance": conductance}
     return drn
 
 
