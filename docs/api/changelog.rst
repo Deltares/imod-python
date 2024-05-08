@@ -52,9 +52,6 @@ Changed
   :class:`imod.mf6.utilities.regrid.RegridderWeightsCache`, as they were not
   used.
 
-[0.16.0] - 2024-03-29
----------------------
-
 Added
 ~~~~~
 - The :func:`imod.mf6.model.mask_all_packages` now also masks the idomain array

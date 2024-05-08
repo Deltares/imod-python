@@ -3,6 +3,7 @@ from typing import Optional, Tuple
 import numpy as np
 
 from imod.logging import init_log_decorator
+from imod.mf6.auxiliary_variables import get_variable_names
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.utilities.regrid import RegridderType
@@ -37,6 +38,15 @@ class Drainage(BoundaryCondition, IRegridPackage):
     concentration_boundary_type: ({"AUX", "AUXMIXED"}, optional)
         if this flow package is used in simulations also involving transport, then this keyword specifies
         how outflow over this boundary is computed.
+    scaling_depth: array of floats (xr.DataArray)
+        if provided, enables the drainage package discharge scaling.
+        Effectively, the conductance is reduced. Its value may be both positive
+        or negative.
+        If positive: drainage starts at head equals elevation. At (elevation +
+        depth) the scaling factor becomes 1.0.
+        If negative: drainage starts at
+        elevation + depth (elevation - |depth|). At elevation the scaling
+        factor becomes 1.0.
     print_input: ({True, False}, optional)
         keyword to indicate that the list of drain information will be written
         to the listing file immediately after it is read. Default is False.
@@ -93,6 +103,12 @@ class Drainage(BoundaryCondition, IRegridPackage):
             ),
             CONC_DIMS_SCHEMA,
         ],
+        "scaling_depth": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(("layer",)),
+            BOUNDARY_DIMS_SCHEMA,
+        ],
         "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
         "save_flows": [DTypeSchema(np.bool_), DimsSchema()],
     }
@@ -104,9 +120,10 @@ class Drainage(BoundaryCondition, IRegridPackage):
         ],
         "conductance": [IdentityNoDataSchema("elevation"), AllValueSchema(">", 0.0)],
         "concentration": [IdentityNoDataSchema("elevation"), AllValueSchema(">=", 0.0)],
+        "scaling_depth": [IdentityNoDataSchema("elevation")],
     }
 
-    _period_data = ("elevation", "conductance")
+    _period_data = ("elevation", "conductance", "scaling_depth")
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
@@ -123,6 +140,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
         elevation,
         conductance,
         concentration=None,
+        scaling_depth=None,
         concentration_boundary_type="aux",
         print_input=False,
         print_flows=False,
@@ -135,6 +153,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
             "elevation": elevation,
             "conductance": conductance,
             "concentration": concentration,
+            "scaling_depth": scaling_depth,
             "concentration_boundary_type": concentration_boundary_type,
             "print_input": print_input,
             "print_flows": print_flows,
@@ -152,6 +171,27 @@ class Drainage(BoundaryCondition, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
+
+    def render(self, directory, pkgname, globaltimes, binary):
+        """Render fills in the template only, doesn't write binary data"""
+        d = {"binary": binary}
+        bin_ds = self._get_bin_ds()
+        d["periods"] = self._period_paths(
+            directory, pkgname, globaltimes, bin_ds, binary
+        )
+        # construct the rest (dict for render)
+        d = self._get_options(d)
+        d["maxbound"] = self._max_active_n()
+
+        if (hasattr(self, "_auxiliary_data")) and (names := get_variable_names(self)):
+            d["auxiliary"] = names
+        if self.dataset["scaling_depth"] is not None:
+            d["auxdepthname"] = "scaling_depth"
+            if "auxiliary" in d:
+                d["auxiliary"] += ["scaling_depth"]
+            else:
+                d["auxiliary"] = ["scaling_depth"]
+        return self._template.render(d)
 
     def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
         return self._regrid_method
