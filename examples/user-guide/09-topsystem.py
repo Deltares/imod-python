@@ -13,6 +13,8 @@ Robin-like boundary conditions over model layers.
 
 """
 
+# sphinx_gallery_thumbnail_number = -4
+
 # %%
 # Example data
 # ------------
