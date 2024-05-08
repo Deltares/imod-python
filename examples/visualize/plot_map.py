@@ -49,7 +49,7 @@ imod.visualize.plot_map(
 
 # %%
 # And to include a basemap:
-import contextily as ctx  # noqa: E402
+import contextily as ctx
 
 src = ctx.providers.OpenStreetMap.Mapnik
 imod.visualize.plot_map(
