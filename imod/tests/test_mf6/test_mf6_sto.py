@@ -433,9 +433,8 @@ def test_check_nan_in_active_cell(sy_layered, convertible, dis):
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5( imod5_dataset, tmp_path):
-    data = deepcopy(imod5_dataset[0])
+    data = deepcopy(imod5_dataset)
 
-    _load_imod5_data_in_memory(data)
     target_grid = data["khv"]["kh"]
 
     sto = imod.mf6.SpecificStorage.from_imod5_data(data, target_grid)
