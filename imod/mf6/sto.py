@@ -1,4 +1,5 @@
 import abc
+from copy import deepcopy
 from typing import Optional, Tuple
 
 import numpy as np
@@ -6,7 +7,11 @@ import numpy as np
 from imod.logging import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
-from imod.mf6.utilities.regrid import RegridderType
+from imod.mf6.utilities.regrid import (
+    RegridderType,
+    RegridderWeightsCache,
+    _regrid_package_data,
+)
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
@@ -15,6 +20,8 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
 )
+from imod.typing import GridDataArray
+from imod.typing.grid import zeros_like
 
 
 class Storage(Package):
@@ -331,3 +338,60 @@ class StorageCoefficient(StorageBase):
 
     def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
         return self._regrid_method
+
+    @classmethod
+    def from_imod5_data(
+        cls,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        target_grid: GridDataArray,
+        regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
+    ) -> "StorageCoefficient":
+        """
+        Construct a StorageCoefficient-package from iMOD5 data, loaded with the
+        :func:`imod.formats.prj.open_projectfile_data` function.
+
+        .. note::
+
+            The method expects the iMOD5 model to be fully 3D, not quasi-3D.
+
+        Parameters
+        ----------
+        imod5_data: dict
+            Dictionary with iMOD5 data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
+        target_grid: GridDataArray
+            The grid that should be used for the new package. Does not
+            need to be identical to one of the input grids.
+        regridder_types: dict, optional
+            Optional dictionary with regridder types for a specific variable.
+            Use this to override default regridding methods.
+
+        Returns
+        -------
+        Modflow 6 StorageCoefficient package. Its specific yield is 0 and it's transient if any storage_coefficient
+             is larger than 0. All cells are set to inconvertible (they stay confined throughout the simulation)
+        """
+
+        data = {
+            "storage_coefficient": imod5_data["sto"]["storage_coefficient"],
+        }
+
+        regridder_settings = deepcopy(cls._regrid_method)
+        if regridder_types is not None:
+            regridder_settings.update(regridder_types)
+
+        regrid_context = RegridderWeightsCache()
+
+        new_package_data = _regrid_package_data(
+            data, target_grid, regridder_settings, regrid_context, {}
+        )
+
+        new_package_data["convertible"] = zeros_like(
+            new_package_data["storage_coefficient"], dtype=int
+        )
+        new_package_data["transient"] = np.any(
+            new_package_data["storage_coefficient"].values > 0
+        )
+        new_package_data["specific_yield"] = None
+
+        return cls(**new_package_data)
