@@ -28,16 +28,16 @@ def test_waterbalance_barchart(waterbalance_df):
     _, ax = plt.subplots()
     df["date"] = df.index
     colors = ["#b2182b", "#ef8a62", "#fddbc7", "#d1e5f0", "#67a9cf", "#2166ac"]
-    kwargs = dict(
-        df=df,
-        inflows=inflows,
-        outflows=outflows,
-        datecolumn="date",
-        format="%Y-%m-%d",
-        ax=ax,
-        unit="m3/d",
-        colors=colors,
-    )
+    kwargs = {
+        "df": df,
+        "inflows": inflows,
+        "outflows": outflows,
+        "datecolumn": "date",
+        "format": "%Y-%m-%d",
+        "ax": ax,
+        "unit": "m3/d",
+        "colors": colors,
+    }
     imod.visualize.waterbalance_barchart(**kwargs)
 
     # Errors

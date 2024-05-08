@@ -679,7 +679,7 @@ def save(path, df, itype=None, assoc_ext="txt", nodata=1.0e20, assoc_columns=Non
     elif isinstance(assoc_columns, dict):
         keys = _lower(assoc_columns.keys())
         values = _lower(assoc_columns.values())
-        assoc_columns = {k: v for k, v in zip(keys, values)}
+        assoc_columns = dict(zip(keys, values))
 
     df.columns = colnames
     if "layer" in colnames:

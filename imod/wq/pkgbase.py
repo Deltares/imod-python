@@ -502,7 +502,7 @@ class BoundaryCondition(Package, abc.ABC):
             for time, start_end in zip(runfile_times, starts_ends):
                 # Check whether any range occurs in the input.
                 # If does does, compress should be False
-                compress = not (":" in start_end)
+                compress = ":" not in start_end
                 values[start_end] = self._compose_values_layer(
                     varname,
                     directory,

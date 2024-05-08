@@ -16,7 +16,7 @@ def write_tif():
         ncol = 8
         values = (10 * np.random.rand(nrow, ncol)).astype(dtype)
 
-        profile = dict()
+        profile = {}
         profile["crs"] = rasterio.crs.CRS.from_epsg(epsg)
         profile["transform"] = affine.Affine(1.0, 0.0, 155_000.0, 0.0, -1.0, 463_000.0)
         if rotation_angle:

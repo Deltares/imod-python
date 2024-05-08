@@ -17,7 +17,7 @@ def zeros_like(grid: xr.DataArray, *args, **kwargs):
 
 
 @typedispatch  # type: ignore [no-redef]
-def zeros_like(grid: xu.UgridDataArray, *args, **kwargs):
+def zeros_like(grid: xu.UgridDataArray, *args, **kwargs):  # noqa: F811
     return xu.zeros_like(grid, *args, **kwargs)
 
 
@@ -27,7 +27,7 @@ def ones_like(grid: xr.DataArray, *args, **kwargs):
 
 
 @typedispatch  # type: ignore [no-redef]
-def ones_like(grid: xu.UgridDataArray, *args, **kwargs):
+def ones_like(grid: xu.UgridDataArray, *args, **kwargs):  # noqa: F811
     return xu.ones_like(grid, *args, **kwargs)
 
 
@@ -37,7 +37,7 @@ def nan_like(grid: xr.DataArray, dtype=np.float32, *args, **kwargs):
 
 
 @typedispatch  # type: ignore [no-redef]
-def nan_like(grid: xu.UgridDataArray, dtype=np.float32, *args, **kwargs):
+def nan_like(grid: xu.UgridDataArray, dtype=np.float32, *args, **kwargs):  # noqa: F811
     return xu.full_like(grid, fill_value=np.nan, dtype=dtype, *args, **kwargs)
 
 
@@ -57,7 +57,7 @@ def is_unstructured(grid: xu.UgridDataArray | xu.UgridDataset) -> bool:
 
 
 @typedispatch  # type: ignore [no-redef]
-def is_unstructured(grid: xr.DataArray | xr.Dataset) -> bool:
+def is_unstructured(grid: xr.DataArray | xr.Dataset) -> bool:  # noqa: F811
     return False
 
 
@@ -90,9 +90,9 @@ def _type_dispatch_functions_on_grid_sequence(
     """
     first_object = _get_first_item(objects)
     start_type = type(first_object)
-    homogeneous = all([isinstance(o, start_type) for o in objects])
+    homogeneous = all(isinstance(o, start_type) for o in objects)
     if not homogeneous:
-        unique_types = set([type(o) for o in objects])
+        unique_types = {type(o) for o in objects}
         raise TypeError(
             f"Only homogeneous sequences can be reduced, received sequence of {unique_types}"
         )
@@ -136,10 +136,8 @@ def _type_dispatch_functions_on_dict(
     has_unstructured = xu.UgridDataArray in types
     # Test structured if xr.DataArray and spatial.
     has_structured_grid = any(
-        [
-            isinstance(arg, xr.DataArray) and is_spatial_2D(arg)
-            for arg in dict_of_objects.values()
-        ]
+        isinstance(arg, xr.DataArray) and is_spatial_2D(arg)
+        for arg in dict_of_objects.values()
     )
     if has_structured_grid and has_unstructured:
         raise TypeError(error_msg)
@@ -245,7 +243,7 @@ def bounding_polygon(active: xr.DataArray):
 
 
 @typedispatch  # type: ignore [no-redef]
-def bounding_polygon(active: xu.UgridDataArray):
+def bounding_polygon(active: xu.UgridDataArray):  # noqa: F811
     """Return bounding polygon of active cells"""
     active_indices = np.where(active > 0)[0]
     domain_slice = {f"{active.ugrid.grid.face_dimension}": active_indices}
@@ -265,7 +263,7 @@ def is_spatial_2D(array: xr.DataArray) -> bool:
 
 
 @typedispatch  # type: ignore [no-redef]
-def is_spatial_2D(array: xu.UgridDataArray) -> bool:
+def is_spatial_2D(array: xu.UgridDataArray) -> bool:  # noqa: F811
     """Return True if the array contains data associated to cell faces"""
     face_dim = array.ugrid.grid.face_dimension
     dims = array.dims
@@ -276,7 +274,7 @@ def is_spatial_2D(array: xu.UgridDataArray) -> bool:
 
 
 @typedispatch  # type: ignore [no-redef]
-def is_spatial_2D(_: object) -> bool:
+def is_spatial_2D(_: object) -> bool:  # noqa: F811
     return False
 
 
@@ -286,12 +284,12 @@ def is_equal(array1: xu.UgridDataArray, array2: xu.UgridDataArray) -> bool:
 
 
 @typedispatch  # type: ignore [no-redef]
-def is_equal(array1: xr.DataArray, array2: xr.DataArray) -> bool:
+def is_equal(array1: xr.DataArray, array2: xr.DataArray) -> bool:  # noqa: F811
     return array1.equals(array2)
 
 
 @typedispatch  # type: ignore [no-redef]
-def is_equal(array1: object, array2: object) -> bool:
+def is_equal(array1: object, array2: object) -> bool:  # noqa: F811
     return False
 
 
@@ -303,12 +301,12 @@ def is_same_domain(grid1: xu.UgridDataArray, grid2: xu.UgridDataArray) -> bool:
 
 
 @typedispatch  # type: ignore [no-redef]
-def is_same_domain(grid1: xr.DataArray, grid2: xr.DataArray) -> bool:
+def is_same_domain(grid1: xr.DataArray, grid2: xr.DataArray) -> bool:  # noqa: F811
     return grid1.coords.equals(grid2.coords)
 
 
 @typedispatch  # type: ignore [no-redef]
-def is_same_domain(grid1: object, grid2: object) -> bool:
+def is_same_domain(grid1: object, grid2: object) -> bool:  # noqa: F811
     return False
 
 
@@ -318,13 +316,13 @@ def get_spatial_dimension_names(grid: xr.DataArray) -> list[str]:
 
 
 @typedispatch  # type: ignore [no-redef]
-def get_spatial_dimension_names(grid: xu.UgridDataArray) -> list[str]:
+def get_spatial_dimension_names(grid: xu.UgridDataArray) -> list[str]:  # noqa: F811
     facedim = grid.ugrid.grid.face_dimension
     return [facedim, "layer"]
 
 
 @typedispatch  # type: ignore [no-redef]
-def get_spatial_dimension_names(grid: object) -> list[str]:
+def get_spatial_dimension_names(grid: object) -> list[str]:  # noqa: F811
     return []
 
 
@@ -336,7 +334,7 @@ def get_grid_geometry_hash(grid: xr.DataArray) -> int:
 
 
 @typedispatch  # type: ignore [no-redef]
-def get_grid_geometry_hash(grid: xu.UgridDataArray) -> int:
+def get_grid_geometry_hash(grid: xu.UgridDataArray) -> int:  # noqa: F811
     hash_x = hash(pickle.dumps(grid.ugrid.grid.node_x))
     hash_y = hash(pickle.dumps(grid.ugrid.grid.node_y))
     hash_connectivity = hash(pickle.dumps(grid.ugrid.grid.node_face_connectivity))
@@ -344,7 +342,7 @@ def get_grid_geometry_hash(grid: xu.UgridDataArray) -> int:
 
 
 @typedispatch  # type: ignore [no-redef]
-def get_grid_geometry_hash(grid: object) -> int:
+def get_grid_geometry_hash(grid: object) -> int:  # noqa: F811
     raise ValueError("get_grid_geometry_hash not supported for this object.")
 
 
@@ -355,7 +353,7 @@ def enforce_dim_order(grid: xr.DataArray) -> xr.DataArray:
 
 
 @typedispatch  # type: ignore [no-redef]
-def enforce_dim_order(grid: xu.UgridDataArray) -> xu.UgridDataArray:
+def enforce_dim_order(grid: xu.UgridDataArray) -> xu.UgridDataArray:  # noqa: F811
     """Enforce dimension order to iMOD Python standard"""
     face_dimension = grid.ugrid.grid.face_dimension
     return grid.transpose(

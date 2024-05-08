@@ -25,7 +25,7 @@ def make_da():
     return xr.DataArray(
         data=np.ones((2, 3, 3), dtype=float),
         dims=("layer", "y", "x"),
-        coords=dict(layer=layer, y=y, x=x, dx=dx, dy=dy),
+        coords={"layer": layer, "y": y, "x": x, "dx": dx, "dy": dy},
     )
 
 
@@ -36,7 +36,7 @@ def dis_dict(make_da):
         data=[1.5, 2.5], dims=("layer",), coords={"layer": [2, 3]}
     )
 
-    return dict(idomain=da.astype(int), top=da.sel(layer=2), bottom=bottom)
+    return {"idomain": da.astype(int), "top": da.sel(layer=2), "bottom": bottom}
 
 
 @pytest.fixture(scope="function")
@@ -48,7 +48,7 @@ def riv_dict(make_da):
         data=[1.0, 2.0], dims=("layer",), coords={"layer": [2, 3]}
     )
 
-    return dict(stage=da, conductance=da, bottom_elevation=bottom)
+    return {"stage": da, "conductance": da, "bottom_elevation": bottom}
 
 
 def make_dict_unstructured(d):
@@ -185,7 +185,7 @@ def test_check_dimsize_zero():
     da = xr.DataArray(
         data=np.ones((0, 3, 3), dtype=float),
         dims=("layer", "y", "x"),
-        coords=dict(layer=[], y=y, x=x, dx=dx, dy=dy),
+        coords={"layer": [], "y": y, "x": x, "dx": dx, "dy": dy},
     )
 
     da[:, 1, 1] = np.nan

@@ -561,10 +561,10 @@ def test_render__concentration_dis_structured_constant_time(well_test_data_stati
     concentration = xr.DataArray(
         data=injection_concentration,
         dims=["cell", "species"],
-        coords=dict(
-            cell=(range(0, 15)),
-            species=(["salinity", "temperature"]),
-        ),
+        coords={
+            "cell": (range(0, 15)),
+            "species": (["salinity", "temperature"]),
+        },
     )
 
     wel = imod.mf6.WellDisStructured(
@@ -614,10 +614,10 @@ def test_render__concentration_dis_vertices_constant_time(well_test_data_station
     concentration = xr.DataArray(
         data=injection_concentration,
         dims=["cell", "species"],
-        coords=dict(
-            cell=(range(0, 15)),
-            species=(["salinity", "temperature"]),
-        ),
+        coords={
+            "cell": (range(0, 15)),
+            "species": (["salinity", "temperature"]),
+        },
     )
 
     cell2d = (row - 1) * 15 + column
@@ -649,11 +649,11 @@ def test_render__concentration_dis_vertices_transient(well_test_data_transient):
     concentration = xr.DataArray(
         data=injection_concentration,
         dims=["time", "cell", "species"],
-        coords=dict(
-            time=time,
-            cell=(range(0, 15)),
-            species=(["salinity", "temperature"]),
-        ),
+        coords={
+            "time": time,
+            "cell": (range(0, 15)),
+            "species": (["salinity", "temperature"]),
+        },
     )
 
     cell2d = (row - 1) * 15 + column

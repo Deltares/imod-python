@@ -45,7 +45,7 @@ def grid_data_structured_layered(
     nlayer = unstructured_grid_data.coords["layer"].max().values[()]
     for ilayer in range(1, nlayer + 1):
         layer_value = ilayer * value
-        unstructured_grid_data.loc[dict(layer=ilayer)] = layer_value
+        unstructured_grid_data.loc[{"layer": ilayer}] = layer_value
     return unstructured_grid_data
 
 
@@ -164,8 +164,6 @@ def solution_settings() -> imod.mf6.Solution:
     return imod.mf6.Solution(
         modelnames=["flow"],
         print_option="summary",
-        csv_output=False,
-        no_ptc=True,
         outer_dvclose=1.0e-4,
         outer_maximum=500,
         under_relaxation=None,

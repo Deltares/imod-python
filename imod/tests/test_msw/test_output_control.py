@@ -120,17 +120,17 @@ def test_idf_oc_settings_simple_model():
 
     idf_output_control = IdfMapping(area, nodata)
 
-    expected = dict(
-        simgro_opt=-1,
-        idf_per=1,
-        idf_dx=1.0,
-        idf_dy=1.0,
-        idf_ncol=4,
-        idf_nrow=3,
-        idf_xmin=0.5,
-        idf_ymin=0.5,
-        idf_nodata=nodata,
-    )
+    expected = {
+        "simgro_opt": -1,
+        "idf_per": 1,
+        "idf_dx": 1.0,
+        "idf_dy": 1.0,
+        "idf_ncol": 4,
+        "idf_nrow": 3,
+        "idf_xmin": 0.5,
+        "idf_ymin": 0.5,
+        "idf_nodata": nodata,
+    }
 
     settings = idf_output_control.get_output_settings()
 

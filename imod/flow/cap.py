@@ -285,7 +285,7 @@ class MetaSwap(Package):
 
     def check_lookup_and_forcing_files(self):
         """Check for presence of required MetaSWAP input files."""
-        filenames = set([os.path.basename(f) for f in self.lookup_and_forcing_files])
+        filenames = {os.path.basename(f) for f in self.lookup_and_forcing_files}
         missing_files = set(self._required_extra) - filenames
         if len(missing_files) > 0:
             raise ValueError(f"Missing MetaSWAP input files {missing_files}")

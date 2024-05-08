@@ -98,7 +98,7 @@ class RegridderWeightsCache:
         source_hash = get_grid_geometry_hash(source_grid)
         target_hash = get_grid_geometry_hash(target_grid)
         key = (source_hash, target_hash, regridder_class)
-        if not key in self.weights_cache.keys():
+        if key not in self.weights_cache.keys():
             if len(self.weights_cache) >= self.max_cache_size:
                 self.remove_first_regridder()
             kwargs = {"source": source_grid, "target": target_grid}
