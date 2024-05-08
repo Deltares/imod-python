@@ -159,7 +159,7 @@ def test_ims_option_validation():
         * reordering_method
         \t- Invalid option: alphabetical. Valid options are: rcm, md
         * print_option
-        \t- Invalid option: whatever. Valid options are: summary, all
+        \t- Invalid option: whatever. Valid options are: none, summary, all
         * no_ptc
         \t- Invalid option: last. Valid options are: first, all
         * ats_outer_maximum_fraction
