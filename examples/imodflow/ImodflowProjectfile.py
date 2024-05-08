@@ -217,7 +217,7 @@ id_name = ["left_upper", "right_upper", "left_lower", "right_lower"]
 # <https://geopandas.org/en/stable/docs/reference/api/geopandas.GeoDataFrame.html>`_
 
 hfb_gdf = gpd.GeoDataFrame(
-    geometry=lines, data=dict(id_name=id_name, layer=hfb_layers, resistance=100.0)
+    geometry=lines, data={"id_name": id_name, "layer": hfb_layers, "resistance": 100.0}
 )
 
 hfb_gdf

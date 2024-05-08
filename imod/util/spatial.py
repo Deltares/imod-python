@@ -342,7 +342,7 @@ def from_mdal_compliant_ugrid2d(dataset: xu.UgridDataset):
         grouped[name].append(da.assign_coords(layer=int(layer)))
 
     # Concatenate, and make sure the dimension order is natural.
-    ugrid_dims = set([dim for grid in dataset.ugrid.grids for dim in grid.dimensions])
+    ugrid_dims = {dim for grid in dataset.ugrid.grids for dim in grid.dimensions}
     for variable, das in grouped.items():
         da = xr.concat(sorted(das, key=lambda da: da["layer"]), dim="layer")
         newdims = list(da.dims)

@@ -48,7 +48,7 @@ def test_write(
     # Therefore we have to ensure that dx * dy exceeds
     # GridData._metadata_dict["area"].max_value, which is 1e6. So a dx and dy of
     # 1000.0 should do the job.
-    coords = dict(x=[500.0, 1500.0], y=[1500.0, 500.0])
+    coords = {"x": [500.0, 1500.0], "y": [1500.0, 500.0]}
     like = xr.DataArray(np.ones((2, 2)), coords=coords, dims=("y", "x"))
     grid_data = GridData(
         (like * area).expand_dims(subunit=[0]),

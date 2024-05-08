@@ -70,11 +70,11 @@ class TimeDiscretization(Package):
         timestrings = [imod.util.time._compose_timestring(time) for time in times]
         timestrings.append(imod.util.time._compose_timestring(self.endtime))
 
-        d = dict(
-            timestrings=timestrings,
-            n_timesteps=self.dataset["n_timesteps"].item(),
-            timestep_multiplier=self.dataset["timestep_multiplier"].item(),
-        )
+        d = {
+            "timestrings": timestrings,
+            "n_timesteps": self.dataset["n_timesteps"].item(),
+            "timestep_multiplier": self.dataset["timestep_multiplier"].item(),
+        }
 
         return _template.render(**d)
 

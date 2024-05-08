@@ -25,7 +25,7 @@ def drainage():
     )
     conductance = elevation.copy()
 
-    drn = dict(elevation=elevation, conductance=conductance)
+    drn = {"elevation": elevation, "conductance": conductance}
     return drn
 
 
@@ -46,7 +46,7 @@ def transient_drainage():
     )
     conductance = time_multiplier * elevation
 
-    drn = dict(elevation=elevation, conductance=conductance)
+    drn = {"elevation": elevation, "conductance": conductance}
     return drn
 
 
@@ -73,9 +73,11 @@ def transient_concentration_drainage():
     conductance = time_multiplier * elevation
     concentration = species_multiplier * conductance
 
-    drn = dict(
-        elevation=elevation, conductance=conductance, concentration=concentration
-    )
+    drn = {
+        "elevation": elevation,
+        "conductance": conductance,
+        "concentration": concentration,
+    }
     return drn
 
 

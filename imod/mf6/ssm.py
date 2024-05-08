@@ -69,14 +69,13 @@ class SourceSinkMixing(BoundaryCondition, IRegridPackage):
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {
-            "sources": [
-                (a, b, c)
-                for a, b, c in zip(
+            "sources": list(
+                zip(
                     self["package_names"].values,
                     self["concentration_boundary_type"].values,
                     self["auxiliary_variable_name"].values,
                 )
-            ],
+            ),
         }
         for var in ("print_flows", "save_flows"):
             value = self[var].values[()]
