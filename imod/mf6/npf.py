@@ -532,7 +532,7 @@ class NodePropertyFlow(Package, IRegridPackage):
         if regridder_types is not None:
             regridder_settings.update(regridder_types)
 
-        regrid_context = RegridderWeightsCache(data["k"], target_grid)
+        regrid_context = RegridderWeightsCache()
 
         new_package_data = _regrid_package_data(
             data, target_grid, regridder_settings, regrid_context, {}
