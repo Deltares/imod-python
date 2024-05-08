@@ -5,6 +5,8 @@ This module contains all kinds of utilities to prepare rivers
 from enum import Enum
 from typing import Optional
 
+import numpy as np
+
 from imod.prepare.layer import (
     create_layered_top,
     get_upper_active_grid_cells,
@@ -44,7 +46,7 @@ class ALLOCATION_OPTION(Enum):
 
     >>> from imod.prepare.topsystem import ALLOCATION_OPTION
     >>> setting = ALLOCATION_OPTION.at_first_active
-    >>> allocated = allocate_rch_cells(setting, active)
+    >>> allocated = allocate_rch_cells(setting, active, rate)
     """
 
     stage_to_riv_bot = 0
@@ -97,7 +99,7 @@ def allocate_riv_cells(
 
     Returns
     -------
-    DataArray | UgridDatarray
+    tuple(DataArray | UgridDatarray)
         Allocated river cells
 
     Examples
@@ -123,7 +125,7 @@ def allocate_riv_cells(
         case ALLOCATION_OPTION.at_elevation:
             return _allocate_cells__at_elevation(top, bottom, bottom_elevation)
         case ALLOCATION_OPTION.at_first_active:
-            return _allocate_cells__at_first_active(active)
+            return _allocate_cells__at_first_active(active, bottom_elevation)
         case _:
             raise ValueError(
                 "Received incompatible setting for rivers, only"
@@ -181,7 +183,7 @@ def allocate_drn_cells(
         case ALLOCATION_OPTION.at_elevation:
             return _allocate_cells__at_elevation(top, bottom, elevation)[0]
         case ALLOCATION_OPTION.at_first_active:
-            return _allocate_cells__at_first_active(active)[0]
+            return _allocate_cells__at_first_active(active, elevation)[0]
         case _:
             raise ValueError(
                 "Received incompatible setting for drains, only"
@@ -237,7 +239,7 @@ def allocate_ghb_cells(
         case ALLOCATION_OPTION.at_elevation:
             return _allocate_cells__at_elevation(top, bottom, head)[0]
         case ALLOCATION_OPTION.at_first_active:
-            return _allocate_cells__at_first_active(active)[0]
+            return _allocate_cells__at_first_active(active, head)[0]
         case _:
             raise ValueError(
                 "Received incompatible setting for general head boundary, only"
@@ -250,6 +252,7 @@ def allocate_ghb_cells(
 def allocate_rch_cells(
     allocation_option: ALLOCATION_OPTION,
     active: GridDataArray,
+    rate: GridDataArray,
 ) -> GridDataArray:
     """
     Allocate recharge cells from a planar grid across the vertical dimension.
@@ -260,13 +263,16 @@ def allocate_rch_cells(
     allocation_option: ALLOCATION_OPTION
         Chosen allocation option, can be selected using the ALLOCATION_OPTION
         enumerator.
-    active: DataArray | UgridDatarray
+    active: DataArray | UgridDataArray
         Boolean array containing active model cells. For Modflow 6, this is the
         equivalent of ``idomain == 1``.
+    rate: DataArray | UgridDataArray
+        Array with recharge rates. This will only be used to infer where
+        recharge cells are defined.
 
     Returns
     -------
-    DataArray | UgridDatarray
+    DataArray | UgridDataArray
         Allocated recharge cells
 
     Examples
@@ -274,11 +280,11 @@ def allocate_rch_cells(
 
     >>> from imod.prepare.topsystem import ALLOCATION_OPTION, allocate_rch_cells
     >>> setting = ALLOCATION_OPTION.at_first_active
-    >>> allocated = allocate_rch_cells(setting, active)
+    >>> allocated = allocate_rch_cells(setting, active, rate)
     """
     match allocation_option:
         case ALLOCATION_OPTION.at_first_active:
-            return _allocate_cells__at_first_active(active)[0]
+            return _allocate_cells__at_first_active(active, rate)[0]
         case _:
             raise ValueError(
                 "Received incompatible setting for recharge, only"
@@ -460,7 +466,7 @@ def _allocate_cells__at_elevation(
     Returns
     -------
     GridDataArray
-        River cells
+        Topsystem cells
     """
 
     PLANAR_GRID.validate(elevation)
@@ -475,6 +481,7 @@ def _allocate_cells__at_elevation(
 @enforced_dim_order
 def _allocate_cells__at_first_active(
     active: GridDataArray,
+    planar_topsystem_grid: GridDataArray,
 ) -> tuple[GridDataArray, None]:
     """
     Allocate cells inbetween first active layer and river bottom elevation.
@@ -487,11 +494,17 @@ def _allocate_cells__at_first_active(
     ----------
     active: GridDataArray
         active model cells
+    planar_topsystem_grid: GridDataArray
+        Grid with planar topsystem cells, assumed active where not nan.
 
     Returns
     -------
     GridDataArray
-        River cells
+        Topsystem cells
     """
+    PLANAR_GRID.validate(planar_topsystem_grid)
 
-    return get_upper_active_grid_cells(active), None
+    upper_active = get_upper_active_grid_cells(active)
+    topsystem_upper_active = upper_active & ~np.isnan(planar_topsystem_grid)
+
+    return topsystem_upper_active, None
