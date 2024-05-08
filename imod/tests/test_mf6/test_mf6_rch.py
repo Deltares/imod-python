@@ -1,3 +1,4 @@
+from copy import deepcopy
 import pathlib
 import re
 import tempfile
@@ -324,3 +325,19 @@ def test_clip_box(rch_dict):
     selection = rch.clip_box(x_min=10.0, x_max=20.0, y_min=10.0, y_max=20.0)
     assert selection["rate"].dims == ("y", "x")
     assert selection["rate"].shape == (1, 1)
+
+
+
+
+@pytest.mark.usefixtures("imod5_dataset")
+def test_rch_from_imod5(imod5_dataset, tmp_path):
+    data = deepcopy(imod5_dataset)
+
+
+    target_grid = data["khv"]["kh"]
+
+    rch = imod.mf6.Recharge.from_imod5_data(data, target_grid)
+
+
+    rendered_rch = rch.render(tmp_path, "npf", None, None)
+    assert "k22" in rendered_rch
