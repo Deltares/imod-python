@@ -28,7 +28,10 @@ Added
   relevant for phreatic models, not using the Newton formulation and model cells
   can become inactive. The prefered method for phreatic models is to use the
   Newton formulation, where cells remain active, and this option irrelevant.
-
+- Added support for ``ats_outer_maximum_fraction`` in :class:`imod.mf6.Solution`.
+- Added validation for ``linear_acceleration``, ``rclose_option``,
+  ``scaling_method``, ``reordering_method``, ``print_option`` and ``no_ptc``
+  entries in :class:`imod.mf6.Solution`.
 
 Fixed
 ~~~~~
@@ -39,15 +42,15 @@ Fixed
 - When importing data from a .prj file, the multipliers and additions specified for
   ipf and idf files are now applied
 - Fix bug where y-coords were flipped in :class:`imod.msw.MeteoMapping`
-
+  
 Changed
 ~~~~~~~
+- Replaced csv_output by outer_csvfile and inner_csvfile in
+  :class:`imod.mf6.Solution` to match newer MODFLOW 6 releases.
+- Changed no_ptc from a bool to an option string in :class:`imod.mf6.Solution`.
 - Removed constructor arguments `source` and `target` from
   :class:`imod.mf6.utilities.regrid.RegridderWeightsCache`, as they were not
   used.
-
-[0.16.0] - 2024-03-29
----------------------
 
 Added
 ~~~~~
