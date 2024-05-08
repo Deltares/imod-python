@@ -16,7 +16,21 @@ from imod.typing.grid import is_unstructured, zeros_like
 from imod.util.dims import enforce_dim_order
 
 
-def take_nth_cell_in_xy_plane(grid: GridDataArray, n: int) -> GridDataArray:
+def take_nth_layer_column(grid: GridDataArray, n: int) -> GridDataArray:
+    """
+    Parameters
+    ----------
+    grid: DataArray | UgridDataArray
+        grid to take values from. Must have dimensions (layer,y,x) for
+        structured and (layer,{face_dim}) for unstructured grids.
+    n: int
+        index number in the xy plane where layer column is taken.
+
+    Returns
+    -------
+    DataArray | UgridDataArray
+        Column along the layer dimension at the nth cell in the xy plane.
+    """
     if is_unstructured(grid):
         return grid.values[:, n]
     else:
@@ -37,15 +51,15 @@ def test_riv_allocation(
         option, active, top, bottom, stage, bottom_elevation
     )
 
-    actual_riv = take_nth_cell_in_xy_plane(actual_riv_da, 0)
-    empty_riv = take_nth_cell_in_xy_plane(actual_riv_da, 1)
+    actual_riv = take_nth_layer_column(actual_riv_da, 0)
+    empty_riv = take_nth_layer_column(actual_riv_da, 1)
 
     if actual_drn_da is None:
         actual_drn = actual_drn_da
         empty_drn = None
     else:
-        actual_drn = take_nth_cell_in_xy_plane(actual_drn_da, 0)
-        empty_drn = take_nth_cell_in_xy_plane(actual_drn_da, 1)
+        actual_drn = take_nth_layer_column(actual_drn_da, 0)
+        empty_drn = take_nth_layer_column(actual_drn_da, 1)
 
     np.testing.assert_equal(actual_riv, expected_riv)
     np.testing.assert_equal(actual_drn, expected_drn)
@@ -64,8 +78,8 @@ def test_riv_allocation(
 def test_drn_allocation(active, top, bottom, drn_elevation, option, expected, _):
     actual_da = allocate_drn_cells(option, active, top, bottom, drn_elevation)
 
-    actual = take_nth_cell_in_xy_plane(actual_da, 0)
-    empty = take_nth_cell_in_xy_plane(actual_da, 1)
+    actual = take_nth_layer_column(actual_da, 0)
+    empty = take_nth_layer_column(actual_da, 1)
 
     np.testing.assert_equal(actual, expected)
     assert np.all(~empty)
@@ -81,8 +95,8 @@ def test_drn_allocation(active, top, bottom, drn_elevation, option, expected, _)
 def test_ghb_allocation(active, top, bottom, head, option, expected, _):
     actual_da = allocate_ghb_cells(option, active, top, bottom, head)
 
-    actual = take_nth_cell_in_xy_plane(actual_da, 0)
-    empty = take_nth_cell_in_xy_plane(actual_da, 1)
+    actual = take_nth_layer_column(actual_da, 0)
+    empty = take_nth_layer_column(actual_da, 1)
 
     np.testing.assert_equal(actual, expected)
     assert np.all(~empty)
@@ -98,8 +112,8 @@ def test_ghb_allocation(active, top, bottom, head, option, expected, _):
 def test_rch_allocation(active, rate, option, expected, _):
     actual_da = allocate_rch_cells(option, active, rate)
 
-    actual = take_nth_cell_in_xy_plane(actual_da, 0)
-    empty = take_nth_cell_in_xy_plane(actual_da, 1)
+    actual = take_nth_layer_column(actual_da, 0)
+    empty = take_nth_layer_column(actual_da, 1)
 
     np.testing.assert_equal(actual, expected)
     assert np.all(~empty)
@@ -125,7 +139,7 @@ def test_distribute_riv_conductance(
     actual_da = distribute_riv_conductance(
         option, allocated, conductance, top, bottom, k, stage, bottom_elevation
     )
-    actual = take_nth_cell_in_xy_plane(actual_da, 0)
+    actual = take_nth_layer_column(actual_da, 0)
 
     np.testing.assert_equal(actual, expected)
 
@@ -150,7 +164,7 @@ def test_distribute_drn_conductance(
     actual_da = distribute_drn_conductance(
         option, allocated, conductance, top, bottom, k, elevation
     )
-    actual = take_nth_cell_in_xy_plane(actual_da, 0)
+    actual = take_nth_layer_column(actual_da, 0)
 
     np.testing.assert_equal(actual, expected)
 
@@ -175,6 +189,6 @@ def test_distribute_ghb_conductance(
     actual_da = distribute_ghb_conductance(
         option, allocated, conductance, top, bottom, k
     )
-    actual = take_nth_cell_in_xy_plane(actual_da, 0)
+    actual = take_nth_layer_column(actual_da, 0)
 
     np.testing.assert_equal(actual, expected)
