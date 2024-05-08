@@ -394,4 +394,4 @@ class StorageCoefficient(StorageBase):
         )
         new_package_data["specific_yield"] = None
 
-        return StorageCoefficient(**new_package_data)
+        return cls(**new_package_data)
