@@ -63,8 +63,6 @@ def make_circle_model():
     simulation["solver"] = imod.mf6.Solution(
         modelnames=["GWF_1"],
         print_option="summary",
-        csv_output=False,
-        no_ptc=True,
         outer_dvclose=1.0e-4,
         outer_maximum=500,
         under_relaxation=None,
@@ -148,8 +146,6 @@ def make_circle_model_flow_with_transport_data(species: list[str]):
     simulation["solver"] = imod.mf6.Solution(
         modelnames=["GWF_1"],
         print_option="summary",
-        csv_output=False,
-        no_ptc=True,
         outer_dvclose=1.0e-4,
         outer_maximum=500,
         under_relaxation=None,
@@ -329,8 +325,6 @@ def circle_model_transport():
     simulation["transport_solver"] = imod.mf6.Solution(
         modelnames=["transport"],
         print_option="summary",
-        csv_output=False,
-        no_ptc=True,
         outer_dvclose=1.0e-4,
         outer_maximum=500,
         under_relaxation=None,
@@ -408,8 +402,6 @@ def circle_model_transport_multispecies_variable_density():
     simulation["transport_solver"] = imod.mf6.Solution(
         modelnames=modelnames,
         print_option="summary",
-        csv_output=False,
-        no_ptc=True,
         outer_dvclose=1.0e-4,
         outer_maximum=500,
         under_relaxation=None,

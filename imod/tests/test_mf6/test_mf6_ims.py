@@ -1,3 +1,4 @@
+import re
 import textwrap
 
 import pytest
@@ -10,8 +11,6 @@ def create_ims() -> imod.mf6.Solution:
     return imod.mf6.Solution(
         modelnames=["GWF_1"],
         print_option="summary",
-        csv_output=False,
-        no_ptc=True,
         outer_dvclose=1.0e-4,
         outer_maximum=500,
         under_relaxation=None,
@@ -29,8 +28,6 @@ def test_render():
     ims = imod.mf6.Solution(
         modelnames=["GWF_1"],
         print_option="summary",
-        csv_output=False,
-        no_ptc=True,
         outer_dvclose=1.0e-4,
         outer_maximum=500,
         under_relaxation=None,
@@ -71,8 +68,6 @@ def test_wrong_dtype():
         imod.mf6.Solution(
             modelnames=["GWF_1"],
             print_option="summary",
-            csv_output=False,
-            no_ptc=True,
             outer_dvclose=4,
             outer_maximum=500,
             under_relaxation=None,
@@ -105,3 +100,85 @@ def test_add_already_present_model():
     ims = create_ims()
     with pytest.raises(ValueError):
         ims.add_model_to_solution("GWF_1")
+
+
+def test_ims_options():
+    """
+    Ensure inner/outer csvfile, no_ptc, and ats_outer_maximum_fraction are
+    written.
+    """
+    ims = imod.mf6.Solution(
+        modelnames=["GWF_1"],
+        outer_dvclose=0.001,
+        outer_maximum=20,
+        inner_maximum=100,
+        inner_dvclose=0.0001,
+        inner_rclose=1.0,
+        linear_acceleration="cg",
+        inner_csvfile="inner.csv",
+        outer_csvfile="outer.csv",
+        no_ptc="first",
+        ats_outer_maximum_fraction=0.25,
+    )
+    actual = ims.render(None, None, None, None)
+    expected = textwrap.dedent(
+        """\
+        begin options
+          print_option summary
+          outer_csvfile fileout outer.csv
+          inner_csvfile fileout inner.csv
+          no_ptc first
+          ats_outer_maximum_fraction 0.25
+        end options
+
+        begin nonlinear
+          outer_dvclose 0.001
+          outer_maximum 20
+        end nonlinear
+
+        begin linear
+          inner_maximum 100
+          inner_dvclose 0.0001
+          inner_rclose 1.0
+          linear_acceleration cg
+        end linear
+        """
+    )
+    assert expected == actual
+
+
+def test_ims_option_validation():
+    expected = textwrap.dedent(
+        """
+        * linear_acceleration
+        \t- Invalid option: abc. Valid options are: cg, bicgstab
+        * rclose_option
+        \t- Invalid option: any. Valid options are: strict, l2norm_rclose, relative_rclose
+        * scaling_method
+        \t- Invalid option: random. Valid options are: diagonal, l2norm
+        * reordering_method
+        \t- Invalid option: alphabetical. Valid options are: rcm, md
+        * print_option
+        \t- Invalid option: whatever. Valid options are: summary, all
+        * no_ptc
+        \t- Invalid option: last. Valid options are: first, all
+        * ats_outer_maximum_fraction
+        \t- not all values comply with criterion: <= 0.5"""
+    )
+
+    with pytest.raises(ValidationError, match=re.escape(expected)):
+        imod.mf6.Solution(
+            modelnames=["GWF_1"],
+            outer_dvclose=0.001,
+            outer_maximum=20,
+            inner_maximum=100,
+            inner_dvclose=0.0001,
+            inner_rclose=1.0,
+            rclose_option="any",
+            linear_acceleration="abc",
+            scaling_method="random",
+            reordering_method="alphabetical",
+            print_option="whatever",
+            no_ptc="last",
+            ats_outer_maximum_fraction=1.0,
+        )
