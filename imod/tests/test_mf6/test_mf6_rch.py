@@ -23,12 +23,12 @@ def rch_dict():
     da = xr.DataArray(
         data=np.ones((1, 3, 3), dtype=float),
         dims=("layer", "y", "x"),
-        coords=dict(layer=layer, y=y, x=x, dx=dx, dy=dy),
+        coords={"layer": layer, "y": y, "x": x, "dx": dx, "dy": dy},
     )
 
     da[:, 1, 1] = np.nan
 
-    return dict(rate=da)
+    return {"rate": da}
 
 
 @pytest.fixture(scope="function")
@@ -43,12 +43,12 @@ def rch_dict_transient():
     da = xr.DataArray(
         data=np.ones((2, 1, 3, 3), dtype=float),
         dims=("time", "layer", "y", "x"),
-        coords=dict(time=time, layer=layer, y=y, x=x, dx=dx, dy=dy),
+        coords={"time": time, "layer": layer, "y": y, "x": x, "dx": dx, "dy": dy},
     )
 
     da[..., 1, 1] = np.nan
 
-    return dict(rate=da)
+    return {"rate": da}
 
 
 def test_render(rch_dict):

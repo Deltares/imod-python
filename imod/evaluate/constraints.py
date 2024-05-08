@@ -181,7 +181,7 @@ def intra_cell_boundary_conditions(
     elif isinstance(riv, dict):
         pass
     elif isinstance(riv, (list, tuple)):
-        riv = {f"riv_{i}": l for i, l in enumerate(riv)}
+        riv = {f"riv_{i}": single_riv for i, single_riv in enumerate(riv)}
     else:
         riv = {"riv": riv}
 
@@ -190,7 +190,7 @@ def intra_cell_boundary_conditions(
     elif isinstance(ghb, dict):
         pass
     elif isinstance(ghb, (list, tuple)):
-        ghb = {f"ghb_{i}": l for i, l in enumerate(ghb)}
+        ghb = {f"ghb_{i}": single_riv for i, single_riv in enumerate(ghb)}
     else:
         ghb = {"ghb": ghb}
 
@@ -199,7 +199,7 @@ def intra_cell_boundary_conditions(
     elif isinstance(drn, dict):
         pass
     elif isinstance(drn, (list, tuple)):
-        drn = {f"drn_{i}": l for i, l in enumerate(drn)}
+        drn = {f"drn_{i}": single_riv for i, single_riv in enumerate(drn)}
     else:
         drn = {"drn": drn}
 

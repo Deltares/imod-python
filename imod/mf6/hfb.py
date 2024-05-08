@@ -431,7 +431,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             return True
 
         linestrings = self.dataset["geometry"]
-        only_empty_lines = all([ls.is_empty for ls in linestrings.values])
+        only_empty_lines = all(ls.is_empty for ls in linestrings.values)
         return only_empty_lines
 
     def _resistance_layer(

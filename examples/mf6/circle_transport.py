@@ -314,7 +314,7 @@ z
 
 # %%
 # Assign these new coordinate values to the dataset
-coords = dict(time=simtimes[1:], z=("layer", z))
+coords = {"time": simtimes[1:], "z": ("layer", z)}
 
 sim_head = sim_head.assign_coords(**coords)
 sim_concentration = sim_concentration.assign_coords(**coords)

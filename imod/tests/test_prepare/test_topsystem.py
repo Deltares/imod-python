@@ -31,6 +31,9 @@ def take_nth_layer_column(grid: GridDataArray, n: int) -> GridDataArray:
     DataArray | UgridDataArray
         Column along the layer dimension at the nth cell in the xy plane.
     """
+    if "time" in grid.dims:
+        grid = grid.isel(time=-1)
+
     if is_unstructured(grid):
         return grid.values[:, n]
     else:
