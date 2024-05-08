@@ -21,18 +21,17 @@ Added
   topsystem in :func:`imod.prepare.distribute_riv_conductance`,
   :func:`imod.prepare.distribute_drn_conductance`,
   :func:`imod.prepare.distribute_ghb_conductance`, for this multiple options can
-  be selected, available in :func:`imod.prepare.DISTRIBUTION_OPTION`.
+  be selected, available in :func:`imod.prepare.DISTRIBUTING_OPTION`.
 - :func:`imod.prepare.celltable` supports an optional ``dtype`` argument. This
   can be used, for example, to create celltables of float values.
-- Added fixed_cell option. This option is relevant for phreatic models, not using 
-  the Newton formulation and model cells can become inactive. The prefered method 
-  for phreatic models is to use the Newton formulation, where cells remain active, 
-  and this option irrelevant. Option Added in
-  :func:`imod.mf6.recharge`,
-- Added support for ats_outer_maximum_fraction in :class:`imod.mf6.Solution`.
-- Added validation for linear_acceleration, rclose_option, scaling_method,
-  reordering_method, print_option and no_ptc entries in
-  :class:`imod.mf6.Solution`.
+- Added ``fixed_cell`` option to :class:`imod.mf6.Recharge`. This option is
+  relevant for phreatic models, not using the Newton formulation and model cells
+  can become inactive. The prefered method for phreatic models is to use the
+  Newton formulation, where cells remain active, and this option irrelevant.
+- Added support for ``ats_outer_maximum_fraction`` in :class:`imod.mf6.Solution`.
+- Added validation for ``linear_acceleration``, ``rclose_option``,
+  ``scaling_method``, ``reordering_method``, ``print_option`` and ``no_ptc``
+  entries in :class:`imod.mf6.Solution`.
 
 Fixed
 ~~~~~
@@ -52,6 +51,9 @@ Changed
 - Removed constructor arguments `source` and `target` from
   :class:`imod.mf6.utilities.regrid.RegridderWeightsCache`, as they were not
   used.
+
+[0.16.0] - 2024-03-29
+---------------------
 
 Added
 ~~~~~
