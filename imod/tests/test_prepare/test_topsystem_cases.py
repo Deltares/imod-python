@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 import xarray as xr
 from pytest_cases import case
 
@@ -11,7 +10,14 @@ from imod.typing.grid import zeros_like
 
 
 def time_da():
-    time_ls = [np.datetime64(t) for t in ["2000-01-01", "2000-01-02", "2000-01-03",]]
+    time_ls = [
+        np.datetime64(t)
+        for t in [
+            "2000-01-01",
+            "2000-01-02",
+            "2000-01-03",
+        ]
+    ]
     return xr.DataArray([1.0, 1.0, 1.0], coords={"time": time_ls}, dims=("time",))
 
 
