@@ -55,7 +55,7 @@ def test_riv_allocation(
     empty_riv = take_nth_layer_column(actual_riv_da, 1)
 
     if actual_drn_da is None:
-        actual_drn = actual_drn_da
+        actual_drn = None
         empty_drn = None
     else:
         actual_drn = take_nth_layer_column(actual_drn_da, 0)
