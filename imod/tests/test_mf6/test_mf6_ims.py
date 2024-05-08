@@ -1,3 +1,4 @@
+import re
 import textwrap
 
 import pytest
@@ -144,3 +145,40 @@ def test_ims_options():
         """
     )
     assert expected == actual
+
+
+def test_ims_option_validation():
+    expected = textwrap.dedent(
+        """
+        * linear_acceleration
+        \t- Invalid option: abc. Valid options are: cg, bicgstab
+        * rclose_option
+        \t- Invalid option: any. Valid options are: strict, l2norm_rclose, relative_rclose
+        * scaling_method
+        \t- Invalid option: random. Valid options are: diagonal, l2norm
+        * reordering_method
+        \t- Invalid option: alphabetical. Valid options are: rcm, md
+        * print_option
+        \t- Invalid option: whatever. Valid options are: summary, all
+        * no_ptc
+        \t- Invalid option: last. Valid options are: first, all
+        * ats_outer_maximum_fraction
+        \t- not all values comply with criterion: <= 0.5"""
+    )
+
+    with pytest.raises(ValidationError, match=re.escape(expected)):
+        imod.mf6.Solution(
+            modelnames=["GWF_1"],
+            outer_dvclose=0.001,
+            outer_maximum=20,
+            inner_maximum=100,
+            inner_dvclose=0.0001,
+            inner_rclose=1.0,
+            rclose_option="any",
+            linear_acceleration="abc",
+            scaling_method="random",
+            reordering_method="alphabetical",
+            print_option="whatever",
+            no_ptc="last",
+            ats_outer_maximum_fraction=1.0,
+        )

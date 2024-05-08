@@ -3,7 +3,7 @@ import xarray as xr
 
 from imod.logging import init_log_decorator
 from imod.mf6.package import Package
-from imod.schemata import DTypeSchema
+from imod.schemata import AllValueSchema, DTypeSchema, OptionSchema
 
 
 class Solution(Package):
@@ -36,7 +36,7 @@ class Solution(Package):
         SolutionPresetComplex: 0.1
     outer_maximum: int
         integer value defining the maximum number of outer (nonlinear)
-        iterations – that is, calls to the solution routine. For a linear
+        iterations - that is, calls to the solution routine. For a linear
         problem outer_maximum should be 1.
         SolutionPresetSimple: 25
         SolutionPresetModerate: 50
@@ -81,7 +81,7 @@ class Solution(Package):
         SolutionPresetModerate: "bicgstab"
         SolutionPresetComplex: "bicgstab"
     under_relaxation: str, optional
-        options: {"None", "simple", "cooley", "bdb"}
+        options: {None, "simple", "cooley", "bdb"}
         is an optional keyword that defines the nonlinear relative_rclose
         schemes used. By default under_relaxation is not used.
         None - relative_rclose is not used.
@@ -178,7 +178,7 @@ class Solution(Package):
     backtracking_reduction_factor: float, optional
         real value defining the reduction in step size used for residual
         reduction computations. The value of backtracking reduction factor is
-        between 142 MODFLOW 6 – Description of Input and Output zero and one.
+        between 142 MODFLOW 6 - Description of Input and Output zero and one.
         The value usually ranges from 0.1 to 0.3; a value of 0.2 works well for
         most problems. backtracking_reduction_factor only needs to be specified
         if backtracking number is greater than zero.
@@ -202,17 +202,17 @@ class Solution(Package):
         options: {"strict", "l2norm_rclose", "relative_rclose"}
         an optional keyword that defines the specific flow residual criterion
         used.
-        strict– an optional keyword that is used to specify that inner rclose
+        strict: an optional keyword that is used to specify that inner rclose
         represents a infinity-norm (absolute convergence criteria) and that the
         head and flow convergence criteria must be met on the first inner
         iteration (this criteria is equivalent to the criteria used by the
         MODFLOW-2005 PCG package (Hill, 1990)).
-        l2norm_rclose – an optionalkeyword that is used to specify that inner
+        l2norm_rclose: an optionalkeyword that is used to specify that inner
         rclose represents a l-2 norm closure criteria instead of a infinity-norm
         (absolute convergence criteria). When l2norm_rclose is specified, a
         reasonable initial inner rclose value is 0.1 times the number of active
         cells when meters and seconds are the defined MODFLOW 6 length and time.
-        relative_rclose – an optional keyword that is used to specify that
+        relative_rclose:  an optional keyword that is used to specify that
         inner_rclose represents a relative L-2 Norm reduction closure criteria
         instead of a infinity-Norm (absolute convergence criteria). When
         relative_rclose is specified, a reasonable initial inner_rclose value is
@@ -277,7 +277,7 @@ class Solution(Package):
         SolutionPresetModerate: 0
         SolutionPresetComplex: 2
     scaling_method: str
-        options: {"None", "diagonal", "l2norm"}
+        options: {None, "diagonal", "l2norm"}
         an optional keyword that defines the matrix scaling approach used. By
         default, matrix scaling is not applied.
         None - no matrix scaling applied.
@@ -286,7 +286,7 @@ class Solution(Package):
         l2norm - symmetric matrix scaling using the L2 norm.
         Default value: None
     reordering_method: str
-        options: {"None", "rcm", "md"}
+        options: {None, "rcm", "md"}
         an optional keyword that defines the matrix reordering approach used. By
         default, matrix reordering is not applied.
         None - original ordering.
@@ -294,7 +294,7 @@ class Solution(Package):
         md - minimum degree ordering
         Default value: None
     print_option: str
-        options: {"None", "summary", "all"}
+        options: {None, "summary", "all"}
         is a flag that controls printing of convergence information from the
         solver.
         None - means print nothing.
@@ -356,6 +356,9 @@ class Solution(Package):
         "inner_maximum": [DTypeSchema(np.integer)],
         "inner_dvclose": [DTypeSchema(np.floating)],
         "inner_rclose": [DTypeSchema(np.floating)],
+        "linear_acceleration": [OptionSchema(("cg", "bicgstab"))],
+        "rclose_option": [OptionSchema(("strict", "l2norm_rclose", "relative_rclose"))],
+        "under_relaxation": [OptionSchema(("simple", "cooley", "bdb"))],
         "under_relaxation_theta": [DTypeSchema(np.floating)],
         "under_relaxation_kappa": [DTypeSchema(np.floating)],
         "under_relaxation_gamma": [DTypeSchema(np.floating)],
@@ -365,6 +368,15 @@ class Solution(Package):
         "backtracking_reduction_factor": [DTypeSchema(np.floating)],
         "backtracking_residual_limit": [DTypeSchema(np.floating)],
         "number_orthogonalizations": [DTypeSchema(np.integer)],
+        "scaling_method": [OptionSchema(("diagonal", "l2norm"))],
+        "reordering_method": [OptionSchema(("rcm", "md"))],
+        "print_option": [OptionSchema(("summary", "all"))],
+        "no_ptc": [OptionSchema(("first", "all"))],
+        "ats_outer_maximum_fraction": [
+            DTypeSchema(np.floating),
+            AllValueSchema(">=", 0.0),
+            AllValueSchema("<=", 0.5),
+        ],
     }
     _template = Package._initialize_template(_pkg_id)
 
