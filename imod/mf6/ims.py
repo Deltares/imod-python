@@ -81,7 +81,7 @@ class Solution(Package):
         SolutionPresetModerate: "bicgstab"
         SolutionPresetComplex: "bicgstab"
     under_relaxation: str, optional
-        options: {None, "simple", "cooley", "bdb"}
+        options: {None, "simple", "cooley", "dbd"}
         is an optional keyword that defines the nonlinear relative_rclose
         schemes used. By default under_relaxation is not used.
         None - relative_rclose is not used.
@@ -358,7 +358,7 @@ class Solution(Package):
         "inner_rclose": [DTypeSchema(np.floating)],
         "linear_acceleration": [OptionSchema(("cg", "bicgstab"))],
         "rclose_option": [OptionSchema(("strict", "l2norm_rclose", "relative_rclose"))],
-        "under_relaxation": [OptionSchema(("simple", "cooley", "bdb"))],
+        "under_relaxation": [OptionSchema(("simple", "cooley", "dbd"))],
         "under_relaxation_theta": [DTypeSchema(np.floating)],
         "under_relaxation_kappa": [DTypeSchema(np.floating)],
         "under_relaxation_gamma": [DTypeSchema(np.floating)],
