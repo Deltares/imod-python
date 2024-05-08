@@ -113,7 +113,7 @@ class InitialConditions(Package, IRegridPackage):
         regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
     ) -> "InitialConditions":
         """
-        Construct a SpecificStorage-package from iMOD5 data, loaded with the
+        Construct an InitialConditions-package from iMOD5 data, loaded with the
         :func:`imod.formats.prj.open_projectfile_data` function.
 
         .. note::
@@ -134,8 +134,7 @@ class InitialConditions(Package, IRegridPackage):
 
         Returns
         -------
-        Modflow 6 SpecificStorage package. Its specific yield is 0 and it's transient if any specific_storage
-             is larger than 0. All cells are set to inconvertible (they stay confined throughout the simulation)
+        Modflow 6 InitialConditions package.
         """
 
         data = {
