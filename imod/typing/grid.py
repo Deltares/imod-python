@@ -47,7 +47,7 @@ def full_like(grid: xr.DataArray, fill_value, *args, **kwargs):
 
 
 @typedispatch  # type: ignore [no-redef]
-def full_like(grid: xu.UgridDataArray, fill_value, *args, **kwargs):
+def full_like(grid: xu.UgridDataArray, fill_value, *args, **kwargs):  # noqa: F811
     return xu.full_like(grid, fill_value, *args, **kwargs)
 
 
