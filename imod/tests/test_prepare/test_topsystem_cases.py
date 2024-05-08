@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 import xarray as xr
 from pytest_cases import case
 
@@ -7,6 +8,37 @@ from imod.prepare.topsystem import (
     DISTRIBUTING_OPTION,
 )
 from imod.typing.grid import zeros_like
+
+
+def time_da():
+    time_ls = [np.datetime64(t) for t in ["2000-01-01", "2000-01-02", "2000-01-03",]]
+    return xr.DataArray([1.0, 1.0, 1.0], coords={"time": time_ls}, dims=("time",))
+
+
+def riv_structured_transient(basic_dis__topsystem):
+    ibound, top, bottom = basic_dis__topsystem
+    top = top.sel(layer=1)
+    elevation = zeros_like(ibound.sel(layer=1), dtype=np.float64)
+    # Deactivate second cell
+    elevation[1, 1] = np.nan
+    elevation = (elevation * time_da()).transpose("time", "y", "x")
+    stage = elevation - 2.0
+    bottom_elevation = elevation - 4.0
+    active = ibound == 1
+    return active, top, bottom, stage, bottom_elevation
+
+
+def riv_unstructured_transient(basic_disv__topsystem):
+    ibound, top, bottom = basic_disv__topsystem
+    elevation = zeros_like(ibound.sel(layer=1), dtype=np.float64)
+    # Deactivate second cell
+    elevation[1] = np.nan
+    face_dim = elevation.ugrid.grid.face_dimension
+    elevation = (elevation * time_da()).transpose("time", face_dim)
+    stage = elevation - 2.0
+    bottom_elevation = elevation - 4.0
+    active = ibound == 1
+    return active, top, bottom, stage, bottom_elevation
 
 
 def riv_structured(basic_dis__topsystem):
