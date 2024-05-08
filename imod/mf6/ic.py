@@ -150,4 +150,4 @@ class InitialConditions(Package, IRegridPackage):
         new_package_data = _regrid_package_data(
             data, target_grid, regridder_settings, regrid_context, {}
         )
-        return InitialConditions(**new_package_data)
+        return cls(**new_package_data)
