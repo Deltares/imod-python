@@ -18,7 +18,7 @@ def _mask_all_models(
     mask: GridDataArray,
 ):
     spatial_dims = get_spatial_dimension_names(mask)
-    if any([coord not in spatial_dims for coord in mask.coords]):
+    if any(coord not in spatial_dims for coord in mask.coords):
         raise ValueError("unexpected coordinate dimension in masking domain")
 
     if simulation.is_split():
@@ -44,7 +44,7 @@ def _mask_all_packages(
     mask: GridDataArray,
 ):
     spatial_dimension_names = get_spatial_dimension_names(mask)
-    if any([coord not in spatial_dimension_names for coord in mask.coords]):
+    if any(coord not in spatial_dimension_names for coord in mask.coords):
         raise ValueError("unexpected coordinate dimension in masking domain")
 
     for pkgname, pkg in model.items():

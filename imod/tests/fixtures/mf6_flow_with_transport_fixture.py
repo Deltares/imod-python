@@ -181,12 +181,12 @@ def flow_model_with_concentration(concentration_fc):
     k33 = xr.full_like(idomain.isel(time=0), 10.0)
 
     # River
-    riv_dict = dict(
-        stage=idomain.sel(layer=1),
-        conductance=idomain.sel(layer=1),
-        bottom_elevation=idomain.sel(layer=1) - 1.0,
-        concentration=concentration_fc.sel(layer=1),
-    )
+    riv_dict = {
+        "stage": idomain.sel(layer=1),
+        "conductance": idomain.sel(layer=1),
+        "bottom_elevation": idomain.sel(layer=1) - 1.0,
+        "concentration": concentration_fc.sel(layer=1),
+    }
 
     gwf_model = GroundwaterFlowModel()
 

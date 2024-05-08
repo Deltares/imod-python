@@ -68,14 +68,14 @@ class IdfMapping(MetaSwapPackage):
 
         nodata = self.dataset["nodata"].values
 
-        return dict(
-            simgro_opt=-1,
-            idf_per=1,
-            idf_dx=dx,
-            idf_dy=np.abs(dy),
-            idf_ncol=ncol,
-            idf_nrow=nrow,
-            idf_xmin=xmin,
-            idf_ymin=ymin,
-            idf_nodata=nodata,
-        )
+        return {
+            "simgro_opt": -1,
+            "idf_per": 1,
+            "idf_dx": dx,
+            "idf_dy": np.abs(dy),
+            "idf_ncol": ncol,
+            "idf_nrow": nrow,
+            "idf_xmin": xmin,
+            "idf_ymin": ymin,
+            "idf_nodata": nodata,
+        }

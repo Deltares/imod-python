@@ -93,7 +93,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
     def _check_for_required_packages(self, modelkey: str) -> None:
         # Check for mandatory packages
-        pkg_ids = set([pkg._pkg_id for pkg in self.values()])
+        pkg_ids = {pkg._pkg_id for pkg in self.values()}
         dispresent = "dis" in pkg_ids or "disv" in pkg_ids or "disu" in pkg_ids
         if not dispresent:
             raise ValueError(f"No dis/disv/disu package found in model {modelkey}")

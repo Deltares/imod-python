@@ -323,7 +323,7 @@ class TestAssignWell:
     @parametrize_with_cases(
         "wells, top, bottom, k", cases=AssignWellCases.case_mix_wells
     )
-    def test_assign_wells_out_of_domain(self, wells, top, bottom, k):
+    def test_assign_wells_out_of_domain_invalid(self, wells, top, bottom, k):
         with pytest.raises(ValueError, match="could not be mapped on the grid"):
             _ = prepwel.assign_wells(
                 wells=wells,

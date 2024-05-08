@@ -29,7 +29,7 @@ def clip_by_grid(_: object, grid: object) -> None:
 
 
 @typedispatch
-def clip_by_grid(package: IPackageBase, active: xr.DataArray) -> IPackageBase:
+def clip_by_grid(package: IPackageBase, active: xr.DataArray) -> IPackageBase:  # noqa: F811
     domain_slice = get_active_domain_slice(active)
     x_min, x_max = domain_slice["x"].start, domain_slice["x"].stop
     y_min, y_max = domain_slice["y"].stop, domain_slice["y"].start
@@ -44,7 +44,7 @@ def clip_by_grid(package: IPackageBase, active: xr.DataArray) -> IPackageBase:
 
 
 @typedispatch
-def clip_by_grid(package: IPackageBase, active: xu.UgridDataArray) -> IPackageBase:
+def clip_by_grid(package: IPackageBase, active: xu.UgridDataArray) -> IPackageBase:  # noqa: F811
     domain_slice = get_active_domain_slice(active)
 
     clipped_dataset = package.dataset.isel(domain_slice, missing_dims="ignore")
@@ -56,7 +56,7 @@ def clip_by_grid(package: IPackageBase, active: xu.UgridDataArray) -> IPackageBa
 
 
 @typedispatch
-def clip_by_grid(
+def clip_by_grid(  # noqa: F811
     package: IPointDataPackage, active: xu.UgridDataArray
 ) -> IPointDataPackage:
     """Clip PointDataPackage outside unstructured grid."""
@@ -93,7 +93,7 @@ def _filter_inactive_cells(package, active):
 
 
 @typedispatch
-def clip_by_grid(package: ILineDataPackage, active: GridDataArray) -> ILineDataPackage:
+def clip_by_grid(package: ILineDataPackage, active: GridDataArray) -> ILineDataPackage:  # noqa: F811
     """Clip LineDataPackage outside unstructured/structured grid."""
 
     # Clip line with polygon

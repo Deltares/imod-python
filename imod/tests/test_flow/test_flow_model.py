@@ -110,22 +110,20 @@ def test_compose_all_packages(model, tmp_path):
     globaltimes = model[diskey]["time"].values
     composition = model._compose_all_packages(modeldir, globaltimes)
 
-    packages = set(
-        [
-            "bnd",
-            "top",
-            "bot",
-            "shd",
-            "dis",
-            "chd",
-            "wel",
-            "pcg",
-            "khv",
-            "kva",
-            "sto",
-            "oc",
-        ]
-    )
+    packages = {
+        "bnd",
+        "top",
+        "bot",
+        "shd",
+        "dis",
+        "chd",
+        "wel",
+        "pcg",
+        "khv",
+        "kva",
+        "sto",
+        "oc",
+    }
 
     assert set(composition.keys()) <= packages
     assert depth(composition) == 5
@@ -147,17 +145,15 @@ def test_write_model(model, tmp_path):
     assert n_files == 18
 
     # Test if file and directorynames in tmp_path match the following
-    files_directories = set(
-        [
-            "bnd",
-            "chd2",
-            "config_run.ini",
-            "shd",
-            "testmodel.prj",
-            "time_discretization.tim",
-            "wel",
-        ]
-    )
+    files_directories = {
+        "bnd",
+        "chd2",
+        "config_run.ini",
+        "shd",
+        "testmodel.prj",
+        "time_discretization.tim",
+        "wel",
+    }
 
     symmetric_difference = files_directories ^ set(os.listdir(tmp_path))
 
@@ -185,18 +181,16 @@ def test_write_model_metaswap(model_metaswap, tmp_path):
     assert n_files == 24
 
     # Test if file and directorynames in tmp_path match the following
-    files_directories = set(
-        [
-            "bnd",
-            "cap",
-            "chd2",
-            "config_run.ini",
-            "shd",
-            "testmodel.prj",
-            "time_discretization.tim",
-            "wel",
-        ]
-    )
+    files_directories = {
+        "bnd",
+        "cap",
+        "chd2",
+        "config_run.ini",
+        "shd",
+        "testmodel.prj",
+        "time_discretization.tim",
+        "wel",
+    }
 
     symmetric_difference = files_directories ^ set(os.listdir(tmp_path))
 
@@ -219,18 +213,16 @@ def test_write_model_horizontal_flow_barrier(model_horizontal_flow_barrier, tmp_
     assert n_files == 20
 
     # Test if file and directorynames in tmp_path match the following
-    files_directories = set(
-        [
-            "bnd",
-            "chd2",
-            "config_run.ini",
-            "hfb",
-            "shd",
-            "testmodel.prj",
-            "time_discretization.tim",
-            "wel",
-        ]
-    )
+    files_directories = {
+        "bnd",
+        "chd2",
+        "config_run.ini",
+        "hfb",
+        "shd",
+        "testmodel.prj",
+        "time_discretization.tim",
+        "wel",
+    }
 
     symmetric_difference = files_directories ^ set(os.listdir(tmp_path))
 
@@ -273,17 +265,15 @@ def test_write_model_periodic(model_periodic_stress, tmp_path):
     assert n_files == 18
 
     # Test if file and directorynames in tmp_path match the following
-    files_directories = set(
-        [
-            "bnd",
-            "chd2",
-            "config_run.ini",
-            "shd",
-            "testmodel.prj",
-            "time_discretization.tim",
-            "wel",
-        ]
-    )
+    files_directories = {
+        "bnd",
+        "chd2",
+        "config_run.ini",
+        "shd",
+        "testmodel.prj",
+        "time_discretization.tim",
+        "wel",
+    }
 
     symmetric_difference = files_directories ^ set(os.listdir(tmp_path))
 
