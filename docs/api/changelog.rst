@@ -49,9 +49,9 @@ Changed
 - Replaced csv_output by outer_csvfile and inner_csvfile in
   :class:`imod.mf6.Solution` to match newer MODFLOW 6 releases.
 - Changed no_ptc from a bool to an option string in :class:`imod.mf6.Solution`.
- 
-[0.16.0] - 2024-03-29
----------------------
+- Removed constructor arguments `source` and `target` from
+  :class:`imod.mf6.utilities.regrid.RegridderWeightsCache`, as they were not
+  used.
 
 Added
 ~~~~~
