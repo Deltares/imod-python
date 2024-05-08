@@ -99,7 +99,7 @@ regridded_k_2.sel(layer=1).plot(y="y", yincrease=False, ax=ax)
 # because initializing a regridder is costly.
 
 regridder_types = {"k": (RegridderType.CENTROIDLOCATOR, None)}
-regrid_context = RegridderWeightsCache(model["npf"]["k"], target_grid)
+regrid_context = RegridderWeightsCache()
 npf_regridded = model["npf"].regrid_like(
     target_grid=target_grid,
     regrid_context=regrid_context,

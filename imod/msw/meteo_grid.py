@@ -95,7 +95,7 @@ class MeteoGrid(MetaSwapPackage):
         else:
             return True
 
-    def _compose_dataframe(self, times: np.array):
+    def _compose_dataframe(self, times: np.ndarray):
         dataframe = pd.DataFrame(index=times)
 
         year, time_since_start_year = to_metaswap_timeformat(times)

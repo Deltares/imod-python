@@ -4,7 +4,6 @@ from collections import defaultdict
 from typing import Any, Optional, Union
 
 import xarray as xr
-import xugrid as xu
 from fastcore.dispatch import typedispatch
 from xarray.core.utils import is_scalar
 from xugrid.regrid.regridder import BaseRegridder
@@ -42,16 +41,11 @@ class RegridderWeightsCache:
 
     def __init__(
         self,
-        source_grid: Union[xr.DataArray, xu.UgridDataArray],
-        target_grid: Union[xr.DataArray, xu.UgridDataArray],
         max_cache_size: int = 6,
     ) -> None:
         self.regridder_instances: dict[
             tuple[type[BaseRegridder], Optional[str]], BaseRegridder
         ] = {}
-        self._source_grid = source_grid
-        self._target_grid = target_grid
-
         self.weights_cache = {}
         self.max_cache_size = max_cache_size
 
@@ -358,7 +352,7 @@ def _regrid_like(
         )
     new_model = model.__class__()
     if regrid_context is None:
-        regrid_context = RegridderWeightsCache(model.domain, target_grid)
+        regrid_context = RegridderWeightsCache()
     for pkg_name, pkg in model.items():
         if isinstance(pkg, (IRegridPackage, ILineDataPackage, IPointDataPackage)):
             new_model[pkg_name] = pkg.regrid_like(target_grid, regrid_context)
@@ -414,9 +408,7 @@ def _regrid_like(
         raise ValueError(
             "Unable to regrid simulation. Regridding can only be done on simulations that have a single flow model."
         )
-    flow_models = simulation.get_models_of_type("gwf6")
-    old_grid = list(flow_models.values())[0].domain
-    regrid_context = RegridderWeightsCache(old_grid, target_grid)
+    regrid_context = RegridderWeightsCache()
 
     models = simulation.get_models()
     for model_name, model in models.items():

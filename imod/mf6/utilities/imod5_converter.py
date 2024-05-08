@@ -1,3 +1,5 @@
+from typing import Union
+
 import numpy as np
 import xarray as xr
 
@@ -26,3 +28,17 @@ def convert_ibound_to_idomain(
     )
     # Fill the remaining nans at tops and bottoms with 0
     return idomain_float.fillna(0).astype(int)
+
+
+def fill_missing_layers(
+    source: xr.DataArray, full: xr.DataArray, fillvalue: Union[float | int]
+) -> xr.DataArray:
+    """
+    This function takes a source grid in which the layer dimension is
+    incomplete. It creates a result-grid which has the same layers as the "full"
+    grid, which is assumed to have all layers. The result has the values in the
+    source for the layers that are in the source. For the other layers, the
+    fillvalue is assigned.
+    """
+    layer = full.coords["layer"]
+    return source.reindex(layer=layer, fill_value=fillvalue)

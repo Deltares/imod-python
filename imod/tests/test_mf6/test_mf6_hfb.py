@@ -137,9 +137,7 @@ def test_to_mf6_creates_mf6_adapter(
     else:
         idomain_clipped = idomain.sel(x=slice(None, 54.0))
 
-    regrid_context = RegridderWeightsCache(
-        idomain.sel(layer=1), idomain_clipped.sel(layer=1)
-    )
+    regrid_context = RegridderWeightsCache()
 
     hfb_clipped = hfb.regrid_like(idomain_clipped.sel(layer=1), regrid_context)
 
