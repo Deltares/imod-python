@@ -437,13 +437,24 @@ def test_from_imod5(imod5_dataset, tmp_path):
 
     target_grid = data["khv"]["kh"]
 
-    sto = imod.mf6.SpecificStorage.from_imod5_data(data, target_grid)
+    sto = imod.mf6.StorageCoefficient.from_imod5_data(data, target_grid)
 
     assert not sto.dataset["save_flows"]
     assert sto.dataset["transient"]
-    assert sto.dataset["specific_storage"].values[0] == 0.15
-    assert np.all(sto.dataset["specific_storage"].values[1:] == 1e-5)
+    assert sto.dataset["storage_coefficient"].values[0] == 0.15
+    assert np.all(sto.dataset["storage_coefficient"].values[1:] == 1e-5)
     assert sto.dataset["specific_yield"].values[()] is None
 
     rendered_sto = sto.render(tmp_path, "sto", None, False)
     assert "ss" in rendered_sto
+
+
+@pytest.mark.usefixtures("imod5_dataset")
+def test_from_imod5_steady_state(imod5_dataset):
+    data = deepcopy(imod5_dataset)
+    data["sto"]["storage_coefficient"].values[:] = 0
+    target_grid = data["khv"]["kh"]
+
+    sto = imod.mf6.StorageCoefficient.from_imod5_data(data, target_grid)
+
+    assert not sto.dataset["transient"]
