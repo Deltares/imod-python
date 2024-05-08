@@ -3,7 +3,7 @@ import xarray as xr
 
 from imod.logging import init_log_decorator
 from imod.mf6.package import Package
-from imod.schemata import DTypeSchema
+from imod.schemata import AllValueSchema, DTypeSchema, OptionSchema
 
 
 class Solution(Package):
@@ -36,7 +36,7 @@ class Solution(Package):
         SolutionPresetComplex: 0.1
     outer_maximum: int
         integer value defining the maximum number of outer (nonlinear)
-        iterations – that is, calls to the solution routine. For a linear
+        iterations - that is, calls to the solution routine. For a linear
         problem outer_maximum should be 1.
         SolutionPresetSimple: 25
         SolutionPresetModerate: 50
@@ -81,7 +81,7 @@ class Solution(Package):
         SolutionPresetModerate: "bicgstab"
         SolutionPresetComplex: "bicgstab"
     under_relaxation: str, optional
-        options: {"None", "simple", "cooley", "bdb"}
+        options: {None, "simple", "cooley", "dbd"}
         is an optional keyword that defines the nonlinear relative_rclose
         schemes used. By default under_relaxation is not used.
         None - relative_rclose is not used.
@@ -178,7 +178,7 @@ class Solution(Package):
     backtracking_reduction_factor: float, optional
         real value defining the reduction in step size used for residual
         reduction computations. The value of backtracking reduction factor is
-        between 142 MODFLOW 6 – Description of Input and Output zero and one.
+        between 142 MODFLOW 6 - Description of Input and Output zero and one.
         The value usually ranges from 0.1 to 0.3; a value of 0.2 works well for
         most problems. backtracking_reduction_factor only needs to be specified
         if backtracking number is greater than zero.
@@ -202,21 +202,21 @@ class Solution(Package):
         options: {"strict", "l2norm_rclose", "relative_rclose"}
         an optional keyword that defines the specific flow residual criterion
         used.
-        strict– an optional keyword that is used to specify that inner rclose
+        strict: an optional keyword that is used to specify that inner rclose
         represents a infinity-norm (absolute convergence criteria) and that the
         head and flow convergence criteria must be met on the first inner
         iteration (this criteria is equivalent to the criteria used by the
         MODFLOW-2005 PCG package (Hill, 1990)).
-        l2norm_rclose – an optionalkeyword that is used to specify that inner
+        l2norm_rclose: an optionalkeyword that is used to specify that inner
         rclose represents a l-2 norm closure criteria instead of a infinity-norm
         (absolute convergence criteria). When l2norm_rclose is specified, a
         reasonable initial inner rclose value is 0.1 times the number of active
         cells when meters and seconds are the defined MODFLOW 6 length and time.
-        relative_rclose – an optional keyword that is used to specify that
+        relative_rclose:  an optional keyword that is used to specify that
         inner_rclose represents a relative L-2 Norm reduction closure criteria
         instead of a infinity-Norm (absolute convergence criteria). When
         relative_rclose is specified, a reasonable initial inner_rclose value is
-        1.0 × 10−4 and convergence is achieved for a given inner (linear)
+        1.0 * 10-4 and convergence is achieved for a given inner (linear)
         iteration when ∆h ≤ inner_dvclose and the current L-2 Norm is ≤ the
         product of the relativ_rclose and the initial L-2 Norm for the current
         inner (linear) iteration. If rclose_option is not specified, an absolute
@@ -277,7 +277,7 @@ class Solution(Package):
         SolutionPresetModerate: 0
         SolutionPresetComplex: 2
     scaling_method: str
-        options: {"None", "diagonal", "l2norm"}
+        options: {None, "diagonal", "l2norm"}
         an optional keyword that defines the matrix scaling approach used. By
         default, matrix scaling is not applied.
         None - no matrix scaling applied.
@@ -285,22 +285,16 @@ class Solution(Package):
         scaling method in Hill (1992).
         l2norm - symmetric matrix scaling using the L2 norm.
         Default value: None
-        SolutionPresetSimple: None
-        SolutionPresetModerate: None
-        SolutionPresetComplex: None
     reordering_method: str
-        options: {"None", "rcm", "md"}
+        options: {None, "rcm", "md"}
         an optional keyword that defines the matrix reordering approach used. By
         default, matrix reordering is not applied.
         None - original ordering.
         rcm - reverse Cuthill McKee ordering.
         md - minimum degree ordering
         Default value: None
-        SolutionPresetSimple: None
-        SolutionPresetModerate: None
-        SolutionPresetComplex: None
     print_option: str
-        options: {"None", "summary", "all"}
+        options: {"none", "summary", "all"}
         is a flag that controls printing of convergence information from the
         solver.
         None - means print nothing.
@@ -311,17 +305,15 @@ class Solution(Package):
         convergence information to each model listing file in addition to
         SUMMARY information.
         Default value: "summary"
-        SolutionPresetSimple: No Default
-        SolutionPresetModerate: No Default
-        SolutionPresetComplex: No Default
-    csv_output: str, optional
-        False if no csv is to be written for the output, enter str of filename
+    outer_csvfile: str, optional
+        None if no csv is to be written for the output, str of filename
         if csv is to be written.
-        Default value: False
-        SolutionPresetSimple: No Default
-        SolutionPresetModerate: No Default
-        SolutionPresetComplex: No Default
-    no_ptc: ({True, False}, optional)
+        Default value: None
+    inner_csvfile: str, optional
+        None if no csv is to be written for the output, str of filename
+        if csv is to be written.
+        Default value: None
+    no_ptc: str, optional, either None, "all", or "first".
         is a flag that is used to disable pseudo-transient continuation (PTC).
         Option only applies to steady-state stress periods for models using the
         Newton-Raphson formulation. For many problems, PTC can significantly
@@ -333,10 +325,22 @@ class Solution(Package):
         PTC option should be used to deactivate PTC. This NO PTC option should
         also be used in order to compare convergence behavior with other MODFLOW
         versions, as PTC is only available in MODFLOW 6.
-        Default value: False
-        SolutionPresetSimple: No Default
-        SolutionPresetModerate: No Default
-        SolutionPresetComplex: No Default
+    ats_outer_maximum_fraction: float, optional.
+        real value defining the fraction of the maximum allowable outer iterations
+        used with the Adaptive Time Step (ATS) capability if it is active. If this
+        value is set to zero by the user, then this solution will have no effect
+        on ATS behavior. This value must be greater than or equal to zero and less
+        than or equal to 0.5 or the program will terminate with an error. If it is
+        not specified by the user, then it is assigned a default value of one
+        third. When the number of outer iterations for this solution is less than
+        the product of this value and the maximum allowable outer iterations, then
+        ATS will increase the time step length by a factor of DTADJ in the ATS
+        input file. When the number of outer iterations for this solution is
+        greater than the maximum allowable outer iterations minus the product of
+        this value and the maximum allowable outer iterations, then the ATS (if
+        active) will decrease the time step length by a factor of 1 / DTADJ.
+
+        Default value is None.
     validate: {True, False}
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
@@ -352,6 +356,9 @@ class Solution(Package):
         "inner_maximum": [DTypeSchema(np.integer)],
         "inner_dvclose": [DTypeSchema(np.floating)],
         "inner_rclose": [DTypeSchema(np.floating)],
+        "linear_acceleration": [OptionSchema(("cg", "bicgstab"))],
+        "rclose_option": [OptionSchema(("strict", "l2norm_rclose", "relative_rclose"))],
+        "under_relaxation": [OptionSchema(("simple", "cooley", "dbd"))],
         "under_relaxation_theta": [DTypeSchema(np.floating)],
         "under_relaxation_kappa": [DTypeSchema(np.floating)],
         "under_relaxation_gamma": [DTypeSchema(np.floating)],
@@ -361,6 +368,15 @@ class Solution(Package):
         "backtracking_reduction_factor": [DTypeSchema(np.floating)],
         "backtracking_residual_limit": [DTypeSchema(np.floating)],
         "number_orthogonalizations": [DTypeSchema(np.integer)],
+        "scaling_method": [OptionSchema(("diagonal", "l2norm"))],
+        "reordering_method": [OptionSchema(("rcm", "md"))],
+        "print_option": [OptionSchema(("none", "summary", "all"))],
+        "no_ptc": [OptionSchema(("first", "all"))],
+        "ats_outer_maximum_fraction": [
+            DTypeSchema(np.floating),
+            AllValueSchema(">=", 0.0),
+            AllValueSchema("<=", 0.5),
+        ],
     }
     _template = Package._initialize_template(_pkg_id)
 
@@ -391,8 +407,10 @@ class Solution(Package):
         scaling_method=None,
         reordering_method=None,
         print_option="summary",
-        csv_output=False,
-        no_ptc=False,
+        outer_csvfile=None,
+        inner_csvfile=None,
+        no_ptc=None,
+        ats_outer_maximum_fraction=None,
         validate: bool = True,
     ):
         dict_dataset = {
@@ -419,7 +437,9 @@ class Solution(Package):
             "scaling_method": scaling_method,
             "reordering_method": reordering_method,
             "print_option": print_option,
-            "csv_output": csv_output,
+            "outer_csvfile": outer_csvfile,
+            "inner_csvfile": inner_csvfile,
+            "ats_outer_maximum_fraction": ats_outer_maximum_fraction,
             "no_ptc": no_ptc,
         }
         # Make sure the modelnames are set as a variable rather than dimension:
@@ -460,12 +480,17 @@ class Solution(Package):
 
 
 def SolutionPresetSimple(
-    modelnames, print_option="summary", csv_output=False, no_ptc=False
+    modelnames,
+    print_option="summary",
+    outer_csvfile=None,
+    inner_csvfile=None,
+    no_ptc=None,
 ):
     solution = Solution(
         modelnames=modelnames,
         print_option=print_option,
-        csv_output=csv_output,
+        outer_csvfile=outer_csvfile,
+        inner_csvfile=inner_csvfile,
         no_ptc=no_ptc,
         outer_dvclose=0.001,
         outer_maximum=25,
@@ -487,19 +512,22 @@ def SolutionPresetSimple(
         preconditioner_levels=0,
         preconditioner_drop_tolerance=0,
         number_orthogonalizations=0,
-        scaling_method=None,
-        reordering_method=None,
     )
     return solution
 
 
 def SolutionPresetModerate(
-    modelnames, print_option="summary", csv_output=False, no_ptc=False
+    modelnames,
+    print_option="summary",
+    outer_csvfile=None,
+    inner_csvfile=None,
+    no_ptc=None,
 ):
     solution = Solution(
         modelnames=modelnames,
         print_option=print_option,
-        csv_output=csv_output,
+        outer_csvfile=outer_csvfile,
+        inner_csvfile=inner_csvfile,
         no_ptc=no_ptc,
         outer_dvclose=0.01,
         outer_maximum=50,
@@ -521,19 +549,22 @@ def SolutionPresetModerate(
         preconditioner_levels=0,
         preconditioner_drop_tolerance=0.0,
         number_orthogonalizations=0,
-        scaling_method=None,
-        reordering_method=None,
     )
     return solution
 
 
 def SolutionPresetComplex(
-    modelnames, print_option="summary", csv_output=False, no_ptc=False
+    modelnames,
+    print_option="summary",
+    outer_csvfile=None,
+    inner_csvfile=None,
+    no_ptc=None,
 ):
     solution = Solution(
         modelnames=modelnames,
         print_option=print_option,
-        csv_output=csv_output,
+        outer_csvfile=outer_csvfile,
+        inner_csvfile=inner_csvfile,
         no_ptc=no_ptc,
         outer_dvclose=0.1,
         outer_maximum=100,
@@ -555,7 +586,5 @@ def SolutionPresetComplex(
         preconditioner_levels=5,
         preconditioner_drop_tolerance=0.0001,
         number_orthogonalizations=2,
-        scaling_method=None,
-        reordering_method=None,
     )
     return solution
