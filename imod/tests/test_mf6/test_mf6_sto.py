@@ -1,6 +1,6 @@
-from copy import deepcopy
 import pathlib
 import textwrap
+from copy import deepcopy
 
 import numpy as np
 import pytest
@@ -8,7 +8,6 @@ import xarray as xr
 
 import imod
 from imod.schemata import ValidationError
-from imod.tests.test_mf6.test_mf6_dis import _load_imod5_data_in_memory
 
 
 @pytest.fixture()
@@ -431,19 +430,19 @@ def test_check_nan_in_active_cell(sy_layered, convertible, dis):
     for var, error in errors.items():
         assert var == "storage_coefficient"
 
+
 @pytest.mark.usefixtures("imod5_dataset")
-def test_from_imod5( imod5_dataset, tmp_path):
+def test_from_imod5(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset)
 
     target_grid = data["khv"]["kh"]
 
     sto = imod.mf6.SpecificStorage.from_imod5_data(data, target_grid)
 
-
     assert not sto.dataset["save_flows"]
-    assert sto.dataset["transient"] 
+    assert sto.dataset["transient"]
     assert sto.dataset["specific_storage"].values[0] == 0.15
-    assert np.all(sto.dataset["specific_storage"].values[1:] == 1e-5 )
+    assert np.all(sto.dataset["specific_storage"].values[1:] == 1e-5)
     assert sto.dataset["specific_yield"].values[()] is None
 
     rendered_sto = sto.render(tmp_path, "sto", None, False)

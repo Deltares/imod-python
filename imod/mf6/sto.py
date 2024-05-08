@@ -7,7 +7,11 @@ import numpy as np
 from imod.logging import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
-from imod.mf6.utilities.regrid import RegridderType, RegridderWeightsCache, _regrid_package_data
+from imod.mf6.utilities.regrid import (
+    RegridderType,
+    RegridderWeightsCache,
+    _regrid_package_data,
+)
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
@@ -196,7 +200,6 @@ class SpecificStorage(StorageBase):
     def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
         return self._regrid_method
 
-
     @classmethod
     def from_imod5_data(
         cls,
@@ -244,11 +247,16 @@ class SpecificStorage(StorageBase):
             data, target_grid, regridder_settings, regrid_context, {}
         )
 
-        new_package_data["convertible"] = zeros_like(new_package_data["specific_storage"], dtype=int)
-        new_package_data["transient"] = np.any(new_package_data["specific_storage"].values >= 0)
+        new_package_data["convertible"] = zeros_like(
+            new_package_data["specific_storage"], dtype=int
+        )
+        new_package_data["transient"] = np.any(
+            new_package_data["specific_storage"].values >= 0
+        )
         new_package_data["specific_yield"] = None
 
         return SpecificStorage(**new_package_data)
+
 
 class StorageCoefficient(StorageBase):
     """
