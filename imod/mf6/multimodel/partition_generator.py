@@ -33,7 +33,7 @@ def get_label_array(simulation: Modflow6Simulation, npartitions: int) -> GridDat
     return _partition_idomain(idomain_top, npartitions)
 
 
-@typedispatch
+@typedispatch  # type: ignore [no-redef]
 def _partition_idomain(
     idomain_grid: xu.UgridDataArray, npartitions: int
 ) -> GridDataArray:
@@ -45,7 +45,7 @@ def _partition_idomain(
     return labels
 
 
-@typedispatch
+@typedispatch  # type: ignore [no-redef]
 def _partition_idomain(idomain_grid: xr.DataArray, npartitions: int) -> GridDataArray:
     """
     Create a label array for structured grids by creating rectangular
@@ -122,16 +122,18 @@ def _partition_1d(nr_partitions: int, axis_size: int) -> List[Tuple]:
     return partitions
 
 
-def _mid_size_factors(number_partitions: int) -> (int, int):
+def _mid_size_factors(number_partitions: int) -> Tuple[int, int]:
     """
     Returns the 2 factors of an integer that are closest to the square root
     (smallest first). Calling it on 27 would return 3 and 7; calling it on 25
-    would return 5 fand 5, calling it on 13 wouldd return 1 and 13.
+    would return 5 fand 5, calling it on 13 would return 1 and 13.
     """
 
     factor = int(sqrt(number_partitions))
     while factor > 0:
         if number_partitions % factor == 0:
-            return (factor, int(number_partitions / factor))
+            break
         else:
             factor -= 1
+
+    return factor, int(number_partitions / factor)

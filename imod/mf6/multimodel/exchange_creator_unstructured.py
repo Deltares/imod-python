@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -149,7 +149,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
     def _get_partition_numbers(self, face: np.ndarray) -> np.ndarray:
         return self._submodel_labels.data[face]
 
-    def _get_partition_sorted_connected_faces(self) -> (np.ndarray, np.ndarray):
+    def _get_partition_sorted_connected_faces(self) -> Tuple[np.ndarray, np.ndarray]:
         grid = self._submodel_labels.ugrid.grid
         edge_face_connectivity = grid.edge_face_connectivity
 
@@ -167,4 +167,4 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         face2 = np.where(
             face_partition_1 > face_partition_2, unordered_face1, unordered_face2
         )
-        return (face1, face2)
+        return face1, face2
