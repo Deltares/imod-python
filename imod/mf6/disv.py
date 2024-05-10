@@ -1,9 +1,10 @@
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 
 from imod.logging import init_log_decorator
+from imod.mf6.interfaces.imaskingsettings import IMaskingSettings
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.utilities.regrid import RegridderType
@@ -19,7 +20,7 @@ from imod.schemata import (
 )
 
 
-class VerticesDiscretization(Package, IRegridPackage):
+class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
     """
     Discretization by Vertices (DISV).
 
@@ -73,7 +74,9 @@ class VerticesDiscretization(Package, IRegridPackage):
         "idomain": (RegridderType.OVERLAP, "mode"),
     }
 
-    _skip_mask_arrays = ["bottom"]
+    @property
+    def skip_variables(self) -> List[str]:
+        return ["bottom"]
 
     @init_log_decorator()
     def __init__(self, top, bottom, idomain, validate: bool = True):
