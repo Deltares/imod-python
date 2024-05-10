@@ -209,7 +209,7 @@ def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, lis
     return methods
 
 
-@typedispatch  # type: ignore[no-redef]
+@typedispatch
 def _regrid_like(
     package: IRegridPackage,
     target_grid: GridDataArray,

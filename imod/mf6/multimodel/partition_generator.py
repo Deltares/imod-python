@@ -31,7 +31,7 @@ def get_label_array(simulation: Modflow6Simulation, npartitions: int) -> GridDat
     return _partition_idomain(idomain_top, npartitions)
 
 
-@typedispatch  # type: ignore [no-redef]
+@typedispatch
 def _partition_idomain(
     idomain_grid: xu.UgridDataArray, npartitions: int
 ) -> GridDataArray:
@@ -43,7 +43,7 @@ def _partition_idomain(
     return labels
 
 
-@typedispatch  # type: ignore [no-redef]
+@typedispatch  # type: ignore[no-redef]
 def _partition_idomain(idomain_grid: xr.DataArray, npartitions: int) -> GridDataArray:
     """
     Create a label array for structured grids by creating rectangular
