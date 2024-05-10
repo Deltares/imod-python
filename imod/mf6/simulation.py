@@ -192,7 +192,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 model_name_file = pathlib.Path(
                     write_context.root_directory / pathlib.Path(f"{key}", f"{key}.nam")
                 ).as_posix()
-                models.append((value.model_id(), model_name_file, key))
+                models.append((value.model_id, model_name_file, key))
             elif isinstance(value, Package):
                 if value._pkg_id == "tdis":
                     d["tdis6"] = f"{key}.tdis"
@@ -566,7 +566,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             output function.
         """
         modeltype = OUTPUT_MODEL_MAPPING[output]
-        modelnames = self.get_models_of_type(modeltype._model_id).keys()
+        modelnames = self._get_models_of_type(modeltype._model_id).keys()
         if len(modelnames) == 0:
             modeltype = OUTPUT_MODEL_MAPPING[output]
             raise ValueError(
@@ -903,11 +903,11 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 result.append(exchange.get_specification())
         return result
 
-    def get_models_of_type(self, modeltype):
+    def _get_models_of_type(self, modeltype):
         return {
             k: v
             for k, v in self.items()
-            if isinstance(v, Modflow6Model) and (v.model_id() == modeltype)
+            if isinstance(v, Modflow6Model) and (v.model_id == modeltype)
         }
 
     def get_models(self):
@@ -1021,8 +1021,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             raise ValueError(
                 "splitting of simulations with more (or less) than 1 flow model currently not supported."
             )
-        transport_models = self.get_models_of_type("gwt6")
-        flow_models = self.get_models_of_type("gwf6")
+        transport_models = self._get_models_of_type("gwt6")
+        flow_models = self._get_models_of_type("gwf6")
         if not any(flow_models) and not any(transport_models):
             raise ValueError("a simulation without any models cannot be split.")
 
@@ -1207,8 +1207,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         return "\n".join(content)
 
     def _get_transport_models_per_flow_model(self) -> dict[str, list[str]]:
-        flow_models = self.get_models_of_type("gwf6")
-        transport_models = self.get_models_of_type("gwt6")
+        flow_models = self._get_models_of_type("gwf6")
+        transport_models = self._get_models_of_type("gwt6")
         # exchange for flow and transport
         result = collections.defaultdict(list)
 
@@ -1258,7 +1258,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         return "split_exchanges" in self.keys()
 
     def has_one_flow_model(self) -> bool:
-        flow_models = self.get_models_of_type("gwf6")
+        flow_models = self._get_models_of_type("gwf6")
         return len(flow_models) == 1
 
     def mask_all_models(

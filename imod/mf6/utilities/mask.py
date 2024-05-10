@@ -28,8 +28,16 @@ def _mask_all_models(
             "masking can only be applied to simulations that have not been split. Apply masking before splitting."
         )
 
-    flowmodels = list(simulation.get_models_of_type("gwf6").keys())
-    transportmodels = list(simulation.get_models_of_type("gwt6").keys())
+    flowmodels = [
+        name
+        for name, model in simulation.get_models().items()
+        if model.model_id == "gwf6"
+    ]
+    transportmodels = [
+        name
+        for name, model in simulation.get_models().items()
+        if model.model_id == "gwt6"
+    ]
     modelnames = flowmodels + transportmodels
 
     for name in modelnames:

@@ -23,5 +23,9 @@ class IModel(IDict):
     def domain(self):
         raise NotImplementedError
 
+    @property
+    def model_id(self) -> str:
+        raise NotImplementedError
+
     def is_regridding_supported(self) -> Tuple[bool, str]:
         raise NotImplementedError
