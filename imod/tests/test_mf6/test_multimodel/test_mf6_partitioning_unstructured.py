@@ -362,14 +362,14 @@ def run_simulation(tmp_path, simulation, species=None):
     simulation.run()
     head = simulation.open_head()
     flow_budget = simulation.open_flow_budget()
-    flow_budget = flow_budget.sel(time=364)
+    flow_budget = flow_budget.sel(time=2)
     concentration = None
     transport_budget = None
     transport_budget = None
     if has_transport:
         concentration = simulation.open_concentration()
         transport_budget = simulation.open_transport_budget(species)
-        transport_budget = transport_budget.sel(time=364)
+        transport_budget = transport_budget.sel(time=2)
     return head, concentration, flow_budget, transport_budget
 
 
