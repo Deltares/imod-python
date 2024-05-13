@@ -283,3 +283,18 @@ def test_to_ugrid2d(write=False):
 
     if write:
         uds.to_netcdf("ugrid-a3dt.nc")
+
+
+def test_gdal_compliant_grid():
+    data = np.ones((2, 3))
+    # explicit dx dy, equidistant
+    coords = {
+        "x": [0.5, 1.5, 2.5],
+        "y": [1.5, 0.5],
+        "dx": ("x", [1.0, 1.0, 1.0]),
+        "dy": ("y", [-1.0, -1.0]),
+    }
+    dims = ("y", "x")
+    da = xr.DataArray(data, coords, dims)
+
+    da_compliant = imod.util.spatial.gdal_compliant_grid(da)

@@ -309,7 +309,7 @@ def mdal_compliant_ugrid2d(dataset: xr.Dataset) -> xr.Dataset:
     return ds
 
 
-def from_mdal_compliant_ugrid2d(dataset: xu.UgridDataset):
+def from_mdal_compliant_ugrid2d(dataset: xu.UgridDataset) -> xu.UgridDataset:
     """
     Undo some of the changes of ``mdal_compliant_ugrid2d``: re-stack the
     layers.
@@ -400,6 +400,28 @@ def to_ugrid2d(data: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
         ds[data.name] = ugrid2d_data(data, grid.face_dimension)
     return mdal_compliant_ugrid2d(ds)
 
+
+def gdal_compliant_grid(
+    data: Union[xr.DataArray, xr.Dataset],
+) -> Union[xr.DataArray, xr.Dataset]:
+    """
+    
+    """
+    x_attrs = {
+        "axis": "X",
+        "long_name": "x coordinate of projection",
+        "standard_name": "projection_x_coordinate",
+    }
+    y_attrs = {
+        "axis": "Y",
+        "long_name": "y coordinate of projection",
+        "standard_name": "projection_y_coordinate",
+    }
+
+    x_coord_attrs = data.coords["x"].assign_attrs(x_attrs)
+    y_coord_attrs = data.coords["y"].assign_attrs(y_attrs)
+
+    return data.assign_coords(x=x_coord_attrs, y=y_coord_attrs)
 
 def empty_2d(
     dx: Union[float, FloatArray],
