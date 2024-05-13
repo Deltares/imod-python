@@ -339,3 +339,21 @@ def test_rch_from_imod5_layer_0(imod5_dataset, rch_layer, tmp_path):
 
     rendered_rch = rch.render(tmp_path, "rch", None, None)
     assert "maxbound 2162" in rendered_rch
+
+
+@pytest.mark.parametrize("rch_layer", [0, 1])
+@pytest.mark.usefixtures("imod5_dataset")
+def test_rch_from_imod5_layer_transient(imod5_dataset, rch_layer, tmp_path):
+    data = deepcopy(imod5_dataset)
+    da = data["rch"]["rate"]
+    da = da.expand_dims({"time": [0, 1, 2]})
+    data["rch"]["rate"] = da
+
+    target_grid = data["khv"]["kh"]
+    data["rch"]["rate"]["layer"].values[0] = rch_layer
+
+    rch = imod.mf6.Recharge.from_imod5_data(data, target_grid)
+
+    rendered_rch = rch.render(tmp_path, "rch", [0, 1, 2], None)
+    assert rendered_rch.count("begin period") == 3
+    assert "maxbound 2162" in rendered_rch

@@ -409,3 +409,12 @@ def is_planar_grid(
         if grid["layer"][0] == 0 and len(grid["layer"]) == 1:
             return True
     return False
+
+
+def is_transient_data_grid(
+    grid: xr.DataArray | xr.Dataset | xu.UgridDataArray | xu.UgridDataset,
+):
+    if "time" in grid.coords:
+        if len(grid["time"]) > 1:
+            return True
+    return False

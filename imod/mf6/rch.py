@@ -26,7 +26,7 @@ from imod.schemata import (
     OtherCoordsSchema,
 )
 from imod.typing import GridDataArray
-from imod.typing.grid import is_planar_grid, zeros_like
+from imod.typing.grid import is_planar_grid, is_transient_data_grid, zeros_like
 
 
 class Recharge(BoundaryCondition, IRegridPackage):
@@ -208,9 +208,18 @@ class Recharge(BoundaryCondition, IRegridPackage):
                 data["rate"].isel(layer=0),
             )
             rch_rate = zeros_like(target_grid)
-            rch_rate.values[:, :, :] = data["rate"]
-            rch_rate = xr.where(is_rch_cell, rch_rate, np.nan)
-            new_package_data["rate"] = rch_rate
+            if is_transient_data_grid(data["rate"]):
+                rch_rate = deepcopy(
+                    rch_rate.expand_dims({"time": data["rate"]["time"]})
+                )
+                for time in data["rate"]["time"].values:
+                    rch_rate.loc[time, :, :, :] = (
+                        data["rate"].sel(time=time).drop_vars("layer")
+                    )
+                rch_rate = xr.where(is_rch_cell, rch_rate, np.nan)
+                new_package_data["rate"] = rch_rate
+            else:
+                new_package_data["rate"] = rch_rate
 
         else:
             regridder_settings = deepcopy(cls._regrid_method)
