@@ -286,6 +286,7 @@ def test_to_ugrid2d(write=False):
 
 
 def test_gdal_compliant_grid():
+    # Arrange
     data = np.ones((2, 3))
     # explicit dx dy, equidistant
     coords = {
@@ -297,4 +298,33 @@ def test_gdal_compliant_grid():
     dims = ("y", "x")
     da = xr.DataArray(data, coords, dims)
 
+    # Act
     da_compliant = imod.util.spatial.gdal_compliant_grid(da)
+
+    # Assert
+    # Test if original dataarray not altered
+    assert da.coords["x"].attrs == {}
+    assert da.coords["y"].attrs == {}
+    # Test if coordinates got correct attributes
+    assert da_compliant.coords["x"].attrs["axis"] == "X"
+    assert da_compliant.coords["x"].attrs["long_name"] == "x coordinate of projection"
+    assert da_compliant.coords["x"].attrs["standard_name"] == "projection_x_coordinate"
+    assert da_compliant.coords["y"].attrs["axis"] == "Y"
+    assert da_compliant.coords["y"].attrs["long_name"] == "y coordinate of projection"
+    assert da_compliant.coords["y"].attrs["standard_name"] == "projection_y_coordinate"
+
+
+def test_gdal_compliant_grid_error():
+    # Arrange
+    data = np.ones((2,))
+    # explicit dx dy, equidistant
+    coords = {
+        "y": [1.5, 0.5],
+        "dy": ("y", [-1.0, -1.0]),
+    }
+    dims = ("y",)
+    da = xr.DataArray(data, coords, dims)
+
+    # Act
+    with pytest.raises(ValueError, match="Missing dimensions: {'x'}"):
+        imod.util.spatial.gdal_compliant_grid(da)

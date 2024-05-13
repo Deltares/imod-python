@@ -405,7 +405,13 @@ def gdal_compliant_grid(
     data: Union[xr.DataArray, xr.Dataset],
 ) -> Union[xr.DataArray, xr.Dataset]:
     """
-    
+    Assign attributes to x,y coordinates to make data accepted by GDAL.
+
+    Parameters
+    ----------
+    data: xr.DataArray | xr.Dataset
+        Structured data with a x and y coordinate.
+
     """
     x_attrs = {
         "axis": "X",
@@ -417,6 +423,12 @@ def gdal_compliant_grid(
         "long_name": "y coordinate of projection",
         "standard_name": "projection_y_coordinate",
     }
+
+    dims = set(data.dims)
+    missing_dims = {"x", "y"} - dims
+
+    if len(missing_dims) > 0:
+        raise ValueError(f"Missing dimensions: {missing_dims}")
 
     x_coord_attrs = data.coords["x"].assign_attrs(x_attrs)
     y_coord_attrs = data.coords["y"].assign_attrs(y_attrs)
