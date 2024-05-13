@@ -26,6 +26,6 @@ def get_first_header_advanced_package(
 ) -> Any:
     for key, header_list in headers.items():
         # multimodels have a gwf-gwf budget for flow-ja-face between domains
-        if not "flow-ja-face" in key and "gwf_" in key:
+        if "flow-ja-face" not in key and "gwf_" in key:
             return header_list[0]
     return None
