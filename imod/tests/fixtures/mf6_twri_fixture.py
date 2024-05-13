@@ -227,7 +227,7 @@ def transient_twri_model():
         save_flows=True,
     )
     simulation.create_time_discretization(
-        additional_times=pd.date_range("2000-01-01", " 2000-01-31")
+        additional_times=pd.date_range("2000-01-01", " 2000-01-03")
     )
     return simulation
 
@@ -255,7 +255,7 @@ def transient_unconfined_twri_model():
     # Write specific discharges
     gwf_model["npf"]["save_specific_discharge"] = True
     simulation.create_time_discretization(
-        additional_times=pd.date_range("2000-01-01", " 2000-01-31")
+        additional_times=pd.date_range("2000-01-01", " 2000-01-03")
     )
     return simulation
 
