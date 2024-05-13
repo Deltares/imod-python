@@ -11,8 +11,10 @@ begin options
   print_flows{% endif %}
 {%- if save_flows is defined %}
   save_flows{% endif %}
-{%- if budget_filerecord is defined %}
-  budget fileout {{budgetfile}}{% endif %}
+{%- if budget_fileout is defined %}
+  budget fileout {{budget_fileout}}{% endif %}
+{%- if budgetcsv_fileout is defined %}
+  budgetcsv fileout {{budgetcsv_fileout}}{% endif %}
 {%- if ts_filerecord is defined %}
   ts6 filein {{ts6_filename}}{% endif %}
 {%- if obs_filerecord is defined %}
