@@ -7,7 +7,7 @@ used internally, but are not private since they may be useful to users as well.
 
 import collections
 import re
-from typing import TYPE_CHECKING, Any, Dict, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence, Tuple, Union
 
 import affine
 import numpy as np
@@ -18,7 +18,7 @@ import xugrid as xu
 from imod.typing import FloatArray, GridDataset, IntArray
 from imod.util.imports import MissingOptionalModule
 
-# since rasterio, shapely, and geopandas are a big dependencies that are
+# since rasterio, shapely, rioxarray, and geopandas are a big dependencies that are
 # sometimes hard to install and not always required, we made this an optional
 # dependency
 try:
@@ -38,6 +38,11 @@ else:
         import geopandas as gpd
     except ImportError:
         gpd = MissingOptionalModule("geopandas")
+
+try:
+    import rioxarray
+except ImportError:
+    rasterio = MissingOptionalModule("rioxarray")
 
 
 def _xycoords(bounds, cellsizes) -> Dict[str, Any]:
@@ -403,6 +408,7 @@ def to_ugrid2d(data: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
 
 def gdal_compliant_grid(
     data: Union[xr.DataArray, xr.Dataset],
+    crs: Optional[Any] = None,
 ) -> Union[xr.DataArray, xr.Dataset]:
     """
     Assign attributes to x,y coordinates to make data accepted by GDAL.
@@ -411,7 +417,13 @@ def gdal_compliant_grid(
     ----------
     data: xr.DataArray | xr.Dataset
         Structured data with a x and y coordinate.
+    crs: Any, Optional
+        Anything accepted by rasterio.crs.CRS.from_user_input
+        Requires ``rioxarray`` installed.
 
+    Returns
+    -------
+    data with attributes to be accepted by GDAL.
     """
     x_attrs = {
         "axis": "X",
@@ -433,7 +445,14 @@ def gdal_compliant_grid(
     x_coord_attrs = data.coords["x"].assign_attrs(x_attrs)
     y_coord_attrs = data.coords["y"].assign_attrs(y_attrs)
 
-    return data.assign_coords(x=x_coord_attrs, y=y_coord_attrs)
+    data_gdal = data.assign_coords(x=x_coord_attrs, y=y_coord_attrs)
+
+    if crs is not None:
+        if isinstance(rioxarray, MissingOptionalModule):
+            raise ModuleNotFoundError("rioxarray is required for this functionality")
+        data_gdal.rio.write_crs(crs, inplace=True)
+
+    return data_gdal
 
 def empty_2d(
     dx: Union[float, FloatArray],

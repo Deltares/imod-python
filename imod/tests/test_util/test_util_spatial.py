@@ -313,6 +313,35 @@ def test_gdal_compliant_grid():
     assert da_compliant.coords["y"].attrs["long_name"] == "y coordinate of projection"
     assert da_compliant.coords["y"].attrs["standard_name"] == "projection_y_coordinate"
 
+def test_gdal_compliant_grid_crs(tmpdir):
+    import rioxarray
+    
+    # Arrange
+    data = np.ones((2, 3))
+    # explicit dx dy, equidistant
+    coords = {
+        "x": [0.5, 1.5, 2.5],
+        "y": [1.5, 0.5],
+        "dx": ("x", [1.0, 1.0, 1.0]),
+        "dy": ("y", [-1.0, -1.0]),
+    }
+    dims = ("y", "x")
+    da = xr.DataArray(data, coords, dims)
+
+    # Act
+    da_compliant = imod.util.spatial.gdal_compliant_grid(da, crs="EPSG:28992")
+    
+    # Assert
+    assert "spatial_ref" in da_compliant.coords
+
+    # Test saving to netcdf, reading with rasterio again to test if crs
+    # understood.
+    da_compliant.to_netcdf(tmpdir / "gdal_accepted_grid.nc")
+    da_compliant.close()
+
+    da_read = rioxarray.open_rasterio(str(tmpdir / "gdal_accepted_grid.nc"))
+    assert da_read.rio.crs == "EPSG:28992"
+
 
 def test_gdal_compliant_grid_error():
     # Arrange
