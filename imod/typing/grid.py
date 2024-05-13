@@ -414,6 +414,7 @@ def is_planar_grid(
 def is_transient_data_grid(
     grid: xr.DataArray | xr.Dataset | xu.UgridDataArray | xu.UgridDataset,
 ):
+    # Returns True if there is a time coordinate on the object with more than one value.
     if "time" in grid.coords:
         if len(grid["time"]) > 1:
             return True
