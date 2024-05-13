@@ -404,10 +404,13 @@ def is_planar_grid(
     grid: xr.DataArray | xr.Dataset | xu.UgridDataArray | xu.UgridDataset,
 ) -> bool:
     # Returns True if the grid is planar. It has then a layer coordinate with
-    # length 1 and value 0.
-    if "layer" in grid.coords:
-        if grid["layer"][0] == 0 and len(grid["layer"]) == 1:
-            return True
+    # length 1 and value 0, or an empty layer coordinate axis, or no layer coordinate at all
+    if "layer" not in grid.coords:
+        return True
+    if grid["layer"].shape == ():
+        return True
+    if grid["layer"][0] == 0 and len(grid["layer"]) == 1:
+        return True
     return False
 
 
