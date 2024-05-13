@@ -1,8 +1,8 @@
-from copy import deepcopy
 import pathlib
 import re
 import tempfile
 import textwrap
+from copy import deepcopy
 
 import numpy as np
 import pytest
@@ -327,17 +327,15 @@ def test_clip_box(rch_dict):
     assert selection["rate"].shape == (1, 1)
 
 
-
-
+@pytest.mark.parametrize("rch_layer", [0, 1])
 @pytest.mark.usefixtures("imod5_dataset")
-def test_rch_from_imod5(imod5_dataset, tmp_path):
+def test_rch_from_imod5_layer_0(imod5_dataset, rch_layer, tmp_path):
     data = deepcopy(imod5_dataset)
 
-
     target_grid = data["khv"]["kh"]
+    data["rch"]["rate"]["layer"].values[0] = rch_layer
 
     rch = imod.mf6.Recharge.from_imod5_data(data, target_grid)
 
-
-    rendered_rch = rch.render(tmp_path, "npf", None, None)
-    assert "k22" in rendered_rch
+    rendered_rch = rch.render(tmp_path, "rch", None, None)
+    assert "maxbound 2162" in rendered_rch

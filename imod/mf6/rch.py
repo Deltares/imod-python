@@ -2,11 +2,16 @@ from copy import deepcopy
 from typing import Optional, Tuple
 
 import numpy as np
+import xarray as xr
 
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.utilities.regrid import RegridderType, RegridderWeightsCache, _regrid_package_data
+from imod.mf6.utilities.regrid import (
+    RegridderType,
+    RegridderWeightsCache,
+    _regrid_package_data,
+)
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_rch_cells
 from imod.schemata import (
@@ -21,6 +26,7 @@ from imod.schemata import (
     OtherCoordsSchema,
 )
 from imod.typing import GridDataArray
+from imod.typing.grid import is_planar_grid, zeros_like
 
 
 class Recharge(BoundaryCondition, IRegridPackage):
@@ -192,17 +198,29 @@ class Recharge(BoundaryCondition, IRegridPackage):
         data = {
             "rate": imod5_data["rch"]["rate"],
         }
-  
-        regridder_settings = deepcopy(cls._regrid_method)
-        if regridder_types is not None:
-            regridder_settings.update(regridder_types)
+        new_package_data = {}
 
-        regrid_context = RegridderWeightsCache()
+        # if rate has only layer 0, then it is planar.
+        if is_planar_grid(data["rate"]):
+            is_rch_cell = allocate_rch_cells(
+                ALLOCATION_OPTION.at_first_active,
+                target_grid,
+                data["rate"].isel(layer=0),
+            )
+            rch_rate = zeros_like(target_grid)
+            rch_rate.values[:, :, :] = data["rate"]
+            rch_rate = xr.where(is_rch_cell, rch_rate, np.nan)
+            new_package_data["rate"] = rch_rate
 
-        new_package_data = _regrid_package_data(
-            data, target_grid, regridder_settings, regrid_context, {}
-        )
+        else:
+            regridder_settings = deepcopy(cls._regrid_method)
+            if regridder_types is not None:
+                regridder_settings.update(regridder_types)
 
-        actual_da = allocate_rch_cells(ALLOCATION_OPTION.at_first_active, target_grid)
-        
+            regrid_context = RegridderWeightsCache()
+
+            new_package_data = _regrid_package_data(
+                data, target_grid, regridder_settings, regrid_context, {}
+            )
+
         return Recharge(**new_package_data)
