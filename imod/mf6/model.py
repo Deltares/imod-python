@@ -6,7 +6,7 @@ import inspect
 import pathlib
 from copy import deepcopy
 from pathlib import Path
-from typing import Optional, Tuple, Union
+from typing import Any, Optional, Tuple, Union
 
 import cftime
 import jinja2
@@ -292,8 +292,36 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
     @standard_log_decorator()
     def dump(
-        self, directory, modelname, validate: bool = True, mdal_compliant: bool = False
+        self,
+        directory,
+        modelname,
+        validate: bool = True,
+        mdal_compliant: bool = False,
+        crs: Optional[Any] = None,
     ):
+        """
+        Dump simulation to files. Writes a model definition as .TOML file, which
+        points to data for each package. Each package is stored as a separate
+        NetCDF. Structured grids are saved as regular NetCDFs, unstructured
+        grids are saved as UGRID NetCDF. Structured grids are always made GDAL
+        compliant, unstructured grids can be made MDAL compliant optionally.
+
+        Parameters
+        ----------
+        directory: str or Path
+            directory to dump simulation into.
+        modelname: str
+            modelname, will be used to create a subdirectory.
+        validate: bool, optional
+            Whether to validate simulation data. Defaults to True.
+        mdal_compliant: bool, optional
+            Convert data with
+            :func:`imod.prepare.spatial.mdal_compliant_ugrid2d` to MDAL
+            compliant unstructured grids. Defaults to False.
+        crs: Any, optional
+            Anything accepted by rasterio.crs.CRS.from_user_input
+            Requires ``rioxarray`` installed.
+        """
         modeldirectory = pathlib.Path(directory) / modelname
         modeldirectory.mkdir(exist_ok=True, parents=True)
         if validate:
@@ -309,12 +337,14 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             if isinstance(dataset, xu.UgridDataset):
                 if mdal_compliant:
                     dataset = dataset.ugrid.to_dataset()
-                    mdal_dataset = imod.util.spatial.mdal_compliant_ugrid2d(dataset)
+                    mdal_dataset = imod.util.spatial.mdal_compliant_ugrid2d(
+                        dataset, crs=crs
+                    )
                     mdal_dataset.to_netcdf(modeldirectory / pkg_path)
                 else:
                     dataset.ugrid.to_netcdf(modeldirectory / pkg_path)
             else:
-                dataset = imod.util.spatial.gdal_compliant_grid(dataset)
+                dataset = imod.util.spatial.gdal_compliant_grid(dataset, crs=crs)
                 dataset.to_netcdf(modeldirectory / pkg_path)
 
         toml_path = modeldirectory / f"{modelname}.toml"

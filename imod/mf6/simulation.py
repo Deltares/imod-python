@@ -822,8 +822,33 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
     @standard_log_decorator()
     def dump(
-        self, directory=".", validate: bool = True, mdal_compliant: bool = False
+        self,
+        directory=".",
+        validate: bool = True,
+        mdal_compliant: bool = False,
+        crs=None,
     ) -> None:
+        """
+        Dump simulation to files. Writes a model definition as .TOML file, which
+        points to data for each package. Each package is stored as a separate
+        NetCDF. Structured grids are saved as regular NetCDFs, unstructured
+        grids are saved as UGRID NetCDF. Structured grids are always made GDAL
+        compliant, unstructured grids can be made MDAL compliant optionally.
+
+        Parameters
+        ----------
+        directory: str or Path, optional
+            directory to dump simulation into. Defaults to current working directory.
+        validate: bool, optional
+            Whether to validate simulation data. Defaults to True.
+        mdal_compliant: bool, optional
+            Convert data with
+            :func:`imod.prepare.spatial.mdal_compliant_ugrid2d` to MDAL
+            compliant unstructured grids. Defaults to False.
+        crs: Any, optional
+            Anything accepted by rasterio.crs.CRS.from_user_input
+            Requires ``rioxarray`` installed.
+        """
         directory = pathlib.Path(directory)
         directory.mkdir(parents=True, exist_ok=True)
 
@@ -831,7 +856,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         for key, value in self.items():
             cls_name = type(value).__name__
             if isinstance(value, Modflow6Model):
-                model_toml_path = value.dump(directory, key, validate, mdal_compliant)
+                model_toml_path = value.dump(
+                    directory, key, validate, mdal_compliant, crs
+                )
                 toml_content[cls_name][key] = model_toml_path.relative_to(
                     directory
                 ).as_posix()
