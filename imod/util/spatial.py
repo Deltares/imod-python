@@ -454,6 +454,7 @@ def gdal_compliant_grid(
 
     return data_gdal
 
+
 def empty_2d(
     dx: Union[float, FloatArray],
     xmin: float,

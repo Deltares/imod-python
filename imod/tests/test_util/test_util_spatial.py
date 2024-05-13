@@ -313,9 +313,10 @@ def test_gdal_compliant_grid():
     assert da_compliant.coords["y"].attrs["long_name"] == "y coordinate of projection"
     assert da_compliant.coords["y"].attrs["standard_name"] == "projection_y_coordinate"
 
+
 def test_gdal_compliant_grid_crs(tmpdir):
     import rioxarray
-    
+
     # Arrange
     data = np.ones((2, 3))
     # explicit dx dy, equidistant
@@ -330,7 +331,7 @@ def test_gdal_compliant_grid_crs(tmpdir):
 
     # Act
     da_compliant = imod.util.spatial.gdal_compliant_grid(da, crs="EPSG:28992")
-    
+
     # Assert
     assert "spatial_ref" in da_compliant.coords
 
