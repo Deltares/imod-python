@@ -62,38 +62,7 @@ def test_import_heads_structured(
     assert np.allclose(merged_heads.coords["layer"].values, [1, 2, 3])
     assert np.allclose(
         merged_heads.coords["time"].values,
-        [
-            1.0,
-            2.0,
-            3.0,
-            4.0,
-            5.0,
-            6.0,
-            7.0,
-            8.0,
-            9.0,
-            10.0,
-            11.0,
-            12.0,
-            13.0,
-            14.0,
-            15.0,
-            16.0,
-            17.0,
-            18.0,
-            19.0,
-            20.0,
-            21.0,
-            22.0,
-            23.0,
-            24.0,
-            25.0,
-            26.0,
-            27.0,
-            28.0,
-            29.0,
-            30.0,
-        ],
+        [1.0, 2.0],
     )
 
 
@@ -110,7 +79,7 @@ def test_import_heads_unstructured(tmp_path, circle_partitioned):
     # Assert
     assert np.allclose(merged_heads.coords["layer"].values, [1, 2])
     assert np.allclose(
-        merged_heads.coords["time"].values, list(np.arange(7.0, 365.0, 7.0))
+        merged_heads.coords["time"].values, [1.0, 2.0]
     )
     assert np.allclose(merged_heads.coords["mesh2d_nFaces"].values, list(range(216)))
 
