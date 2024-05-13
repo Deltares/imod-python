@@ -156,11 +156,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         >>> simulation["time_discretization"]["n_timesteps"] = 5
         """
         self.use_cftime = any(
-            [
-                model._use_cftime()
-                for model in self.values()
-                if isinstance(model, Modflow6Model)
-            ]
+            model._use_cftime()
+            for model in self.values()
+            if isinstance(model, Modflow6Model)
         )
 
         times = [
@@ -877,7 +875,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         simulation = Modflow6Simulation(name=toml_path.stem)
         for key, entry in toml_content.items():
-            if not key in ["gwtgwf_exchanges", "split_exchanges"]:
+            if key not in ["gwtgwf_exchanges", "split_exchanges"]:
                 item_cls = classes[key]
                 for name, filename in entry.items():
                     path = toml_path.parent / filename

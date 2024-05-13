@@ -173,7 +173,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 fig, axes = plt.subplots(nrows=2, sharex=True)
-plot_kwargs = dict(colors="viridis", levels=np.linspace(0.0, 100.0, 21), fig=fig)
+plot_kwargs = {"colors": "viridis", "levels": np.linspace(0.0, 100.0, 21), "fig": fig}
 
 imod.visualize.spatial.plot_map(
     original_simulation["GWF"]["npf"]["k"].sel(layer=3), ax=axes[0], **plot_kwargs
@@ -186,18 +186,12 @@ axes[0].set_ylabel("original")
 axes[1].set_ylabel("regridded")
 
 # %%
-# Set up the input needed for custom regridding including the method and the old grid.
+# Set up the input needed for custom regridding. Create a regridder
+# weight-cache. This object can (and should) be reused for all the packages that
+# undergo custom regridding at this stage.
 from imod.mf6.utilities.regrid import RegridderWeightsCache
 
-# just take any array of the package to use as the old grid
-old_grid = original_rch_package["rate"]
-
-old_grid
-
-# %%
-# Create a regridder weight-cache. This object can (and should) be reused for all the packages
-# that undergo custom regridding at this stage.
-regrid_context = RegridderWeightsCache(original_rch_package["rate"], target_grid)
+regrid_context = RegridderWeightsCache()
 
 regrid_context
 
@@ -343,7 +337,7 @@ hds_regridded
 # %%
 # Let's make a comparison plot of the regridded heads.
 fig, axes = plt.subplots(nrows=2, sharex=True)
-plot_kwargs = dict(colors="viridis", levels=np.linspace(0.0, 11.0, 12), fig=fig)
+plot_kwargs = {"colors": "viridis", "levels": np.linspace(0.0, 11.0, 12), "fig": fig}
 
 imod.visualize.spatial.plot_map(
     hds_original.isel(layer=6, time=-1), ax=axes[0], **plot_kwargs

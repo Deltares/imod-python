@@ -23,12 +23,12 @@ def rch_dict():
     da = xr.DataArray(
         data=np.ones((1, 3, 3), dtype=float),
         dims=("layer", "y", "x"),
-        coords=dict(layer=layer, y=y, x=x, dx=dx, dy=dy),
+        coords={"layer": layer, "y": y, "x": x, "dx": dx, "dy": dy},
     )
 
     da[:, 1, 1] = np.nan
 
-    return dict(rate=da)
+    return {"rate": da}
 
 
 @pytest.fixture(scope="function")
@@ -43,12 +43,12 @@ def rch_dict_transient():
     da = xr.DataArray(
         data=np.ones((2, 1, 3, 3), dtype=float),
         dims=("time", "layer", "y", "x"),
-        coords=dict(time=time, layer=layer, y=y, x=x, dx=dx, dy=dy),
+        coords={"time": time, "layer": layer, "y": y, "x": x, "dx": dx, "dy": dy},
     )
 
     da[..., 1, 1] = np.nan
 
-    return dict(rate=da)
+    return {"rate": da}
 
 
 def test_render(rch_dict):
@@ -59,6 +59,30 @@ def test_render(rch_dict):
     expected = textwrap.dedent(
         """\
         begin options
+        end options
+
+        begin dimensions
+          maxbound 8
+        end dimensions
+
+        begin period 1
+          open/close mymodel/recharge/rch.bin (binary)
+        end period
+        """
+    )
+    assert actual == expected
+
+
+def test_render_fixed_cell(rch_dict):
+    rch_dict["fixed_cell"] = True
+    rch = imod.mf6.Recharge(**rch_dict)
+    directory = pathlib.Path("mymodel")
+    globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
+    actual = rch.render(directory, "recharge", globaltimes, True)
+    expected = textwrap.dedent(
+        """\
+        begin options
+          fixed_cell
         end options
 
         begin dimensions

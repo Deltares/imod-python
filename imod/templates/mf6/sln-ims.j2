@@ -1,10 +1,15 @@
 begin options
 {% if print_option is defined %}  print_option {{print_option}}
 {% endif %}
-{%- if csv_output_filerecord is defined %}  csv_output fileout {{csvfile}}
+{%- if outer_csvfile is defined %}  outer_csvfile fileout {{outer_csvfile}}
 {% endif %}
-{%- if no_ptcrecord is defined %}  no_ptc {% if no_ptc_option is defined %}{{no_ptc_option}}{% endif %}
+{%- if inner_csvfile is defined %}  inner_csvfile fileout {{inner_csvfile}}
+{% endif %}
+{%- if no_ptc is defined %}  no_ptc {{no_ptc}}
 {% endif -%}
+{%- if ats_outer_maximum_fraction is defined %}  ats_outer_maximum_fraction {{ats_outer_maximum_fraction}}
+{% endif -%}
+
 end options
 
 begin nonlinear

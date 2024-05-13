@@ -112,7 +112,7 @@ class MeteoGrid(MetaSwapPackage):
             if self._is_grid(varname):
                 dataframe[varname] = [
                     self._compose_filename(
-                        dict(time=time, name=varname, extension=".asc"),
+                        {"time": time, "name": varname, "extension": ".asc"},
                         directory=data_dir,
                     )
                     for time in times

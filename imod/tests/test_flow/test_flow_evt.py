@@ -26,14 +26,14 @@ def test_evapotranspiration_no_time(three_days):
         nlayer,
     )
 
-    to_render = dict(
-        pkg_id=evt._pkg_id,
-        name=evt.__class__.__name__,
-        variable_order=evt._variable_order,
-        package_data=composition[evt._pkg_id],
-        n_entry=1,
-        times=time_composed,
-    )
+    to_render = {
+        "pkg_id": evt._pkg_id,
+        "name": evt.__class__.__name__,
+        "variable_order": evt._variable_order,
+        "package_data": composition[evt._pkg_id],
+        "n_entry": 1,
+        "times": time_composed,
+    }
 
     compare = (
         "0001, (evt), 1, EvapoTranspiration, ['rate', 'top_elevation', 'extinction_depth']\n"
