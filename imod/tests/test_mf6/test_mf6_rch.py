@@ -11,7 +11,8 @@ import xarray as xr
 import imod
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
-from imod.typing.grid import nan_like, is_transient_data_grid, is_planar_grid
+from imod.typing.grid import is_planar_grid, is_transient_data_grid, nan_like
+
 
 @pytest.fixture(scope="function")
 def rch_dict():
@@ -327,16 +328,15 @@ def test_clip_box(rch_dict):
     assert selection["rate"].shape == (1, 1)
 
 
-
 @pytest.mark.usefixtures("imod5_dataset")
-def test_planar_rch_from_imod5_constant(imod5_dataset,  tmp_path):
+def test_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset)
     target_grid = data["khv"]["kh"]
 
-    # create a planar grid with time-independent recharge    
+    # create a planar grid with time-independent recharge
     data["rch"]["rate"]["layer"].values[0] = 0
     assert not is_transient_data_grid(data["rch"]["rate"])
-    assert is_planar_grid(data["rch"]["rate"])       
+    assert is_planar_grid(data["rch"]["rate"])
 
     # Act
     rch = imod.mf6.Recharge.from_imod5_data(data, target_grid)
@@ -345,26 +345,28 @@ def test_planar_rch_from_imod5_constant(imod5_dataset,  tmp_path):
     rendered_rch = rch.render(tmp_path, "rch", None, None)
     assert "maxbound 2162" in rendered_rch
     assert rendered_rch.count("begin period") == 1
-    assert np.all(rch.dataset["rate"].isel(layer=0).values == data["rch"]["rate"].values)
+    assert np.all(
+        rch.dataset["rate"].isel(layer=0).values == data["rch"]["rate"].values
+    )
 
 
 @pytest.mark.usefixtures("imod5_dataset")
-def test_planar_rch_from_imod5_transient(imod5_dataset,  tmp_path):
+def test_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset)
     target_grid = data["khv"]["kh"]
 
-    # create a grid with recharge for 3 timesteps 
+    # create a grid with recharge for 3 timesteps
     input_recharge = data["rch"]["rate"]
-    input_recharge.values[0] = 0    
+    input_recharge.values[0] = 0
     input_recharge = input_recharge.expand_dims({"time": [0, 1, 2]})
 
     # make it planar by setting the layer coordinate to 0
     input_recharge["layer"].values[0] = 0
- 
-    # update the data set    
+
+    # update the data set
     data["rch"]["rate"] = input_recharge
     assert is_transient_data_grid(data["rch"]["rate"])
-    assert is_planar_grid(data["rch"]["rate"])    
+    assert is_planar_grid(data["rch"]["rate"])
 
     # act
     rch = imod.mf6.Recharge.from_imod5_data(data, target_grid)
@@ -373,25 +375,27 @@ def test_planar_rch_from_imod5_transient(imod5_dataset,  tmp_path):
     rendered_rch = rch.render(tmp_path, "rch", [0, 1, 2], None)
     assert rendered_rch.count("begin period") == 3
     assert "maxbound 2162" in rendered_rch
-    assert np.all(rch.dataset["rate"].isel(layer=0).values == data["rch"]["rate"].values)    
+    assert np.all(
+        rch.dataset["rate"].isel(layer=0).values == data["rch"]["rate"].values
+    )
 
 
 @pytest.mark.usefixtures("imod5_dataset")
-def test_non_planar_rch_from_imod5_constant(imod5_dataset,  tmp_path):
+def test_non_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset)
 
     # make the first layer of the target grid inactive
     target_grid = data["khv"]["kh"]
-    target_grid.loc[{"layer": 1}]  = 0
+    target_grid.loc[{"layer": 1}] = 0
 
-    #the input for recharge is on the second layer of the targetgrid 
+    # the input for recharge is on the second layer of the targetgrid
     input_recharge = nan_like(target_grid)
-    input_recharge.loc[{ "layer" : 2}] = data["rch"]["rate"].isel(layer=0)
- 
+    input_recharge.loc[{"layer": 2}] = data["rch"]["rate"].isel(layer=0)
+
     # update the data set
     data["rch"]["rate"] = input_recharge
-    assert not is_planar_grid(data["rch"]["rate"])    
-    assert not is_transient_data_grid(data["rch"]["rate"])       
+    assert not is_planar_grid(data["rch"]["rate"])
+    assert not is_transient_data_grid(data["rch"]["rate"])
 
     # act
     rch = imod.mf6.Recharge.from_imod5_data(data, target_grid)
@@ -400,26 +404,31 @@ def test_non_planar_rch_from_imod5_constant(imod5_dataset,  tmp_path):
     rendered_rch = rch.render(tmp_path, "rch", None, None)
     assert rendered_rch.count("begin period") == 1
     assert "maxbound 2162" in rendered_rch
-    assert  np.all(rch.dataset["rate"].sel(layer=2).values == data["rch"]["rate"].sel(layer=2).values) 
+    assert np.all(
+        rch.dataset["rate"].sel(layer=2).values
+        == data["rch"]["rate"].sel(layer=2).values
+    )
 
 
 @pytest.mark.usefixtures("imod5_dataset")
-def test_non_planar_rch_from_imod5_transient(imod5_dataset,  tmp_path):
+def test_non_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset)
 
     # make the first layer of the target grid inactive
     target_grid = data["khv"]["kh"]
-    target_grid.loc[{"layer": 1}]  = 0
+    target_grid.loc[{"layer": 1}] = 0
 
-    #the input for recharge is on the second layer of the targetgrid 
+    # the input for recharge is on the second layer of the targetgrid
     input_recharge = nan_like(target_grid)
-    input_recharge.loc[{ "layer" : 2}] = data["rch"]["rate"].sel(layer=1,  method='nearest')
-    input_recharge = input_recharge.expand_dims({"time": [0, 1, 2]})    
- 
+    input_recharge.loc[{"layer": 2}] = data["rch"]["rate"].sel(
+        layer=1, method="nearest"
+    )
+    input_recharge = input_recharge.expand_dims({"time": [0, 1, 2]})
+
     # update the data set
     data["rch"]["rate"] = input_recharge
-    assert not is_planar_grid(data["rch"]["rate"])    
-    assert is_transient_data_grid(data["rch"]["rate"])       
+    assert not is_planar_grid(data["rch"]["rate"])
+    assert is_transient_data_grid(data["rch"]["rate"])
 
     # act
     rch = imod.mf6.Recharge.from_imod5_data(data, target_grid)
@@ -428,4 +437,7 @@ def test_non_planar_rch_from_imod5_transient(imod5_dataset,  tmp_path):
     rendered_rch = rch.render(tmp_path, "rch", [0, 1, 2], None)
     assert rendered_rch.count("begin period") == 3
     assert "maxbound 2162" in rendered_rch
-    assert  np.all(rch.dataset["rate"].sel(layer=2,  method='nearest').values == data["rch"]["rate"].sel(layer=2,  method='nearest').values)     
+    assert np.all(
+        rch.dataset["rate"].sel(layer=2, method="nearest").values
+        == data["rch"]["rate"].sel(layer=2, method="nearest").values
+    )
