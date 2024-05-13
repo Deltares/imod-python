@@ -222,7 +222,7 @@ def test_open_cbc__dis_transient(transient_twri_result):
             "wel",
         ]
         for array in cbc.values():
-            assert array.shape == (30, 3, 15, 15)
+            assert array.shape == (2, 3, 15, 15)
             assert isinstance(array, xr.DataArray)
             assert isinstance(array.data, dask.array.Array)
 
@@ -266,7 +266,7 @@ def test_open_cbc__dis_transient_unconfined(transient_unconfined_twri_result):
             "wel",
         ]
         for array in cbc.values():
-            assert array.shape == (30, 3, 15, 15)
+            assert array.shape == (2, 3, 15, 15)
             assert isinstance(array, xr.DataArray)
             assert isinstance(array.data, dask.array.Array)
 
@@ -289,10 +289,10 @@ def test_open_cbc__disv(circle_result):
         ]
         for key, array in cbc.items():
             if key in ("chd", "flow-lower-face"):
-                assert array.shape == (52, 2, 216)
+                assert array.shape == (2, 2, 216)
                 assert array.dims[-1] == array.ugrid.grid.face_dimension
             else:
-                assert array.shape == (52, 2, 342)
+                assert array.shape == (2, 2, 342)
                 assert array.dims[-1] == array.ugrid.grid.edge_dimension
             assert isinstance(array, xu.UgridDataArray)
             assert isinstance(array.data, dask.array.Array)
@@ -333,10 +333,10 @@ def test_open_cbc__disv_sto(circle_result_sto):
         ]
         for key, array in cbc.items():
             if key in ("chd", "flow-lower-face", "sto-ss"):
-                assert array.shape == (52, 2, 216)
+                assert array.shape == (2, 2, 216)
                 assert array.dims[-1] == array.ugrid.grid.face_dimension
             else:
-                assert array.shape == (52, 2, 342)
+                assert array.shape == (2, 2, 342)
                 assert array.dims[-1] == array.ugrid.grid.edge_dimension
             assert isinstance(array, xu.UgridDataArray)
             assert isinstance(array.data, dask.array.Array)
