@@ -210,7 +210,7 @@ def flow_transport_simulation():
     duration = pd.to_timedelta("2000d")
     start = pd.to_datetime("2000-01-01")
     simulation.create_time_discretization(additional_times=[start, start + duration])
-    simulation["time_discretization"]["n_timesteps"] = 100
+    simulation["time_discretization"]["n_timesteps"] = 50
 
     return simulation
     # %%
