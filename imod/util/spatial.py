@@ -245,7 +245,9 @@ def unstack_dim_into_variable(dataset: GridDataset, dim: str) -> GridDataset:
     return unstacked
 
 
-def mdal_compliant_ugrid2d(dataset: xr.Dataset) -> xr.Dataset:
+def mdal_compliant_ugrid2d(
+    dataset: xr.Dataset, crs: Optional[Any] = None
+) -> xr.Dataset:
     """
     Ensures the xarray Dataset will be written to a UGRID netCDF that will be
     accepted by MDAL.
@@ -257,6 +259,10 @@ def mdal_compliant_ugrid2d(dataset: xr.Dataset) -> xr.Dataset:
     Parameters
     ----------
     dataset: xarray.Dataset
+        Dataset to make compliant with MDAL
+    crs: Any, Optional
+        Anything accepted by rasterio.crs.CRS.from_user_input
+        Requires ``rioxarray`` installed.
 
     Returns
     -------
@@ -304,6 +310,11 @@ def mdal_compliant_ugrid2d(dataset: xr.Dataset) -> xr.Dataset:
             edge_nodes = attrs.get("edge_node_connectivity")
             if edge_nodes and edge_nodes not in ds:
                 attrs.pop("edge_node_connectivity")
+
+    if crs is not None:
+        if isinstance(rioxarray, MissingOptionalModule):
+            raise ModuleNotFoundError("rioxarray is required for this functionality")
+        ds.rio.write_crs(crs, inplace=True)
 
     # Make sure time is encoded as a float for MDAL
     # TODO: MDAL requires all data variables to be float (this excludes the UGRID topology data)
