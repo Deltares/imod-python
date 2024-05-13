@@ -329,7 +329,7 @@ def test_clip_box(rch_dict):
 
 @pytest.mark.parametrize("rch_layer", [0, 1])
 @pytest.mark.usefixtures("imod5_dataset")
-def test_rch_from_imod5_layer_0(imod5_dataset, rch_layer, tmp_path):
+def test_planar_rch_from_imod5_constant(imod5_dataset, rch_layer, tmp_path):
     data = deepcopy(imod5_dataset)
 
     target_grid = data["khv"]["kh"]
@@ -339,11 +339,12 @@ def test_rch_from_imod5_layer_0(imod5_dataset, rch_layer, tmp_path):
 
     rendered_rch = rch.render(tmp_path, "rch", None, None)
     assert "maxbound 2162" in rendered_rch
+    assert rendered_rch.count("begin period") == 1
 
 
 @pytest.mark.parametrize("rch_layer", [0, 1])
 @pytest.mark.usefixtures("imod5_dataset")
-def test_rch_from_imod5_layer_transient(imod5_dataset, rch_layer, tmp_path):
+def test_planar_rch_from_imod5_transient(imod5_dataset, rch_layer, tmp_path):
     data = deepcopy(imod5_dataset)
     da = data["rch"]["rate"]
     da = da.expand_dims({"time": [0, 1, 2]})

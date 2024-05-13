@@ -216,10 +216,10 @@ class Recharge(BoundaryCondition, IRegridPackage):
                     rch_rate.loc[time, :, :, :] = (
                         data["rate"].sel(time=time).drop_vars("layer")
                     )
-                rch_rate = xr.where(is_rch_cell, rch_rate, np.nan)
-                new_package_data["rate"] = rch_rate
             else:
-                new_package_data["rate"] = rch_rate
+                rch_rate.loc[:, :, :] = data["rate"].drop_vars("layer")
+            rch_rate = xr.where(is_rch_cell, rch_rate, np.nan)
+            new_package_data["rate"] = rch_rate
 
         else:
             regridder_settings = deepcopy(cls._regrid_method)
