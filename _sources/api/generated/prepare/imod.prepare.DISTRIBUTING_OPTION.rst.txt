@@ -1,0 +1,28 @@
+﻿imod.prepare.DISTRIBUTING\_OPTION
+=================================
+
+.. currentmodule:: imod.prepare
+
+.. autoclass:: DISTRIBUTING_OPTION
+
+   
+   .. automethod:: __init__
+
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DISTRIBUTING_OPTION.by_corrected_transmissivity
+      ~DISTRIBUTING_OPTION.equally
+      ~DISTRIBUTING_OPTION.by_crosscut_thickness
+      ~DISTRIBUTING_OPTION.by_layer_thickness
+      ~DISTRIBUTING_OPTION.by_crosscut_transmissivity
+      ~DISTRIBUTING_OPTION.by_conductivity
+      ~DISTRIBUTING_OPTION.by_layer_transmissivity
+   
+   

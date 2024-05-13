@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.msw.coupler_mapping &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>imod.msw.coupler_mapping &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -448,7 +448,9 @@ document.write(`
                 <article class="bd-article">
                   
   <h1>Source code for imod.msw.coupler_mapping</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
 
@@ -489,7 +491,7 @@ document.write(`
 <div class="viewcode-block" id="CouplerMapping.__init__"><a class="viewcode-back" href="../../../api/generated/msw/imod.msw.CouplerMapping.html#imod.msw.CouplerMapping.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">modflow_dis</span><span class="p">:</span> <span class="n">StructuredDiscretization</span><span class="p">,</span>
-        <span class="n">well</span><span class="p">:</span> <span class="n">WellDisStructured</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">well</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">WellDisStructured</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 

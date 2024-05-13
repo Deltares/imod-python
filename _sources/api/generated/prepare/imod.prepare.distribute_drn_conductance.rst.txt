@@ -1,0 +1,6 @@
+﻿imod.prepare.distribute\_drn\_conductance
+=========================================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: distribute_drn_conductance

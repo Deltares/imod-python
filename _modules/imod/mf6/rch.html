@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.rch &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>imod.mf6.rch &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -518,6 +518,9 @@ document.write(`
 <span class="sd">        value is the &quot;value&quot;. For the &quot;key&quot; datetime, the data of the &quot;value&quot;</span>
 <span class="sd">        datetime will be used. Can also be set with a dictionary using the</span>
 <span class="sd">        ``set_repeat_stress`` method.</span>
+<span class="sd">    fixed_cell: ({True, False}, optional)</span>
+<span class="sd">        indicates that recharge will not be reassigned to a cell underlying the</span>
+<span class="sd">        cell specified in the list if the specified cell is inactive.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_pkg_id</span> <span class="o">=</span> <span class="s2">&quot;rch&quot;</span>
@@ -574,6 +577,7 @@ document.write(`
         <span class="n">observations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">validate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">repeat_stress</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">fixed_cell</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="n">dict_dataset</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;rate&quot;</span><span class="p">:</span> <span class="n">rate</span><span class="p">,</span>
@@ -584,6 +588,7 @@ document.write(`
             <span class="s2">&quot;save_flows&quot;</span><span class="p">:</span> <span class="n">save_flows</span><span class="p">,</span>
             <span class="s2">&quot;observations&quot;</span><span class="p">:</span> <span class="n">observations</span><span class="p">,</span>
             <span class="s2">&quot;repeat_stress&quot;</span><span class="p">:</span> <span class="n">repeat_stress</span><span class="p">,</span>
+            <span class="s2">&quot;fixed_cell&quot;</span><span class="p">:</span> <span class="n">fixed_cell</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dict_dataset</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span>

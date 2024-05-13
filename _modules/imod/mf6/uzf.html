@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.uzf &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>imod.mf6.uzf &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -454,6 +454,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">imod.logging</span> <span class="kn">import</span> <span class="n">init_log_decorator</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.boundary_condition</span> <span class="kn">import</span> <span class="n">AdvancedBoundaryCondition</span><span class="p">,</span> <span class="n">BoundaryCondition</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.validation</span> <span class="kn">import</span> <span class="n">BOUNDARY_DIMS_SCHEMA</span>
+<span class="kn">from</span> <span class="nn">imod.prepare.layer</span> <span class="kn">import</span> <span class="n">get_upper_active_grid_cells</span>
 <span class="kn">from</span> <span class="nn">imod.schemata</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AllInsideNoDataSchema</span><span class="p">,</span>
     <span class="n">AllNoDataSchema</span><span class="p">,</span>
@@ -542,6 +543,10 @@ document.write(`
 <span class="sd">        keyword to indicate that UZF flow terms will be written to the file specified with &quot;BUDGET</span>
 <span class="sd">        FILEOUT&quot; in Output Control.</span>
 <span class="sd">        Default is False.</span>
+<span class="sd">    budget_fileout: ({&quot;str&quot;}, optional)</span>
+<span class="sd">        path to output cbc-file for UZF budgets</span>
+<span class="sd">    budgetcsv_fileout: ({&quot;str&quot;}, optional)</span>
+<span class="sd">        path to output csv-file for summed budgets</span>
 <span class="sd">    observations: [Not yet supported.]</span>
 <span class="sd">        Default is None.</span>
 <span class="sd">    water_mover: [Not yet supported.]</span>
@@ -633,12 +638,12 @@ document.write(`
         <span class="s2">&quot;theta_sat&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;kv_sat&quot;</span><span class="p">),</span> <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">&quot;&gt;=&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)],</span>
         <span class="s2">&quot;theta_init&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;kv_sat&quot;</span><span class="p">),</span> <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">&quot;&gt;=&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)],</span>
         <span class="s2">&quot;epsilon&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;kv_sat&quot;</span><span class="p">)],</span>
-        <span class="s2">&quot;infiltration_rate&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;kv_sat&quot;</span><span class="p">)],</span>
-        <span class="s2">&quot;et_pot&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;kv_sat&quot;</span><span class="p">)],</span>
-        <span class="s2">&quot;extinction_depth&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;kv_sat&quot;</span><span class="p">)],</span>
-        <span class="s2">&quot;extinction_theta&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;kv_sat&quot;</span><span class="p">)],</span>
-        <span class="s2">&quot;root_potential&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;kv_sat&quot;</span><span class="p">)],</span>
-        <span class="s2">&quot;root_activity&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;kv_sat&quot;</span><span class="p">)],</span>
+        <span class="s2">&quot;infiltration_rate&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;stress_period_active&quot;</span><span class="p">)],</span>
+        <span class="s2">&quot;et_pot&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;stress_period_active&quot;</span><span class="p">)],</span>
+        <span class="s2">&quot;extinction_depth&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;stress_period_active&quot;</span><span class="p">)],</span>
+        <span class="s2">&quot;extinction_theta&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;stress_period_active&quot;</span><span class="p">)],</span>
+        <span class="s2">&quot;root_potential&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;stress_period_active&quot;</span><span class="p">)],</span>
+        <span class="s2">&quot;root_activity&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">IdentityNoDataSchema</span><span class="p">(</span><span class="s2">&quot;stress_period_active&quot;</span><span class="p">)],</span>
     <span class="p">}</span>
 
     <span class="n">_package_data</span> <span class="o">=</span> <span class="p">(</span>
@@ -676,6 +681,8 @@ document.write(`
         <span class="n">print_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">print_flows</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">save_flows</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">budget_fileout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">budgetcsv_fileout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">observations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">water_mover</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">timeseries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -684,6 +691,7 @@ document.write(`
         <span class="n">landflag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_determine_landflag</span><span class="p">(</span><span class="n">kv_sat</span><span class="p">)</span>
         <span class="n">iuzno</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_uzf_numbers</span><span class="p">(</span><span class="n">landflag</span><span class="p">)</span>
         <span class="n">ivertcon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_determine_vertical_connection</span><span class="p">(</span><span class="n">iuzno</span><span class="p">)</span>
+        <span class="n">stress_period_active</span> <span class="o">=</span> <span class="n">landflag</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">landflag</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="n">dict_dataset</span> <span class="o">=</span> <span class="p">{</span>
             <span class="c1"># Package data</span>
@@ -694,6 +702,7 @@ document.write(`
             <span class="s2">&quot;theta_init&quot;</span><span class="p">:</span> <span class="n">theta_init</span><span class="p">,</span>
             <span class="s2">&quot;epsilon&quot;</span><span class="p">:</span> <span class="n">epsilon</span><span class="p">,</span>
             <span class="c1"># Stress period data</span>
+            <span class="s2">&quot;stress_period_active&quot;</span><span class="p">:</span> <span class="n">stress_period_active</span><span class="p">,</span>
             <span class="s2">&quot;infiltration_rate&quot;</span><span class="p">:</span> <span class="n">infiltration_rate</span><span class="p">,</span>
             <span class="s2">&quot;et_pot&quot;</span><span class="p">:</span> <span class="n">et_pot</span><span class="p">,</span>
             <span class="s2">&quot;extinction_depth&quot;</span><span class="p">:</span> <span class="n">extinction_depth</span><span class="p">,</span>
@@ -710,6 +719,8 @@ document.write(`
             <span class="s2">&quot;print_input&quot;</span><span class="p">:</span> <span class="n">print_input</span><span class="p">,</span>
             <span class="s2">&quot;print_flows&quot;</span><span class="p">:</span> <span class="n">print_flows</span><span class="p">,</span>
             <span class="s2">&quot;save_flows&quot;</span><span class="p">:</span> <span class="n">save_flows</span><span class="p">,</span>
+            <span class="s2">&quot;budget_fileout&quot;</span><span class="p">:</span> <span class="n">budget_fileout</span><span class="p">,</span>
+            <span class="s2">&quot;budgetcsv_fileout&quot;</span><span class="p">:</span> <span class="n">budgetcsv_fileout</span><span class="p">,</span>
             <span class="s2">&quot;observations&quot;</span><span class="p">:</span> <span class="n">observations</span><span class="p">,</span>
             <span class="s2">&quot;water_mover&quot;</span><span class="p">:</span> <span class="n">water_mover</span><span class="p">,</span>
             <span class="s2">&quot;timeseries&quot;</span><span class="p">:</span> <span class="n">timeseries</span><span class="p">,</span>
@@ -793,16 +804,19 @@ document.write(`
 
     <span class="k">def</span> <span class="nf">_create_uzf_numbers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">landflag</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create unique UZF ID&#39;s. Inactive cells equal 0&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">landflag</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">landflag</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">*</span> <span class="n">landflag</span>
+        <span class="n">active_nodes</span> <span class="o">=</span> <span class="n">landflag</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nancumsum</span><span class="p">(</span><span class="n">active_nodes</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">landflag</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">*</span> <span class="n">active_nodes</span>
 
     <span class="k">def</span> <span class="nf">_determine_landflag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kv_sat</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">kv_sat</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;returns the landflag for uzf-model. Landflag == 1 for top active UZF-nodes&quot;&quot;&quot;</span>
+        <span class="n">land_nodes</span> <span class="o">=</span> <span class="n">get_upper_active_grid_cells</span><span class="p">(</span><span class="n">kv_sat</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">land_nodes</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">kv_sat</span><span class="o">.</span><span class="n">notnull</span><span class="p">())</span>
 
     <span class="k">def</span> <span class="nf">_determine_vertical_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uzf_number</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">uzf_number</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">layer</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_package_data_to_sparse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">notnull</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;landflag&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="n">notnull</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;landflag&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
         <span class="n">iuzno</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;iuzno&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">notnull</span><span class="p">]</span>
         <span class="n">landflag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;landflag&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">notnull</span><span class="p">]</span>
         <span class="n">ivertcon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;ivertcon&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">notnull</span><span class="p">]</span>
@@ -842,7 +856,8 @@ document.write(`
         <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_options</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">not_options</span><span class="o">=</span><span class="n">not_options</span><span class="p">)</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">directory</span> <span class="o">/</span> <span class="n">pkgname</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_pkg_id</span><span class="si">}</span><span class="s2">-pkgdata.dat&quot;</span>
         <span class="n">d</span><span class="p">[</span><span class="s2">&quot;packagedata&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
-        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;nuzfcells&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_active_n</span><span class="p">()</span>
+        <span class="c1"># max uzf-cells for which time period data will be supplied</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;nuzfcells&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;landflag&quot;</span><span class="p">]))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_to_struct_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arrdict</span><span class="p">,</span> <span class="n">layer</span><span class="p">):</span>
@@ -872,6 +887,7 @@ document.write(`
     <span class="k">def</span> <span class="nf">_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schemata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># Insert additional kwargs</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;kv_sat&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;kv_sat&quot;</span><span class="p">]</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;stress_period_active&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;stress_period_active&quot;</span><span class="p">]</span>
         <span class="n">errors</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_validate</span><span class="p">(</span><span class="n">schemata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">errors</span></div>

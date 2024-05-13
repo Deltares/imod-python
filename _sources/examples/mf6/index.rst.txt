@@ -35,6 +35,7 @@ These examples demonstrate how to use imod to build MODFLOW6 models.
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -208,23 +209,6 @@ These examples demonstrate how to use imod to build MODFLOW6 models.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how a model can be regridded using default regridding methods. The example u...">
-
-.. only:: html
-
-  .. image:: /examples/mf6/images/thumb/sphx_glr_hondsrug_regridding_thumb.png
-    :alt:
-
-  :ref:`sphx_glr_examples_mf6_hondsrug_regridding.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Regridding a regional model</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="This is a synthetic example (using invented, not necesarily physical data) of how to use the la...">
 
 .. only:: html
@@ -257,6 +241,8 @@ These examples demonstrate how to use imod to build MODFLOW6 models.
     </div>
 
 
+.. thumbnail-parent-div-close
+
 .. raw:: html
 
     </div>
@@ -275,7 +261,6 @@ These examples demonstrate how to use imod to build MODFLOW6 models.
    /examples/mf6/example_models
    /examples/mf6/hondsrug
    /examples/mf6/hondsrug_partitioning
-   /examples/mf6/hondsrug_regridding
    /examples/mf6/lake
    /examples/mf6/transport_2d
 

@@ -1,0 +1,6 @@
+﻿imod.prepare.allocate\_rch\_cells
+=================================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: allocate_rch_cells

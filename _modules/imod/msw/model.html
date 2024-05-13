@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.msw.model &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>imod.msw.model &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -470,7 +470,6 @@ document.write(`
 <span class="kn">from</span> <span class="nn">imod.msw.meteo_grid</span> <span class="kn">import</span> <span class="n">MeteoGrid</span>
 <span class="kn">from</span> <span class="nn">imod.msw.meteo_mapping</span> <span class="kn">import</span> <span class="n">EvapotranspirationMapping</span><span class="p">,</span> <span class="n">PrecipitationMapping</span>
 <span class="kn">from</span> <span class="nn">imod.msw.output_control</span> <span class="kn">import</span> <span class="n">TimeOutputControl</span>
-<span class="kn">from</span> <span class="nn">imod.msw.pkgbase</span> <span class="kn">import</span> <span class="n">MetaSwapPackage</span>
 <span class="kn">from</span> <span class="nn">imod.msw.timeutil</span> <span class="kn">import</span> <span class="n">to_metaswap_timeformat</span>
 <span class="kn">from</span> <span class="nn">imod.msw.vegetation</span> <span class="kn">import</span> <span class="n">AnnualCropFactors</span>
 
@@ -494,27 +493,27 @@ document.write(`
     <span class="n">InitialConditionsSavedState</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">DEFAULT_SETTINGS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-    <span class="n">vegetation_mdl</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">evapotranspiration_mdl</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">saltstress_mdl</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">surfacewater_mdl</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">infilimsat_opt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">netcdf_per</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">postmsw_opt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">dtgw</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-    <span class="n">dtsw</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-    <span class="n">ipstep</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-    <span class="n">nxlvage_dim</span><span class="o">=</span><span class="mi">366</span><span class="p">,</span>
-    <span class="n">co2</span><span class="o">=</span><span class="mf">404.32</span><span class="p">,</span>
-    <span class="n">fact_beta2</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-    <span class="n">rcsoil</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span>
-    <span class="n">iterur1</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-    <span class="n">iterur2</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-    <span class="n">tdbgsm</span><span class="o">=</span><span class="mf">91.0</span><span class="p">,</span>
-    <span class="n">tdedsm</span><span class="o">=</span><span class="mf">270.0</span><span class="p">,</span>
-    <span class="n">clocktime</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="n">DEFAULT_SETTINGS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;vegetation_mdl&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;evapotranspiration_mdl&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;saltstress_mdl&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s2">&quot;surfacewater_mdl&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s2">&quot;infilimsat_opt&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s2">&quot;netcdf_per&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s2">&quot;postmsw_opt&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s2">&quot;dtgw&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="s2">&quot;dtsw&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="s2">&quot;ipstep&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s2">&quot;nxlvage_dim&quot;</span><span class="p">:</span> <span class="mi">366</span><span class="p">,</span>
+    <span class="s2">&quot;co2&quot;</span><span class="p">:</span> <span class="mf">404.32</span><span class="p">,</span>
+    <span class="s2">&quot;fact_beta2&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="s2">&quot;rcsoil&quot;</span><span class="p">:</span> <span class="mf">0.15</span><span class="p">,</span>
+    <span class="s2">&quot;iterur1&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="s2">&quot;iterur2&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="s2">&quot;tdbgsm&quot;</span><span class="p">:</span> <span class="mf">91.0</span><span class="p">,</span>
+    <span class="s2">&quot;tdedsm&quot;</span><span class="p">:</span> <span class="mf">270.0</span><span class="p">,</span>
+    <span class="s2">&quot;clocktime&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">}</span>
 
 
 <span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">collections</span><span class="o">.</span><span class="n">UserDict</span><span class="p">):</span>
@@ -644,7 +643,7 @@ document.write(`
 
         <span class="k">return</span> <span class="n">year</span><span class="p">,</span> <span class="n">time_since_start_year</span>
 
-    <span class="k">def</span> <span class="nf">_get_pkg_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkg_type</span><span class="p">:</span> <span class="n">MetaSwapPackage</span><span class="p">,</span> <span class="n">optional_package</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_pkg_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkg_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="n">optional_package</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">pkg_key</span><span class="p">,</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pkg</span><span class="p">,</span> <span class="n">pkg_type</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">pkg_key</span>

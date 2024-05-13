@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_examples_prepare_point_interpolation.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -409,7 +409,7 @@ heads.
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x0000015AAD0281D0>
+    <matplotlib.image.AxesImage object at 0x0000014A1FB59DD0>
 
 
 
@@ -449,7 +449,7 @@ and the closing criteria.
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x0000015AACDAA550>
+    <matplotlib.image.AxesImage object at 0x0000014A1AAE3C10>
 
 
 
@@ -496,14 +496,14 @@ values as well, which allows us to set transparency per cell.
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x0000015AAE532350>
+    <matplotlib.image.AxesImage object at 0x0000014A1A962810>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.684 seconds)
+   **Total running time of the script:** (0 minutes 4.750 seconds)
 
 
 .. _sphx_glr_download_examples_prepare_point_interpolation.py:

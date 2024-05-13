@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.prepare.spatial &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>imod.prepare.spatial &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -449,7 +449,7 @@ document.write(`
                   
   <h1>Source code for imod.prepare.spatial</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">pathlib</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">dask</span>
 <span class="kn">import</span> <span class="nn">numba</span>
@@ -457,10 +457,12 @@ document.write(`
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">scipy.ndimage</span>
 <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">DTypeLike</span>
 
 <span class="kn">import</span> <span class="nn">imod</span>
 <span class="kn">from</span> <span class="nn">imod.prepare</span> <span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">pcg</span>
 <span class="kn">from</span> <span class="nn">imod.util.imports</span> <span class="kn">import</span> <span class="n">MissingOptionalModule</span>
+<span class="kn">from</span> <span class="nn">imod.util.spatial</span> <span class="kn">import</span> <span class="n">_polygonize</span>
 
 <span class="c1"># since rasterio is a big dependency that is sometimes hard to install</span>
 <span class="c1"># and not always required, we made this an optional dependency</span>
@@ -470,6 +472,9 @@ document.write(`
     <span class="kn">import</span> <span class="nn">rasterio.warp</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">rasterio</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;rasterio&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
 
 
 <span class="k">def</span> <span class="nf">round_extent</span><span class="p">(</span><span class="n">extent</span><span class="p">,</span> <span class="n">cellsize</span><span class="p">):</span>
@@ -678,12 +683,9 @@ document.write(`
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">shapes</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">geom</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">geodataframe</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="n">geodataframe</span><span class="p">[</span><span class="n">column</span><span class="p">])</span>
-        <span class="p">]</span>
+        <span class="n">shapes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">geodataframe</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="n">geodataframe</span><span class="p">[</span><span class="n">column</span><span class="p">]))</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">shapes</span> <span class="o">=</span> <span class="p">[</span><span class="n">geom</span> <span class="k">for</span> <span class="n">geom</span> <span class="ow">in</span> <span class="n">geodataframe</span><span class="o">.</span><span class="n">geometry</span><span class="p">]</span>
+        <span class="n">shapes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">geodataframe</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
 
     <span class="c1"># shapes must be an iterable</span>
     <span class="k">try</span><span class="p">:</span>
@@ -702,7 +704,7 @@ document.write(`
     <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">raster</span><span class="p">,</span> <span class="n">like</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">like</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="polygonize"><a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.polygonize.html#imod.prepare.polygonize">[docs]</a><span class="k">def</span> <span class="nf">polygonize</span><span class="p">(</span><span class="n">da</span><span class="p">):</span>
+<div class="viewcode-block" id="polygonize"><a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.polygonize.html#imod.prepare.polygonize">[docs]</a><span class="k">def</span> <span class="nf">polygonize</span><span class="p">(</span><span class="n">da</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Polygonize a 2D-DataArray into a GeoDataFrame of polygons.</span>
 
@@ -714,28 +716,7 @@ document.write(`
 <span class="sd">    -------</span>
 <span class="sd">    polygonized : geopandas.GeoDataFrame</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
-    <span class="kn">import</span> <span class="nn">shapely.geometry</span> <span class="k">as</span> <span class="nn">sg</span>
-
-    <span class="k">if</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span> <span class="o">!=</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Dimensions must be (&quot;y&quot;, &quot;x&quot;)&#39;</span><span class="p">)</span>
-
-    <span class="n">values</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">values</span>
-    <span class="k">if</span> <span class="n">values</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
-        <span class="n">values</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-
-    <span class="n">transform</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">da</span><span class="p">)</span>
-    <span class="n">shapes</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">shapes</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
-
-    <span class="n">geometries</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">colvalues</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">geom</span><span class="p">,</span> <span class="n">colval</span> <span class="ow">in</span> <span class="n">shapes</span><span class="p">:</span>
-        <span class="n">geometries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sg</span><span class="o">.</span><span class="n">Polygon</span><span class="p">(</span><span class="n">geom</span><span class="p">[</span><span class="s2">&quot;coordinates&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]))</span>
-        <span class="n">colvalues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">colval</span><span class="p">)</span>
-
-    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">({</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">colvalues</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="n">geometries</span><span class="p">})</span>
-    <span class="n">gdf</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;crs&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">gdf</span></div>
+    <span class="k">return</span> <span class="n">_polygonize</span><span class="p">(</span><span class="n">da</span><span class="p">)</span></div>
 
 
 <span class="k">def</span> <span class="nf">_handle_dtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">nodata</span><span class="p">):</span>
@@ -1009,7 +990,15 @@ document.write(`
     <span class="k">return</span> <span class="n">row_i_arr</span><span class="p">,</span> <span class="n">col_i_arr</span><span class="p">,</span> <span class="n">value_arr</span><span class="p">,</span> <span class="n">count_arr</span>
 
 
-<span class="k">def</span> <span class="nf">_celltable</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">like</span><span class="p">,</span> <span class="n">rowstart</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">colstart</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_celltable</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span>
+    <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">resolution</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">like</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span><span class="p">,</span>
+    <span class="n">rowstart</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">colstart</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns a table of cell indices (row, column) with feature ID, and feature</span>
 <span class="sd">    area within cell. Essentially returns a COO sparse matrix, but with</span>
@@ -1031,6 +1020,8 @@ document.write(`
 <span class="sd">    like : xarray.DataArray</span>
 <span class="sd">        Example DataArray of where the cells will be located. Used only for the</span>
 <span class="sd">        coordinates.</span>
+<span class="sd">    dtype: numpy.dtype</span>
+<span class="sd">        datatype of data referred to with &quot;column&quot;.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1045,7 +1036,7 @@ document.write(`
     <span class="n">spatial_reference</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;bounds&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">),</span> <span class="s2">&quot;cellsizes&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)}</span>
 
     <span class="n">rasterized</span> <span class="o">=</span> <span class="n">gdal_rasterize</span><span class="p">(</span>
-        <span class="n">path</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">nodata</span><span class="o">=</span><span class="n">nodata</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">spatial_reference</span><span class="o">=</span><span class="n">spatial_reference</span>
+        <span class="n">path</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">nodata</span><span class="o">=</span><span class="n">nodata</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">spatial_reference</span><span class="o">=</span><span class="n">spatial_reference</span>
     <span class="p">)</span>
 
     <span class="c1"># Make sure the coordinates are increasing.</span>
@@ -1066,8 +1057,8 @@ document.write(`
         <span class="n">alloc_len</span> <span class="o">*=</span> <span class="n">size</span>
 
     <span class="c1"># Pre-allocate work arrays</span>
-    <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">alloc_len</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="n">frequencies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">alloc_len</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">alloc_len</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">frequencies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">alloc_len</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
     <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">counts</span> <span class="o">=</span> <span class="n">_cell_count</span><span class="p">(</span>
         <span class="n">rasterized</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">frequencies</span><span class="p">,</span> <span class="n">nodata</span><span class="p">,</span> <span class="o">*</span><span class="n">inds_weights</span>
     <span class="p">)</span>
@@ -1133,7 +1124,14 @@ document.write(`
     <span class="k">return</span> <span class="n">chunks</span><span class="p">,</span> <span class="n">rowstarts</span><span class="p">,</span> <span class="n">colstarts</span>
 
 
-<div class="viewcode-block" id="celltable"><a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.celltable.html#imod.prepare.celltable">[docs]</a><span class="k">def</span> <span class="nf">celltable</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">like</span><span class="p">,</span> <span class="n">chunksize</span><span class="o">=</span><span class="mf">1e4</span><span class="p">):</span>
+<div class="viewcode-block" id="celltable"><a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.celltable.html#imod.prepare.celltable">[docs]</a><span class="k">def</span> <span class="nf">celltable</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span>
+    <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">resolution</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">like</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
+    <span class="n">chunksize</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10_000</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Process area of features by rasterizing in a chunkwise manner to limit</span>
 <span class="sd">    memory usage.</span>
@@ -1175,6 +1173,8 @@ document.write(`
 <span class="sd">    like : xarray.DataArray</span>
 <span class="sd">        Example DataArray of where the cells will be located. Used only for the</span>
 <span class="sd">        coordinates.</span>
+<span class="sd">    dtype: DtypeLike, optional</span>
+<span class="sd">        datatype of data referred to with &quot;column&quot;, defaults to 32-bit integer.</span>
 <span class="sd">    chunksize : int, optional</span>
 <span class="sd">        The size of the chunksize. Used for both x and y dimension.</span>
 
@@ -1244,7 +1244,9 @@ document.write(`
 
     <span class="n">like_chunks</span><span class="p">,</span> <span class="n">rowstarts</span><span class="p">,</span> <span class="n">colstarts</span> <span class="o">=</span> <span class="n">_create_chunks</span><span class="p">(</span><span class="n">like</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">chunksize</span><span class="p">)</span>
     <span class="n">collection</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">_celltable</span><span class="p">)(</span><span class="n">path</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">chunk</span><span class="p">,</span> <span class="n">rowstart</span><span class="p">,</span> <span class="n">colstart</span><span class="p">)</span>
+        <span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">_celltable</span><span class="p">)(</span>
+            <span class="n">path</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">chunk</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">rowstart</span><span class="p">,</span> <span class="n">colstart</span>
+        <span class="p">)</span>
         <span class="k">for</span> <span class="n">chunk</span><span class="p">,</span> <span class="n">rowstart</span><span class="p">,</span> <span class="n">colstart</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">like_chunks</span><span class="p">,</span> <span class="n">rowstarts</span><span class="p">,</span> <span class="n">colstarts</span><span class="p">)</span>
     <span class="p">]</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">collection</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -1415,7 +1417,7 @@ document.write(`
     <span class="n">raster</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
     <span class="n">resolution</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">method</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">],</span>
-    <span class="n">chunksize</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mf">1e4</span><span class="p">,</span>
+    <span class="n">chunksize</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10_000</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute a zonal aggregate of raster data for polygon geometries, e.g. a mean,</span>
@@ -1498,7 +1500,7 @@ document.write(`
     <span class="n">like</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
     <span class="n">resolution</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">method</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">],</span>
-    <span class="n">chunksize</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mf">1e4</span><span class="p">,</span>
+    <span class="n">chunksize</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10_000</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute a zonal aggregate of polygon data for (other) polygon geometries,</span>

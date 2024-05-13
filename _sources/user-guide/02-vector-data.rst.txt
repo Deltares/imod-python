@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_user-guide_02-vector-data.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -543,7 +543,7 @@ intersections, spatial joins, or plotting.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.354 seconds)
+   **Total running time of the script:** (0 minutes 1.558 seconds)
 
 
 .. _sphx_glr_download_user-guide_02-vector-data.py:

@@ -1,0 +1,6 @@
+﻿imod.prepare.distribute\_ghb\_conductance
+=========================================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: distribute_ghb_conductance

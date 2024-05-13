@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.msw.meteo_mapping &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>imod.msw.meteo_mapping &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -486,14 +486,13 @@ document.write(`
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">grid_mapping</span><span class="p">(</span><span class="n">svat</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">meteo_grid</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-        <span class="n">flip_svat_x</span> <span class="o">=</span> <span class="n">svat</span><span class="o">.</span><span class="n">indexes</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_decreasing</span>
-        <span class="n">flip_svat_y</span> <span class="o">=</span> <span class="n">svat</span><span class="o">.</span><span class="n">indexes</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_decreasing</span>
         <span class="n">flip_meteo_x</span> <span class="o">=</span> <span class="n">meteo_grid</span><span class="o">.</span><span class="n">indexes</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_decreasing</span>
         <span class="n">flip_meteo_y</span> <span class="o">=</span> <span class="n">meteo_grid</span><span class="o">.</span><span class="n">indexes</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">is_monotonic_decreasing</span>
         <span class="n">nrow</span> <span class="o">=</span> <span class="n">meteo_grid</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
         <span class="n">ncol</span> <span class="o">=</span> <span class="n">meteo_grid</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
 
         <span class="c1"># Convert to cell boundaries for the meteo grid</span>
+        <span class="c1"># Method always returns monotonic increasing edges</span>
         <span class="n">meteo_x</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">_coord</span><span class="p">(</span><span class="n">meteo_grid</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
         <span class="n">meteo_y</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">_coord</span><span class="p">(</span><span class="n">meteo_grid</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span>
 
@@ -512,10 +511,10 @@ document.write(`
         <span class="k">if</span> <span class="p">(</span><span class="n">row</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="ow">or</span> <span class="p">(</span><span class="n">row</span> <span class="o">&gt;</span> <span class="n">nrow</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Some values are out of bounds for row&quot;</span><span class="p">)</span>
 
-        <span class="c1"># Flip axis if necessary</span>
-        <span class="k">if</span> <span class="n">flip_meteo_y</span> <span class="o">^</span> <span class="n">flip_svat_y</span><span class="p">:</span>
+        <span class="c1"># Flip axis when meteofile bound are flipped, relative to the coords</span>
+        <span class="k">if</span> <span class="n">flip_meteo_y</span><span class="p">:</span>
             <span class="n">row</span> <span class="o">=</span> <span class="p">(</span><span class="n">nrow</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">row</span>
-        <span class="k">if</span> <span class="n">flip_meteo_x</span> <span class="o">^</span> <span class="n">flip_svat_x</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">flip_meteo_x</span><span class="p">:</span>
             <span class="n">column</span> <span class="o">=</span> <span class="p">(</span><span class="n">ncol</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">column</span>
 
         <span class="n">n_subunit</span> <span class="o">=</span> <span class="n">svat</span><span class="p">[</span><span class="s2">&quot;subunit&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>

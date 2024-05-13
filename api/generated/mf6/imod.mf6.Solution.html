@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>imod.mf6.Solution &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>imod.mf6.Solution &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -125,8 +125,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -448,6 +448,18 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.get_lower_active_layer_number.html">imod.prepare.get_lower_active_layer_number</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.get_upper_active_grid_cells.html">imod.prepare.get_upper_active_grid_cells</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.get_upper_active_layer_number.html">imod.prepare.get_upper_active_layer_number</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.create_layered_top.html">imod.prepare.create_layered_top</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.ALLOCATION_OPTION.html">imod.prepare.ALLOCATION_OPTION</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.DISTRIBUTING_OPTION.html">imod.prepare.DISTRIBUTING_OPTION</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.allocate_drn_cells.html">imod.prepare.allocate_drn_cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.allocate_ghb_cells.html">imod.prepare.allocate_ghb_cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.allocate_rch_cells.html">imod.prepare.allocate_rch_cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.allocate_riv_cells.html">imod.prepare.allocate_riv_cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.c_leakage.html">imod.prepare.c_leakage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.c_radial.html">imod.prepare.c_radial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.distribute_drn_conductance.html">imod.prepare.distribute_drn_conductance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.distribute_ghb_conductance.html">imod.prepare.distribute_ghb_conductance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.distribute_riv_conductance.html">imod.prepare.distribute_riv_conductance</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../select.html">Select points and cross sections</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -776,7 +788,7 @@ SolutionPresetSimple: 0.001
 SolutionPresetModerate: 0.01
 SolutionPresetComplex: 0.1</p></li>
 <li><p><strong>outer_maximum</strong> (<em>int</em>) – integer value defining the maximum number of outer (nonlinear)
-iterations – that is, calls to the solution routine. For a linear
+iterations - that is, calls to the solution routine. For a linear
 problem outer_maximum should be 1.
 SolutionPresetSimple: 25
 SolutionPresetModerate: 50
@@ -816,7 +828,7 @@ method.
 SolutionPresetSimple: “cg”
 SolutionPresetModerate: “bicgstab”
 SolutionPresetComplex: “bicgstab”</p></li>
-<li><p><strong>under_relaxation</strong> (<em>str</em><em>, </em><em>optional</em>) – options: {“None”, “simple”, “cooley”, “bdb”}
+<li><p><strong>under_relaxation</strong> (<em>str</em><em>, </em><em>optional</em>) – options: {None, “simple”, “cooley”, “dbd”}
 is an optional keyword that defines the nonlinear relative_rclose
 schemes used. By default under_relaxation is not used.
 None - relative_rclose is not used.
@@ -906,7 +918,7 @@ SolutionPresetModerate: 0.0
 SolutionPresetComplex: 1.05</p></li>
 <li><p><strong>backtracking_reduction_factor</strong> (<em>float</em><em>, </em><em>optional</em>) – real value defining the reduction in step size used for residual
 reduction computations. The value of backtracking reduction factor is
-between 142 MODFLOW 6 – Description of Input and Output zero and one.
+between 142 MODFLOW 6 - Description of Input and Output zero and one.
 The value usually ranges from 0.1 to 0.3; a value of 0.2 works well for
 most problems. backtracking_reduction_factor only needs to be specified
 if backtracking number is greater than zero.
@@ -928,21 +940,21 @@ SolutionPresetComplex: 0.002</p></li>
 <li><p><strong>rclose_option</strong> (<em>str</em><em>, </em><em>optional</em>) – options: {“strict”, “l2norm_rclose”, “relative_rclose”}
 an optional keyword that defines the specific flow residual criterion
 used.
-strict– an optional keyword that is used to specify that inner rclose
+strict: an optional keyword that is used to specify that inner rclose
 represents a infinity-norm (absolute convergence criteria) and that the
 head and flow convergence criteria must be met on the first inner
 iteration (this criteria is equivalent to the criteria used by the
 MODFLOW-2005 PCG package (Hill, 1990)).
-l2norm_rclose – an optionalkeyword that is used to specify that inner
+l2norm_rclose: an optionalkeyword that is used to specify that inner
 rclose represents a l-2 norm closure criteria instead of a infinity-norm
 (absolute convergence criteria). When l2norm_rclose is specified, a
 reasonable initial inner rclose value is 0.1 times the number of active
 cells when meters and seconds are the defined MODFLOW 6 length and time.
-relative_rclose – an optional keyword that is used to specify that
+relative_rclose:  an optional keyword that is used to specify that
 inner_rclose represents a relative L-2 Norm reduction closure criteria
 instead of a infinity-Norm (absolute convergence criteria). When
 relative_rclose is specified, a reasonable initial inner_rclose value is
-1.0 × 10−4 and convergence is achieved for a given inner (linear)
+1.0 * 10-4 and convergence is achieved for a given inner (linear)
 iteration when ∆h ≤ inner_dvclose and the current L-2 Norm is ≤ the
 product of the relativ_rclose and the initial L-2 Norm for the current
 inner (linear) iteration. If rclose_option is not specified, an absolute
@@ -998,28 +1010,22 @@ Default value: None
 SolutionPresetSimple: 0
 SolutionPresetModerate: 0
 SolutionPresetComplex: 2</p></li>
-<li><p><strong>scaling_method</strong> (<em>str</em>) – options: {“None”, “diagonal”, “l2norm”}
+<li><p><strong>scaling_method</strong> (<em>str</em>) – options: {None, “diagonal”, “l2norm”}
 an optional keyword that defines the matrix scaling approach used. By
 default, matrix scaling is not applied.
 None - no matrix scaling applied.
 diagonal - symmetric matrix scaling using the POLCG preconditioner
 scaling method in Hill (1992).
 l2norm - symmetric matrix scaling using the L2 norm.
-Default value: None
-SolutionPresetSimple: None
-SolutionPresetModerate: None
-SolutionPresetComplex: None</p></li>
-<li><p><strong>reordering_method</strong> (<em>str</em>) – options: {“None”, “rcm”, “md”}
+Default value: None</p></li>
+<li><p><strong>reordering_method</strong> (<em>str</em>) – options: {None, “rcm”, “md”}
 an optional keyword that defines the matrix reordering approach used. By
 default, matrix reordering is not applied.
 None - original ordering.
 rcm - reverse Cuthill McKee ordering.
 md - minimum degree ordering
-Default value: None
-SolutionPresetSimple: None
-SolutionPresetModerate: None
-SolutionPresetComplex: None</p></li>
-<li><p><strong>print_option</strong> (<em>str</em>) – options: {“None”, “summary”, “all”}
+Default value: None</p></li>
+<li><p><strong>print_option</strong> (<em>str</em>) – options: {“none”, “summary”, “all”}
 is a flag that controls printing of convergence information from the
 solver.
 None - means print nothing.
@@ -1029,17 +1035,14 @@ all - means print linear matrix solver convergence information to the
 solution listing file and model specific linear matrix solver
 convergence information to each model listing file in addition to
 SUMMARY information.
-Default value: “summary”
-SolutionPresetSimple: No Default
-SolutionPresetModerate: No Default
-SolutionPresetComplex: No Default</p></li>
-<li><p><strong>csv_output</strong> (<em>str</em><em>, </em><em>optional</em>) – False if no csv is to be written for the output, enter str of filename
+Default value: “summary”</p></li>
+<li><p><strong>outer_csvfile</strong> (<em>str</em><em>, </em><em>optional</em>) – None if no csv is to be written for the output, str of filename
 if csv is to be written.
-Default value: False
-SolutionPresetSimple: No Default
-SolutionPresetModerate: No Default
-SolutionPresetComplex: No Default</p></li>
-<li><p><strong>no_ptc</strong> (<em>(</em><em>{True</em><em>, </em><em>False}</em><em>, </em><em>optional</em><em>)</em>) – is a flag that is used to disable pseudo-transient continuation (PTC).
+Default value: None</p></li>
+<li><p><strong>inner_csvfile</strong> (<em>str</em><em>, </em><em>optional</em>) – None if no csv is to be written for the output, str of filename
+if csv is to be written.
+Default value: None</p></li>
+<li><p><strong>no_ptc</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>either None</em><em>, </em><em>&quot;all&quot;</em><em>, or </em><em>&quot;first&quot;.</em>) – is a flag that is used to disable pseudo-transient continuation (PTC).
 Option only applies to steady-state stress periods for models using the
 Newton-Raphson formulation. For many problems, PTC can significantly
 improve convergence behavior for steady-state simulations, and for this
@@ -1049,11 +1052,22 @@ similar to the solution. When the initial conditions are similar to, or
 exactly the same as, the solution and convergence is slow, then this NO
 PTC option should be used to deactivate PTC. This NO PTC option should
 also be used in order to compare convergence behavior with other MODFLOW
-versions, as PTC is only available in MODFLOW 6.
-Default value: False
-SolutionPresetSimple: No Default
-SolutionPresetModerate: No Default
-SolutionPresetComplex: No Default</p></li>
+versions, as PTC is only available in MODFLOW 6.</p></li>
+<li><p><strong>ats_outer_maximum_fraction</strong> (<em>float</em><em>, </em><em>optional.</em>) – <p>real value defining the fraction of the maximum allowable outer iterations
+used with the Adaptive Time Step (ATS) capability if it is active. If this
+value is set to zero by the user, then this solution will have no effect
+on ATS behavior. This value must be greater than or equal to zero and less
+than or equal to 0.5 or the program will terminate with an error. If it is
+not specified by the user, then it is assigned a default value of one
+third. When the number of outer iterations for this solution is less than
+the product of this value and the maximum allowable outer iterations, then
+ATS will increase the time step length by a factor of DTADJ in the ATS
+input file. When the number of outer iterations for this solution is
+greater than the maximum allowable outer iterations minus the product of
+this value and the maximum allowable outer iterations, then the ATS (if
+active) will decrease the time step length by a factor of 1 / DTADJ.</p>
+<p>Default value is None.</p>
+</p></li>
 <li><p><strong>validate</strong> (<em>{True</em><em>, </em><em>False}</em>) – Flag to indicate whether the package should be validated upon
 initialization. This raises a ValidationError if package input is
 provided in the wrong manner. Defaults to True.</p></li>

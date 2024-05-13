@@ -1,0 +1,6 @@
+﻿imod.prepare.allocate\_drn\_cells
+=================================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: allocate_drn_cells

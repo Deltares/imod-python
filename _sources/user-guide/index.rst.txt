@@ -48,6 +48,7 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -153,6 +154,42 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Most MF6 packages have spatial data arrays as input. These arrays are discrete: they are define...">
+
+.. only:: html
+
+  .. image:: /user-guide/images/thumb/sphx_glr_08-regridding_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_user-guide_08-regridding.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Regridding</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="iMOD Python has multiple features to help you define the topsystem of the groundwater system. W...">
+
+.. only:: html
+
+  .. image:: /user-guide/images/thumb/sphx_glr_09-topsystem_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_user-guide_09-topsystem.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Defining the topsystem</div>
+    </div>
+
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
     </div>
 
 
@@ -165,6 +202,8 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
    /user-guide/05-unstructured-grids
    /user-guide/06-lazy-evaluation
    /user-guide/07-time-discretization
+   /user-guide/08-regridding
+   /user-guide/09-topsystem
 
 
 .. only:: html

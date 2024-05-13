@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.wq.model &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>imod.wq.model &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -848,9 +848,9 @@ document.write(`
         <span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_render_gen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelname</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">,</span> <span class="n">writehelp</span><span class="p">,</span> <span class="n">result_dir</span><span class="p">):</span>
-        <span class="n">package_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">pkg</span><span class="o">.</span><span class="n">_pkg_id</span> <span class="k">for</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">pkg</span><span class="o">.</span><span class="n">_pkg_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;tvc&quot;</span><span class="p">,</span> <span class="s2">&quot;mal&quot;</span><span class="p">)]</span>
-        <span class="p">)</span>
+        <span class="n">package_set</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">pkg</span><span class="o">.</span><span class="n">_pkg_id</span> <span class="k">for</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">pkg</span><span class="o">.</span><span class="n">_pkg_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;tvc&quot;</span><span class="p">,</span> <span class="s2">&quot;mal&quot;</span><span class="p">)</span>
+        <span class="p">}</span>
         <span class="n">package_set</span><span class="o">.</span><span class="n">update</span><span class="p">((</span><span class="s2">&quot;btn&quot;</span><span class="p">,</span> <span class="s2">&quot;ssm&quot;</span><span class="p">))</span>
         <span class="n">package_set</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">package_set</span><span class="p">)</span>
         <span class="n">baskey</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_pkgkey</span><span class="p">(</span><span class="s2">&quot;bas6&quot;</span><span class="p">)</span>

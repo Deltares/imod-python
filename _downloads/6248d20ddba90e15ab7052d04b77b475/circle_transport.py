@@ -175,8 +175,6 @@ simulation["flow"] = gwf_model
 simulation["flow_solver"] = imod.mf6.Solution(
     modelnames=["flow"],
     print_option="summary",
-    csv_output=False,
-    no_ptc=True,
     outer_dvclose=1.0e-4,
     outer_maximum=500,
     under_relaxation=None,
@@ -264,8 +262,6 @@ simulation["transport"] = transport_model
 simulation["transport_solver"] = imod.mf6.Solution(
     modelnames=["transport"],
     print_option="summary",
-    csv_output=False,
-    no_ptc=True,
     outer_dvclose=1.0e-4,
     outer_maximum=500,
     under_relaxation=None,
@@ -318,7 +314,7 @@ z
 
 # %%
 # Assign these new coordinate values to the dataset
-coords = dict(time=simtimes[1:], z=("layer", z))
+coords = {"time": simtimes[1:], "z": ("layer", z)}
 
 sim_head = sim_head.assign_coords(**coords)
 sim_concentration = sim_concentration.assign_coords(**coords)

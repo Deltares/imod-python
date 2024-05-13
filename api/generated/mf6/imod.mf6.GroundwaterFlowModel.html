@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>imod.mf6.GroundwaterFlowModel &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>imod.mf6.GroundwaterFlowModel &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -125,8 +125,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -448,6 +448,18 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.get_lower_active_layer_number.html">imod.prepare.get_lower_active_layer_number</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.get_upper_active_grid_cells.html">imod.prepare.get_upper_active_grid_cells</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.get_upper_active_layer_number.html">imod.prepare.get_upper_active_layer_number</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.create_layered_top.html">imod.prepare.create_layered_top</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.ALLOCATION_OPTION.html">imod.prepare.ALLOCATION_OPTION</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.DISTRIBUTING_OPTION.html">imod.prepare.DISTRIBUTING_OPTION</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.allocate_drn_cells.html">imod.prepare.allocate_drn_cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.allocate_ghb_cells.html">imod.prepare.allocate_ghb_cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.allocate_rch_cells.html">imod.prepare.allocate_rch_cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.allocate_riv_cells.html">imod.prepare.allocate_riv_cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.c_leakage.html">imod.prepare.c_leakage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.c_radial.html">imod.prepare.c_radial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.distribute_drn_conductance.html">imod.prepare.distribute_drn_conductance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.distribute_ghb_conductance.html">imod.prepare.distribute_ghb_conductance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.distribute_riv_conductance.html">imod.prepare.distribute_riv_conductance</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../select.html">Select points and cross sections</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -752,7 +764,33 @@ document.write(`
 <dl class="py class">
 <dt class="sig sig-object py" id="imod.mf6.GroundwaterFlowModel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">imod.mf6.</span></span><span class="sig-name descname"><span class="pre">GroundwaterFlowModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/imod/mf6/model_gwf.html#GroundwaterFlowModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imod.mf6.GroundwaterFlowModel" title="Permalink to this definition">#</a></dt>
-<dd><dl class="py method">
+<dd><p>The GroundwaterFlowModel (GWF) simulates flow of (liquid) groundwater.
+More information can be found here:
+<a class="reference external" href="https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.4.2.pdf#page=27">https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.4.2.pdf#page=27</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>listing_file</strong> (<em>Optional</em><em>[</em><em>str</em><em>] </em><em>= None</em>) – name of the listing file to create for this GWF model. If not specified,
+then the name of the list file will be the basename of the GWF model
+name file and the ‘lst’ extension.</p></li>
+<li><p><strong>print_input</strong> (<em>bool = False</em>) – keyword to indicate that the list of all model stress package
+information will be written to the listing file immediately after it is
+read.</p></li>
+<li><p><strong>print_flows</strong> (<em>bool = False</em>) – keyword to indicate that the list of all model package flow rates will
+be printed to the listing file for every stress period time step in
+which “BUDGET PRINT” is specified in Output Control.</p></li>
+<li><p><strong>save_flows</strong> (<em>bool = False</em>) – indicate that all model package flow terms will be written to the file
+specified with “BUDGET FILEOUT” in Output Control.</p></li>
+<li><p><strong>newton</strong> (<em>bool = False</em>) – activates the Newton-Raphson formulation for groundwater flow between
+connected, convertible groundwater cells and stress packages that
+support calculation of Newton-Raphson terms for groundwater exchanges.</p></li>
+<li><p><strong>under_relaxation</strong> (<em>bool = False</em><em>,</em>) – indicates whether the groundwater head in a cell will be under-relaxed when
+water levels fall below the bottom of the model below any given cell. By
+default, Newton-Raphson UNDER_RELAXATION is not applied.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
 <dt class="sig sig-object py" id="imod.mf6.GroundwaterFlowModel.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#imod.mf6.GroundwaterFlowModel.__init__" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>

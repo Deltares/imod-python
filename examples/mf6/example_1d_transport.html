@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>1D Solute Transport Benchmarks &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>1D Solute Transport Benchmarks &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -125,8 +125,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -427,10 +427,6 @@ document.write(`
 
 
 <li class="toctree-l2"><a class="reference internal" href="hondsrug_partitioning.html">Partitioning a regional model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hondsrug_regridding.html">Regridding a regional model</a></li>
-
-
-
 <li class="toctree-l2"><a class="reference internal" href="lake.html">Lake package example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="transport_2d.html">Transport 2d example</a></li>
 </ul>
@@ -528,7 +524,7 @@ document.write(`
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
 <p><a class="reference internal" href="#sphx-glr-download-examples-mf6-example-1d-transport-py"><span class="std std-ref">Go to the end</span></a>
-to download the full example code</p>
+to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="d-solute-transport-benchmarks">
 <span id="sphx-glr-examples-mf6-example-1d-transport-py"></span><h1>1D Solute Transport Benchmarks<a class="headerlink" href="#d-solute-transport-benchmarks" title="Permalink to this heading">#</a></h1>
@@ -692,8 +688,6 @@ shape of the front of the solute plume.</p></li>
 <span class="n">simulation</span><span class="p">[</span><span class="s2">&quot;flow_solver&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Solution</span><span class="p">(</span>
     <span class="n">modelnames</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;flow&quot;</span><span class="p">],</span>
     <span class="n">print_option</span><span class="o">=</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span>
-    <span class="n">csv_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">no_ptc</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">outer_dvclose</span><span class="o">=</span><span class="mf">1.0e-4</span><span class="p">,</span>
     <span class="n">outer_maximum</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
     <span class="n">under_relaxation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -708,8 +702,6 @@ shape of the front of the solute plume.</p></li>
 <span class="n">simulation</span><span class="p">[</span><span class="s2">&quot;transport_solver&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Solution</span><span class="p">(</span>
     <span class="n">modelnames</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;tpt_a&quot;</span><span class="p">,</span> <span class="s2">&quot;tpt_b&quot;</span><span class="p">,</span> <span class="s2">&quot;tpt_c&quot;</span><span class="p">,</span> <span class="s2">&quot;tpt_d&quot;</span><span class="p">],</span>
     <span class="n">print_option</span><span class="o">=</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span>
-    <span class="n">csv_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">no_ptc</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">outer_dvclose</span><span class="o">=</span><span class="mf">1.0e-4</span><span class="p">,</span>
     <span class="n">outer_maximum</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
     <span class="n">under_relaxation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -744,10 +736,10 @@ species.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">concentration</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">time</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;species&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_example_1d_transport_001.png" srcset="../../_images/sphx_glr_example_1d_transport_001.png" alt="y = 1.5, dx = 10.0, dy = -1.0, layer = 1, time ..." class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D object at 0x0000015AAA011F10&gt;, &lt;matplotlib.lines.Line2D object at 0x0000015AAAFFF4D0&gt;, &lt;matplotlib.lines.Line2D object at 0x0000015AAAFFCD50&gt;, &lt;matplotlib.lines.Line2D object at 0x0000015AAAFFCD90&gt;]
+<img src="../../_images/sphx_glr_example_1d_transport_001.png" srcset="../../_images/sphx_glr_example_1d_transport_001.png" alt="y = 1.5, dx = 10.0, dy = -1.0, layer = 1, time ..." class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[&lt;matplotlib.lines.Line2D object at 0x0000014A2030E590&gt;, &lt;matplotlib.lines.Line2D object at 0x0000014A1A7A2B90&gt;, &lt;matplotlib.lines.Line2D object at 0x0000014A1A7A1F90&gt;, &lt;matplotlib.lines.Line2D object at 0x0000014A1A7A1ED0&gt;]
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 2.985 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 3.345 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-example-1d-transport-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/5153289a2b35429bbbceb8b8ae4a7e08/example_1d_transport.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">example_1d_transport.ipynb</span></code></a></p>

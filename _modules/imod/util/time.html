@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.util.time &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>imod.util.time &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -533,7 +533,7 @@ document.write(`
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="s2">&quot;ns&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">timestep_duration</span><span class="p">(</span><span class="n">times</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">use_cftime</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">timestep_duration</span><span class="p">(</span><span class="n">times</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">use_cftime</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates dictionary containing stress period time discretization data.</span>
 
@@ -558,7 +558,7 @@ document.write(`
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">timestep_duration</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">forcing_starts_ends</span><span class="p">(</span><span class="n">package_times</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">forcing_starts_ends</span><span class="p">(</span><span class="n">package_times</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Determines the stress period numbers for start and end for a forcing defined</span>
 <span class="sd">    at a starting time, until the next starting time.</span>
@@ -592,7 +592,7 @@ document.write(`
     <span class="k">return</span> <span class="n">starts_ends</span>
 
 
-<span class="k">def</span> <span class="nf">_convert_datetimes</span><span class="p">(</span><span class="n">times</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">use_cftime</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_convert_datetimes</span><span class="p">(</span><span class="n">times</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">use_cftime</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return times as np.datetime64[ns] or cftime.DatetimeProlepticGregorian</span>
 <span class="sd">    depending on whether the dates fall within the inclusive bounds of</span>
@@ -639,7 +639,7 @@ document.write(`
 <span class="sd">    types of available time objects.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">time</span> <span class="o">==</span> <span class="s2">&quot;steady-state&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">time</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>  <span class="c1"># the conversion to str is for mypy</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">):</span>
             <span class="c1"># The following line is because numpy.datetime64[ns] does not</span>

@@ -1,0 +1,6 @@
+﻿imod.prepare.create\_layered\_top
+=================================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: create_layered_top

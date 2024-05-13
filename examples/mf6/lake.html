@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Lake package example &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>Lake package example &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -50,7 +50,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Transport 2d example" href="transport_2d.html" />
-    <link rel="prev" title="Regridding a regional model" href="hondsrug_regridding.html" />
+    <link rel="prev" title="Partitioning a regional model" href="hondsrug_partitioning.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -125,8 +125,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -427,10 +427,6 @@ document.write(`
 
 
 <li class="toctree-l2"><a class="reference internal" href="hondsrug_partitioning.html">Partitioning a regional model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hondsrug_regridding.html">Regridding a regional model</a></li>
-
-
-
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Lake package example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="transport_2d.html">Transport 2d example</a></li>
 </ul>
@@ -528,7 +524,7 @@ document.write(`
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
 <p><a class="reference internal" href="#sphx-glr-download-examples-mf6-lake-py"><span class="std std-ref">Go to the end</span></a>
-to download the full example code</p>
+to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="lake-package-example">
 <span id="sphx-glr-examples-mf6-lake-py"></span><h1>Lake package example<a class="headerlink" href="#lake-package-example" title="Permalink to this heading">#</a></h1>
@@ -584,7 +580,7 @@ structured model, we can make due with few packages.</p>
 <span class="n">is_lake</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">imshow</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_lake_001.png" srcset="../../_images/sphx_glr_lake_001.png" alt="layer = 1" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x0000015AACE40650&gt;
+<img src="../../_images/sphx_glr_lake_001.png" srcset="../../_images/sphx_glr_lake_001.png" alt="layer = 1" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage object at 0x0000014A2D551B10&gt;
 </pre></div>
 </div>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">VERTICAL</span> <span class="o">=</span> <span class="mi">1</span>
@@ -693,8 +689,6 @@ parameters. The model is characterized by:</p>
 <span class="n">simulation</span><span class="p">[</span><span class="s2">&quot;solver&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Solution</span><span class="p">(</span>
     <span class="n">modelnames</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GWF_1&quot;</span><span class="p">],</span>
     <span class="n">print_option</span><span class="o">=</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span>
-    <span class="n">csv_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">no_ptc</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">outer_dvclose</span><span class="o">=</span><span class="mf">1.0e-4</span><span class="p">,</span>
     <span class="n">outer_maximum</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
     <span class="n">under_relaxation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -727,7 +721,7 @@ parameters. The model is characterized by:</p>
 <span class="n">simulation</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">modeldir</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\lak.py:1045: UserWarning: The `squeeze` kwarg to GroupBy is being removed.Pass .groupby(..., squeeze=False) to disable squeezing, which is the new default, and to silence this warning.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\lak.py:1043: UserWarning: The `squeeze` kwarg to GroupBy is being removed.Pass .groupby(..., squeeze=False) to disable squeezing, which is the new default, and to silence this warning.
   for iperiod, (_, period_data) in zip(
 </pre></div>
 </div>
@@ -759,10 +753,10 @@ describes how to add it to yours.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">head</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contourf</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_lake_002.png" srcset="../../_images/sphx_glr_lake_002.png" alt="dx = 5e+03, dy = -5e+03, layer = 1, time = 4.90..." class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x0000015AAAFE1F10&gt;
+<img src="../../_images/sphx_glr_lake_002.png" srcset="../../_images/sphx_glr_lake_002.png" alt="dx = 5e+03, dy = -5e+03, layer = 1, time = 4.90..." class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x0000014A1A846A90&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.722 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.837 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-lake-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/3e561bea3b8b74fe958e91a442daed49/lake.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">lake.ipynb</span></code></a></p>
@@ -786,12 +780,12 @@ describes how to add it to yours.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="hondsrug_regridding.html"
+       href="hondsrug_partitioning.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Regridding a regional model</p>
+        <p class="prev-next-title">Partitioning a regional model</p>
       </div>
     </a>
     <a class="right-next"

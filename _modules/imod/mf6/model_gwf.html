@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.model_gwf &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>imod.mf6.model_gwf &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -463,6 +463,39 @@ document.write(`
 
 
 <div class="viewcode-block" id="GroundwaterFlowModel"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.GroundwaterFlowModel.html#imod.mf6.GroundwaterFlowModel">[docs]</a><span class="k">class</span> <span class="nc">GroundwaterFlowModel</span><span class="p">(</span><span class="n">Modflow6Model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The GroundwaterFlowModel (GWF) simulates flow of (liquid) groundwater.</span>
+<span class="sd">    More information can be found here:</span>
+<span class="sd">    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.4.2.pdf#page=27</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    listing_file: Optional[str] = None</span>
+<span class="sd">        name of the listing file to create for this GWF model. If not specified,</span>
+<span class="sd">        then the name of the list file will be the basename of the GWF model</span>
+<span class="sd">        name file and the &#39;lst&#39; extension.</span>
+<span class="sd">    print_input: bool = False</span>
+<span class="sd">        keyword to indicate that the list of all model stress package</span>
+<span class="sd">        information will be written to the listing file immediately after it is</span>
+<span class="sd">        read.</span>
+<span class="sd">    print_flows: bool = False</span>
+<span class="sd">        keyword to indicate that the list of all model package flow rates will</span>
+<span class="sd">        be printed to the listing file for every stress period time step in</span>
+<span class="sd">        which &quot;BUDGET PRINT&quot; is specified in Output Control.</span>
+<span class="sd">    save_flows: bool = False</span>
+<span class="sd">        indicate that all model package flow terms will be written to the file</span>
+<span class="sd">        specified with &quot;BUDGET FILEOUT&quot; in Output Control.</span>
+<span class="sd">    newton: bool = False</span>
+<span class="sd">        activates the Newton-Raphson formulation for groundwater flow between</span>
+<span class="sd">        connected, convertible groundwater cells and stress packages that</span>
+<span class="sd">        support calculation of Newton-Raphson terms for groundwater exchanges.</span>
+<span class="sd">    under_relaxation: bool = False,</span>
+<span class="sd">        indicates whether the groundwater head in a cell will be under-relaxed when</span>
+<span class="sd">        water levels fall below the bottom of the model below any given cell. By</span>
+<span class="sd">        default, Newton-Raphson UNDER_RELAXATION is not applied.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">_mandatory_packages</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;npf&quot;</span><span class="p">,</span> <span class="s2">&quot;ic&quot;</span><span class="p">,</span> <span class="s2">&quot;oc&quot;</span><span class="p">,</span> <span class="s2">&quot;sto&quot;</span><span class="p">)</span>
     <span class="n">_model_id</span> <span class="o">=</span> <span class="s2">&quot;gwf6&quot;</span>
     <span class="n">_template</span> <span class="o">=</span> <span class="n">Modflow6Model</span><span class="o">.</span><span class="n">_initialize_template</span><span class="p">(</span><span class="s2">&quot;gwf-nam.j2&quot;</span><span class="p">)</span>

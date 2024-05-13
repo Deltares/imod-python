@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Partitioning a regional model &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>Partitioning a regional model &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -49,7 +49,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/mf6/hondsrug_partitioning';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Regridding a regional model" href="hondsrug_regridding.html" />
+    <link rel="next" title="Lake package example" href="lake.html" />
     <link rel="prev" title="Regional model" href="hondsrug.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -125,8 +125,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -427,10 +427,6 @@ document.write(`
 
 
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Partitioning a regional model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hondsrug_regridding.html">Regridding a regional model</a></li>
-
-
-
 <li class="toctree-l2"><a class="reference internal" href="lake.html">Lake package example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="transport_2d.html">Transport 2d example</a></li>
 </ul>
@@ -528,7 +524,7 @@ document.write(`
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
 <p><a class="reference internal" href="#sphx-glr-download-examples-mf6-hondsrug-partitioning-py"><span class="std std-ref">Go to the end</span></a>
-to download the full example code</p>
+to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="partitioning-a-regional-model">
 <span id="sphx-glr-examples-mf6-hondsrug-partitioning-py"></span><h1>Partitioning a regional model<a class="headerlink" href="#partitioning-a-regional-model" title="Permalink to this heading">#</a></h1>
@@ -553,11 +549,6 @@ that you should look at if you are interested in the model building</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">tmpdir</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">temporary_directory</span><span class="p">()</span>
 
 <span class="n">gwf_simulation</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">hondsrug_simulation</span><span class="p">(</span><span class="n">tmpdir</span> <span class="o">/</span> <span class="s2">&quot;hondsrug_saved&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>The model was written before the xt3d_option and rhs_option arguments were
-added to iMOD Python. Set missing options to False.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">gwf_simulation</span><span class="p">[</span><span class="s2">&quot;GWF&quot;</span><span class="p">][</span><span class="s2">&quot;npf&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">set_xt3d_option</span><span class="p">(</span><span class="n">is_xt3d_used</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_rhs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Write the model and run it (before partitioning, so we can compare if the
@@ -621,7 +612,7 @@ results are similar).</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, &#39;hondsrug diff &#39;)
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (3 minutes 56.871 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (4 minutes 34.148 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-hondsrug-partitioning-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/c36f338498698f0b51edf3b5cbb2ebe2/hondsrug_partitioning.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">hondsrug_partitioning.ipynb</span></code></a></p>
@@ -653,11 +644,11 @@ results are similar).</p>
       </div>
     </a>
     <a class="right-next"
-       href="hondsrug_regridding.html"
+       href="lake.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Regridding a regional model</p>
+        <p class="prev-next-title">Lake package example</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

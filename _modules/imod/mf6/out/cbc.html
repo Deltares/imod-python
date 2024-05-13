@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.out.cbc &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>imod.mf6.out.cbc &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -582,10 +582,17 @@ document.write(`
                 <span class="n">imeth6_header</span> <span class="o">=</span> <span class="n">read_imeth6_header</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
                 <span class="n">datasize</span> <span class="o">=</span> <span class="n">imeth6_header</span><span class="p">[</span><span class="s2">&quot;nlist&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">8</span> <span class="o">+</span> <span class="n">imeth6_header</span><span class="p">[</span><span class="s2">&quot;ndat&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">8</span><span class="p">)</span>
                 <span class="n">header</span><span class="p">[</span><span class="s2">&quot;pos&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
-                <span class="n">key</span> <span class="o">=</span> <span class="n">imeth6_header</span><span class="p">[</span><span class="s2">&quot;txt2id2&quot;</span><span class="p">]</span>
+                <span class="c1"># key-format: &quot;package type&quot;-&quot;optional_package_variable&quot;_&quot;package name&quot;</span>
+                <span class="c1"># for river output: riv_sys1</span>
+                <span class="c1"># for uzf output: uzf-gwrch_uzf_sys1</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">imeth6_header</span><span class="p">[</span><span class="s2">&quot;txt2id2&quot;</span><span class="p">]</span>
                 <span class="c1"># npf-key can be present multiple times in cases of saved saturation + specific discharge</span>
                 <span class="k">if</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;data-&quot;</span><span class="p">):</span>
-                    <span class="n">key</span> <span class="o">=</span> <span class="n">key</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;data-&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                    <span class="n">key</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">imeth6_header</span><span class="p">[</span><span class="s2">&quot;txt2id2&quot;</span><span class="p">]</span>
+                        <span class="o">+</span> <span class="s2">&quot;_&quot;</span>
+                        <span class="o">+</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;data-&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                    <span class="p">)</span>
                 <span class="n">headers</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Imeth6Header</span><span class="p">(</span><span class="o">**</span><span class="n">header</span><span class="p">,</span> <span class="o">**</span><span class="n">imeth6_header</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -714,6 +721,7 @@ document.write(`
     <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">shape</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
     <span class="n">return_variable</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">indices</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Read the data for an imeth==6 budget section.</span>
@@ -735,16 +743,21 @@ document.write(`
 <span class="sd">        size of the entire model domain</span>
 <span class="sd">    shape: tuple[int, int, int]</span>
 <span class="sd">        Shape (nlayer, nrow, ncolumn) of entire model domain.</span>
+<span class="sd">    return_variable: str</span>
+<span class="sd">        variable name to return from budget table</span>
+<span class="sd">    indices: np.ndarray | None</span>
+<span class="sd">        optional array that contains the indices to map return_variable to model topology</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    Three-dimensional array of floats</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Allocates a dense array for the entire domain</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">table</span> <span class="o">=</span> <span class="n">read_imeth6_budgets</span><span class="p">(</span><span class="n">cbc_path</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">pos</span><span class="p">)</span>
-    <span class="n">id1</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="s2">&quot;id1&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># Convert to 0 based index</span>
-    <span class="n">out</span><span class="p">[</span><span class="n">id1</span><span class="p">]</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="n">return_variable</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">indices</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="s2">&quot;id1&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># Convert to 0 based index</span>
+    <span class="n">out</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="n">return_variable</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 

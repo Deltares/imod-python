@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Transport 2d example &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>Transport 2d example &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -125,8 +125,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -427,10 +427,6 @@ document.write(`
 
 
 <li class="toctree-l2"><a class="reference internal" href="hondsrug_partitioning.html">Partitioning a regional model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hondsrug_regridding.html">Regridding a regional model</a></li>
-
-
-
 <li class="toctree-l2"><a class="reference internal" href="lake.html">Lake package example</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Transport 2d example</a></li>
 </ul>
@@ -528,7 +524,7 @@ document.write(`
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
 <p><a class="reference internal" href="#sphx-glr-download-examples-mf6-transport-2d-py"><span class="std std-ref">Go to the end</span></a>
-to download the full example code</p>
+to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="transport-2d-example">
 <span id="sphx-glr-examples-mf6-transport-2d-py"></span><h1>Transport 2d example<a class="headerlink" href="#transport-2d-example" title="Permalink to this heading">#</a></h1>
@@ -677,8 +673,6 @@ Finally create 365 time steps of 1 day each.</p>
 <span class="n">simulation</span><span class="p">[</span><span class="s2">&quot;flow_solver&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Solution</span><span class="p">(</span>
     <span class="n">modelnames</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GWF_1&quot;</span><span class="p">],</span>
     <span class="n">print_option</span><span class="o">=</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span>
-    <span class="n">csv_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">no_ptc</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">outer_dvclose</span><span class="o">=</span><span class="mf">1.0e-4</span><span class="p">,</span>
     <span class="n">outer_maximum</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
     <span class="n">under_relaxation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -693,8 +687,6 @@ Finally create 365 time steps of 1 day each.</p>
 <span class="n">simulation</span><span class="p">[</span><span class="s2">&quot;transport_solver&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Solution</span><span class="p">(</span>
     <span class="n">modelnames</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;TPT_1&quot;</span><span class="p">],</span>
     <span class="n">print_option</span><span class="o">=</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span>
-    <span class="n">csv_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">no_ptc</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">outer_dvclose</span><span class="o">=</span><span class="mf">1.0e-4</span><span class="p">,</span>
     <span class="n">outer_maximum</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
     <span class="n">under_relaxation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -725,13 +717,13 @@ We use the utility function  <code class="docutils literal notranslate"><span cl
 <span class="n">split_simulation</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">label_array</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_transport_2d_001.png" srcset="../../_images/sphx_glr_transport_2d_001.png" alt="layer = 1, dx = 10.0, dy = -10.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\wel.py:319: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
+<img src="../../_images/sphx_glr_transport_2d_001.png" srcset="../../_images/sphx_glr_transport_2d_001.png" alt="layer = 1, dx = 10.0, dy = -10.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\wel.py:318: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
   in_bounds = np.full(ds.dims[&quot;index&quot;], True)
-D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\wel.py:319: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
+D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\wel.py:318: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
   in_bounds = np.full(ds.dims[&quot;index&quot;], True)
-D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\wel.py:319: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
+D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\wel.py:318: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
   in_bounds = np.full(ds.dims[&quot;index&quot;], True)
-D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\wel.py:319: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
+D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\wel.py:318: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
   in_bounds = np.full(ds.dims[&quot;index&quot;], True)
 </pre></div>
 </div>
@@ -749,7 +741,7 @@ D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\wel.py:319: FutureWarni
 <span class="n">split_conc</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="mi">364</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_transport_2d_002.png" srcset="../../_images/sphx_glr_transport_2d_002.png" alt="dx = 10.0, dy = -10.0, layer = 1, time = 365.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x0000015AAE200D10&gt;
+<img src="../../_images/sphx_glr_transport_2d_002.png" srcset="../../_images/sphx_glr_transport_2d_002.png" alt="dx = 10.0, dy = -10.0, layer = 1, time = 365.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x0000014A26620950&gt;
 </pre></div>
 </div>
 <p>Compute the difference between the split and unsplit simulation results for transport at the
@@ -759,10 +751,10 @@ end of the simulation, and print them</p>
 <span class="n">diff</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="mi">364</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_transport_2d_003.png" srcset="../../_images/sphx_glr_transport_2d_003.png" alt="dx = 10.0, dy = -10.0, layer = 1, time = 365.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x0000015AAA3ACFD0&gt;
+<img src="../../_images/sphx_glr_transport_2d_003.png" srcset="../../_images/sphx_glr_transport_2d_003.png" alt="dx = 10.0, dy = -10.0, layer = 1, time = 365.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x0000014A266D1650&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 51.813 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 58.945 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-transport-2d-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/0c664f948b24c042ef878353e08d519b/transport_2d.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">transport_2d.ipynb</span></code></a></p>

@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_examples_mf6_hondsrug_partitioning.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -70,28 +70,10 @@ that you should look at if you are interested in the model building
 
 .. GENERATED FROM PYTHON SOURCE LINES 31-33
 
-The model was written before the xt3d_option and rhs_option arguments were
-added to iMOD Python. Set missing options to False.
-
-.. GENERATED FROM PYTHON SOURCE LINES 33-35
-
-.. code-block:: Python
-
-    gwf_simulation["GWF"]["npf"].set_xt3d_option(is_xt3d_used=False, is_rhs=False)
-
-
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 36-38
-
 Write the model and run it (before partitioning, so we can compare if the
 results are similar).
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-43
+.. GENERATED FROM PYTHON SOURCE LINES 33-38
 
 .. code-block:: Python
 
@@ -107,11 +89,11 @@ results are similar).
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-45
+.. GENERATED FROM PYTHON SOURCE LINES 39-40
 
 Plot the simulation results of the unpartitioned model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 45-51
+.. GENERATED FROM PYTHON SOURCE LINES 40-46
 
 .. code-block:: Python
 
@@ -139,11 +121,11 @@ Plot the simulation results of the unpartitioned model.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-53
+.. GENERATED FROM PYTHON SOURCE LINES 47-48
 
 Now we partition the Hondsrug model
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-57
+.. GENERATED FROM PYTHON SOURCE LINES 48-52
 
 .. code-block:: Python
 
@@ -158,11 +140,11 @@ Now we partition the Hondsrug model
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 58-59
+.. GENERATED FROM PYTHON SOURCE LINES 53-54
 
 plot the partitioning array. It shows how the model will be partitioned.
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-65
+.. GENERATED FROM PYTHON SOURCE LINES 54-60
 
 .. code-block:: Python
 
@@ -184,11 +166,11 @@ plot the partitioning array. It shows how the model will be partitioned.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-67
+.. GENERATED FROM PYTHON SOURCE LINES 61-62
 
 Now we  write and run the partitioned model
 
-.. GENERATED FROM PYTHON SOURCE LINES 67-73
+.. GENERATED FROM PYTHON SOURCE LINES 62-68
 
 .. code-block:: Python
 
@@ -205,11 +187,11 @@ Now we  write and run the partitioned model
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 74-75
+.. GENERATED FROM PYTHON SOURCE LINES 69-70
 
 Load and plot the simulation results. Also plot the differences with the original model
 
-.. GENERATED FROM PYTHON SOURCE LINES 75-86
+.. GENERATED FROM PYTHON SOURCE LINES 70-81
 
 .. code-block:: Python
 
@@ -257,7 +239,7 @@ Load and plot the simulation results. Also plot the differences with the origina
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (3 minutes 56.871 seconds)
+   **Total running time of the script:** (4 minutes 34.148 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_hondsrug_partitioning.py:

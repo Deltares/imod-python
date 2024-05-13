@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_examples_mf6_example_models.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -25,7 +25,7 @@ This source file contains functions that create a simulation that can be used in
 examples that are not focused on building a simulation, but on doing something
 with it (such as regridding).
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-300
+.. GENERATED FROM PYTHON SOURCE LINES 10-296
 
 
 
@@ -221,8 +221,6 @@ with it (such as regridding).
         simulation["solver"] = imod.mf6.Solution(
             modelnames=["GWF_1"],
             print_option="summary",
-            csv_output=False,
-            no_ptc=True,
             outer_dvclose=1.0e-4,
             outer_maximum=500,
             under_relaxation=None,
@@ -309,8 +307,6 @@ with it (such as regridding).
         simulation["solver"] = imod.mf6.Solution(
             modelnames=["GWF_1"],
             print_option="summary",
-            csv_output=False,
-            no_ptc=True,
             outer_dvclose=1.0e-4,
             outer_maximum=500,
             under_relaxation=None,
@@ -329,7 +325,7 @@ with it (such as regridding).
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.005 seconds)
+   **Total running time of the script:** (0 minutes 0.008 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_example_models.py:

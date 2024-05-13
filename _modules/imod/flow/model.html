@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.flow.model &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>imod.flow.model &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -487,7 +487,7 @@ document.write(`
         <span class="k">for</span> <span class="n">timekey</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;sdate&quot;</span><span class="p">,</span> <span class="s2">&quot;edate&quot;</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">timekey</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="c1"># If not string assume it is in some kind of datetime format</span>
-                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">timekey</span><span class="p">])</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">timekey</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
                     <span class="bp">self</span><span class="p">[</span><span class="n">timekey</span><span class="p">]</span> <span class="o">=</span> <span class="n">_compose_timestring</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">timekey</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -757,12 +757,10 @@ document.write(`
         <span class="n">time_composed</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;time_discretization&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">_compose_values_time</span><span class="p">(</span>
             <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">globaltimes</span>
         <span class="p">)</span>
-        <span class="n">time_composed</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="p">(</span><span class="n">timestep_nr</span><span class="p">,</span> <span class="n">_compose_timestring</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">time_format</span><span class="o">=</span><span class="n">time_format</span><span class="p">))</span>
-                <span class="k">for</span> <span class="n">timestep_nr</span><span class="p">,</span> <span class="n">time</span> <span class="ow">in</span> <span class="n">time_composed</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-            <span class="p">]</span>
-        <span class="p">)</span>
+        <span class="n">time_composed</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">timestep_nr</span><span class="p">:</span> <span class="n">_compose_timestring</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">time_format</span><span class="o">=</span><span class="n">time_format</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">timestep_nr</span><span class="p">,</span> <span class="n">time</span> <span class="ow">in</span> <span class="n">time_composed</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
         <span class="k">return</span> <span class="n">time_composed</span>
 
     <span class="k">def</span> <span class="nf">_compose_periods</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -779,12 +777,10 @@ document.write(`
         <span class="c1"># Note that the timeformat for periods in the Projectfile is different</span>
         <span class="c1"># from that for stress periods</span>
         <span class="n">time_format</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">-%m-%Y %H:%M:%S&quot;</span>
-        <span class="n">periods_composed</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">_compose_timestring</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">time_format</span><span class="o">=</span><span class="n">time_format</span><span class="p">))</span>
-                <span class="k">for</span> <span class="n">time</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">periods</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-            <span class="p">]</span>
-        <span class="p">)</span>
+        <span class="n">periods_composed</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">value</span><span class="p">:</span> <span class="n">_compose_timestring</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">time_format</span><span class="o">=</span><span class="n">time_format</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">time</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">periods</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
         <span class="k">return</span> <span class="n">periods_composed</span>
 
     <span class="k">def</span> <span class="nf">_compose_all_packages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">globaltimes</span><span class="p">):</span>
@@ -868,12 +864,12 @@ document.write(`
             <span class="k">if</span> <span class="p">(</span><span class="n">pkg_id</span> <span class="ow">in</span> <span class="n">rendered</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">pkg_id</span> <span class="ow">in</span> <span class="n">ignored</span><span class="p">):</span>
                 <span class="k">continue</span>  <span class="c1"># Skip if already rendered (for groups) or not necessary to render</span>
 
-            <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-                <span class="n">pkg_id</span><span class="o">=</span><span class="n">pkg_id</span><span class="p">,</span>
-                <span class="n">name</span><span class="o">=</span><span class="n">package</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
-                <span class="n">variable_order</span><span class="o">=</span><span class="n">package</span><span class="o">.</span><span class="n">_variable_order</span><span class="p">,</span>
-                <span class="n">package_data</span><span class="o">=</span><span class="n">composition</span><span class="p">[</span><span class="n">pkg_id</span><span class="p">],</span>
-            <span class="p">)</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;pkg_id&quot;</span><span class="p">:</span> <span class="n">pkg_id</span><span class="p">,</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">package</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                <span class="s2">&quot;variable_order&quot;</span><span class="p">:</span> <span class="n">package</span><span class="o">.</span><span class="n">_variable_order</span><span class="p">,</span>
+                <span class="s2">&quot;package_data&quot;</span><span class="p">:</span> <span class="n">composition</span><span class="p">[</span><span class="n">pkg_id</span><span class="p">],</span>
+            <span class="p">}</span>
 
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="n">BoundaryCondition</span><span class="p">):</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;n_entry&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calc_n_entry</span><span class="p">(</span><span class="n">composition</span><span class="p">[</span><span class="n">pkg_id</span><span class="p">],</span> <span class="kc">True</span><span class="p">)</span>
@@ -1072,13 +1068,15 @@ document.write(`
         <span class="n">outfilepath</span> <span class="o">=</span> <span class="n">directory</span> <span class="o">/</span> <span class="n">runfilepath</span>
 
         <span class="n">RUNFILE_OPTIONS</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;mf2005_namfile&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span>
-                <span class="n">sim_type</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">namfile_out</span><span class="o">=</span><span class="n">outfilepath</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.nam&quot;</span><span class="p">)</span>
-            <span class="p">),</span>
-            <span class="s2">&quot;runfile&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">sim_type</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">runfile_out</span><span class="o">=</span><span class="n">outfilepath</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.run&quot;</span><span class="p">)),</span>
-            <span class="s2">&quot;mf6_namfile&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span>
-                <span class="n">sim_type</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">namfile_out</span><span class="o">=</span><span class="n">outfilepath</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.nam&quot;</span><span class="p">)</span>
-            <span class="p">),</span>
+            <span class="s2">&quot;mf2005_namfile&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;sim_type&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+                <span class="s2">&quot;namfile_out&quot;</span><span class="p">:</span> <span class="n">outfilepath</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.nam&quot;</span><span class="p">),</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;runfile&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;sim_type&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;runfile_out&quot;</span><span class="p">:</span> <span class="n">outfilepath</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.run&quot;</span><span class="p">)},</span>
+            <span class="s2">&quot;mf6_namfile&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;sim_type&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                <span class="s2">&quot;namfile_out&quot;</span><span class="p">:</span> <span class="n">outfilepath</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.nam&quot;</span><span class="p">),</span>
+            <span class="p">},</span>
         <span class="p">}</span>
 
         <span class="n">conversion_settings</span> <span class="o">=</span> <span class="n">RUNFILE_OPTIONS</span><span class="p">[</span><span class="n">convert_to</span><span class="p">]</span>

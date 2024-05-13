@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.wel &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>imod.mf6.wel &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -471,11 +471,11 @@ document.write(`
 <span class="kn">from</span> <span class="nn">imod.mf6.mf6_wel_adapter</span> <span class="kn">import</span> <span class="n">Mf6Wel</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.package</span> <span class="kn">import</span> <span class="n">Package</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.utilities.dataset</span> <span class="kn">import</span> <span class="n">remove_inactive</span>
-<span class="kn">from</span> <span class="nn">imod.mf6.utilities.grid</span> <span class="kn">import</span> <span class="n">create_layered_top</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.utilities.regrid</span> <span class="kn">import</span> <span class="n">RegridderType</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.validation</span> <span class="kn">import</span> <span class="n">validation_pkg_error_message</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.write_context</span> <span class="kn">import</span> <span class="n">WriteContext</span>
 <span class="kn">from</span> <span class="nn">imod.prepare</span> <span class="kn">import</span> <span class="n">assign_wells</span>
+<span class="kn">from</span> <span class="nn">imod.prepare.layer</span> <span class="kn">import</span> <span class="n">create_layered_top</span>
 <span class="kn">from</span> <span class="nn">imod.schemata</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AnyNoDataSchema</span><span class="p">,</span>
     <span class="n">DTypeSchema</span><span class="p">,</span>
@@ -703,7 +703,6 @@ document.write(`
         <span class="n">y_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">top</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">bottom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">state_for_boundary</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Package</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Clip a package by a bounding box (time, layer, y, x).</span>
@@ -844,7 +843,7 @@ document.write(`
         <span class="n">wells_df</span> <span class="o">=</span> <span class="n">wells_df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
 
         <span class="n">wells_assigned</span> <span class="o">=</span> <span class="n">assign_wells</span><span class="p">(</span>
-            <span class="n">wells_df</span><span class="p">,</span> <span class="n">top_3d</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">minimum_thickness</span><span class="p">,</span> <span class="n">minimum_k</span>
+            <span class="n">wells_df</span><span class="p">,</span> <span class="n">top_3d</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">minimum_thickness</span><span class="p">,</span> <span class="n">minimum_k</span><span class="p">,</span> <span class="kc">True</span>
         <span class="p">)</span>
         <span class="c1"># Set multi-index again</span>
         <span class="n">wells_assigned</span> <span class="o">=</span> <span class="n">wells_assigned</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">index_names</span><span class="p">)</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
@@ -926,7 +925,7 @@ document.write(`
         <span class="c1"># Find indices belonging to x, y coordinates</span>
         <span class="n">indices_cell2d</span> <span class="o">=</span> <span class="n">points_indices</span><span class="p">(</span><span class="n">dst_grid</span><span class="p">,</span> <span class="n">out_of_bounds</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
         <span class="c1"># Convert cell2d indices from 0-based to 1-based.</span>
-        <span class="n">indices_cell2d</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indices_cell2d</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="n">indices_cell2d</span> <span class="o">=</span> <span class="p">{</span><span class="n">dim</span><span class="p">:</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indices_cell2d</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
         <span class="c1"># Prepare layer indices, for later concatenation</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dst_grid</span><span class="p">,</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">):</span>
@@ -1028,7 +1027,7 @@ document.write(`
 
         <span class="k">if</span> <span class="n">nwells_df</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No wells were assigned in package. None were present.&quot;</span><span class="p">)</span>
-        <span class="c1"># @TODO: reinstate this check. issue github #621.</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_partitioned</span> <span class="ow">and</span> <span class="n">nwells_df</span> <span class="o">!=</span> <span class="n">nwells_assigned</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;One or more well(s) are completely invalid due to minimum conductivity and thickness constraints.&quot;</span>
@@ -1191,7 +1190,6 @@ document.write(`
         <span class="n">y_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">top</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">bottom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">state_for_boundary</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Package</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Clip a package by a bounding box (time, layer, y, x).</span>
@@ -1347,7 +1345,6 @@ document.write(`
         <span class="n">y_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">top</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">bottom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">state_for_boundary</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Package</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Clip a package by a bounding box (time, layer, y, x).</span>

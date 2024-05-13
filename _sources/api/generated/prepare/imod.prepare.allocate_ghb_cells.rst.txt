@@ -1,0 +1,6 @@
+﻿imod.prepare.allocate\_ghb\_cells
+=================================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: allocate_ghb_cells

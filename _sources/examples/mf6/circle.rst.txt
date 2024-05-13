@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_examples_mf6_circle.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -233,7 +233,7 @@ Write the model
 The first step is to define an empty model, the parameters and boundary
 conditions are added in the form of the familiar MODFLOW packages.
 
-.. GENERATED FROM PYTHON SOURCE LINES 110-154
+.. GENERATED FROM PYTHON SOURCE LINES 110-152
 
 .. code-block:: Python
 
@@ -266,8 +266,6 @@ conditions are added in the form of the familiar MODFLOW packages.
     simulation["solver"] = imod.mf6.Solution(
         modelnames=["GWF_1"],
         print_option="summary",
-        csv_output=False,
-        no_ptc=True,
         outer_dvclose=1.0e-4,
         outer_maximum=500,
         under_relaxation=None,
@@ -288,11 +286,11 @@ conditions are added in the form of the familiar MODFLOW packages.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 155-156
+.. GENERATED FROM PYTHON SOURCE LINES 153-154
 
 We'll create a new directory in which we will write and run the model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 156-160
+.. GENERATED FROM PYTHON SOURCE LINES 154-158
 
 .. code-block:: Python
 
@@ -307,7 +305,7 @@ We'll create a new directory in which we will write and run the model.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 161-169
+.. GENERATED FROM PYTHON SOURCE LINES 159-167
 
 Run the model
 -------------
@@ -318,7 +316,7 @@ Run the model
   :ref:`The Modflow 6 examples introduction <mf6-introduction>` shortly
   describes how to add it to yours.
 
-.. GENERATED FROM PYTHON SOURCE LINES 169-172
+.. GENERATED FROM PYTHON SOURCE LINES 167-170
 
 .. code-block:: Python
 
@@ -332,14 +330,14 @@ Run the model
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 173-177
+.. GENERATED FROM PYTHON SOURCE LINES 171-175
 
 Open the results
 ----------------
 
 First, we'll open the heads (.hds) file.
 
-.. GENERATED FROM PYTHON SOURCE LINES 177-182
+.. GENERATED FROM PYTHON SOURCE LINES 175-180
 
 .. code-block:: Python
 
@@ -724,7 +722,7 @@ First, we'll open the heads (.hds) file.
     Coordinates:
       * layer          (layer) int32 8B 1 2
       * time           (time) float64 8B 1.0
-      * mesh2d_nFaces  (mesh2d_nFaces) int64 2kB 0 1 2 3 4 5 ... 211 212 213 214 215</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'head'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>time</span>: 1</li><li><span class='xr-has-index'>layer</span>: 2</li><li><span class='xr-has-index'>mesh2d_nFaces</span>: 216</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-3baccbc8-a773-4e1b-8ccf-039cef228e9f' class='xr-array-in' type='checkbox' checked><label for='section-3baccbc8-a773-4e1b-8ccf-039cef228e9f' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>dask.array&lt;chunksize=(1, 2, 216), meta=np.ndarray&gt;</span></div><div class='xr-array-data'><table>
+      * mesh2d_nFaces  (mesh2d_nFaces) int64 2kB 0 1 2 3 4 5 ... 211 212 213 214 215</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'head'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>time</span>: 1</li><li><span class='xr-has-index'>layer</span>: 2</li><li><span class='xr-has-index'>mesh2d_nFaces</span>: 216</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-73f4794d-ec3e-4a67-b2f9-6bf08e221681' class='xr-array-in' type='checkbox' checked><label for='section-73f4794d-ec3e-4a67-b2f9-6bf08e221681' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>dask.array&lt;chunksize=(1, 2, 216), meta=np.ndarray&gt;</span></div><div class='xr-array-data'><table>
         <tr>
             <td>
                 <table style="border-collapse: collapse;">
@@ -802,12 +800,12 @@ First, we'll open the heads (.hds) file.
     </svg>
             </td>
         </tr>
-    </table></div></div></li><li class='xr-section-item'><input id='section-884b4229-0779-49ae-9e57-5cc044506fb1' class='xr-section-summary-in' type='checkbox'  checked><label for='section-884b4229-0779-49ae-9e57-5cc044506fb1' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int32</div><div class='xr-var-preview xr-preview'>1 2</div><input id='attrs-b9a55684-62f4-4efd-bcdf-c85f7ae337ba' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b9a55684-62f4-4efd-bcdf-c85f7ae337ba' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-86dd91a0-67f0-4fcf-b69d-5636b640c9a9' class='xr-var-data-in' type='checkbox'><label for='data-86dd91a0-67f0-4fcf-b69d-5636b640c9a9' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 2])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>time</span></div><div class='xr-var-dims'>(time)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.0</div><input id='attrs-b1880dde-50cd-4cd9-9a57-9e3c3d347a30' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b1880dde-50cd-4cd9-9a57-9e3c3d347a30' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-26ac0481-ca2c-45ad-a473-37e9de215d8c' class='xr-var-data-in' type='checkbox'><label for='data-26ac0481-ca2c-45ad-a473-37e9de215d8c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 ... 211 212 213 214 215</div><input id='attrs-47529c4b-53f7-49ab-9d86-084f3b8f1405' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-47529c4b-53f7-49ab-9d86-084f3b8f1405' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e8922808-6b49-4225-9caf-bc0d335b890f' class='xr-var-data-in' type='checkbox'><label for='data-e8922808-6b49-4225-9caf-bc0d335b890f' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  0,   1,   2, ..., 213, 214, 215], dtype=int64)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-523f64e0-d451-4215-a093-0cc8fea1238e' class='xr-section-summary-in' type='checkbox'  ><label for='section-523f64e0-d451-4215-a093-0cc8fea1238e' class='xr-section-summary' >Indexes: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>layer</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-2911fac4-bd7b-41e0-8f2f-7289a5b851ba' class='xr-index-data-in' type='checkbox'/><label for='index-2911fac4-bd7b-41e0-8f2f-7289a5b851ba' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([1, 2], dtype=&#x27;int32&#x27;, name=&#x27;layer&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>time</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-e998704f-53d1-47be-9e24-82f44b13b12e' class='xr-index-data-in' type='checkbox'/><label for='index-e998704f-53d1-47be-9e24-82f44b13b12e' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([1.0], dtype=&#x27;float64&#x27;, name=&#x27;time&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-93a2b3fe-7060-441f-aaa3-5fe1f1cfec43' class='xr-index-data-in' type='checkbox'/><label for='index-93a2b3fe-7060-441f-aaa3-5fe1f1cfec43' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=216, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-aba7eef0-a69f-4a3c-9659-5ff676626ded' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-aba7eef0-a69f-4a3c-9659-5ff676626ded' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
+    </table></div></div></li><li class='xr-section-item'><input id='section-da437e4c-40a4-480d-91c0-5f823507e9b6' class='xr-section-summary-in' type='checkbox'  checked><label for='section-da437e4c-40a4-480d-91c0-5f823507e9b6' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>layer</span></div><div class='xr-var-dims'>(layer)</div><div class='xr-var-dtype'>int32</div><div class='xr-var-preview xr-preview'>1 2</div><input id='attrs-224eb43f-7d00-4274-bfa0-b66be374680e' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-224eb43f-7d00-4274-bfa0-b66be374680e' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7ac47b52-a610-4101-a7df-88e2618dfc41' class='xr-var-data-in' type='checkbox'><label for='data-7ac47b52-a610-4101-a7df-88e2618dfc41' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1, 2])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>time</span></div><div class='xr-var-dims'>(time)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.0</div><input id='attrs-4363b165-ebd0-4737-bb81-c1757954f3ea' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-4363b165-ebd0-4737-bb81-c1757954f3ea' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-93ff9b89-6383-4604-b91f-a423b2e701ce' class='xr-var-data-in' type='checkbox'><label for='data-93ff9b89-6383-4604-b91f-a423b2e701ce' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>mesh2d_nFaces</span></div><div class='xr-var-dims'>(mesh2d_nFaces)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0 1 2 3 4 5 ... 211 212 213 214 215</div><input id='attrs-5fe857e4-94de-4473-b6ef-0cf6e93a2e1e' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-5fe857e4-94de-4473-b6ef-0cf6e93a2e1e' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b54a1e8a-2f29-44b2-9dcf-c32d4bd0d2be' class='xr-var-data-in' type='checkbox'><label for='data-b54a1e8a-2f29-44b2-9dcf-c32d4bd0d2be' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([  0,   1,   2, ..., 213, 214, 215], dtype=int64)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-c71cec76-dafd-4c1a-b3cd-115ef9d70d75' class='xr-section-summary-in' type='checkbox'  ><label for='section-c71cec76-dafd-4c1a-b3cd-115ef9d70d75' class='xr-section-summary' >Indexes: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-index-name'><div>layer</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-330be491-36b0-4d43-9acc-9106e7941ebe' class='xr-index-data-in' type='checkbox'/><label for='index-330be491-36b0-4d43-9acc-9106e7941ebe' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([1, 2], dtype=&#x27;int32&#x27;, name=&#x27;layer&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>time</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-e9a32c4d-f470-472d-bf7a-6b987f66a101' class='xr-index-data-in' type='checkbox'/><label for='index-e9a32c4d-f470-472d-bf7a-6b987f66a101' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(Index([1.0], dtype=&#x27;float64&#x27;, name=&#x27;time&#x27;))</pre></div></li><li class='xr-var-item'><div class='xr-index-name'><div>mesh2d_nFaces</div></div><div class='xr-index-preview'>PandasIndex</div><div></div><input id='index-a53e52d3-01e8-4935-80d1-0751f58163f1' class='xr-index-data-in' type='checkbox'/><label for='index-a53e52d3-01e8-4935-80d1-0751f58163f1' title='Show/Hide index repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-index-data'><pre>PandasIndex(RangeIndex(start=0, stop=216, step=1, name=&#x27;mesh2d_nFaces&#x27;))</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-1a769152-f2d7-40bc-969b-21379636b810' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-1a769152-f2d7-40bc-969b-21379636b810' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
     </div>
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 183-188
+.. GENERATED FROM PYTHON SOURCE LINES 181-186
 
 For a DISV MODFLOW6 model, the heads are returned as a UgridDataArray.  While
 all layers are timesteps are available, they are only loaded into memory as
@@ -815,7 +813,7 @@ needed.
 
 We may also open the cell-by-cell flows (.cbc) file.
 
-.. GENERATED FROM PYTHON SOURCE LINES 188-193
+.. GENERATED FROM PYTHON SOURCE LINES 186-191
 
 .. code-block:: Python
 
@@ -845,12 +843,12 @@ We may also open the cell-by-cell flows (.cbc) file.
         flow-horizontal-face-x  (time, layer, mesh2d_nEdges) float64 5kB dask.array<chunksize=(1, 2, 342), meta=np.ndarray>
         flow-horizontal-face-y  (time, layer, mesh2d_nEdges) float64 5kB dask.array<chunksize=(1, 2, 342), meta=np.ndarray>
         flow-lower-face         (time, layer, mesh2d_nFaces) float64 3kB dask.array<chunksize=(1, 2, 216), meta=np.ndarray>
-        chd                     (time, layer, mesh2d_nFaces) float64 3kB dask.array<chunksize=(1, 2, 216), meta=np.ndarray>)
+        chd_chd                 (time, layer, mesh2d_nFaces) float64 3kB dask.array<chunksize=(1, 2, 216), meta=np.ndarray>)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 194-203
+.. GENERATED FROM PYTHON SOURCE LINES 192-201
 
 The flows are returned as a dictionary of UgridDataArrays. This dictionary
 contains all entries that are stored in the CBC file, but like for the heads
@@ -862,7 +860,7 @@ flow-lower-face.
 
 We'll create a dataset for the horizontal flows for further analysis.
 
-.. GENERATED FROM PYTHON SOURCE LINES 203-209
+.. GENERATED FROM PYTHON SOURCE LINES 201-207
 
 .. code-block:: Python
 
@@ -879,7 +877,7 @@ We'll create a dataset for the horizontal flows for further analysis.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 210-216
+.. GENERATED FROM PYTHON SOURCE LINES 208-214
 
 Visualize the results
 ---------------------
@@ -888,7 +886,7 @@ We can quickly and easily visualize the output with the plotting functions
 provided by xarray and xugrid. We'll add some some edge coordinates to the
 dataset so that they can be used to place the arrows in the quiver plot.
 
-.. GENERATED FROM PYTHON SOURCE LINES 216-225
+.. GENERATED FROM PYTHON SOURCE LINES 214-223
 
 .. code-block:: Python
 
@@ -913,12 +911,12 @@ dataset so that they can be used to place the arrows in the quiver plot.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 226-228
+.. GENERATED FROM PYTHON SOURCE LINES 224-226
 
 As would be expected from our model input, we observe circular groundwater
 mounding and increasing flows as we move from the center to the exterior.
 
-.. GENERATED FROM PYTHON SOURCE LINES 230-237
+.. GENERATED FROM PYTHON SOURCE LINES 228-235
 
 Slice the model domain
 ----------------------
@@ -928,7 +926,7 @@ domain. To set up the boundary conditions on the clipped edges you can provide
 a states_for_boundary dictionary. In this case we add the head values of the
 computed full domain simulation as the clipped boundary values
 
-.. GENERATED FROM PYTHON SOURCE LINES 237-246
+.. GENERATED FROM PYTHON SOURCE LINES 235-244
 
 .. code-block:: Python
 
@@ -948,11 +946,11 @@ computed full domain simulation as the clipped boundary values
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 247-248
+.. GENERATED FROM PYTHON SOURCE LINES 245-246
 
 Let's run the model, read the results, and visualize.
 
-.. GENERATED FROM PYTHON SOURCE LINES 248-254
+.. GENERATED FROM PYTHON SOURCE LINES 246-252
 
 .. code-block:: Python
 
@@ -969,11 +967,11 @@ Let's run the model, read the results, and visualize.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 255-256
+.. GENERATED FROM PYTHON SOURCE LINES 253-254
 
 Let's add constant head boundaries together and plot them
 
-.. GENERATED FROM PYTHON SOURCE LINES 256-272
+.. GENERATED FROM PYTHON SOURCE LINES 254-270
 
 .. code-block:: Python
 
@@ -1005,11 +1003,11 @@ Let's add constant head boundaries together and plot them
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 273-274
+.. GENERATED FROM PYTHON SOURCE LINES 271-272
 
 plot computed heads
 
-.. GENERATED FROM PYTHON SOURCE LINES 274-277
+.. GENERATED FROM PYTHON SOURCE LINES 272-275
 
 .. code-block:: Python
 
@@ -1031,7 +1029,7 @@ plot computed heads
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.620 seconds)
+   **Total running time of the script:** (0 minutes 2.914 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_circle.py:

@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.select.grid &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>imod.select.grid &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -465,7 +465,7 @@ document.write(`
     <span class="n">grid</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="n">preserve_dims</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
     <span class="n">to_reduce</span> <span class="o">=</span> <span class="p">{</span><span class="n">dim</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">grid</span><span class="o">.</span><span class="n">dims</span> <span class="k">if</span> <span class="n">dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">preserve_dims</span><span class="p">}</span>
-    <span class="k">return</span> <span class="n">grid</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="o">**</span><span class="n">to_reduce</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">grid</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="o">**</span><span class="n">to_reduce</span><span class="p">)</span>  <span class="c1"># type: ignore [no-untyped-call, misc, arg-type]</span>
 
 
 <span class="k">def</span> <span class="nf">_validate_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">):</span>
@@ -501,7 +501,7 @@ document.write(`
     <span class="p">)</span>
 
 
-<span class="nd">@typedispatch</span>
+<span class="nd">@typedispatch</span>  <span class="c1"># type: ignore [no-redef]</span>
 <span class="k">def</span> <span class="nf">_grid_boundary_xy</span><span class="p">(</span><span class="n">grid</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
     <span class="n">_validate_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
     <span class="n">like_2d</span> <span class="o">=</span> <span class="n">_reduce_grid_except_dims</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">])</span>
@@ -510,7 +510,7 @@ document.write(`
     <span class="k">return</span> <span class="n">boundary_grid</span>
 
 
-<span class="nd">@typedispatch</span>
+<span class="nd">@typedispatch</span>  <span class="c1"># type: ignore [no-redef]</span>
 <span class="k">def</span> <span class="nf">_grid_boundary_xy</span><span class="p">(</span><span class="n">grid</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">:</span>
     <span class="n">_validate_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
     <span class="n">like_2d</span> <span class="o">=</span> <span class="n">_reduce_grid_except_dims</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="p">[</span><span class="n">grid</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">])</span>

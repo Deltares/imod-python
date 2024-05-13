@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.ims &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>imod.mf6.ims &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -453,7 +453,7 @@ document.write(`
 
 <span class="kn">from</span> <span class="nn">imod.logging</span> <span class="kn">import</span> <span class="n">init_log_decorator</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.package</span> <span class="kn">import</span> <span class="n">Package</span>
-<span class="kn">from</span> <span class="nn">imod.schemata</span> <span class="kn">import</span> <span class="n">DTypeSchema</span>
+<span class="kn">from</span> <span class="nn">imod.schemata</span> <span class="kn">import</span> <span class="n">AllValueSchema</span><span class="p">,</span> <span class="n">DTypeSchema</span><span class="p">,</span> <span class="n">OptionSchema</span>
 
 
 <div class="viewcode-block" id="Solution"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Solution.html#imod.mf6.Solution">[docs]</a><span class="k">class</span> <span class="nc">Solution</span><span class="p">(</span><span class="n">Package</span><span class="p">):</span>
@@ -486,7 +486,7 @@ document.write(`
 <span class="sd">        SolutionPresetComplex: 0.1</span>
 <span class="sd">    outer_maximum: int</span>
 <span class="sd">        integer value defining the maximum number of outer (nonlinear)</span>
-<span class="sd">        iterations – that is, calls to the solution routine. For a linear</span>
+<span class="sd">        iterations - that is, calls to the solution routine. For a linear</span>
 <span class="sd">        problem outer_maximum should be 1.</span>
 <span class="sd">        SolutionPresetSimple: 25</span>
 <span class="sd">        SolutionPresetModerate: 50</span>
@@ -531,7 +531,7 @@ document.write(`
 <span class="sd">        SolutionPresetModerate: &quot;bicgstab&quot;</span>
 <span class="sd">        SolutionPresetComplex: &quot;bicgstab&quot;</span>
 <span class="sd">    under_relaxation: str, optional</span>
-<span class="sd">        options: {&quot;None&quot;, &quot;simple&quot;, &quot;cooley&quot;, &quot;bdb&quot;}</span>
+<span class="sd">        options: {None, &quot;simple&quot;, &quot;cooley&quot;, &quot;dbd&quot;}</span>
 <span class="sd">        is an optional keyword that defines the nonlinear relative_rclose</span>
 <span class="sd">        schemes used. By default under_relaxation is not used.</span>
 <span class="sd">        None - relative_rclose is not used.</span>
@@ -628,7 +628,7 @@ document.write(`
 <span class="sd">    backtracking_reduction_factor: float, optional</span>
 <span class="sd">        real value defining the reduction in step size used for residual</span>
 <span class="sd">        reduction computations. The value of backtracking reduction factor is</span>
-<span class="sd">        between 142 MODFLOW 6 – Description of Input and Output zero and one.</span>
+<span class="sd">        between 142 MODFLOW 6 - Description of Input and Output zero and one.</span>
 <span class="sd">        The value usually ranges from 0.1 to 0.3; a value of 0.2 works well for</span>
 <span class="sd">        most problems. backtracking_reduction_factor only needs to be specified</span>
 <span class="sd">        if backtracking number is greater than zero.</span>
@@ -652,21 +652,21 @@ document.write(`
 <span class="sd">        options: {&quot;strict&quot;, &quot;l2norm_rclose&quot;, &quot;relative_rclose&quot;}</span>
 <span class="sd">        an optional keyword that defines the specific flow residual criterion</span>
 <span class="sd">        used.</span>
-<span class="sd">        strict– an optional keyword that is used to specify that inner rclose</span>
+<span class="sd">        strict: an optional keyword that is used to specify that inner rclose</span>
 <span class="sd">        represents a infinity-norm (absolute convergence criteria) and that the</span>
 <span class="sd">        head and flow convergence criteria must be met on the first inner</span>
 <span class="sd">        iteration (this criteria is equivalent to the criteria used by the</span>
 <span class="sd">        MODFLOW-2005 PCG package (Hill, 1990)).</span>
-<span class="sd">        l2norm_rclose – an optionalkeyword that is used to specify that inner</span>
+<span class="sd">        l2norm_rclose: an optionalkeyword that is used to specify that inner</span>
 <span class="sd">        rclose represents a l-2 norm closure criteria instead of a infinity-norm</span>
 <span class="sd">        (absolute convergence criteria). When l2norm_rclose is specified, a</span>
 <span class="sd">        reasonable initial inner rclose value is 0.1 times the number of active</span>
 <span class="sd">        cells when meters and seconds are the defined MODFLOW 6 length and time.</span>
-<span class="sd">        relative_rclose – an optional keyword that is used to specify that</span>
+<span class="sd">        relative_rclose:  an optional keyword that is used to specify that</span>
 <span class="sd">        inner_rclose represents a relative L-2 Norm reduction closure criteria</span>
 <span class="sd">        instead of a infinity-Norm (absolute convergence criteria). When</span>
 <span class="sd">        relative_rclose is specified, a reasonable initial inner_rclose value is</span>
-<span class="sd">        1.0 × 10−4 and convergence is achieved for a given inner (linear)</span>
+<span class="sd">        1.0 * 10-4 and convergence is achieved for a given inner (linear)</span>
 <span class="sd">        iteration when ∆h ≤ inner_dvclose and the current L-2 Norm is ≤ the</span>
 <span class="sd">        product of the relativ_rclose and the initial L-2 Norm for the current</span>
 <span class="sd">        inner (linear) iteration. If rclose_option is not specified, an absolute</span>
@@ -727,7 +727,7 @@ document.write(`
 <span class="sd">        SolutionPresetModerate: 0</span>
 <span class="sd">        SolutionPresetComplex: 2</span>
 <span class="sd">    scaling_method: str</span>
-<span class="sd">        options: {&quot;None&quot;, &quot;diagonal&quot;, &quot;l2norm&quot;}</span>
+<span class="sd">        options: {None, &quot;diagonal&quot;, &quot;l2norm&quot;}</span>
 <span class="sd">        an optional keyword that defines the matrix scaling approach used. By</span>
 <span class="sd">        default, matrix scaling is not applied.</span>
 <span class="sd">        None - no matrix scaling applied.</span>
@@ -735,22 +735,16 @@ document.write(`
 <span class="sd">        scaling method in Hill (1992).</span>
 <span class="sd">        l2norm - symmetric matrix scaling using the L2 norm.</span>
 <span class="sd">        Default value: None</span>
-<span class="sd">        SolutionPresetSimple: None</span>
-<span class="sd">        SolutionPresetModerate: None</span>
-<span class="sd">        SolutionPresetComplex: None</span>
 <span class="sd">    reordering_method: str</span>
-<span class="sd">        options: {&quot;None&quot;, &quot;rcm&quot;, &quot;md&quot;}</span>
+<span class="sd">        options: {None, &quot;rcm&quot;, &quot;md&quot;}</span>
 <span class="sd">        an optional keyword that defines the matrix reordering approach used. By</span>
 <span class="sd">        default, matrix reordering is not applied.</span>
 <span class="sd">        None - original ordering.</span>
 <span class="sd">        rcm - reverse Cuthill McKee ordering.</span>
 <span class="sd">        md - minimum degree ordering</span>
 <span class="sd">        Default value: None</span>
-<span class="sd">        SolutionPresetSimple: None</span>
-<span class="sd">        SolutionPresetModerate: None</span>
-<span class="sd">        SolutionPresetComplex: None</span>
 <span class="sd">    print_option: str</span>
-<span class="sd">        options: {&quot;None&quot;, &quot;summary&quot;, &quot;all&quot;}</span>
+<span class="sd">        options: {&quot;none&quot;, &quot;summary&quot;, &quot;all&quot;}</span>
 <span class="sd">        is a flag that controls printing of convergence information from the</span>
 <span class="sd">        solver.</span>
 <span class="sd">        None - means print nothing.</span>
@@ -761,17 +755,15 @@ document.write(`
 <span class="sd">        convergence information to each model listing file in addition to</span>
 <span class="sd">        SUMMARY information.</span>
 <span class="sd">        Default value: &quot;summary&quot;</span>
-<span class="sd">        SolutionPresetSimple: No Default</span>
-<span class="sd">        SolutionPresetModerate: No Default</span>
-<span class="sd">        SolutionPresetComplex: No Default</span>
-<span class="sd">    csv_output: str, optional</span>
-<span class="sd">        False if no csv is to be written for the output, enter str of filename</span>
+<span class="sd">    outer_csvfile: str, optional</span>
+<span class="sd">        None if no csv is to be written for the output, str of filename</span>
 <span class="sd">        if csv is to be written.</span>
-<span class="sd">        Default value: False</span>
-<span class="sd">        SolutionPresetSimple: No Default</span>
-<span class="sd">        SolutionPresetModerate: No Default</span>
-<span class="sd">        SolutionPresetComplex: No Default</span>
-<span class="sd">    no_ptc: ({True, False}, optional)</span>
+<span class="sd">        Default value: None</span>
+<span class="sd">    inner_csvfile: str, optional</span>
+<span class="sd">        None if no csv is to be written for the output, str of filename</span>
+<span class="sd">        if csv is to be written.</span>
+<span class="sd">        Default value: None</span>
+<span class="sd">    no_ptc: str, optional, either None, &quot;all&quot;, or &quot;first&quot;.</span>
 <span class="sd">        is a flag that is used to disable pseudo-transient continuation (PTC).</span>
 <span class="sd">        Option only applies to steady-state stress periods for models using the</span>
 <span class="sd">        Newton-Raphson formulation. For many problems, PTC can significantly</span>
@@ -783,10 +775,22 @@ document.write(`
 <span class="sd">        PTC option should be used to deactivate PTC. This NO PTC option should</span>
 <span class="sd">        also be used in order to compare convergence behavior with other MODFLOW</span>
 <span class="sd">        versions, as PTC is only available in MODFLOW 6.</span>
-<span class="sd">        Default value: False</span>
-<span class="sd">        SolutionPresetSimple: No Default</span>
-<span class="sd">        SolutionPresetModerate: No Default</span>
-<span class="sd">        SolutionPresetComplex: No Default</span>
+<span class="sd">    ats_outer_maximum_fraction: float, optional.</span>
+<span class="sd">        real value defining the fraction of the maximum allowable outer iterations</span>
+<span class="sd">        used with the Adaptive Time Step (ATS) capability if it is active. If this</span>
+<span class="sd">        value is set to zero by the user, then this solution will have no effect</span>
+<span class="sd">        on ATS behavior. This value must be greater than or equal to zero and less</span>
+<span class="sd">        than or equal to 0.5 or the program will terminate with an error. If it is</span>
+<span class="sd">        not specified by the user, then it is assigned a default value of one</span>
+<span class="sd">        third. When the number of outer iterations for this solution is less than</span>
+<span class="sd">        the product of this value and the maximum allowable outer iterations, then</span>
+<span class="sd">        ATS will increase the time step length by a factor of DTADJ in the ATS</span>
+<span class="sd">        input file. When the number of outer iterations for this solution is</span>
+<span class="sd">        greater than the maximum allowable outer iterations minus the product of</span>
+<span class="sd">        this value and the maximum allowable outer iterations, then the ATS (if</span>
+<span class="sd">        active) will decrease the time step length by a factor of 1 / DTADJ.</span>
+
+<span class="sd">        Default value is None.</span>
 <span class="sd">    validate: {True, False}</span>
 <span class="sd">        Flag to indicate whether the package should be validated upon</span>
 <span class="sd">        initialization. This raises a ValidationError if package input is</span>
@@ -802,6 +806,9 @@ document.write(`
         <span class="s2">&quot;inner_maximum&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)],</span>
         <span class="s2">&quot;inner_dvclose&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
         <span class="s2">&quot;inner_rclose&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
+        <span class="s2">&quot;linear_acceleration&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">OptionSchema</span><span class="p">((</span><span class="s2">&quot;cg&quot;</span><span class="p">,</span> <span class="s2">&quot;bicgstab&quot;</span><span class="p">))],</span>
+        <span class="s2">&quot;rclose_option&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">OptionSchema</span><span class="p">((</span><span class="s2">&quot;strict&quot;</span><span class="p">,</span> <span class="s2">&quot;l2norm_rclose&quot;</span><span class="p">,</span> <span class="s2">&quot;relative_rclose&quot;</span><span class="p">))],</span>
+        <span class="s2">&quot;under_relaxation&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">OptionSchema</span><span class="p">((</span><span class="s2">&quot;simple&quot;</span><span class="p">,</span> <span class="s2">&quot;cooley&quot;</span><span class="p">,</span> <span class="s2">&quot;dbd&quot;</span><span class="p">))],</span>
         <span class="s2">&quot;under_relaxation_theta&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
         <span class="s2">&quot;under_relaxation_kappa&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
         <span class="s2">&quot;under_relaxation_gamma&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
@@ -811,6 +818,15 @@ document.write(`
         <span class="s2">&quot;backtracking_reduction_factor&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
         <span class="s2">&quot;backtracking_residual_limit&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)],</span>
         <span class="s2">&quot;number_orthogonalizations&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)],</span>
+        <span class="s2">&quot;scaling_method&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">OptionSchema</span><span class="p">((</span><span class="s2">&quot;diagonal&quot;</span><span class="p">,</span> <span class="s2">&quot;l2norm&quot;</span><span class="p">))],</span>
+        <span class="s2">&quot;reordering_method&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">OptionSchema</span><span class="p">((</span><span class="s2">&quot;rcm&quot;</span><span class="p">,</span> <span class="s2">&quot;md&quot;</span><span class="p">))],</span>
+        <span class="s2">&quot;print_option&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">OptionSchema</span><span class="p">((</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;summary&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">))],</span>
+        <span class="s2">&quot;no_ptc&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">OptionSchema</span><span class="p">((</span><span class="s2">&quot;first&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">))],</span>
+        <span class="s2">&quot;ats_outer_maximum_fraction&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="n">DTypeSchema</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">),</span>
+            <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">&quot;&gt;=&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+            <span class="n">AllValueSchema</span><span class="p">(</span><span class="s2">&quot;&lt;=&quot;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+        <span class="p">],</span>
     <span class="p">}</span>
     <span class="n">_template</span> <span class="o">=</span> <span class="n">Package</span><span class="o">.</span><span class="n">_initialize_template</span><span class="p">(</span><span class="n">_pkg_id</span><span class="p">)</span>
 
@@ -841,8 +857,10 @@ document.write(`
         <span class="n">scaling_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">reordering_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">print_option</span><span class="o">=</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span>
-        <span class="n">csv_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">no_ptc</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">outer_csvfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">inner_csvfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">no_ptc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">ats_outer_maximum_fraction</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">validate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="n">dict_dataset</span> <span class="o">=</span> <span class="p">{</span>
@@ -869,7 +887,9 @@ document.write(`
             <span class="s2">&quot;scaling_method&quot;</span><span class="p">:</span> <span class="n">scaling_method</span><span class="p">,</span>
             <span class="s2">&quot;reordering_method&quot;</span><span class="p">:</span> <span class="n">reordering_method</span><span class="p">,</span>
             <span class="s2">&quot;print_option&quot;</span><span class="p">:</span> <span class="n">print_option</span><span class="p">,</span>
-            <span class="s2">&quot;csv_output&quot;</span><span class="p">:</span> <span class="n">csv_output</span><span class="p">,</span>
+            <span class="s2">&quot;outer_csvfile&quot;</span><span class="p">:</span> <span class="n">outer_csvfile</span><span class="p">,</span>
+            <span class="s2">&quot;inner_csvfile&quot;</span><span class="p">:</span> <span class="n">inner_csvfile</span><span class="p">,</span>
+            <span class="s2">&quot;ats_outer_maximum_fraction&quot;</span><span class="p">:</span> <span class="n">ats_outer_maximum_fraction</span><span class="p">,</span>
             <span class="s2">&quot;no_ptc&quot;</span><span class="p">:</span> <span class="n">no_ptc</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="c1"># Make sure the modelnames are set as a variable rather than dimension:</span>
@@ -910,12 +930,17 @@ document.write(`
 
 
 <div class="viewcode-block" id="SolutionPresetSimple"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.SolutionPresetSimple.html#imod.mf6.SolutionPresetSimple">[docs]</a><span class="k">def</span> <span class="nf">SolutionPresetSimple</span><span class="p">(</span>
-    <span class="n">modelnames</span><span class="p">,</span> <span class="n">print_option</span><span class="o">=</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span> <span class="n">csv_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_ptc</span><span class="o">=</span><span class="kc">False</span>
+    <span class="n">modelnames</span><span class="p">,</span>
+    <span class="n">print_option</span><span class="o">=</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span>
+    <span class="n">outer_csvfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">inner_csvfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">no_ptc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="n">solution</span> <span class="o">=</span> <span class="n">Solution</span><span class="p">(</span>
         <span class="n">modelnames</span><span class="o">=</span><span class="n">modelnames</span><span class="p">,</span>
         <span class="n">print_option</span><span class="o">=</span><span class="n">print_option</span><span class="p">,</span>
-        <span class="n">csv_output</span><span class="o">=</span><span class="n">csv_output</span><span class="p">,</span>
+        <span class="n">outer_csvfile</span><span class="o">=</span><span class="n">outer_csvfile</span><span class="p">,</span>
+        <span class="n">inner_csvfile</span><span class="o">=</span><span class="n">inner_csvfile</span><span class="p">,</span>
         <span class="n">no_ptc</span><span class="o">=</span><span class="n">no_ptc</span><span class="p">,</span>
         <span class="n">outer_dvclose</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
         <span class="n">outer_maximum</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
@@ -937,19 +962,22 @@ document.write(`
         <span class="n">preconditioner_levels</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">preconditioner_drop_tolerance</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">number_orthogonalizations</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-        <span class="n">scaling_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">reordering_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">solution</span></div>
 
 
 <div class="viewcode-block" id="SolutionPresetModerate"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.SolutionPresetModerate.html#imod.mf6.SolutionPresetModerate">[docs]</a><span class="k">def</span> <span class="nf">SolutionPresetModerate</span><span class="p">(</span>
-    <span class="n">modelnames</span><span class="p">,</span> <span class="n">print_option</span><span class="o">=</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span> <span class="n">csv_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_ptc</span><span class="o">=</span><span class="kc">False</span>
+    <span class="n">modelnames</span><span class="p">,</span>
+    <span class="n">print_option</span><span class="o">=</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span>
+    <span class="n">outer_csvfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">inner_csvfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">no_ptc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="n">solution</span> <span class="o">=</span> <span class="n">Solution</span><span class="p">(</span>
         <span class="n">modelnames</span><span class="o">=</span><span class="n">modelnames</span><span class="p">,</span>
         <span class="n">print_option</span><span class="o">=</span><span class="n">print_option</span><span class="p">,</span>
-        <span class="n">csv_output</span><span class="o">=</span><span class="n">csv_output</span><span class="p">,</span>
+        <span class="n">outer_csvfile</span><span class="o">=</span><span class="n">outer_csvfile</span><span class="p">,</span>
+        <span class="n">inner_csvfile</span><span class="o">=</span><span class="n">inner_csvfile</span><span class="p">,</span>
         <span class="n">no_ptc</span><span class="o">=</span><span class="n">no_ptc</span><span class="p">,</span>
         <span class="n">outer_dvclose</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
         <span class="n">outer_maximum</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
@@ -971,19 +999,22 @@ document.write(`
         <span class="n">preconditioner_levels</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">preconditioner_drop_tolerance</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
         <span class="n">number_orthogonalizations</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-        <span class="n">scaling_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">reordering_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">solution</span></div>
 
 
 <div class="viewcode-block" id="SolutionPresetComplex"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.SolutionPresetComplex.html#imod.mf6.SolutionPresetComplex">[docs]</a><span class="k">def</span> <span class="nf">SolutionPresetComplex</span><span class="p">(</span>
-    <span class="n">modelnames</span><span class="p">,</span> <span class="n">print_option</span><span class="o">=</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span> <span class="n">csv_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_ptc</span><span class="o">=</span><span class="kc">False</span>
+    <span class="n">modelnames</span><span class="p">,</span>
+    <span class="n">print_option</span><span class="o">=</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span>
+    <span class="n">outer_csvfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">inner_csvfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">no_ptc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="n">solution</span> <span class="o">=</span> <span class="n">Solution</span><span class="p">(</span>
         <span class="n">modelnames</span><span class="o">=</span><span class="n">modelnames</span><span class="p">,</span>
         <span class="n">print_option</span><span class="o">=</span><span class="n">print_option</span><span class="p">,</span>
-        <span class="n">csv_output</span><span class="o">=</span><span class="n">csv_output</span><span class="p">,</span>
+        <span class="n">outer_csvfile</span><span class="o">=</span><span class="n">outer_csvfile</span><span class="p">,</span>
+        <span class="n">inner_csvfile</span><span class="o">=</span><span class="n">inner_csvfile</span><span class="p">,</span>
         <span class="n">no_ptc</span><span class="o">=</span><span class="n">no_ptc</span><span class="p">,</span>
         <span class="n">outer_dvclose</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
         <span class="n">outer_maximum</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
@@ -1005,8 +1036,6 @@ document.write(`
         <span class="n">preconditioner_levels</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
         <span class="n">preconditioner_drop_tolerance</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span>
         <span class="n">number_orthogonalizations</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-        <span class="n">scaling_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">reordering_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">solution</span></div>
 </pre></div>

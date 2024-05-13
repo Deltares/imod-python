@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Henry &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>Henry &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -125,8 +125,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -427,10 +427,6 @@ document.write(`
 
 
 <li class="toctree-l2"><a class="reference internal" href="hondsrug_partitioning.html">Partitioning a regional model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hondsrug_regridding.html">Regridding a regional model</a></li>
-
-
-
 <li class="toctree-l2"><a class="reference internal" href="lake.html">Lake package example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="transport_2d.html">Transport 2d example</a></li>
 </ul>
@@ -528,7 +524,7 @@ document.write(`
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
 <p><a class="reference internal" href="#sphx-glr-download-examples-mf6-henry-py"><span class="std std-ref">Go to the end</span></a>
-to download the full example code</p>
+to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="henry">
 <span id="sphx-glr-examples-mf6-henry-py"></span><h1>Henry<a class="headerlink" href="#henry" title="Permalink to this heading">#</a></h1>
@@ -724,8 +720,6 @@ units from the flow model.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">simulation</span><span class="p">[</span><span class="s2">&quot;flow_solver&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Solution</span><span class="p">(</span>
     <span class="n">modelnames</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;flow&quot;</span><span class="p">],</span>
     <span class="n">print_option</span><span class="o">=</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span>
-    <span class="n">csv_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">no_ptc</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">outer_dvclose</span><span class="o">=</span><span class="mf">1.0e-6</span><span class="p">,</span>
     <span class="n">outer_maximum</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
     <span class="n">under_relaxation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -740,8 +734,6 @@ units from the flow model.</p>
 <span class="n">simulation</span><span class="p">[</span><span class="s2">&quot;transport_solver&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Solution</span><span class="p">(</span>
     <span class="n">modelnames</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;transport&quot;</span><span class="p">],</span>
     <span class="n">print_option</span><span class="o">=</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span>
-    <span class="n">csv_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">no_ptc</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">outer_dvclose</span><span class="o">=</span><span class="mf">1.0e-6</span><span class="p">,</span>
     <span class="n">outer_maximum</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
     <span class="n">under_relaxation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -794,7 +786,7 @@ describes how to add it to yours.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">head</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">time</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_Henry_001.png" srcset="../../_images/sphx_glr_Henry_001.png" alt="y = 0.5, dx = 0.025, dy = -1.0, time = 0.5" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x0000015AA7317250&gt;
+<img src="../../_images/sphx_glr_Henry_001.png" srcset="../../_images/sphx_glr_Henry_001.png" alt="y = 0.5, dx = 0.025, dy = -1.0, time = 0.5" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x0000014A245147D0&gt;
 </pre></div>
 </div>
 <p>We can check the concentration to see that a fresh-saline interface has been
@@ -802,10 +794,10 @@ formed:</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">conc</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">time</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;RdYlBu_r&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_Henry_002.png" srcset="../../_images/sphx_glr_Henry_002.png" alt="y = 0.5, dx = 0.025, dy = -1.0, time = 0.5" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x0000015AA8529F10&gt;
+<img src="../../_images/sphx_glr_Henry_002.png" srcset="../../_images/sphx_glr_Henry_002.png" alt="y = 0.5, dx = 0.025, dy = -1.0, time = 0.5" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x0000014A206EA3D0&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 1.162 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 1.407 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-henry-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/2a9f5616bdf35c8e78b3214ec7e10034/Henry.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">Henry.ipynb</span></code></a></p>

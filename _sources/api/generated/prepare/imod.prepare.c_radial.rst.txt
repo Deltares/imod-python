@@ -1,0 +1,6 @@
+﻿imod.prepare.c\_radial
+======================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: c_radial

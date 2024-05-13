@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.msw.output_control &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>imod.msw.output_control &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -496,7 +496,7 @@ document.write(`
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_file_name</span> <span class="o">=</span> <span class="s2">&quot;sel_key_svat_per.inp&quot;</span>
-    <span class="n">_settings</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_settings</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">_metadata_dict</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;variable&quot;</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
         <span class="s2">&quot;option&quot;</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
@@ -535,7 +535,7 @@ document.write(`
             <span class="o">*</span><span class="p">[(</span><span class="n">var</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_vars</span><span class="p">]</span>
         <span class="p">)</span>
 
-        <span class="n">dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">variable</span><span class="o">=</span><span class="n">variable</span><span class="p">,</span> <span class="n">option</span><span class="o">=</span><span class="n">option</span><span class="p">))</span>
+        <span class="n">dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;variable&quot;</span><span class="p">:</span> <span class="n">variable</span><span class="p">,</span> <span class="s2">&quot;option&quot;</span><span class="p">:</span> <span class="n">option</span><span class="p">})</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_range</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span>
 
@@ -556,7 +556,7 @@ document.write(`
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_file_name</span> <span class="o">=</span> <span class="s2">&quot;tiop_sim.inp&quot;</span>
-    <span class="n">_settings</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_settings</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">_metadata_dict</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;time_since_start_year&quot;</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">366.0</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
         <span class="s2">&quot;year&quot;</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">9999</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
@@ -572,7 +572,7 @@ document.write(`
         <span class="n">year</span><span class="p">,</span> <span class="n">time_since_start_year</span> <span class="o">=</span> <span class="n">to_metaswap_timeformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;times&quot;</span><span class="p">])</span>
 
         <span class="n">dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-            <span class="n">data</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">time_since_start_year</span><span class="o">=</span><span class="n">time_since_start_year</span><span class="p">,</span> <span class="n">year</span><span class="o">=</span><span class="n">year</span><span class="p">)</span>
+            <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;time_since_start_year&quot;</span><span class="p">:</span> <span class="n">time_since_start_year</span><span class="p">,</span> <span class="s2">&quot;year&quot;</span><span class="p">:</span> <span class="n">year</span><span class="p">}</span>
         <span class="p">)</span>
 
         <span class="n">dataframe</span><span class="p">[</span><span class="s2">&quot;time_since_start_year&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>

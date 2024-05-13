@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_examples_mf6_example_1d_transport.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -243,7 +243,7 @@ Create the simulation.
 
 Add four transport simulations, and setup the solver flow and transport.
 
-.. GENERATED FROM PYTHON SOURCE LINES 165-209
+.. GENERATED FROM PYTHON SOURCE LINES 165-205
 
 .. code-block:: Python
 
@@ -256,8 +256,6 @@ Add four transport simulations, and setup the solver flow and transport.
     simulation["flow_solver"] = imod.mf6.Solution(
         modelnames=["flow"],
         print_option="summary",
-        csv_output=False,
-        no_ptc=True,
         outer_dvclose=1.0e-4,
         outer_maximum=500,
         under_relaxation=None,
@@ -272,8 +270,6 @@ Add four transport simulations, and setup the solver flow and transport.
     simulation["transport_solver"] = imod.mf6.Solution(
         modelnames=["tpt_a", "tpt_b", "tpt_c", "tpt_d"],
         print_option="summary",
-        csv_output=False,
-        no_ptc=True,
         outer_dvclose=1.0e-4,
         outer_maximum=500,
         under_relaxation=None,
@@ -298,11 +294,11 @@ Add four transport simulations, and setup the solver flow and transport.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 210-211
+.. GENERATED FROM PYTHON SOURCE LINES 206-207
 
 Run the simulation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 211-215
+.. GENERATED FROM PYTHON SOURCE LINES 207-211
 
 .. code-block:: Python
 
@@ -317,11 +313,11 @@ Run the simulation.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 216-217
+.. GENERATED FROM PYTHON SOURCE LINES 212-213
 
 Open the concentration results and store them in a single DataArray.
 
-.. GENERATED FROM PYTHON SOURCE LINES 217-221
+.. GENERATED FROM PYTHON SOURCE LINES 213-217
 
 .. code-block:: Python
 
@@ -336,12 +332,12 @@ Open the concentration results and store them in a single DataArray.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 222-224
+.. GENERATED FROM PYTHON SOURCE LINES 218-220
 
 Visualize the last concentration profiles of the model run for the different
 species.
 
-.. GENERATED FROM PYTHON SOURCE LINES 224-227
+.. GENERATED FROM PYTHON SOURCE LINES 220-223
 
 .. code-block:: Python
 
@@ -362,14 +358,14 @@ species.
  .. code-block:: none
 
 
-    [<matplotlib.lines.Line2D object at 0x0000015AAA011F10>, <matplotlib.lines.Line2D object at 0x0000015AAAFFF4D0>, <matplotlib.lines.Line2D object at 0x0000015AAAFFCD50>, <matplotlib.lines.Line2D object at 0x0000015AAAFFCD90>]
+    [<matplotlib.lines.Line2D object at 0x0000014A2030E590>, <matplotlib.lines.Line2D object at 0x0000014A1A7A2B90>, <matplotlib.lines.Line2D object at 0x0000014A1A7A1F90>, <matplotlib.lines.Line2D object at 0x0000014A1A7A1ED0>]
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 2.985 seconds)
+   **Total running time of the script:** (0 minutes 3.345 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_example_1d_transport.py:

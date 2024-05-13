@@ -1,0 +1,6 @@
+﻿imod.prepare.distribute\_riv\_conductance
+=========================================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: distribute_riv_conductance

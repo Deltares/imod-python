@@ -11,6 +11,7 @@ These examples demonstrate how to use imod to build iMOD-WQ models.
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -113,6 +114,8 @@ These examples demonstrate how to use imod to build iMOD-WQ models.
       <div class="sphx-glr-thumbnail-title">Vertical Interface</div>
     </div>
 
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 

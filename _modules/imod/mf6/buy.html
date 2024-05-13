@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.buy &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>imod.mf6.buy &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -610,7 +610,7 @@ document.write(`
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">transport_model_names</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_modelnames</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;the number of transport models cannot be changed.&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">modelname</span><span class="p">,</span> <span class="n">new_modelname</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">transport_model_names</span><span class="p">,</span> <span class="n">new_modelnames</span><span class="p">):</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">modelname</span> <span class="ow">in</span> <span class="n">new_modelname</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">modelname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">new_modelname</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="s2">&quot;new transport model names do not match the old ones. The new names should be equal to the old ones, with a suffix.&quot;</span>
                 <span class="p">)</span>

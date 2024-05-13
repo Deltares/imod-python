@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.hfb &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>imod.mf6.hfb &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -881,7 +881,7 @@ document.write(`
             <span class="k">return</span> <span class="kc">True</span>
 
         <span class="n">linestrings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span>
-        <span class="n">only_empty_lines</span> <span class="o">=</span> <span class="nb">all</span><span class="p">([</span><span class="n">ls</span><span class="o">.</span><span class="n">is_empty</span> <span class="k">for</span> <span class="n">ls</span> <span class="ow">in</span> <span class="n">linestrings</span><span class="o">.</span><span class="n">values</span><span class="p">])</span>
+        <span class="n">only_empty_lines</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span><span class="n">ls</span><span class="o">.</span><span class="n">is_empty</span> <span class="k">for</span> <span class="n">ls</span> <span class="ow">in</span> <span class="n">linestrings</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">only_empty_lines</span>
 
     <span class="k">def</span> <span class="nf">_resistance_layer</span><span class="p">(</span>
@@ -1009,7 +1009,6 @@ document.write(`
         <span class="n">y_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">top</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">bottom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">state_for_boundary</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;HorizontalFlowBarrierBase&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Clip a package by a bounding box (time, layer, y, x).</span>
@@ -1035,7 +1034,6 @@ document.write(`
 <span class="sd">        y_max: optional, float</span>
 <span class="sd">        top: optional, GridDataArray</span>
 <span class="sd">        bottom: optional, GridDataArray</span>
-<span class="sd">        state_for_boundary: optional, GridDataArray</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>

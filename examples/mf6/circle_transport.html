@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Freshwater lens (circle) &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>Freshwater lens (circle) &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -125,8 +125,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -427,10 +427,6 @@ document.write(`
 
 
 <li class="toctree-l2"><a class="reference internal" href="hondsrug_partitioning.html">Partitioning a regional model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="hondsrug_regridding.html">Regridding a regional model</a></li>
-
-
-
 <li class="toctree-l2"><a class="reference internal" href="lake.html">Lake package example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="transport_2d.html">Transport 2d example</a></li>
 </ul>
@@ -528,7 +524,7 @@ document.write(`
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
 <p><a class="reference internal" href="#sphx-glr-download-examples-mf6-circle-transport-py"><span class="std std-ref">Go to the end</span></a>
-to download the full example code</p>
+to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="freshwater-lens-circle">
 <span id="sphx-glr-examples-mf6-circle-transport-py"></span><h1>Freshwater lens (circle)<a class="headerlink" href="#freshwater-lens-circle" title="Permalink to this heading">#</a></h1>
@@ -694,8 +690,6 @@ concentration to 35.0 as well. The boundary only operates on the top layer.</p>
 <span class="n">simulation</span><span class="p">[</span><span class="s2">&quot;flow_solver&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Solution</span><span class="p">(</span>
     <span class="n">modelnames</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;flow&quot;</span><span class="p">],</span>
     <span class="n">print_option</span><span class="o">=</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span>
-    <span class="n">csv_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">no_ptc</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">outer_dvclose</span><span class="o">=</span><span class="mf">1.0e-4</span><span class="p">,</span>
     <span class="n">outer_maximum</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
     <span class="n">under_relaxation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -718,9 +712,9 @@ period.</p>
 <span class="n">simulation</span><span class="p">[</span><span class="s2">&quot;time_discretization&quot;</span><span class="p">][</span><span class="s2">&quot;n_timesteps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>D:\buildAgent\work\4b9080cbb3354582\imod-python\examples\mf6\circle_transport.py:198: FutureWarning: &#39;As&#39; is deprecated and will be removed in a future version, please use &#39;AS&#39; instead.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>D:\buildAgent\work\4b9080cbb3354582\imod-python\examples\mf6\circle_transport.py:196: FutureWarning: &#39;As&#39; is deprecated and will be removed in a future version, please use &#39;AS&#39; instead.
   simtimes = pd.date_range(start=&quot;2000-01-01&quot;, end=&quot;2030-01-01&quot;, freq=&quot;As&quot;)
-D:\buildAgent\work\4b9080cbb3354582\imod-python\examples\mf6\circle_transport.py:198: FutureWarning: &#39;AS&#39; is deprecated and will be removed in a future version, please use &#39;YS&#39; instead.
+D:\buildAgent\work\4b9080cbb3354582\imod-python\examples\mf6\circle_transport.py:196: FutureWarning: &#39;AS&#39; is deprecated and will be removed in a future version, please use &#39;YS&#39; instead.
   simtimes = pd.date_range(start=&quot;2000-01-01&quot;, end=&quot;2030-01-01&quot;, freq=&quot;As&quot;)
 </pre></div>
 </div>
@@ -785,8 +779,6 @@ simulation as well.</p>
 <span class="n">simulation</span><span class="p">[</span><span class="s2">&quot;transport_solver&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">mf6</span><span class="o">.</span><span class="n">Solution</span><span class="p">(</span>
     <span class="n">modelnames</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;transport&quot;</span><span class="p">],</span>
     <span class="n">print_option</span><span class="o">=</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span>
-    <span class="n">csv_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">no_ptc</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">outer_dvclose</span><span class="o">=</span><span class="mf">1.0e-4</span><span class="p">,</span>
     <span class="n">outer_maximum</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
     <span class="n">under_relaxation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -841,7 +833,7 @@ understandable plots.</p>
 </pre></div>
 </div>
 <p>Assign these new coordinate values to the dataset</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">coords</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">simtimes</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">z</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">coords</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">simtimes</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="n">z</span><span class="p">)}</span>
 
 <span class="n">sim_head</span> <span class="o">=</span> <span class="n">sim_head</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="o">**</span><span class="n">coords</span><span class="p">)</span>
 <span class="n">sim_concentration</span> <span class="o">=</span> <span class="n">sim_concentration</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="o">**</span><span class="n">coords</span><span class="p">)</span>
@@ -865,10 +857,10 @@ can plot the contours as follows:</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_circle_transport_004.png" srcset="../../_images/sphx_glr_circle_transport_004.png" alt="time = 2030-01-01" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x0000015AAAD20DD0&gt;
+<img src="../../_images/sphx_glr_circle_transport_004.png" srcset="../../_images/sphx_glr_circle_transport_004.png" alt="time = 2030-01-01" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x0000014A24662BD0&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 51.078 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 55.767 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-circle-transport-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/9965fe2b3f087f8c76ddd1d60b60c7d5/circle_transport.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">circle_transport.ipynb</span></code></a></p>

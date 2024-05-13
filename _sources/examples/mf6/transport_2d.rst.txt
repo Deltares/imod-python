@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_examples_mf6_transport_2d.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -246,7 +246,7 @@ Create a simulation and add the flow and transport models to it.
 Then define some ims packages: 1 for every type of model.
 Finally create 365 time steps of 1 day each.
 
-.. GENERATED FROM PYTHON SOURCE LINES 145-191
+.. GENERATED FROM PYTHON SOURCE LINES 145-187
 
 .. code-block:: Python
 
@@ -258,8 +258,6 @@ Finally create 365 time steps of 1 day each.
     simulation["flow_solver"] = imod.mf6.Solution(
         modelnames=["GWF_1"],
         print_option="summary",
-        csv_output=False,
-        no_ptc=True,
         outer_dvclose=1.0e-4,
         outer_maximum=500,
         under_relaxation=None,
@@ -274,8 +272,6 @@ Finally create 365 time steps of 1 day each.
     simulation["transport_solver"] = imod.mf6.Solution(
         modelnames=["TPT_1"],
         print_option="summary",
-        csv_output=False,
-        no_ptc=True,
         outer_dvclose=1.0e-4,
         outer_maximum=500,
         under_relaxation=None,
@@ -303,12 +299,12 @@ Finally create 365 time steps of 1 day each.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 192-194
+.. GENERATED FROM PYTHON SOURCE LINES 188-190
 
 To split the model in 4 partitions, we must create a label array.
 We use the utility function  ``get_label_array`` for that.
 
-.. GENERATED FROM PYTHON SOURCE LINES 194-200
+.. GENERATED FROM PYTHON SOURCE LINES 190-196
 
 .. code-block:: Python
 
@@ -331,23 +327,23 @@ We use the utility function  ``get_label_array`` for that.
 
  .. code-block:: none
 
-    D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\wel.py:319: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
+    D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\wel.py:318: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
       in_bounds = np.full(ds.dims["index"], True)
-    D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\wel.py:319: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
+    D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\wel.py:318: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
       in_bounds = np.full(ds.dims["index"], True)
-    D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\wel.py:319: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
+    D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\wel.py:318: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
       in_bounds = np.full(ds.dims["index"], True)
-    D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\wel.py:319: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
+    D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\wel.py:318: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
       in_bounds = np.full(ds.dims["index"], True)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 201-202
+.. GENERATED FROM PYTHON SOURCE LINES 197-198
 
 Run the unsplit model and load the simulation results.
 
-.. GENERATED FROM PYTHON SOURCE LINES 202-205
+.. GENERATED FROM PYTHON SOURCE LINES 198-201
 
 .. code-block:: Python
 
@@ -361,11 +357,11 @@ Run the unsplit model and load the simulation results.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 206-207
+.. GENERATED FROM PYTHON SOURCE LINES 202-203
 
 Run the split model and load the simulation results.
 
-.. GENERATED FROM PYTHON SOURCE LINES 207-214
+.. GENERATED FROM PYTHON SOURCE LINES 203-210
 
 .. code-block:: Python
 
@@ -390,16 +386,16 @@ Run the split model and load the simulation results.
  .. code-block:: none
 
 
-    <matplotlib.contour.QuadContourSet object at 0x0000015AAE200D10>
+    <matplotlib.contour.QuadContourSet object at 0x0000014A26620950>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 215-217
+.. GENERATED FROM PYTHON SOURCE LINES 211-213
 
 Compute the difference between the split and unsplit simulation results for transport at the
 end of the simulation, and print them
 
-.. GENERATED FROM PYTHON SOURCE LINES 217-220
+.. GENERATED FROM PYTHON SOURCE LINES 213-216
 
 .. code-block:: Python
 
@@ -420,14 +416,14 @@ end of the simulation, and print them
  .. code-block:: none
 
 
-    <matplotlib.contour.QuadContourSet object at 0x0000015AAA3ACFD0>
+    <matplotlib.contour.QuadContourSet object at 0x0000014A266D1650>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 51.813 seconds)
+   **Total running time of the script:** (0 minutes 58.945 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_transport_2d.py:

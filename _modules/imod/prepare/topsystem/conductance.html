@@ -1,0 +1,1010 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imod.prepare.topsystem.conductance &#8212; iMOD Python 0.17.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/prepare/topsystem/conductance';</script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../installation.html">
+                        Installing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../user-guide/index.html">
+                        User Guide
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../faq/index.html">
+                        FAQ
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../../developing.html">
+                        Developing
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../_static/deltares-white.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">imod.prepare...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for imod.prepare.topsystem.conductance</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">imod.prepare.topsystem.allocation</span> <span class="kn">import</span> <span class="n">_enforce_layered_top</span>
+<span class="kn">from</span> <span class="nn">imod.schemata</span> <span class="kn">import</span> <span class="n">DimsSchema</span>
+<span class="kn">from</span> <span class="nn">imod.typing</span> <span class="kn">import</span> <span class="n">GridDataArray</span>
+<span class="kn">from</span> <span class="nn">imod.typing.grid</span> <span class="kn">import</span> <span class="n">ones_like</span><span class="p">,</span> <span class="n">preserve_gridtype</span><span class="p">,</span> <span class="n">zeros_like</span>
+<span class="kn">from</span> <span class="nn">imod.util.dims</span> <span class="kn">import</span> <span class="n">enforced_dim_order</span>
+
+
+<div class="viewcode-block" id="DISTRIBUTING_OPTION"><a class="viewcode-back" href="../../../../api/generated/prepare/imod.prepare.DISTRIBUTING_OPTION.html#imod.prepare.DISTRIBUTING_OPTION">[docs]</a><span class="k">class</span> <span class="nc">DISTRIBUTING_OPTION</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Enumerator containing settings to distribute 2D conductance grids over</span>
+<span class="sd">    vertical layers for the RIV, DRN or GHB package.</span>
+
+<span class="sd">    * ``by_corrected_transmissivity``: RIV. Distribute the conductance by</span>
+<span class="sd">      corrected transmissivities. Crosscut thicknesses are used to compute</span>
+<span class="sd">      transmissivities. The crosscut thicknesses is computed based on the</span>
+<span class="sd">      overlap of bottom_elevation over the bottom allocated layer. Same holds</span>
+<span class="sd">      for the stage and top allocated layer. Furthermore the method corrects</span>
+<span class="sd">      distribution weights for the mismatch between the midpoints of crosscut</span>
+<span class="sd">      areas and model layer midpoints. This is the default method in iMOD 5.6,</span>
+<span class="sd">      thus DISTRCOND = 0.</span>
+<span class="sd">    * ``equally``: RIV, DRN, GHB. Distribute conductances equally over layers.</span>
+<span class="sd">      This matches iMOD 5.6 DISTRCOND = 1 option.</span>
+<span class="sd">    * ``by_crosscut_thickness``: RIV. Distribute the conductance by crosscut</span>
+<span class="sd">      thicknesses. The crosscut thicknesses is computed based on the overlap of</span>
+<span class="sd">      bottom_elevation over the bottom allocated layer. Same holds for the stage</span>
+<span class="sd">      and top allocated layer. This matches iMOD 5.6 DISTRCOND = 2 option.</span>
+<span class="sd">    * ``by_layer_thickness``: RIV, DRN, GHB. Distribute the conductance by model</span>
+<span class="sd">      layer thickness. This matches iMOD 5.6 DISTRCOND = 3 option.</span>
+<span class="sd">    * ``by_crosscut_transmissivity``: RIV. Distribute the conductance by</span>
+<span class="sd">      crosscut transmissivity. Crosscut thicknesses are used to compute</span>
+<span class="sd">      transmissivities. The crosscut thicknesses is computed based on the</span>
+<span class="sd">      overlap of bottom_elevation over the bottom allocated layer. Same holds</span>
+<span class="sd">      for the stage and top allocated layer. This matches iMOD 5.6 DISTRCOND = 4</span>
+<span class="sd">      option.</span>
+<span class="sd">    * ``by_conductivity``: RIV, DRN, GHB. Distribute the conductance weighted by</span>
+<span class="sd">      model layer hydraulic conductivities. This matches iMOD 5.6 DISTRCOND = 5</span>
+<span class="sd">      option.</span>
+<span class="sd">    * ``by_layer_transmissivity``: RIV, DRN, GHB. Distribute the conductance by</span>
+<span class="sd">      model layer transmissivity. This has no equivalent in iMOD 5.6.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">by_corrected_transmissivity</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">equally</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">by_crosscut_thickness</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">by_layer_thickness</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">by_crosscut_transmissivity</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">by_conductivity</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">by_layer_transmissivity</span> <span class="o">=</span> <span class="mi">9</span>  <span class="c1"># Not an iMOD 5.6 option</span></div>
+
+
+<span class="n">PLANAR_GRID</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
+    <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
+    <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{face_dim}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="o">|</span> <span class="n">DimsSchema</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{face_dim}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+
+
+<span class="nd">@enforced_dim_order</span>
+<span class="k">def</span> <span class="nf">distribute_riv_conductance</span><span class="p">(</span>
+    <span class="n">distributing_option</span><span class="p">:</span> <span class="n">DISTRIBUTING_OPTION</span><span class="p">,</span>
+    <span class="n">allocated</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">conductance</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">top</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">k</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">stage</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">bottom_elevation</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to distribute 2D conductance over vertical layers for the RIV</span>
+<span class="sd">    package. Multiple options are available, which need to be selected in the</span>
+<span class="sd">    DISTRIBUTING_OPTION enumerator.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    distributing_option : DISTRIBUTING_OPTION</span>
+<span class="sd">        Distributing option available in the DISTRIBUTING_OPTION enumerator.</span>
+<span class="sd">    allocated: DataArray | UgridDataArray</span>
+<span class="sd">        3D boolean array with river cell locations. This can be made with the</span>
+<span class="sd">        :func:`imod.prepare.allocate_riv_cells` function.</span>
+<span class="sd">    conductance: DataArray | UgridDataArray</span>
+<span class="sd">        Planar grid with conductances that need to be distributed over layers,</span>
+<span class="sd">        so grid cannot contain a layer dimension. Can contain a time dimension.</span>
+<span class="sd">    top: DataArray | UgridDataArray</span>
+<span class="sd">        Model top</span>
+<span class="sd">    bottom: DataArray | UgridDataArray</span>
+<span class="sd">        Model layer bottoms</span>
+<span class="sd">    k: DataArray | UgridDataArray</span>
+<span class="sd">        Hydraulic conductivities</span>
+<span class="sd">    stage: DataArray | UgridDataArray</span>
+<span class="sd">        Planar grid with river stages, cannot contain a layer dimension. Can</span>
+<span class="sd">        contain a time dimension.</span>
+<span class="sd">    bottom_elevation: DataArray | UgridDataArray</span>
+<span class="sd">        Planar grid with river bottom elevations, cannot contain a layer</span>
+<span class="sd">        dimension. Can contain a time dimension.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Conductances distributed over depth.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from imod.prepare import allocate_riv_cells, distribute_riv_conductance, ALLOCATION_OPTION, DISTRIBUTING_OPTION</span>
+<span class="sd">    &gt;&gt;&gt; allocated = allocate_riv_cells(</span>
+<span class="sd">        ALLOCATION_OPTION.stage_to_riv_bot, active, top, bottom, stage, bottom_elevation</span>
+<span class="sd">        )</span>
+<span class="sd">    &gt;&gt;&gt; conductances_distributed = distribute_riv_conductance(</span>
+<span class="sd">            DISTRIBUTING_OPTION.by_corrected_transmissivity, allocated,</span>
+<span class="sd">            conductance, top, bottom, stage, bottom_elevation, k</span>
+<span class="sd">        )</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">PLANAR_GRID</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">conductance</span><span class="p">)</span>
+
+    <span class="k">match</span> <span class="n">distributing_option</span><span class="p">:</span>
+        <span class="k">case</span> <span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">equally</span><span class="p">:</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">_distribute_weights__equally</span><span class="p">(</span><span class="n">allocated</span><span class="p">)</span>
+        <span class="k">case</span> <span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_layer_thickness</span><span class="p">:</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">_distribute_weights__by_layer_thickness</span><span class="p">(</span><span class="n">allocated</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">)</span>
+        <span class="k">case</span> <span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_layer_transmissivity</span><span class="p">:</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">_distribute_weights__by_layer_transmissivity</span><span class="p">(</span>
+                <span class="n">allocated</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span>
+            <span class="p">)</span>
+        <span class="k">case</span> <span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_conductivity</span><span class="p">:</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">_distribute_weights__by_conductivity</span><span class="p">(</span><span class="n">allocated</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="k">case</span> <span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_crosscut_thickness</span><span class="p">:</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">_distribute_weights__by_crosscut_thickness</span><span class="p">(</span>
+                <span class="n">allocated</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">stage</span><span class="p">,</span> <span class="n">bottom_elevation</span>
+            <span class="p">)</span>
+        <span class="k">case</span> <span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_crosscut_transmissivity</span><span class="p">:</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">_distribute_weights__by_crosscut_transmissivity</span><span class="p">(</span>
+                <span class="n">allocated</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">stage</span><span class="p">,</span> <span class="n">bottom_elevation</span>
+            <span class="p">)</span>
+        <span class="k">case</span> <span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_corrected_transmissivity</span><span class="p">:</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">_distribute_weights__by_corrected_transmissivity</span><span class="p">(</span>
+                <span class="n">allocated</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">stage</span><span class="p">,</span> <span class="n">bottom_elevation</span>
+            <span class="p">)</span>
+        <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Received incompatible setting for rivers, only&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">equally</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_layer_thickness</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_layer_transmissivity</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_conductivity</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_crosscut_thickness</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_crosscut_transmissivity</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;, and &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_corrected_transmissivity</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; supported. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Got: &#39;</span><span class="si">{</span><span class="n">distributing_option</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+            <span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">weights</span> <span class="o">*</span> <span class="n">conductance</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">allocated</span><span class="p">)</span>
+
+
+<span class="nd">@enforced_dim_order</span>
+<span class="k">def</span> <span class="nf">distribute_drn_conductance</span><span class="p">(</span>
+    <span class="n">distributing_option</span><span class="p">:</span> <span class="n">DISTRIBUTING_OPTION</span><span class="p">,</span>
+    <span class="n">allocated</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">conductance</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">top</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">k</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">elevation</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to distribute 2D conductance over vertical layers for the DRN</span>
+<span class="sd">    package. Multiple options are available, which need to be selected in the</span>
+<span class="sd">    DISTRIBUTING_OPTION enumerator.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    distributing_option : DISTRIBUTING_OPTION</span>
+<span class="sd">        Distributing option available in the DISTRIBUTING_OPTION enumerator.</span>
+<span class="sd">    allocated: DataArray | UgridDataArray</span>
+<span class="sd">        3D boolean array with drain cell locations. This can be made with the</span>
+<span class="sd">        :func:`imod.prepare.allocate_drn_cells` function.</span>
+<span class="sd">    conductance: DataArray | UgridDataArray</span>
+<span class="sd">        Planar grid with conductances that need to be distributed over layers,</span>
+<span class="sd">        so grid cannot contain a layer dimension. Can contain a time dimension.</span>
+<span class="sd">    top: DataArray | UgridDataArray</span>
+<span class="sd">        Model top</span>
+<span class="sd">    bottom: DataArray | UgridDataArray</span>
+<span class="sd">        Model layer bottoms</span>
+<span class="sd">    k: DataArray | UgridDataArray</span>
+<span class="sd">        Hydraulic conductivities</span>
+<span class="sd">    elevation: DataArray | UgridDataArray</span>
+<span class="sd">        Drain elevation</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Conductances distributed over depth.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from imod.prepare import allocate_drn_cells, distribute_drn_conductance, ALLOCATION_OPTION, DISTRIBUTING_OPTION</span>
+<span class="sd">    &gt;&gt;&gt; allocated = allocate_drn_cells(</span>
+<span class="sd">        ALLOCATION_OPTION.at_elevation, active, top, bottom, drain_elevation</span>
+<span class="sd">        )</span>
+<span class="sd">    &gt;&gt;&gt; conductances_distributed = distribute_drn_conductance(</span>
+<span class="sd">            DISTRIBUTING_OPTION.by_layer_transmissivity, allocated,</span>
+<span class="sd">            conductance, top, bottom, k, drain_elevation</span>
+<span class="sd">        )</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">PLANAR_GRID</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">conductance</span><span class="p">)</span>
+
+    <span class="k">match</span> <span class="n">distributing_option</span><span class="p">:</span>
+        <span class="k">case</span> <span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">equally</span><span class="p">:</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">_distribute_weights__equally</span><span class="p">(</span><span class="n">allocated</span><span class="p">)</span>
+        <span class="k">case</span> <span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_layer_thickness</span><span class="p">:</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">_distribute_weights__by_layer_thickness</span><span class="p">(</span><span class="n">allocated</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">)</span>
+        <span class="k">case</span> <span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_layer_transmissivity</span><span class="p">:</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">_distribute_weights__by_layer_transmissivity</span><span class="p">(</span>
+                <span class="n">allocated</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span>
+            <span class="p">)</span>
+        <span class="k">case</span> <span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_conductivity</span><span class="p">:</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">_distribute_weights__by_conductivity</span><span class="p">(</span><span class="n">allocated</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="k">case</span> <span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_crosscut_thickness</span><span class="p">:</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">_distribute_weights__by_crosscut_thickness</span><span class="p">(</span>
+                <span class="n">allocated</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">bc_bottom</span><span class="o">=</span><span class="n">elevation</span>
+            <span class="p">)</span>
+        <span class="k">case</span> <span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_crosscut_transmissivity</span><span class="p">:</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">_distribute_weights__by_crosscut_transmissivity</span><span class="p">(</span>
+                <span class="n">allocated</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">bc_bottom</span><span class="o">=</span><span class="n">elevation</span>
+            <span class="p">)</span>
+        <span class="k">case</span> <span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_corrected_transmissivity</span><span class="p">:</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">_distribute_weights__by_corrected_transmissivity</span><span class="p">(</span>
+                <span class="n">allocated</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">bc_bottom</span><span class="o">=</span><span class="n">elevation</span>
+            <span class="p">)</span>
+        <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Received incompatible setting for drains, only&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">equally</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_layer_thickness</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_layer_transmissivity</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_conductivity</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_crosscut_thickness</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_crosscut_transmissivity</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;, and &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_corrected_transmissivity</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; supported. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Got: &#39;</span><span class="si">{</span><span class="n">distributing_option</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+            <span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">weights</span> <span class="o">*</span> <span class="n">conductance</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">allocated</span><span class="p">)</span>
+
+
+<span class="nd">@enforced_dim_order</span>
+<span class="k">def</span> <span class="nf">distribute_ghb_conductance</span><span class="p">(</span>
+    <span class="n">distributing_option</span><span class="p">:</span> <span class="n">DISTRIBUTING_OPTION</span><span class="p">,</span>
+    <span class="n">allocated</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">conductance</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">top</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">k</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
+    <span class="n">PLANAR_GRID</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">conductance</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to distribute 2D conductance over vertical layers for the GHB</span>
+<span class="sd">    package. Multiple options are available, which need to be selected in the</span>
+<span class="sd">    DISTRIBUTING_OPTION enumerator.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    distributing_option : DISTRIBUTING_OPTION</span>
+<span class="sd">        Distributing option available in the DISTRIBUTING_OPTION enumerator.</span>
+<span class="sd">    allocated: DataArray | UgridDataArray</span>
+<span class="sd">        3D boolean array with GHB cell locations. This can be made with the</span>
+<span class="sd">        :func:`imod.prepare.allocate_ghb_cells` function.</span>
+<span class="sd">    conductance: DataArray | UgridDataArray</span>
+<span class="sd">        Planar grid with conductances that need to be distributed over layers,</span>
+<span class="sd">        so grid cannot contain a layer dimension. Can contain a time dimension.</span>
+<span class="sd">    top: DataArray | UgridDataArray</span>
+<span class="sd">        Model top</span>
+<span class="sd">    bottom: DataArray | UgridDataArray</span>
+<span class="sd">        Model layer bottoms</span>
+<span class="sd">    k: DataArray | UgridDataArray</span>
+<span class="sd">        Hydraulic conductivities</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Conductances distributed over depth.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from imod.prepare import allocate_ghb_cells, distribute_drn_conductance, ALLOCATION_OPTION, DISTRIBUTING_OPTION</span>
+<span class="sd">    &gt;&gt;&gt; allocated = allocate_ghb_cells(</span>
+<span class="sd">        ALLOCATION_OPTION.at_elevation, active, top, bottom, ghb_head</span>
+<span class="sd">        )</span>
+<span class="sd">    &gt;&gt;&gt; conductances_distributed = distribute_ghb_conductance(</span>
+<span class="sd">            DISTRIBUTING_OPTION.by_layer_transmissivity, allocated, </span>
+<span class="sd">            conductance, top, bottom, k</span>
+<span class="sd">        )</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">match</span> <span class="n">distributing_option</span><span class="p">:</span>
+        <span class="k">case</span> <span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">equally</span><span class="p">:</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">_distribute_weights__equally</span><span class="p">(</span><span class="n">allocated</span><span class="p">)</span>
+        <span class="k">case</span> <span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_layer_thickness</span><span class="p">:</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">_distribute_weights__by_layer_thickness</span><span class="p">(</span><span class="n">allocated</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">)</span>
+        <span class="k">case</span> <span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_layer_transmissivity</span><span class="p">:</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">_distribute_weights__by_layer_transmissivity</span><span class="p">(</span>
+                <span class="n">allocated</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">k</span>
+            <span class="p">)</span>
+        <span class="k">case</span> <span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_conductivity</span><span class="p">:</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">_distribute_weights__by_conductivity</span><span class="p">(</span><span class="n">allocated</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Received incompatible setting for general head boundary, only&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">equally</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_layer_thickness</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_layer_transmissivity</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;, and &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_conductivity</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; supported. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Got: &#39;</span><span class="si">{</span><span class="n">distributing_option</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+            <span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">weights</span> <span class="o">*</span> <span class="n">conductance</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">allocated</span><span class="p">)</span>
+
+
+<span class="nd">@preserve_gridtype</span>
+<span class="k">def</span> <span class="nf">_compute_layer_thickness</span><span class="p">(</span>
+    <span class="n">allocated</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="n">top</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute 3D grid of thicknesses in allocated cells</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">top_layered</span> <span class="o">=</span> <span class="n">_enforce_layered_top</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">)</span>
+
+    <span class="n">thickness</span> <span class="o">=</span> <span class="n">top_layered</span> <span class="o">-</span> <span class="n">bottom</span>
+    <span class="k">return</span> <span class="n">thickness</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">allocated</span><span class="p">)</span>
+
+
+<span class="nd">@preserve_gridtype</span>
+<span class="k">def</span> <span class="nf">_compute_crosscut_thickness</span><span class="p">(</span>
+    <span class="n">allocated</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">top</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">bc_top</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">bc_bottom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute 3D grid of thicknesses crosscut by boundary condition (river/drain)</span>
+<span class="sd">    in allocated cells. So the thickness in the upper allocated layer is bc_top</span>
+<span class="sd">    - bottom and the lower allocated layer is top - bc_bottom.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">bc_top</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">bc_bottom</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`bc_top` and `bc_bottom` cannot both be None.&quot;</span><span class="p">)</span>
+
+    <span class="n">top_layered</span> <span class="o">=</span> <span class="n">_enforce_layered_top</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">)</span>
+    <span class="n">thickness</span> <span class="o">=</span> <span class="n">_compute_layer_thickness</span><span class="p">(</span><span class="n">allocated</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">)</span>
+    <span class="n">outside</span> <span class="o">=</span> <span class="n">zeros_like</span><span class="p">(</span><span class="n">allocated</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">bc_top</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">upper_layer_bc</span> <span class="o">=</span> <span class="p">(</span><span class="n">bc_top</span> <span class="o">&lt;</span> <span class="n">top_layered</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">bc_top</span> <span class="o">&gt;</span> <span class="n">bottom</span><span class="p">)</span>
+        <span class="n">outside</span> <span class="o">=</span> <span class="n">outside</span> <span class="o">|</span> <span class="p">(</span><span class="n">bc_top</span> <span class="o">&lt;</span> <span class="n">bottom</span><span class="p">)</span>
+        <span class="n">thickness</span> <span class="o">=</span> <span class="n">thickness</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">upper_layer_bc</span><span class="p">,</span> <span class="n">thickness</span> <span class="o">-</span> <span class="p">(</span><span class="n">top_layered</span> <span class="o">-</span> <span class="n">bc_top</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">bc_bottom</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">lower_layer_bc</span> <span class="o">=</span> <span class="p">(</span><span class="n">bc_bottom</span> <span class="o">&lt;</span> <span class="n">top_layered</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">bc_bottom</span> <span class="o">&gt;</span> <span class="n">bottom</span><span class="p">)</span>
+        <span class="n">outside</span> <span class="o">=</span> <span class="n">outside</span> <span class="o">|</span> <span class="p">(</span><span class="n">bc_bottom</span> <span class="o">&gt;</span> <span class="n">top_layered</span><span class="p">)</span>
+        <span class="n">thickness</span> <span class="o">=</span> <span class="n">thickness</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">lower_layer_bc</span><span class="p">,</span> <span class="n">thickness</span> <span class="o">-</span> <span class="p">(</span><span class="n">bc_bottom</span> <span class="o">-</span> <span class="n">bottom</span><span class="p">))</span>
+
+    <span class="n">thickness</span> <span class="o">=</span> <span class="n">thickness</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">outside</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">thickness</span>
+
+
+<span class="k">def</span> <span class="nf">_distribute_weights__by_corrected_transmissivity</span><span class="p">(</span>
+    <span class="n">allocated</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">top</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">k</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">bc_top</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">bc_bottom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Distribute conductances according to default method in iMOD 5.6, as</span>
+<span class="sd">    described page 690 of the iMOD 5.6 manual (but then to distribute WEL</span>
+<span class="sd">    rates). The method uses crosscut thicknesses to compute transmissivities.</span>
+<span class="sd">    Furthermore it corrects distribution weights for the mismatch between the</span>
+<span class="sd">    midpoints of crosscut areas and layer midpoints.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">crosscut_thickness</span> <span class="o">=</span> <span class="n">_compute_crosscut_thickness</span><span class="p">(</span>
+        <span class="n">allocated</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">bc_top</span><span class="o">=</span><span class="n">bc_top</span><span class="p">,</span> <span class="n">bc_bottom</span><span class="o">=</span><span class="n">bc_bottom</span>
+    <span class="p">)</span>
+    <span class="n">transmissivity</span> <span class="o">=</span> <span class="n">crosscut_thickness</span> <span class="o">*</span> <span class="n">k</span>
+
+    <span class="n">top_layered</span> <span class="o">=</span> <span class="n">_enforce_layered_top</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">)</span>
+    <span class="n">layer_thickness</span> <span class="o">=</span> <span class="n">_compute_layer_thickness</span><span class="p">(</span><span class="n">allocated</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">)</span>
+    <span class="n">midpoints</span> <span class="o">=</span> <span class="p">(</span><span class="n">top_layered</span> <span class="o">+</span> <span class="n">bottom</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">Fc</span> <span class="o">=</span> <span class="n">midpoints</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">bc_top</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">PLANAR_GRID</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">bc_top</span><span class="p">)</span>
+        <span class="n">upper_layer_bc</span> <span class="o">=</span> <span class="p">(</span><span class="n">bc_top</span> <span class="o">&lt;</span> <span class="n">top_layered</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">bc_top</span> <span class="o">&gt;</span> <span class="n">bottom</span><span class="p">)</span>
+        <span class="c1"># Computing vertical midpoint of river crosscutting layers.</span>
+        <span class="n">Fc</span> <span class="o">=</span> <span class="n">Fc</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">upper_layer_bc</span><span class="p">,</span> <span class="p">(</span><span class="n">bottom</span> <span class="o">+</span> <span class="n">bc_top</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">bc_bottom</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">PLANAR_GRID</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">bc_bottom</span><span class="p">)</span>
+        <span class="n">lower_layer_bc</span> <span class="o">=</span> <span class="p">(</span><span class="n">bc_bottom</span> <span class="o">&lt;</span> <span class="n">top_layered</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">bc_bottom</span> <span class="o">&gt;</span> <span class="n">bottom</span><span class="p">)</span>
+        <span class="c1"># Computing vertical midpoint of river crosscutting layers.</span>
+        <span class="n">Fc</span> <span class="o">=</span> <span class="n">Fc</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">lower_layer_bc</span><span class="p">,</span> <span class="p">(</span><span class="n">top_layered</span> <span class="o">+</span> <span class="n">bc_bottom</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># Correction factor for mismatch between midpoints of crosscut layers and</span>
+    <span class="c1"># layer midpoints.</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">midpoints</span> <span class="o">-</span> <span class="n">Fc</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">layer_thickness</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">)</span>
+
+    <span class="n">transmissivity_corrected</span> <span class="o">=</span> <span class="n">transmissivity</span> <span class="o">*</span> <span class="n">F</span>
+    <span class="k">return</span> <span class="n">transmissivity_corrected</span> <span class="o">/</span> <span class="n">transmissivity_corrected</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_distribute_weights__equally</span><span class="p">(</span><span class="n">allocated</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute weights over layers equally.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">ones_like</span><span class="p">(</span><span class="n">allocated</span><span class="p">)</span> <span class="o">/</span> <span class="n">allocated</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_distribute_weights__by_layer_thickness</span><span class="p">(</span>
+    <span class="n">allocated</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">top</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute weights based on layer thickness&quot;&quot;&quot;</span>
+    <span class="n">layer_thickness</span> <span class="o">=</span> <span class="n">_compute_layer_thickness</span><span class="p">(</span><span class="n">allocated</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">layer_thickness</span> <span class="o">/</span> <span class="n">layer_thickness</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_distribute_weights__by_crosscut_thickness</span><span class="p">(</span>
+    <span class="n">allocated</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">top</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">bc_top</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">bc_bottom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute weights based on crosscut thickness&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">bc_top</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">PLANAR_GRID</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">bc_top</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">bc_bottom</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">PLANAR_GRID</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">bc_bottom</span><span class="p">)</span>
+
+    <span class="n">crosscut_thickness</span> <span class="o">=</span> <span class="n">_compute_crosscut_thickness</span><span class="p">(</span>
+        <span class="n">allocated</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">bc_top</span><span class="p">,</span> <span class="n">bc_bottom</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">allocated</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">crosscut_thickness</span> <span class="o">/</span> <span class="n">crosscut_thickness</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_distribute_weights__by_layer_transmissivity</span><span class="p">(</span>
+    <span class="n">allocated</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">top</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">k</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute weights based on layer transmissivity&quot;&quot;&quot;</span>
+    <span class="n">layer_thickness</span> <span class="o">=</span> <span class="n">_compute_layer_thickness</span><span class="p">(</span><span class="n">allocated</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">)</span>
+    <span class="n">transmissivity</span> <span class="o">=</span> <span class="n">layer_thickness</span> <span class="o">*</span> <span class="n">k</span>
+
+    <span class="k">return</span> <span class="n">transmissivity</span> <span class="o">/</span> <span class="n">transmissivity</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_distribute_weights__by_crosscut_transmissivity</span><span class="p">(</span>
+    <span class="n">allocated</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">top</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">k</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">bc_top</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">bc_bottom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute weights based on crosscut transmissivity&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">bc_top</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">PLANAR_GRID</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">bc_top</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">bc_bottom</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">PLANAR_GRID</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">bc_bottom</span><span class="p">)</span>
+
+    <span class="n">crosscut_thickness</span> <span class="o">=</span> <span class="n">_compute_crosscut_thickness</span><span class="p">(</span>
+        <span class="n">allocated</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">bc_top</span><span class="o">=</span><span class="n">bc_top</span><span class="p">,</span> <span class="n">bc_bottom</span><span class="o">=</span><span class="n">bc_bottom</span>
+    <span class="p">)</span>
+    <span class="n">transmissivity</span> <span class="o">=</span> <span class="n">crosscut_thickness</span> <span class="o">*</span> <span class="n">k</span>
+
+    <span class="k">return</span> <span class="n">transmissivity</span> <span class="o">/</span> <span class="n">transmissivity</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_distribute_weights__by_conductivity</span><span class="p">(</span><span class="n">allocated</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute weights based on hydraulic conductivity&quot;&quot;&quot;</span>
+    <span class="n">k_allocated</span> <span class="o">=</span> <span class="n">allocated</span> <span class="o">*</span> <span class="n">k</span>
+
+    <span class="k">return</span> <span class="n">k_allocated</span> <span class="o">/</span> <span class="n">k_allocated</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

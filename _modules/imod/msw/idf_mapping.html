@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.msw.idf_mapping &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>imod.msw.idf_mapping &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -518,17 +518,17 @@ document.write(`
 
         <span class="n">nodata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;nodata&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
-        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
-            <span class="n">simgro_opt</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-            <span class="n">idf_per</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-            <span class="n">idf_dx</span><span class="o">=</span><span class="n">dx</span><span class="p">,</span>
-            <span class="n">idf_dy</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dy</span><span class="p">),</span>
-            <span class="n">idf_ncol</span><span class="o">=</span><span class="n">ncol</span><span class="p">,</span>
-            <span class="n">idf_nrow</span><span class="o">=</span><span class="n">nrow</span><span class="p">,</span>
-            <span class="n">idf_xmin</span><span class="o">=</span><span class="n">xmin</span><span class="p">,</span>
-            <span class="n">idf_ymin</span><span class="o">=</span><span class="n">ymin</span><span class="p">,</span>
-            <span class="n">idf_nodata</span><span class="o">=</span><span class="n">nodata</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;simgro_opt&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;idf_per&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;idf_dx&quot;</span><span class="p">:</span> <span class="n">dx</span><span class="p">,</span>
+            <span class="s2">&quot;idf_dy&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dy</span><span class="p">),</span>
+            <span class="s2">&quot;idf_ncol&quot;</span><span class="p">:</span> <span class="n">ncol</span><span class="p">,</span>
+            <span class="s2">&quot;idf_nrow&quot;</span><span class="p">:</span> <span class="n">nrow</span><span class="p">,</span>
+            <span class="s2">&quot;idf_xmin&quot;</span><span class="p">:</span> <span class="n">xmin</span><span class="p">,</span>
+            <span class="s2">&quot;idf_ymin&quot;</span><span class="p">:</span> <span class="n">ymin</span><span class="p">,</span>
+            <span class="s2">&quot;idf_nodata&quot;</span><span class="p">:</span> <span class="n">nodata</span><span class="p">,</span>
+        <span class="p">}</span></div>
 </pre></div>
 
                 </article>

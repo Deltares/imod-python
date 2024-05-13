@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_examples_mf6_Henry.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -337,7 +337,7 @@ transport models. In this case, we'll use the same settings, but generally
 convergence settings should differ: the transport model has very different
 units from the flow model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 204-241
+.. GENERATED FROM PYTHON SOURCE LINES 204-237
 
 .. code-block:: Python
 
@@ -345,8 +345,6 @@ units from the flow model.
     simulation["flow_solver"] = imod.mf6.Solution(
         modelnames=["flow"],
         print_option="summary",
-        csv_output=False,
-        no_ptc=True,
         outer_dvclose=1.0e-6,
         outer_maximum=500,
         under_relaxation=None,
@@ -361,8 +359,6 @@ units from the flow model.
     simulation["transport_solver"] = imod.mf6.Solution(
         modelnames=["transport"],
         print_option="summary",
-        csv_output=False,
-        no_ptc=True,
         outer_dvclose=1.0e-6,
         outer_maximum=500,
         under_relaxation=None,
@@ -385,11 +381,11 @@ units from the flow model.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 242-243
+.. GENERATED FROM PYTHON SOURCE LINES 238-239
 
 Increase the number of time steps for the single stress period:
 
-.. GENERATED FROM PYTHON SOURCE LINES 243-245
+.. GENERATED FROM PYTHON SOURCE LINES 239-241
 
 .. code-block:: Python
 
@@ -402,11 +398,11 @@ Increase the number of time steps for the single stress period:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 246-247
+.. GENERATED FROM PYTHON SOURCE LINES 242-243
 
 We'll create a new directory in which we will write and run the model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 247-250
+.. GENERATED FROM PYTHON SOURCE LINES 243-246
 
 .. code-block:: Python
 
@@ -420,7 +416,7 @@ We'll create a new directory in which we will write and run the model.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 251-261
+.. GENERATED FROM PYTHON SOURCE LINES 247-257
 
 Run the model
 -------------
@@ -433,7 +429,7 @@ This takes about 20 seconds.
   :ref:`The Modflow 6 examples introduction <mf6-introduction>` shortly
   describes how to add it to yours.
 
-.. GENERATED FROM PYTHON SOURCE LINES 261-264
+.. GENERATED FROM PYTHON SOURCE LINES 257-260
 
 .. code-block:: Python
 
@@ -447,14 +443,14 @@ This takes about 20 seconds.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 265-269
+.. GENERATED FROM PYTHON SOURCE LINES 261-265
 
 Open the results
 ----------------
 
 We'll open the head and concentration files.
 
-.. GENERATED FROM PYTHON SOURCE LINES 269-274
+.. GENERATED FROM PYTHON SOURCE LINES 265-270
 
 .. code-block:: Python
 
@@ -470,12 +466,12 @@ We'll open the head and concentration files.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 275-277
+.. GENERATED FROM PYTHON SOURCE LINES 271-273
 
 Visualize the results
 ---------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 277-280
+.. GENERATED FROM PYTHON SOURCE LINES 273-276
 
 .. code-block:: Python
 
@@ -496,16 +492,16 @@ Visualize the results
  .. code-block:: none
 
 
-    <matplotlib.contour.QuadContourSet object at 0x0000015AA7317250>
+    <matplotlib.contour.QuadContourSet object at 0x0000014A245147D0>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 281-283
+.. GENERATED FROM PYTHON SOURCE LINES 277-279
 
 We can check the concentration to see that a fresh-saline interface has been
 formed:
 
-.. GENERATED FROM PYTHON SOURCE LINES 283-286
+.. GENERATED FROM PYTHON SOURCE LINES 279-282
 
 .. code-block:: Python
 
@@ -526,14 +522,14 @@ formed:
  .. code-block:: none
 
 
-    <matplotlib.contour.QuadContourSet object at 0x0000015AA8529F10>
+    <matplotlib.contour.QuadContourSet object at 0x0000014A206EA3D0>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 1.162 seconds)
+   **Total running time of the script:** (1 minutes 1.407 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_Henry.py:

@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.logging.logging_decorators &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>imod.logging.logging_decorators &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -448,7 +448,9 @@ document.write(`
                 <article class="bd-article">
                   
   <h1>Source code for imod.logging.logging_decorators</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">imod.logging.loglevel</span> <span class="kn">import</span> <span class="n">LogLevel</span>
+<span></span><span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
+
+<span class="kn">from</span> <span class="nn">imod.logging.loglevel</span> <span class="kn">import</span> <span class="n">LogLevel</span>
 
 
 <div class="viewcode-block" id="standard_log_decorator"><a class="viewcode-back" href="../../../api/generated/logging/imod.logging.logging_decorators.standard_log_decorator.html#imod.logging.logging_decorators.standard_log_decorator">[docs]</a><span class="k">def</span> <span class="nf">standard_log_decorator</span><span class="p">(</span>
@@ -462,12 +464,20 @@ document.write(`
         <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="kn">from</span> <span class="nn">imod.logging</span> <span class="kn">import</span> <span class="n">logger</span>
 
+            <span class="c1"># anounce start of function</span>
             <span class="n">object_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
             <span class="n">start_message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Beginning execution of </span><span class="si">{</span><span class="n">fun</span><span class="o">.</span><span class="vm">__module__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">fun</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> for object </span><span class="si">{</span><span class="n">object_name</span><span class="si">}</span><span class="s2">...&quot;</span>
-            <span class="n">end_message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Finished execution of </span><span class="si">{</span><span class="n">fun</span><span class="o">.</span><span class="vm">__module__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">fun</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">  for object </span><span class="si">{</span><span class="n">object_name</span><span class="si">}</span><span class="s2">...&quot;</span>
 
+            <span class="c1"># anounce start of function</span>
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">loglevel</span><span class="o">=</span><span class="n">start_level</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">start_message</span><span class="p">,</span> <span class="n">additional_depth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+            <span class="c1"># run function</span>
             <span class="n">return_value</span> <span class="o">=</span> <span class="n">fun</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+
+            <span class="c1"># anounce end of function</span>
+            <span class="n">end_message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Finished execution of </span><span class="si">{</span><span class="n">fun</span><span class="o">.</span><span class="vm">__module__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">fun</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">  for object </span><span class="si">{</span><span class="n">object_name</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="n">end_time</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start_time</span><span class="si">}</span><span class="s2"> seconds...&quot;</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">loglevel</span><span class="o">=</span><span class="n">end_level</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">end_message</span><span class="p">,</span> <span class="n">additional_depth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">return_value</span>
 
@@ -487,12 +497,18 @@ document.write(`
         <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="kn">from</span> <span class="nn">imod.logging</span> <span class="kn">import</span> <span class="n">logger</span>
 
+            <span class="c1"># anounce start of function</span>
             <span class="n">object_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
             <span class="n">start_message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Initializing the </span><span class="si">{</span><span class="n">object_name</span><span class="si">}</span><span class="s2"> package...&quot;</span>
-            <span class="n">end_message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Successfully initialized the </span><span class="si">{</span><span class="n">object_name</span><span class="si">}</span><span class="s2">...&quot;</span>
-
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">loglevel</span><span class="o">=</span><span class="n">start_level</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">start_message</span><span class="p">,</span> <span class="n">additional_depth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+            <span class="c1"># run function</span>
             <span class="n">return_value</span> <span class="o">=</span> <span class="n">fun</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+
+            <span class="c1"># anounce end of function</span>
+            <span class="n">end_message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Successfully initialized the </span><span class="si">{</span><span class="n">object_name</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="n">end_time</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start_time</span><span class="si">}</span><span class="s2"> seconds...&quot;</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">loglevel</span><span class="o">=</span><span class="n">end_level</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">end_message</span><span class="p">,</span> <span class="n">additional_depth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">return_value</span>
 

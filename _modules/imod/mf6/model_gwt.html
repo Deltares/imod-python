@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.model_gwt &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>imod.mf6.model_gwt &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -460,6 +460,26 @@ document.write(`
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The GroundwaterTransportModel (GWT) simulates transport of a single solute</span>
 <span class="sd">    species flowing in groundwater.</span>
+<span class="sd">    More information can be found here:</span>
+<span class="sd">    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.4.2.pdf#page=172</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    listing_file: Optional[str] = None</span>
+<span class="sd">        name of the listing file to create for this GWT model. If not specified,</span>
+<span class="sd">        then the name of the list file will be the basename of the GWT model</span>
+<span class="sd">        name file and the &#39;lst&#39; extension.</span>
+<span class="sd">    print_input: bool = False</span>
+<span class="sd">        if True, indicates that the list of exchange entries will be echoed to</span>
+<span class="sd">        the listing file immediately after it is read.</span>
+<span class="sd">    print_flows: bool = False</span>
+<span class="sd">        if True, indicates that the list of exchange flow rates will be printed</span>
+<span class="sd">        to the listing file for every stress period in which &quot;SAVE BUDGET&quot; is</span>
+<span class="sd">        specified in Output Control</span>
+<span class="sd">    save_flows: bool = False,</span>
+<span class="sd">        if True, indicates that all model package flow terms will be written to</span>
+<span class="sd">        the file specified with &quot;BUDGET FILEOUT&quot; in Output Control.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_mandatory_packages</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;mst&quot;</span><span class="p">,</span> <span class="s2">&quot;dsp&quot;</span><span class="p">,</span> <span class="s2">&quot;oc&quot;</span><span class="p">,</span> <span class="s2">&quot;ic&quot;</span><span class="p">)</span>

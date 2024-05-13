@@ -1,0 +1,6 @@
+﻿imod.prepare.c\_leakage
+=======================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: c_leakage

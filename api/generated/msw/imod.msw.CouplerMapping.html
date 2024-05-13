@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>imod.msw.CouplerMapping &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>imod.msw.CouplerMapping &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -125,8 +125,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -448,6 +448,18 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.get_lower_active_layer_number.html">imod.prepare.get_lower_active_layer_number</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.get_upper_active_grid_cells.html">imod.prepare.get_upper_active_grid_cells</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.get_upper_active_layer_number.html">imod.prepare.get_upper_active_layer_number</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.create_layered_top.html">imod.prepare.create_layered_top</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.ALLOCATION_OPTION.html">imod.prepare.ALLOCATION_OPTION</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.DISTRIBUTING_OPTION.html">imod.prepare.DISTRIBUTING_OPTION</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.allocate_drn_cells.html">imod.prepare.allocate_drn_cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.allocate_ghb_cells.html">imod.prepare.allocate_ghb_cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.allocate_rch_cells.html">imod.prepare.allocate_rch_cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.allocate_riv_cells.html">imod.prepare.allocate_riv_cells</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.c_leakage.html">imod.prepare.c_leakage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.c_radial.html">imod.prepare.c_radial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.distribute_drn_conductance.html">imod.prepare.distribute_drn_conductance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.distribute_ghb_conductance.html">imod.prepare.distribute_ghb_conductance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../prepare/imod.prepare.distribute_riv_conductance.html">imod.prepare.distribute_riv_conductance</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../select.html">Select points and cross sections</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -751,7 +763,7 @@ document.write(`
 <h1>imod.msw.CouplerMapping<a class="headerlink" href="#imod-msw-couplermapping" title="Permalink to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="imod.msw.CouplerMapping">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">imod.msw.</span></span><span class="sig-name descname"><span class="pre">CouplerMapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modflow_dis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../mf6/imod.mf6.StructuredDiscretization.html#imod.mf6.StructuredDiscretization" title="imod.mf6.dis.StructuredDiscretization"><span class="pre">StructuredDiscretization</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">well</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../mf6/imod.mf6.WellDisStructured.html#imod.mf6.WellDisStructured" title="imod.mf6.wel.WellDisStructured"><span class="pre">WellDisStructured</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/imod/msw/coupler_mapping.html#CouplerMapping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imod.msw.CouplerMapping" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">imod.msw.</span></span><span class="sig-name descname"><span class="pre">CouplerMapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modflow_dis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../mf6/imod.mf6.StructuredDiscretization.html#imod.mf6.StructuredDiscretization" title="imod.mf6.dis.StructuredDiscretization"><span class="pre">StructuredDiscretization</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">well</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../mf6/imod.mf6.WellDisStructured.html#imod.mf6.WellDisStructured" title="imod.mf6.wel.WellDisStructured"><span class="pre">WellDisStructured</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/imod/msw/coupler_mapping.html#CouplerMapping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imod.msw.CouplerMapping" title="Permalink to this definition">#</a></dt>
 <dd><p>This contains the data to connect MODFLOW 6 cells to MetaSWAP svats.</p>
 <p>This class is responsible for the file <cite>mod2svat.inp</cite>. It also includes
 connection to wells.</p>
@@ -766,7 +778,7 @@ cells.</p></li>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="imod.msw.CouplerMapping.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modflow_dis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../mf6/imod.mf6.StructuredDiscretization.html#imod.mf6.StructuredDiscretization" title="imod.mf6.dis.StructuredDiscretization"><span class="pre">StructuredDiscretization</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">well</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../mf6/imod.mf6.WellDisStructured.html#imod.mf6.WellDisStructured" title="imod.mf6.wel.WellDisStructured"><span class="pre">WellDisStructured</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/imod/msw/coupler_mapping.html#CouplerMapping.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imod.msw.CouplerMapping.__init__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modflow_dis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../mf6/imod.mf6.StructuredDiscretization.html#imod.mf6.StructuredDiscretization" title="imod.mf6.dis.StructuredDiscretization"><span class="pre">StructuredDiscretization</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">well</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../mf6/imod.mf6.WellDisStructured.html#imod.mf6.WellDisStructured" title="imod.mf6.wel.WellDisStructured"><span class="pre">WellDisStructured</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/imod/msw/coupler_mapping.html#CouplerMapping.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imod.msw.CouplerMapping.__init__" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>

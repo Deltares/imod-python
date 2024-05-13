@@ -11,6 +11,7 @@ Modflow 6 models.
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -45,6 +46,8 @@ Modflow 6 models.
       <div class="sphx-glr-thumbnail-title">Reading existing MetaSWAP input</div>
     </div>
 
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 

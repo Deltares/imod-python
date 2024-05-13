@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.simulation &#8212; iMOD Python 0.16.0 documentation</title>
+    <title>imod.mf6.simulation &#8212; iMOD Python 0.17.0 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.16.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.16.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -606,11 +606,9 @@ document.write(`
 <span class="sd">        &gt;&gt;&gt; simulation[&quot;time_discretization&quot;][&quot;n_timesteps&quot;] = 5</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">use_cftime</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="n">model</span><span class="o">.</span><span class="n">_use_cftime</span><span class="p">()</span>
-                <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">Modflow6Model</span><span class="p">)</span>
-            <span class="p">]</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">_use_cftime</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">Modflow6Model</span><span class="p">)</span>
         <span class="p">)</span>
 
         <span class="n">times</span> <span class="o">=</span> <span class="p">[</span>
@@ -624,7 +622,7 @@ document.write(`
         <span class="c1"># np.unique also sorts</span>
         <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">times</span><span class="p">))</span>
 
-        <span class="n">duration</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">timestep_duration</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cftime</span><span class="p">)</span>
+        <span class="n">duration</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">timestep_duration</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cftime</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
         <span class="c1"># Generate time discretization, just rely on default arguments</span>
         <span class="c1"># Probably won&#39;t be used that much anyway?</span>
         <span class="n">timestep_duration</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
@@ -1082,7 +1080,7 @@ document.write(`
         <span class="n">exchange_budgets</span> <span class="o">=</span> <span class="n">cbc</span><span class="p">[</span><span class="n">exchange_names</span><span class="p">]</span><span class="o">.</span><span class="n">to_array</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;variable&quot;</span><span class="p">)</span>
         <span class="n">cbc</span> <span class="o">=</span> <span class="n">cbc</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="n">exchange_names</span><span class="p">)</span>
         <span class="c1"># &quot;gwf-gwf&quot; or &quot;gwt-gwt&quot;</span>
-        <span class="n">exchange_key</span> <span class="o">=</span> <span class="n">exchange_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">exchange_key</span> <span class="o">=</span> <span class="n">exchange_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">cbc</span><span class="p">[</span><span class="n">exchange_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">exchange_budgets</span>
         <span class="k">return</span> <span class="n">cbc</span>
 
@@ -1327,7 +1325,7 @@ document.write(`
 
         <span class="n">simulation</span> <span class="o">=</span> <span class="n">Modflow6Simulation</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">toml_path</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">toml_content</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;gwtgwf_exchanges&quot;</span><span class="p">,</span> <span class="s2">&quot;split_exchanges&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;gwtgwf_exchanges&quot;</span><span class="p">,</span> <span class="s2">&quot;split_exchanges&quot;</span><span class="p">]:</span>
                 <span class="n">item_cls</span> <span class="o">=</span> <span class="n">classes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
                 <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">entry</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                     <span class="n">path</span> <span class="o">=</span> <span class="n">toml_path</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">filename</span>
@@ -1427,18 +1425,31 @@ document.write(`
             <span class="n">state_for_boundary</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="kc">None</span> <span class="k">if</span> <span class="n">states_for_boundary</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">states_for_boundary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
             <span class="p">)</span>
-
-            <span class="n">clipped</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">clip_box</span><span class="p">(</span>
-                <span class="n">time_min</span><span class="o">=</span><span class="n">time_min</span><span class="p">,</span>
-                <span class="n">time_max</span><span class="o">=</span><span class="n">time_max</span><span class="p">,</span>
-                <span class="n">layer_min</span><span class="o">=</span><span class="n">layer_min</span><span class="p">,</span>
-                <span class="n">layer_max</span><span class="o">=</span><span class="n">layer_max</span><span class="p">,</span>
-                <span class="n">x_min</span><span class="o">=</span><span class="n">x_min</span><span class="p">,</span>
-                <span class="n">x_max</span><span class="o">=</span><span class="n">x_max</span><span class="p">,</span>
-                <span class="n">y_min</span><span class="o">=</span><span class="n">y_min</span><span class="p">,</span>
-                <span class="n">y_max</span><span class="o">=</span><span class="n">y_max</span><span class="p">,</span>
-                <span class="n">state_for_boundary</span><span class="o">=</span><span class="n">state_for_boundary</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Modflow6Model</span><span class="p">):</span>
+                <span class="n">clipped</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">clip_box</span><span class="p">(</span>
+                    <span class="n">time_min</span><span class="o">=</span><span class="n">time_min</span><span class="p">,</span>
+                    <span class="n">time_max</span><span class="o">=</span><span class="n">time_max</span><span class="p">,</span>
+                    <span class="n">layer_min</span><span class="o">=</span><span class="n">layer_min</span><span class="p">,</span>
+                    <span class="n">layer_max</span><span class="o">=</span><span class="n">layer_max</span><span class="p">,</span>
+                    <span class="n">x_min</span><span class="o">=</span><span class="n">x_min</span><span class="p">,</span>
+                    <span class="n">x_max</span><span class="o">=</span><span class="n">x_max</span><span class="p">,</span>
+                    <span class="n">y_min</span><span class="o">=</span><span class="n">y_min</span><span class="p">,</span>
+                    <span class="n">y_max</span><span class="o">=</span><span class="n">y_max</span><span class="p">,</span>
+                    <span class="n">state_for_boundary</span><span class="o">=</span><span class="n">state_for_boundary</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Package</span><span class="p">):</span>
+                <span class="n">clipped</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">clip_box</span><span class="p">(</span>
+                    <span class="n">time_min</span><span class="o">=</span><span class="n">time_min</span><span class="p">,</span>
+                    <span class="n">time_max</span><span class="o">=</span><span class="n">time_max</span><span class="p">,</span>
+                    <span class="n">layer_min</span><span class="o">=</span><span class="n">layer_min</span><span class="p">,</span>
+                    <span class="n">layer_max</span><span class="o">=</span><span class="n">layer_max</span><span class="p">,</span>
+                    <span class="n">x_min</span><span class="o">=</span><span class="n">x_min</span><span class="p">,</span>
+                    <span class="n">x_max</span><span class="o">=</span><span class="n">x_max</span><span class="p">,</span>
+                    <span class="n">y_min</span><span class="o">=</span><span class="n">y_min</span><span class="p">,</span>
+                    <span class="n">y_max</span><span class="o">=</span><span class="n">y_max</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;object of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2"> cannot be clipped.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">clipped</span></div>
 
 <div class="viewcode-block" id="Modflow6Simulation.split"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Modflow6Simulation.split.html#imod.mf6.Modflow6Simulation.split">[docs]</a>    <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">submodel_labels</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Modflow6Simulation</span><span class="p">:</span>

@@ -1,0 +1,26 @@
+﻿imod.prepare.ALLOCATION\_OPTION
+===============================
+
+.. currentmodule:: imod.prepare
+
+.. autoclass:: ALLOCATION_OPTION
+
+   
+   .. automethod:: __init__
+
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ALLOCATION_OPTION.stage_to_riv_bot
+      ~ALLOCATION_OPTION.first_active_to_elevation
+      ~ALLOCATION_OPTION.stage_to_riv_bot_drn_above
+      ~ALLOCATION_OPTION.at_elevation
+      ~ALLOCATION_OPTION.at_first_active
+   
+   

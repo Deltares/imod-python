@@ -1,0 +1,6 @@
+﻿imod.prepare.allocate\_riv\_cells
+=================================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: allocate_riv_cells
