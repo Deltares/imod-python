@@ -308,13 +308,14 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             dataset = pkg.dataset
             if isinstance(dataset, xu.UgridDataset):
                 if mdal_compliant:
-                    dataset = pkg.dataset.ugrid.to_dataset()
+                    dataset = dataset.ugrid.to_dataset()
                     mdal_dataset = imod.util.spatial.mdal_compliant_ugrid2d(dataset)
                     mdal_dataset.to_netcdf(modeldirectory / pkg_path)
                 else:
-                    pkg.dataset.ugrid.to_netcdf(modeldirectory / pkg_path)
+                    dataset.ugrid.to_netcdf(modeldirectory / pkg_path)
             else:
-                pkg.to_netcdf(modeldirectory / pkg_path)
+                dataset = imod.util.spatial.gdal_compliant_grid(dataset)
+                dataset.to_netcdf(modeldirectory / pkg_path)
 
         toml_path = modeldirectory / f"{modelname}.toml"
         with open(toml_path, "wb") as f:
