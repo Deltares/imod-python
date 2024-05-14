@@ -213,12 +213,15 @@ class Recharge(BoundaryCondition, IRegridPackage):
 
         # if rate has only layer 0, then it is planar.
         if is_planar_grid(data["rate"]):
+            # create an array indicating in which cells rch is active
             is_rch_cell = allocate_rch_cells(
                 ALLOCATION_OPTION.at_first_active,
                 target_grid,
                 new_package_data["rate"].isel(layer=0),
             )
             rch_rate = zeros_like(target_grid)
+
+            # assign the rch-rate to all cells in a column
             if is_transient_data_grid(data["rate"]):
                 rch_rate = deepcopy(
                     rch_rate.expand_dims({"time": data["rate"]["time"]})
@@ -229,6 +232,8 @@ class Recharge(BoundaryCondition, IRegridPackage):
                     )
             else:
                 rch_rate.loc[:, :, :] = data["rate"].drop_vars("layer")
+
+            # remove rch from cells where it is not allocated
             rch_rate = xr.where(is_rch_cell, rch_rate, np.nan)
             new_package_data["rate"] = rch_rate
 
