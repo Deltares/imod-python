@@ -11,7 +11,7 @@ import imod
 @pytest.fixture(scope="module")
 def uzf_model():
     # Initiate model
-    gwf_model = imod.mf6.GroundwaterFlowModel()
+    gwf_model = imod.mf6.GroundwaterFlowModel(newton=True)
 
     # Create discretication
     shape = nlay, nrow, ncol = 7, 9, 9
@@ -64,7 +64,7 @@ def uzf_model():
         icelltype=icelltype,
         k=k,
         k33=k33,
-        variable_vertical_conductance=True,
+        variable_vertical_conductance=False,  # cant be true when newton is active
         dewatered=False,
         perched=False,
         save_flows=True,
@@ -98,9 +98,13 @@ def uzf_model():
     uds["theta_res"] = uzf_units * 0.05
     uds["theta_init"] = uzf_units * 0.08
     uds["epsilon"] = ones_shape * 7.0
-    uds["surface_depression_depth"] = ones_shape * top + 0.1
+    uds["surface_depression_depth"] = xr.where(
+        ones_shape.layer == 1, ones_shape * top + 0.1, ones_shape * 0.0
+    )
 
-    uds["infiltration_rate"] = ones_shape_time * 0.003
+    uds["infiltration_rate"] = (ones_shape_time * 0.003).where(
+        ones_shape_time.layer == 1
+    )
     uds["et_pot"] = (
         xr.DataArray(
             (np.sin(np.linspace(0, 1, num=nper) * 2 * np.pi) + 1) * 0.5 * 0.003,
@@ -108,12 +112,14 @@ def uzf_model():
             dims=("time",),
         )
         * ones_shape_time
+    ).where(ones_shape_time.layer == 1)
+    uds["extinction_depth"] = (ones_shape_time * -10.0).where(
+        ones_shape_time.layer == 1
     )
-    uds["extinction_depth"] = ones_shape_time * -10.0
 
-    uds["simulate_groundwater_seepage"] = (
-        False  # Model doesn't converge if set to True....
-    )
+    uds["simulate_groundwater_seepage"] = True
+    uds["save_flows"] = True
+    uds["budget_fileout"] = "GWF_1/uzf.cbc"
 
     gwf_model["uzf"] = imod.mf6.UnsaturatedZoneFlow(**uds)
 
@@ -132,23 +138,9 @@ def uzf_model():
     simulation = imod.mf6.Modflow6Simulation("test")
     simulation["GWF_1"] = gwf_model
     # Define solver settings
-    simulation["solver"] = imod.mf6.Solution(
-        modelnames=["GWF_1"],
-        print_option="summary",
-        outer_dvclose=1.0e-4,
-        outer_maximum=500,
-        under_relaxation=None,
-        inner_dvclose=1.0e-4,
-        inner_rclose=0.001,
-        inner_maximum=100,
-        linear_acceleration="cg",
-        scaling_method=None,
-        reordering_method=None,
-        relaxation_factor=0.97,
-    )
+    simulation["solver"] = imod.mf6.SolutionPresetComplex(modelnames=["GWF_1"])
     # Collect time discretization
     simulation.create_time_discretization(additional_times=time)
-
     return simulation
 
 
@@ -163,5 +155,10 @@ def test_simulation_write(uzf_model, tmp_path):
         assert head.dims == ("time", "layer", "y", "x")
         assert head.shape == (47, 7, 9, 9)
         meanhead = head.mean().values
-        mean_answer = 17.32092902
+        mean_answer = -1.54998241
         assert np.allclose(meanhead, mean_answer)
+        budget_mf6 = head = imod.mf6.open_cbc("GWF_1/GWF_1.cbc", "GWF_1/dis.dis.grb")
+        budgets_uzf = imod.mf6.open_cbc("GWF_1/uzf.cbc", "GWF_1/dis.dis.grb")
+        assert np.allclose(
+            budget_mf6["uzf-gwrch_uzf"], -budgets_uzf["gwf_gwf_1"], equal_nan=True
+        )

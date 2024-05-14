@@ -26,10 +26,10 @@ class ALLOCATION_OPTION(Enum):
     * ``stage_to_riv_bot``: RIV. Allocate cells spanning from the river stage up
       to the river bottom elevation. This matches the iMOD 5.6 IDEFLAYER = 0
       option.
-    * ``first_active_to_riv_bot``: RIV. Allocate cells spanning from first upper
-      active cell up to the river bottom elevation. This matches the iMOD 5.6
-      IDEFLAYER = -1 option.
-    * ``first_active_to_riv_bot__drn``: RIV. Allocate cells spanning from first
+    * ``first_active_to_elevation``: RIV, DRN, GHB. Allocate cells spanning from
+      first upper active cell up to the river bottom elevation. This matches the
+      iMOD 5.6 IDEFLAYER = -1 option.
+    * ``stage_to_riv_bot_drn_above``: RIV. Allocate cells spanning from first
       upper active cell up to the river bottom elevation. Method returns both
       allocated cells for a river package as well as a drain package. Cells
       above river stage are allocated as drain cells, cells below are as river
@@ -50,8 +50,8 @@ class ALLOCATION_OPTION(Enum):
     """
 
     stage_to_riv_bot = 0
-    first_active_to_riv_bot = -1
-    first_active_to_riv_bot__drn = 1
+    first_active_to_elevation = -1
+    stage_to_riv_bot_drn_above = 1
     at_elevation = 2
     at_first_active = 9  # Not an iMOD 5.6 option
 
@@ -114,12 +114,12 @@ def allocate_riv_cells(
             return _allocate_cells__stage_to_riv_bot(
                 top, bottom, stage, bottom_elevation
             )
-        case ALLOCATION_OPTION.first_active_to_riv_bot:
-            return _allocate_cells__first_active_to_riv_bot(
+        case ALLOCATION_OPTION.first_active_to_elevation:
+            return _allocate_cells__first_active_to_elevation(
                 active, top, bottom, bottom_elevation
             )
-        case ALLOCATION_OPTION.first_active_to_riv_bot__drn:
-            return _allocate_cells__first_active_to_riv_bot__drn(
+        case ALLOCATION_OPTION.stage_to_riv_bot_drn_above:
+            return _allocate_cells__stage_to_riv_bot_drn_above(
                 active, top, bottom, stage, bottom_elevation
             )
         case ALLOCATION_OPTION.at_elevation:
@@ -130,8 +130,8 @@ def allocate_riv_cells(
             raise ValueError(
                 "Received incompatible setting for rivers, only"
                 f"'{ALLOCATION_OPTION.stage_to_riv_bot.name}' and"
-                f"'{ALLOCATION_OPTION.first_active_to_riv_bot.name}' and"
-                f"'{ALLOCATION_OPTION.first_active_to_riv_bot__drn.name}' and"
+                f"'{ALLOCATION_OPTION.first_active_to_elevation.name}' and"
+                f"'{ALLOCATION_OPTION.stage_to_riv_bot_drn_above.name}' and"
                 f"'{ALLOCATION_OPTION.at_elevation.name}' and"
                 f"'{ALLOCATION_OPTION.at_first_active.name}' supported."
                 f"got: '{allocation_option.name}'"
@@ -180,6 +180,10 @@ def allocate_drn_cells(
     >>> allocated = allocate_drn_cells(setting, active, top, bottom, stage, drain_elevation)
     """
     match allocation_option:
+        case ALLOCATION_OPTION.first_active_to_elevation:
+            return _allocate_cells__first_active_to_elevation(
+                active, top, bottom, elevation
+            )[0]
         case ALLOCATION_OPTION.at_elevation:
             return _allocate_cells__at_elevation(top, bottom, elevation)[0]
         case ALLOCATION_OPTION.at_first_active:
@@ -187,6 +191,7 @@ def allocate_drn_cells(
         case _:
             raise ValueError(
                 "Received incompatible setting for drains, only"
+                f"'{ALLOCATION_OPTION.first_active_to_elevation.name}', "
                 f"'{ALLOCATION_OPTION.at_elevation.name}' and"
                 f"'{ALLOCATION_OPTION.at_first_active.name}' supported."
                 f"got: '{allocation_option.name}'"
@@ -236,6 +241,10 @@ def allocate_ghb_cells(
     >>> allocated = allocate_ghb_cells(setting, active, top, bottom, head)
     """
     match allocation_option:
+        case ALLOCATION_OPTION.first_active_to_elevation:
+            return _allocate_cells__first_active_to_elevation(
+                active, top, bottom, head
+            )[0]
         case ALLOCATION_OPTION.at_elevation:
             return _allocate_cells__at_elevation(top, bottom, head)[0]
         case ALLOCATION_OPTION.at_first_active:
@@ -243,6 +252,7 @@ def allocate_ghb_cells(
         case _:
             raise ValueError(
                 "Received incompatible setting for general head boundary, only"
+                f"'{ALLOCATION_OPTION.first_active_to_elevation.name}', "
                 f"'{ALLOCATION_OPTION.at_elevation.name}' and"
                 f"'{ALLOCATION_OPTION.at_first_active.name}' supported."
                 f"got: '{allocation_option.name}'"
@@ -347,7 +357,7 @@ def _allocate_cells__stage_to_riv_bot(
 
 
 @enforced_dim_order
-def _allocate_cells__first_active_to_riv_bot(
+def _allocate_cells__first_active_to_elevation(
     active: GridDataArray,
     top: GridDataArray,
     bottom: GridDataArray,
@@ -390,7 +400,7 @@ def _allocate_cells__first_active_to_riv_bot(
 
 
 @enforced_dim_order
-def _allocate_cells__first_active_to_riv_bot__drn(
+def _allocate_cells__stage_to_riv_bot_drn_above(
     active: GridDataArray,
     top: GridDataArray,
     bottom: GridDataArray,

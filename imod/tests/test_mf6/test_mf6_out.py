@@ -64,14 +64,14 @@ def test_read_cbc_headers(twri_result):
         headers = imod.mf6.read_cbc_headers("GWF_1/GWF_1.cbc")
         assert isinstance(headers, dict)
         assert sorted(headers.keys()) == [
-            "chd",
-            "drn",
+            "chd_chd",
+            "drn_drn",
             "flow-ja-face",
-            "wel",
+            "wel_wel",
         ]
-        assert isinstance(headers["chd"], list)
+        assert isinstance(headers["chd_chd"], list)
         assert isinstance(headers["flow-ja-face"][0], imod.mf6.out.cbc.Imeth1Header)
-        assert isinstance(headers["chd"][0], imod.mf6.out.cbc.Imeth6Header)
+        assert isinstance(headers["chd_chd"][0], imod.mf6.out.cbc.Imeth6Header)
 
 
 @pytest.mark.usefixtures("transient_twri_result")
@@ -81,15 +81,15 @@ def test_read_cbc_headers__transient(transient_twri_result):
         headers = imod.mf6.read_cbc_headers("GWF_1/GWF_1.cbc")
         assert isinstance(headers, dict)
         assert sorted(headers.keys()) == [
-            "chd",
-            "drn",
+            "chd_chd",
+            "drn_drn",
             "flow-ja-face",
             "sto-ss",
-            "wel",
+            "wel_wel",
         ]
-        assert isinstance(headers["chd"], list)
+        assert isinstance(headers["chd_chd"], list)
         assert isinstance(headers["flow-ja-face"][0], imod.mf6.out.cbc.Imeth1Header)
-        assert isinstance(headers["chd"][0], imod.mf6.out.cbc.Imeth6Header)
+        assert isinstance(headers["chd_chd"][0], imod.mf6.out.cbc.Imeth6Header)
         assert isinstance(headers["sto-ss"][0], imod.mf6.out.cbc.Imeth1Header)
 
 
@@ -189,13 +189,14 @@ def test_open_cbc__dis(twri_result):
     with imod.util.cd(modeldir):
         cbc = imod.mf6.open_cbc("GWF_1/GWF_1.cbc", "GWF_1/dis.dis.grb")
         assert isinstance(cbc, dict)
+        # packagename_packagetype
         assert sorted(cbc.keys()) == [
-            "chd",
-            "drn",
+            "chd_chd",
+            "drn_drn",
             "flow-front-face",
             "flow-lower-face",
             "flow-right-face",
-            "wel",
+            "wel_wel",
         ]
         for array in cbc.values():
             assert array.shape == (1, 3, 15, 15)
@@ -213,13 +214,13 @@ def test_open_cbc__dis_transient(transient_twri_result):
         cbc = imod.mf6.open_cbc("GWF_1/GWF_1.cbc", "GWF_1/dis.dis.grb")
         assert isinstance(cbc, dict)
         assert sorted(cbc.keys()) == [
-            "chd",
-            "drn",
+            "chd_chd",
+            "drn_drn",
             "flow-front-face",
             "flow-lower-face",
             "flow-right-face",
             "sto-ss",
-            "wel",
+            "wel_wel",
         ]
         for array in cbc.values():
             assert array.shape == (30, 3, 15, 15)
@@ -252,8 +253,8 @@ def test_open_cbc__dis_transient_unconfined(transient_unconfined_twri_result):
         cbc = imod.mf6.open_cbc("GWF_1/GWF_1.cbc", "GWF_1/dis.dis.grb")
         assert isinstance(cbc, dict)
         assert sorted(cbc.keys()) == [
-            "chd",
-            "drn",
+            "chd_chd",
+            "drn_drn",
             "flow-front-face",
             "flow-lower-face",
             "flow-right-face",
@@ -263,7 +264,7 @@ def test_open_cbc__dis_transient_unconfined(transient_unconfined_twri_result):
             "npf-sat",
             "sto-ss",
             "sto-sy",
-            "wel",
+            "wel_wel",
         ]
         for array in cbc.values():
             assert array.shape == (30, 3, 15, 15)
@@ -281,14 +282,14 @@ def test_open_cbc__disv(circle_result):
         cbc = imod.mf6.open_cbc("GWF_1/GWF_1.cbc", "GWF_1/disv.disv.grb")
         assert isinstance(cbc, dict)
         assert sorted(cbc.keys()) == [
-            "chd",
+            "chd_chd",
             "flow-horizontal-face",
             "flow-horizontal-face-x",
             "flow-horizontal-face-y",
             "flow-lower-face",
         ]
         for key, array in cbc.items():
-            if key in ("chd", "flow-lower-face"):
+            if key in ("chd_chd", "flow-lower-face"):
                 assert array.shape == (52, 2, 216)
                 assert array.dims[-1] == array.ugrid.grid.face_dimension
             else:
@@ -324,7 +325,7 @@ def test_open_cbc__disv_sto(circle_result_sto):
         cbc = imod.mf6.open_cbc("GWF_1/GWF_1.cbc", "GWF_1/disv.disv.grb")
         assert isinstance(cbc, dict)
         assert sorted(cbc.keys()) == [
-            "chd",
+            "chd_chd",
             "flow-horizontal-face",
             "flow-horizontal-face-x",
             "flow-horizontal-face-y",
@@ -332,7 +333,7 @@ def test_open_cbc__disv_sto(circle_result_sto):
             "sto-ss",
         ]
         for key, array in cbc.items():
-            if key in ("chd", "flow-lower-face", "sto-ss"):
+            if key in ("chd_chd", "flow-lower-face", "sto-ss"):
                 assert array.shape == (52, 2, 216)
                 assert array.dims[-1] == array.ugrid.grid.face_dimension
             else:
