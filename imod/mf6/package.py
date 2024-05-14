@@ -22,7 +22,7 @@ from imod.mf6.pkgbase import (
     TRANSPORT_PACKAGES,
     PackageBase,
 )
-from imod.mf6.utilities.mask import _mask
+from imod.mf6.utilities.mask import mask_package
 from imod.mf6.utilities.regrid import (
     RegridderType,
     RegridderWeightsCache,
@@ -549,7 +549,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             The package with part masked.
         """
 
-        return _mask(self, mask)
+        return mask_package(self, mask)
 
     def regrid_like(
         self,
@@ -597,11 +597,6 @@ class Package(PackageBase, IPackage, abc.ABC):
         except Exception:
             raise ValueError("package could not be regridded.")
         return result
-
-    def _skip_masking_dataarray(self, array_name: str) -> bool:
-        if hasattr(self, "_skip_mask_arrays"):
-            return array_name in self._skip_mask_arrays
-        return False
 
     @classmethod
     def is_grid_agnostic_package(cls) -> bool:

@@ -21,14 +21,14 @@ except ImportError:
     shapely = MissingOptionalModule("shapely")
 
 
-@typedispatch
+@typedispatch  # type: ignore [no-redef]
 def clip_by_grid(_: object, grid: object) -> None:
     raise TypeError(
         f"'grid' should be of type xr.DataArray, xu.Ugrid2d or xu.UgridDataArray, got {type(grid)}"
     )
 
 
-@typedispatch
+@typedispatch  # type: ignore [no-redef]
 def clip_by_grid(package: IPackageBase, active: xr.DataArray) -> IPackageBase:  # noqa: F811
     domain_slice = get_active_domain_slice(active)
     x_min, x_max = domain_slice["x"].start, domain_slice["x"].stop
@@ -43,7 +43,7 @@ def clip_by_grid(package: IPackageBase, active: xr.DataArray) -> IPackageBase:  
     return clipped_package
 
 
-@typedispatch
+@typedispatch  # type: ignore [no-redef]
 def clip_by_grid(package: IPackageBase, active: xu.UgridDataArray) -> IPackageBase:  # noqa: F811
     domain_slice = get_active_domain_slice(active)
 
@@ -55,7 +55,7 @@ def clip_by_grid(package: IPackageBase, active: xu.UgridDataArray) -> IPackageBa
     return new
 
 
-@typedispatch
+@typedispatch  # type: ignore [no-redef]
 def clip_by_grid(  # noqa: F811
     package: IPointDataPackage, active: xu.UgridDataArray
 ) -> IPointDataPackage:
@@ -92,7 +92,7 @@ def _filter_inactive_cells(package, active):
                 )
 
 
-@typedispatch
+@typedispatch  # type: ignore [no-redef]
 def clip_by_grid(package: ILineDataPackage, active: GridDataArray) -> ILineDataPackage:  # noqa: F811
     """Clip LineDataPackage outside unstructured/structured grid."""
 

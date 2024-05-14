@@ -1,7 +1,7 @@
 import abc
 import copy
 from collections import defaultdict
-from typing import Any, Optional, Union
+from typing import Any, Dict, Optional, Tuple, Union
 
 import xarray as xr
 from fastcore.dispatch import typedispatch
@@ -24,6 +24,8 @@ from imod.mf6.utilities.regridding_types import RegridderType
 from imod.schemata import ValidationError
 from imod.typing.grid import GridDataArray, get_grid_geometry_hash, ones_like
 
+HashRegridderMapping = Tuple[int, int, BaseRegridder]
+
 
 class RegridderWeightsCache:
     """
@@ -40,7 +42,7 @@ class RegridderWeightsCache:
         self.regridder_instances: dict[
             tuple[type[BaseRegridder], Optional[str]], BaseRegridder
         ] = {}
-        self.weights_cache = {}
+        self.weights_cache: Dict[HashRegridderMapping, GridDataArray] = {}
         self.max_cache_size = max_cache_size
 
     def __get_regridder_class(
@@ -188,17 +190,22 @@ def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, lis
     This function loops over the packages and  collects all regridder-types that are in use.
     """
     methods: defaultdict = defaultdict(list)
-    for _, pkg in model.items():
-        if isinstance(pkg, IRegridPackage):
-            pkg_methods = pkg.get_regrid_methods()
-            for variable, regrid_method in pkg_methods.items():
-                if variable in pkg.dataset.data_vars:
-                    functiontype = None
-                    regriddertype = regrid_method[0]
-                    if len(regrid_method) > 1:
-                        functiontype = regrid_method[1]
-                    if functiontype not in methods[regriddertype]:
-                        methods[regriddertype].append(functiontype)
+    regrid_packages = [pkg for pkg in model.values() if isinstance(pkg, IRegridPackage)]
+    regrid_packages_with_methods = {
+        pkg: pkg.get_regrid_methods().items()  # type: ignore # noqa: union-attr
+        for pkg in regrid_packages
+        if pkg.get_regrid_methods() is not None
+    }
+
+    for pkg, regrid_methods in regrid_packages_with_methods.items():
+        for variable, regrid_method in regrid_methods:
+            if variable in pkg.dataset.data_vars:
+                functiontype = None
+                regriddertype = regrid_method[0]
+                if len(regrid_method) > 1:
+                    functiontype = regrid_method[1]
+                if functiontype not in methods[regriddertype]:
+                    methods[regriddertype].append(functiontype)
     return methods
 
 

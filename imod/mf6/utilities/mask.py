@@ -1,12 +1,14 @@
 import numbers
 
 import numpy as np
+from fastcore.dispatch import typedispatch
 from xarray.core.utils import is_scalar
 
 from imod.mf6.auxiliary_variables import (
     expand_transient_auxiliary_variables,
     remove_expanded_auxiliary_variables_from_dataset,
 )
+from imod.mf6.interfaces.imaskingsettings import IMaskingSettings
 from imod.mf6.interfaces.imodel import IModel
 from imod.mf6.interfaces.ipackage import IPackage
 from imod.mf6.interfaces.isimulation import ISimulation
@@ -28,6 +30,7 @@ def _mask_all_models(
 
     flowmodels = list(simulation.get_models_of_type("gwf6").keys())
     transportmodels = list(simulation.get_models_of_type("gwt6").keys())
+
     modelnames = flowmodels + transportmodels
 
     for name in modelnames:
@@ -52,33 +55,44 @@ def _mask_all_packages(
     model.purge_empty_packages()
 
 
-def _mask(package: IPackage, mask: GridDataArray) -> IPackage:
+def mask_package(package: IPackage, mask: GridDataArray) -> IPackage:
     masked = {}
     if len(package.auxiliary_data_fields) > 0:
         remove_expanded_auxiliary_variables_from_dataset(package)
+
     for var in package.dataset.data_vars.keys():
-        if _skip_masking_variable(package, var, package.dataset[var]):
+        if _skip_dataarray(package.dataset[var]) or _skip_variable(package, var):
             masked[var] = package.dataset[var]
         else:
             masked[var] = _mask_spatial_var(package, var, mask)
+
     if len(package.auxiliary_data_fields) > 0:
         expand_transient_auxiliary_variables(package)
     return type(package)(**masked)
 
 
-def _skip_masking_variable(package: IPackage, var: str, da: GridDataArray) -> bool:
-    if (
-        package._skip_masking_dataarray(var)
-        or len(da.dims) == 0
-        or set(da.coords).issubset(["layer"])
-    ):
+def _skip_dataarray(da: GridDataArray) -> bool:
+    if len(da.dims) == 0 or set(da.coords).issubset(["layer"]):
         return True
+
     if is_scalar(da.values[()]):
         return True
+
     spatial_dims = ["x", "y", "mesh2d_nFaces", "layer"]
     if not np.any([coord in spatial_dims for coord in da.coords]):
         return True
+
     return False
+
+
+@typedispatch  # type: ignore [no-redef]
+def _skip_variable(package: IPackage, var: str) -> bool:
+    return False
+
+
+@typedispatch  # type: ignore [no-redef]
+def _skip_variable(package: IMaskingSettings, var: str) -> bool:
+    return var in package.skip_variables
 
 
 def _mask_spatial_var(self, var: str, mask: GridDataArray) -> GridDataArray:
