@@ -200,12 +200,25 @@ class Recharge(BoundaryCondition, IRegridPackage):
         }
         new_package_data = {}
 
+
+        # first regrid the inputs to the target grid.
+        regridder_settings = deepcopy(cls._regrid_method)
+        if regridder_types is not None:
+            regridder_settings.update(regridder_types)
+
+        regrid_context = RegridderWeightsCache()
+
+        new_package_data = _regrid_package_data(
+            data, target_grid, regridder_settings, regrid_context, {}
+        )
+
+
         # if rate has only layer 0, then it is planar.
         if is_planar_grid(data["rate"]):
             is_rch_cell = allocate_rch_cells(
                 ALLOCATION_OPTION.at_first_active,
                 target_grid,
-                data["rate"].isel(layer=0),
+                new_package_data["rate"].isel(layer=0),
             )
             rch_rate = zeros_like(target_grid)
             if is_transient_data_grid(data["rate"]):
@@ -221,15 +234,5 @@ class Recharge(BoundaryCondition, IRegridPackage):
             rch_rate = xr.where(is_rch_cell, rch_rate, np.nan)
             new_package_data["rate"] = rch_rate
 
-        else:
-            regridder_settings = deepcopy(cls._regrid_method)
-            if regridder_types is not None:
-                regridder_settings.update(regridder_types)
-
-            regrid_context = RegridderWeightsCache()
-
-            new_package_data = _regrid_package_data(
-                data, target_grid, regridder_settings, regrid_context, {}
-            )
 
         return Recharge(**new_package_data)
