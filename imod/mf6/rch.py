@@ -200,7 +200,6 @@ class Recharge(BoundaryCondition, IRegridPackage):
         }
         new_package_data = {}
 
-
         # first regrid the inputs to the target grid.
         regridder_settings = deepcopy(cls._regrid_method)
         if regridder_types is not None:
@@ -211,7 +210,6 @@ class Recharge(BoundaryCondition, IRegridPackage):
         new_package_data = _regrid_package_data(
             data, target_grid, regridder_settings, regrid_context, {}
         )
-
 
         # if rate has only layer 0, then it is planar.
         if is_planar_grid(data["rate"]):
@@ -233,6 +231,5 @@ class Recharge(BoundaryCondition, IRegridPackage):
                 rch_rate.loc[:, :, :] = data["rate"].drop_vars("layer")
             rch_rate = xr.where(is_rch_cell, rch_rate, np.nan)
             new_package_data["rate"] = rch_rate
-
 
         return Recharge(**new_package_data)
