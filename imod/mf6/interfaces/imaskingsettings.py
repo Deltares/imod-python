@@ -6,7 +6,7 @@ from imod.mf6.interfaces.ipackage import IPackage
 
 class IMaskingSettings(IPackage, abc.ABC):
     """
-    Interface for packages that support regridding
+    Interface for packages that support masking
     """
 
     @property

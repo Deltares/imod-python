@@ -16,9 +16,7 @@ def get_label_array(simulation: Modflow6Simulation, npartitions: int) -> GridDat
     idomain. Every array element is the partition number to which the column of
     gridblocks of idomain at that location belong.
     """
-    gwf_models = [
-        model for model in simulation.get_models().values() if model.model_id == "gwf6"
-    ]
+    gwf_models = simulation.get_models_of_type("gwf6")
     if len(gwf_models) != 1:
         raise ValueError(
             "for partitioning a simulation to work, it must have exactly 1 flow model"
@@ -26,7 +24,7 @@ def get_label_array(simulation: Modflow6Simulation, npartitions: int) -> GridDat
     if npartitions <= 0:
         raise ValueError("You should create at least 1 partition")
 
-    flowmodel = gwf_models[0]
+    flowmodel = list(gwf_models.values())[0]
     idomain = flowmodel.domain
     idomain_top = copy.deepcopy(idomain.isel(layer=0))
 

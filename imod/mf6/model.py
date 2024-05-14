@@ -344,6 +344,12 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         return instance
 
     @property
+    def options(self) -> dict:
+        if self._options is None:
+            raise ValueError("Model id has not been set")
+        return self._options
+
+    @property
     def model_id(self) -> str:
         if self._model_id is None:
             raise ValueError("Model id has not been set")
