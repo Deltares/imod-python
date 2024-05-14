@@ -28,6 +28,7 @@ from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray
+from imod.typing.grid import is_spatial_2D
 
 
 class Modflow6Model(collections.UserDict, IModel, abc.ABC):
@@ -344,7 +345,8 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 else:
                     dataset.ugrid.to_netcdf(modeldirectory / pkg_path)
             else:
-                dataset = imod.util.spatial.gdal_compliant_grid(dataset, crs=crs)
+                if is_spatial_2D(dataset):
+                    dataset = imod.util.spatial.gdal_compliant_grid(dataset, crs=crs)
                 dataset.to_netcdf(modeldirectory / pkg_path)
 
         toml_path = modeldirectory / f"{modelname}.toml"
