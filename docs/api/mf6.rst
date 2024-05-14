@@ -22,6 +22,7 @@ Model objects & methods
     Modflow6Simulation
     Modflow6Simulation.create_time_discretization
     Modflow6Simulation.write
+    Modflow6Simulation.dump
     Modflow6Simulation.run
     Modflow6Simulation.open_flow_budget
     Modflow6Simulation.open_transport_budget
@@ -31,9 +32,11 @@ Model objects & methods
     Modflow6Simulation.split
     Modflow6Simulation.regrid_like
     GroundwaterFlowModel
-    GroundwaterFlowModel.mask_all_packages     
+    GroundwaterFlowModel.mask_all_packages
+    GroundwaterFlowModel.dump
     GroundwaterTransportModel
     GroundwaterTransportModel.mask_all_packages
+    GroundwaterTransportModel.dump
 
 Discretization
 --------------
