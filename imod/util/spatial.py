@@ -312,9 +312,7 @@ def mdal_compliant_ugrid2d(
                 attrs.pop("edge_node_connectivity")
 
     if crs is not None:
-        if isinstance(rioxarray, MissingOptionalModule):
-            raise ModuleNotFoundError("rioxarray is required for this functionality")
-        ds.rio.write_crs(crs, inplace=True)
+        ds.ugrid.grid.set_crs(crs=crs, allow_override=True)
 
     # Make sure time is encoded as a float for MDAL
     # TODO: MDAL requires all data variables to be float (this excludes the UGRID topology data)
