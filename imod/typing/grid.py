@@ -69,11 +69,11 @@ def _get_first_item(objects: Sequence):
 # Typedispatching doesn't work based on types of list elements, therefore resort to
 # isinstance testing
 def _type_dispatch_functions_on_grid_sequence(
-        objects: Sequence[GridDataArray | GridDataset],
-        unstructured_func: Callable,
-        structured_func: Callable,
-        *args,
-        **kwargs,
+    objects: Sequence[GridDataArray | GridDataset],
+    unstructured_func: Callable,
+    structured_func: Callable,
+    *args,
+    **kwargs,
 ) -> GridDataArray | GridDataset:
     """
     Type dispatch functions on sequence of grids. Functions like merging or concatenating.
@@ -98,11 +98,11 @@ def _type_dispatch_functions_on_grid_sequence(
 # Typedispatching doesn't work based on types of dict elements, therefore resort
 # to manual type testing
 def _type_dispatch_functions_on_dict(
-        dict_of_objects: Mapping[str, GridDataArray | float | bool | int],
-        unstructured_func: Callable,
-        structured_func: Callable,
-        *args,
-        **kwargs,
+    dict_of_objects: Mapping[str, GridDataArray | float | bool | int],
+    unstructured_func: Callable,
+    structured_func: Callable,
+    *args,
+    **kwargs,
 ):
     """
     Typedispatch function on grid and scalar variables provided in dictionary.
@@ -138,7 +138,7 @@ def _type_dispatch_functions_on_dict(
 
 
 def merge(
-        objects: Sequence[GridDataArray | GridDataset], *args, **kwargs
+    objects: Sequence[GridDataArray | GridDataset], *args, **kwargs
 ) -> GridDataset:
     return _type_dispatch_functions_on_grid_sequence(
         objects, xu.merge, xr.merge, *args, **kwargs
@@ -146,7 +146,7 @@ def merge(
 
 
 def merge_partitions(
-        objects: Sequence[GridDataArray | GridDataset], *args, **kwargs
+    objects: Sequence[GridDataArray | GridDataset], *args, **kwargs
 ) -> GridDataArray | GridDataset:
     return _type_dispatch_functions_on_grid_sequence(
         objects, xu.merge_partitions, structured.merge_partitions, *args, **kwargs
@@ -154,7 +154,7 @@ def merge_partitions(
 
 
 def concat(
-        objects: Sequence[GridDataArray | GridDataset], *args, **kwargs
+    objects: Sequence[GridDataArray | GridDataset], *args, **kwargs
 ) -> GridDataArray | GridDataset:
     return _type_dispatch_functions_on_grid_sequence(
         objects, xu.concat, xr.concat, *args, **kwargs
@@ -213,9 +213,9 @@ def merge_unstructured_dataset(variables_to_merge: list[dict], *args, **kwargs):
 
 
 def merge_with_dictionary(
-        variables_to_merge: Mapping[str, GridDataArray | float | bool | int],
-        *args,
-        **kwargs,
+    variables_to_merge: Mapping[str, GridDataArray | float | bool | int],
+    *args,
+    **kwargs,
 ):
     return _type_dispatch_functions_on_dict(
         variables_to_merge, merge_unstructured_dataset, xr.merge, *args, **kwargs

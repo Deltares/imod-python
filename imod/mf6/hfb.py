@@ -408,11 +408,16 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
                 )
             )
 
-        barrier_dataset = to_connected_cells_dataset(idomain, unstructured_grid.ugrid.grid, edge_index,
-                {
-                    "hydraulic_characteristic": self.__to_hydraulic_characteristic(barrier_values)
-                },
-            )
+        barrier_dataset = to_connected_cells_dataset(
+            idomain,
+            unstructured_grid.ugrid.grid,
+            edge_index,
+            {
+                "hydraulic_characteristic": self.__to_hydraulic_characteristic(
+                    barrier_values
+                )
+            },
+        )
 
         barrier_dataset["print_input"] = self.dataset["print_input"]
 
