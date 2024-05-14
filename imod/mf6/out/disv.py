@@ -534,7 +534,10 @@ def open_cbc(
                     )
             else:
                 cbc_content[key] = open_imeth6_budgets(
-                    cbc_path, grb_content, cast(List[cbc.Imeth6Header], header_list), return_id=indices
+                    cbc_path,
+                    grb_content,
+                    cast(List[cbc.Imeth6Header], header_list),
+                    return_id=indices,
                 )
 
     if simulation_start_time is not None:
