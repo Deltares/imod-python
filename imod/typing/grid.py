@@ -243,7 +243,7 @@ def bounding_polygon(active: xu.UgridDataArray):  # noqa: F811
 
 
 @typedispatch  # type: ignore [no-redef]
-def is_spatial_2D(array: xr.DataArray) -> bool:
+def is_spatial_2D(array: xr.DataArray | xr.Dataset) -> bool:
     """Return True if the array contains data in at least 2 spatial dimensions"""
     coords = array.coords
     dims = array.dims
@@ -253,7 +253,7 @@ def is_spatial_2D(array: xr.DataArray) -> bool:
 
 
 @typedispatch  # type: ignore [no-redef]
-def is_spatial_2D(array: xu.UgridDataArray) -> bool:  # noqa: F811
+def is_spatial_2D(array: xu.UgridDataArray | xu.UgridDataset) -> bool:  # noqa: F811
     """Return True if the array contains data associated to cell faces"""
     face_dim = array.ugrid.grid.face_dimension
     dims = array.dims
