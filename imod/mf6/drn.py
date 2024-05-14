@@ -5,9 +5,12 @@ import numpy as np
 
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.utilities.regrid import RegridderType, RegridderWeightsCache, _regrid_package_data
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
+from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_drn_cells
 from imod.schemata import (
     AllInsideNoDataSchema,
     AllNoDataSchema,
@@ -20,7 +23,7 @@ from imod.schemata import (
     OtherCoordsSchema,
 )
 from imod.typing import GridDataArray
-from imod.typing.grid import zeros_like
+from imod.typing.grid import is_planar_grid, zeros_like
 
 
 class Drainage(BoundaryCondition, IRegridPackage):
@@ -163,7 +166,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
     def from_imod5_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        target_grid: GridDataArray,
+        target_discretization:VerticesDiscretization | StructuredDiscretization,
         regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
     ) -> "Drainage":
         """
@@ -198,7 +201,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
             package = cls.from_imod5_data_single(
                 key,
                 imod5_data,
-                target_grid,
+                target_discretization,
                 regridder_types
             )  
             drainage_packages.append(package)
@@ -208,9 +211,15 @@ class Drainage(BoundaryCondition, IRegridPackage):
         cls,
         key:str,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        target_grid: GridDataArray,
+        target_discretization: VerticesDiscretization | StructuredDiscretization,,
         regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
     ) -> "Drainage":
+        
+        top = target_discretization.dataset["top"]
+        bottom = target_discretization.dataset["bottom"]
+        idomain =  target_discretization.dataset["idomain"]
+
+        
         data = {
             "elevation": imod5_data[key]["elevation"],
             "conductance": imod5_data[key]["conductance"],            
@@ -225,14 +234,15 @@ class Drainage(BoundaryCondition, IRegridPackage):
         new_package_data = _regrid_package_data(
             data, target_grid, regridder_settings, regrid_context, {}
         )
+        allocation_option = ALLOCATION_OPTION.first_active_to_elevation
 
-        new_package_data["convertible"] = zeros_like(
-            new_package_data["storage_coefficient"], dtype=int
-        )
-        new_package_data["transient"] = np.any(
-            new_package_data["storage_coefficient"].values > 0
-        )
-        new_package_data["specific_yield"] = None
+        if is_planar_grid(new_package_data["elevation"] ):
+            allocate_drn_cells(allocation_option, target_grid, )
+            
+            new_package_data["transient"] = np.any(
+                new_package_data["storage_coefficient"].values > 0
+            )
+            new_package_data["specific_yield"] = None
 
-        return cls(**new_package_data)
+            return cls(**new_package_data)
 
