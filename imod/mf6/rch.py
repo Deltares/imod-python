@@ -170,7 +170,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
         regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
     ) -> "Recharge":
         """
-        Construct an npf-package from iMOD5 data, loaded with the
+        Construct an rch-package from iMOD5 data, loaded with the
         :func:`imod.formats.prj.open_projectfile_data` function.
 
         .. note::
@@ -191,7 +191,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
 
         Returns
         -------
-        Modflow 6 npf package.
+        Modflow 6 rch package.
 
         """
 
