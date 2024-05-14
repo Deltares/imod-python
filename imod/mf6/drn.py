@@ -219,7 +219,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
         bottom = target_discretization.dataset["bottom"]
         idomain =  target_discretization.dataset["idomain"]
 
-        
+
         data = {
             "elevation": imod5_data[key]["elevation"],
             "conductance": imod5_data[key]["conductance"],            
@@ -232,17 +232,14 @@ class Drainage(BoundaryCondition, IRegridPackage):
         regrid_context = RegridderWeightsCache()
 
         new_package_data = _regrid_package_data(
-            data, target_grid, regridder_settings, regrid_context, {}
+            data, idomain, regridder_settings, regrid_context, {}
         )
         allocation_option = ALLOCATION_OPTION.first_active_to_elevation
 
         if is_planar_grid(new_package_data["elevation"] ):
-            allocate_drn_cells(allocation_option, target_grid, )
+            drn_allocation = allocate_drn_cells(allocation_option, idomain, top, bottom, new_package_data["elevation"] )
             
-            new_package_data["transient"] = np.any(
-                new_package_data["storage_coefficient"].values > 0
-            )
-            new_package_data["specific_yield"] = None
+
 
             return cls(**new_package_data)
 
