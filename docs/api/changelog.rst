@@ -6,8 +6,8 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
-[Unreleased]
-------------
+[0.17.0] - 2024-05-13
+---------------------
 
 Added
 ~~~~~
@@ -21,18 +21,17 @@ Added
   topsystem in :func:`imod.prepare.distribute_riv_conductance`,
   :func:`imod.prepare.distribute_drn_conductance`,
   :func:`imod.prepare.distribute_ghb_conductance`, for this multiple options can
-  be selected, available in :func:`imod.prepare.DISTRIBUTION_OPTION`.
+  be selected, available in :func:`imod.prepare.DISTRIBUTING_OPTION`.
 - :func:`imod.prepare.celltable` supports an optional ``dtype`` argument. This
   can be used, for example, to create celltables of float values.
-- Added fixed_cell option. This option is relevant for phreatic models, not using 
-  the Newton formulation and model cells can become inactive. The prefered method 
-  for phreatic models is to use the Newton formulation, where cells remain active, 
-  and this option irrelevant. Option Added in
-  :func:`imod.mf6.recharge`,
-- Added support for ats_outer_maximum_fraction in :class:`imod.mf6.Solution`.
-- Added validation for linear_acceleration, rclose_option, scaling_method,
-  reordering_method, print_option and no_ptc entries in
-  :class:`imod.mf6.Solution`.
+- Added ``fixed_cell`` option to :class:`imod.mf6.Recharge`. This option is
+  relevant for phreatic models, not using the Newton formulation and model cells
+  can become inactive. The prefered method for phreatic models is to use the
+  Newton formulation, where cells remain active, and this option irrelevant.
+- Added support for ``ats_outer_maximum_fraction`` in :class:`imod.mf6.Solution`.
+- Added validation for ``linear_acceleration``, ``rclose_option``,
+  ``scaling_method``, ``reordering_method``, ``print_option`` and ``no_ptc``
+  entries in :class:`imod.mf6.Solution`.
 
 Fixed
 ~~~~~
@@ -43,7 +42,7 @@ Fixed
 - When importing data from a .prj file, the multipliers and additions specified for
   ipf and idf files are now applied
 - Fix bug where y-coords were flipped in :class:`imod.msw.MeteoMapping`
-  
+
 Changed
 ~~~~~~~
 - Replaced csv_output by outer_csvfile and inner_csvfile in
@@ -52,6 +51,18 @@ Changed
 - Removed constructor arguments `source` and `target` from
   :class:`imod.mf6.utilities.regrid.RegridderWeightsCache`, as they were not
   used.
+- :func:`imod.mf6.open_cbc` now returns arrays which contain np.nan for cells where 
+  budget variables are not defined. Based on new budget output a disquisition between 
+  active cells but zero flow and inactive cells can be made.
+- :func:`imod.mf6.open_cbc` now returns package type in return budget names. New format 
+  is "package type"-"optional package variable"_"package name". E.g. a River package 
+  named ``primary-sys`` will get a budget name ``riv_primary-sys``. An UZF package 
+  with name ``uzf-sys1`` will get a budget name ``uzf-gwrch_uzf-sys1`` for the 
+  groundwater recharge budget from the UZF-CBC.
+
+
+[0.16.0] - 2024-03-29
+---------------------
 
 Added
 ~~~~~
