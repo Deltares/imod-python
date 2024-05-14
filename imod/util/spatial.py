@@ -447,7 +447,10 @@ def gdal_compliant_grid(
         "standard_name": "projection_y_coordinate",
     }
 
-    dims = set(data.dims)
+    # Use of ``dims`` in xarray currently inconsistent between DataArray and
+    # Dataset, therefore use .sizes.keys() to force getting the same thing.
+    # FUTURE: change this to set(data.dims) when made consistent.
+    dims = {str(k) for k in data.sizes.keys()}
     missing_dims = {"x", "y"} - dims
 
     if len(missing_dims) > 0:
