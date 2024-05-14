@@ -71,19 +71,6 @@ def test_enforce_dim_order__unstructured(basic_unstructured_dis):
     assert isinstance(actual, type(ibound))
 
 
-def test_is_transient(basic_dis, basic_unstructured_dis):
-    ibound, _, _ = basic_unstructured_dis
-
-    face_dim = ibound.ugrid.grid.face_dimension
-
-    ibound_wrong_order = ibound.transpose(face_dim, "layer")
-
-    actual = enforce_dim_order(ibound_wrong_order)
-
-    assert actual.dims == ibound.dims
-    assert isinstance(actual, type(ibound))
-
-
 def test_is_planar_grid(basic_dis, basic_unstructured_dis):
     discretizations = [basic_dis, basic_unstructured_dis]
     for discr in discretizations:
