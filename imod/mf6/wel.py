@@ -34,7 +34,7 @@ from imod.schemata import (
 )
 from imod.select.points import points_indices, points_values
 from imod.typing import GridDataArray
-from imod.typing.grid import is_spatial_2D, ones_like
+from imod.typing.grid import is_spatial_grid, ones_like
 from imod.util.structured import values_within_range
 
 
@@ -335,7 +335,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         value = None if layer is None else grid.isel(layer=layer)
 
         # if value is a grid select the values at the well locations and drop the dimensions
-        if (value is not None) and is_spatial_2D(value):
+        if (value is not None) and is_spatial_grid(value):
             value = imod.select.points_values(
                 value,
                 x=well_dataset["x"].values,

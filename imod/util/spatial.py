@@ -7,7 +7,7 @@ used internally, but are not private since they may be useful to users as well.
 
 import collections
 import re
-from typing import TYPE_CHECKING, Any, Dict, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence, Tuple, Union
 
 import affine
 import numpy as np
@@ -18,7 +18,7 @@ import xugrid as xu
 from imod.typing import FloatArray, GridDataset, IntArray
 from imod.util.imports import MissingOptionalModule
 
-# since rasterio, shapely, and geopandas are a big dependencies that are
+# since rasterio, shapely, rioxarray, and geopandas are a big dependencies that are
 # sometimes hard to install and not always required, we made this an optional
 # dependency
 try:
@@ -38,6 +38,11 @@ else:
         import geopandas as gpd
     except ImportError:
         gpd = MissingOptionalModule("geopandas")
+
+try:
+    import rioxarray
+except ImportError:
+    rasterio = MissingOptionalModule("rioxarray")
 
 
 def _xycoords(bounds, cellsizes) -> Dict[str, Any]:
@@ -240,7 +245,9 @@ def unstack_dim_into_variable(dataset: GridDataset, dim: str) -> GridDataset:
     return unstacked
 
 
-def mdal_compliant_ugrid2d(dataset: xr.Dataset) -> xr.Dataset:
+def mdal_compliant_ugrid2d(
+    dataset: xr.Dataset, crs: Optional[Any] = None
+) -> xr.Dataset:
     """
     Ensures the xarray Dataset will be written to a UGRID netCDF that will be
     accepted by MDAL.
@@ -252,6 +259,10 @@ def mdal_compliant_ugrid2d(dataset: xr.Dataset) -> xr.Dataset:
     Parameters
     ----------
     dataset: xarray.Dataset
+        Dataset to make compliant with MDAL
+    crs: Any, Optional
+        Anything accepted by rasterio.crs.CRS.from_user_input
+        Requires ``rioxarray`` installed.
 
     Returns
     -------
@@ -300,6 +311,11 @@ def mdal_compliant_ugrid2d(dataset: xr.Dataset) -> xr.Dataset:
             if edge_nodes and edge_nodes not in ds:
                 attrs.pop("edge_node_connectivity")
 
+    if crs is not None:
+        if isinstance(rioxarray, MissingOptionalModule):
+            raise ModuleNotFoundError("rioxarray is required for this functionality")
+        ds.rio.write_crs(crs, inplace=True)
+
     # Make sure time is encoded as a float for MDAL
     # TODO: MDAL requires all data variables to be float (this excludes the UGRID topology data)
     for var in ds.coords:
@@ -309,7 +325,7 @@ def mdal_compliant_ugrid2d(dataset: xr.Dataset) -> xr.Dataset:
     return ds
 
 
-def from_mdal_compliant_ugrid2d(dataset: xu.UgridDataset):
+def from_mdal_compliant_ugrid2d(dataset: xu.UgridDataset) -> xu.UgridDataset:
     """
     Undo some of the changes of ``mdal_compliant_ugrid2d``: re-stack the
     layers.
@@ -399,6 +415,64 @@ def to_ugrid2d(data: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
             )
         ds[data.name] = ugrid2d_data(data, grid.face_dimension)
     return mdal_compliant_ugrid2d(ds)
+
+
+def gdal_compliant_grid(
+    data: Union[xr.DataArray, xr.Dataset],
+    crs: Optional[Any] = None,
+) -> Union[xr.DataArray, xr.Dataset]:
+    """
+    Assign attributes to x,y coordinates to make data accepted by GDAL.
+
+    Parameters
+    ----------
+    data: xr.DataArray | xr.Dataset
+        Structured data with a x and y coordinate.
+    crs: Any, Optional
+        Anything accepted by rasterio.crs.CRS.from_user_input
+        Requires ``rioxarray`` installed.
+
+    Returns
+    -------
+    data with attributes to be accepted by GDAL.
+    """
+    x_attrs = {
+        "axis": "X",
+        "long_name": "x coordinate of projection",
+        "standard_name": "projection_x_coordinate",
+    }
+    y_attrs = {
+        "axis": "Y",
+        "long_name": "y coordinate of projection",
+        "standard_name": "projection_y_coordinate",
+    }
+
+    # Use of ``dims`` in xarray currently inconsistent between DataArray and
+    # Dataset, therefore use .sizes.keys() to force getting the same thing.
+    # FUTURE: change this to set(data.dims) when made consistent.
+    dims = {str(k) for k in data.sizes.keys()}
+    missing_dims = {"x", "y"} - dims
+
+    if len(missing_dims) > 0:
+        raise ValueError(f"Missing dimensions: {missing_dims}")
+
+    x_coord_attrs = data.coords["x"].assign_attrs(x_attrs)
+    y_coord_attrs = data.coords["y"].assign_attrs(y_attrs)
+
+    data_gdal = data.assign_coords(x=x_coord_attrs, y=y_coord_attrs)
+
+    if crs is not None:
+        if isinstance(rioxarray, MissingOptionalModule):
+            raise ModuleNotFoundError("rioxarray is required for this functionality")
+        elif (data_gdal.rio.crs is not None) and (data_gdal.rio.crs != crs):
+            raise ValueError(
+                "Grid already has CRS different then provided CRS. "
+                f"Grid has {data_gdal.rio.crs}, got {crs}."
+            )
+
+        data_gdal.rio.write_crs(crs, inplace=True)
+
+    return data_gdal
 
 
 def empty_2d(

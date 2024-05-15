@@ -6,6 +6,25 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[Unreleased]
+------------
+
+Added
+~~~~~
+- Added function :func:`imod.util.spatial.gdal_compliant_grid` to make spatial
+  coordinates of a NetCDF interpretable for GDAL (and so QGIS).
+- Added ``crs`` argument to :func:`imod.util.spatial.mdal_compliant_ugrid2d`,
+  :meth:`imod.mf6.Simulation.dump`, :meth:`imod.mf6.GroundwaterFlowModel.dump`,
+  :meth:`imod.mf6.GroundwaterTransportModel.dump`, to add a coordinate reference
+  system to dumped files, to ease loading them in QGIS.
+
+Changed
+~~~~~~~
+- :meth:`imod.mf6.Simulation.dump`, :meth:`imod.mf6.GroundwaterFlowModel.dump`,
+  :meth:`imod.mf6.GroundwaterTransportModel.dump` write with necessary
+  attributes to NetCDF to make these files interpretable for GDAL (and so QGIS).
+
+
 [0.17.0] - 2024-05-13
 ---------------------
 
