@@ -28,7 +28,7 @@ from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray
-from imod.typing.grid import is_spatial_2D
+from imod.typing.grid import is_spatial_grid
 
 
 class Modflow6Model(collections.UserDict, IModel, abc.ABC):
@@ -345,7 +345,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 else:
                     dataset.ugrid.to_netcdf(modeldirectory / pkg_path)
             else:
-                if is_spatial_2D(dataset):
+                if is_spatial_grid(dataset):
                     dataset = imod.util.spatial.gdal_compliant_grid(dataset, crs=crs)
                 dataset.to_netcdf(modeldirectory / pkg_path)
 

@@ -3,7 +3,7 @@ import xugrid as xu
 
 from imod.typing.grid import (
     enforce_dim_order,
-    is_spatial_2D,
+    is_spatial_grid,
     merge_with_dictionary,
     preserve_gridtype,
 )
@@ -71,18 +71,18 @@ def test_enforce_dim_order__unstructured(basic_unstructured_dis):
     assert isinstance(actual, type(ibound))
 
 
-def test_is_spatial_2D__structured(basic_dis):
+def test_is_spatial_grid__structured(basic_dis):
     ibound, _, bottom = basic_dis
     ds = xr.Dataset()
     ds["ibound"] = ibound
     ds["bottom"] = bottom
 
-    assert is_spatial_2D(ibound)
-    assert not is_spatial_2D(bottom)
-    assert is_spatial_2D(ds)
+    assert is_spatial_grid(ibound)
+    assert not is_spatial_grid(bottom)
+    assert is_spatial_grid(ds)
 
 
-def test_is_spatial_2D__unstructured(basic_unstructured_dis):
+def test_is_spatial_grid__unstructured(basic_unstructured_dis):
     ibound, _, bottom = basic_unstructured_dis
     grid = ibound.ugrid.grid
     ds = xr.Dataset()
@@ -92,9 +92,9 @@ def test_is_spatial_2D__unstructured(basic_unstructured_dis):
     ds["bottom"] = bottom
     uds = xu.UgridDataset(ds, grid)
 
-    assert is_spatial_2D(ibound)
-    assert not is_spatial_2D(bottom)
-    assert is_spatial_2D(uds)
+    assert is_spatial_grid(ibound)
+    assert not is_spatial_grid(bottom)
+    assert is_spatial_grid(uds)
 
 
 def test_merge_dictionary__structured(basic_dis):
