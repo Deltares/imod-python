@@ -5,6 +5,7 @@ from imod.typing.grid import enforce_dim_order
 
 def enforced_dim_order(func):
     """Decorator to enforce dimension order after function call"""
+
     @wraps(func)
     def decorator(*args, **kwargs):
         x = func(*args, **kwargs)

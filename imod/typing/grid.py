@@ -370,6 +370,7 @@ def preserve_gridtype(func):
     >>> UgridDataArray() * DataArray() -> UgridDataArray
     >>> DataArray() * UgridDataArray() -> UgridDataArray
     """
+
     @wraps(func)
     def decorator(*args, **kwargs):
         unstructured = False
