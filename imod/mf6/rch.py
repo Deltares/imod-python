@@ -26,7 +26,12 @@ from imod.schemata import (
     OtherCoordsSchema,
 )
 from imod.typing import GridDataArray
-from imod.typing.grid import enforce_dim_order, is_planar_grid, is_transient_data_grid, zeros_like
+from imod.typing.grid import (
+    enforce_dim_order,
+    is_planar_grid,
+    is_transient_data_grid,
+    zeros_like,
+)
 
 
 class Recharge(BoundaryCondition, IRegridPackage):
@@ -212,16 +217,17 @@ class Recharge(BoundaryCondition, IRegridPackage):
         )
 
         # if rate has only layer 0, then it is planar.
-        if is_planar_grid(data["rate"]):
+        if is_planar_grid(new_package_data["rate"]):
+            planar_rate_regridded = new_package_data["rate"].isel(layer=0, drop=True)
             # create an array indicating in which cells rch is active
             is_rch_cell = allocate_rch_cells(
                 ALLOCATION_OPTION.at_first_active,
                 target_grid,
-                new_package_data["rate"].isel(layer=0),
+                planar_rate_regridded,
             )
 
             # remove rch from cells where it is not allocated and broadcast over layers.
-            rch_rate = new_package_data["rate"].where(is_rch_cell)
+            rch_rate = planar_rate_regridded.where(is_rch_cell)
             rch_rate = enforce_dim_order(rch_rate)
             new_package_data["rate"] = rch_rate
 
