@@ -464,6 +464,12 @@ def gdal_compliant_grid(
     if crs is not None:
         if isinstance(rioxarray, MissingOptionalModule):
             raise ModuleNotFoundError("rioxarray is required for this functionality")
+        elif data_gdal.rio.crs is not None or (data_gdal.rio.crs != crs):
+            raise ValueError(
+                "Grid already has CRS different then provided CRS. "
+                f"Grid has {data_gdal.rio.crs}, got {crs}."
+            )
+
         data_gdal.rio.write_crs(crs, inplace=True)
 
     return data_gdal
