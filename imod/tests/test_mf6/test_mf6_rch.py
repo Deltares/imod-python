@@ -357,11 +357,10 @@ def test_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
 
     # create a grid with recharge for 3 timesteps
     input_recharge = data["rch"]["rate"]
-    input_recharge.values[0] = 0
     input_recharge = input_recharge.expand_dims({"time": [0, 1, 2]})
 
     # make it planar by setting the layer coordinate to 0
-    input_recharge["layer"].values[0] = 0
+    input_recharge = input_recharge.assign_coords({"layer": [0]})
 
     # update the data set
     data["rch"]["rate"] = input_recharge
@@ -389,6 +388,7 @@ def test_non_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
     target_grid.loc[{"layer": 1}] = 0
 
     # the input for recharge is on the second layer of the targetgrid
+    data["rch"]["rate"] = data["rch"]["rate"].assign_coords({"layer": [0]})
     input_recharge = nan_like(target_grid)
     input_recharge.loc[{"layer": 2}] = data["rch"]["rate"].isel(layer=0)
 
@@ -419,10 +419,9 @@ def test_non_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     target_grid.loc[{"layer": 1}] = 0
 
     # the input for recharge is on the second layer of the targetgrid
+    data["rch"]["rate"] = data["rch"]["rate"].assign_coords({"layer": [1]})
     input_recharge = nan_like(target_grid)
-    input_recharge.loc[{"layer": 2}] = data["rch"]["rate"].sel(
-        layer=1, method="nearest"
-    )
+    input_recharge.loc[{"layer": 2}] = data["rch"]["rate"].sel(layer=1)
     input_recharge = input_recharge.expand_dims({"time": [0, 1, 2]})
 
     # update the data set
