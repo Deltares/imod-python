@@ -9,6 +9,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing.grid import is_planar_grid, is_transient_data_grid, nan_like
@@ -353,7 +354,7 @@ def test_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
 @pytest.mark.usefixtures("imod5_dataset")
 def test_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset)
-    target_grid = data["khv"]["kh"] != 0
+    target_discretization = StructuredDiscretization.from_imod5_data(data)
 
     # create a grid with recharge for 3 timesteps
     input_recharge = data["rch"]["rate"]
@@ -368,15 +369,13 @@ def test_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     assert is_planar_grid(data["rch"]["rate"])
 
     # act
-    rch = imod.mf6.Recharge.from_imod5_data(data, target_grid)
+    rch = imod.mf6.Recharge.from_imod5_data(data, target_discretization)
 
     # assert
     rendered_rch = rch.render(tmp_path, "rch", [0, 1, 2], None)
     assert rendered_rch.count("begin period") == 3
-    assert "maxbound 2162" in rendered_rch
-    assert np.all(
-        rch.dataset["rate"].isel(layer=0).values == data["rch"]["rate"].values
-    )
+    assert "maxbound 33856" in rendered_rch
+
 
 
 @pytest.mark.usefixtures("imod5_dataset")

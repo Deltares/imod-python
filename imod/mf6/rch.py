@@ -5,6 +5,8 @@ import numpy as np
 
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.utilities.regrid import (
     RegridderType,
@@ -168,7 +170,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
     def from_imod5_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        target_grid: GridDataArray,
+        discretization_package: VerticesDiscretization | StructuredDiscretization,
         regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
     ) -> "Recharge":
         """
@@ -196,7 +198,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
         Modflow 6 rch package.
 
         """
-
+        new_idomain = discretization_package.dataset["idomain"]
         data = {
             "rate": imod5_data["rch"]["rate"],
         }
@@ -210,7 +212,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
         regrid_context = RegridderWeightsCache()
 
         new_package_data = _regrid_package_data(
-            data, target_grid, regridder_settings, regrid_context, {}
+            data, new_idomain, regridder_settings, regrid_context, {}
         )
 
         # if rate has only layer 0, then it is planar.
@@ -219,7 +221,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
             # create an array indicating in which cells rch is active
             is_rch_cell = allocate_rch_cells(
                 ALLOCATION_OPTION.at_first_active,
-                target_grid,
+                new_idomain,
                 planar_rate_regridded,
             )
 
