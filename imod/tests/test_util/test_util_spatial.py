@@ -359,6 +359,7 @@ def test_gdal_compliant_grid_error_dims():
     with pytest.raises(ValueError, match="Missing dimensions: {'x'}"):
         imod.util.spatial.gdal_compliant_grid(da)
 
+
 def test_gdal_compliant_grid_error_crs_existing():
     # Arrange
     data = np.ones((2, 3))
@@ -374,6 +375,8 @@ def test_gdal_compliant_grid_error_crs_existing():
 
     da_crs = da.rio.write_crs("EPSG:28992")
 
-    # Test if fails for 
-    with pytest.raises(ValueError, match="Grid already has CRS different then provided CRS."):
+    # Test if fails for
+    with pytest.raises(
+        ValueError, match="Grid already has CRS different then provided CRS."
+    ):
         imod.util.spatial.gdal_compliant_grid(da_crs, crs="EPSG:4326")
