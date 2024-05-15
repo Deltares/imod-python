@@ -1,3 +1,4 @@
+from functools import wraps
 from time import time
 
 from imod.logging.loglevel import LogLevel
@@ -11,6 +12,7 @@ def standard_log_decorator(
     """
 
     def decorator(fun):
+        @wraps(fun)
         def wrapper(*args, **kwargs):
             from imod.logging import logger
 
@@ -44,6 +46,7 @@ def init_log_decorator(
     """
 
     def decorator(fun):
+        @wraps(fun)
         def wrapper(*args, **kwargs):
             from imod.logging import logger
 
