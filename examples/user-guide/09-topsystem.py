@@ -1,6 +1,6 @@
 """
-Allocating topsystem over model layers
-======================================
+Topsystem: from 2D map to 3D model
+==================================
 
 iMOD Python has multiple features to help you define the topsystem of the
 groundwater system. With "topsystem" we mean all forcings which act on the top
