@@ -1,6 +1,6 @@
-from copy import deepcopy
 import pathlib
 import textwrap
+from copy import deepcopy
 
 import numpy as np
 import pandas as pd
@@ -8,8 +8,9 @@ import pytest
 import xarray as xr
 
 import imod
-from imod.logging import LoggerType, LogLevel
 import imod.mf6.drn
+from imod.logging import LoggerType, LogLevel
+from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.utilities.package import get_repeat_stress
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
@@ -469,14 +470,11 @@ def test_html_repr(drainage):
     assert html_string.split("</div>")[0] == "<div>Drainage"
 
 
-
 @pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset)
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset)
 
-    target_grid = data["khv"]["kh"]
-
-    drn = imod.mf6.Drainage.from_imod5_data(data, target_grid)
+    drn = imod.mf6.Drainage.from_imod5_data(data, target_dis)
 
     assert not drn.dataset["save_flows"]
-
