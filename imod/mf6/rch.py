@@ -26,7 +26,7 @@ from imod.schemata import (
     OtherCoordsSchema,
 )
 from imod.typing import GridDataArray
-from imod.typing.grid import is_planar_grid, is_transient_data_grid, zeros_like
+from imod.typing.grid import enforce_dim_order, is_planar_grid, is_transient_data_grid, zeros_like
 
 
 class Recharge(BoundaryCondition, IRegridPackage):
