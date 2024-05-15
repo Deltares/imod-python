@@ -25,6 +25,7 @@ from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwfgwt import GWFGWT
 from imod.mf6.gwtgwt import GWTGWT
 from imod.mf6.ims import Solution
+from imod.mf6.interfaces.imodel import IModel
 from imod.mf6.interfaces.isimulation import ISimulation
 from imod.mf6.model import Modflow6Model
 from imod.mf6.model_gwf import GroundwaterFlowModel
@@ -192,7 +193,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 model_name_file = pathlib.Path(
                     write_context.root_directory / pathlib.Path(f"{key}", f"{key}.nam")
                 ).as_posix()
-                models.append((value.model_id(), model_name_file, key))
+                models.append((value.model_id, model_name_file, key))
             elif isinstance(value, Package):
                 if value._pkg_id == "tdis":
                     d["tdis6"] = f"{key}.tdis"
@@ -575,7 +576,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             )
 
         if output in ["head", "budget-flow"]:
-            return self._open_single_output(modelnames, output, **settings)
+            return self._open_single_output(list(modelnames), output, **settings)
         elif output in ["concentration", "budget-transport"]:
             return self._concat_species(output, **settings)
         else:
@@ -930,11 +931,11 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 result.append(exchange.get_specification())
         return result
 
-    def get_models_of_type(self, modeltype):
+    def get_models_of_type(self, model_id) -> dict[str, IModel]:
         return {
             k: v
             for k, v in self.items()
-            if isinstance(v, Modflow6Model) and (v.model_id() == modeltype)
+            if isinstance(v, Modflow6Model) and (v.model_id == model_id)
         }
 
     def get_models(self):

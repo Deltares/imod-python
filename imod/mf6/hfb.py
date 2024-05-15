@@ -37,7 +37,7 @@ except ImportError:
     shapely = MissingOptionalModule("shapely")
 
 
-@typedispatch  # type: ignore[no-redef]
+@typedispatch
 def _derive_connected_cell_ids(
     idomain: xr.DataArray, grid: xu.Ugrid2d, edge_index: np.ndarray
 ):
@@ -408,18 +408,15 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
                 )
             )
 
-        barrier_dataset = typing.cast(
-            xr.Dataset,
-            to_connected_cells_dataset(
-                idomain,
-                unstructured_grid.ugrid.grid,
-                edge_index,
-                {
-                    "hydraulic_characteristic": self.__to_hydraulic_characteristic(
-                        barrier_values
-                    )
-                },
-            ),
+        barrier_dataset = to_connected_cells_dataset(
+            idomain,
+            unstructured_grid.ugrid.grid,
+            edge_index,
+            {
+                "hydraulic_characteristic": self.__to_hydraulic_characteristic(
+                    barrier_values
+                )
+            },
         )
 
         barrier_dataset["print_input"] = self.dataset["print_input"]
@@ -505,9 +502,9 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
     def __to_resistance(self, value: xu.UgridDataArray) -> xu.UgridDataArray:
         match self._get_barrier_type():
             case BarrierType.HydraulicCharacteristic:
-                return 1.0 / value  # type: ignore
+                return 1.0 / value
             case BarrierType.Multiplier:
-                return -1.0 / value  # type: ignore
+                return -1.0 / value
             case BarrierType.Resistance:
                 return value
 

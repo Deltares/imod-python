@@ -10,5 +10,6 @@ class IRegridPackage(IPackage, abc.ABC):
     Interface for packages that support regridding
     """
 
+    @abc.abstractmethod
     def get_regrid_methods(self) -> Optional[dict[str, tuple[RegridderType, str]]]:
         raise NotImplementedError

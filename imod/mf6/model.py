@@ -376,11 +376,17 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
         return instance
 
-    @classmethod
-    def model_id(cls) -> str:
-        if cls._model_id is None:
+    @property
+    def options(self) -> dict:
+        if self._options is None:
             raise ValueError("Model id has not been set")
-        return cls._model_id
+        return self._options
+
+    @property
+    def model_id(self) -> str:
+        if self._model_id is None:
+            raise ValueError("Model id has not been set")
+        return self._model_id
 
     def clip_box(
         self,
