@@ -331,7 +331,7 @@ def test_clip_box(rch_dict):
 @pytest.mark.usefixtures("imod5_dataset")
 def test_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset)
-    target_grid = data["khv"]["kh"]
+    target_grid = data["khv"]["kh"] != 0
 
     # create a planar grid with time-independent recharge
     data["rch"]["rate"]["layer"].values[0] = 0
@@ -353,7 +353,7 @@ def test_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
 @pytest.mark.usefixtures("imod5_dataset")
 def test_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset)
-    target_grid = data["khv"]["kh"]
+    target_grid = data["khv"]["kh"] != 0
 
     # create a grid with recharge for 3 timesteps
     input_recharge = data["rch"]["rate"]
@@ -385,7 +385,7 @@ def test_non_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset)
 
     # make the first layer of the target grid inactive
-    target_grid = data["khv"]["kh"]
+    target_grid = data["khv"]["kh"] != 0
     target_grid.loc[{"layer": 1}] = 0
 
     # the input for recharge is on the second layer of the targetgrid
@@ -415,7 +415,7 @@ def test_non_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset)
 
     # make the first layer of the target grid inactive
-    target_grid = data["khv"]["kh"]
+    target_grid = data["khv"]["kh"] != 0
     target_grid.loc[{"layer": 1}] = 0
 
     # the input for recharge is on the second layer of the targetgrid
