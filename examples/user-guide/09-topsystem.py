@@ -135,7 +135,8 @@ layer_grid.coords["bottom"] = layer_model["bottom"]
 xsection_layer_nr = imod.select.cross_section_linestring(layer_grid, geometry)
 
 imod.visualize.cross_section(xsection_layer_nr, "tab20", np.arange(21))
-
+ax.scatter(x_line, stage_line.values, marker=7, c="k")
+ax.scatter(x_line, stage_bottom.values, marker=6, c="k")
 
 # %%
 # Overview allocation options
@@ -167,8 +168,8 @@ imod.visualize.cross_section(
     fig=fig,
     ax=ax,
 )
-ax.scatter(x_line, stage_line.values, s=32.0, marker=7, c="k", linewidths=0)
-ax.scatter(x_line, stage_bottom.values, s=32.0, marker=6, c="k", linewidths=0)
+ax.scatter(x_line, stage_line.values, marker=7, c="k")
+ax.scatter(x_line, stage_bottom.values, marker=6, c="k")
 ax.set_title("stage and bottom elevation")
 
 # Loop over allocation options, and plot the allocated cells as a polygon,
@@ -336,8 +337,8 @@ imod.visualize.cross_section(
     fig=fig,
     ax=ax,
 )
-ax.scatter(x_line, stage_line.values, s=32.0, marker=7, c="k", linewidths=0)
-ax.scatter(x_line, stage_bottom.values, s=32.0, marker=6, c="k", linewidths=0)
+ax.scatter(x_line, stage_line.values, marker=7, c="k")
+ax.scatter(x_line, stage_bottom.values, marker=6, c="k")
 ax.set_title("hydraulic conductivity")
 
 for i, option in enumerate(DISTRIBUTING_OPTION, start=1):
