@@ -2,7 +2,6 @@ from copy import deepcopy
 from typing import Optional, Tuple
 
 import numpy as np
-import xarray as xr
 
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
@@ -29,8 +28,6 @@ from imod.typing import GridDataArray
 from imod.typing.grid import (
     enforce_dim_order,
     is_planar_grid,
-    is_transient_data_grid,
-    zeros_like,
 )
 
 
