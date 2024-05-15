@@ -85,7 +85,7 @@ def _skip_dataarray(da: GridDataArray) -> bool:
     return False
 
 
-@typedispatch  # type: ignore [no-redef]
+@typedispatch
 def _skip_variable(package: IPackage, var: str) -> bool:
     return False
 
