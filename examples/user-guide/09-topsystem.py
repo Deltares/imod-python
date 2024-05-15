@@ -426,7 +426,9 @@ riv_bottom = enforce_dim_order(riv_bottom)
 # Remove coordinates that were added for cross-section plots previously
 riv_conductance = riv_conductance.drop_vars(["bottom", "top"])
 
-riv = imod.mf6.River(stage=riv_stage, conductance=riv_conductance, bottom_elevation=riv_bottom)
+riv = imod.mf6.River(
+    stage=riv_stage, conductance=riv_conductance, bottom_elevation=riv_bottom
+)
 
 riv
 
