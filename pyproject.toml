@@ -109,9 +109,6 @@ files = [
 follow_imports = "normal"
 strict = true
 
-# Strongly recommend enabling this one as soon as you can
-check_untyped_defs = false
-
 # These shouldn't be too much additional work, but may be tricky to
 # get passing if you use a lot of untyped libraries
 disallow_untyped_decorators = false
@@ -127,6 +124,10 @@ no_implicit_reexport = false
 
 # This one can be tricky to get passing if you use a lot of untyped libraries
 warn_return_any = false
+
+[[tool.mypy.overrides]]
+module = ["imod.msw.*"]
+check_untyped_defs = false
 
 [[tool.mypy.overrides]]
 module = [
