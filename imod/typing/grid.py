@@ -1,5 +1,6 @@
 import pickle
 import textwrap
+from functools import wraps
 from typing import Callable, Mapping, Sequence
 
 import numpy as np
@@ -370,6 +371,7 @@ def preserve_gridtype(func):
     >>> DataArray() * UgridDataArray() -> UgridDataArray
     """
 
+    @wraps(func)
     def decorator(*args, **kwargs):
         unstructured = False
         grid = None
