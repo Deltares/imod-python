@@ -45,5 +45,6 @@
    
       ~VerticesDiscretization.auxiliary_data_fields
       ~VerticesDiscretization.dataset
+      ~VerticesDiscretization.skip_variables
    
    

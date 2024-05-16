@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>imod.mf6.ImmobileStorageTransfer &#8212; iMOD Python 0.17.0 documentation</title>
+    <title>imod.mf6.ImmobileStorageTransfer &#8212; iMOD Python 0.17.1 documentation</title>
   
   
   
@@ -125,8 +125,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.1 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.1 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -563,6 +563,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.html">imod.mf6.Modflow6Simulation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.create_time_discretization.html">imod.mf6.Modflow6Simulation.create_time_discretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.write.html">imod.mf6.Modflow6Simulation.write</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.dump.html">imod.mf6.Modflow6Simulation.dump</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.run.html">imod.mf6.Modflow6Simulation.run</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.open_flow_budget.html">imod.mf6.Modflow6Simulation.open_flow_budget</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.open_transport_budget.html">imod.mf6.Modflow6Simulation.open_transport_budget</a></li>
@@ -573,8 +574,10 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.regrid_like.html">imod.mf6.Modflow6Simulation.regrid_like</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.GroundwaterFlowModel.html">imod.mf6.GroundwaterFlowModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.GroundwaterFlowModel.mask_all_packages.html">imod.mf6.GroundwaterFlowModel.mask_all_packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.mf6.GroundwaterFlowModel.dump.html">imod.mf6.GroundwaterFlowModel.dump</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.GroundwaterTransportModel.html">imod.mf6.GroundwaterTransportModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.GroundwaterTransportModel.mask_all_packages.html">imod.mf6.GroundwaterTransportModel.mask_all_packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.mf6.GroundwaterTransportModel.dump.html">imod.mf6.GroundwaterTransportModel.dump</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.StructuredDiscretization.html">imod.mf6.StructuredDiscretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.VerticesDiscretization.html">imod.mf6.VerticesDiscretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.TimeDiscretization.html">imod.mf6.TimeDiscretization</a></li>
@@ -833,7 +836,7 @@ provided in the wrong manner. Defaults to True.</p></li>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="imod.mf6.ImmobileStorageTransfer.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#imod.mf6.ImmobileStorageTransfer.__init__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_immobile_concentration</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">immobile_porosity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mobile_immobile_mass_transfer_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decay_sorbed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bulk_density</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">DataArray</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distribution_coefficient</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_flows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">budgetbinfile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">budgetcsvfile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sorption</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_order_decay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_order_decay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cimfile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'cim.dat'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">digits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'EXPONENTIAL'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/imod/mf6/ist.html#ImmobileStorageTransfer.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imod.mf6.ImmobileStorageTransfer.__init__" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
@@ -843,7 +846,7 @@ provided in the wrong manner. Defaults to True.</p></li>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#imod.mf6.ImmobileStorageTransfer.__init__" title="imod.mf6.ImmobileStorageTransfer.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(**kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#imod.mf6.ImmobileStorageTransfer.__init__" title="imod.mf6.ImmobileStorageTransfer.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(initial_immobile_concentration, ...)</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">clip_box</span></code>([time_min, time_max, layer_min, ...])</p></td>
@@ -891,7 +894,7 @@ provided in the wrong manner. Defaults to True.</p></li>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_netcdf</span></code>(*args, **kwargs)</p></td>
 <td><p>Write dataset contents to a netCDF file.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code>(**kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code>(pkgname, globaltimes, write_context)</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_binary_griddata</span></code>(outpath, da, dtype)</p></td>

@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.timedis &#8212; iMOD Python 0.17.0 documentation</title>
+    <title>imod.mf6.timedis &#8212; iMOD Python 0.17.1 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.1 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.1 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -505,7 +505,7 @@ document.write(`
 
     <span class="n">_write_schemata</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="nd">@init_log_decorator</span><span class="p">()</span>
+<div class="viewcode-block" id="TimeDiscretization.__init__"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.TimeDiscretization.html#imod.mf6.TimeDiscretization.__init__">[docs]</a>    <span class="nd">@init_log_decorator</span><span class="p">()</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">timestep_duration</span><span class="p">,</span>
@@ -519,7 +519,7 @@ document.write(`
             <span class="s2">&quot;timestep_multiplier&quot;</span><span class="p">:</span> <span class="n">timestep_multiplier</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dict_dataset</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">start_date_time</span> <span class="o">=</span> <span class="n">iso8601</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>

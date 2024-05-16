@@ -45,5 +45,6 @@
    
       ~StructuredDiscretization.auxiliary_data_fields
       ~StructuredDiscretization.dataset
+      ~StructuredDiscretization.skip_variables
    
    

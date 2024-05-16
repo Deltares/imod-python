@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.simulation &#8212; iMOD Python 0.17.0 documentation</title>
+    <title>imod.mf6.simulation &#8212; iMOD Python 0.17.1 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.1 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.1 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -475,6 +475,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">imod.mf6.gwfgwt</span> <span class="kn">import</span> <span class="n">GWFGWT</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.gwtgwt</span> <span class="kn">import</span> <span class="n">GWTGWT</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.ims</span> <span class="kn">import</span> <span class="n">Solution</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.interfaces.imodel</span> <span class="kn">import</span> <span class="n">IModel</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.interfaces.isimulation</span> <span class="kn">import</span> <span class="n">ISimulation</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.model</span> <span class="kn">import</span> <span class="n">Modflow6Model</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.model_gwf</span> <span class="kn">import</span> <span class="n">GroundwaterFlowModel</span>
@@ -642,7 +643,7 @@ document.write(`
                 <span class="n">model_name_file</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span>
                     <span class="n">write_context</span><span class="o">.</span><span class="n">root_directory</span> <span class="o">/</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">.nam&quot;</span><span class="p">)</span>
                 <span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
-                <span class="n">models</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">value</span><span class="o">.</span><span class="n">model_id</span><span class="p">(),</span> <span class="n">model_name_file</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+                <span class="n">models</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">value</span><span class="o">.</span><span class="n">model_id</span><span class="p">,</span> <span class="n">model_name_file</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Package</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">_pkg_id</span> <span class="o">==</span> <span class="s2">&quot;tdis&quot;</span><span class="p">:</span>
                     <span class="n">d</span><span class="p">[</span><span class="s2">&quot;tdis6&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">.tdis&quot;</span>
@@ -668,7 +669,7 @@ document.write(`
         <span class="n">d</span><span class="p">[</span><span class="s2">&quot;solutiongroups&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">solutiongroups</span><span class="p">]</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
 
-    <span class="nd">@standard_log_decorator</span><span class="p">()</span>
+<div class="viewcode-block" id="Modflow6Simulation.write"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Modflow6Simulation.write.html#imod.mf6.Modflow6Simulation.write">[docs]</a>    <span class="nd">@standard_log_decorator</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">write</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">directory</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span>
@@ -754,7 +755,7 @@ document.write(`
         <span class="k">if</span> <span class="n">status_info</span><span class="o">.</span><span class="n">has_errors</span><span class="p">():</span>
             <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">status_info</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">directory</span> <span class="o">=</span> <span class="n">directory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">directory</span> <span class="o">=</span> <span class="n">directory</span></div>
 
 <div class="viewcode-block" id="Modflow6Simulation.run"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Modflow6Simulation.run.html#imod.mf6.Modflow6Simulation.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mf6path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;mf6&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1025,7 +1026,7 @@ document.write(`
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">output</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;head&quot;</span><span class="p">,</span> <span class="s2">&quot;budget-flow&quot;</span><span class="p">]:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_single_output</span><span class="p">(</span><span class="n">modelnames</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_single_output</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">modelnames</span><span class="p">),</span> <span class="n">output</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">output</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;concentration&quot;</span><span class="p">,</span> <span class="s2">&quot;budget-transport&quot;</span><span class="p">]:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_concat_species</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1270,10 +1271,35 @@ document.write(`
         <span class="n">dis_id</span> <span class="o">=</span> <span class="n">model</span><span class="p">[</span><span class="n">diskey</span><span class="p">]</span><span class="o">.</span><span class="n">_pkg_id</span>
         <span class="k">return</span> <span class="n">flow_model_path</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">diskey</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">dis_id</span><span class="si">}</span><span class="s2">.grb&quot;</span>
 
-    <span class="nd">@standard_log_decorator</span><span class="p">()</span>
+<div class="viewcode-block" id="Modflow6Simulation.dump"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.Modflow6Simulation.dump.html#imod.mf6.Modflow6Simulation.dump">[docs]</a>    <span class="nd">@standard_log_decorator</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">validate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">mdal_compliant</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">directory</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span>
+        <span class="n">validate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">mdal_compliant</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Dump simulation to files. Writes a model definition as .TOML file, which</span>
+<span class="sd">        points to data for each package. Each package is stored as a separate</span>
+<span class="sd">        NetCDF. Structured grids are saved as regular NetCDFs, unstructured</span>
+<span class="sd">        grids are saved as UGRID NetCDF. Structured grids are always made GDAL</span>
+<span class="sd">        compliant, unstructured grids can be made MDAL compliant optionally.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        directory: str or Path, optional</span>
+<span class="sd">            directory to dump simulation into. Defaults to current working directory.</span>
+<span class="sd">        validate: bool, optional</span>
+<span class="sd">            Whether to validate simulation data. Defaults to True.</span>
+<span class="sd">        mdal_compliant: bool, optional</span>
+<span class="sd">            Convert data with</span>
+<span class="sd">            :func:`imod.prepare.spatial.mdal_compliant_ugrid2d` to MDAL</span>
+<span class="sd">            compliant unstructured grids. Defaults to False.</span>
+<span class="sd">        crs: Any, optional</span>
+<span class="sd">            Anything accepted by rasterio.crs.CRS.from_user_input</span>
+<span class="sd">            Requires ``rioxarray`` installed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">directory</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
         <span class="n">directory</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -1281,7 +1307,9 @@ document.write(`
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">cls_name</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Modflow6Model</span><span class="p">):</span>
-                <span class="n">model_toml_path</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">validate</span><span class="p">,</span> <span class="n">mdal_compliant</span><span class="p">)</span>
+                <span class="n">model_toml_path</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span>
+                    <span class="n">directory</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">validate</span><span class="p">,</span> <span class="n">mdal_compliant</span><span class="p">,</span> <span class="n">crs</span>
+                <span class="p">)</span>
                 <span class="n">toml_content</span><span class="p">[</span><span class="n">cls_name</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_toml_path</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span>
                     <span class="n">directory</span>
                 <span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
@@ -1302,7 +1330,7 @@ document.write(`
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">directory</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.toml&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">tomli_w</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">toml_content</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
 
-        <span class="k">return</span>
+        <span class="k">return</span></div>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_file</span><span class="p">(</span><span class="n">toml_path</span><span class="p">):</span>
@@ -1353,11 +1381,11 @@ document.write(`
                 <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">exchange</span><span class="o">.</span><span class="n">get_specification</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">result</span>
 
-    <span class="k">def</span> <span class="nf">get_models_of_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modeltype</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_models_of_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_id</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">IModel</span><span class="p">]:</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="n">k</span><span class="p">:</span> <span class="n">v</span>
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Modflow6Model</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">model_id</span><span class="p">()</span> <span class="o">==</span> <span class="n">modeltype</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Modflow6Model</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">model_id</span> <span class="o">==</span> <span class="n">model_id</span><span class="p">)</span>
         <span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">get_models</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

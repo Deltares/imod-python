@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>imod.mf6.GroundwaterTransportModel &#8212; iMOD Python 0.17.0 documentation</title>
+    <title>imod.mf6.GroundwaterTransportModel &#8212; iMOD Python 0.17.1 documentation</title>
   
   
   
@@ -50,7 +50,7 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="imod.mf6.GroundwaterTransportModel.mask_all_packages" href="imod.mf6.GroundwaterTransportModel.mask_all_packages.html" />
-    <link rel="prev" title="imod.mf6.GroundwaterFlowModel.mask_all_packages" href="imod.mf6.GroundwaterFlowModel.mask_all_packages.html" />
+    <link rel="prev" title="imod.mf6.GroundwaterFlowModel.dump" href="imod.mf6.GroundwaterFlowModel.dump.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -125,8 +125,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.1 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.1 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -563,6 +563,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.html">imod.mf6.Modflow6Simulation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.create_time_discretization.html">imod.mf6.Modflow6Simulation.create_time_discretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.write.html">imod.mf6.Modflow6Simulation.write</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.dump.html">imod.mf6.Modflow6Simulation.dump</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.run.html">imod.mf6.Modflow6Simulation.run</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.open_flow_budget.html">imod.mf6.Modflow6Simulation.open_flow_budget</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.open_transport_budget.html">imod.mf6.Modflow6Simulation.open_transport_budget</a></li>
@@ -573,8 +574,10 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.regrid_like.html">imod.mf6.Modflow6Simulation.regrid_like</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.GroundwaterFlowModel.html">imod.mf6.GroundwaterFlowModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.GroundwaterFlowModel.mask_all_packages.html">imod.mf6.GroundwaterFlowModel.mask_all_packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.mf6.GroundwaterFlowModel.dump.html">imod.mf6.GroundwaterFlowModel.dump</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">imod.mf6.GroundwaterTransportModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.GroundwaterTransportModel.mask_all_packages.html">imod.mf6.GroundwaterTransportModel.mask_all_packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.mf6.GroundwaterTransportModel.dump.html">imod.mf6.GroundwaterTransportModel.dump</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.StructuredDiscretization.html">imod.mf6.StructuredDiscretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.VerticesDiscretization.html">imod.mf6.VerticesDiscretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.TimeDiscretization.html">imod.mf6.TimeDiscretization</a></li>
@@ -763,7 +766,7 @@ document.write(`
 <h1>imod.mf6.GroundwaterTransportModel<a class="headerlink" href="#imod-mf6-groundwatertransportmodel" title="Permalink to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="imod.mf6.GroundwaterTransportModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">imod.mf6.</span></span><span class="sig-name descname"><span class="pre">GroundwaterTransportModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/imod/mf6/model_gwt.html#GroundwaterTransportModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imod.mf6.GroundwaterTransportModel" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">imod.mf6.</span></span><span class="sig-name descname"><span class="pre">GroundwaterTransportModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">listing_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_flows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_flows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/imod/mf6/model_gwt.html#GroundwaterTransportModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imod.mf6.GroundwaterTransportModel" title="Permalink to this definition">#</a></dt>
 <dd><p>The GroundwaterTransportModel (GWT) simulates transport of a single solute
 species flowing in groundwater.
 More information can be found here:
@@ -786,7 +789,7 @@ the file specified with “BUDGET FILEOUT” in Output Control.</p></li>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="imod.mf6.GroundwaterTransportModel.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#imod.mf6.GroundwaterTransportModel.__init__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">listing_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_flows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_flows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/imod/mf6/model_gwt.html#GroundwaterTransportModel.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imod.mf6.GroundwaterTransportModel.__init__" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
@@ -796,7 +799,7 @@ the file specified with “BUDGET FILEOUT” in Output Control.</p></li>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#imod.mf6.GroundwaterTransportModel.__init__" title="imod.mf6.GroundwaterTransportModel.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(**kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#imod.mf6.GroundwaterTransportModel.__init__" title="imod.mf6.GroundwaterTransportModel.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([listing_file, print_input, ...])</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear</span></code>()</p></td>
@@ -808,8 +811,8 @@ the file specified with “BUDGET FILEOUT” in Output Control.</p></li>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dump</span></code>(**kwargs)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="imod.mf6.GroundwaterTransportModel.dump.html#imod.mf6.GroundwaterTransportModel.dump" title="imod.mf6.GroundwaterTransportModel.dump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dump</span></code></a>(directory, modelname[, validate, ...])</p></td>
+<td><p>Dump simulation to files.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_file</span></code>(toml_path)</p></td>
 <td><p></p></td>
@@ -844,38 +847,35 @@ the file specified with “BUDGET FILEOUT” in Output Control.</p></li>
 <tr class="row-even"><td><p><a class="reference internal" href="imod.mf6.GroundwaterTransportModel.mask_all_packages.html#imod.mf6.GroundwaterTransportModel.mask_all_packages" title="imod.mf6.GroundwaterTransportModel.mask_all_packages"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mask_all_packages</span></code></a>(mask)</p></td>
 <td><p>This function applies a mask to all packages in a model.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_id</span></code>()</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop</span></code>(k[,d])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop</span></code>(k[,d])</p></td>
 <td><p>If key is not found, d is returned if given, otherwise KeyError is raised.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">popitem</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">popitem</span></code>()</p></td>
 <td><p>as a 2-tuple; but raise KeyError if D is empty.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">purge_empty_packages</span></code>([model_name])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">purge_empty_packages</span></code>([model_name])</p></td>
 <td><p>This function removes empty packages from the model.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">regrid_like</span></code>(target_grid[, validate, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">regrid_like</span></code>(target_grid[, validate, ...])</p></td>
 <td><p>Creates a model by regridding the packages of this model to another discretization.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">render</span></code>(modelname, write_context)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">render</span></code>(modelname, write_context)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">setdefault</span></code>(k[,d])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">setdefault</span></code>(k[,d])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>([E, ]**F)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>([E, ]**F)</p></td>
 <td><p>If E present and has a .keys() method, does:     for k in E: D[k] = E[k] If E present and lacks .keys() method, does:     for (k, v) in E: D[k] = v In either case, this is followed by: for k, v in F.items(): D[k] = v</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code>(**kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code>([model_name])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code>(**kwargs)</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code>(modelname, globaltimes, validate, ...)</p></td>
+<td><p>Write model namefile Write packages</p></td>
 </tr>
 </tbody>
 </table>
@@ -890,6 +890,12 @@ the file specified with “BUDGET FILEOUT” in Output Control.</p></li>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">domain</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_id</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">options</span></code></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -909,12 +915,12 @@ the file specified with “BUDGET FILEOUT” in Output Control.</p></li>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="imod.mf6.GroundwaterFlowModel.mask_all_packages.html"
+       href="imod.mf6.GroundwaterFlowModel.dump.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">imod.mf6.GroundwaterFlowModel.mask_all_packages</p>
+        <p class="prev-next-title">imod.mf6.GroundwaterFlowModel.dump</p>
       </div>
     </a>
     <a class="right-next"

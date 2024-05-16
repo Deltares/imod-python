@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.prepare.topsystem.conductance &#8212; iMOD Python 0.17.0 documentation</title>
+    <title>imod.prepare.topsystem.conductance &#8212; iMOD Python 0.17.1 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
+    <img src="../../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.1 documentation - Home"/>
+    <script>document.write(`<img src="../../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.1 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -511,7 +511,7 @@ document.write(`
 <span class="p">)</span>
 
 
-<span class="nd">@enforced_dim_order</span>
+<div class="viewcode-block" id="distribute_riv_conductance"><a class="viewcode-back" href="../../../../api/generated/prepare/imod.prepare.distribute_riv_conductance.html#imod.prepare.distribute_riv_conductance">[docs]</a><span class="nd">@enforced_dim_order</span>
 <span class="k">def</span> <span class="nf">distribute_riv_conductance</span><span class="p">(</span>
     <span class="n">distributing_option</span><span class="p">:</span> <span class="n">DISTRIBUTING_OPTION</span><span class="p">,</span>
     <span class="n">allocated</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
@@ -602,10 +602,10 @@ document.write(`
                 <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_corrected_transmissivity</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; supported. &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;Got: &#39;</span><span class="si">{</span><span class="n">distributing_option</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
             <span class="p">)</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">weights</span> <span class="o">*</span> <span class="n">conductance</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">allocated</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">weights</span> <span class="o">*</span> <span class="n">conductance</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">allocated</span><span class="p">)</span></div>
 
 
-<span class="nd">@enforced_dim_order</span>
+<div class="viewcode-block" id="distribute_drn_conductance"><a class="viewcode-back" href="../../../../api/generated/prepare/imod.prepare.distribute_drn_conductance.html#imod.prepare.distribute_drn_conductance">[docs]</a><span class="nd">@enforced_dim_order</span>
 <span class="k">def</span> <span class="nf">distribute_drn_conductance</span><span class="p">(</span>
     <span class="n">distributing_option</span><span class="p">:</span> <span class="n">DISTRIBUTING_OPTION</span><span class="p">,</span>
     <span class="n">allocated</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
@@ -691,10 +691,10 @@ document.write(`
                 <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_corrected_transmissivity</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; supported. &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;Got: &#39;</span><span class="si">{</span><span class="n">distributing_option</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
             <span class="p">)</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">weights</span> <span class="o">*</span> <span class="n">conductance</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">allocated</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">weights</span> <span class="o">*</span> <span class="n">conductance</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">allocated</span><span class="p">)</span></div>
 
 
-<span class="nd">@enforced_dim_order</span>
+<div class="viewcode-block" id="distribute_ghb_conductance"><a class="viewcode-back" href="../../../../api/generated/prepare/imod.prepare.distribute_ghb_conductance.html#imod.prepare.distribute_ghb_conductance">[docs]</a><span class="nd">@enforced_dim_order</span>
 <span class="k">def</span> <span class="nf">distribute_ghb_conductance</span><span class="p">(</span>
     <span class="n">distributing_option</span><span class="p">:</span> <span class="n">DISTRIBUTING_OPTION</span><span class="p">,</span>
     <span class="n">allocated</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
@@ -761,7 +761,7 @@ document.write(`
                 <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">DISTRIBUTING_OPTION</span><span class="o">.</span><span class="n">by_conductivity</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; supported. &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;Got: &#39;</span><span class="si">{</span><span class="n">distributing_option</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
             <span class="p">)</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">weights</span> <span class="o">*</span> <span class="n">conductance</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">allocated</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">weights</span> <span class="o">*</span> <span class="n">conductance</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">allocated</span><span class="p">)</span></div>
 
 
 <span class="nd">@preserve_gridtype</span>

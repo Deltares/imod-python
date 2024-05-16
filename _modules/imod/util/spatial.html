@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.util.spatial &#8212; iMOD Python 0.17.0 documentation</title>
+    <title>imod.util.spatial &#8212; iMOD Python 0.17.1 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.1 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.1 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -457,7 +457,7 @@ document.write(`
 
 <span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">affine</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -468,7 +468,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">imod.typing</span> <span class="kn">import</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">GridDataset</span><span class="p">,</span> <span class="n">IntArray</span>
 <span class="kn">from</span> <span class="nn">imod.util.imports</span> <span class="kn">import</span> <span class="n">MissingOptionalModule</span>
 
-<span class="c1"># since rasterio, shapely, and geopandas are a big dependencies that are</span>
+<span class="c1"># since rasterio, shapely, rioxarray, and geopandas are a big dependencies that are</span>
 <span class="c1"># sometimes hard to install and not always required, we made this an optional</span>
 <span class="c1"># dependency</span>
 <span class="k">try</span><span class="p">:</span>
@@ -488,6 +488,11 @@ document.write(`
         <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="n">gpd</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;geopandas&quot;</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">rioxarray</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">rasterio</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;rioxarray&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_xycoords</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">cellsizes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
@@ -690,7 +695,9 @@ document.write(`
     <span class="k">return</span> <span class="n">unstacked</span>
 
 
-<div class="viewcode-block" id="mdal_compliant_ugrid2d"><a class="viewcode-back" href="../../../api/generated/util/imod.util.mdal_compliant_ugrid2d.html#imod.util.mdal_compliant_ugrid2d">[docs]</a><span class="k">def</span> <span class="nf">mdal_compliant_ugrid2d</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<div class="viewcode-block" id="mdal_compliant_ugrid2d"><a class="viewcode-back" href="../../../api/generated/util/imod.util.mdal_compliant_ugrid2d.html#imod.util.mdal_compliant_ugrid2d">[docs]</a><span class="k">def</span> <span class="nf">mdal_compliant_ugrid2d</span><span class="p">(</span>
+    <span class="n">dataset</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">crs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Ensures the xarray Dataset will be written to a UGRID netCDF that will be</span>
 <span class="sd">    accepted by MDAL.</span>
@@ -702,6 +709,10 @@ document.write(`
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    dataset: xarray.Dataset</span>
+<span class="sd">        Dataset to make compliant with MDAL</span>
+<span class="sd">    crs: Any, Optional</span>
+<span class="sd">        Anything accepted by rasterio.crs.CRS.from_user_input</span>
+<span class="sd">        Requires ``rioxarray`` installed.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -750,6 +761,11 @@ document.write(`
             <span class="k">if</span> <span class="n">edge_nodes</span> <span class="ow">and</span> <span class="n">edge_nodes</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
                 <span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;edge_node_connectivity&quot;</span><span class="p">)</span>
 
+    <span class="k">if</span> <span class="n">crs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rioxarray</span><span class="p">,</span> <span class="n">MissingOptionalModule</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ModuleNotFoundError</span><span class="p">(</span><span class="s2">&quot;rioxarray is required for this functionality&quot;</span><span class="p">)</span>
+        <span class="n">ds</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">write_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
     <span class="c1"># Make sure time is encoded as a float for MDAL</span>
     <span class="c1"># TODO: MDAL requires all data variables to be float (this excludes the UGRID topology data)</span>
     <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
@@ -759,7 +775,7 @@ document.write(`
     <span class="k">return</span> <span class="n">ds</span></div>
 
 
-<div class="viewcode-block" id="from_mdal_compliant_ugrid2d"><a class="viewcode-back" href="../../../api/generated/util/imod.util.from_mdal_compliant_ugrid2d.html#imod.util.from_mdal_compliant_ugrid2d">[docs]</a><span class="k">def</span> <span class="nf">from_mdal_compliant_ugrid2d</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">):</span>
+<div class="viewcode-block" id="from_mdal_compliant_ugrid2d"><a class="viewcode-back" href="../../../api/generated/util/imod.util.from_mdal_compliant_ugrid2d.html#imod.util.from_mdal_compliant_ugrid2d">[docs]</a><span class="k">def</span> <span class="nf">from_mdal_compliant_ugrid2d</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Undo some of the changes of ``mdal_compliant_ugrid2d``: re-stack the</span>
 <span class="sd">    layers.</span>
@@ -849,6 +865,64 @@ document.write(`
             <span class="p">)</span>
         <span class="n">ds</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ugrid2d_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">face_dimension</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">mdal_compliant_ugrid2d</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">gdal_compliant_grid</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">],</span>
+    <span class="n">crs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Assign attributes to x,y coordinates to make data accepted by GDAL.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data: xr.DataArray | xr.Dataset</span>
+<span class="sd">        Structured data with a x and y coordinate.</span>
+<span class="sd">    crs: Any, Optional</span>
+<span class="sd">        Anything accepted by rasterio.crs.CRS.from_user_input</span>
+<span class="sd">        Requires ``rioxarray`` installed.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    data with attributes to be accepted by GDAL.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x_attrs</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;axis&quot;</span><span class="p">:</span> <span class="s2">&quot;X&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;long_name&quot;</span><span class="p">:</span> <span class="s2">&quot;x coordinate of projection&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;standard_name&quot;</span><span class="p">:</span> <span class="s2">&quot;projection_x_coordinate&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">y_attrs</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;axis&quot;</span><span class="p">:</span> <span class="s2">&quot;Y&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;long_name&quot;</span><span class="p">:</span> <span class="s2">&quot;y coordinate of projection&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;standard_name&quot;</span><span class="p">:</span> <span class="s2">&quot;projection_y_coordinate&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Use of ``dims`` in xarray currently inconsistent between DataArray and</span>
+    <span class="c1"># Dataset, therefore use .sizes.keys() to force getting the same thing.</span>
+    <span class="c1"># FUTURE: change this to set(data.dims) when made consistent.</span>
+    <span class="n">dims</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">sizes</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+    <span class="n">missing_dims</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">}</span> <span class="o">-</span> <span class="n">dims</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_dims</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing dimensions: </span><span class="si">{</span><span class="n">missing_dims</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">x_coord_attrs</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">assign_attrs</span><span class="p">(</span><span class="n">x_attrs</span><span class="p">)</span>
+    <span class="n">y_coord_attrs</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">assign_attrs</span><span class="p">(</span><span class="n">y_attrs</span><span class="p">)</span>
+
+    <span class="n">data_gdal</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x_coord_attrs</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_coord_attrs</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">crs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rioxarray</span><span class="p">,</span> <span class="n">MissingOptionalModule</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ModuleNotFoundError</span><span class="p">(</span><span class="s2">&quot;rioxarray is required for this functionality&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">data_gdal</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">data_gdal</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">crs</span> <span class="o">!=</span> <span class="n">crs</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Grid already has CRS different then provided CRS. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Grid has </span><span class="si">{</span><span class="n">data_gdal</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">crs</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">crs</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">data_gdal</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">write_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data_gdal</span>
 
 
 <div class="viewcode-block" id="empty_2d"><a class="viewcode-back" href="../../../api/generated/util/imod.util.empty_2d.html#imod.util.empty_2d">[docs]</a><span class="k">def</span> <span class="nf">empty_2d</span><span class="p">(</span>

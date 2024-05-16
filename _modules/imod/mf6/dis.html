@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.dis &#8212; iMOD Python 0.17.0 documentation</title>
+    <title>imod.mf6.dis &#8212; iMOD Python 0.17.1 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.1 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.1 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -449,12 +449,13 @@ document.write(`
                   
   <h1>Source code for imod.mf6.dis</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">pathlib</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">import</span> <span class="nn">imod</span>
 <span class="kn">from</span> <span class="nn">imod.logging</span> <span class="kn">import</span> <span class="n">init_log_decorator</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.interfaces.imaskingsettings</span> <span class="kn">import</span> <span class="n">IMaskingSettings</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.interfaces.iregridpackage</span> <span class="kn">import</span> <span class="n">IRegridPackage</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.package</span> <span class="kn">import</span> <span class="n">Package</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.utilities.regrid</span> <span class="kn">import</span> <span class="n">RegridderType</span>
@@ -470,7 +471,7 @@ document.write(`
 <span class="p">)</span>
 
 
-<div class="viewcode-block" id="StructuredDiscretization"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.StructuredDiscretization.html#imod.mf6.StructuredDiscretization">[docs]</a><span class="k">class</span> <span class="nc">StructuredDiscretization</span><span class="p">(</span><span class="n">Package</span><span class="p">,</span> <span class="n">IRegridPackage</span><span class="p">):</span>
+<div class="viewcode-block" id="StructuredDiscretization"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.StructuredDiscretization.html#imod.mf6.StructuredDiscretization">[docs]</a><span class="k">class</span> <span class="nc">StructuredDiscretization</span><span class="p">(</span><span class="n">Package</span><span class="p">,</span> <span class="n">IRegridPackage</span><span class="p">,</span> <span class="n">IMaskingSettings</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Discretization information for structered grids is specified using the file.</span>
 <span class="sd">    (DIS6) Only one discretization input file (DISU6, DISV6 or DIS6) can be</span>
@@ -541,9 +542,11 @@ document.write(`
         <span class="s2">&quot;idomain&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">RegridderType</span><span class="o">.</span><span class="n">OVERLAP</span><span class="p">,</span> <span class="s2">&quot;mode&quot;</span><span class="p">),</span>
     <span class="p">}</span>
 
-    <span class="n">_skip_mask_arrays</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">skip_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]</span>
 
-    <span class="nd">@init_log_decorator</span><span class="p">()</span>
+<div class="viewcode-block" id="StructuredDiscretization.__init__"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.StructuredDiscretization.html#imod.mf6.StructuredDiscretization.__init__">[docs]</a>    <span class="nd">@init_log_decorator</span><span class="p">()</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">idomain</span><span class="p">,</span> <span class="n">validate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
         <span class="n">dict_dataset</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;idomain&quot;</span><span class="p">:</span> <span class="n">idomain</span><span class="p">,</span>
@@ -551,7 +554,7 @@ document.write(`
             <span class="s2">&quot;bottom&quot;</span><span class="p">:</span> <span class="n">bottom</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dict_dataset</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_init_schemata</span><span class="p">(</span><span class="n">validate</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_delrc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dx</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>

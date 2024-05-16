@@ -29,7 +29,6 @@
       ~GroundwaterTransportModel.items
       ~GroundwaterTransportModel.keys
       ~GroundwaterTransportModel.mask_all_packages
-      ~GroundwaterTransportModel.model_id
       ~GroundwaterTransportModel.pop
       ~GroundwaterTransportModel.popitem
       ~GroundwaterTransportModel.purge_empty_packages
@@ -51,5 +50,7 @@
    
       ~GroundwaterTransportModel.bottom
       ~GroundwaterTransportModel.domain
+      ~GroundwaterTransportModel.model_id
+      ~GroundwaterTransportModel.options
    
    

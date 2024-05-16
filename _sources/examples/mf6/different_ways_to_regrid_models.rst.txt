@@ -112,7 +112,7 @@ Let's plot the k-field. This is going to be the input for the regridder, and the
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x0000014A1A34C210>
+    <matplotlib.collections.QuadMesh object at 0x00000204AF2524D0>
 
 
 
@@ -205,7 +205,7 @@ Let's plot the k-field. This is the regridded output, and it should should somew
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x0000014A246C1610>
+    <matplotlib.collections.QuadMesh object at 0x00000204AF3BC710>
 
 
 
@@ -242,7 +242,7 @@ A second way to regrid  twri  is to regrid the groundwater flow model.
     D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\wel.py:318: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
       in_bounds = np.full(ds.dims["index"], True)
 
-    <matplotlib.collections.QuadMesh object at 0x0000014A20298610>
+    <matplotlib.collections.QuadMesh object at 0x00000204ADF95BD0>
 
 
 
@@ -288,14 +288,14 @@ because initializing a regridder is costly.
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x0000014A1ACD2C90>
+    <matplotlib.collections.QuadMesh object at 0x00000204A3EEA310>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 4.501 seconds)
+   **Total running time of the script:** (0 minutes 3.731 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_different_ways_to_regrid_models.py:

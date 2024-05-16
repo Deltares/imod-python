@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.hfb &#8212; iMOD Python 0.17.0 documentation</title>
+    <title>imod.mf6.hfb &#8212; iMOD Python 0.17.1 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.1 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.1 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -487,7 +487,7 @@ document.write(`
     <span class="n">shapely</span> <span class="o">=</span> <span class="n">MissingOptionalModule</span><span class="p">(</span><span class="s2">&quot;shapely&quot;</span><span class="p">)</span>
 
 
-<span class="nd">@typedispatch</span>  <span class="c1"># type: ignore[no-redef]</span>
+<span class="nd">@typedispatch</span>
 <span class="k">def</span> <span class="nf">_derive_connected_cell_ids</span><span class="p">(</span>
     <span class="n">idomain</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">grid</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">Ugrid2d</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
 <span class="p">):</span>
@@ -858,18 +858,15 @@ document.write(`
                 <span class="p">)</span>
             <span class="p">)</span>
 
-        <span class="n">barrier_dataset</span> <span class="o">=</span> <span class="n">typing</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span>
-            <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
-            <span class="n">to_connected_cells_dataset</span><span class="p">(</span>
-                <span class="n">idomain</span><span class="p">,</span>
-                <span class="n">unstructured_grid</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span>
-                <span class="n">edge_index</span><span class="p">,</span>
-                <span class="p">{</span>
-                    <span class="s2">&quot;hydraulic_characteristic&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__to_hydraulic_characteristic</span><span class="p">(</span>
-                        <span class="n">barrier_values</span>
-                    <span class="p">)</span>
-                <span class="p">},</span>
-            <span class="p">),</span>
+        <span class="n">barrier_dataset</span> <span class="o">=</span> <span class="n">to_connected_cells_dataset</span><span class="p">(</span>
+            <span class="n">idomain</span><span class="p">,</span>
+            <span class="n">unstructured_grid</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span>
+            <span class="n">edge_index</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;hydraulic_characteristic&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__to_hydraulic_characteristic</span><span class="p">(</span>
+                    <span class="n">barrier_values</span>
+                <span class="p">)</span>
+            <span class="p">},</span>
         <span class="p">)</span>
 
         <span class="n">barrier_dataset</span><span class="p">[</span><span class="s2">&quot;print_input&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;print_input&quot;</span><span class="p">]</span>
@@ -955,9 +952,9 @@ document.write(`
     <span class="k">def</span> <span class="nf">__to_resistance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xu</span><span class="o">.</span><span class="n">UgridDataArray</span><span class="p">:</span>
         <span class="k">match</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_barrier_type</span><span class="p">():</span>
             <span class="k">case</span> <span class="n">BarrierType</span><span class="o">.</span><span class="n">HydraulicCharacteristic</span><span class="p">:</span>
-                <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">value</span>  <span class="c1"># type: ignore</span>
+                <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">value</span>
             <span class="k">case</span> <span class="n">BarrierType</span><span class="o">.</span><span class="n">Multiplier</span><span class="p">:</span>
-                <span class="k">return</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">value</span>  <span class="c1"># type: ignore</span>
+                <span class="k">return</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">value</span>
             <span class="k">case</span> <span class="n">BarrierType</span><span class="o">.</span><span class="n">Resistance</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">value</span>
 
@@ -1172,13 +1169,13 @@ document.write(`
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="nd">@init_log_decorator</span><span class="p">()</span>
+<div class="viewcode-block" id="HorizontalFlowBarrierHydraulicCharacteristic.__init__"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic.html#imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic.__init__">[docs]</a>    <span class="nd">@init_log_decorator</span><span class="p">()</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">geometry</span><span class="p">:</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">,</span>
         <span class="n">print_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">print_input</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">print_input</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_get_barrier_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">BarrierType</span><span class="o">.</span><span class="n">HydraulicCharacteristic</span>
@@ -1300,13 +1297,13 @@ document.write(`
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="nd">@init_log_decorator</span><span class="p">()</span>
+<div class="viewcode-block" id="HorizontalFlowBarrierMultiplier.__init__"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.HorizontalFlowBarrierMultiplier.html#imod.mf6.HorizontalFlowBarrierMultiplier.__init__">[docs]</a>    <span class="nd">@init_log_decorator</span><span class="p">()</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">geometry</span><span class="p">:</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">,</span>
         <span class="n">print_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">print_input</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">print_input</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_get_barrier_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">BarrierType</span><span class="o">.</span><span class="n">Multiplier</span>
@@ -1452,13 +1449,13 @@ document.write(`
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="nd">@init_log_decorator</span><span class="p">()</span>
+<div class="viewcode-block" id="HorizontalFlowBarrierResistance.__init__"><a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.HorizontalFlowBarrierResistance.html#imod.mf6.HorizontalFlowBarrierResistance.__init__">[docs]</a>    <span class="nd">@init_log_decorator</span><span class="p">()</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">geometry</span><span class="p">:</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">,</span>
         <span class="n">print_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">print_input</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">print_input</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_get_barrier_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">BarrierType</span><span class="o">.</span><span class="n">Resistance</span>

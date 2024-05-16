@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>imod.prepare.distribute_drn_conductance &#8212; iMOD Python 0.17.0 documentation</title>
+    <title>imod.prepare.distribute_drn_conductance &#8212; iMOD Python 0.17.1 documentation</title>
   
   
   
@@ -125,8 +125,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.1 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.1 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -563,6 +563,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Modflow6Simulation.html">imod.mf6.Modflow6Simulation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Modflow6Simulation.create_time_discretization.html">imod.mf6.Modflow6Simulation.create_time_discretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Modflow6Simulation.write.html">imod.mf6.Modflow6Simulation.write</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Modflow6Simulation.dump.html">imod.mf6.Modflow6Simulation.dump</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Modflow6Simulation.run.html">imod.mf6.Modflow6Simulation.run</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Modflow6Simulation.open_flow_budget.html">imod.mf6.Modflow6Simulation.open_flow_budget</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Modflow6Simulation.open_transport_budget.html">imod.mf6.Modflow6Simulation.open_transport_budget</a></li>
@@ -573,8 +574,10 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.Modflow6Simulation.regrid_like.html">imod.mf6.Modflow6Simulation.regrid_like</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.GroundwaterFlowModel.html">imod.mf6.GroundwaterFlowModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.GroundwaterFlowModel.mask_all_packages.html">imod.mf6.GroundwaterFlowModel.mask_all_packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.GroundwaterFlowModel.dump.html">imod.mf6.GroundwaterFlowModel.dump</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.GroundwaterTransportModel.html">imod.mf6.GroundwaterTransportModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.GroundwaterTransportModel.mask_all_packages.html">imod.mf6.GroundwaterTransportModel.mask_all_packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.GroundwaterTransportModel.dump.html">imod.mf6.GroundwaterTransportModel.dump</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.StructuredDiscretization.html">imod.mf6.StructuredDiscretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.VerticesDiscretization.html">imod.mf6.VerticesDiscretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../mf6/imod.mf6.TimeDiscretization.html">imod.mf6.TimeDiscretization</a></li>
@@ -763,8 +766,40 @@ document.write(`
 <h1>imod.prepare.distribute_drn_conductance<a class="headerlink" href="#imod-prepare-distribute-drn-conductance" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="imod.prepare.distribute_drn_conductance">
-<span class="sig-prename descclassname"><span class="pre">imod.prepare.</span></span><span class="sig-name descname"><span class="pre">distribute_drn_conductance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#imod.prepare.distribute_drn_conductance" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">imod.prepare.</span></span><span class="sig-name descname"><span class="pre">distribute_drn_conductance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distributing_option</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="imod.prepare.DISTRIBUTING_OPTION.html#imod.prepare.DISTRIBUTING_OPTION" title="imod.prepare.topsystem.conductance.DISTRIBUTING_OPTION"><span class="pre">DISTRIBUTING_OPTION</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">allocated</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">DataArray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">UgridDataArray</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conductance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">DataArray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">UgridDataArray</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">DataArray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">UgridDataArray</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bottom</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">DataArray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">UgridDataArray</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">DataArray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">UgridDataArray</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elevation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">DataArray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">UgridDataArray</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">DataArray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">UgridDataArray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../_modules/imod/prepare/topsystem/conductance.html#distribute_drn_conductance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imod.prepare.distribute_drn_conductance" title="Permalink to this definition">#</a></dt>
+<dd><p>Function to distribute 2D conductance over vertical layers for the DRN
+package. Multiple options are available, which need to be selected in the
+DISTRIBUTING_OPTION enumerator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distributing_option</strong> (<a class="reference internal" href="imod.prepare.DISTRIBUTING_OPTION.html#imod.prepare.DISTRIBUTING_OPTION" title="imod.prepare.DISTRIBUTING_OPTION"><em>DISTRIBUTING_OPTION</em></a>) – Distributing option available in the DISTRIBUTING_OPTION enumerator.</p></li>
+<li><p><strong>allocated</strong> (<em>DataArray</em><em> | </em><em>UgridDataArray</em>) – 3D boolean array with drain cell locations. This can be made with the
+<a class="reference internal" href="imod.prepare.allocate_drn_cells.html#imod.prepare.allocate_drn_cells" title="imod.prepare.allocate_drn_cells"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.prepare.allocate_drn_cells()</span></code></a> function.</p></li>
+<li><p><strong>conductance</strong> (<em>DataArray</em><em> | </em><em>UgridDataArray</em>) – Planar grid with conductances that need to be distributed over layers,
+so grid cannot contain a layer dimension. Can contain a time dimension.</p></li>
+<li><p><strong>top</strong> (<em>DataArray</em><em> | </em><em>UgridDataArray</em>) – Model top</p></li>
+<li><p><strong>bottom</strong> (<em>DataArray</em><em> | </em><em>UgridDataArray</em>) – Model layer bottoms</p></li>
+<li><p><strong>k</strong> (<em>DataArray</em><em> | </em><em>UgridDataArray</em>) – Hydraulic conductivities</p></li>
+<li><p><strong>elevation</strong> (<em>DataArray</em><em> | </em><em>UgridDataArray</em>) – Drain elevation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Conductances distributed over depth.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">imod.prepare</span> <span class="kn">import</span> <span class="n">allocate_drn_cells</span><span class="p">,</span> <span class="n">distribute_drn_conductance</span><span class="p">,</span> <span class="n">ALLOCATION_OPTION</span><span class="p">,</span> <span class="n">DISTRIBUTING_OPTION</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">allocated</span> <span class="o">=</span> <span class="n">allocate_drn_cells</span><span class="p">(</span>
+<span class="go">    ALLOCATION_OPTION.at_elevation, active, top, bottom, drain_elevation</span>
+<span class="go">    )</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conductances_distributed</span> <span class="o">=</span> <span class="n">distribute_drn_conductance</span><span class="p">(</span>
+<span class="go">        DISTRIBUTING_OPTION.by_layer_transmissivity, allocated,</span>
+<span class="go">        conductance, top, bottom, k, drain_elevation</span>
+<span class="go">    )</span>
+</pre></div>
+</div>
+</dd></dl>
 
 </section>
 

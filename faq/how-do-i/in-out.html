@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Data In/Out &#8212; iMOD Python 0.17.0 documentation</title>
+    <title>Data In/Out &#8212; iMOD Python 0.17.1 documentation</title>
   
   
   
@@ -123,8 +123,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
-    <script>document.write(`<img src="../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
+    <img src="../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.1 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.1 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -492,6 +492,23 @@ document.write(`
 </pre></div>
 </div>
 </section>
+<section id="make-data-readable-by-qgis">
+<h2>Make data readable by QGIS<a class="headerlink" href="#make-data-readable-by-qgis" title="Permalink to this heading">#</a></h2>
+<p>This requires the data to be compliant with <a class="reference external" href="https://gdal.org/index.html">GDAL</a> for structured data, or <a class="reference external" href="https://www.mdal.xyz/">MDAL</a> for
+unstructured data respectively.</p>
+<p>For structured data:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">da_gdal</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">gdal_compliant_grid</span><span class="p">(</span><span class="n">da</span><span class="p">)</span>
+<span class="n">da_gdal</span><span class="o">.</span><span class="n">to_netcdf</span><span class="p">(</span><span class="s2">&quot;path/to/file.nc&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can open this data as <strong>raster</strong> data in QGIS.</p>
+<p>For unstructured data:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">uda_mdal</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">mdal_compliant_ugrid2d</span><span class="p">(</span><span class="n">uda</span><span class="p">)</span>
+<span class="n">uda_mdal</span><span class="o">.</span><span class="n">ugrid</span><span class="o">.</span><span class="n">to_netcdf</span><span class="p">(</span><span class="s2">&quot;path/to/file.nc&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You you can open this data as <strong>mesh</strong> data in QGIS.</p>
+</section>
 </section>
 
 
@@ -528,6 +545,7 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#import-netcdf-file-as-dataset">Import netCDF file as Dataset</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#import-a-single-netcdf-variable-as-dataarray">Import a single netCDF variable as DataArray</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convert-structured-data-to-ugrid-netcdf">Convert structured data to UGRID netCDF</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#make-data-readable-by-qgis">Make data readable by QGIS</a></li>
 </ul>
   </nav></div>
 

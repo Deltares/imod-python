@@ -29,7 +29,6 @@
       ~GroundwaterFlowModel.items
       ~GroundwaterFlowModel.keys
       ~GroundwaterFlowModel.mask_all_packages
-      ~GroundwaterFlowModel.model_id
       ~GroundwaterFlowModel.pop
       ~GroundwaterFlowModel.popitem
       ~GroundwaterFlowModel.purge_empty_packages
@@ -53,5 +52,7 @@
    
       ~GroundwaterFlowModel.bottom
       ~GroundwaterFlowModel.domain
+      ~GroundwaterFlowModel.model_id
+      ~GroundwaterFlowModel.options
    
    

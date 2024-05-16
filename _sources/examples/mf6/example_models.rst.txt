@@ -325,7 +325,7 @@ with it (such as regridding).
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.008 seconds)
+   **Total running time of the script:** (0 minutes 0.006 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_example_models.py:

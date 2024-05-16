@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>imod.mf6.Modflow6Simulation.write &#8212; iMOD Python 0.17.0 documentation</title>
+    <title>imod.mf6.Modflow6Simulation.write &#8212; iMOD Python 0.17.1 documentation</title>
   
   
   
@@ -49,7 +49,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/generated/mf6/imod.mf6.Modflow6Simulation.write';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="imod.mf6.Modflow6Simulation.run" href="imod.mf6.Modflow6Simulation.run.html" />
+    <link rel="next" title="imod.mf6.Modflow6Simulation.dump" href="imod.mf6.Modflow6Simulation.dump.html" />
     <link rel="prev" title="imod.mf6.Modflow6Simulation.create_time_discretization" href="imod.mf6.Modflow6Simulation.create_time_discretization.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -125,8 +125,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.1 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.1 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -563,6 +563,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.html">imod.mf6.Modflow6Simulation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.create_time_discretization.html">imod.mf6.Modflow6Simulation.create_time_discretization</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">imod.mf6.Modflow6Simulation.write</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.dump.html">imod.mf6.Modflow6Simulation.dump</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.run.html">imod.mf6.Modflow6Simulation.run</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.open_flow_budget.html">imod.mf6.Modflow6Simulation.open_flow_budget</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.open_transport_budget.html">imod.mf6.Modflow6Simulation.open_transport_budget</a></li>
@@ -573,8 +574,10 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.regrid_like.html">imod.mf6.Modflow6Simulation.regrid_like</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.GroundwaterFlowModel.html">imod.mf6.GroundwaterFlowModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.GroundwaterFlowModel.mask_all_packages.html">imod.mf6.GroundwaterFlowModel.mask_all_packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.mf6.GroundwaterFlowModel.dump.html">imod.mf6.GroundwaterFlowModel.dump</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.GroundwaterTransportModel.html">imod.mf6.GroundwaterTransportModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.GroundwaterTransportModel.mask_all_packages.html">imod.mf6.GroundwaterTransportModel.mask_all_packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.mf6.GroundwaterTransportModel.dump.html">imod.mf6.GroundwaterTransportModel.dump</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.StructuredDiscretization.html">imod.mf6.StructuredDiscretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.VerticesDiscretization.html">imod.mf6.VerticesDiscretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.TimeDiscretization.html">imod.mf6.TimeDiscretization</a></li>
@@ -763,8 +766,23 @@ document.write(`
 <h1>imod.mf6.Modflow6Simulation.write<a class="headerlink" href="#imod-mf6-modflow6simulation-write" title="Permalink to this heading">#</a></h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="imod.mf6.Modflow6Simulation.write">
-<span class="sig-prename descclassname"><span class="pre">Modflow6Simulation.</span></span><span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#imod.mf6.Modflow6Simulation.write" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">Modflow6Simulation.</span></span><span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_absolute_paths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/imod/mf6/simulation.html#Modflow6Simulation.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#imod.mf6.Modflow6Simulation.write" title="Permalink to this definition">#</a></dt>
+<dd><p>Write Modflow6 simulation, including assigned groundwater flow and
+transport models.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>directory</strong> (<em>str</em><em>, </em><em>pathlib.Path</em>) – Directory to write Modflow 6 simulation to.</p></li>
+<li><p><strong>binary</strong> (<em>(</em><em>{True</em><em>, </em><em>False}</em><em>, </em><em>optional</em><em>)</em>) – Whether to write time-dependent input for stress packages as binary
+files, which are smaller in size, or more human-readable text files.</p></li>
+<li><p><strong>validate</strong> (<em>(</em><em>{True</em><em>, </em><em>False}</em><em>, </em><em>optional</em><em>)</em>) – Whether to validate the Modflow6 simulation, including models, at
+write. If True, erronous model input will throw a
+<code class="docutils literal notranslate"><span class="pre">ValidationError</span></code>.</p></li>
+<li><p><strong>absolute_paths</strong> (<em>(</em><em>{True</em><em>, </em><em>False}</em><em>, </em><em>optional</em><em>)</em>) – True if all paths written to the mf6 inputfiles should be absolute.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 
@@ -788,11 +806,11 @@ document.write(`
       </div>
     </a>
     <a class="right-next"
-       href="imod.mf6.Modflow6Simulation.run.html"
+       href="imod.mf6.Modflow6Simulation.dump.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">imod.mf6.Modflow6Simulation.run</p>
+        <p class="prev-next-title">imod.mf6.Modflow6Simulation.dump</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>API Reference &#8212; iMOD Python 0.17.0 documentation</title>
+    <title>API Reference &#8212; iMOD Python 0.17.1 documentation</title>
   
   
   
@@ -125,8 +125,8 @@
     
     
     
-    <img src="../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
-    <script>document.write(`<img src="../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
+    <img src="../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.1 documentation - Home"/>
+    <script>document.write(`<img src="../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.1 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -563,6 +563,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.html">imod.mf6.Modflow6Simulation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.create_time_discretization.html">imod.mf6.Modflow6Simulation.create_time_discretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.write.html">imod.mf6.Modflow6Simulation.write</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.dump.html">imod.mf6.Modflow6Simulation.dump</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.run.html">imod.mf6.Modflow6Simulation.run</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.open_flow_budget.html">imod.mf6.Modflow6Simulation.open_flow_budget</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.open_transport_budget.html">imod.mf6.Modflow6Simulation.open_transport_budget</a></li>
@@ -573,8 +574,10 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.regrid_like.html">imod.mf6.Modflow6Simulation.regrid_like</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.html">imod.mf6.GroundwaterFlowModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.mask_all_packages.html">imod.mf6.GroundwaterFlowModel.mask_all_packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.dump.html">imod.mf6.GroundwaterFlowModel.dump</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterTransportModel.html">imod.mf6.GroundwaterTransportModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterTransportModel.mask_all_packages.html">imod.mf6.GroundwaterTransportModel.mask_all_packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterTransportModel.dump.html">imod.mf6.GroundwaterTransportModel.dump</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.StructuredDiscretization.html">imod.mf6.StructuredDiscretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.VerticesDiscretization.html">imod.mf6.VerticesDiscretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.TimeDiscretization.html">imod.mf6.TimeDiscretization</a></li>
@@ -926,32 +929,33 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id1">[0.17.0] - 2024-05-13</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id2">[0.16.0] - 2024-03-29</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id6">[0.15.3] - 2024-02-22</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id9">[0.15.2] - 2024-02-16</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id13">[0.15.1] - 2023-12-22</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id18">[0.15.0] - 2023-11-25</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id22">[0.14.1] - 2023-09-07</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id25">[0.14.0] - 2023-09-06</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id28">[0.13.2] - 2023-07-26</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id32">[0.13.1] - 2023-05-05</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id35">[0.13.0] - 2023-05-02</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id38">[0.12.0] - 2023-03-17</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id42">[0.11.6] - 2023-02-01</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id45">[0.11.5] - 2022-12-15</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id49">[0.11.4] - 2022-09-05</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id53">[0.11.1] - 2021-12-23</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id55">[0.11.0] - 2021-12-21</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id60">[0.10.1] - 2020-10-19</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id64">[0.10.0] - 2020-05-23</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id68">[0.9.0] - 2020-01-19</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id72">[0.8.0] - 2019-10-14</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id75">[0.7.1] - 2019-08-07</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id78">[0.7.0] - 2019-07-23</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id82">[0.6.1] - 2019-04-17</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id85">[0.6.0] - 2019-03-15</a></li>
-<li class="toctree-l2"><a class="reference internal" href="changelog.html#id90">[0.5.0] - 2019-02-26</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id1">[0.17.1] - 2024-05-16</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id2">[0.17.0] - 2024-05-13</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id6">[0.16.0] - 2024-03-29</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id10">[0.15.3] - 2024-02-22</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id13">[0.15.2] - 2024-02-16</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id17">[0.15.1] - 2023-12-22</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id22">[0.15.0] - 2023-11-25</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id26">[0.14.1] - 2023-09-07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id29">[0.14.0] - 2023-09-06</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id32">[0.13.2] - 2023-07-26</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id36">[0.13.1] - 2023-05-05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id39">[0.13.0] - 2023-05-02</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id42">[0.12.0] - 2023-03-17</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id46">[0.11.6] - 2023-02-01</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id49">[0.11.5] - 2022-12-15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id53">[0.11.4] - 2022-09-05</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id57">[0.11.1] - 2021-12-23</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id59">[0.11.0] - 2021-12-21</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id64">[0.10.1] - 2020-10-19</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id68">[0.10.0] - 2020-05-23</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id72">[0.9.0] - 2020-01-19</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id76">[0.8.0] - 2019-10-14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id79">[0.7.1] - 2019-08-07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id82">[0.7.0] - 2019-07-23</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id86">[0.6.1] - 2019-04-17</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id89">[0.6.0] - 2019-03-15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#id94">[0.5.0] - 2019-02-26</a></li>
 </ul>
 </li>
 </ul>

@@ -25,11 +25,6 @@ The functionality to generate coupled models has been moved to the ``primod`` pa
 `You can find the example here <https://deltares.github.io/iMOD-Documentation/coupler_metamod_example.html>`_
 
 
-.. rst-class:: sphx-glr-timing
-
-   **Total running time of the script:** (0 minutes 0.001 seconds)
-
-
 .. _sphx_glr_download_examples_metaswap_metaswap_example.py:
 
 .. only:: html

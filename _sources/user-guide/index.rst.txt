@@ -182,7 +182,7 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Defining the topsystem</div>
+      <div class="sphx-glr-thumbnail-title">Topsystem: from 2D map to 3D model</div>
     </div>
 
 

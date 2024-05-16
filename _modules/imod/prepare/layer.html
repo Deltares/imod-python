@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.prepare.layer &#8212; iMOD Python 0.17.0 documentation</title>
+    <title>imod.prepare.layer &#8212; iMOD Python 0.17.1 documentation</title>
   
   
   
@@ -122,8 +122,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.0 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.0 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo.svg" class="logo__image only-light" alt="iMOD Python 0.17.1 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/imod-python-logo.svg" class="logo__image only-dark" alt="iMOD Python 0.17.1 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -456,7 +456,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">imod.typing.grid</span> <span class="kn">import</span> <span class="n">preserve_gridtype</span><span class="p">,</span> <span class="n">zeros_like</span>
 
 
-<span class="nd">@preserve_gridtype</span>
+<div class="viewcode-block" id="get_upper_active_layer_number"><a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.get_upper_active_layer_number.html#imod.prepare.get_upper_active_layer_number">[docs]</a><span class="nd">@preserve_gridtype</span>
 <span class="k">def</span> <span class="nf">get_upper_active_layer_number</span><span class="p">(</span><span class="n">active</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns planar grid of integers with the layer number of the upper most</span>
@@ -471,10 +471,10 @@ document.write(`
     <span class="c1"># Set nodata to sentinel value to prevent a dtype shift from integer to</span>
     <span class="c1"># float as np.nan forces float.</span>
     <span class="n">nodata</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="k">return</span> <span class="n">layer</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">active</span><span class="p">,</span> <span class="n">nodata</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">layer</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">active</span><span class="p">,</span> <span class="n">nodata</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span></div>
 
 
-<span class="nd">@preserve_gridtype</span>
+<div class="viewcode-block" id="get_upper_active_grid_cells"><a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.get_upper_active_grid_cells.html#imod.prepare.get_upper_active_grid_cells">[docs]</a><span class="nd">@preserve_gridtype</span>
 <span class="k">def</span> <span class="nf">get_upper_active_grid_cells</span><span class="p">(</span><span class="n">active</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns grid of booleans designating location of the uppermost active grid</span>
@@ -487,10 +487,10 @@ document.write(`
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">layer</span> <span class="o">=</span> <span class="n">active</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span>
     <span class="n">upper_active_layer</span> <span class="o">=</span> <span class="n">get_upper_active_layer_number</span><span class="p">(</span><span class="n">active</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">layer</span> <span class="o">==</span> <span class="n">upper_active_layer</span>
+    <span class="k">return</span> <span class="n">layer</span> <span class="o">==</span> <span class="n">upper_active_layer</span></div>
 
 
-<span class="nd">@preserve_gridtype</span>
+<div class="viewcode-block" id="get_lower_active_layer_number"><a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.get_lower_active_layer_number.html#imod.prepare.get_lower_active_layer_number">[docs]</a><span class="nd">@preserve_gridtype</span>
 <span class="k">def</span> <span class="nf">get_lower_active_layer_number</span><span class="p">(</span><span class="n">active</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns two-dimensional grid of integers with the layer number of the lower</span>
@@ -505,10 +505,10 @@ document.write(`
     <span class="c1"># Set nodata to sentinel value to prevent a dtype shift from integer to</span>
     <span class="c1"># float as np.nan forces float.</span>
     <span class="n">nodata</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
-    <span class="k">return</span> <span class="n">layer</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">active</span><span class="p">,</span> <span class="n">nodata</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">layer</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">active</span><span class="p">,</span> <span class="n">nodata</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span></div>
 
 
-<span class="nd">@preserve_gridtype</span>
+<div class="viewcode-block" id="get_lower_active_grid_cells"><a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.get_lower_active_grid_cells.html#imod.prepare.get_lower_active_grid_cells">[docs]</a><span class="nd">@preserve_gridtype</span>
 <span class="k">def</span> <span class="nf">get_lower_active_grid_cells</span><span class="p">(</span><span class="n">active</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns grid of booleans designating location of the lowermost active grid</span>
@@ -521,7 +521,7 @@ document.write(`
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">layer</span> <span class="o">=</span> <span class="n">active</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span>
     <span class="n">lower_active_layer</span> <span class="o">=</span> <span class="n">get_lower_active_layer_number</span><span class="p">(</span><span class="n">active</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">layer</span> <span class="o">==</span> <span class="n">lower_active_layer</span>
+    <span class="k">return</span> <span class="n">layer</span> <span class="o">==</span> <span class="n">lower_active_layer</span></div>
 
 
 <div class="viewcode-block" id="create_layered_top"><a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.create_layered_top.html#imod.prepare.create_layered_top">[docs]</a><span class="k">def</span> <span class="nf">create_layered_top</span><span class="p">(</span><span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="n">top</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataArray</span><span class="p">:</span>
