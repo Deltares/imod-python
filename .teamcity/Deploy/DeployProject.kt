@@ -166,7 +166,7 @@ object DeployPackage : BuildType({
         param("env.TWINE_USERNAME", "__token__")
         param("env.TWINE_NON_INTERACTIVE", "true")
         param("env.PIXI_BETA_WARNING_OFF", "true")
-        password("env.TWINE_PASSWORD", "credentialsJSON:2881ed77-6bd2-439f-99d6-c19b776099b0")
+        password("env.TWINE_PASSWORD", "credentialsJSON:2cea585c-e4f8-4a45-9941-9189daf09ecc")
     }
 
     vcs {
@@ -185,8 +185,8 @@ object DeployPackage : BuildType({
             id = "Deploy_to_PyPi"
             workingDir = "imod-python"
             scriptContent = """
-                pixi run --environment default --frozen twine check ../dist
-                pixi run --environment default --frozen twine upload ../dist/*
+                pixi run --frozen twine check ../dist/*
+                pixi run --frozen twine upload ../dist/*
             """.trimIndent()
         }
     }
