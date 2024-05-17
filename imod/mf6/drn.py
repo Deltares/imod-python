@@ -230,7 +230,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
 
         drainage_packages = []
         for key in drainage_keys:
-            package = cls.from_imod5_data_single(
+            package = cls._from_imod5_data_single(
                 key,
                 imod5_data,
                 target_discretization,
@@ -243,7 +243,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
         return drainage_packages
 
     @classmethod
-    def from_imod5_data_single(
+    def _from_imod5_data_single(
         cls,
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
