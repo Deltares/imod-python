@@ -201,11 +201,19 @@ class Drainage(BoundaryCondition, IRegridPackage):
         regridder_types: dict, optional
             Optional dictionary with regridder types for a specific variable.
             Use this to override default regridding methods.
+        regridder_types:  dict[str, dict[str, tuple[RegridderType, str]]], optional
+            regridder types per array, per package. The first key is the package name
+            as present imod 5 and the second one the input array
+        allocation_methods: dict[str, ALLOCATION_OPTION]], optional
+            allocation option per package. The key is the package name as present in
+            imod 5. All or none should be present.
+        distributing_option: dict[str, DISTRIBUTING_OPTION]], optional
+            distributing option option per package. The key is the package name as present in
+            imod 5. All or none should be present.
 
         Returns
         -------
-        Modflow 6 StorageCoefficient package. Its specific yield is 0 and it's transient if any storage_coefficient
-             is larger than 0. All cells are set to inconvertible (they stay confined throughout the simulation)
+        A list of Modflow 6 Drainage packages.
         """
 
         drainage_keys = [k for k in imod5_data.keys() if k[0:3] == "drn"]
