@@ -14,6 +14,8 @@ from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.utilities.package import get_repeat_stress
 from imod.mf6.write_context import WriteContext
+from imod.prepare.topsystem.allocation import ALLOCATION_OPTION
+from imod.prepare.topsystem.conductance import DISTRIBUTING_OPTION
 from imod.schemata import ValidationError
 
 
@@ -479,7 +481,22 @@ def test_from_imod5(imod5_dataset, tmp_path):
         imod5_dataset, target_dis.dataset["idomain"]
     )
 
-    drn_list = imod.mf6.Drainage.from_imod5_data(data, target_dis, target_npf)
+    allocation_methods = {
+        "drn-1": ALLOCATION_OPTION.first_active_to_elevation,
+        "drn-2": ALLOCATION_OPTION.at_elevation,
+    }
+    distributing_methods = {
+        "drn-1": DISTRIBUTING_OPTION.by_corrected_transmissivity,
+        "drn-2": DISTRIBUTING_OPTION.by_crosscut_thickness,
+    }
+
+    drn_list = imod.mf6.Drainage.from_imod5_data(
+        data,
+        target_dis,
+        target_npf,
+        allocation_methods=allocation_methods,
+        distributing_option=distributing_methods,
+    )
 
     # check the number of produced pacages is correct
     assert len(drn_list) == 2

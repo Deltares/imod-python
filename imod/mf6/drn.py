@@ -6,7 +6,6 @@ import numpy as np
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
-from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.utilities.regrid import (
@@ -175,10 +174,13 @@ class Drainage(BoundaryCondition, IRegridPackage):
     def from_imod5_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        target_discretization: VerticesDiscretization | StructuredDiscretization,
+        target_discretization: StructuredDiscretization,
         target_npf: NodePropertyFlow,
-        regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
-        allocation_methods: Optional[dict[str,]] = None,
+        regridder_types: Optional[
+            dict[str, dict[str, tuple[RegridderType, str]]]
+        ] = None,
+        allocation_methods: Optional[dict[str, ALLOCATION_OPTION]] = None,
+        distributing_option: Optional[dict[str, DISTRIBUTING_OPTION]] = None,
     ) -> list["Drainage"]:
         """
         Construct a drainage-package from iMOD5 data, loaded with the
@@ -207,10 +209,27 @@ class Drainage(BoundaryCondition, IRegridPackage):
         """
 
         drainage_keys = [k for k in imod5_data.keys() if k[0:3] == "drn"]
+        if allocation_methods is None:
+            allocation_methods = dict.fromkeys(
+                drainage_keys, ALLOCATION_OPTION.first_active_to_elevation
+            )
+        if distributing_option is None:
+            distributing_option = dict.fromkeys(
+                drainage_keys, DISTRIBUTING_OPTION.by_corrected_transmissivity
+            )
+        if regridder_types is None:
+            regridder_types = dict.fromkeys(drainage_keys, Drainage._regrid_method)
+
         drainage_packages = []
         for key in drainage_keys:
             package = cls.from_imod5_data_single(
-                key, imod5_data, target_discretization, target_npf, regridder_types
+                key,
+                imod5_data,
+                target_discretization,
+                target_npf,
+                allocation_method=allocation_methods[key],
+                distributing_option=distributing_option[key],
+                regridder_types=regridder_types[key],
             )
             drainage_packages.append(package)
         return drainage_packages
@@ -222,9 +241,9 @@ class Drainage(BoundaryCondition, IRegridPackage):
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_discretization: StructuredDiscretization,
         target_npf: NodePropertyFlow,
-        regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
-        allocation_method: ALLOCATION_OPTION = ALLOCATION_OPTION.first_active_to_elevation,
-        distrubuting_option=DISTRIBUTING_OPTION.by_corrected_transmissivity,
+        allocation_method: ALLOCATION_OPTION,
+        distributing_option: DISTRIBUTING_OPTION,
+        regridder_types: dict[str, tuple[RegridderType, str]],
     ) -> "Drainage":
         target_top = target_discretization.dataset["top"]
         target_bottom = target_discretization.dataset["bottom"]
@@ -266,7 +285,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
         new_package_data["elevation"] = layered_elevation
 
         new_package_data["conductance"] = distribute_drn_conductance(
-            distrubuting_option,
+            distributing_option,
             drn_allocation,
             new_package_data["conductance"],
             target_top,
