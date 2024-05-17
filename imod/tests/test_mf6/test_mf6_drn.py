@@ -11,6 +11,7 @@ import imod
 import imod.mf6.drn
 from imod.logging import LoggerType, LogLevel
 from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.utilities.package import get_repeat_stress
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
@@ -474,7 +475,16 @@ def test_html_repr(drainage):
 def test_from_imod5(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset)
     target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset)
+    target_npf = NodePropertyFlow.from_imod5_data(
+        imod5_dataset, target_dis.dataset["idomain"]
+    )
 
-    drn = imod.mf6.Drainage.from_imod5_data(data, target_dis)
+    drn_list = imod.mf6.Drainage.from_imod5_data(data, target_dis, target_npf)
 
-    assert not drn.dataset["save_flows"]
+    # check the number of produced pacages is correct
+    assert len(drn_list) == 2
+
+    # write the packages for write validation
+    write_context = WriteContext(simulation_directory=tmp_path, use_binary=False)
+    for drainage in drn_list:
+        drainage.write("mydrn", [1], write_context)
