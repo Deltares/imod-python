@@ -4,7 +4,9 @@ import xugrid as xu
 from imod.typing.grid import (
     enforce_dim_order,
     is_planar_grid,
+    is_spatial_grid,
     is_transient_data_grid,
+    merge_with_dictionary,
     preserve_gridtype,
 )
 
@@ -92,6 +94,17 @@ def test_is_planar_grid(basic_dis, basic_unstructured_dis):
         assert is_planar_grid(bottom_layer)
 
 
+def test_is_spatial_grid__structured(basic_dis):
+    ibound, _, bottom = basic_dis
+    ds = xr.Dataset()
+    ds["ibound"] = ibound
+    ds["bottom"] = bottom
+
+    assert is_spatial_grid(ibound)
+    assert not is_spatial_grid(bottom)
+    assert is_spatial_grid(ds)
+
+
 def test_is_transient_data_grid(basic_dis, basic_unstructured_dis):
     discretizations = [basic_dis, basic_unstructured_dis]
 
@@ -109,3 +122,26 @@ def test_is_transient_data_grid(basic_dis, basic_unstructured_dis):
         ibound, _, _ = discr
         ibound = ibound.expand_dims({"time": [1, 2]})
         assert is_transient_data_grid(ibound)
+
+
+def test_is_spatial_grid__unstructured(basic_unstructured_dis):
+    ibound, _, bottom = basic_unstructured_dis
+    grid = ibound.ugrid.grid
+    ds = xr.Dataset()
+    # For some reason xarray requires explicit dimnames in this case to assign
+    # to dataset.
+    ds["ibound"] = (("layer", "mesh2d_nFaces"), ibound)
+    ds["bottom"] = bottom
+    _ = xu.UgridDataset(ds, grid)
+
+
+def test_merge_dictionary__unstructured(basic_unstructured_dis):
+    ibound, _, bottom = basic_unstructured_dis
+
+    uds = merge_with_dictionary({"ibound": ibound, "bottom": bottom})
+
+    assert isinstance(uds, xu.UgridDataset)
+    assert isinstance(uds["ibound"], xu.UgridDataArray)
+    assert isinstance(uds["bottom"], xr.DataArray)
+    assert uds["ibound"].dims == ("layer", "mesh2d_nFaces")
+    assert uds["bottom"].dims == ("layer",)
