@@ -1,7 +1,12 @@
 import xarray as xr
 import xugrid as xu
 
-from imod.typing.grid import enforce_dim_order, preserve_gridtype
+from imod.typing.grid import (
+    enforce_dim_order,
+    is_planar_grid,
+    is_transient_data_grid,
+    preserve_gridtype,
+)
 
 
 def test_preserve_gridtype__single_output(basic_unstructured_dis):
@@ -64,3 +69,43 @@ def test_enforce_dim_order__unstructured(basic_unstructured_dis):
 
     assert actual.dims == ibound.dims
     assert isinstance(actual, type(ibound))
+
+
+def test_is_planar_grid(basic_dis, basic_unstructured_dis):
+    discretizations = [basic_dis, basic_unstructured_dis]
+    for discr in discretizations:
+        ibound, _, _ = discr
+
+        # layer coordinates is present
+        assert not is_planar_grid(ibound)
+
+        # set layer coordinates as present but empty
+        bottom_layer = ibound.sel(layer=3)
+        assert is_planar_grid(bottom_layer)
+
+        # set layer coordinates as  present and not  empty or 0
+        bottom_layer = bottom_layer.expand_dims({"layer": [9]})
+        assert not is_planar_grid(bottom_layer)
+
+        # set layer coordinates as  present and   0
+        bottom_layer.coords["layer"].values[0] = 0
+        assert is_planar_grid(bottom_layer)
+
+
+def test_is_transient_data_grid(basic_dis, basic_unstructured_dis):
+    discretizations = [basic_dis, basic_unstructured_dis]
+
+    for discr in discretizations:
+        ibound, _, _ = discr
+
+        # no time coordinate
+        assert not is_transient_data_grid(ibound)
+
+        #  time coordinate but with single value
+        ibound = ibound.expand_dims({"time": [1]})
+        assert not is_transient_data_grid(ibound)
+
+        #  time coordinate but with several values
+        ibound, _, _ = discr
+        ibound = ibound.expand_dims({"time": [1, 2]})
+        assert is_transient_data_grid(ibound)
