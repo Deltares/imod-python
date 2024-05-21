@@ -169,7 +169,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
     def from_imod5_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        discretization_package: StructuredDiscretization,
+        dis_pkg: StructuredDiscretization,
         regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
     ) -> "Recharge":
         """
@@ -185,8 +185,8 @@ class Recharge(BoundaryCondition, IRegridPackage):
         imod5_data: dict
             Dictionary with iMOD5 data. This can be constructed from the
             :func:`imod.formats.prj.open_projectfile_data` method.
-        target_grid: GridDataArray
-            The grid that should be used for the new package. Does not
+        dis_pkg: GridDataArray
+            The discretization package for the simulation. Its grid does not
             need to be identical to one of the input grids.
         regridder_types: dict, optional
             Optional dictionary with regridder types for a specific variable.
@@ -197,7 +197,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
         Modflow 6 rch package.
 
         """
-        new_idomain = discretization_package.dataset["idomain"]
+        new_idomain = dis_pkg.dataset["idomain"]
         data = {
             "rate": imod5_data["rch"]["rate"],
         }
