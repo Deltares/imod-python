@@ -1,15 +1,19 @@
 """
-Defining the topsystem
-======================
+Topsystem: from 2D map to 3D model
+==================================
 
 iMOD Python has multiple features to help you define the topsystem of the
 groundwater system. With "topsystem" we mean all forcings which act on the top
 of the groundwater system. These are usually either meteorological
 (precipitation & evapotranspiration) or hydrological (rivers, ditches, lakes,
-sea) in nature. This data is usually provided as planar grids (x, y) without any
-vertical dimension. This user guide will show you how to allocate these forcings
-across model layers to grid cells and how to distribute conductances for
-Robin-like boundary conditions over model layers.
+sea) in nature. In MODFLOW6 these are usually simulated with the DRN, RIV, GHB,
+and RCH package. This data is usually provided as planar grids (x, y) without
+any vertical dimension. This user guide will show you how to allocate these
+forcings across model layers to grid cells and how to distribute conductances
+for Robin-like boundary conditions (RIV, DRN, GHB) over model layers. We will
+demonstrate this with the RIV package, as this package supports all options for
+allocating cells and distributing conductances. A subset of options are
+available for the DRN, GHB, and RCH packages.
 
 """
 
@@ -78,7 +82,7 @@ riv_allocated, _ = allocate_riv_cells(
 import geopandas as gpd
 from shapely.geometry import LineString
 
-geometry = LineString([[238000, 562200], [242000, 559800]])
+geometry = LineString([[238725, 561800], [241050, 560350]])
 
 # Define overlay
 overlays = [
@@ -131,7 +135,8 @@ layer_grid.coords["bottom"] = layer_model["bottom"]
 xsection_layer_nr = imod.select.cross_section_linestring(layer_grid, geometry)
 
 imod.visualize.cross_section(xsection_layer_nr, "tab20", np.arange(21))
-
+ax.scatter(x_line, stage_line.values, marker=7, c="k")
+ax.scatter(x_line, stage_bottom.values, marker=6, c="k")
 
 # %%
 # Overview allocation options
@@ -163,8 +168,8 @@ imod.visualize.cross_section(
     fig=fig,
     ax=ax,
 )
-ax.scatter(x_line, stage_line.values, s=32.0, marker=7, c="k", linewidths=0)
-ax.scatter(x_line, stage_bottom.values, s=32.0, marker=6, c="k", linewidths=0)
+ax.scatter(x_line, stage_line.values, marker=7, c="k")
+ax.scatter(x_line, stage_bottom.values, marker=6, c="k")
 ax.set_title("stage and bottom elevation")
 
 # Loop over allocation options, and plot the allocated cells as a polygon,
@@ -332,8 +337,8 @@ imod.visualize.cross_section(
     fig=fig,
     ax=ax,
 )
-ax.scatter(x_line, stage_line.values, s=32.0, marker=7, c="k", linewidths=0)
-ax.scatter(x_line, stage_bottom.values, s=32.0, marker=6, c="k", linewidths=0)
+ax.scatter(x_line, stage_line.values, marker=7, c="k")
+ax.scatter(x_line, stage_bottom.values, marker=6, c="k")
 ax.set_title("hydraulic conductivity")
 
 for i, option in enumerate(DISTRIBUTING_OPTION, start=1):
@@ -396,5 +401,37 @@ plt.tight_layout()
 # midpoint over the length where crosscut transmissivity is computed over
 # (``[layer top - river bottom]/2``) compared to the model cell centre. This
 # further reduces the conductance in the deeper layer.
+
+# %%
+# MODFLOW6 package
+# ----------------
+#
+# The data created can now be used to create a MODFLOW6 package. To construct 3D
+# grids from planar grids for the stages, we can utilize xarrays broadcasting:
+from imod.typing.grid import enforce_dim_order
+
+riv_stage = planar_river["stage"].where(riv_allocated)
+# Use this function to enforce the right dimension order for iMOD Python.
+riv_stage = enforce_dim_order(riv_stage)
+
+riv_stage
+
+# %%
+# We can do the same for the river bottom and construct a river package. Note
+# that we use the previously distributed conductance which we assigned to the
+# variable ``riv_conducance``.
+
+riv_bottom = planar_river["bottom"].where(riv_allocated)
+riv_bottom = enforce_dim_order(riv_bottom)
+
+# Remove coordinates that were added for cross-section plots previously
+riv_conductance = riv_conductance.drop_vars(["bottom", "top"])
+
+riv = imod.mf6.River(
+    stage=riv_stage, conductance=riv_conductance, bottom_elevation=riv_bottom
+)
+
+riv
+
 
 # %%

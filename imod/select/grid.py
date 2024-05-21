@@ -15,7 +15,7 @@ def _reduce_grid_except_dims(
     grid: GridDataArray, preserve_dims: List[str]
 ) -> GridDataArray:
     to_reduce = {dim: 0 for dim in grid.dims if dim not in preserve_dims}
-    return grid.isel(**to_reduce)  # type: ignore [no-untyped-call, misc, arg-type]
+    return grid.isel(**to_reduce)  # type: ignore [misc, arg-type]
 
 
 def _validate_grid(grid):

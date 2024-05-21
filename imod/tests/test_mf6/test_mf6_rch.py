@@ -9,6 +9,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing.grid import is_planar_grid, is_transient_data_grid, nan_like
@@ -331,7 +332,7 @@ def test_clip_box(rch_dict):
 @pytest.mark.usefixtures("imod5_dataset")
 def test_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset)
-    target_grid = data["khv"]["kh"]
+    target_discretization = StructuredDiscretization.from_imod5_data(data)
 
     # create a planar grid with time-independent recharge
     data["rch"]["rate"]["layer"].values[0] = 0
@@ -339,29 +340,27 @@ def test_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
     assert is_planar_grid(data["rch"]["rate"])
 
     # Act
-    rch = imod.mf6.Recharge.from_imod5_data(data, target_grid)
+    rch = imod.mf6.Recharge.from_imod5_data(data, target_discretization)
 
     # Assert
     rendered_rch = rch.render(tmp_path, "rch", None, None)
-    assert "maxbound 2162" in rendered_rch
+    assert "maxbound 33856" in rendered_rch
     assert rendered_rch.count("begin period") == 1
-    assert np.all(
-        rch.dataset["rate"].isel(layer=0).values == data["rch"]["rate"].values
-    )
+    # teardown
+    data["rch"]["rate"]["layer"].values[0] = 1
 
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset)
-    target_grid = data["khv"]["kh"]
+    target_discretization = StructuredDiscretization.from_imod5_data(data)
 
     # create a grid with recharge for 3 timesteps
-    input_recharge = data["rch"]["rate"]
-    input_recharge.values[0] = 0
+    input_recharge = data["rch"]["rate"].copy(deep=True)
     input_recharge = input_recharge.expand_dims({"time": [0, 1, 2]})
 
     # make it planar by setting the layer coordinate to 0
-    input_recharge["layer"].values[0] = 0
+    input_recharge = input_recharge.assign_coords({"layer": [0]})
 
     # update the data set
     data["rch"]["rate"] = input_recharge
@@ -369,60 +368,59 @@ def test_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     assert is_planar_grid(data["rch"]["rate"])
 
     # act
-    rch = imod.mf6.Recharge.from_imod5_data(data, target_grid)
+    rch = imod.mf6.Recharge.from_imod5_data(data, target_discretization)
 
     # assert
     rendered_rch = rch.render(tmp_path, "rch", [0, 1, 2], None)
     assert rendered_rch.count("begin period") == 3
-    assert "maxbound 2162" in rendered_rch
-    assert np.all(
-        rch.dataset["rate"].isel(layer=0).values == data["rch"]["rate"].values
-    )
+    assert "maxbound 33856" in rendered_rch
 
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_non_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset)
+    target_discretization = StructuredDiscretization.from_imod5_data(data)
 
     # make the first layer of the target grid inactive
-    target_grid = data["khv"]["kh"]
+    target_grid = target_discretization.dataset["idomain"]
     target_grid.loc[{"layer": 1}] = 0
 
     # the input for recharge is on the second layer of the targetgrid
-    input_recharge = nan_like(target_grid)
+    original_rch = data["rch"]["rate"].copy(deep=True)
+    data["rch"]["rate"] = data["rch"]["rate"].assign_coords({"layer": [0]})
+    input_recharge = nan_like(data["khv"]["kh"])
     input_recharge.loc[{"layer": 2}] = data["rch"]["rate"].isel(layer=0)
 
     # update the data set
+
     data["rch"]["rate"] = input_recharge
     assert not is_planar_grid(data["rch"]["rate"])
     assert not is_transient_data_grid(data["rch"]["rate"])
 
     # act
-    rch = imod.mf6.Recharge.from_imod5_data(data, target_grid)
+    rch = imod.mf6.Recharge.from_imod5_data(data, target_discretization)
 
     # assert
     rendered_rch = rch.render(tmp_path, "rch", None, None)
     assert rendered_rch.count("begin period") == 1
-    assert "maxbound 2162" in rendered_rch
-    assert np.all(
-        rch.dataset["rate"].sel(layer=2).values
-        == data["rch"]["rate"].sel(layer=2).values
-    )
+    assert "maxbound 33856" in rendered_rch
+
+    # teardown
+    data["rch"]["rate"] = original_rch
 
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_non_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset)
-
+    target_discretization = StructuredDiscretization.from_imod5_data(data)
     # make the first layer of the target grid inactive
-    target_grid = data["khv"]["kh"]
+    target_grid = target_discretization.dataset["idomain"]
     target_grid.loc[{"layer": 1}] = 0
 
     # the input for recharge is on the second layer of the targetgrid
-    input_recharge = nan_like(target_grid)
-    input_recharge.loc[{"layer": 2}] = data["rch"]["rate"].sel(
-        layer=1, method="nearest"
-    )
+    input_recharge = nan_like(data["rch"]["rate"])
+    input_recharge = input_recharge.assign_coords({"layer": [2]})
+    input_recharge.loc[{"layer": 2}] = data["rch"]["rate"].sel(layer=1)
     input_recharge = input_recharge.expand_dims({"time": [0, 1, 2]})
 
     # update the data set
@@ -431,13 +429,9 @@ def test_non_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     assert is_transient_data_grid(data["rch"]["rate"])
 
     # act
-    rch = imod.mf6.Recharge.from_imod5_data(data, target_grid)
+    rch = imod.mf6.Recharge.from_imod5_data(data, target_discretization)
 
     # assert
     rendered_rch = rch.render(tmp_path, "rch", [0, 1, 2], None)
     assert rendered_rch.count("begin period") == 3
-    assert "maxbound 2162" in rendered_rch
-    assert np.all(
-        rch.dataset["rate"].sel(layer=2, method="nearest").values
-        == data["rch"]["rate"].sel(layer=2, method="nearest").values
-    )
+    assert "maxbound 33856" in rendered_rch

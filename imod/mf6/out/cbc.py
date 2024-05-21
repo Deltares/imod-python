@@ -71,7 +71,7 @@ def read_imeth6_header(f: BinaryIO) -> Dict[str, Any]:
     """
     Read the imeth=6 specific data of a CBC header section.
     """
-    content = {}
+    content: Dict[str, str | List[str]] = {}
     content["txt1id1"] = f.read(16).decode("utf-8").strip().lower()
     content["txt2id1"] = f.read(16).decode("utf-8").strip().lower()
     content["txt1id2"] = f.read(16).decode("utf-8").strip().lower()
@@ -111,7 +111,7 @@ def read_cbc_headers(
         Dictionary containing a list of headers per TEXT record in the budget
         file.
     """
-    headers = defaultdict(list)
+    headers: Dict[str, List[Union[Imeth1Header, Imeth6Header]]] = defaultdict(list)
     with open(cbc_path, "rb") as f:
         filesize = os.fstat(f.fileno()).st_size
         while f.tell() < filesize:

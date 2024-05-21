@@ -2,10 +2,10 @@ from copy import deepcopy
 from typing import Optional, Tuple
 
 import numpy as np
-import xarray as xr
 
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.utilities.regrid import (
     RegridderType,
@@ -26,7 +26,10 @@ from imod.schemata import (
     OtherCoordsSchema,
 )
 from imod.typing import GridDataArray
-from imod.typing.grid import is_planar_grid, is_transient_data_grid, zeros_like
+from imod.typing.grid import (
+    enforce_dim_order,
+    is_planar_grid,
+)
 
 
 class Recharge(BoundaryCondition, IRegridPackage):
@@ -166,7 +169,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
     def from_imod5_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        target_grid: GridDataArray,
+        dis_pkg: StructuredDiscretization,
         regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
     ) -> "Recharge":
         """
@@ -182,8 +185,8 @@ class Recharge(BoundaryCondition, IRegridPackage):
         imod5_data: dict
             Dictionary with iMOD5 data. This can be constructed from the
             :func:`imod.formats.prj.open_projectfile_data` method.
-        target_grid: GridDataArray
-            The grid that should be used for the new package. Does not
+        dis_pkg: GridDataArray
+            The discretization package for the simulation. Its grid does not
             need to be identical to one of the input grids.
         regridder_types: dict, optional
             Optional dictionary with regridder types for a specific variable.
@@ -194,7 +197,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
         Modflow 6 rch package.
 
         """
-
+        new_idomain = dis_pkg.dataset["idomain"]
         data = {
             "rate": imod5_data["rch"]["rate"],
         }
@@ -208,33 +211,22 @@ class Recharge(BoundaryCondition, IRegridPackage):
         regrid_context = RegridderWeightsCache()
 
         new_package_data = _regrid_package_data(
-            data, target_grid, regridder_settings, regrid_context, {}
+            data, new_idomain, regridder_settings, regrid_context, {}
         )
 
         # if rate has only layer 0, then it is planar.
-        if is_planar_grid(data["rate"]):
+        if is_planar_grid(new_package_data["rate"]):
+            planar_rate_regridded = new_package_data["rate"].isel(layer=0, drop=True)
             # create an array indicating in which cells rch is active
             is_rch_cell = allocate_rch_cells(
                 ALLOCATION_OPTION.at_first_active,
-                target_grid,
-                new_package_data["rate"].isel(layer=0),
+                new_idomain == 1,
+                planar_rate_regridded,
             )
-            rch_rate = zeros_like(target_grid)
 
-            # assign the rch-rate to all cells in a column
-            if is_transient_data_grid(data["rate"]):
-                rch_rate = deepcopy(
-                    rch_rate.expand_dims({"time": data["rate"]["time"]})
-                )
-                for time in data["rate"]["time"].values:
-                    rch_rate.loc[time, :, :, :] = (
-                        data["rate"].sel(time=time).drop_vars("layer")
-                    )
-            else:
-                rch_rate.loc[:, :, :] = data["rate"].drop_vars("layer")
-
-            # remove rch from cells where it is not allocated
-            rch_rate = xr.where(is_rch_cell, rch_rate, np.nan)
+            # remove rch from cells where it is not allocated and broadcast over layers.
+            rch_rate = planar_rate_regridded.where(is_rch_cell)
+            rch_rate = enforce_dim_order(rch_rate)
             new_package_data["rate"] = rch_rate
 
         return Recharge(**new_package_data)
