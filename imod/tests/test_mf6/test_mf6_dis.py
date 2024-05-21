@@ -194,16 +194,9 @@ def test_write_ascii_griddata_2d_3d(idomain_and_bottom, tmp_path):
     assert len(bottom_content) == 1
 
 
-def test_from_imod5_data__idomain_values(tmp_path):
-    data = imod.data.imod5_projectfile_data(tmp_path)
-    imod5_data = data[0]
-    ibound = imod5_data["bnd"]["ibound"]
-    # Fix data, as it contains floating values like 0.34, 0.25 etc.
-    ibound = ibound.where(ibound <= 0, 1)
-    imod5_data["bnd"]["ibound"] = ibound
-    _load_imod5_data_in_memory(imod5_data)
-
-    dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_data)
+@pytest.mark.usefixtures("imod5_dataset")
+def test_from_imod5_data__idomain_values(imod5_dataset):
+    dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_dataset)
 
     # Test if idomain has appropriate count
     assert (dis["idomain"] == -1).sum() == 371824
@@ -211,16 +204,9 @@ def test_from_imod5_data__idomain_values(tmp_path):
     assert (dis["idomain"] == 1).sum() == 703936
 
 
-def test_from_imod5_data__grid_extent(tmp_path):
-    data = imod.data.imod5_projectfile_data(tmp_path)
-    imod5_data = data[0]
-    ibound = imod5_data["bnd"]["ibound"]
-    # Fix data, as it contains floating values like 0.34, 0.25 etc.
-    ibound = ibound.where(ibound <= 0, 1)
-    imod5_data["bnd"]["ibound"] = ibound
-    _load_imod5_data_in_memory(imod5_data)
-
-    dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_data)
+@pytest.mark.usefixtures("imod5_dataset")
+def test_from_imod5_data__grid_extent(imod5_dataset):
+    dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_dataset)
 
     # Test if regridded to smallest grid resolution
     assert dis["top"].dx == 25.0
@@ -235,20 +221,13 @@ def test_from_imod5_data__grid_extent(tmp_path):
     assert dis.dataset.coords["x"].max() == 199287.5
 
 
-def test_from_imod5_data__write(tmp_path):
-    data = imod.data.imod5_projectfile_data(tmp_path)
-    imod5_data = data[0]
-    ibound = imod5_data["bnd"]["ibound"]
-    # Fix data, as it contains floating values like 0.34, 0.25 etc.
-    ibound = ibound.where(ibound <= 0, 1)
-    imod5_data["bnd"]["ibound"] = ibound
-    _load_imod5_data_in_memory(imod5_data)
-
+@pytest.mark.usefixtures("imod5_dataset")
+def test_from_imod5_data__write(imod5_dataset, tmp_path):
     directory = tmp_path / "dis_griddata"
     directory.mkdir()
     write_context = WriteContext(simulation_directory=directory)
 
-    dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_data)
+    dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_dataset)
 
     # Test if package written without ValidationError
     dis.write(pkgname="dis", globaltimes=[], write_context=write_context)
@@ -259,10 +238,14 @@ def test_from_imod5_data__write(tmp_path):
 
 
 def test_from_imod5_data__validation_error(tmp_path):
+    # don't use the fixture "imod5_dataset" for this test, because we don't want the
+    # ibound cleanup. Without this cleanup we get a validation error,
+    # which is what we want to test here.
+
+    tmp_path = imod.util.temporary_directory()
     data = imod.data.imod5_projectfile_data(tmp_path)
-    imod5_data = data[0]
+    data = data[0]
 
-    _load_imod5_data_in_memory(imod5_data)
-
+    _load_imod5_data_in_memory(data)
     with pytest.raises(ValidationError):
-        imod.mf6.StructuredDiscretization.from_imod5_data(imod5_data)
+        imod.mf6.StructuredDiscretization.from_imod5_data(data)

@@ -1,12 +1,19 @@
+from copy import deepcopy
 from typing import Optional, Tuple
 
 import numpy as np
 
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.utilities.regrid import RegridderType
+from imod.mf6.utilities.regrid import (
+    RegridderType,
+    RegridderWeightsCache,
+    _regrid_package_data,
+)
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
+from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_rch_cells
 from imod.schemata import (
     AllInsideNoDataSchema,
     AllNoDataSchema,
@@ -17,6 +24,11 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
     OtherCoordsSchema,
+)
+from imod.typing import GridDataArray
+from imod.typing.grid import (
+    enforce_dim_order,
+    is_planar_grid,
 )
 
 
@@ -152,3 +164,69 @@ class Recharge(BoundaryCondition, IRegridPackage):
 
     def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
         return self._regrid_method
+
+    @classmethod
+    def from_imod5_data(
+        cls,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        dis_pkg: StructuredDiscretization,
+        regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
+    ) -> "Recharge":
+        """
+        Construct an rch-package from iMOD5 data, loaded with the
+        :func:`imod.formats.prj.open_projectfile_data` function.
+
+        .. note::
+
+            The method expects the iMOD5 model to be fully 3D, not quasi-3D.
+
+        Parameters
+        ----------
+        imod5_data: dict
+            Dictionary with iMOD5 data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
+        dis_pkg: GridDataArray
+            The discretization package for the simulation. Its grid does not
+            need to be identical to one of the input grids.
+        regridder_types: dict, optional
+            Optional dictionary with regridder types for a specific variable.
+            Use this to override default regridding methods.
+
+        Returns
+        -------
+        Modflow 6 rch package.
+
+        """
+        new_idomain = dis_pkg.dataset["idomain"]
+        data = {
+            "rate": imod5_data["rch"]["rate"],
+        }
+        new_package_data = {}
+
+        # first regrid the inputs to the target grid.
+        regridder_settings = deepcopy(cls._regrid_method)
+        if regridder_types is not None:
+            regridder_settings.update(regridder_types)
+
+        regrid_context = RegridderWeightsCache()
+
+        new_package_data = _regrid_package_data(
+            data, new_idomain, regridder_settings, regrid_context, {}
+        )
+
+        # if rate has only layer 0, then it is planar.
+        if is_planar_grid(new_package_data["rate"]):
+            planar_rate_regridded = new_package_data["rate"].isel(layer=0, drop=True)
+            # create an array indicating in which cells rch is active
+            is_rch_cell = allocate_rch_cells(
+                ALLOCATION_OPTION.at_first_active,
+                new_idomain == 1,
+                planar_rate_regridded,
+            )
+
+            # remove rch from cells where it is not allocated and broadcast over layers.
+            rch_rate = planar_rate_regridded.where(is_rch_cell)
+            rch_rate = enforce_dim_order(rch_rate)
+            new_package_data["rate"] = rch_rate
+
+        return Recharge(**new_package_data)
