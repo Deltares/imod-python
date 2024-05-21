@@ -92,7 +92,7 @@ def test_is_planar_grid(basic_dis, basic_unstructured_dis):
         assert is_planar_grid(bottom_layer)
 
 
-def test_is_transient_grid(basic_dis, basic_unstructured_dis):
+def test_is_transient_data_grid(basic_dis, basic_unstructured_dis):
     discretizations = [basic_dis, basic_unstructured_dis]
 
     for discr in discretizations:
