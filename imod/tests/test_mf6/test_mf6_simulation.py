@@ -17,6 +17,7 @@ import xugrid as xu
 import imod
 from imod.mf6.model import Modflow6Model
 from imod.mf6.multimodel.modelsplitter import PartitionInfo
+from imod.mf6.simulation import Modflow6Simulation
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo
 from imod.schemata import ValidationError
 from imod.tests.fixtures.mf6_small_models_fixture import (
@@ -426,3 +427,11 @@ def compare_submodel_partition_info(first: PartitionInfo, second: PartitionInfo)
     return (first.id == second.id) and np.array_equal(
         first.active_domain, second.active_domain
     )
+
+@pytest.mark.usefixtures("imod5_dataset")
+def test_import_from_imod5(imod5_dataset, tmp_path):
+
+    simulation = Modflow6Simulation.from_imod5_data(imod5_dataset)
+    assert simulation is not None
+
+

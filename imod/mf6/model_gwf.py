@@ -5,10 +5,17 @@ from typing import Optional
 import cftime
 import numpy as np
 
+from imod.mf6.rch import Recharge
+from imod.mf6.sto import StorageCoefficient
 from imod.logging import init_log_decorator
+from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6 import ConstantHead
 from imod.mf6.clipped_boundary_condition_creator import create_clipped_boundary
+from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.model import Modflow6Model
+from imod.mf6.npf import NodePropertyFlow
+from imod.mf6.sto import Storage
+from imod.mf6.utilities.regridding_types import RegridderType
 from imod.typing import GridDataArray
 
 
@@ -153,3 +160,37 @@ class GroundwaterFlowModel(Modflow6Model):
         transport_models_old = buoyancy_package.get_transport_model_names()
         if len(transport_models_old) == len(transport_models_per_flow_model):
             buoyancy_package.update_transport_models(transport_models_per_flow_model)
+
+    
+
+    @classmethod
+    @standard_log_decorator()
+    def from_imod5_data(
+        cls,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
+    ) -> "GroundwaterFlowModel":
+        
+        # import discretization
+        dis_pkg = StructuredDiscretization.from_imod5_data(imod5_data, regridder_types)
+
+        grid = dis_pkg.dataset["idomain"]
+        #import npf
+        npf_pkg = NodePropertyFlow.from_imod5_data(imod5_data, grid, regridder_types)
+ 
+        #import sto
+        sto_pkg = StorageCoefficient.from_imod5_data(imod5_data, grid, regridder_types)   
+
+        #import drainages
+        rch_pkg = Recharge.from_imod5_data(imod5_data, grid, regridder_types) 
+
+
+        result = GroundwaterFlowModel()
+        result["dis"] = dis_pkg
+        result["npf"] = npf_pkg
+        result["sto"] = sto_pkg        
+        result["rch"] = rch_pkg        
+
+        return result
+
+

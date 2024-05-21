@@ -40,6 +40,7 @@ from imod.mf6.ssm import SourceSinkMixing
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.utilities.mask import _mask_all_models
 from imod.mf6.utilities.regrid import _regrid_like
+from imod.mf6.utilities.regridding_types import RegridderType
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
@@ -1280,3 +1281,15 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             -1 sets cells to vertical passthrough
         """
         _mask_all_models(self, mask)
+
+
+    @classmethod
+    @standard_log_decorator()
+    def from_imod5_data(
+        cls,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
+    ) -> "Modflow6Simulation":
+        
+        groundwaterFlowModel = GroundwaterFlowModel.from_imod5_data(imod5_data, regridder_types)
+        
