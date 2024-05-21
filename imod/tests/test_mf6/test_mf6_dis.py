@@ -196,8 +196,6 @@ def test_write_ascii_griddata_2d_3d(idomain_and_bottom, tmp_path):
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5_data__idomain_values(imod5_dataset):
-
-
     dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_dataset)
 
     # Test if idomain has appropriate count
@@ -205,10 +203,9 @@ def test_from_imod5_data__idomain_values(imod5_dataset):
     assert (dis["idomain"] == 0).sum() == 176912
     assert (dis["idomain"] == 1).sum() == 703936
 
+
 @pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5_data__grid_extent(imod5_dataset):
-
-
     dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_dataset)
 
     # Test if regridded to smallest grid resolution
@@ -226,7 +223,6 @@ def test_from_imod5_data__grid_extent(imod5_dataset):
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5_data__write(imod5_dataset, tmp_path):
-
     directory = tmp_path / "dis_griddata"
     directory.mkdir()
     write_context = WriteContext(simulation_directory=directory)
@@ -243,7 +239,7 @@ def test_from_imod5_data__write(imod5_dataset, tmp_path):
 
 def test_from_imod5_data__validation_error(tmp_path):
     # don't use the fixture "imod5_dataset" for this test, because we don't want the
-    # ibound cleanup. Without this cleanup we get a validation error, 
+    # ibound cleanup. Without this cleanup we get a validation error,
     # which is what we want to test here.
 
     tmp_path = imod.util.temporary_directory()
