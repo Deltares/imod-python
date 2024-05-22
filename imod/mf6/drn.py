@@ -179,7 +179,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
         regridder_types: Optional[
             dict[str, dict[str, tuple[RegridderType, str]]]
         ] = None,
-        allocation_methods: Optional[dict[str, ALLOCATION_OPTION]] = None,
+        allocation_option: Optional[dict[str, ALLOCATION_OPTION]] = None,
         distributing_option: Optional[dict[str, DISTRIBUTING_OPTION]] = None,
     ) -> list["Drainage"]:
         """
