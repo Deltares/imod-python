@@ -1291,5 +1291,12 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
     ) -> "Modflow6Simulation":
         
+        simulation = Modflow6Simulation("imported_simulation")
         groundwaterFlowModel = GroundwaterFlowModel.from_imod5_data(imod5_data, regridder_types)
+        simulation["imported_model"] = groundwaterFlowModel
+
+        idomain = groundwaterFlowModel.domain
+        simulation.mask_all_models(idomain)
+
+        return simulation
         

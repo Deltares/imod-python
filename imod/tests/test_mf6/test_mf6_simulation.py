@@ -17,6 +17,7 @@ import xugrid as xu
 import imod
 from imod.mf6.model import Modflow6Model
 from imod.mf6.multimodel.modelsplitter import PartitionInfo
+from imod.mf6.oc import OutputControl
 from imod.mf6.simulation import Modflow6Simulation
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo
 from imod.schemata import ValidationError
@@ -432,6 +433,29 @@ def compare_submodel_partition_info(first: PartitionInfo, second: PartitionInfo)
 def test_import_from_imod5(imod5_dataset, tmp_path):
 
     simulation = Modflow6Simulation.from_imod5_data(imod5_dataset)
+
+    # create output control and ims
+    oc = OutputControl(save_head="last", save_budget="last")
+    simulation["imported_model"]["oc"] = oc
+    simulation.create_time_discretization(additional_times=["2010-01-09", "2010-01-10"])
+
+    ims = imod.mf6.Solution(
+        modelnames=["imported_model"],
+        print_option="summary",
+        outer_dvclose=1.0e-4,
+        outer_maximum=500,
+        under_relaxation=None,
+        inner_dvclose=1.0e-4,
+        inner_rclose=0.001,
+        inner_maximum=100,
+        linear_acceleration="cg",
+        scaling_method=None,
+        reordering_method=None,
+        relaxation_factor=0.97,
+    )    
+    simulation["solver"] = ims
+    simulation.write(tmp_path, False,True, False)
+    simulation.run()
     assert simulation is not None
 
 

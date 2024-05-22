@@ -297,10 +297,6 @@ class StorageCoefficient(StorageBase):
             AllValueSchema(">=", 0.0),
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),
-        "convertible": (
-            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
-            # No need to check coords: dataset ensures they align with idomain.
-        ),
     }
 
     _regrid_method = {
@@ -387,7 +383,7 @@ class StorageCoefficient(StorageBase):
         )
 
         new_package_data["convertible"] = zeros_like(
-            new_package_data["storage_coefficient"], dtype=int
+            target_grid, dtype=int
         )
         new_package_data["transient"] = np.any(
             new_package_data["storage_coefficient"].values > 0

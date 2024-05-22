@@ -5,6 +5,7 @@ from typing import Optional
 import cftime
 import numpy as np
 
+from imod.mf6.ic import InitialConditions
 from imod.mf6.rch import Recharge
 from imod.mf6.sto import StorageCoefficient
 from imod.logging import init_log_decorator
@@ -173,22 +174,27 @@ class GroundwaterFlowModel(Modflow6Model):
         
         # import discretization
         dis_pkg = StructuredDiscretization.from_imod5_data(imod5_data, regridder_types)
-
         grid = dis_pkg.dataset["idomain"]
+
         #import npf
         npf_pkg = NodePropertyFlow.from_imod5_data(imod5_data, grid, regridder_types)
  
         #import sto
         sto_pkg = StorageCoefficient.from_imod5_data(imod5_data, grid, regridder_types)   
 
-        #import drainages
-        rch_pkg = Recharge.from_imod5_data(imod5_data, grid, regridder_types) 
+
+        #import initial conditions
+        ic_pkg = InitialConditions.from_imod5_data(imod5_data, grid, regridder_types) 
+
+        #import recharge
+        rch_pkg = Recharge.from_imod5_data(imod5_data, dis_pkg, regridder_types) 
 
 
         result = GroundwaterFlowModel()
         result["dis"] = dis_pkg
         result["npf"] = npf_pkg
-        result["sto"] = sto_pkg        
+        result["sto"] = sto_pkg
+        result["ic"] = ic_pkg   
         result["rch"] = rch_pkg        
 
         return result
