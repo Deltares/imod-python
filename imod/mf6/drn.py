@@ -204,7 +204,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
         regridder_types:  dict[str, dict[str, tuple[RegridderType, str]]], optional
             regridder types per array, per package. The first key is the package name
             as present imod 5 and the second one the input array
-        allocation_methods: dict[str, ALLOCATION_OPTION]], optional
+        allocation_option: dict[str, ALLOCATION_OPTION]], optional
             allocation option per package. The key is the package name as present in
             imod 5. All or none should be present.
         distributing_option: dict[str, DISTRIBUTING_OPTION]], optional
