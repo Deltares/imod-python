@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple
+from typing import List
 
 import numpy as np
 import pandas as pd
@@ -8,7 +8,6 @@ from imod.mf6.interfaces.imaskingsettings import IMaskingSettings
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.regrid.regrid_schemes import DiscretizationRegridMethod
-from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import DisBottomSchema
 from imod.mf6.write_context import WriteContext
 from imod.schemata import (

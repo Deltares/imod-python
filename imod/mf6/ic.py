@@ -1,5 +1,4 @@
 import warnings
-from typing import Optional, Tuple
 
 import numpy as np
 
@@ -7,7 +6,6 @@ from imod.logging import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.regrid.regrid_schemes import InitialConditionsRegridMethod
-from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import DTypeSchema, IdentityNoDataSchema, IndexesSchema
 

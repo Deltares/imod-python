@@ -1,5 +1,3 @@
-from typing import Optional, Tuple
-
 import numpy as np
 
 from imod.logging import init_log_decorator
@@ -148,8 +146,6 @@ class Dispersion(Package, IRegridPackage):
         ),
     }
 
-
-
     @init_log_decorator()
     def __init__(
         self,
@@ -183,4 +179,3 @@ class Dispersion(Package, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
-

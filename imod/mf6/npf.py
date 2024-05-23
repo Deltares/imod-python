@@ -1,5 +1,4 @@
 import warnings
-from typing import Optional, Tuple
 
 import numpy as np
 
@@ -7,7 +6,6 @@ from imod.logging import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.regrid.regrid_schemes import NodePropertyFlowRegridMethod
-from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
@@ -31,6 +29,7 @@ def _dataarray_to_bool(griddataarray: GridDataArray) -> bool:
         raise ValueError("DataArray is not a boolean")
 
     return griddataarray.values.item()
+
 
 class NodePropertyFlow(Package, IRegridPackage):
     """
@@ -337,7 +336,6 @@ class NodePropertyFlow(Package, IRegridPackage):
         "rhs_option": "rhs",
     }
     _template = Package._initialize_template(_pkg_id)
-
 
     @init_log_decorator()
     def __init__(

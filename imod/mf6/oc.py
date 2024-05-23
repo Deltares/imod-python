@@ -1,7 +1,7 @@
 import collections
 import os
 from pathlib import Path
-from typing import Optional, Tuple, Union
+from typing import Union
 
 import numpy as np
 
@@ -17,6 +17,7 @@ OUTPUT_EXT_MAPPING = {
     "concentration": "ucn",
     "budget": "cbc",
 }
+
 
 class OutputControl(Package, IRegridPackage):
     """

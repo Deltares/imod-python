@@ -1,12 +1,9 @@
-from typing import Optional, Tuple
-
 import numpy as np
 
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.regrid.regrid_schemes import RechargeRegridMethod
-from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -110,7 +107,6 @@ class Recharge(BoundaryCondition, IRegridPackage):
 
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
-
 
     @init_log_decorator()
     def __init__(

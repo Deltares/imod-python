@@ -10,7 +10,6 @@ robust alternative.
 """
 
 from copy import deepcopy
-from typing import Optional, Tuple
 
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package

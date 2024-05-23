@@ -277,6 +277,7 @@ class BarrierType(Enum):
     Multiplier = 1
     Resistance = 2
 
+
 class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
     _pkg_id = "hfb"
 

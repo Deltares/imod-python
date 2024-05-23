@@ -1,5 +1,4 @@
 import abc
-from typing import Optional, Tuple
 
 import numpy as np
 
@@ -10,7 +9,6 @@ from imod.mf6.regrid.regrid_schemes import (
     SpecificStorageRegridMethod,
     StorageCoefficientRegridMethod,
 )
-from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
@@ -191,7 +189,6 @@ class SpecificStorage(StorageBase):
         return self._template.render(d)
 
 
-
 class StorageCoefficient(StorageBase):
     """
     Storage Package with a storage coefficient.  Be careful,
@@ -321,4 +318,3 @@ class StorageCoefficient(StorageBase):
         d = self._render_dict(directory, pkgname, globaltimes, binary)
         d["storagecoefficient"] = True
         return self._template.render(d)
-
