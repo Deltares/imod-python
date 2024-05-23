@@ -8,6 +8,7 @@ from imod.logging import init_log_decorator
 from imod.mf6.interfaces.imaskingsettings import IMaskingSettings
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
+from imod.mf6.regrid.regrid_schemes import DiscretizationRegridMethod
 from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import DisBottomSchema
 from imod.schemata import (
@@ -86,12 +87,6 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
     _keyword_map = {"bottom": "botm"}
     _template = Package._initialize_template(_pkg_id)
 
-    _regrid_method = {
-        "top": (RegridderType.OVERLAP, "mean"),
-        "bottom": (RegridderType.OVERLAP, "mean"),
-        "idomain": (RegridderType.OVERLAP, "mode"),
-    }
-
     @property
     def skip_variables(self) -> List[str]:
         return ["bottom"]
@@ -104,6 +99,9 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
             "bottom": bottom,
         }
         super().__init__(dict_dataset)
+
+        self._regrid_method = DiscretizationRegridMethod()
+
         self._validate_init_schemata(validate)
 
     def _delrc(self, dx):
@@ -151,6 +149,3 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method

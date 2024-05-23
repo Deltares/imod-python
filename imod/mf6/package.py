@@ -3,6 +3,7 @@ from __future__ import annotations
 import abc
 import pathlib
 from collections import defaultdict
+from dataclasses import asdict
 from typing import Any, Mapping, Optional, Tuple, Union
 
 import cftime
@@ -22,6 +23,7 @@ from imod.mf6.pkgbase import (
     TRANSPORT_PACKAGES,
     PackageBase,
 )
+from imod.mf6.regrid.regrid_schemes import EmptyRegridderMethods
 from imod.mf6.utilities.mask import mask_package
 from imod.mf6.utilities.regrid import (
     RegridderType,
@@ -60,6 +62,7 @@ class Package(PackageBase, IPackage, abc.ABC):
 
     def __init__(self, allargs: Mapping[str, GridDataArray | float | int | bool | str]):
         super().__init__(allargs)
+        self._regrid_methods = EmptyRegridderMethods()
 
     def isel(self):
         raise NotImplementedError(
@@ -646,3 +649,6 @@ class Package(PackageBase, IPackage, abc.ABC):
 
     def is_clipping_supported(self) -> bool:
         return True
+
+    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
+        return asdict(self._regrid_method)

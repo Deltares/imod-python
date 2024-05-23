@@ -8,6 +8,7 @@ import numpy as np
 from imod.logging import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
+from imod.mf6.regrid.regrid_schemes import OutputControlRegridderMethod
 from imod.mf6.utilities.dataset import is_dataarray_none
 from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.write_context import WriteContext
@@ -18,7 +19,6 @@ OUTPUT_EXT_MAPPING = {
     "concentration": "ucn",
     "budget": "cbc",
 }
-
 
 class OutputControl(Package, IRegridPackage):
     """
@@ -82,7 +82,6 @@ class OutputControl(Package, IRegridPackage):
     }
 
     _write_schemata = {}
-    _regrid_method: dict[str, Tuple[RegridderType, str]] = {}
 
     @init_log_decorator()
     def __init__(
@@ -113,6 +112,7 @@ class OutputControl(Package, IRegridPackage):
             "concentration_file": concentration_file,
         }
         super().__init__(dict_dataset)
+        self._regrid_method = OutputControlRegridderMethod()
         self._validate_init_schemata(validate)
 
     def _get_ocsetting(self, setting):

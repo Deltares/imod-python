@@ -6,6 +6,7 @@ import numpy as np
 from imod.logging import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
+from imod.mf6.regrid.regrid_schemes import InitialConditionsRegridMethod
 from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import DTypeSchema, IdentityNoDataSchema, IndexesSchema
@@ -62,13 +63,6 @@ class InitialConditions(Package, IRegridPackage):
     _keyword_map = {"start": "strt"}
     _template = Package._initialize_template(_pkg_id)
 
-    _regrid_method = {
-        "start": (
-            RegridderType.OVERLAP,
-            "mean",
-        ),  # TODO set to barycentric once supported
-    }
-
     @init_log_decorator()
     def __init__(self, start=None, head=None, validate: bool = True):
         if start is None:
@@ -85,6 +79,9 @@ class InitialConditions(Package, IRegridPackage):
 
         dict_dataset = {"start": start}
         super().__init__(dict_dataset)
+
+        self._regrid_method = InitialConditionsRegridMethod()
+
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):
@@ -95,6 +92,3 @@ class InitialConditions(Package, IRegridPackage):
             self["start"], icdirectory, "strt", binary=binary
         )
         return self._template.render(d)
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method

@@ -5,6 +5,7 @@ import numpy as np
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
+from imod.mf6.regrid.regrid_schemes import GeneralHeadBoundaryRegridMethod
 from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
@@ -114,15 +115,6 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
 
-    _regrid_method = {
-        "head": (
-            RegridderType.OVERLAP,
-            "mean",
-        ),  # TODO set to barycentric once supported
-        "conductance": (RegridderType.RELATIVEOVERLAP, "conductance"),
-        "concentration": (RegridderType.OVERLAP, "mean"),
-    }
-
     @init_log_decorator()
     def __init__(
         self,
@@ -149,6 +141,9 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
             "repeat_stress": repeat_stress,
         }
         super().__init__(dict_dataset)
+
+        self._regrid_method = GeneralHeadBoundaryRegridMethod()
+
         self._validate_init_schemata(validate)
 
     def _validate(self, schemata, **kwargs):
@@ -157,6 +152,3 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method

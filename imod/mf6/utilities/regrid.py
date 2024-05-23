@@ -1,6 +1,7 @@
 import abc
 import copy
 from collections import defaultdict
+from dataclasses import asdict
 from typing import Any, Dict, Optional, Tuple, Union
 
 import xarray as xr
@@ -257,10 +258,10 @@ def _regrid_like(
     if hasattr(package, "auxiliary_data_fields"):
         remove_expanded_auxiliary_variables_from_dataset(package)
 
-    regridder_settings = package.get_regrid_methods()
-    if regridder_types is not None:
-        regridder_settings.update(regridder_types)
+    if regridder_types is None:
+        regridder_types = package.get_regrid_methods()
 
+    regridder_settings = asdict(regridder_types)
     new_package_data = package.get_non_grid_data(list(regridder_settings.keys()))
 
     for (

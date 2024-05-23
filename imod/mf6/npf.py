@@ -6,6 +6,7 @@ import numpy as np
 from imod.logging import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
+from imod.mf6.regrid.regrid_schemes import NodePropertyFlowRegridMethod
 from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
@@ -30,7 +31,6 @@ def _dataarray_to_bool(griddataarray: GridDataArray) -> bool:
         raise ValueError("DataArray is not a boolean")
 
     return griddataarray.values.item()
-
 
 class NodePropertyFlow(Package, IRegridPackage):
     """
@@ -338,22 +338,6 @@ class NodePropertyFlow(Package, IRegridPackage):
     }
     _template = Package._initialize_template(_pkg_id)
 
-    _regrid_method = {
-        "icelltype": (RegridderType.OVERLAP, "mean"),
-        "k": (RegridderType.OVERLAP, "geometric_mean"),  # horizontal if angle2 = 0
-        "k22": (
-            RegridderType.OVERLAP,
-            "geometric_mean",
-        ),  # horizontal if angle2 = 0 & angle3 = 0
-        "k33": (
-            RegridderType.OVERLAP,
-            "harmonic_mean",
-        ),  # vertical if angle2 = 0 & angle3 = 0
-        "angle1": (RegridderType.OVERLAP, "mean"),
-        "angle2": (RegridderType.OVERLAP, "mean"),
-        "angle3": (RegridderType.OVERLAP, "mean"),
-        "rewet_layer": (RegridderType.OVERLAP, "mean"),
-    }
 
     @init_log_decorator()
     def __init__(
@@ -423,6 +407,9 @@ class NodePropertyFlow(Package, IRegridPackage):
             "rhs_option": rhs_option,
         }
         super().__init__(dict_dataset)
+
+        self._regrid_method = NodePropertyFlowRegridMethod()
+
         self._validate_init_schemata(validate)
 
     def get_xt3d_option(self) -> bool:
@@ -458,6 +445,3 @@ class NodePropertyFlow(Package, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method
