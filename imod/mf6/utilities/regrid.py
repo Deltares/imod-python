@@ -195,7 +195,7 @@ def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, lis
     regrid_packages_with_methods = {
         pkg: pkg.get_regrid_methods().items()  # type: ignore # noqa: union-attr
         for pkg in regrid_packages
-        if not pkg.get_regrid_methods()
+        if pkg.get_regrid_methods()
     }
 
     for pkg, regrid_methods in regrid_packages_with_methods.items():

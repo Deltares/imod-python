@@ -4,6 +4,8 @@ import numpy as np
 import pytest
 
 import imod
+from imod.mf6.regrid.regrid_schemes import ConstantHeadRegridMethod
+from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.mf6.utilities.regridding_types import RegridderType
 from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
 from imod.tests.fixtures.mf6_small_models_fixture import (
@@ -56,26 +58,18 @@ def test_regridded_simulation_has_required_packages(
 
 
 @pytest.mark.usefixtures("circle_model")
-def test_regrid_with_methods_without_functions(circle_model, tmp_path):
+def test_regrid_with_custom_method(circle_model):
     simulation = circle_model
     idomain = circle_model["GWF_1"].domain
-    # redefine the default regridding method for the constant head package,
-    # assign a default method that does not have a function
-    old_regrid_method = imod.mf6.ConstantHead._regrid_method
-    imod.mf6.ConstantHead._regrid_method = {
-        "head": (RegridderType.BARYCENTRIC,),
-        "concentration": (RegridderType.BARYCENTRIC,),
-    }
-    regridding_succeeded = False
+    chd_pkg = circle_model["GWF_1"].pop("chd")
 
-    # try regridding the simulation with the new default method
-    try:
-        simulation.regrid_like("regridded", idomain)
-        regridding_succeeded = True
-    finally:
-        # Set the regrid_method back to its old value. It is a class variable
-        # and not an instance variable, so if we don't put it back all chd
-        # packages will be affected in the next tests
-        imod.mf6.ConstantHead._regrid_method = old_regrid_method
+    simulation_regridded = simulation.regrid_like("regridded", idomain)
+    regrid_method = ConstantHeadRegridMethod(
+            head = (RegridderType.BARYCENTRIC,),
+            concentration=(RegridderType.BARYCENTRIC,)
+        )
+    regrid_context = RegridderWeightsCache()
+    simulation_regridded["GWF_1"]["chd"] = chd_pkg.regrid_like(
+        idomain, regrid_context = regrid_context, regridder_types=regrid_method
+    )
 
-    assert regridding_succeeded
