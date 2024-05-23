@@ -31,7 +31,7 @@ from imod.schemata import (
     OtherCoordsSchema,
 )
 from imod.typing import GridDataArray
-from imod.typing.grid import enforce_dim_order
+from imod.typing.grid import enforce_dim_order, is_planar_grid
 
 
 class Drainage(BoundaryCondition, IRegridPackage):
@@ -173,15 +173,14 @@ class Drainage(BoundaryCondition, IRegridPackage):
     @classmethod
     def from_imod5_data(
         cls,
+        key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_discretization: StructuredDiscretization,
         target_npf: NodePropertyFlow,
-        regridder_types: Optional[
-            dict[str, dict[str, tuple[RegridderType, str]]]
-        ] = None,
-        allocation_option: Optional[dict[str, ALLOCATION_OPTION]] = None,
-        distributing_option: Optional[dict[str, DISTRIBUTING_OPTION]] = None,
-    ) -> list["Drainage"]:
+        allocation_option: ALLOCATION_OPTION,
+        distributing_option: DISTRIBUTING_OPTION,
+        regridder_types: dict[str, tuple[RegridderType, str]],
+    ) -> "Drainage":
         """
         Construct a drainage-package from iMOD5 data, loaded with the
         :func:`imod.formats.prj.open_projectfile_data` function.
@@ -201,58 +200,15 @@ class Drainage(BoundaryCondition, IRegridPackage):
         regridder_types: dict, optional
             Optional dictionary with regridder types for a specific variable.
             Use this to override default regridding methods.
-        regridder_types:  dict[str, dict[str, tuple[RegridderType, str]]], optional
-            regridder types per array, per package. The first key is the package name
-            as present imod 5 and the second one the input array
-        allocation_option: dict[str, ALLOCATION_OPTION]], optional
-            allocation option per package. The key is the package name as present in
-            imod 5. All or none should be present.
-        distributing_option: dict[str, DISTRIBUTING_OPTION]], optional
-            distributing option option per package. The key is the package name as present in
-            imod 5. All or none should be present.
-
+        allocation_option: ALLOCATION_OPTION
+            allocation option.
+        distributing_option: dict[str, DISTRIBUTING_OPTION]
+            distributing option.
         Returns
         -------
         A list of Modflow 6 Drainage packages.
         """
 
-        drainage_keys = [k for k in imod5_data.keys() if k[0:3] == "drn"]
-        if allocation_methods is None:
-            allocation_methods = dict.fromkeys(
-                drainage_keys, ALLOCATION_OPTION.first_active_to_elevation
-            )
-        if distributing_option is None:
-            distributing_option = dict.fromkeys(
-                drainage_keys, DISTRIBUTING_OPTION.by_corrected_transmissivity
-            )
-        if regridder_types is None:
-            regridder_types = dict.fromkeys(drainage_keys, Drainage._regrid_method)
-
-        drainage_packages = []
-        for key in drainage_keys:
-            package = cls._from_imod5_data_single(
-                key,
-                imod5_data,
-                target_discretization,
-                target_npf,
-                allocation_method=allocation_methods[key],
-                distributing_option=distributing_option[key],
-                regridder_types=regridder_types[key],
-            )
-            drainage_packages.append(package)
-        return drainage_packages
-
-    @classmethod
-    def _from_imod5_data_single(
-        cls,
-        key: str,
-        imod5_data: dict[str, dict[str, GridDataArray]],
-        target_discretization: StructuredDiscretization,
-        target_npf: NodePropertyFlow,
-        allocation_method: ALLOCATION_OPTION,
-        distributing_option: DISTRIBUTING_OPTION,
-        regridder_types: dict[str, tuple[RegridderType, str]],
-    ) -> "Drainage":
         target_top = target_discretization.dataset["top"]
         target_bottom = target_discretization.dataset["bottom"]
         target_idomain = target_discretization.dataset["idomain"]
@@ -261,6 +217,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
             "elevation": imod5_data[key]["elevation"],
             "conductance": imod5_data[key]["conductance"],
         }
+        elevation_is_planar = is_planar_grid(data["elevation"])
 
         regridder_settings = deepcopy(cls._regrid_method)
         if regridder_types is not None:
@@ -268,37 +225,34 @@ class Drainage(BoundaryCondition, IRegridPackage):
 
         regrid_context = RegridderWeightsCache()
 
-        new_package_data = _regrid_package_data(
+        regridded_package_data = _regrid_package_data(
             data, target_idomain, regridder_settings, regrid_context, {}
         )
 
-        planar_elevation = new_package_data["elevation"]
-        if "layer" in new_package_data["elevation"].coords:
-            planar_elevation = new_package_data["elevation"].sel(layer=1, drop=True)
+        conductance = regridded_package_data["conductance"]
 
-        if "layer" in new_package_data["conductance"].coords:
-            new_package_data["conductance"] = new_package_data["conductance"].sel(
-                layer=1, drop=True
+        if elevation_is_planar:
+            planar_elevation = regridded_package_data["elevation"]
+
+            drn_allocation = allocate_drn_cells(
+                allocation_option,
+                target_idomain == 1,
+                target_top,
+                target_bottom,
+                planar_elevation,
             )
 
-        drn_allocation = allocate_drn_cells(
-            allocation_method,
-            target_idomain == 1,
-            target_top,
-            target_bottom,
-            planar_elevation,
-        )
-        layered_elevation = planar_elevation.where(drn_allocation)
-        layered_elevation = enforce_dim_order(layered_elevation)
-        new_package_data["elevation"] = layered_elevation
+            layered_elevation = planar_elevation.where(drn_allocation)
+            layered_elevation = enforce_dim_order(layered_elevation)
+            regridded_package_data["elevation"] = layered_elevation
 
-        new_package_data["conductance"] = distribute_drn_conductance(
-            distributing_option,
-            drn_allocation,
-            new_package_data["conductance"],
-            target_top,
-            target_bottom,
-            target_npf.dataset["k"],
-            planar_elevation,
-        )
-        return Drainage(**new_package_data)
+            regridded_package_data["conductance"] = distribute_drn_conductance(
+                distributing_option,
+                drn_allocation,
+                conductance,
+                target_top,
+                target_bottom,
+                target_npf.dataset["k"],
+                planar_elevation,
+            )
+        return Drainage(**regridded_package_data)

@@ -481,27 +481,19 @@ def test_from_imod5(imod5_dataset, tmp_path):
         imod5_dataset, target_dis.dataset["idomain"]
     )
 
-    allocation_methods = {
-        "drn-1": ALLOCATION_OPTION.first_active_to_elevation,
-        "drn-2": ALLOCATION_OPTION.at_elevation,
-    }
-    distributing_methods = {
-        "drn-1": DISTRIBUTING_OPTION.by_corrected_transmissivity,
-        "drn-2": DISTRIBUTING_OPTION.by_crosscut_thickness,
-    }
-
-    drn_list = imod.mf6.Drainage.from_imod5_data(
+    drn_2 = imod.mf6.Drainage.from_imod5_data(
+        "drn-2",
         data,
         target_dis,
         target_npf,
-        allocation_methods=allocation_methods,
-        distributing_option=distributing_methods,
+        allocation_option=ALLOCATION_OPTION.at_elevation,
+        distributing_option=DISTRIBUTING_OPTION.by_crosscut_thickness,
+        regridder_types={},
     )
 
     # check the number of produced pacages is correct
-    assert len(drn_list) == 2
+    assert drn_2 is not None
 
     # write the packages for write validation
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=False)
-    for drainage in drn_list:
-        drainage.write("mydrn", [1], write_context)
+    drn_2.write("mydrn", [1], write_context)
