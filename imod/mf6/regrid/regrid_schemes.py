@@ -1,11 +1,22 @@
 from dataclasses import dataclass
-from typing import Tuple
+from typing import ClassVar, Protocol, Tuple
 
 from imod.mf6.utilities.regrid import RegridderType
 
 
+class RegridMethodType(Protocol):
+    # Work around that type annotation is a bit hard on dataclasses, as they
+    # don't expose a class interface. 
+    # Adapted from: https://stackoverflow.com/a/55240861 
+    # "As already noted in comments, checking for this attribute is currently the
+    # most reliable way to ascertain that something is a dataclass"
+    # See also:
+    # https://github.com/python/mypy/issues/6568#issuecomment-1324196557
+
+    __dataclass_fields__: ClassVar[dict] 
+
 @dataclass
-class ConstantHeadRegridMethod:
+class ConstantHeadRegridMethod(RegridMethodType):
     head: Tuple[RegridderType, str] = (
         RegridderType.OVERLAP,
         "mean",
@@ -14,14 +25,14 @@ class ConstantHeadRegridMethod:
 
 
 @dataclass
-class DiscretizationRegridMethod:
+class DiscretizationRegridMethod(RegridMethodType):
     top: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
     bottom: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
     idomain: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mode")
 
 
 @dataclass
-class DispersionRegridMethod:
+class DispersionRegridMethod(RegridMethodType):
     diffusion_coefficient: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
     longitudinal_horizontal: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
     transversal_horizontal1: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
@@ -31,7 +42,7 @@ class DispersionRegridMethod:
 
 
 @dataclass
-class DrainageRegridMethod:
+class DrainageRegridMethod(RegridMethodType):
     elevation: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
     conductance: Tuple[RegridderType, str] = (
         RegridderType.RELATIVEOVERLAP,
@@ -41,12 +52,12 @@ class DrainageRegridMethod:
 
 
 @dataclass
-class EmptyRegridderMethod:
+class EmptyRegridderMethod(RegridMethodType):
     pass
 
 
 @dataclass
-class EvapotranspirationRegridMethod:
+class EvapotranspirationRegridMethod(RegridMethodType):
     surface: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
     rate: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
     depth: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
@@ -55,7 +66,7 @@ class EvapotranspirationRegridMethod:
 
 
 @dataclass
-class GeneralHeadBoundaryRegridMethod:
+class GeneralHeadBoundaryRegridMethod(RegridMethodType):
     head: Tuple[RegridderType, str] = (
         RegridderType.OVERLAP,
         "mean",
@@ -68,7 +79,7 @@ class GeneralHeadBoundaryRegridMethod:
 
 
 @dataclass
-class InitialConditionsRegridMethod:
+class InitialConditionsRegridMethod(RegridMethodType):
     start: Tuple[RegridderType, str] = (
         RegridderType.OVERLAP,
         "mean",
@@ -76,7 +87,7 @@ class InitialConditionsRegridMethod:
 
 
 @dataclass
-class MobileStorageTransferRegridMethod:
+class MobileStorageTransferRegridMethod(RegridMethodType):
     porosity: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
     decay: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
     decay_sorbed: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
@@ -86,7 +97,7 @@ class MobileStorageTransferRegridMethod:
 
 
 @dataclass
-class NodePropertyFlowRegridMethod:
+class NodePropertyFlowRegridMethod(RegridMethodType):
     icelltype: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
     k: Tuple[RegridderType, str] = (
         RegridderType.OVERLAP,
@@ -107,13 +118,13 @@ class NodePropertyFlowRegridMethod:
 
 
 @dataclass
-class RechargeRegridMethod:
+class RechargeRegridMethod(RegridMethodType):
     rate: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
     concentration: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
 
 
 @dataclass
-class RiverRegridMethod:
+class RiverRegridMethod(RegridMethodType):
     stage: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
     conductance: Tuple[RegridderType, str] = (
         RegridderType.RELATIVEOVERLAP,
@@ -124,14 +135,14 @@ class RiverRegridMethod:
 
 
 @dataclass
-class SpecificStorageRegridMethod:
+class SpecificStorageRegridMethod(RegridMethodType):
     convertible: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mode")
     specific_storage: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
     specific_yield: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
 
 
 @dataclass
-class StorageCoefficientRegridMethod:
+class StorageCoefficientRegridMethod(RegridMethodType):
     convertible: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mode")
     storage_coefficient: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
     specific_yield: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")

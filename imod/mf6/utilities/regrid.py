@@ -261,7 +261,7 @@ def _regrid_like(
     if regridder_types is None:
         regridder_settings = package.get_regrid_methods()
     else:
-        regridder_settings = asdict(regridder_types)
+        regridder_settings = asdict(regridder_types, dict_factory=dict)
 
     new_package_data = package.get_non_grid_data(list(regridder_settings.keys()))
 
