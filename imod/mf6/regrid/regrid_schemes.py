@@ -6,6 +6,7 @@ from imod.mf6.utilities.regrid import RegridderType
 
 _RegridVarType: TypeAlias = Tuple[RegridderType, str] | Tuple[RegridderType]
 
+
 class RegridMethodType(Protocol):
     # Work around that type annotation is a bit hard on dataclasses, as they
     # don't expose a class interface.
