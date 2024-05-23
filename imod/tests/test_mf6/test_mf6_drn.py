@@ -1,6 +1,5 @@
 import pathlib
 import textwrap
-from copy import deepcopy
 
 import numpy as np
 import pandas as pd
@@ -475,7 +474,6 @@ def test_html_repr(drainage):
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5(imod5_dataset, tmp_path):
-    data = deepcopy(imod5_dataset)
     target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset)
     target_npf = NodePropertyFlow.from_imod5_data(
         imod5_dataset, target_dis.dataset["idomain"]
@@ -483,7 +481,7 @@ def test_from_imod5(imod5_dataset, tmp_path):
 
     drn_2 = imod.mf6.Drainage.from_imod5_data(
         "drn-2",
-        data,
+        imod5_dataset,
         target_dis,
         target_npf,
         allocation_option=ALLOCATION_OPTION.at_elevation,
