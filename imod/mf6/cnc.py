@@ -53,8 +53,6 @@ class ConstantConcentration(BoundaryCondition, IRegridPackage):
     _period_data = ("concentration",)
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
-    _regrid_method: dict[str, tuple[RegridderType, str]] = {}
-
     _init_schemata = {
         "concentration": [
             DTypeSchema(np.floating),
@@ -91,6 +89,3 @@ class ConstantConcentration(BoundaryCondition, IRegridPackage):
         }
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method

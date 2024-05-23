@@ -5,7 +5,7 @@ import numpy as np
 from imod.logging import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
-from imod.mf6.utilities.regrid import RegridderType
+from imod.mf6.regrid.regrid_schemes import DispersionRegridMethod
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     CompatibleSettingsSchema,
@@ -148,20 +148,7 @@ class Dispersion(Package, IRegridPackage):
         ),
     }
 
-    _regrid_method = {
-        "diffusion_coefficient": (RegridderType.OVERLAP, "mean"),
-        "longitudinal_horizontal": (RegridderType.OVERLAP, "mean"),
-        "transversal_horizontal1": (
-            RegridderType.OVERLAP,
-            "mean",
-        ),
-        "longitudinal_vertical": (
-            RegridderType.OVERLAP,
-            "mean",
-        ),
-        "transversal_horizontal2": (RegridderType.OVERLAP, "mean"),
-        "transversal_vertical": (RegridderType.OVERLAP, "mean"),
-    }
+
 
     @init_log_decorator()
     def __init__(
@@ -187,6 +174,7 @@ class Dispersion(Package, IRegridPackage):
             "transversal_vertical": transversal_vertical,
         }
         super().__init__(dict_dataset)
+        self._regrid_method = DispersionRegridMethod()
         self._validate_init_schemata(validate)
 
     def _validate(self, schemata, **kwargs):
@@ -196,5 +184,3 @@ class Dispersion(Package, IRegridPackage):
 
         return errors
 
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method

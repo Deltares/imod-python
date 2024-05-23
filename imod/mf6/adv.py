@@ -14,13 +14,11 @@ from typing import Optional, Tuple
 
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
-from imod.mf6.utilities.regrid import RegridderType
 
 
 class Advection(Package, IRegridPackage):
     _pkg_id = "adv"
     _template = Package._initialize_template(_pkg_id)
-    _regrid_method: dict[str, tuple[RegridderType, str]] = {}
 
     def __init__(self, scheme: str):
         dict_dataset = {"scheme": scheme}
@@ -36,9 +34,6 @@ class Advection(Package, IRegridPackage):
         retuns a copy of itself.
         """
         return deepcopy(self)
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method
 
 
 class AdvectionUpstream(Advection):

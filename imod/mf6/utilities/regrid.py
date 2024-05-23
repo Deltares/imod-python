@@ -195,7 +195,7 @@ def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, lis
     regrid_packages_with_methods = {
         pkg: pkg.get_regrid_methods().items()  # type: ignore # noqa: union-attr
         for pkg in regrid_packages
-        if pkg.get_regrid_methods() is not None
+        if not pkg.get_regrid_methods()
     }
 
     for pkg, regrid_methods in regrid_packages_with_methods.items():
@@ -259,9 +259,10 @@ def _regrid_like(
         remove_expanded_auxiliary_variables_from_dataset(package)
 
     if regridder_types is None:
-        regridder_types = package.get_regrid_methods()
-
-    regridder_settings = asdict(regridder_types)
+        regridder_settings = package.get_regrid_methods()
+    else:
+        regridder_settings = asdict(regridder_types)
+    
     new_package_data = package.get_non_grid_data(list(regridder_settings.keys()))
 
     for (

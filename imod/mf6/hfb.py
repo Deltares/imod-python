@@ -17,9 +17,7 @@ from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
-from imod.mf6.regrid.regrid_schemes import HorizontalFlowBarrierRegridderMethods
 from imod.mf6.utilities.grid import broadcast_to_full_domain
-from imod.mf6.utilities.regrid import RegridderType
 from imod.schemata import EmptyIndexesSchema
 from imod.typing import GridDataArray
 from imod.util.imports import MissingOptionalModule
@@ -293,9 +291,6 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
     ) -> None:
         dict_dataset = {"print_input": print_input}
         super().__init__(dict_dataset)
-
-        self._regrid_method = HorizontalFlowBarrierRegridderMethods()
-
         self.line_data = geometry
 
     def _get_variable_names_for_gdf(self) -> list[str]:

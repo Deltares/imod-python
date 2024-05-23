@@ -18,14 +18,31 @@ class DiscretizationRegridMethod:
 
 
 @dataclass
+class DispersionRegridMethod:
+    diffusion_coefficient: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
+    longitudinal_horizontal: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
+    transversal_horizontal1: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
+    longitudinal_vertical: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
+    transversal_horizontal2: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
+    transversal_vertical: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
+
+@dataclass
 class DrainageRegridMethod:
     elevation: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
     conductance: Tuple[RegridderType, str] = (RegridderType.RELATIVEOVERLAP, "conductance")
     concentration: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
 
 @dataclass
-class EmptyRegridderMethods:
+class EmptyRegridderMethod:
     pass
+
+@dataclass
+class EvapotranspirationRegridMethod:
+    surface: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
+    rate: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
+    depth: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
+    proportion_rate: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
+    proportion_depth: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
 
 @dataclass
 class GeneralHeadBoundaryRegridMethod:
@@ -35,16 +52,20 @@ class GeneralHeadBoundaryRegridMethod:
 
 
 @dataclass
-class HorizontalFlowBarrierRegridderMethods:
-    pass
-
-
-@dataclass
 class InitialConditionsRegridMethod:
     start: Tuple[RegridderType, str] = (
             RegridderType.OVERLAP,
             "mean",
         )  # TODO set to barycentric once supported
+
+@dataclass
+class MobileStorageTransferRegridMethod:
+    porosity: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
+    decay: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
+    decay_sorbed: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
+    bulk_density: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
+    distcoef: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
+    sp2: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
 
 
 @dataclass
@@ -57,11 +78,6 @@ class NodePropertyFlowRegridMethod:
     angle2: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
     angle3: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
     rewet_layer: Tuple[RegridderType, str] = (RegridderType.OVERLAP, "mean")
-
-
-@dataclass
-class OutputControlRegridderMethod:
-    pass
 
 
 @dataclass

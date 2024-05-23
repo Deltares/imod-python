@@ -8,9 +8,7 @@ import numpy as np
 from imod.logging import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
-from imod.mf6.regrid.regrid_schemes import OutputControlRegridderMethod
 from imod.mf6.utilities.dataset import is_dataarray_none
-from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.write_context import WriteContext
 from imod.schemata import DTypeSchema
 
@@ -112,7 +110,6 @@ class OutputControl(Package, IRegridPackage):
             "concentration_file": concentration_file,
         }
         super().__init__(dict_dataset)
-        self._regrid_method = OutputControlRegridderMethod()
         self._validate_init_schemata(validate)
 
     def _get_ocsetting(self, setting):
@@ -209,6 +206,3 @@ class OutputControl(Package, IRegridPackage):
     @property
     def is_budget_output(self) -> bool:
         return self.dataset["save_budget"].values[()] is not None
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method

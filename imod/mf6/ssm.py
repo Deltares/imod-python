@@ -43,7 +43,6 @@ class SourceSinkMixing(BoundaryCondition, IRegridPackage):
 
     _write_schemata = {}
 
-    _regrid_method: dict[str, Tuple[RegridderType, str]] = {}
 
     @init_log_decorator()
     def __init__(
@@ -171,5 +170,3 @@ class SourceSinkMixing(BoundaryCondition, IRegridPackage):
             validate=validate,
         )
 
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method

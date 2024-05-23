@@ -1,11 +1,11 @@
-from typing import Optional, Tuple
+from typing import Optional
 
 import numpy as np
 
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.utilities.regrid import RegridderType
+from imod.mf6.regrid.regrid_schemes import EvapotranspirationRegridMethod
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -166,29 +166,6 @@ class Evapotranspiration(BoundaryCondition, IRegridPackage):
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
 
-    _regrid_method = {
-        "surface": (
-            RegridderType.OVERLAP,
-            "mean",
-        ),
-        "rate": (
-            RegridderType.OVERLAP,
-            "mean",
-        ),
-        "depth": (
-            RegridderType.OVERLAP,
-            "mean",
-        ),
-        "proportion_rate": (
-            RegridderType.OVERLAP,
-            "mean",
-        ),
-        "proportion_depth": (
-            RegridderType.OVERLAP,
-            "mean",
-        ),
-    }
-
     @init_log_decorator()
     def __init__(
         self,
@@ -228,6 +205,7 @@ class Evapotranspiration(BoundaryCondition, IRegridPackage):
             "repeat_stress": repeat_stress,
         }
         super().__init__(dict_dataset)
+        self._regrid_method = EvapotranspirationRegridMethod()
         self._validate_init_schemata(validate)
 
     def _validate(self, schemata, **kwargs):
@@ -255,6 +233,3 @@ class Evapotranspiration(BoundaryCondition, IRegridPackage):
         bin_ds = unstack_dim_into_variable(bin_ds, "segment")
 
         return bin_ds
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method

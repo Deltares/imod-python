@@ -23,7 +23,7 @@ from imod.mf6.pkgbase import (
     TRANSPORT_PACKAGES,
     PackageBase,
 )
-from imod.mf6.regrid.regrid_schemes import EmptyRegridderMethods
+from imod.mf6.regrid.regrid_schemes import EmptyRegridderMethod
 from imod.mf6.utilities.mask import mask_package
 from imod.mf6.utilities.regrid import (
     RegridderType,
@@ -62,7 +62,7 @@ class Package(PackageBase, IPackage, abc.ABC):
 
     def __init__(self, allargs: Mapping[str, GridDataArray | float | int | bool | str]):
         super().__init__(allargs)
-        self._regrid_methods = EmptyRegridderMethods()
+        self._regrid_method = EmptyRegridderMethod()
 
     def isel(self):
         raise NotImplementedError(
