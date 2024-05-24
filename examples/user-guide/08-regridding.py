@@ -202,7 +202,7 @@ regrid_context
 from imod.mf6.regrid import RechargeRegridMethod
 from imod.mf6.utilities.regrid import RegridderType
 
-regridder_types = RechargeRegridMethod(rate = (RegridderType.CENTROIDLOCATOR,))
+regridder_types = RechargeRegridMethod(rate=(RegridderType.CENTROIDLOCATOR,))
 
 regridded_recharge = original_rch_package.regrid_like(
     target_grid,

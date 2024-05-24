@@ -22,7 +22,8 @@ from imod.mf6.regrid.regrid_schemes import (
 )
 from imod.mf6.utilities.regrid import RegridderType
 
-ALL_REGRID_METHODS = [ConstantHeadRegridMethod,
+ALL_REGRID_METHODS = [
+    ConstantHeadRegridMethod,
     DiscretizationRegridMethod,
     DispersionRegridMethod,
     DrainageRegridMethod,
@@ -35,8 +36,8 @@ ALL_REGRID_METHODS = [ConstantHeadRegridMethod,
     RechargeRegridMethod,
     RiverRegridMethod,
     SpecificStorageRegridMethod,
-    StorageCoefficientRegridMethod
-    ]
+    StorageCoefficientRegridMethod,
+]
 
 
 # Forward regrid methods to case functions to generate readable test ids
@@ -47,6 +48,7 @@ def case_regrid(regrid_method):
 
 def tuple_centroid():
     return (RegridderType.CENTROIDLOCATOR, "max")
+
 
 def tuple_barycentric():
     return (RegridderType.BARYCENTRIC,)
