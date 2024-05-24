@@ -582,6 +582,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         cls = type(self)
         new = cls.__new__(cls)
         new.dataset = copy.deepcopy(self.dataset)
+        new.line_data = self.line_data
         return new
 
     def mask(self, _) -> Package:
