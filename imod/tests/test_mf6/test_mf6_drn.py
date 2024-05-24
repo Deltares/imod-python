@@ -489,8 +489,7 @@ def test_from_imod5(imod5_dataset, tmp_path):
         regridder_types={},
     )
 
-    # check the number of produced pacages is correct
-    assert drn_2 is not None
+    assert isinstance(drn_2, imod.mf6.Drainage)
 
     # write the packages for write validation
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=False)
