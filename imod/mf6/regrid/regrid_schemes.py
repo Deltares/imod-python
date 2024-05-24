@@ -27,7 +27,7 @@ class ConstantHeadRegridMethod(RegridMethodType):
     Object containing regridder methods for the :class:`imod.mf6.ConstantHead`
     package. This can be provided to the ``regrid_like`` method to regrid with
     custom settings.
-    
+
     Parameters
     ----------
     head: tuple, default (RegridderType.OVERLAP, "mean")
@@ -43,8 +43,9 @@ class ConstantHeadRegridMethod(RegridMethodType):
     The RegridderType.OVERLAP and RegridderType.RELATIVEOVERLAP require an extra
     method as string.
 
-    >>> regrid_method = ConstantHeadRegridMethod(head=(RegridderType.OVERLAP, "max",))    
+    >>> regrid_method = ConstantHeadRegridMethod(head=(RegridderType.OVERLAP, "max",))
     """
+
     head: _RegridVarType = (
         RegridderType.OVERLAP,
         "mean",
@@ -59,13 +60,13 @@ class DiscretizationRegridMethod(RegridMethodType):
     :class:`imod.mf6.StructuredDiscretization` and
     :class:`imod.mf6.VerticesDiscretization` packages. This can be provided to
     the ``regrid_like`` method to regrid with custom settings.
-    
+
     Parameters
     ----------
     top: tuple, default (RegridderType.OVERLAP, "mean")
     bottom: tuple, default (RegridderType.OVERLAP, "mean")
     idomain: tuple, default (RegridderType.OVERLAP, "mode")
-        
+
     Examples
     --------
     Regrid with custom settings:
@@ -76,8 +77,9 @@ class DiscretizationRegridMethod(RegridMethodType):
     The RegridderType.OVERLAP and RegridderType.RELATIVEOVERLAP require an extra
     method as string.
 
-    >>> regrid_method = DiscretizationRegridMethod(top=(RegridderType.OVERLAP, "max",))  
+    >>> regrid_method = DiscretizationRegridMethod(top=(RegridderType.OVERLAP, "max",))
     """
+
     top: _RegridVarType = (RegridderType.OVERLAP, "mean")
     bottom: _RegridVarType = (RegridderType.OVERLAP, "mean")
     idomain: _RegridVarType = (RegridderType.OVERLAP, "mode")
@@ -89,7 +91,7 @@ class DispersionRegridMethod(RegridMethodType):
     Object containing regridder methods for the :class:`imod.mf6.Dispersion`
     package. This can be provided to the ``regrid_like`` method to regrid with
     custom settings.
-    
+
     Parameters
     ----------
     diffusion_coefficient: tuple, default (RegridderType.OVERLAP, "mean")
@@ -97,8 +99,8 @@ class DispersionRegridMethod(RegridMethodType):
     transversal_horizontal: tuple, default (RegridderType.OVERLAP, "mean")
     longitudinal_vertical: tuple, default (RegridderType.OVERLAP, "mean")
     transversal_horizontal2: tuple, default (RegridderType.OVERLAP, "mean")
-    transversal_vertical: tuple, default (RegridderType.OVERLAP, "mean")    
-    
+    transversal_vertical: tuple, default (RegridderType.OVERLAP, "mean")
+
     Examples
     --------
     Regrid with custom settings:
@@ -109,8 +111,9 @@ class DispersionRegridMethod(RegridMethodType):
     The RegridderType.OVERLAP and RegridderType.RELATIVEOVERLAP require an extra
     method as string.
 
-    >>> regrid_method = DispersionRegridMethod(longitudinal_horizontal=(RegridderType.OVERLAP, "max",))  
+    >>> regrid_method = DispersionRegridMethod(longitudinal_horizontal=(RegridderType.OVERLAP, "max",))
     """
+
     diffusion_coefficient: _RegridVarType = (RegridderType.OVERLAP, "mean")
     longitudinal_horizontal: _RegridVarType = (RegridderType.OVERLAP, "mean")
     transversal_horizontal1: _RegridVarType = (RegridderType.OVERLAP, "mean")
@@ -125,13 +128,13 @@ class DrainageRegridMethod(RegridMethodType):
     Object containing regridder methods for the :class:`imod.mf6.Drainage`
     package. This can be provided to the ``regrid_like`` method to regrid with
     custom settings.
-    
+
     Parameters
     ----------
     elevation: tuple, default (RegridderType.OVERLAP, "mean")
     conductance: tuple, default (RegridderType.RELATIVEOVERLAP,"conductance")
     concentration: tuple, default (RegridderType.OVERLAP, "mean")
-    
+
     Examples
     --------
     Regrid with custom settings:
@@ -142,10 +145,11 @@ class DrainageRegridMethod(RegridMethodType):
     The RegridderType.OVERLAP and RegridderType.RELATIVEOVERLAP require an extra
     method as string.
 
-    >>> regrid_method = DrainageRegridMethod(elevation=(RegridderType.OVERLAP, "max",))  
+    >>> regrid_method = DrainageRegridMethod(elevation=(RegridderType.OVERLAP, "max",))
     """
+
     elevation: _RegridVarType = (RegridderType.OVERLAP, "mean")
-    conductance: _RegridVarType = (RegridderType.RELATIVEOVERLAP,"conductance")
+    conductance: _RegridVarType = (RegridderType.RELATIVEOVERLAP, "conductance")
     concentration: _RegridVarType = (RegridderType.OVERLAP, "mean")
 
 
@@ -160,7 +164,7 @@ class EvapotranspirationRegridMethod(RegridMethodType):
     Object containing regridder methods for the
     :class:`imod.mf6.Evapotranspiration` package. This can be provided to the
     ``regrid_like`` method to regrid with custom settings.
-    
+
     Parameters
     ----------
     surface: tuple, default (RegridderType.OVERLAP, "mean")
@@ -168,7 +172,7 @@ class EvapotranspirationRegridMethod(RegridMethodType):
     depth: tuple, default (RegridderType.OVERLAP, "mean")
     proportion_rate: tuple, default (RegridderType.OVERLAP, "mean")
     proportion_depth: tuple, default (RegridderType.OVERLAP, "mean")
-    
+
     Examples
     --------
     Regrid with custom settings:
@@ -179,8 +183,9 @@ class EvapotranspirationRegridMethod(RegridMethodType):
     The RegridderType.OVERLAP and RegridderType.RELATIVEOVERLAP require an extra
     method as string.
 
-    >>> regrid_method = EvapotranspirationRegridMethod(surface=(RegridderType.OVERLAP, "max",))  
+    >>> regrid_method = EvapotranspirationRegridMethod(surface=(RegridderType.OVERLAP, "max",))
     """
+
     surface: _RegridVarType = (RegridderType.OVERLAP, "mean")
     rate: _RegridVarType = (RegridderType.OVERLAP, "mean")
     depth: _RegridVarType = (RegridderType.OVERLAP, "mean")
@@ -194,13 +199,13 @@ class GeneralHeadBoundaryRegridMethod(RegridMethodType):
     Object containing regridder methods for the
     :class:`imod.mf6.GeneralHeadBoundary` package. This can be provided to the
     ``regrid_like`` method to regrid with custom settings.
-    
+
     Parameters
     ----------
     head: tuple, default (RegridderType.OVERLAP, "mean")
     conductance: tuple, default (RegridderType.RELATIVEOVERLAP,"conductance")
     concentration: tuple, default (RegridderType.OVERLAP, "mean")
-    
+
     Examples
     --------
     Regrid with custom settings:
@@ -211,11 +216,14 @@ class GeneralHeadBoundaryRegridMethod(RegridMethodType):
     The RegridderType.OVERLAP and RegridderType.RELATIVEOVERLAP require an extra
     method as string.
 
-    >>> regrid_method = GeneralHeadBoundaryRegridMethod(head=(RegridderType.OVERLAP, "max",))  
+    >>> regrid_method = GeneralHeadBoundaryRegridMethod(head=(RegridderType.OVERLAP, "max",))
     """
 
-    head: _RegridVarType = (RegridderType.OVERLAP, "mean")  # TODO set to barycentric once supported
-    conductance: _RegridVarType = (RegridderType.RELATIVEOVERLAP,"conductance")
+    head: _RegridVarType = (
+        RegridderType.OVERLAP,
+        "mean",
+    )  # TODO set to barycentric once supported
+    conductance: _RegridVarType = (RegridderType.RELATIVEOVERLAP, "conductance")
     concentration: _RegridVarType = (RegridderType.OVERLAP, "mean")
 
 
@@ -225,7 +233,7 @@ class InitialConditionsRegridMethod(RegridMethodType):
     Object containing regridder methods for the
     :class:`imod.mf6.InitialConditions` package. This can be provided to the
     ``regrid_like`` method to regrid with custom settings.
-    
+
     Parameters
     ----------
     start: tuple, default (RegridderType.OVERLAP, "mean")
@@ -240,7 +248,7 @@ class InitialConditionsRegridMethod(RegridMethodType):
     The RegridderType.OVERLAP and RegridderType.RELATIVEOVERLAP require an extra
     method as string.
 
-    >>> regrid_method = InitialConditionsRegridMethod(start=(RegridderType.OVERLAP, "max",))  
+    >>> regrid_method = InitialConditionsRegridMethod(start=(RegridderType.OVERLAP, "max",))
     """
 
     start: _RegridVarType = (
@@ -255,7 +263,7 @@ class MobileStorageTransferRegridMethod(RegridMethodType):
     Object containing regridder methods for the
     :class:`imod.mf6.MobileStorageTransfer` package. This can be provided to the
     ``regrid_like`` method to regrid with custom settings.
-    
+
     Parameters
     ----------
     porosity: tuple, default (RegridderType.OVERLAP, "mean")
@@ -275,7 +283,7 @@ class MobileStorageTransferRegridMethod(RegridMethodType):
     The RegridderType.OVERLAP and RegridderType.RELATIVEOVERLAP require an extra
     method as string.
 
-    >>> regrid_method = MobileStorageTransferRegridMethod(porosity=(RegridderType.OVERLAP, "max",))  
+    >>> regrid_method = MobileStorageTransferRegridMethod(porosity=(RegridderType.OVERLAP, "max",))
     """
 
     porosity: _RegridVarType = (RegridderType.OVERLAP, "mean")
@@ -292,13 +300,13 @@ class NodePropertyFlowRegridMethod(RegridMethodType):
     Object containing regridder methods for the
     :class:`imod.mf6.NodePropertyFlow` package. This can be provided to the
     ``regrid_like`` method to regrid with custom settings.
-    
+
     Parameters
     ----------
     icelltype: tuple, defaults (RegridderType.OVERLAP, "mean")
     k: tuple, defaults ( RegridderType.OVERLAP,"geometric_mean")
     k22: tuple, defaults (RegridderType.OVERLAP,"geometric_mean")
-    k33: tuple, defaults (RegridderType.OVERLAP,"harmonic_mean") 
+    k33: tuple, defaults (RegridderType.OVERLAP,"harmonic_mean")
     angle1: tuple, defaults (RegridderType.OVERLAP, "mean")
     angle2: tuple, defaults (RegridderType.OVERLAP, "mean")
     angle3: tuple, defaults (RegridderType.OVERLAP, "mean")
@@ -314,12 +322,22 @@ class NodePropertyFlowRegridMethod(RegridMethodType):
     The RegridderType.OVERLAP and RegridderType.RELATIVEOVERLAP require an extra
     method as string.
 
-    >>> regrid_method = NodePropertyFlowRegridMethod(k=(RegridderType.OVERLAP, "max",))  
+    >>> regrid_method = NodePropertyFlowRegridMethod(k=(RegridderType.OVERLAP, "max",))
     """
+
     icelltype: _RegridVarType = (RegridderType.OVERLAP, "mode")
-    k: _RegridVarType = ( RegridderType.OVERLAP,"geometric_mean" )  # horizontal if angle2 = 0
-    k22: _RegridVarType = (RegridderType.OVERLAP,"geometric_mean")  # horizontal if angle2 = 0 & angle3 = 0
-    k33: _RegridVarType = (RegridderType.OVERLAP,"harmonic_mean")  # vertical if angle2 = 0 & angle3 = 0
+    k: _RegridVarType = (
+        RegridderType.OVERLAP,
+        "geometric_mean",
+    )  # horizontal if angle2 = 0
+    k22: _RegridVarType = (
+        RegridderType.OVERLAP,
+        "geometric_mean",
+    )  # horizontal if angle2 = 0 & angle3 = 0
+    k33: _RegridVarType = (
+        RegridderType.OVERLAP,
+        "harmonic_mean",
+    )  # vertical if angle2 = 0 & angle3 = 0
     angle1: _RegridVarType = (RegridderType.OVERLAP, "mean")
     angle2: _RegridVarType = (RegridderType.OVERLAP, "mean")
     angle3: _RegridVarType = (RegridderType.OVERLAP, "mean")
@@ -332,7 +350,7 @@ class RechargeRegridMethod(RegridMethodType):
     Object containing regridder methods for the :class:`imod.mf6.Recharge`
     package. This can be provided to the ``regrid_like`` method to regrid with
     custom settings.
-    
+
     Parameters
     ----------
     rate: tuple, defaults (RegridderType.OVERLAP, "mean")
@@ -348,8 +366,9 @@ class RechargeRegridMethod(RegridMethodType):
     The RegridderType.OVERLAP and RegridderType.RELATIVEOVERLAP require an extra
     method as string.
 
-    >>> regrid_method = RechargeRegridMethod(rate=(RegridderType.OVERLAP, "max",))  
+    >>> regrid_method = RechargeRegridMethod(rate=(RegridderType.OVERLAP, "max",))
     """
+
     rate: _RegridVarType = (RegridderType.OVERLAP, "mean")
     concentration: _RegridVarType = (RegridderType.OVERLAP, "mean")
 
@@ -360,7 +379,7 @@ class RiverRegridMethod(RegridMethodType):
     Object containing regridder methods for the :class:`imod.mf6.River` package.
     This can be provided to the ``regrid_like`` method to regrid with custom
     settings.
-    
+
     Parameters
     ----------
     stage: tuple, default (RegridderType.OVERLAP, "mean")
@@ -378,8 +397,9 @@ class RiverRegridMethod(RegridMethodType):
     The RegridderType.OVERLAP and RegridderType.RELATIVEOVERLAP require an extra
     method as string.
 
-    >>> regrid_method = RiverRegridMethod(stage=(RegridderType.OVERLAP, "max",))  
+    >>> regrid_method = RiverRegridMethod(stage=(RegridderType.OVERLAP, "max",))
     """
+
     stage: _RegridVarType = (RegridderType.OVERLAP, "mean")
     conductance: _RegridVarType = (RegridderType.RELATIVEOVERLAP, "conductance")
     bottom_elevation: _RegridVarType = (RegridderType.OVERLAP, "mean")
@@ -392,7 +412,7 @@ class SpecificStorageRegridMethod(RegridMethodType):
     Object containing regridder methods for the
     :class:`imod.mf6.SpecificStorage` package. This can be provided to the
     ``regrid_like`` method to regrid with custom settings.
-    
+
     Parameters
     ----------
     convertible: tuple, default (RegridderType.OVERLAP, "mode")
@@ -409,8 +429,9 @@ class SpecificStorageRegridMethod(RegridMethodType):
     The RegridderType.OVERLAP and RegridderType.RELATIVEOVERLAP require an extra
     method as string.
 
-    >>> regrid_method = SpecificStorageRegridMethod(specific_storage=(RegridderType.OVERLAP, "max",))  
+    >>> regrid_method = SpecificStorageRegridMethod(specific_storage=(RegridderType.OVERLAP, "max",))
     """
+
     convertible: _RegridVarType = (RegridderType.OVERLAP, "mode")
     specific_storage: _RegridVarType = (RegridderType.OVERLAP, "mean")
     specific_yield: _RegridVarType = (RegridderType.OVERLAP, "mean")
@@ -422,7 +443,7 @@ class StorageCoefficientRegridMethod(RegridMethodType):
     Object containing regridder methods for the
     :class:`imod.mf6.StorageCoefficient` package. This can be provided to the
     ``regrid_like`` method to regrid with custom settings.
-    
+
     Parameters
     ----------
     convertible: tuple, default (RegridderType.OVERLAP, "mode")
@@ -439,8 +460,9 @@ class StorageCoefficientRegridMethod(RegridMethodType):
     The RegridderType.OVERLAP and RegridderType.RELATIVEOVERLAP require an extra
     method as string.
 
-    >>> regrid_method = StorageCoefficientRegridMethod(storage_coefficient=(RegridderType.OVERLAP, "max",))  
+    >>> regrid_method = StorageCoefficientRegridMethod(storage_coefficient=(RegridderType.OVERLAP, "max",))
     """
+
     convertible: _RegridVarType = (RegridderType.OVERLAP, "mode")
     storage_coefficient: _RegridVarType = (RegridderType.OVERLAP, "mean")
     specific_yield: _RegridVarType = (RegridderType.OVERLAP, "mean")
