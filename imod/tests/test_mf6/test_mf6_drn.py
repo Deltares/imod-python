@@ -7,9 +7,14 @@ import pytest
 import xarray as xr
 
 import imod
+import imod.mf6.drn
 from imod.logging import LoggerType, LogLevel
+from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.utilities.package import get_repeat_stress
 from imod.mf6.write_context import WriteContext
+from imod.prepare.topsystem.allocation import ALLOCATION_OPTION
+from imod.prepare.topsystem.conductance import DISTRIBUTING_OPTION
 from imod.schemata import ValidationError
 
 
@@ -465,3 +470,27 @@ def test_html_repr(drainage):
     html_string = imod.mf6.Drainage(**drainage)._repr_html_()
     assert isinstance(html_string, str)
     assert html_string.split("</div>")[0] == "<div>Drainage"
+
+
+@pytest.mark.usefixtures("imod5_dataset")
+def test_from_imod5(imod5_dataset, tmp_path):
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset)
+    target_npf = NodePropertyFlow.from_imod5_data(
+        imod5_dataset, target_dis.dataset["idomain"]
+    )
+
+    drn_2 = imod.mf6.Drainage.from_imod5_data(
+        "drn-2",
+        imod5_dataset,
+        target_dis,
+        target_npf,
+        allocation_option=ALLOCATION_OPTION.at_elevation,
+        distributing_option=DISTRIBUTING_OPTION.by_crosscut_thickness,
+        regridder_types={},
+    )
+
+    assert isinstance(drn_2, imod.mf6.Drainage)
+
+    # write the packages for write validation
+    write_context = WriteContext(simulation_directory=tmp_path, use_binary=False)
+    drn_2.write("mydrn", [1], write_context)
