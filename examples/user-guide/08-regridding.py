@@ -199,9 +199,10 @@ regrid_context
 # Regrid the recharge package with a custom regridder. In this case we opt
 # for the centroid locator regridder. This regridder is similar to using a
 # "nearest neighbour" lookup.
+from imod.mf6.regrid import RechargeRegridMethod
 from imod.mf6.utilities.regrid import RegridderType
 
-regridder_types = {"rate": (RegridderType.CENTROIDLOCATOR, None)}
+regridder_types = RechargeRegridMethod(rate = (RegridderType.CENTROIDLOCATOR,))
 
 regridded_recharge = original_rch_package.regrid_like(
     target_grid,
@@ -428,7 +429,7 @@ counter = 0
 for pkg in ALL_PACKAGE_INSTANCES:
     if hasattr(pkg, "_regrid_method"):
         package_name = type(pkg).__name__
-        regrid_methods = pkg._regrid_method
+        regrid_methods = pkg.get_regrid_methods()
         for array_name in regrid_methods.keys():
             method_name = regrid_methods[array_name][0].name
             function_name = ""
