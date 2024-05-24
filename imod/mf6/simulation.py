@@ -24,7 +24,7 @@ from imod.logging import standard_log_decorator
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwfgwt import GWFGWT
 from imod.mf6.gwtgwt import GWTGWT
-from imod.mf6.ims import Solution
+from imod.mf6.ims import Solution, SolutionPresetModerate
 from imod.mf6.interfaces.imodel import IModel
 from imod.mf6.interfaces.isimulation import ISimulation
 from imod.mf6.model import Modflow6Model
@@ -1310,21 +1310,36 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         """
         _mask_all_models(self, mask)
 
-
     @classmethod
     @standard_log_decorator()
     def from_imod5_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
         regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
+        additional_times: Any =None
     ) -> "Modflow6Simulation":
         
         simulation = Modflow6Simulation("imported_simulation")
-        groundwaterFlowModel = GroundwaterFlowModel.from_imod5_data(imod5_data, regridder_types)
+
+        # import GWF model
+        groundwaterFlowModel = GroundwaterFlowModel.from_imod5_data(
+            imod5_data, regridder_types
+        )
         simulation["imported_model"] = groundwaterFlowModel
 
+        # generate ims package      
+        solution = SolutionPresetModerate(
+            ["imported_model"],
+            print_option="all",
+        )
+        simulation["ims"] = solution
+
+        # create time discretization
+        simulation.create_time_discretization(additional_times= additional_times)
+
+
+        # cleanup packages for validation
         idomain = groundwaterFlowModel.domain
         simulation.mask_all_models(idomain)
 
         return simulation
-        

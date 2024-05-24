@@ -382,9 +382,7 @@ class StorageCoefficient(StorageBase):
             data, target_grid, regridder_settings, regrid_context, {}
         )
 
-        new_package_data["convertible"] = zeros_like(
-            target_grid, dtype=int
-        )
+        new_package_data["convertible"] = zeros_like(target_grid, dtype=int)
         new_package_data["transient"] = np.any(
             new_package_data["storage_coefficient"].values > 0
         )
