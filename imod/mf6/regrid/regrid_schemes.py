@@ -56,7 +56,7 @@ class DrainageRegridMethod(RegridMethodType):
 
 
 @dataclass
-class EmptyRegridderMethod(RegridMethodType):
+class EmptyRegridMethod(RegridMethodType):
     pass
 
 
