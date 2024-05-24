@@ -231,7 +231,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
 
         conductance = regridded_package_data["conductance"]
 
-        if elevation_is_planar:
+        if is_planar:
             planar_elevation = regridded_package_data["elevation"]
 
             drn_allocation = allocate_drn_cells(
