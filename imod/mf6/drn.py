@@ -217,7 +217,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
             "elevation": imod5_data[key]["elevation"],
             "conductance": imod5_data[key]["conductance"],
         }
-        elevation_is_planar = is_planar_grid(data["elevation"])
+        is_planar = is_planar_grid(data["elevation"])
 
         regridder_settings = deepcopy(cls._regrid_method)
         if regridder_types is not None:
