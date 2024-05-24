@@ -63,7 +63,7 @@ _OPEN_HDS = {
     "disu": disu.open_hds,
 }
 
-_OPEN_CBC = {
+_OPEN_CBC: Dict[str, Callable] = {
     "dis": dis.open_cbc,
     "disv": disv.open_cbc,
     "disu": disu.open_cbc,

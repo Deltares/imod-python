@@ -1,6 +1,6 @@
 import os
 import struct
-from typing import Any, BinaryIO, Dict, List, Optional, Tuple
+from typing import Any, BinaryIO, Dict, List, Optional, Tuple, cast
 
 import dask
 import numba
@@ -230,7 +230,7 @@ def open_imeth6_budgets(
         + [(name, np.float64) for name in header_list[0].auxtxt]
     )
     shape = (grb_content["nlayer"], grb_content["nrow"], grb_content["ncol"])
-    size = np.product(shape)
+    size = np.prod(shape)
     dask_list = []
     time = np.empty(len(header_list), dtype=np.float64)
     for i, header in enumerate(header_list):
@@ -443,25 +443,29 @@ def open_cbc(
     for key, header_list in headers.items():
         # TODO: validate homogeneity of header_list, ndat consistent, nlist consistent etc.
         if key == "flow-ja-face" and isinstance(header_list[0], cbc.Imeth1Header):
+            assert all(isinstance(x, cbc.Imeth1Header) for x in header_list)
             if flowja:
-                flowja, nm = cbc.open_face_budgets_as_flowja(
-                    cbc_path, header_list, grb_content
+                flowjaface, nm = cbc.open_face_budgets_as_flowja(
+                    cbc_path, cast(List[cbc.Imeth1Header], header_list), grb_content
                 )
-                cbc_content["flow-ja-face"] = flowja
+                cbc_content["flow-ja-face"] = flowjaface
                 cbc_content["connectivity"] = nm
             else:
                 right, front, lower = dis_open_face_budgets(
-                    cbc_path, grb_content, header_list
+                    cbc_path, grb_content, cast(List[cbc.Imeth1Header], header_list)
                 )
                 cbc_content["flow-right-face"] = right
                 cbc_content["flow-front-face"] = front
                 cbc_content["flow-lower-face"] = lower
         else:
             if isinstance(header_list[0], cbc.Imeth1Header):
+                assert all(isinstance(x, cbc.Imeth1Header) for x in header_list)
                 cbc_content[key] = open_imeth1_budgets(
-                    cbc_path, grb_content, header_list
+                    cbc_path, grb_content, cast(List[cbc.Imeth1Header], header_list)
                 )
             elif isinstance(header_list[0], cbc.Imeth6Header):
+                assert all(isinstance(x, cbc.Imeth6Header) for x in header_list)
+
                 # for non cell flow budget terms, use auxiliary variables as return value
                 if header_list[0].text.startswith("data-"):
                     for return_variable in header_list[0].auxtxt:
@@ -469,13 +473,16 @@ def open_cbc(
                         cbc_content[key_aux] = open_imeth6_budgets(
                             cbc_path,
                             grb_content,
-                            header_list,
-                            return_variable=return_variable,
+                            cast(List[cbc.Imeth6Header], header_list),
+                            return_variable,
                             indices=indices,
                         )
                 else:
                     cbc_content[key] = open_imeth6_budgets(
-                        cbc_path, grb_content, header_list, indices=indices
+                        cbc_path,
+                        grb_content,
+                        cast(List[cbc.Imeth6Header], header_list),
+                        indices=indices,
                     )
     if simulation_start_time is not None:
         for cbc_name, cbc_array in cbc_content.items():

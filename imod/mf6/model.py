@@ -6,7 +6,7 @@ import inspect
 import pathlib
 from copy import deepcopy
 from pathlib import Path
-from typing import Optional, Tuple, Union
+from typing import Any, Optional, Tuple, Union
 
 import cftime
 import jinja2
@@ -28,6 +28,7 @@ from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray
+from imod.typing.grid import is_spatial_grid
 
 
 class Modflow6Model(collections.UserDict, IModel, abc.ABC):
@@ -292,8 +293,36 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
     @standard_log_decorator()
     def dump(
-        self, directory, modelname, validate: bool = True, mdal_compliant: bool = False
+        self,
+        directory,
+        modelname,
+        validate: bool = True,
+        mdal_compliant: bool = False,
+        crs: Optional[Any] = None,
     ):
+        """
+        Dump simulation to files. Writes a model definition as .TOML file, which
+        points to data for each package. Each package is stored as a separate
+        NetCDF. Structured grids are saved as regular NetCDFs, unstructured
+        grids are saved as UGRID NetCDF. Structured grids are always made GDAL
+        compliant, unstructured grids can be made MDAL compliant optionally.
+
+        Parameters
+        ----------
+        directory: str or Path
+            directory to dump simulation into.
+        modelname: str
+            modelname, will be used to create a subdirectory.
+        validate: bool, optional
+            Whether to validate simulation data. Defaults to True.
+        mdal_compliant: bool, optional
+            Convert data with
+            :func:`imod.prepare.spatial.mdal_compliant_ugrid2d` to MDAL
+            compliant unstructured grids. Defaults to False.
+        crs: Any, optional
+            Anything accepted by rasterio.crs.CRS.from_user_input
+            Requires ``rioxarray`` installed.
+        """
         modeldirectory = pathlib.Path(directory) / modelname
         modeldirectory.mkdir(exist_ok=True, parents=True)
         if validate:
@@ -308,13 +337,17 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             dataset = pkg.dataset
             if isinstance(dataset, xu.UgridDataset):
                 if mdal_compliant:
-                    dataset = pkg.dataset.ugrid.to_dataset()
-                    mdal_dataset = imod.util.spatial.mdal_compliant_ugrid2d(dataset)
+                    dataset = dataset.ugrid.to_dataset()
+                    mdal_dataset = imod.util.spatial.mdal_compliant_ugrid2d(
+                        dataset, crs=crs
+                    )
                     mdal_dataset.to_netcdf(modeldirectory / pkg_path)
                 else:
-                    pkg.dataset.ugrid.to_netcdf(modeldirectory / pkg_path)
+                    dataset.ugrid.to_netcdf(modeldirectory / pkg_path)
             else:
-                pkg.to_netcdf(modeldirectory / pkg_path)
+                if is_spatial_grid(dataset):
+                    dataset = imod.util.spatial.gdal_compliant_grid(dataset, crs=crs)
+                dataset.to_netcdf(modeldirectory / pkg_path)
 
         toml_path = modeldirectory / f"{modelname}.toml"
         with open(toml_path, "wb") as f:
@@ -343,11 +376,17 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
         return instance
 
-    @classmethod
-    def model_id(cls) -> str:
-        if cls._model_id is None:
+    @property
+    def options(self) -> dict:
+        if self._options is None:
             raise ValueError("Model id has not been set")
-        return cls._model_id
+        return self._options
+
+    @property
+    def model_id(self) -> str:
+        if self._model_id is None:
+            raise ValueError("Model id has not been set")
+        return self._model_id
 
     def clip_box(
         self,

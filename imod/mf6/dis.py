@@ -1,11 +1,12 @@
 import pathlib
 from copy import deepcopy
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 import numpy as np
 
 import imod
 from imod.logging import init_log_decorator, standard_log_decorator
+from imod.mf6.interfaces.imaskingsettings import IMaskingSettings
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.utilities.grid import create_smallest_target_grid
@@ -30,7 +31,7 @@ from imod.schemata import (
 from imod.typing.grid import GridDataArray
 
 
-class StructuredDiscretization(Package, IRegridPackage):
+class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
     """
     Discretization information for structered grids is specified using the file.
     (DIS6) Only one discretization input file (DISU6, DISV6 or DIS6) can be
@@ -104,7 +105,9 @@ class StructuredDiscretization(Package, IRegridPackage):
         ),  # TODO: Change back to 'mode' when xugrid 0.9.1 released
     }
 
-    _skip_mask_arrays = ["bottom"]
+    @property
+    def skip_variables(self) -> List[str]:
+        return ["bottom"]
 
     @init_log_decorator()
     def __init__(self, top, bottom, idomain, validate: bool = True):
