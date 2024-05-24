@@ -106,6 +106,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
     _keyword_map = {}
     _auxiliary_data = {"concentration": "species"}
     _template = BoundaryCondition._initialize_template(_pkg_id)
+    _regrid_method = ConstantHeadRegridMethod()
 
     @init_log_decorator()
     def __init__(
@@ -131,8 +132,6 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
             "repeat_stress": repeat_stress,
         }
         super().__init__(dict_dataset)
-
-        self._regrid_method = ConstantHeadRegridMethod()
 
         self._validate_init_schemata(validate)
 

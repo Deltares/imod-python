@@ -97,6 +97,7 @@ class MobileStorageTransfer(Package, IRegridPackage):
         "distcoef": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),
         "sp2": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),
     }
+    _regrid_method = MobileStorageTransferRegridMethod()
 
     @init_log_decorator()
     def __init__(
@@ -130,7 +131,4 @@ class MobileStorageTransfer(Package, IRegridPackage):
             "first_order_decay": first_order_decay,
         }
         super().__init__(dict_dataset)
-
-        self._regrid_method = MobileStorageTransferRegridMethod()
-
         self._validate_init_schemata(validate)

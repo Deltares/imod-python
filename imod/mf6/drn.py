@@ -108,6 +108,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
+    _regrid_method = DrainageRegridMethod()
 
     @init_log_decorator()
     def __init__(
@@ -135,9 +136,6 @@ class Drainage(BoundaryCondition, IRegridPackage):
             "repeat_stress": repeat_stress,
         }
         super().__init__(dict_dataset)
-
-        self._regrid_method = DrainageRegridMethod()
-
         self._validate_init_schemata(validate)
 
     def _validate(self, schemata, **kwargs):

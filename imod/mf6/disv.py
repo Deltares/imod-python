@@ -67,6 +67,7 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
     _grid_data = {"top": np.float64, "bottom": np.float64, "idomain": np.int32}
     _keyword_map = {"bottom": "botm"}
     _template = Package._initialize_template(_pkg_id)
+    _regrid_method = DiscretizationRegridMethod()
 
     @property
     def skip_variables(self) -> List[str]:
@@ -80,9 +81,6 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
             "bottom": bottom,
         }
         super().__init__(dict_dataset)
-
-        self._regrid_method = DiscretizationRegridMethod()
-
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, binary):

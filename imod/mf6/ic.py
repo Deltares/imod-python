@@ -60,6 +60,7 @@ class InitialConditions(Package, IRegridPackage):
     _grid_data = {"start": np.float64}
     _keyword_map = {"start": "strt"}
     _template = Package._initialize_template(_pkg_id)
+    _regrid_method = InitialConditionsRegridMethod()
 
     @init_log_decorator()
     def __init__(self, start=None, head=None, validate: bool = True):
@@ -77,9 +78,6 @@ class InitialConditions(Package, IRegridPackage):
 
         dict_dataset = {"start": start}
         super().__init__(dict_dataset)
-
-        self._regrid_method = InitialConditionsRegridMethod()
-
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):

@@ -336,6 +336,7 @@ class NodePropertyFlow(Package, IRegridPackage):
         "rhs_option": "rhs",
     }
     _template = Package._initialize_template(_pkg_id)
+    _regrid_method = NodePropertyFlowRegridMethod()
 
     @init_log_decorator()
     def __init__(
@@ -405,9 +406,6 @@ class NodePropertyFlow(Package, IRegridPackage):
             "rhs_option": rhs_option,
         }
         super().__init__(dict_dataset)
-
-        self._regrid_method = NodePropertyFlowRegridMethod()
-
         self._validate_init_schemata(validate)
 
     def get_xt3d_option(self) -> bool:

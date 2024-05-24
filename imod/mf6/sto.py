@@ -161,6 +161,7 @@ class SpecificStorage(StorageBase):
     }
 
     _template = Package._initialize_template(_pkg_id)
+    _regrid_method = SpecificStorageRegridMethod()
 
     @init_log_decorator()
     def __init__(
@@ -180,8 +181,6 @@ class SpecificStorage(StorageBase):
             "save_flows": save_flows,
         }
         super().__init__(dict_dataset)
-        self._regrid_method = SpecificStorageRegridMethod()
-
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):
@@ -292,6 +291,7 @@ class StorageCoefficient(StorageBase):
     }
 
     _template = Package._initialize_template(_pkg_id)
+    _regrid_method = StorageCoefficientRegridMethod()
 
     @init_log_decorator()
     def __init__(
@@ -311,7 +311,6 @@ class StorageCoefficient(StorageBase):
             "save_flows": save_flows,
         }
         super().__init__(dict_dataset)
-        self._regrid_method = StorageCoefficientRegridMethod()
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):

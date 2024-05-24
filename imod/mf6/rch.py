@@ -107,6 +107,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
 
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
+    _regrid_method = RechargeRegridMethod()
 
     @init_log_decorator()
     def __init__(
@@ -134,8 +135,6 @@ class Recharge(BoundaryCondition, IRegridPackage):
             "fixed_cell": fixed_cell,
         }
         super().__init__(dict_dataset)
-        self._regrid_method = RechargeRegridMethod()
-
         self._validate_init_schemata(validate)
 
     def _validate(self, schemata, **kwargs):

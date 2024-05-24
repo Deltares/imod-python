@@ -145,6 +145,7 @@ class Dispersion(Package, IRegridPackage):
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),
     }
+    _regrid_method = DispersionRegridMethod()
 
     @init_log_decorator()
     def __init__(
@@ -170,7 +171,6 @@ class Dispersion(Package, IRegridPackage):
             "transversal_vertical": transversal_vertical,
         }
         super().__init__(dict_dataset)
-        self._regrid_method = DispersionRegridMethod()
         self._validate_init_schemata(validate)
 
     def _validate(self, schemata, **kwargs):

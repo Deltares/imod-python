@@ -59,10 +59,10 @@ class Package(PackageBase, IPackage, abc.ABC):
     _init_schemata: dict[str, list[SchemaType] | Tuple[SchemaType, ...]] = {}
     _write_schemata: dict[str, list[SchemaType] | Tuple[SchemaType, ...]] = {}
     _keyword_map: dict[str, str] = {}
+    _regrid_method: RegridMethodType = EmptyRegridMethod()
 
     def __init__(self, allargs: Mapping[str, GridDataArray | float | int | bool | str]):
         super().__init__(allargs)
-        self._regrid_method: RegridMethodType = EmptyRegridMethod()
 
     def isel(self):
         raise NotImplementedError(
