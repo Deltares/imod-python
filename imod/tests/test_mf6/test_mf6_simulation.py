@@ -18,7 +18,6 @@ import xugrid as xu
 import imod
 from imod.mf6.model import Modflow6Model
 from imod.mf6.multimodel.modelsplitter import PartitionInfo
-from imod.mf6.oc import OutputControl
 from imod.mf6.simulation import Modflow6Simulation
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo
 from imod.schemata import ValidationError
@@ -467,10 +466,9 @@ def compare_submodel_partition_info(first: PartitionInfo, second: PartitionInfo)
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_import_from_imod5(imod5_dataset, tmp_path):
+    simulation = Modflow6Simulation.from_imod5_data(
+        imod5_dataset, additional_times=["2010-01-09", "2010-01-10"]
+    )
 
-    simulation = Modflow6Simulation.from_imod5_data(imod5_dataset, additional_times=["2010-01-09", "2010-01-10"])
-
-    
     simulation.write(tmp_path, False, True, False)
     simulation.run()
-

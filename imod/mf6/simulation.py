@@ -1316,9 +1316,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
         regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
-        additional_times: Any =None
+        additional_times: Any = None,
     ) -> "Modflow6Simulation":
-        
         simulation = Modflow6Simulation("imported_simulation")
 
         # import GWF model
@@ -1327,7 +1326,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         )
         simulation["imported_model"] = groundwaterFlowModel
 
-        # generate ims package      
+        # generate ims package
         solution = SolutionPresetModerate(
             ["imported_model"],
             print_option="all",
@@ -1335,8 +1334,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         simulation["ims"] = solution
 
         # create time discretization
-        simulation.create_time_discretization(additional_times= additional_times)
-
+        simulation.create_time_discretization(additional_times=additional_times)
 
         # cleanup packages for validation
         idomain = groundwaterFlowModel.domain

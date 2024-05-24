@@ -189,7 +189,7 @@ class GroundwaterFlowModel(Modflow6Model):
         # import recharge
         rch_pkg = Recharge.from_imod5_data(imod5_data, dis_pkg, regridder_types)
 
-        rch_pkg = Recharge.from_imod5_data(imod5_data, dis_pkg, regridder_types)        
+        rch_pkg = Recharge.from_imod5_data(imod5_data, dis_pkg, regridder_types)
 
         result = GroundwaterFlowModel()
         result["dis"] = dis_pkg
@@ -197,7 +197,7 @@ class GroundwaterFlowModel(Modflow6Model):
         result["sto"] = sto_pkg
         result["ic"] = ic_pkg
         result["rch"] = rch_pkg
-        
+
         oc = OutputControl(save_head="last", save_budget="last")
         result["oc"] = oc
 
