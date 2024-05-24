@@ -28,7 +28,7 @@ object UnitTestsTemplate : Template({
             id = "Run_unittests"
             workingDir = "imod-python"
             scriptContent = """
-                set Path=%system.teamcity.build.checkoutDir%\modflow6;%env.Path% 
+                set Path=%system.teamcity.build.checkoutDir%\modflow6;"d:\ProgramData\pixi"
                 pixi run --environment default --frozen unittests
             """.trimIndent()
             formatStderrAsError = true
