@@ -194,16 +194,19 @@ class Drainage(BoundaryCondition, IRegridPackage):
         imod5_data: dict
             Dictionary with iMOD5 data. This can be constructed from the
             :func:`imod.formats.prj.open_projectfile_data` method.
-        target_grid: GridDataArray
+        target_discretization:  StructuredDiscretization package
             The grid that should be used for the new package. Does not
             need to be identical to one of the input grids.
-        regridder_types: dict, optional
-            Optional dictionary with regridder types for a specific variable.
-            Use this to override default regridding methods.
+        target_npf: NodePropertyFlow package
+            The conductivity information, used to compute drainage flux
         allocation_option: ALLOCATION_OPTION
             allocation option.
         distributing_option: dict[str, DISTRIBUTING_OPTION]
             distributing option.
+        regridder_types: dict, optional
+            Optional dictionary with regridder types for a specific variable.
+            Use this to override default regridding methods.
+
         Returns
         -------
         A list of Modflow 6 Drainage packages.
