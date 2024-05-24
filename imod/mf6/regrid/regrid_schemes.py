@@ -1,11 +1,12 @@
 from typing import ClassVar, Protocol, Tuple, TypeAlias
 
+from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
 
 from imod.mf6.utilities.regrid import RegridderType
 
 _RegridVarType: TypeAlias = Tuple[RegridderType, str] | Tuple[RegridderType]
-
+_CONFIG = ConfigDict(extra="forbid")
 
 class RegridMethodType(Protocol):
     # Work around that type annotation is a bit hard on dataclasses, as they
@@ -19,7 +20,7 @@ class RegridMethodType(Protocol):
     __dataclass_fields__: ClassVar[dict]
 
 
-@dataclass
+@dataclass(config=_CONFIG)
 class ConstantHeadRegridMethod(RegridMethodType):
     head: _RegridVarType = (
         RegridderType.OVERLAP,
@@ -28,14 +29,14 @@ class ConstantHeadRegridMethod(RegridMethodType):
     concentration: _RegridVarType = (RegridderType.OVERLAP, "mean")
 
 
-@dataclass
+@dataclass(config=_CONFIG)
 class DiscretizationRegridMethod(RegridMethodType):
     top: _RegridVarType = (RegridderType.OVERLAP, "mean")
     bottom: _RegridVarType = (RegridderType.OVERLAP, "mean")
     idomain: _RegridVarType = (RegridderType.OVERLAP, "mode")
 
 
-@dataclass
+@dataclass(config=_CONFIG)
 class DispersionRegridMethod(RegridMethodType):
     diffusion_coefficient: _RegridVarType = (RegridderType.OVERLAP, "mean")
     longitudinal_horizontal: _RegridVarType = (RegridderType.OVERLAP, "mean")
@@ -45,7 +46,7 @@ class DispersionRegridMethod(RegridMethodType):
     transversal_vertical: _RegridVarType = (RegridderType.OVERLAP, "mean")
 
 
-@dataclass
+@dataclass(config=_CONFIG)
 class DrainageRegridMethod(RegridMethodType):
     elevation: _RegridVarType = (RegridderType.OVERLAP, "mean")
     conductance: _RegridVarType = (
@@ -55,12 +56,12 @@ class DrainageRegridMethod(RegridMethodType):
     concentration: _RegridVarType = (RegridderType.OVERLAP, "mean")
 
 
-@dataclass
+@dataclass(config=_CONFIG)
 class EmptyRegridMethod(RegridMethodType):
     pass
 
 
-@dataclass
+@dataclass(config=_CONFIG)
 class EvapotranspirationRegridMethod(RegridMethodType):
     surface: _RegridVarType = (RegridderType.OVERLAP, "mean")
     rate: _RegridVarType = (RegridderType.OVERLAP, "mean")
@@ -69,7 +70,7 @@ class EvapotranspirationRegridMethod(RegridMethodType):
     proportion_depth: _RegridVarType = (RegridderType.OVERLAP, "mean")
 
 
-@dataclass
+@dataclass(config=_CONFIG)
 class GeneralHeadBoundaryRegridMethod(RegridMethodType):
     head: _RegridVarType = (
         RegridderType.OVERLAP,
@@ -82,7 +83,7 @@ class GeneralHeadBoundaryRegridMethod(RegridMethodType):
     concentration: _RegridVarType = (RegridderType.OVERLAP, "mean")
 
 
-@dataclass
+@dataclass(config=_CONFIG)
 class InitialConditionsRegridMethod(RegridMethodType):
     start: _RegridVarType = (
         RegridderType.OVERLAP,
@@ -90,7 +91,7 @@ class InitialConditionsRegridMethod(RegridMethodType):
     )  # TODO set to barycentric once supported
 
 
-@dataclass
+@dataclass(config=_CONFIG)
 class MobileStorageTransferRegridMethod(RegridMethodType):
     porosity: _RegridVarType = (RegridderType.OVERLAP, "mean")
     decay: _RegridVarType = (RegridderType.OVERLAP, "mean")
@@ -100,7 +101,7 @@ class MobileStorageTransferRegridMethod(RegridMethodType):
     sp2: _RegridVarType = (RegridderType.OVERLAP, "mean")
 
 
-@dataclass
+@dataclass(config=_CONFIG)
 class NodePropertyFlowRegridMethod(RegridMethodType):
     icelltype: _RegridVarType = (RegridderType.OVERLAP, "mean")
     k: _RegridVarType = (
@@ -121,13 +122,13 @@ class NodePropertyFlowRegridMethod(RegridMethodType):
     rewet_layer: _RegridVarType = (RegridderType.OVERLAP, "mean")
 
 
-@dataclass
+@dataclass(config=_CONFIG)
 class RechargeRegridMethod(RegridMethodType):
     rate: _RegridVarType = (RegridderType.OVERLAP, "mean")
     concentration: _RegridVarType = (RegridderType.OVERLAP, "mean")
 
 
-@dataclass
+@dataclass(config=_CONFIG)
 class RiverRegridMethod(RegridMethodType):
     stage: _RegridVarType = (RegridderType.OVERLAP, "mean")
     conductance: _RegridVarType = (
@@ -138,14 +139,14 @@ class RiverRegridMethod(RegridMethodType):
     concentration: _RegridVarType = (RegridderType.OVERLAP, "mean")
 
 
-@dataclass
+@dataclass(config=_CONFIG)
 class SpecificStorageRegridMethod(RegridMethodType):
     convertible: _RegridVarType = (RegridderType.OVERLAP, "mode")
     specific_storage: _RegridVarType = (RegridderType.OVERLAP, "mean")
     specific_yield: _RegridVarType = (RegridderType.OVERLAP, "mean")
 
 
-@dataclass
+@dataclass(config=_CONFIG)
 class StorageCoefficientRegridMethod(RegridMethodType):
     convertible: _RegridVarType = (RegridderType.OVERLAP, "mode")
     storage_coefficient: _RegridVarType = (RegridderType.OVERLAP, "mean")
