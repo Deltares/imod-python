@@ -561,20 +561,23 @@ class Package(PackageBase, IPackage, abc.ABC):
         regridder_types: Optional[dict[str, Tuple[RegridderType, str]]] = None,
     ) -> "Package":
         """
-        Creates a package of the same type as this package, based on another discretization.
-        It regrids all the arrays in this package to the desired discretization, and leaves the options
-        unmodified. At the moment only regridding to a different planar grid is supported, meaning
-        ``target_grid`` has different ``"x"`` and ``"y"`` or different ``cell2d`` coords.
+        Creates a package of the same type as this package, based on another
+        discretization. It regrids all the arrays in this package to the desired
+        discretization, and leaves the options unmodified. At the moment only
+        regridding to a different planar grid is supported, meaning
+        ``target_grid`` has different ``"x"`` and ``"y"`` or different
+        ``cell2d`` coords.
 
-        The regridding methods can be specified in the _regrid_method attribute of the package. These are the defaults
-        that specify how each array should be regridded. These defaults can be overridden using the input
-        parameters of this function.
+        The default regridding methods are specified in the ``_regrid_method``
+        attribute of the package. These defaults can be overridden using the
+        input parameters of this function.
 
         Examples
         --------
         To regrid the npf package with a non-default method for the k-field, call regrid_like with these arguments:
 
-        >>> new_npf = npf.regrid_like(like, {"k": (imod.RegridderType.OVERLAP, "mean")})
+        >>> regridder_types = imod.mf6.regrid.NodePropertyFlowRegridMethod(k=(imod.RegridderType.OVERLAP, "mean"))
+        >>> new_npf = npf.regrid_like(like,  RegridderWeightsCache, regridder_types)
 
 
         Parameters
