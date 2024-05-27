@@ -193,8 +193,6 @@ class GroundwaterFlowModel(Modflow6Model):
         # import recharge
         rch_pkg = Recharge.from_imod5_data(imod5_data, dis_pkg, regridder_types)
 
-        rch_pkg = Recharge.from_imod5_data(imod5_data, dis_pkg, regridder_types)
-
         result = GroundwaterFlowModel()
         result["dis"] = dis_pkg
         result["npf"] = npf_pkg
