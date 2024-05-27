@@ -7,8 +7,9 @@ from imod.prepare.topsystem.conductance import DISTRIBUTING_OPTION
 @dataclass()
 class SimulationAllocationOptions:
     """
-    Object containing default allocation otpions for different packages
-    on importing fron imod5.
+    Object containing allocation otpions, specified per packages type on
+    importing fron imod5. Can be used to set defaults when importing a
+    simulation or a GroundwaterFlowModel from imod5.
 
     Parameters
     ----------
@@ -24,8 +25,9 @@ class SimulationAllocationOptions:
 @dataclass()
 class SimulationDistributingOptions:
     """
-    Object containing  conductivity distribution methods for different packages
-    on importing fron imod5.
+    Object containing conductivity distribution methods, specified per packages
+    type. Can be used to set defaults when importing a simulation or a
+    GroundwaterFlowModel from imod5.
 
     Parameters
     ----------
