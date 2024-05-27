@@ -43,6 +43,10 @@ from imod.mf6.utilities.mask import _mask_all_models
 from imod.mf6.utilities.regrid import _regrid_like
 from imod.mf6.utilities.regridding_types import RegridderType
 from imod.mf6.write_context import WriteContext
+from imod.prepare.topsystem.default_allocation_methods import (
+    SimulationAllocationOptions,
+    SimulationDistributingOptions,
+)
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
 from imod.typing.grid import (
@@ -1315,14 +1319,18 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
     def from_imod5_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
+        default_simulation_allocation_options: SimulationAllocationOptions,
+        default_simulation_distributing_options: SimulationDistributingOptions,
         regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
-        additional_times: Any = None,
     ) -> "Modflow6Simulation":
         simulation = Modflow6Simulation("imported_simulation")
 
-        # import GWF model
+        # import GWF model,
         groundwaterFlowModel = GroundwaterFlowModel.from_imod5_data(
-            imod5_data, regridder_types
+            imod5_data,
+            default_simulation_allocation_options,
+            default_simulation_distributing_options,
+            regridder_types,
         )
         simulation["imported_model"] = groundwaterFlowModel
 
@@ -1332,9 +1340,6 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             print_option="all",
         )
         simulation["ims"] = solution
-
-        # create time discretization
-        simulation.create_time_discretization(additional_times=additional_times)
 
         # cleanup packages for validation
         idomain = groundwaterFlowModel.domain

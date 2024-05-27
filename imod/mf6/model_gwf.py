@@ -18,8 +18,10 @@ from imod.mf6.oc import OutputControl
 from imod.mf6.rch import Recharge
 from imod.mf6.sto import StorageCoefficient
 from imod.mf6.utilities.regridding_types import RegridderType
-from imod.prepare.topsystem.allocation import ALLOCATION_OPTION
-from imod.prepare.topsystem.conductance import DISTRIBUTING_OPTION
+from imod.prepare.topsystem.default_allocation_methods import (
+    SimulationAllocationOptions,
+    SimulationDistributingOptions,
+)
 from imod.typing import GridDataArray
 
 
@@ -170,6 +172,8 @@ class GroundwaterFlowModel(Modflow6Model):
     def from_imod5_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
+        default_simulation_allocation_options: SimulationAllocationOptions,
+        default_simulation_distributing_options: SimulationDistributingOptions,
         regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
     ) -> "GroundwaterFlowModel":
         # first import the singleton packages
@@ -211,8 +215,8 @@ class GroundwaterFlowModel(Modflow6Model):
                 imod5_data,
                 dis_pkg,
                 npf_pkg,
-                ALLOCATION_OPTION.at_elevation,
-                distributing_option=DISTRIBUTING_OPTION.by_corrected_transmissivity,
+                default_simulation_allocation_options.drn,
+                distributing_option=default_simulation_distributing_options.drn,
                 regridder_types=regridder_types,
             )
             result[drn_key] = drn_pkg

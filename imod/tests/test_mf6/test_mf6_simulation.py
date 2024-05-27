@@ -20,6 +20,10 @@ from imod.mf6.model import Modflow6Model
 from imod.mf6.multimodel.modelsplitter import PartitionInfo
 from imod.mf6.simulation import Modflow6Simulation
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo
+from imod.prepare.topsystem.default_allocation_methods import (
+    SimulationAllocationOptions,
+    SimulationDistributingOptions,
+)
 from imod.schemata import ValidationError
 from imod.tests.fixtures.mf6_small_models_fixture import (
     grid_data_structured,
@@ -466,9 +470,15 @@ def compare_submodel_partition_info(first: PartitionInfo, second: PartitionInfo)
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_import_from_imod5(imod5_dataset, tmp_path):
+    default_simulation_allocation_options = SimulationAllocationOptions
+    default_simulation_distributing_options = SimulationDistributingOptions
     simulation = Modflow6Simulation.from_imod5_data(
-        imod5_dataset, additional_times=["2010-01-09", "2010-01-10"]
+        imod5_dataset,
+        default_simulation_allocation_options,
+        default_simulation_distributing_options,
     )
 
+    simulation.create_time_discretization(["01-01-2003", "02-01-2003"])
+
+    # write and validate the simulation
     simulation.write(tmp_path, False, True, False)
-    simulation.run()
