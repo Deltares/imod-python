@@ -176,6 +176,32 @@ class GroundwaterFlowModel(Modflow6Model):
         default_simulation_distributing_options: SimulationDistributingOptions,
         regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
     ) -> "GroundwaterFlowModel":
+        
+        """
+        Imports a GroundwaterFlowModel (GWF) from the data in an IMOD5 project file.
+        It adds the packages for which import from imod5 is supported.
+        Some packages (like OC) must be added manually later.
+
+
+        Parameters
+        ----------
+        imod5_data: dict[str, dict[str, GridDataArray]]
+            dictionary containing the arrays mentioned in the project file as xarray datasets,
+            under the key of the package type to which it belongs
+        default_simulation_allocation_options: SimulationAllocationOptions
+            object containing the allocation options per package type.
+            If you want a package to have a different allocation option, 
+            then it should be imported separately
+        default_simulation_distributing_options: SimulationDistributingOptions
+            object containing the conductivity distribution options per package type.
+            If you want a package to have a different allocation option, 
+            then it should be imported separately        
+        regridder_types: Optional[dict[str, tuple[RegridderType, str]]] 
+
+        RETURNS
+        -------
+
+        """        
         # first import the singleton packages
         # import discretization
         dis_pkg = StructuredDiscretization.from_imod5_data(imod5_data, regridder_types)
