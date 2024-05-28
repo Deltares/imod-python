@@ -1,12 +1,18 @@
+from copy import deepcopy
 from typing import Optional, Tuple
 
 import numpy as np
 
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.drn import Drainage
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.utilities.regrid import RegridderType
+from imod.mf6.npf import NodePropertyFlow
+from imod.mf6.utilities.regrid import RegridderType, RegridderWeightsCache, _regrid_package_data
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
+from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_riv_cells
+from imod.prepare.topsystem.conductance import DISTRIBUTING_OPTION, distribute_drn_conductance, distribute_riv_conductance
 from imod.schemata import (
     AllInsideNoDataSchema,
     AllNoDataSchema,
@@ -18,6 +24,8 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
+from imod.typing import GridDataArray
+from imod.typing.grid import enforce_dim_order, is_planar_grid
 
 
 class River(BoundaryCondition, IRegridPackage):
@@ -174,3 +182,196 @@ class River(BoundaryCondition, IRegridPackage):
 
     def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
         return self._regrid_method
+
+
+    @classmethod
+    def from_imod5_data(
+        cls,
+        key: str,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        target_discretization: StructuredDiscretization,
+        target_npf: NodePropertyFlow,
+        allocation_option_riv: ALLOCATION_OPTION,
+        distributing_option_riv: DISTRIBUTING_OPTION,
+        distributing_option_drn: DISTRIBUTING_OPTION,        
+        regridder_types: dict[str, tuple[RegridderType, str]],
+    ) -> "River":
+        """
+        Construct a river-package from iMOD5 data, loaded with the
+        :func:`imod.formats.prj.open_projectfile_data` function.
+
+        .. note::
+
+            The method expects the iMOD5 model to be fully 3D, not quasi-3D.
+
+        Parameters
+        ----------
+        imod5_data: dict
+            Dictionary with iMOD5 data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
+        target_discretization:  StructuredDiscretization package
+            The grid that should be used for the new package. Does not
+            need to be identical to one of the input grids.
+        target_npf: NodePropertyFlow package
+            The conductivity information, used to compute drainage flux
+        allocation_option: ALLOCATION_OPTION
+            allocation option.
+        distributing_option: dict[str, DISTRIBUTING_OPTION]
+            distributing option.
+        regridder_types: dict, optional
+            Optional dictionary with regridder types for a specific variable.
+            Use this to override default regridding methods.
+
+        Returns
+        -------
+        A list of Modflow 6 Drainage packages.
+        """
+
+        target_top = target_discretization.dataset["top"]
+        target_bottom = target_discretization.dataset["bottom"]
+        target_idomain = target_discretization.dataset["idomain"]
+
+        data = {
+            "conductance": imod5_data[key]["conductance"],
+            "stage": imod5_data[key]["stage"],            
+            "bottom_elevation": imod5_data[key]["bottom_elevation"],
+            "infiltration_factor": imod5_data[key]["infiltration_factor"],   
+                
+        }
+        k = target_npf.dataset["k"]   
+        is_planar = is_planar_grid(data["conductance"])
+
+        regridder_settings = deepcopy(cls._regrid_method)
+        regridder_settings["infiltration_factor"] = (RegridderType.OVERLAP, "mean")        
+        if regridder_types is not None:
+            regridder_settings.update(regridder_types)
+
+
+
+        regrid_context = RegridderWeightsCache()
+
+        regridded_package_data = _regrid_package_data(
+            data, target_idomain, regridder_settings, regrid_context, {}
+        )
+
+        conductance = regridded_package_data["conductance"]
+        infiltration_factor = regridded_package_data["infiltration_factor"]
+        river_conductance, drain_conductance = cls.split_conductance(conductance, infiltration_factor)
+        if is_planar:
+            bottom_elevation = regridded_package_data["bottom_elevation"]
+
+            riv_allocation = allocate_riv_cells(
+                allocation_option_riv,
+                target_idomain == 1,
+                target_top,
+                target_bottom,
+                regridded_package_data["stage"],
+                regridded_package_data["bottom_elevation"],
+            )
+
+            regridded_package_data["conductance"] = distribute_riv_conductance(
+                distributing_option_riv,
+                riv_allocation[0],
+                conductance,
+                target_top,
+                target_bottom,
+                river_conductance,
+                regridded_package_data["stage"],
+                bottom_elevation,
+            )
+
+            #create layered arrays of stage and bottom elevation
+            layered_stage = regridded_package_data["stage"].where(riv_allocation[0])
+            layered_stage = enforce_dim_order(layered_stage)
+            regridded_package_data["stage"] = layered_stage
+
+            layered_bottom_elevation = regridded_package_data["bottom_elevation"].where(riv_allocation[0])
+            layered_bottom_elevation = enforce_dim_order(layered_bottom_elevation)
+            regridded_package_data["bottom_elevation"] = layered_bottom_elevation
+
+        regridded_package_data.pop("infiltration_factor")
+        river_package =  River(**regridded_package_data)
+        drainage_package = cls.create_infiltration_factor_drain(regridded_package_data["stage"], drain_conductance, riv_allocation[0], target_top, target_bottom,
+                                                                bottom_elevation, distributing_option_drn, k)
+        return (river_package, drainage_package)
+
+
+    @classmethod
+    def create_infiltration_factor_drain(cls, drain_elevation, drain_conductance, riv_allocation , target_top, target_bottom, 
+                                         bottom_elevation, distributing_option_drn, k):
+    # create a drainage package from the river package, to account for the infiltration factor.
+    # this factor is optional in imod5, but it does not exist in MF6, so we mimic its effect 
+    # with a Drainage boundary. 
+
+        if is_planar_grid(drain_conductance):
+            conductance = distribute_drn_conductance(
+                distributing_option_drn,
+                riv_allocation,
+                drain_conductance,
+                target_top,
+                target_bottom,
+                k,
+                bottom_elevation
+            ) 
+        else:
+            conductance	= drain_conductance
+ 
+            
+        return Drainage(drain_elevation, conductance)
+
+    @classmethod        
+    def split_conductance(cls, conductance, infiltration_factor):
+        """
+        Seperates (exfiltration) conductance with an infiltration factor (iMODFLOW) into
+        a drainage conductance and a river conductance following methods explained in Zaadnoordijk (2009).
+
+        Parameters
+        ----------
+        conductance : xr.DataArray or float
+            Exfiltration conductance. Is the default conductance provided to the iMODFLOW river package
+        infiltration_factor : xr.DataArray or float
+            Infiltration factor. The exfiltration conductance is multiplied with this factor to compute
+            the infiltration conductance. If 0, no infiltration takes place; if 1, infiltration is equal to    exfiltration
+
+        Returns
+        -------
+        drainage_conductance : xr.DataArray
+            conductance for the drainage package
+        river_conductance : xr.DataArray
+            conductance for the river package
+
+        Derivation
+        ----------
+        From Zaadnoordijk (2009):
+        [1] cond_RIV = A/ci
+        [2] cond_DRN = A * (ci-cd) / (ci*cd)
+        Where cond_RIV and cond_DRN repsectively are the River and Drainage conductance [L^2/T],
+        A is the cell area [L^2] and ci and cd respectively are the infiltration and exfiltration resistance [T]
+
+        Taking f as the infiltration factor and cond_d as the exfiltration conductance, we can write (iMOD manual):
+        [3] ci = cd * (1/f)
+        [4] cond_d = A/cd
+
+        We can then rewrite equations 1 and 2 to:
+        [5] cond_RIV = f * cond_d
+        [6] cond_DRN = (1-f) * cond_d
+
+        References
+        ----------
+        Zaadnoordijk, W. (2009).
+        Simulating Piecewise-Linear Surface Water and Ground Water Interactions with MODFLOW.
+        Ground Water.
+        https://ngwa.onlinelibrary.wiley.com/doi/10.1111/j.1745-6584.2009.00582.x
+
+        iMOD manual v5.2 (2020)
+        https://oss.deltares.nl/web/imod/
+
+        """
+        if np.any(infiltration_factor > 1):
+            raise ValueError("The infiltration factor should not exceed 1")
+
+        drainage_conductance = conductance * (1 - infiltration_factor)
+
+        river_conductance = conductance * infiltration_factor
+
+        return drainage_conductance, river_conductance

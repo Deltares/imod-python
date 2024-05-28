@@ -10,7 +10,11 @@ import xugrid as xu
 from pytest_cases import parametrize_with_cases
 
 import imod
+from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.write_context import WriteContext
+from imod.prepare.topsystem.allocation import ALLOCATION_OPTION
+from imod.prepare.topsystem.conductance import DISTRIBUTING_OPTION
 from imod.schemata import ValidationError
 
 
@@ -387,3 +391,24 @@ def test_write_concentration_period_data(concentration_fc):
             assert (
                 data.count("2") == 1755
             )  # the number 2 is in the concentration data, and in the cell indices.
+
+
+@pytest.mark.usefixtures("imod5_dataset")
+def test_import_river_from_imod5(imod5_dataset, tmp_path):
+    globaltimes = [np.datetime64("2000-01-01")]
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset)
+    target_npf = NodePropertyFlow.from_imod5_data(
+        imod5_dataset, target_dis.dataset["idomain"]
+    )
+    riv = imod.mf6.River.from_imod5_data(
+        "riv-1", imod5_dataset, target_dis, target_npf,ALLOCATION_OPTION.at_elevation,
+        DISTRIBUTING_OPTION.by_crosscut_thickness,
+        DISTRIBUTING_OPTION.by_crosscut_thickness, regridder_types={}
+    )
+    write_context = WriteContext(simulation_directory=tmp_path)
+    riv.write("riv", globaltimes, write_context)
+    with open(tmp_path / "riv/riv.dat", "r") as f:
+        data = f.read()
+        assert (
+            data.count("\n") == 1314
+        )  # the number of lines in the file. 
