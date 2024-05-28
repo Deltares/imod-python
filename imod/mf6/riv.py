@@ -9,10 +9,18 @@ from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.drn import Drainage
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.npf import NodePropertyFlow
-from imod.mf6.utilities.regrid import RegridderType, RegridderWeightsCache, _regrid_package_data
+from imod.mf6.utilities.regrid import (
+    RegridderType,
+    RegridderWeightsCache,
+    _regrid_package_data,
+)
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_riv_cells
-from imod.prepare.topsystem.conductance import DISTRIBUTING_OPTION, distribute_drn_conductance, distribute_riv_conductance
+from imod.prepare.topsystem.conductance import (
+    DISTRIBUTING_OPTION,
+    distribute_drn_conductance,
+    distribute_riv_conductance,
+)
 from imod.schemata import (
     AllInsideNoDataSchema,
     AllNoDataSchema,
@@ -183,7 +191,6 @@ class River(BoundaryCondition, IRegridPackage):
     def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
         return self._regrid_method
 
-
     @classmethod
     def from_imod5_data(
         cls,
@@ -193,7 +200,7 @@ class River(BoundaryCondition, IRegridPackage):
         target_npf: NodePropertyFlow,
         allocation_option_riv: ALLOCATION_OPTION,
         distributing_option_riv: DISTRIBUTING_OPTION,
-        distributing_option_drn: DISTRIBUTING_OPTION,        
+        distributing_option_drn: DISTRIBUTING_OPTION,
         regridder_types: dict[str, tuple[RegridderType, str]],
     ) -> "River":
         """
@@ -233,20 +240,17 @@ class River(BoundaryCondition, IRegridPackage):
 
         data = {
             "conductance": imod5_data[key]["conductance"],
-            "stage": imod5_data[key]["stage"],            
+            "stage": imod5_data[key]["stage"],
             "bottom_elevation": imod5_data[key]["bottom_elevation"],
-            "infiltration_factor": imod5_data[key]["infiltration_factor"],   
-                
+            "infiltration_factor": imod5_data[key]["infiltration_factor"],
         }
-        k = target_npf.dataset["k"]   
+        k = target_npf.dataset["k"]
         is_planar = is_planar_grid(data["conductance"])
 
         regridder_settings = deepcopy(cls._regrid_method)
-        regridder_settings["infiltration_factor"] = (RegridderType.OVERLAP, "mean")        
+        regridder_settings["infiltration_factor"] = (RegridderType.OVERLAP, "mean")
         if regridder_types is not None:
             regridder_settings.update(regridder_types)
-
-
 
         regrid_context = RegridderWeightsCache()
 
@@ -256,7 +260,9 @@ class River(BoundaryCondition, IRegridPackage):
 
         conductance = regridded_package_data["conductance"]
         infiltration_factor = regridded_package_data["infiltration_factor"]
-        river_conductance, drain_conductance = cls.split_conductance(conductance, infiltration_factor)
+        river_conductance, drain_conductance = cls.split_conductance(
+            conductance, infiltration_factor
+        )
         if is_planar:
             bottom_elevation = regridded_package_data["bottom_elevation"]
 
@@ -280,28 +286,46 @@ class River(BoundaryCondition, IRegridPackage):
                 bottom_elevation,
             )
 
-            #create layered arrays of stage and bottom elevation
+            # create layered arrays of stage and bottom elevation
             layered_stage = regridded_package_data["stage"].where(riv_allocation[0])
             layered_stage = enforce_dim_order(layered_stage)
             regridded_package_data["stage"] = layered_stage
 
-            layered_bottom_elevation = regridded_package_data["bottom_elevation"].where(riv_allocation[0])
+            layered_bottom_elevation = regridded_package_data["bottom_elevation"].where(
+                riv_allocation[0]
+            )
             layered_bottom_elevation = enforce_dim_order(layered_bottom_elevation)
             regridded_package_data["bottom_elevation"] = layered_bottom_elevation
 
         regridded_package_data.pop("infiltration_factor")
-        river_package =  River(**regridded_package_data)
-        drainage_package = cls.create_infiltration_factor_drain(regridded_package_data["stage"], drain_conductance, riv_allocation[0], target_top, target_bottom,
-                                                                bottom_elevation, distributing_option_drn, k)
+        river_package = River(**regridded_package_data)
+        drainage_package = cls.create_infiltration_factor_drain(
+            regridded_package_data["stage"],
+            drain_conductance,
+            riv_allocation[0],
+            target_top,
+            target_bottom,
+            bottom_elevation,
+            distributing_option_drn,
+            k,
+        )
         return (river_package, drainage_package)
 
-
     @classmethod
-    def create_infiltration_factor_drain(cls, drain_elevation, drain_conductance, riv_allocation , target_top, target_bottom, 
-                                         bottom_elevation, distributing_option_drn, k):
-    # create a drainage package from the river package, to account for the infiltration factor.
-    # this factor is optional in imod5, but it does not exist in MF6, so we mimic its effect 
-    # with a Drainage boundary. 
+    def create_infiltration_factor_drain(
+        cls,
+        drain_elevation,
+        drain_conductance,
+        riv_allocation,
+        target_top,
+        target_bottom,
+        bottom_elevation,
+        distributing_option_drn,
+        k,
+    ):
+        # create a drainage package from the river package, to account for the infiltration factor.
+        # this factor is optional in imod5, but it does not exist in MF6, so we mimic its effect
+        # with a Drainage boundary.
 
         if is_planar_grid(drain_conductance):
             conductance = distribute_drn_conductance(
@@ -311,15 +335,14 @@ class River(BoundaryCondition, IRegridPackage):
                 target_top,
                 target_bottom,
                 k,
-                bottom_elevation
-            ) 
+                bottom_elevation,
+            )
         else:
-            conductance	= drain_conductance
- 
-            
+            conductance = drain_conductance
+
         return Drainage(drain_elevation, conductance)
 
-    @classmethod        
+    @classmethod
     def split_conductance(cls, conductance, infiltration_factor):
         """
         Seperates (exfiltration) conductance with an infiltration factor (iMODFLOW) into
