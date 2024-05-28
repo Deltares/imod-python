@@ -400,7 +400,7 @@ def test_import_river_from_imod5(imod5_dataset, tmp_path):
     target_npf = NodePropertyFlow.from_imod5_data(
         imod5_dataset, target_dis.dataset["idomain"]
     )
-    riv = imod.mf6.River.from_imod5_data(
+    riv_drn = imod.mf6.River.from_imod5_data(
         "riv-1",
         imod5_dataset,
         target_dis,
@@ -410,8 +410,15 @@ def test_import_river_from_imod5(imod5_dataset, tmp_path):
         DISTRIBUTING_OPTION.by_crosscut_thickness,
         regridder_types={},
     )
+    riv = riv_drn[0]
+    drn = riv_drn[1]    
     write_context = WriteContext(simulation_directory=tmp_path)
     riv.write("riv", globaltimes, write_context)
+    drn.write("drn", globaltimes, write_context)
     with open(tmp_path / "riv/riv.dat", "r") as f:
         data = f.read()
         assert data.count("\n") == 1314  # the number of lines in the file.
+
+    with open(tmp_path / "drn/drn.dat", "r") as f:
+        data = f.read()
+        assert data.count("\n") == 1314  # the number of lines in the file.        
