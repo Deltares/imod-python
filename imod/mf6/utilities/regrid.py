@@ -19,6 +19,7 @@ from imod.mf6.interfaces.ipackage import IPackage
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.interfaces.isimulation import ISimulation
+from imod.mf6.regrid.regrid_schemes import RegridMethodType
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.regridding_types import RegridderType
@@ -215,7 +216,7 @@ def _regrid_like(
     package: IRegridPackage,
     target_grid: GridDataArray,
     regrid_context: RegridderWeightsCache,
-    regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
+    regridder_types: Optional[RegridMethodType] = None,
 ) -> IPackage:
     """
     Creates a package of the same type as this package, based on another
@@ -237,15 +238,17 @@ def _regrid_like(
 
     Parameters
     ----------
+    package: IRegridPackage:
+        package to regrid
     target_grid: xr.DataArray or xu.UgridDataArray
         a grid defined over the same discretization as the one we want to regrid the package to
-    regridder_types: dict(str->(regridder type,str))
-        dictionary mapping arraynames (str) to a tuple of regrid type (a specialization class of BaseRegridder) and function name (str)
-        this dictionary can be used to override the default mapping method.
     regrid_context: RegridderWeightsCache
         stores regridder weights for different regridders. Can be used to speed up regridding,
         if the same regridders are used several times for regridding different arrays.
-
+    regridder_types: RegridMethodType, optional
+        dictionary mapping arraynames (str) to a tuple of regrid type (a specialization class of BaseRegridder) and function name (str)
+        this dictionary can be used to override the default mapping method.
+        
     Returns
     -------
     a package with the same options as this package, and with all the data-arrays regridded to another discretization,
