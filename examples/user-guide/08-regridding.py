@@ -413,6 +413,8 @@ axes[1].set_ylabel("regridded")
 #
 # This code snippet prints all default methods:
 #
+from dataclasses import asdict
+
 import pandas as pd
 
 from imod.tests.fixtures.package_instance_creation import ALL_PACKAGE_INSTANCES
@@ -429,7 +431,7 @@ counter = 0
 for pkg in ALL_PACKAGE_INSTANCES:
     if hasattr(pkg, "_regrid_method"):
         package_name = type(pkg).__name__
-        regrid_methods = pkg.get_regrid_methods()
+        regrid_methods = asdict(pkg.get_regrid_methods())
         for array_name in regrid_methods.keys():
             method_name = regrid_methods[array_name][0].name
             function_name = ""
