@@ -18,6 +18,7 @@ import xugrid as xu
 import imod
 from imod.mf6.model import Modflow6Model
 from imod.mf6.multimodel.modelsplitter import PartitionInfo
+from imod.mf6.oc import OutputControl
 from imod.mf6.simulation import Modflow6Simulation
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo
 from imod.prepare.topsystem.default_allocation_methods import (
@@ -477,6 +478,8 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
         default_simulation_allocation_options,
         default_simulation_distributing_options,
     )
+
+    simulation["imported_model"] = OutputControl(save_head="last", save_budget="last")
 
     simulation.create_time_discretization(["01-01-2003", "02-01-2003"])
 

@@ -172,8 +172,8 @@ class GroundwaterFlowModel(Modflow6Model):
     def from_imod5_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        default_simulation_allocation_options: SimulationAllocationOptions,
-        default_simulation_distributing_options: SimulationDistributingOptions,
+        allocation_options: SimulationAllocationOptions,
+        distributing_options: SimulationDistributingOptions,
         regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
     ) -> "GroundwaterFlowModel":
         
@@ -188,18 +188,22 @@ class GroundwaterFlowModel(Modflow6Model):
         imod5_data: dict[str, dict[str, GridDataArray]]
             dictionary containing the arrays mentioned in the project file as xarray datasets,
             under the key of the package type to which it belongs
-        default_simulation_allocation_options: SimulationAllocationOptions
+        allocation_options: SimulationAllocationOptions
             object containing the allocation options per package type.
             If you want a package to have a different allocation option, 
             then it should be imported separately
-        default_simulation_distributing_options: SimulationDistributingOptions
+        distributing_options: SimulationDistributingOptions
             object containing the conductivity distribution options per package type.
             If you want a package to have a different allocation option, 
             then it should be imported separately        
-        regridder_types: Optional[dict[str, tuple[RegridderType, str]]] 
+        regridder_types: Optional[dict[str, dict[str, tuple[RegridderType, str]]]]
+            the first key is the package name. The second key is the array name, and the value is
+            the RegridderType tuple (method + function)
 
-        RETURNS
+        Returns
         -------
+        A GWF model containing the packages that could be imported form IMOD5. Users must still
+        add the OC package to the model.
 
         """        
         # first import the singleton packages
@@ -226,8 +230,6 @@ class GroundwaterFlowModel(Modflow6Model):
         result["ic"] = ic_pkg
         result["rch"] = rch_pkg
 
-        oc = OutputControl(save_head="last", save_budget="last")
-        result["oc"] = oc
 
         # now import the non-singleton packages
         # import drainage
@@ -239,8 +241,8 @@ class GroundwaterFlowModel(Modflow6Model):
                 imod5_data,
                 dis_pkg,
                 npf_pkg,
-                default_simulation_allocation_options.drn,
-                distributing_option=default_simulation_distributing_options.drn,
+                allocation_options.drn,
+                distributing_option=distributing_options.drn,
                 regridder_types=regridder_types,
             )
             result[drn_key] = drn_pkg
