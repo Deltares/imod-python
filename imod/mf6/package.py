@@ -3,8 +3,8 @@ from __future__ import annotations
 import abc
 import pathlib
 from collections import defaultdict
-from dataclasses import asdict
-from typing import Any, Dict, Mapping, Optional, Tuple, Union
+from copy import deepcopy
+from typing import Any, Mapping, Optional, Tuple, Union
 
 import cftime
 import jinja2
@@ -26,7 +26,6 @@ from imod.mf6.pkgbase import (
 from imod.mf6.regrid.regrid_schemes import EmptyRegridMethod, RegridMethodType
 from imod.mf6.utilities.mask import mask_package
 from imod.mf6.utilities.regrid import (
-    RegridderType,
     RegridderWeightsCache,
     _regrid_like,
 )
@@ -653,5 +652,5 @@ class Package(PackageBase, IPackage, abc.ABC):
     def is_clipping_supported(self) -> bool:
         return True
 
-    def get_regrid_methods(self) -> Dict[str, tuple[RegridderType, str]]:
-        return asdict(self._regrid_method)
+    def get_regrid_methods(self) -> RegridMethodType:
+        return deepcopy(self._regrid_method)

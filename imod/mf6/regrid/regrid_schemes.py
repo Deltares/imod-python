@@ -3,7 +3,7 @@ from typing import ClassVar, Protocol, Tuple, TypeAlias
 from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
 
-from imod.mf6.utilities.regrid import RegridderType
+from imod.mf6.utilities.regridding_types import RegridderType
 
 _RegridVarType: TypeAlias = Tuple[RegridderType, str] | Tuple[RegridderType]
 _CONFIG = ConfigDict(extra="forbid")

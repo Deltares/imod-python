@@ -19,7 +19,7 @@ from imod.mf6.interfaces.ipackage import IPackage
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.interfaces.isimulation import ISimulation
-from imod.mf6.regrid.regrid_schemes import RegridMethodType
+from imod.mf6.regrid.regrid_schemes import EmptyRegridMethod, RegridMethodType
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.regridding_types import RegridderType
@@ -31,10 +31,13 @@ HashRegridderMapping = Tuple[int, int, BaseRegridder]
 
 class RegridderWeightsCache:
     """
-    This class stores any number of regridders that can regrid a single source grid to a single target grid.
-    By storing the regridders, we make sure the regridders can be re-used for different arrays on the same grid.
-    Regridders are stored based on their type (`see these docs<https://deltares.github.io/xugrid/examples/regridder_overview.html>`_) and planar coordinates (x, y).
-    This is important because computing the regridding weights is a costly affair.
+    This class stores any number of regridders that can regrid a single source
+    grid to a single target grid. By storing the regridders, we make sure the
+    regridders can be re-used for different arrays on the same grid. Regridders
+    are stored based on their type (`see these
+    docs<https://deltares.github.io/xugrid/examples/regridder_overview.html>`_)
+    and planar coordinates (x, y). This is important because computing the
+    regridding weights is a costly affair.
     """
 
     def __init__(
@@ -70,9 +73,8 @@ class RegridderWeightsCache:
     ) -> BaseRegridder:
         """
         returns a regridder of the specified type and with the specified method.
-        The desired type can be passed through  the argument "regridder_type" as an enumerator or
-        as a class.
-        The following two are equivalent:
+        The desired type can be passed through the argument "regridder_type" as
+        an enumerator or as a class. The following two are equivalent:
         instancesCollection.get_regridder(RegridderType.OVERLAP, "mean")
         instancesCollection.get_regridder(xu.OverlapRegridder, "mean")
 
@@ -194,9 +196,9 @@ def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, lis
     methods: defaultdict = defaultdict(list)
     regrid_packages = [pkg for pkg in model.values() if isinstance(pkg, IRegridPackage)]
     regrid_packages_with_methods = {
-        pkg: pkg.get_regrid_methods().items()  # type: ignore # noqa: union-attr
+        pkg: asdict(pkg.get_regrid_methods()).items()  # type: ignore # noqa: union-attr
         for pkg in regrid_packages
-        if pkg.get_regrid_methods()
+        if not isinstance(pkg.get_regrid_methods(), EmptyRegridMethod)
     }
 
     for pkg, regrid_methods in regrid_packages_with_methods.items():
@@ -248,7 +250,7 @@ def _regrid_like(
     regridder_types: RegridMethodType, optional
         dictionary mapping arraynames (str) to a tuple of regrid type (a specialization class of BaseRegridder) and function name (str)
         this dictionary can be used to override the default mapping method.
-        
+
     Returns
     -------
     a package with the same options as this package, and with all the data-arrays regridded to another discretization,
@@ -263,7 +265,7 @@ def _regrid_like(
         remove_expanded_auxiliary_variables_from_dataset(package)
 
     if regridder_types is None:
-        regridder_settings = package.get_regrid_methods()
+        regridder_settings = asdict(package.get_regrid_methods(), dict_factory=dict)
     else:
         regridder_settings = asdict(regridder_types, dict_factory=dict)
 
