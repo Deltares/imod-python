@@ -14,7 +14,6 @@ from imod.mf6.drn import Drainage
 from imod.mf6.ic import InitialConditions
 from imod.mf6.model import Modflow6Model
 from imod.mf6.npf import NodePropertyFlow
-from imod.mf6.oc import OutputControl
 from imod.mf6.rch import Recharge
 from imod.mf6.sto import StorageCoefficient
 from imod.mf6.utilities.regridding_types import RegridderType
@@ -176,7 +175,6 @@ class GroundwaterFlowModel(Modflow6Model):
         distributing_options: SimulationDistributingOptions,
         regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
     ) -> "GroundwaterFlowModel":
-        
         """
         Imports a GroundwaterFlowModel (GWF) from the data in an IMOD5 project file.
         It adds the packages for which import from imod5 is supported.
@@ -190,12 +188,12 @@ class GroundwaterFlowModel(Modflow6Model):
             under the key of the package type to which it belongs
         allocation_options: SimulationAllocationOptions
             object containing the allocation options per package type.
-            If you want a package to have a different allocation option, 
+            If you want a package to have a different allocation option,
             then it should be imported separately
         distributing_options: SimulationDistributingOptions
             object containing the conductivity distribution options per package type.
-            If you want a package to have a different allocation option, 
-            then it should be imported separately        
+            If you want a package to have a different allocation option,
+            then it should be imported separately
         regridder_types: Optional[dict[str, dict[str, tuple[RegridderType, str]]]]
             the first key is the package name. The second key is the array name, and the value is
             the RegridderType tuple (method + function)
@@ -205,7 +203,7 @@ class GroundwaterFlowModel(Modflow6Model):
         A GWF model containing the packages that could be imported form IMOD5. Users must still
         add the OC package to the model.
 
-        """        
+        """
         # first import the singleton packages
         # import discretization
         dis_pkg = StructuredDiscretization.from_imod5_data(imod5_data, regridder_types)
@@ -229,7 +227,6 @@ class GroundwaterFlowModel(Modflow6Model):
         result["sto"] = sto_pkg
         result["ic"] = ic_pkg
         result["rch"] = rch_pkg
-
 
         # now import the non-singleton packages
         # import drainage

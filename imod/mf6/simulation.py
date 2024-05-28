@@ -1323,7 +1323,6 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         distributing_options: SimulationDistributingOptions,
         regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
     ) -> "Modflow6Simulation":
-        
         """
         Imports a GroundwaterFlowModel (GWF) from the data in an IMOD5 project file.
         It adds the packages for which import from imod5 is supported.
@@ -1337,12 +1336,12 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             under the key of the package type to which it belongs
         allocation_options: SimulationAllocationOptions
             object containing the allocation options per package type.
-            If you want a package to have a different allocation option, 
+            If you want a package to have a different allocation option,
             then it should be imported separately
         distributing_options: SimulationDistributingOptions
             object containing the conductivity distribution options per package type.
-            If you want a package to have a different allocation option, 
-            then it should be imported separately        
+            If you want a package to have a different allocation option,
+            then it should be imported separately
         regridder_types: Optional[dict[str, dict[str, tuple[RegridderType, str]]]]
             the first key is the package name. The second key is the array name, and the value is
             the RegridderType tuple (method + function)
