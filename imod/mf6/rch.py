@@ -178,8 +178,8 @@ class Recharge(BoundaryCondition, IRegridPackage):
         dis_pkg: GridDataArray
             The discretization package for the simulation. Its grid does not
             need to be identical to one of the input grids.
-        regridder_types: dict, optional
-            Optional dictionary with regridder types for a specific variable.
+        regridder_types: RegridMethodType, optional
+            Optional dataclass with regridder types for a specific variable.
             Use this to override default regridding methods.
 
         Returns

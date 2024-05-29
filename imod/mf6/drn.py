@@ -194,8 +194,8 @@ class Drainage(BoundaryCondition, IRegridPackage):
             allocation option.
         distributing_option: dict[str, DISTRIBUTING_OPTION]
             distributing option.
-        regridder_types: dict, optional
-            Optional dictionary with regridder types for a specific variable.
+        regridder_types: RegridMethodType, optional
+            Optional dataclass with regridder types for a specific variable.
             Use this to override default regridding methods.
 
         Returns

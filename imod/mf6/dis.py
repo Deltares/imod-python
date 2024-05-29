@@ -181,8 +181,8 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         imod5_data: dict
             Dictionary with iMOD5 data. This can be constructed from the
             :func:`imod.formats.prj.open_projectfile_data` method.
-        regridder_types: dict, optional
-            Optional dictionary with regridder types for a specific variable.
+        regridder_types: RegridMethodType, optional
+            Optional dataclass with regridder types for a specific variable.
             Use this to override default regridding methods.
 
         Returns
