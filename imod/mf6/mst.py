@@ -1,11 +1,9 @@
-from typing import Optional, Tuple
-
 import numpy as np
 
 from imod.logging import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
-from imod.mf6.utilities.regrid import RegridderType
+from imod.mf6.regrid.regrid_schemes import MobileStorageTransferRegridMethod
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
@@ -99,18 +97,7 @@ class MobileStorageTransfer(Package, IRegridPackage):
         "distcoef": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),
         "sp2": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),
     }
-
-    _regrid_method = {
-        "porosity": (RegridderType.OVERLAP, "mean"),
-        "decay": (RegridderType.OVERLAP, "mean"),
-        "decay_sorbed": (
-            RegridderType.OVERLAP,
-            "mean",
-        ),
-        "bulk_density": (RegridderType.OVERLAP, "mean"),
-        "distcoef": (RegridderType.OVERLAP, "mean"),
-        "sp2": (RegridderType.OVERLAP, "mean"),
-    }
+    _regrid_method = MobileStorageTransferRegridMethod()
 
     @init_log_decorator()
     def __init__(
@@ -145,6 +132,3 @@ class MobileStorageTransfer(Package, IRegridPackage):
         }
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method

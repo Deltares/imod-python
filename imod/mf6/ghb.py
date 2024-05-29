@@ -1,11 +1,9 @@
-from typing import Optional, Tuple
-
 import numpy as np
 
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.utilities.regrid import RegridderType
+from imod.mf6.regrid.regrid_schemes import GeneralHeadBoundaryRegridMethod
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -113,15 +111,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
-
-    _regrid_method = {
-        "head": (
-            RegridderType.OVERLAP,
-            "mean",
-        ),  # TODO set to barycentric once supported
-        "conductance": (RegridderType.RELATIVEOVERLAP, "conductance"),
-        "concentration": (RegridderType.OVERLAP, "mean"),
-    }
+    _regrid_method = GeneralHeadBoundaryRegridMethod()
 
     @init_log_decorator()
     def __init__(
@@ -157,6 +147,3 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method

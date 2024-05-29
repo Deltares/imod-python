@@ -21,7 +21,6 @@ from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
 from imod.mf6.utilities.dataset import remove_inactive
-from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
@@ -184,8 +183,6 @@ class Well(BoundaryCondition, IPointDataPackage):
         "rate": [AnyNoDataSchema(), EmptyIndexesSchema()],
         "concentration": [AnyNoDataSchema(), EmptyIndexesSchema()],
     }
-
-    _regrid_method: dict[str, Tuple[RegridderType, str]] = {}
 
     @init_log_decorator()
     def __init__(
@@ -611,9 +608,6 @@ class Well(BoundaryCondition, IPointDataPackage):
             "layer", errors="ignore"
         )
         return mask_2D(self, domain_2d)
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method
 
 
 class WellDisStructured(DisStructuredBoundaryCondition):

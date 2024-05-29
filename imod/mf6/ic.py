@@ -1,17 +1,15 @@
 import warnings
 from copy import deepcopy
-from typing import Optional, Tuple
+from typing import Optional
 
 import numpy as np
 
 from imod.logging import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
-from imod.mf6.utilities.regrid import (
-    RegridderType,
-    RegridderWeightsCache,
-    _regrid_package_data,
-)
+from imod.mf6.regrid.regrid_schemes import InitialConditionsRegridMethod
+from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
+from imod.mf6.utilities.regridding_types import RegridderType
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import DTypeSchema, IdentityNoDataSchema, IndexesSchema
 from imod.typing import GridDataArray
@@ -67,13 +65,7 @@ class InitialConditions(Package, IRegridPackage):
     _grid_data = {"start": np.float64}
     _keyword_map = {"start": "strt"}
     _template = Package._initialize_template(_pkg_id)
-
-    _regrid_method = {
-        "start": (
-            RegridderType.OVERLAP,
-            "mean",
-        ),  # TODO set to barycentric once supported
-    }
+    _regrid_method = InitialConditionsRegridMethod()
 
     @init_log_decorator()
     def __init__(self, start=None, head=None, validate: bool = True):
@@ -101,9 +93,6 @@ class InitialConditions(Package, IRegridPackage):
             self["start"], icdirectory, "strt", binary=binary
         )
         return self._template.render(d)
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method
 
     @classmethod
     def from_imod5_data(

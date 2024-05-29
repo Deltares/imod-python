@@ -6,6 +6,48 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[Unreleased]
+------------
+
+Added
+~~~~~
+- Added objects with regrid settings. These can be used to provide custom
+  settings: :class:`imod.mf6.regrid.ConstantHeadRegridMethod`,
+  :class:`imod.mf6.regrid.DiscretizationRegridMethod`,
+  :class:`imod.mf6.regrid.DispersionRegridMethod`,
+  :class:`imod.mf6.regrid.DrainageRegridMethod`,
+  :class:`imod.mf6.regrid.EmptyRegridMethod`,
+  :class:`imod.mf6.regrid.EvapotranspirationRegridMethod`,
+  :class:`imod.mf6.regrid.GeneralHeadBoundaryRegridMethod`,
+  :class:`imod.mf6.regrid.InitialConditionsRegridMethod`,
+  :class:`imod.mf6.regrid.MobileStorageTransferRegridMethod`,
+  :class:`imod.mf6.regrid.NodePropertyFlowRegridMethod`,
+  :class:`imod.mf6.regrid.RechargeRegridMethod`,
+  :class:`imod.mf6.regrid.RiverRegridMethod`,
+  :class:`imod.mf6.regrid.SpecificStorageRegridMethod`,
+  :class:`imod.mf6.regrid.StorageCoefficientRegridMethod`.
+
+Changed
+~~~~~~~
+- Instead of providing a dictionary with settings to ``Package.regrid_like``,
+  provide one of the following ``RegridMethod`` objects: 
+  :class:`imod.mf6.regrid.ConstantHeadRegridMethod`,
+  :class:`imod.mf6.regrid.DiscretizationRegridMethod`,
+  :class:`imod.mf6.regrid.DispersionRegridMethod`,
+  :class:`imod.mf6.regrid.DrainageRegridMethod`,
+  :class:`imod.mf6.regrid.EmptyRegridMethod`,
+  :class:`imod.mf6.regrid.EvapotranspirationRegridMethod`,
+  :class:`imod.mf6.regrid.GeneralHeadBoundaryRegridMethod`,
+  :class:`imod.mf6.regrid.InitialConditionsRegridMethod`,
+  :class:`imod.mf6.regrid.MobileStorageTransferRegridMethod`,
+  :class:`imod.mf6.regrid.NodePropertyFlowRegridMethod`,
+  :class:`imod.mf6.regrid.RechargeRegridMethod`,
+  :class:`imod.mf6.regrid.RiverRegridMethod`,
+  :class:`imod.mf6.regrid.SpecificStorageRegridMethod`,
+  :class:`imod.mf6.regrid.StorageCoefficientRegridMethod`.
+
+
+
 [0.17.1] - 2024-05-16
 ---------------------
 
