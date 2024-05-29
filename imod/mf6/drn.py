@@ -1,5 +1,4 @@
 from copy import deepcopy
-from typing import Optional, Tuple
 
 import numpy as np
 
@@ -8,6 +7,7 @@ from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.npf import NodePropertyFlow
+from imod.mf6.regrid.regrid_schemes import DrainageRegridMethod
 from imod.mf6.utilities.regrid import (
     RegridderType,
     RegridderWeightsCache,
@@ -124,12 +124,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
-
-    _regrid_method = {
-        "elevation": (RegridderType.OVERLAP, "mean"),
-        "conductance": (RegridderType.RELATIVEOVERLAP, "conductance"),
-        "concentration": (RegridderType.OVERLAP, "mean"),
-    }
+    _regrid_method = DrainageRegridMethod()
 
     @init_log_decorator()
     def __init__(
@@ -157,7 +152,6 @@ class Drainage(BoundaryCondition, IRegridPackage):
             "repeat_stress": repeat_stress,
         }
         super().__init__(dict_dataset)
-
         self._validate_init_schemata(validate)
 
     def _validate(self, schemata, **kwargs):
@@ -166,9 +160,6 @@ class Drainage(BoundaryCondition, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method
 
     @classmethod
     def from_imod5_data(

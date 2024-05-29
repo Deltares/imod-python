@@ -1,6 +1,6 @@
 import warnings
 from copy import deepcopy
-from typing import Optional, Tuple
+from typing import Optional
 
 import numpy as np
 import xarray as xr
@@ -8,6 +8,7 @@ import xarray as xr
 from imod.logging import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
+from imod.mf6.regrid.regrid_schemes import NodePropertyFlowRegridMethod
 from imod.mf6.utilities.imod5_converter import fill_missing_layers
 from imod.mf6.utilities.regrid import (
     RegridderType,
@@ -345,23 +346,7 @@ class NodePropertyFlow(Package, IRegridPackage):
         "rhs_option": "rhs",
     }
     _template = Package._initialize_template(_pkg_id)
-
-    _regrid_method = {
-        "icelltype": (RegridderType.OVERLAP, "mean"),
-        "k": (RegridderType.OVERLAP, "geometric_mean"),  # horizontal if angle2 = 0
-        "k22": (
-            RegridderType.OVERLAP,
-            "geometric_mean",
-        ),  # horizontal if angle2 = 0 & angle3 = 0
-        "k33": (
-            RegridderType.OVERLAP,
-            "harmonic_mean",
-        ),  # vertical if angle2 = 0 & angle3 = 0
-        "angle1": (RegridderType.OVERLAP, "mean"),
-        "angle2": (RegridderType.OVERLAP, "mean"),
-        "angle3": (RegridderType.OVERLAP, "mean"),
-        "rewet_layer": (RegridderType.OVERLAP, "mean"),
-    }
+    _regrid_method = NodePropertyFlowRegridMethod()
 
     @init_log_decorator()
     def __init__(
@@ -466,9 +451,6 @@ class NodePropertyFlow(Package, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method
 
     @classmethod
     def from_imod5_data(

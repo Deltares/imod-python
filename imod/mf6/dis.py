@@ -1,6 +1,6 @@
 import pathlib
 from copy import deepcopy
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
 import numpy as np
 
@@ -9,6 +9,7 @@ from imod.logging import init_log_decorator, standard_log_decorator
 from imod.mf6.interfaces.imaskingsettings import IMaskingSettings
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
+from imod.mf6.regrid.regrid_schemes import DiscretizationRegridMethod
 from imod.mf6.utilities.grid import create_smallest_target_grid
 from imod.mf6.utilities.imod5_converter import convert_ibound_to_idomain
 from imod.mf6.utilities.regrid import (
@@ -95,15 +96,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
     _grid_data = {"top": np.float64, "bottom": np.float64, "idomain": np.int32}
     _keyword_map = {"bottom": "botm"}
     _template = Package._initialize_template(_pkg_id)
-
-    _regrid_method = {
-        "top": (RegridderType.OVERLAP, "mean"),
-        "bottom": (RegridderType.OVERLAP, "mean"),
-        "idomain": (
-            RegridderType.OVERLAP,
-            "median",
-        ),  # TODO: Change back to 'mode' when xugrid 0.9.1 released
-    }
+    _regrid_method = DiscretizationRegridMethod()
 
     @property
     def skip_variables(self) -> List[str]:
@@ -164,9 +157,6 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method
 
     @classmethod
     @standard_log_decorator()
