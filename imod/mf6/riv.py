@@ -7,6 +7,7 @@ from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.drn import Drainage
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
+from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.regrid.regrid_schemes import RiverRegridMethod
 from imod.mf6.utilities.regrid import (
     RegridderType,
