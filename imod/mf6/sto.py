@@ -8,11 +8,11 @@ from imod.logging import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.regrid.regrid_schemes import (
+    RegridMethodType,
     SpecificStorageRegridMethod,
     StorageCoefficientRegridMethod,
 )
 from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
-from imod.mf6.utilities.regridding_types import RegridderType
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
@@ -329,7 +329,7 @@ class StorageCoefficient(StorageBase):
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_grid: GridDataArray,
-        regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
+        regridder_types: Optional[RegridMethodType] = None,
     ) -> "StorageCoefficient":
         """
         Construct a StorageCoefficient-package from iMOD5 data, loaded with the

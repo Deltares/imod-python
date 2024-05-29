@@ -1,4 +1,5 @@
 from dataclasses import asdict
+from typing import Optional
 
 import numpy as np
 
@@ -7,9 +8,8 @@ from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.npf import NodePropertyFlow
-from imod.mf6.regrid.regrid_schemes import DrainageRegridMethod
+from imod.mf6.regrid.regrid_schemes import DrainageRegridMethod, RegridMethodType
 from imod.mf6.utilities.regrid import (
-    RegridderType,
     RegridderWeightsCache,
     _regrid_package_data,
 )
@@ -170,7 +170,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
         target_npf: NodePropertyFlow,
         allocation_option: ALLOCATION_OPTION,
         distributing_option: DISTRIBUTING_OPTION,
-        regridder_types: dict[str, tuple[RegridderType, str]],
+        regridder_types: Optional[RegridMethodType] = None,
     ) -> "Drainage":
         """
         Construct a drainage-package from iMOD5 data, loaded with the
