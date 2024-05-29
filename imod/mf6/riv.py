@@ -1,5 +1,5 @@
-from copy import deepcopy
 from dataclasses import asdict
+
 import numpy as np
 import xarray as xr
 
@@ -181,7 +181,6 @@ class River(BoundaryCondition, IRegridPackage):
 
         return errors
 
-
     @classmethod
     def from_imod5_data(
         cls,
@@ -303,6 +302,9 @@ class River(BoundaryCondition, IRegridPackage):
             regridded_package_data["stage"],
             drain_conductance,
         )
+
+        mask = ~np.isnan(river_conductance)
+        river_package.mask(mask)
         return (river_package, drainage_package)
 
     @classmethod
