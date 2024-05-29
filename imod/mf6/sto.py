@@ -1,12 +1,14 @@
 import abc
-from typing import Optional, Tuple
 
 import numpy as np
 
 from imod.logging import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
-from imod.mf6.utilities.regrid import RegridderType
+from imod.mf6.regrid.regrid_schemes import (
+    SpecificStorageRegridMethod,
+    StorageCoefficientRegridMethod,
+)
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
@@ -158,13 +160,8 @@ class SpecificStorage(StorageBase):
         ),
     }
 
-    _regrid_method = {
-        "convertible": (RegridderType.OVERLAP, "mode"),
-        "specific_storage": (RegridderType.OVERLAP, "mean"),
-        "specific_yield": (RegridderType.OVERLAP, "mean"),
-    }
-
     _template = Package._initialize_template(_pkg_id)
+    _regrid_method = SpecificStorageRegridMethod()
 
     @init_log_decorator()
     def __init__(
@@ -189,9 +186,6 @@ class SpecificStorage(StorageBase):
     def render(self, directory, pkgname, globaltimes, binary):
         d = self._render_dict(directory, pkgname, globaltimes, binary)
         return self._template.render(d)
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method
 
 
 class StorageCoefficient(StorageBase):
@@ -296,13 +290,8 @@ class StorageCoefficient(StorageBase):
         ),
     }
 
-    _regrid_method = {
-        "convertible": (RegridderType.OVERLAP, "mode"),
-        "storage_coefficient": (RegridderType.OVERLAP, "mean"),
-        "specific_yield": (RegridderType.OVERLAP, "mean"),
-    }
-
     _template = Package._initialize_template(_pkg_id)
+    _regrid_method = StorageCoefficientRegridMethod()
 
     @init_log_decorator()
     def __init__(
@@ -328,6 +317,3 @@ class StorageCoefficient(StorageBase):
         d = self._render_dict(directory, pkgname, globaltimes, binary)
         d["storagecoefficient"] = True
         return self._template.render(d)
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method

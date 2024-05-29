@@ -101,3 +101,30 @@ Transport Packages
     MassSourceLoading
     SourceSinkMixing
     SourceSinkMixing.from_flow_model
+
+
+.. currentmodule:: imod.mf6.regrid
+
+Regrid
+======
+
+Regrid Method Settings
+----------------------
+
+.. autosummary::
+    :toctree: generated/mf6/regrid
+
+    ConstantHeadRegridMethod
+    DiscretizationRegridMethod
+    DispersionRegridMethod
+    DrainageRegridMethod
+    EmptyRegridMethod
+    EvapotranspirationRegridMethod
+    GeneralHeadBoundaryRegridMethod
+    InitialConditionsRegridMethod
+    MobileStorageTransferRegridMethod
+    NodePropertyFlowRegridMethod
+    RechargeRegridMethod
+    RiverRegridMethod
+    SpecificStorageRegridMethod
+    StorageCoefficientRegridMethod

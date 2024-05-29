@@ -1,6 +1,7 @@
 import abc
 import copy
 from collections import defaultdict
+from dataclasses import asdict
 from typing import Any, Dict, Optional, Tuple, Union
 
 import xarray as xr
@@ -18,6 +19,7 @@ from imod.mf6.interfaces.ipackage import IPackage
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.interfaces.isimulation import ISimulation
+from imod.mf6.regrid.regrid_schemes import EmptyRegridMethod, RegridMethodType
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.regridding_types import RegridderType
@@ -29,10 +31,13 @@ HashRegridderMapping = Tuple[int, int, BaseRegridder]
 
 class RegridderWeightsCache:
     """
-    This class stores any number of regridders that can regrid a single source grid to a single target grid.
-    By storing the regridders, we make sure the regridders can be re-used for different arrays on the same grid.
-    Regridders are stored based on their type (`see these docs<https://deltares.github.io/xugrid/examples/regridder_overview.html>`_) and planar coordinates (x, y).
-    This is important because computing the regridding weights is a costly affair.
+    This class stores any number of regridders that can regrid a single source
+    grid to a single target grid. By storing the regridders, we make sure the
+    regridders can be re-used for different arrays on the same grid. Regridders
+    are stored based on their type (`see these
+    docs<https://deltares.github.io/xugrid/examples/regridder_overview.html>`_)
+    and planar coordinates (x, y). This is important because computing the
+    regridding weights is a costly affair.
     """
 
     def __init__(
@@ -68,9 +73,8 @@ class RegridderWeightsCache:
     ) -> BaseRegridder:
         """
         returns a regridder of the specified type and with the specified method.
-        The desired type can be passed through  the argument "regridder_type" as an enumerator or
-        as a class.
-        The following two are equivalent:
+        The desired type can be passed through the argument "regridder_type" as
+        an enumerator or as a class. The following two are equivalent:
         instancesCollection.get_regridder(RegridderType.OVERLAP, "mean")
         instancesCollection.get_regridder(xu.OverlapRegridder, "mean")
 
@@ -192,9 +196,9 @@ def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, lis
     methods: defaultdict = defaultdict(list)
     regrid_packages = [pkg for pkg in model.values() if isinstance(pkg, IRegridPackage)]
     regrid_packages_with_methods = {
-        pkg: pkg.get_regrid_methods().items()  # type: ignore # noqa: union-attr
+        pkg: asdict(pkg.get_regrid_methods()).items()  # type: ignore # noqa: union-attr
         for pkg in regrid_packages
-        if pkg.get_regrid_methods() is not None
+        if not isinstance(pkg.get_regrid_methods(), EmptyRegridMethod)
     }
 
     for pkg, regrid_methods in regrid_packages_with_methods.items():
@@ -214,35 +218,38 @@ def _regrid_like(
     package: IRegridPackage,
     target_grid: GridDataArray,
     regrid_context: RegridderWeightsCache,
-    regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
+    regridder_types: Optional[RegridMethodType] = None,
 ) -> IPackage:
     """
-    Creates a package of the same type as this package, based on another discretization.
-    It regrids all the arrays in this package to the desired discretization, and leaves the options
-    unmodified. At the moment only regridding to a different planar grid is supported, meaning
-    ``target_grid`` has different ``"x"`` and ``"y"`` or different ``cell2d`` coords.
+    Creates a package of the same type as this package, based on another
+    discretization. It regrids all the arrays in this package to the desired
+    discretization, and leaves the options unmodified. At the moment only
+    regridding to a different planar grid is supported, meaning ``target_grid``
+    has different ``"x"`` and ``"y"`` or different ``cell2d`` coords.
 
-    The regridding methods can be specified in the _regrid_method attribute of the package. These are the defaults
-    that specify how each array should be regridded. These defaults can be overridden using the input
-    parameters of this function.
+    The default regridding methods are specified in the ``_regrid_method``
+    attribute of the package. These defaults can be overridden using the
+    input parameters of this function.
 
     Examples
     --------
     To regrid the npf package with a non-default method for the k-field, call regrid_like with these arguments:
 
-    >>> new_npf = npf.regrid_like(like, {"k": (imod.RegridderType.OVERLAP, "mean")})
-
+    >>> regridder_types = imod.mf6.regrid.NodePropertyFlowRegridMethod(k=(imod.RegridderType.OVERLAP, "mean"))
+    >>> new_npf = npf.regrid_like(like,  RegridderWeightsCache, regridder_types)
 
     Parameters
     ----------
+    package: IRegridPackage:
+        package to regrid
     target_grid: xr.DataArray or xu.UgridDataArray
         a grid defined over the same discretization as the one we want to regrid the package to
-    regridder_types: dict(str->(regridder type,str))
-        dictionary mapping arraynames (str) to a tuple of regrid type (a specialization class of BaseRegridder) and function name (str)
-        this dictionary can be used to override the default mapping method.
     regrid_context: RegridderWeightsCache
         stores regridder weights for different regridders. Can be used to speed up regridding,
         if the same regridders are used several times for regridding different arrays.
+    regridder_types: RegridMethodType, optional
+        dictionary mapping arraynames (str) to a tuple of regrid type (a specialization class of BaseRegridder) and function name (str)
+        this dictionary can be used to override the default mapping method.
 
     Returns
     -------
@@ -257,9 +264,10 @@ def _regrid_like(
     if hasattr(package, "auxiliary_data_fields"):
         remove_expanded_auxiliary_variables_from_dataset(package)
 
-    regridder_settings = package.get_regrid_methods()
-    if regridder_types is not None:
-        regridder_settings.update(regridder_types)
+    if regridder_types is None:
+        regridder_settings = asdict(package.get_regrid_methods(), dict_factory=dict)
+    else:
+        regridder_settings = asdict(regridder_types, dict_factory=dict)
 
     new_package_data = package.get_non_grid_data(list(regridder_settings.keys()))
 

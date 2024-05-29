@@ -6,6 +6,8 @@ This page provides an auto-generated summary of imod's API.
 .. toctree::
   :maxdepth: 2
   
+  changelog
+
   io
   prepare
   select
@@ -19,5 +21,3 @@ This page provides an auto-generated summary of imod's API.
   flow
   msw
   metamod
-
-  changelog

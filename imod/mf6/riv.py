@@ -1,11 +1,9 @@
-from typing import Optional, Tuple
-
 import numpy as np
 
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.utilities.regrid import RegridderType
+from imod.mf6.regrid.regrid_schemes import RiverRegridMethod
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -125,13 +123,7 @@ class River(BoundaryCondition, IRegridPackage):
 
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
-
-    _regrid_method = {
-        "stage": (RegridderType.OVERLAP, "mean"),
-        "conductance": (RegridderType.RELATIVEOVERLAP, "conductance"),
-        "bottom_elevation": (RegridderType.OVERLAP, "mean"),
-        "concentration": (RegridderType.OVERLAP, "mean"),
-    }
+    _regrid_method = RiverRegridMethod()
 
     @init_log_decorator()
     def __init__(
@@ -161,7 +153,6 @@ class River(BoundaryCondition, IRegridPackage):
             "repeat_stress": repeat_stress,
         }
         super().__init__(dict_dataset)
-
         self._validate_init_schemata(validate)
 
     def _validate(self, schemata, **kwargs):
@@ -171,6 +162,3 @@ class River(BoundaryCondition, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method
