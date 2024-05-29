@@ -407,7 +407,7 @@ def test_import_river_from_imod5(imod5_dataset, tmp_path):
         target_npf,
         ALLOCATION_OPTION.at_elevation,
         DISTRIBUTING_OPTION.by_crosscut_thickness,
-        regridder_types={},
+        regridder_types=None,
     )
 
     write_context = WriteContext(simulation_directory=tmp_path)

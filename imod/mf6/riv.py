@@ -1,4 +1,5 @@
 from copy import deepcopy
+from dataclasses import asdict
 import numpy as np
 import xarray as xr
 
@@ -239,10 +240,12 @@ class River(BoundaryCondition, IRegridPackage):
         is_planar_conductance = is_planar_grid(data["conductance"])
 
         # set up regridder methods
-        regridder_settings = deepcopy(cls._regrid_method)
-        regridder_settings["infiltration_factor"] = (RegridderType.OVERLAP, "mean")
-        if regridder_types is not None:
-            regridder_settings.update(regridder_types)
+        if regridder_types is None:
+            regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
+        else:
+            regridder_settings = asdict(regridder_types, dict_factory=dict)
+        if "infiltration_factor" not in regridder_settings.keys():
+            regridder_settings["infiltration_factor"] = (RegridderType.OVERLAP, "mean")
 
         regrid_context = RegridderWeightsCache()
 
