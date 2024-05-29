@@ -16,6 +16,7 @@ from imod.mf6.write_context import WriteContext
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION
 from imod.prepare.topsystem.conductance import DISTRIBUTING_OPTION
 from imod.schemata import ValidationError
+from imod.typing.grid import ones_like
 
 
 @pytest.fixture(scope="function")
@@ -419,4 +420,36 @@ def test_import_river_from_imod5(imod5_dataset, tmp_path):
 
     with open(tmp_path / "drn/drn.dat", "r") as f:
         data = f.read()
+        assert  data.count("\n") == 1314  # the number of lines in the file. 
+
+
+@pytest.mark.usefixtures("imod5_dataset")
+def test_import_river_from_imod5_infiltration_factor(imod5_dataset, tmp_path):
+    globaltimes = [np.datetime64("2000-01-01")]
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset)
+    target_npf = NodePropertyFlow.from_imod5_data(
+        imod5_dataset, target_dis.dataset["idomain"]
+    )
+    original_infiltration_factor = imod5_dataset["riv-1"]["infiltration_factor"]
+    imod5_dataset["riv-1"]["infiltration_factor"] = ones_like(original_infiltration_factor)
+
+    (riv, drn) = imod.mf6.River.from_imod5_data(
+        "riv-1",
+        imod5_dataset,
+        target_dis,
+        target_npf,
+        ALLOCATION_OPTION.at_elevation,
+        DISTRIBUTING_OPTION.by_crosscut_thickness,
+        regridder_types=None,
+    )
+
+    write_context = WriteContext(simulation_directory=tmp_path)
+    riv.write("riv", globaltimes, write_context)
+
+    imod5_dataset["riv-1"]["infiltration_factor"] = original_infiltration_factor
+
+    with open(tmp_path / "riv/riv.dat", "r") as f:
+        data = f.read()
         assert data.count("\n") == 1314  # the number of lines in the file.
+
+    assert drn is None

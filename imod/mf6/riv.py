@@ -1,4 +1,5 @@
 from dataclasses import asdict
+from typing import Optional
 
 import numpy as np
 import xarray as xr
@@ -9,7 +10,7 @@ from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.drn import Drainage
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.npf import NodePropertyFlow
-from imod.mf6.regrid.regrid_schemes import RiverRegridMethod
+from imod.mf6.regrid.regrid_schemes import RegridMethodType, RiverRegridMethod
 from imod.mf6.utilities.regrid import (
     RegridderType,
     RegridderWeightsCache,
@@ -190,7 +191,7 @@ class River(BoundaryCondition, IRegridPackage):
         target_npf: NodePropertyFlow,
         allocation_option_riv: ALLOCATION_OPTION,
         distributing_option_riv: DISTRIBUTING_OPTION,
-        regridder_types: dict[str, tuple[RegridderType, str]],
+        regridder_types: Optional[RegridMethodType] = None,
     ) -> "River":
         """
         Construct a river-package from iMOD5 data, loaded with the
@@ -214,8 +215,8 @@ class River(BoundaryCondition, IRegridPackage):
             allocation option.
         distributing_option: dict[str, DISTRIBUTING_OPTION]
             distributing option.
-        regridder_types: dict, optional
-            Optional dictionary with regridder types for a specific variable.
+        regridder_types: RegridMethodType, optional
+            Optional dataclass with regridder types for a specific variable.
             Use this to override default regridding methods.
 
         Returns
@@ -290,7 +291,7 @@ class River(BoundaryCondition, IRegridPackage):
 
         # update the conductance of the river package to account for the infiltration
         # factor
-        river_conductance, drain_conductance = cls.split_conductance(
+        drain_conductance, river_conductance  = cls.split_conductance(
             regridded_package_data["conductance"], infiltration_factor
         )
         regridded_package_data["conductance"] = river_conductance
@@ -304,7 +305,15 @@ class River(BoundaryCondition, IRegridPackage):
         )
 
         mask = ~np.isnan(river_conductance)
-        river_package.mask(mask)
+        if np.any(mask == True):
+             river_package =  river_package.mask(mask)
+        else:
+            river_package = None
+        mask = ~np.isnan(drain_conductance)
+        if np.any(mask == True):
+            drainage_package =drainage_package.mask(mask)
+        else:
+            drainage_package =  None
         return (river_package, drainage_package)
 
     @classmethod
