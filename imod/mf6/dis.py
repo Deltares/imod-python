@@ -9,11 +9,10 @@ from imod.logging import init_log_decorator, standard_log_decorator
 from imod.mf6.interfaces.imaskingsettings import IMaskingSettings
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
-from imod.mf6.regrid.regrid_schemes import DiscretizationRegridMethod
+from imod.mf6.regrid.regrid_schemes import DiscretizationRegridMethod, RegridMethodType
 from imod.mf6.utilities.grid import create_smallest_target_grid
 from imod.mf6.utilities.imod5_converter import convert_ibound_to_idomain
 from imod.mf6.utilities.regrid import (
-    RegridderType,
     RegridderWeightsCache,
     _regrid_package_data,
 )
@@ -163,7 +162,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
     def from_imod5_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
+        regridder_types: Optional[RegridMethodType] = None,
     ) -> "StructuredDiscretization":
         """
         Construct package from iMOD5 data, loaded with the
@@ -182,8 +181,8 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         imod5_data: dict
             Dictionary with iMOD5 data. This can be constructed from the
             :func:`imod.formats.prj.open_projectfile_data` method.
-        regridder_types: dict, optional
-            Optional dictionary with regridder types for a specific variable.
+        regridder_types: RegridMethodType, optional
+            Optional dataclass with regridder types for a specific variable.
             Use this to override default regridding methods.
 
         Returns

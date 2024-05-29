@@ -8,10 +8,12 @@ import xarray as xr
 from imod.logging import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
-from imod.mf6.regrid.regrid_schemes import NodePropertyFlowRegridMethod
+from imod.mf6.regrid.regrid_schemes import (
+    NodePropertyFlowRegridMethod,
+    RegridMethodType,
+)
 from imod.mf6.utilities.imod5_converter import fill_missing_layers
 from imod.mf6.utilities.regrid import (
-    RegridderType,
     RegridderWeightsCache,
     _regrid_package_data,
 )
@@ -457,7 +459,7 @@ class NodePropertyFlow(Package, IRegridPackage):
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_grid: GridDataArray,
-        regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
+        regridder_types: Optional[RegridMethodType] = None,
     ) -> "NodePropertyFlow":
         """
         Construct an npf-package from iMOD5 data, loaded with the
@@ -475,8 +477,8 @@ class NodePropertyFlow(Package, IRegridPackage):
         target_grid: GridDataArray
             The grid that should be used for the new package. Does not
             need to be identical to one of the input grids.
-        regridder_types: dict, optional
-            Optional dictionary with regridder types for a specific variable.
+        regridder_types: RegridMethodType, optional
+            Optional dataclass with regridder types for a specific variable.
             Use this to override default regridding methods.
 
         Returns

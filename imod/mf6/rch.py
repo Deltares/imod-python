@@ -7,9 +7,8 @@ from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.regrid.regrid_schemes import RechargeRegridMethod
+from imod.mf6.regrid.regrid_schemes import RechargeRegridMethod, RegridMethodType
 from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
-from imod.mf6.utilities.regridding_types import RegridderType
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_rch_cells
 from imod.schemata import (
@@ -161,7 +160,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
         dis_pkg: StructuredDiscretization,
-        regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
+        regridder_types: Optional[RegridMethodType] = None,
     ) -> "Recharge":
         """
         Construct an rch-package from iMOD5 data, loaded with the
@@ -179,8 +178,8 @@ class Recharge(BoundaryCondition, IRegridPackage):
         dis_pkg: GridDataArray
             The discretization package for the simulation. Its grid does not
             need to be identical to one of the input grids.
-        regridder_types: dict, optional
-            Optional dictionary with regridder types for a specific variable.
+        regridder_types: RegridMethodType, optional
+            Optional dataclass with regridder types for a specific variable.
             Use this to override default regridding methods.
 
         Returns
