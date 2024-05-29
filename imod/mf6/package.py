@@ -637,5 +637,6 @@ class Package(PackageBase, IPackage, abc.ABC):
     def is_clipping_supported(self) -> bool:
         return True
 
-    def get_regrid_methods(self) -> RegridMethodType:
-        return deepcopy(self._regrid_method)
+    @classmethod
+    def get_regrid_methods(cls) -> RegridMethodType:
+        return deepcopy(cls._regrid_method)

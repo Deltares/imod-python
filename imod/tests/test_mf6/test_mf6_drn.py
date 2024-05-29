@@ -486,7 +486,7 @@ def test_from_imod5(imod5_dataset, tmp_path):
         target_npf,
         allocation_option=ALLOCATION_OPTION.at_elevation,
         distributing_option=DISTRIBUTING_OPTION.by_crosscut_thickness,
-        regridder_types={},
+        regridder_types=None,
     )
 
     assert isinstance(drn_2, imod.mf6.Drainage)

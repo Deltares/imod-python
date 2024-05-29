@@ -1,5 +1,5 @@
 import pathlib
-from copy import deepcopy
+from dataclasses import asdict
 from typing import List, Optional
 
 import numpy as np
@@ -199,12 +199,10 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
 
         target_grid = create_smallest_target_grid(*data.values())
 
-        # For some reason ``get_regrid_methods`` cannot be called in a
-        # classmethod.
-        regridder_settings = deepcopy(cls._regrid_method)
-        if regridder_types is not None:
-            regridder_settings.update(regridder_types)
-
+        if regridder_types is None:
+            regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
+        else:
+            regridder_settings = asdict(regridder_types, dict_factory=dict)
         regrid_context = RegridderWeightsCache()
 
         new_package_data = _regrid_package_data(

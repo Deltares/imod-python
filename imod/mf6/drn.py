@@ -1,4 +1,4 @@
-from copy import deepcopy
+from dataclasses import asdict
 
 import numpy as np
 
@@ -213,9 +213,10 @@ class Drainage(BoundaryCondition, IRegridPackage):
         }
         is_planar = is_planar_grid(data["elevation"])
 
-        regridder_settings = deepcopy(cls._regrid_method)
-        if regridder_types is not None:
-            regridder_settings.update(regridder_types)
+        if regridder_types is None:
+            regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
+        else:
+            regridder_settings = asdict(regridder_types, dict_factory=dict)
 
         regrid_context = RegridderWeightsCache()
 
