@@ -24,7 +24,7 @@ from imod.logging import standard_log_decorator
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwfgwt import GWFGWT
 from imod.mf6.gwtgwt import GWTGWT
-from imod.mf6.ims import Solution
+from imod.mf6.ims import Solution, SolutionPresetModerate
 from imod.mf6.interfaces.imodel import IModel
 from imod.mf6.interfaces.isimulation import ISimulation
 from imod.mf6.model import Modflow6Model
@@ -41,7 +41,12 @@ from imod.mf6.ssm import SourceSinkMixing
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.utilities.mask import _mask_all_models
 from imod.mf6.utilities.regrid import _regrid_like
+from imod.mf6.utilities.regridding_types import RegridderType
 from imod.mf6.write_context import WriteContext
+from imod.prepare.topsystem.default_allocation_methods import (
+    SimulationAllocationOptions,
+    SimulationDistributingOptions,
+)
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
 from imod.typing.grid import (
@@ -1308,3 +1313,62 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             -1 sets cells to vertical passthrough
         """
         _mask_all_models(self, mask)
+
+    @classmethod
+    @standard_log_decorator()
+    def from_imod5_data(
+        cls,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        allocation_options: SimulationAllocationOptions,
+        distributing_options: SimulationDistributingOptions,
+        regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
+    ) -> "Modflow6Simulation":
+        """
+        Imports a GroundwaterFlowModel (GWF) from the data in an IMOD5 project file.
+        It adds the packages for which import from imod5 is supported.
+        Some packages (like OC) must be added manually later.
+
+
+        Parameters
+        ----------
+        imod5_data: dict[str, dict[str, GridDataArray]]
+            dictionary containing the arrays mentioned in the project file as xarray datasets,
+            under the key of the package type to which it belongs
+        allocation_options: SimulationAllocationOptions
+            object containing the allocation options per package type.
+            If you want a package to have a different allocation option,
+            then it should be imported separately
+        distributing_options: SimulationDistributingOptions
+            object containing the conductivity distribution options per package type.
+            If you want a package to have a different allocation option,
+            then it should be imported separately
+        regridder_types: Optional[dict[str, dict[str, tuple[RegridderType, str]]]]
+            the first key is the package name. The second key is the array name, and the value is
+            the RegridderType tuple (method + function)
+
+        Returns
+        -------
+        """
+        simulation = Modflow6Simulation("imported_simulation")
+
+        # import GWF model,
+        groundwaterFlowModel = GroundwaterFlowModel.from_imod5_data(
+            imod5_data,
+            allocation_options,
+            distributing_options,
+            regridder_types,
+        )
+        simulation["imported_model"] = groundwaterFlowModel
+
+        # generate ims package
+        solution = SolutionPresetModerate(
+            ["imported_model"],
+            print_option="all",
+        )
+        simulation["ims"] = solution
+
+        # cleanup packages for validation
+        idomain = groundwaterFlowModel.domain
+        simulation.mask_all_models(idomain)
+
+        return simulation
