@@ -1,7 +1,7 @@
 import pickle
 import textwrap
 from functools import wraps
-from typing import Callable, Mapping, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 import numpy as np
 import xarray as xr
@@ -427,3 +427,18 @@ def is_transient_data_grid(
         if len(grid["time"]) > 1:
             return True
     return False
+
+
+def deepcopy_imod5_dict(imod5_data: dict[str, dict[str, Any]]):
+    # this function makes a deepcopy of the kind of dictionary that is used
+    # in import from imod5
+    result = {}
+    for k in imod5_data.keys():
+        subresult = {}
+        for p in imod5_data[k].keys():
+            if type(imod5_data[k][p]) is xr.DataArray:
+                subresult[p] = imod5_data[k][p].copy(deep=True)
+            else:
+                subresult[p] = imod5_data[k][p]
+        result[k] = subresult
+    return result

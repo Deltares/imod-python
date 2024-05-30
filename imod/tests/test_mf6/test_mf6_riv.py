@@ -11,7 +11,6 @@ from pytest_cases import parametrize_with_cases
 
 import imod
 from imod.mf6.dis import StructuredDiscretization
-from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.write_context import WriteContext
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION
 from imod.prepare.topsystem.conductance import DISTRIBUTING_OPTION
@@ -398,14 +397,11 @@ def test_write_concentration_period_data(concentration_fc):
 def test_import_river_from_imod5(imod5_dataset, tmp_path):
     globaltimes = [np.datetime64("2000-01-01")]
     target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset)
-    target_npf = NodePropertyFlow.from_imod5_data(
-        imod5_dataset, target_dis.dataset["idomain"]
-    )
+
     (riv, drn) = imod.mf6.River.from_imod5_data(
         "riv-1",
         imod5_dataset,
         target_dis,
-        target_npf,
         ALLOCATION_OPTION.at_elevation,
         DISTRIBUTING_OPTION.by_crosscut_thickness,
         regridder_types=None,
@@ -414,13 +410,20 @@ def test_import_river_from_imod5(imod5_dataset, tmp_path):
     write_context = WriteContext(simulation_directory=tmp_path)
     riv.write("riv", globaltimes, write_context)
     drn.write("drn", globaltimes, write_context)
-    with open(tmp_path / "riv/riv.dat", "r") as f:
-        data = f.read()
-        assert data.count("\n") == 1314  # the number of lines in the file.
 
-    with open(tmp_path / "drn/drn.dat", "r") as f:
-        data = f.read()
-        assert data.count("\n") == 1314  # the number of lines in the file.
+    errors = riv._validate(
+        imod.mf6.River._write_schemata,
+        idomain=target_dis.dataset["idomain"],
+        bottom=target_dis.dataset["bottom"],
+    )
+    assert len(errors) == 0
+
+    errors = drn._validate(
+        imod.mf6.Drainage._write_schemata,
+        idomain=target_dis.dataset["idomain"],
+        bottom=target_dis.dataset["bottom"],
+    )
+    assert len(errors) == 0
 
 
 @pytest.mark.usefixtures("imod5_dataset")

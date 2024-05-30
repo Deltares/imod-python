@@ -285,6 +285,16 @@ class River(BoundaryCondition, IRegridPackage):
                 riv_allocation[0]
             )
             layered_bottom_elevation = enforce_dim_order(layered_bottom_elevation)
+
+            # due to regridding, the layered_bottom_elevation could be smaller than the
+            # bottom, so here we overwrite it with bottom if that's
+            # the case.
+            layered_bottom_elevation = xr.where(
+                target_bottom > layered_bottom_elevation,
+                target_bottom,
+                layered_bottom_elevation,
+            )
+
             regridded_package_data["bottom_elevation"] = layered_bottom_elevation
 
         # update the conductance of the river package to account for the infiltration
@@ -294,8 +304,8 @@ class River(BoundaryCondition, IRegridPackage):
         )
         regridded_package_data["conductance"] = river_conductance
         regridded_package_data.pop("infiltration_factor")
-        river_package = River(**regridded_package_data)
 
+        river_package = River(**regridded_package_data)
         # create a drtainage package with the conductance we comptuted from the infiltration factor
         drainage_package = cls.create_infiltration_factor_drain(
             regridded_package_data["stage"],
