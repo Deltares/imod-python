@@ -219,6 +219,8 @@ class River(BoundaryCondition, IRegridPackage):
         -------
         A MF6 river package, and a drainage package to account
         for the infiltration factor which exists in IMOD5 but not in MF6.
+        Both the river package and the drainage package can be None,
+        this can happen if the infiltration factor is 0 or 1 everywhere.
         """
 
         # gather discretrizations
