@@ -1,5 +1,5 @@
 from dataclasses import asdict
-from typing import Optional
+from typing import Optional, Tuple
 
 import numpy as np
 import xarray as xr
@@ -9,7 +9,6 @@ from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.drn import Drainage
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.regrid.regrid_schemes import RegridMethodType, RiverRegridMethod
 from imod.mf6.utilities.regrid import (
     RegridderType,
@@ -188,11 +187,10 @@ class River(BoundaryCondition, IRegridPackage):
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_discretization: StructuredDiscretization,
-        target_npf: NodePropertyFlow,
         allocation_option_riv: ALLOCATION_OPTION,
         distributing_option_riv: DISTRIBUTING_OPTION,
         regridder_types: Optional[RegridMethodType] = None,
-    ) -> "River":
+    ) -> Tuple[Optional["River"], Optional[Drainage]]:
         """
         Construct a river-package from iMOD5 data, loaded with the
         :func:`imod.formats.prj.open_projectfile_data` function.
@@ -209,8 +207,6 @@ class River(BoundaryCondition, IRegridPackage):
         target_discretization:  StructuredDiscretization package
             The grid that should be used for the new package. Does not
             need to be identical to one of the input grids.
-        target_npf: NodePropertyFlow package
-            The conductivity information, used to compute drainage flux
         allocation_option: ALLOCATION_OPTION
             allocation option.
         distributing_option: dict[str, DISTRIBUTING_OPTION]
@@ -291,7 +287,7 @@ class River(BoundaryCondition, IRegridPackage):
 
         # update the conductance of the river package to account for the infiltration
         # factor
-        drain_conductance, river_conductance  = cls.split_conductance(
+        drain_conductance, river_conductance = cls.split_conductance(
             regridded_package_data["conductance"], infiltration_factor
         )
         regridded_package_data["conductance"] = river_conductance
@@ -303,17 +299,19 @@ class River(BoundaryCondition, IRegridPackage):
             regridded_package_data["stage"],
             drain_conductance,
         )
-
+        # remove River package if its mask is False everywhere
         mask = ~np.isnan(river_conductance)
-        if np.any(mask == True):
-             river_package =  river_package.mask(mask)
+        if np.any(mask):
+            river_package = river_package.mask(mask)
         else:
             river_package = None
+
+        # remove Drainage package if its mask is False everywhere
         mask = ~np.isnan(drain_conductance)
-        if np.any(mask == True):
-            drainage_package =drainage_package.mask(mask)
+        if np.any(mask):
+            drainage_package = drainage_package.mask(mask)
         else:
-            drainage_package =  None
+            drainage_package = None
         return (river_package, drainage_package)
 
     @classmethod
