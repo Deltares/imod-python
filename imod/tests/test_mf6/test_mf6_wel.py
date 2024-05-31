@@ -67,6 +67,24 @@ def test_to_mf6_pkg__validate(well_high_lvl_test_data_stationary):
     errors = wel._validate(wel._write_schemata)
     assert len(errors) == 1
 
+def test_to_mf6_pkg__validate_filter_top(well_high_lvl_test_data_stationary):
+
+    # Arrange
+    x, y, screen_top, screen_bottom, rate_wel, concentration =well_high_lvl_test_data_stationary
+    screen_top =    [-2.,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, 0.0]
+    screen_bottom = [ 0., -2.0, -2.0, -2.0, -2.0, -2.0, -2.0, -2.0]
+    well_test_data = ( x, y, screen_top, screen_bottom, rate_wel, concentration)
+
+    wel = imod.mf6.Well(*well_test_data)
+
+    # Act
+    kwargs = { "screen_top" : wel.dataset["screen_top"]}
+    errors = wel._validate(wel._write_schemata, **kwargs)
+
+    # Assert
+    assert len(errors) == 1
+    assert str(errors["screen_bottom"][0]) == 'not all values comply with criterion: < screen_top'    
+
 
 def test_to_mf6_pkg__high_lvl_multilevel(basic_dis, well_high_lvl_test_data_stationary):
     """

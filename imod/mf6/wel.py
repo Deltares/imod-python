@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import defaultdict
 import warnings
 from typing import Any, Optional, Tuple, Union
 
@@ -12,6 +13,7 @@ import xugrid as xu
 
 import imod
 from imod.logging import init_log_decorator
+from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6.boundary_condition import (
     BoundaryCondition,
     DisStructuredBoundaryCondition,
@@ -26,6 +28,7 @@ from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
 from imod.prepare.layer import create_layered_top
 from imod.schemata import (
+    AllValueSchema,
     AnyNoDataSchema,
     DTypeSchema,
     EmptyIndexesSchema,
@@ -177,7 +180,7 @@ class Well(BoundaryCondition, IPointDataPackage):
     }
     _write_schemata = {
         "screen_top": [AnyNoDataSchema(), EmptyIndexesSchema()],
-        "screen_bottom": [AnyNoDataSchema(), EmptyIndexesSchema()],
+        "screen_bottom": [AnyNoDataSchema(), EmptyIndexesSchema(), AllValueSchema("<", "screen_top")],
         "y": [AnyNoDataSchema(), EmptyIndexesSchema()],
         "x": [AnyNoDataSchema(), EmptyIndexesSchema()],
         "rate": [AnyNoDataSchema(), EmptyIndexesSchema()],
@@ -362,6 +365,11 @@ class Well(BoundaryCondition, IPointDataPackage):
         )
 
         return wells_df
+    
+    @standard_log_decorator()
+    def _validate(self, schemata: dict, **kwargs) -> dict[str, list[ValidationError]]:
+        kwargs["screen_top"] = self.dataset["screen_top"]
+        return Package._validate(self, schemata, **kwargs)    
 
     def __create_assigned_wells(
         self,
