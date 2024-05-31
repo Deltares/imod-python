@@ -192,6 +192,12 @@ def test_import_ipf(tmp_path):
         result_snippet_1[0]["wel-3"]["dataframe"]["rate"]
         == 2 * result_snippet_0[0]["wel-2"]["dataframe"]["rate"] + 1.3
     )
+    assert np.all(result_snippet_1[0]["wel-1"]["dataframe"]["filt_top"] == 11.0)
+    assert np.all(result_snippet_1[0]["wel-1"]["dataframe"]["filt_bot"] == 6.0)
+    assert np.all(result_snippet_1[0]["wel-2"]["dataframe"]["filt_top"] == 11.0)
+    assert np.all(result_snippet_1[0]["wel-2"]["dataframe"]["filt_bot"] == 6.0)
+    assert np.all(result_snippet_1[0]["wel-3"]["dataframe"]["filt_top"] == 11.0)
+    assert np.all(result_snippet_1[0]["wel-3"]["dataframe"]["filt_bot"] == 6.0)
 
 
 def snippet_boundary_condition(factor: float, addition: float):
