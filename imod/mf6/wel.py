@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections import defaultdict
 import warnings
 from typing import Any, Optional, Tuple, Union
 
@@ -180,7 +179,11 @@ class Well(BoundaryCondition, IPointDataPackage):
     }
     _write_schemata = {
         "screen_top": [AnyNoDataSchema(), EmptyIndexesSchema()],
-        "screen_bottom": [AnyNoDataSchema(), EmptyIndexesSchema(), AllValueSchema("<", "screen_top")],
+        "screen_bottom": [
+            AnyNoDataSchema(),
+            EmptyIndexesSchema(),
+            AllValueSchema("<", "screen_top"),
+        ],
         "y": [AnyNoDataSchema(), EmptyIndexesSchema()],
         "x": [AnyNoDataSchema(), EmptyIndexesSchema()],
         "rate": [AnyNoDataSchema(), EmptyIndexesSchema()],
@@ -365,11 +368,11 @@ class Well(BoundaryCondition, IPointDataPackage):
         )
 
         return wells_df
-    
+
     @standard_log_decorator()
     def _validate(self, schemata: dict, **kwargs) -> dict[str, list[ValidationError]]:
         kwargs["screen_top"] = self.dataset["screen_top"]
-        return Package._validate(self, schemata, **kwargs)    
+        return Package._validate(self, schemata, **kwargs)
 
     def __create_assigned_wells(
         self,
