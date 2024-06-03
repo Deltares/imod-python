@@ -4,7 +4,9 @@ from typing import Optional, Tuple
 import numpy as np
 import xarray as xr
 
+from imod import logging
 from imod.logging import init_log_decorator
+from imod.logging.loglevel import LogLevel
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.drn import Drainage
@@ -223,6 +225,7 @@ class River(BoundaryCondition, IRegridPackage):
         this can happen if the infiltration factor is 0 or 1 everywhere.
         """
 
+        logger = logging.logger
         # gather discretrizations
         target_top = target_discretization.dataset["top"]
         target_bottom = target_discretization.dataset["bottom"]
@@ -291,6 +294,9 @@ class River(BoundaryCondition, IRegridPackage):
             # due to regridding, the layered_bottom_elevation could be smaller than the
             # bottom, so here we overwrite it with bottom if that's
             # the case.
+
+            if np.any(target_bottom > layered_bottom_elevation).values[()]:
+                logger.log(loglevel=LogLevel.WARNING,message= "Note: riv bottom was detected below model bottom. Updated the riv's bottom.")
             layered_bottom_elevation = xr.where(
                 target_bottom > layered_bottom_elevation,
                 target_bottom,
