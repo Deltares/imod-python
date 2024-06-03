@@ -487,4 +487,3 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
 
     # write and validate the simulation.
     simulation.write(tmp_path, binary=False, validate=True)
-    pass
