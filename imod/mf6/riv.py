@@ -306,7 +306,7 @@ class River(BoundaryCondition, IRegridPackage):
         regridded_package_data.pop("infiltration_factor")
 
         river_package = River(**regridded_package_data)
-        # create a drtainage package with the conductance we comptuted from the infiltration factor
+        # create a drainage package with the conductance we computed from the infiltration factor
         drainage_package = cls.create_infiltration_factor_drain(
             regridded_package_data["stage"],
             drain_conductance,
