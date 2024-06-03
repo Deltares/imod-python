@@ -23,7 +23,6 @@ from imod.prepare.topsystem.default_allocation_methods import (
     SimulationDistributingOptions,
 )
 from imod.typing import GridDataArray
-from imod.typing.grid import deepcopy_imod5_dict
 
 
 class GroundwaterFlowModel(Modflow6Model):
@@ -210,28 +209,28 @@ class GroundwaterFlowModel(Modflow6Model):
         # import discretization
 
         dis_pkg = StructuredDiscretization.from_imod5_data(
-            deepcopy_imod5_dict(imod5_data), regridder_types
+            imod5_data, regridder_types
         )
         grid = dis_pkg.dataset["idomain"]
 
         # import npf
         npf_pkg = NodePropertyFlow.from_imod5_data(
-            deepcopy_imod5_dict(imod5_data), grid, regridder_types
+          imod5_data, grid, regridder_types
         )
 
         # import sto
         sto_pkg = StorageCoefficient.from_imod5_data(
-            deepcopy_imod5_dict(imod5_data), grid, regridder_types
+            imod5_data, grid, regridder_types
         )
 
         # import initial conditions
         ic_pkg = InitialConditions.from_imod5_data(
-            deepcopy_imod5_dict(imod5_data), grid, regridder_types
+            imod5_data, grid, regridder_types
         )
 
         # import recharge
         rch_pkg = Recharge.from_imod5_data(
-            deepcopy_imod5_dict(imod5_data), dis_pkg, regridder_types
+            imod5_data, dis_pkg, regridder_types
         )
 
         result = GroundwaterFlowModel()
@@ -248,7 +247,7 @@ class GroundwaterFlowModel(Modflow6Model):
         for drn_key in drainage_keys:
             drn_pkg = Drainage.from_imod5_data(
                 drn_key,
-                deepcopy_imod5_dict(imod5_data),
+                imod5_data,
                 dis_pkg,
                 npf_pkg,
                 allocation_options.drn,
@@ -262,7 +261,7 @@ class GroundwaterFlowModel(Modflow6Model):
         for riv_key in riv_keys:
             riv_pkg, drn_pkg = River.from_imod5_data(
                 riv_key,
-                deepcopy_imod5_dict(imod5_data),
+                imod5_data,
                 dis_pkg,
                 allocation_options.riv,
                 distributing_options.riv,

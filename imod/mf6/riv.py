@@ -331,12 +331,14 @@ class River(BoundaryCondition, IRegridPackage):
     @classmethod
     def create_infiltration_factor_drain(
         cls,
-        drain_elevation,
-        drain_conductance,
+        drain_elevation: GridDataArray,
+        drain_conductance: GridDataArray,
     ):
-        # create a drainage package from the river package, to account for the infiltration factor.
-        # this factor is optional in imod5, but it does not exist in MF6, so we mimic its effect
-        # with a Drainage boundary.
+        """        
+        Create a drainage package from the river package, to account for the infiltration factor.
+        This factor is optional in imod5, but it does not exist in MF6, so we mimic its effect
+        with a Drainage boundary.
+        """
 
         mask = ~np.isnan(drain_conductance)
         drainage = Drainage(drain_elevation, drain_conductance)
