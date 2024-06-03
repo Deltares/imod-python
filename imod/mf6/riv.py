@@ -295,10 +295,11 @@ class River(BoundaryCondition, IRegridPackage):
             # bottom, so here we overwrite it with bottom if that's
             # the case.
 
-            if np.any(target_bottom > layered_bottom_elevation).values[()]:
+            if np.any((target_bottom > layered_bottom_elevation).values[()]):
                 logger.log(
                     loglevel=LogLevel.WARNING,
                     message="Note: riv bottom was detected below model bottom. Updated the riv's bottom.",
+                    additional_depth=0
                 )
             layered_bottom_elevation = xr.where(
                 target_bottom > layered_bottom_elevation,
