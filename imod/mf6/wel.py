@@ -17,8 +17,10 @@ from imod.mf6.boundary_condition import (
     DisStructuredBoundaryCondition,
     DisVerticesBoundaryCondition,
 )
+from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.mf6_wel_adapter import Mf6Wel
+from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.package import Package
 from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.validation import validation_pkg_error_message
@@ -608,6 +610,37 @@ class Well(BoundaryCondition, IPointDataPackage):
             "layer", errors="ignore"
         )
         return mask_2D(self, domain_2d)
+
+    @classmethod
+    def from_imod5_data(
+        cls,
+        key: str,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        target_discretization: StructuredDiscretization,
+        target_npf: NodePropertyFlow,
+    ) -> "Well":
+        x = imod5_data[key]["dataframe"]["x"]
+        y = imod5_data[key]["dataframe"]["y"]
+        top = imod5_data[key]["dataframe"]["filt_top"]
+        bot = imod5_data[key]["dataframe"]["filt_bot"]
+        rate = imod5_data[key]["dataframe"]["rate"]
+
+        wel_x = float(x[0])
+        wel_y = float(y[0])
+        wel_top = float(top[0])
+        wel_bot = float(bot[0])
+        xrate_wel = xr.DataArray(
+            rate,
+            dims=("time"),
+            coords={"time": imod5_data["wel-1"]["dataframe"]["time"]},
+        )
+        xrate_wel = xrate_wel.expand_dims(dim={"index": [1]})
+        assert np.all(x == wel_x)
+        assert np.all(y == wel_y)
+        assert np.all(top == wel_top)
+        assert np.all(bot == wel_bot)
+
+        return cls([wel_x], [wel_y], [wel_top], [wel_bot], xrate_wel)
 
 
 class WellDisStructured(DisStructuredBoundaryCondition):

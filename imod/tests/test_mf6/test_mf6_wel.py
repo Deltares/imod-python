@@ -10,7 +10,10 @@ import xugrid as xu
 from pytest_cases import parametrize_with_cases
 
 import imod
+from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.utilities.grid import broadcast_to_full_domain
+from imod.mf6.wel import Well
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
@@ -682,3 +685,16 @@ def test_render__concentration_dis_vertices_transient(well_test_data_transient):
             assert (
                 data.count(" 246 135") == 15
             )  # check salinity and temperature was written to period data
+
+
+@pytest.mark.usefixtures("imod5_dataset")
+def test_import_from_imod5(imod5_dataset, tmp_path):
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset)
+    target_npf = NodePropertyFlow.from_imod5_data(
+        imod5_dataset, target_dis.dataset["idomain"]
+    )
+
+    wel = Well.from_imod5_data("wel-1", imod5_dataset, target_dis, target_npf)
+    assert wel.dataset["x"].values[0] == 197910.0
+    assert wel.dataset["y"].values[0] == 362860.0
+    assert np.mean(wel.dataset["rate"].values) == -323.8936170212766
