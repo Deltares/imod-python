@@ -299,7 +299,7 @@ class River(BoundaryCondition, IRegridPackage):
                 logger.log(
                     loglevel=LogLevel.WARNING,
                     message="Note: riv bottom was detected below model bottom. Updated the riv's bottom.",
-                    additional_depth=0
+                    additional_depth=0,
                 )
             layered_bottom_elevation = xr.where(
                 target_bottom > layered_bottom_elevation,
