@@ -230,10 +230,10 @@ class River(BoundaryCondition, IRegridPackage):
 
         # gather input data
         data = {
-            "conductance": imod5_data[key]["conductance"],
-            "stage": imod5_data[key]["stage"],
-            "bottom_elevation": imod5_data[key]["bottom_elevation"],
-            "infiltration_factor": imod5_data[key]["infiltration_factor"],
+            "conductance": imod5_data[key]["conductance"].copy(deep=True),
+            "stage": imod5_data[key]["stage"].copy(deep=True),
+            "bottom_elevation": imod5_data[key]["bottom_elevation"].copy(deep=True),
+            "infiltration_factor": imod5_data[key]["infiltration_factor"].copy(deep=True),
         }
         is_planar_conductance = is_planar_grid(data["conductance"])
 
