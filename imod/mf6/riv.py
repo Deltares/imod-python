@@ -296,7 +296,10 @@ class River(BoundaryCondition, IRegridPackage):
             # the case.
 
             if np.any(target_bottom > layered_bottom_elevation).values[()]:
-                logger.log(loglevel=LogLevel.WARNING,message= "Note: riv bottom was detected below model bottom. Updated the riv's bottom.")
+                logger.log(
+                    loglevel=LogLevel.WARNING,
+                    message="Note: riv bottom was detected below model bottom. Updated the riv's bottom.",
+                )
             layered_bottom_elevation = xr.where(
                 target_bottom > layered_bottom_elevation,
                 target_bottom,
@@ -340,7 +343,7 @@ class River(BoundaryCondition, IRegridPackage):
         drain_elevation: GridDataArray,
         drain_conductance: GridDataArray,
     ):
-        """        
+        """
         Create a drainage package from the river package, to account for the infiltration factor.
         This factor is optional in imod5, but it does not exist in MF6, so we mimic its effect
         with a Drainage boundary.

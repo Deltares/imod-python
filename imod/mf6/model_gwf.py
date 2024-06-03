@@ -208,30 +208,20 @@ class GroundwaterFlowModel(Modflow6Model):
         # first import the singleton packages
         # import discretization
 
-        dis_pkg = StructuredDiscretization.from_imod5_data(
-            imod5_data, regridder_types
-        )
+        dis_pkg = StructuredDiscretization.from_imod5_data(imod5_data, regridder_types)
         grid = dis_pkg.dataset["idomain"]
 
         # import npf
-        npf_pkg = NodePropertyFlow.from_imod5_data(
-          imod5_data, grid, regridder_types
-        )
+        npf_pkg = NodePropertyFlow.from_imod5_data(imod5_data, grid, regridder_types)
 
         # import sto
-        sto_pkg = StorageCoefficient.from_imod5_data(
-            imod5_data, grid, regridder_types
-        )
+        sto_pkg = StorageCoefficient.from_imod5_data(imod5_data, grid, regridder_types)
 
         # import initial conditions
-        ic_pkg = InitialConditions.from_imod5_data(
-            imod5_data, grid, regridder_types
-        )
+        ic_pkg = InitialConditions.from_imod5_data(imod5_data, grid, regridder_types)
 
         # import recharge
-        rch_pkg = Recharge.from_imod5_data(
-            imod5_data, dis_pkg, regridder_types
-        )
+        rch_pkg = Recharge.from_imod5_data(imod5_data, dis_pkg, regridder_types)
 
         result = GroundwaterFlowModel()
         result["dis"] = dis_pkg

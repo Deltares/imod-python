@@ -1,7 +1,7 @@
 import pickle
 import textwrap
 from functools import wraps
-from typing import Any, Callable, Mapping, Sequence
+from typing import Callable, Mapping, Sequence
 
 import numpy as np
 import xarray as xr
