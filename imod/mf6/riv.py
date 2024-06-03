@@ -397,8 +397,8 @@ class River(BoundaryCondition, IRegridPackage):
         river_conductance = conductance * infiltration_factor
 
         # clean up the packages
-        drainage_conductance = xr.where(
-            drainage_conductance > 0, drainage_conductance, np.nan
+        drainage_conductance = drainage_conductance.where(
+            drainage_conductance > 0
         )
         river_conductance = xr.where(river_conductance > 0, river_conductance, np.nan)
         return drainage_conductance, river_conductance
