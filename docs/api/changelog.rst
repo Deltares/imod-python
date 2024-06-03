@@ -6,6 +6,14 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+
+[Unreleased- feature branch]
+----------------------------
+
+Changed
+~~~~~~~
+- :function:`open_projectfile_data` now also imports well filter top and bottom.
+
 [Unreleased]
 ------------
 
