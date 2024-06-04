@@ -17,6 +17,7 @@ from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.rch import Recharge
 from imod.mf6.sto import StorageCoefficient
 from imod.mf6.utilities.regridding_types import RegridderType
+from imod.mf6.wel import Well
 from imod.prepare.topsystem.default_allocation_methods import (
     SimulationAllocationOptions,
     SimulationDistributingOptions,
@@ -243,5 +244,10 @@ class GroundwaterFlowModel(Modflow6Model):
                 regridder_types=regridder_types,
             )
             result[drn_key] = drn_pkg
+
+        wel_keys = [key for key in imod5_keys if key[0:3] == "wel"]
+        for wel_key in wel_keys:
+            wel_pkg = Well.from_imod5_data(wel_key, imod5_data)
+            result[wel_key] = wel_pkg
 
         return result

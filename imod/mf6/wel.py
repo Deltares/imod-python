@@ -17,10 +17,8 @@ from imod.mf6.boundary_condition import (
     DisStructuredBoundaryCondition,
     DisVerticesBoundaryCondition,
 )
-from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.mf6_wel_adapter import Mf6Wel
-from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.package import Package
 from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.validation import validation_pkg_error_message
@@ -616,31 +614,41 @@ class Well(BoundaryCondition, IPointDataPackage):
         cls,
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        target_discretization: StructuredDiscretization,
-        target_npf: NodePropertyFlow,
+        minimum_k: float = 0.1,
+        minimum_thickness: float = 1.0,
     ) -> "Well":
-        x = imod5_data[key]["dataframe"]["x"]
-        y = imod5_data[key]["dataframe"]["y"]
-        top = imod5_data[key]["dataframe"]["filt_top"]
-        bot = imod5_data[key]["dataframe"]["filt_bot"]
+        wel_x = cls.panda_column_to_scalar(imod5_data[key]["dataframe"]["x"])
+        wel_y = cls.panda_column_to_scalar(imod5_data[key]["dataframe"]["y"])
+        wel_top = cls.panda_column_to_scalar(imod5_data[key]["dataframe"]["filt_top"])
+        wel_bot = cls.panda_column_to_scalar(imod5_data[key]["dataframe"]["filt_bot"])
         rate = imod5_data[key]["dataframe"]["rate"]
 
-        wel_x = float(x[0])
-        wel_y = float(y[0])
-        wel_top = float(top[0])
-        wel_bot = float(bot[0])
-        xrate_wel = xr.DataArray(
+        wel_rate = xr.DataArray(
             rate,
             dims=("time"),
             coords={"time": imod5_data["wel-1"]["dataframe"]["time"]},
         )
-        xrate_wel = xrate_wel.expand_dims(dim={"index": [1]})
-        assert np.all(x == wel_x)
-        assert np.all(y == wel_y)
-        assert np.all(top == wel_top)
-        assert np.all(bot == wel_bot)
+        wel_rate = wel_rate.expand_dims(dim={"index": [1]})
 
-        return cls([wel_x], [wel_y], [wel_top], [wel_bot], xrate_wel)
+        return cls(
+            x=[wel_x],
+            y=[wel_y],
+            screen_top=[wel_top],
+            screen_bottom=[wel_bot],
+            rate=wel_rate,
+            minimum_k=minimum_k,
+            minimum_thickness=minimum_thickness,
+        )
+
+    @classmethod
+    def panda_column_to_scalar(cls, column: pd.Series) -> float:
+        # input is a column of a pandas dataframe expected to contain the same value
+        # in every row (like the x-coordinate of a well)
+        # This function returns that value and checks they are all the same
+
+        if not np.all(column == column[0]):
+            raise ValueError("error while converting pandas column to scalar")
+        return float(column[0])
 
 
 class WellDisStructured(DisStructuredBoundaryCondition):
