@@ -156,6 +156,42 @@ def test_to_mf6_pkg__high_lvl_transient(basic_dis, well_high_lvl_test_data_trans
     np.testing.assert_equal(mf6_ds["rate"].values, rate_expected)
 
 
+def test_to_mf6_pkg__logging(basic_dis, well_high_lvl_test_data_transient):
+    # Arrange
+    idomain, top, bottom = basic_dis
+    wel = imod.mf6.Well(*well_high_lvl_test_data_transient)
+    active = idomain == 1
+    k = xr.ones_like(idomain)
+
+    cellid_expected = np.array(
+        [
+            [2, 3, 7],
+            [2, 4, 7],
+            [2, 3, 6],
+            [2, 4, 6],
+        ],
+        dtype=np.int64,
+    )
+
+    make_inactive = np.array(
+        [
+            [1, 1, 9],
+            [1, 2, 9],
+            [1, 1, 8],
+            [1, 2, 8],
+        ])
+    for inactive in make_inactive:
+        active.values[inactive[0]-1, inactive[1]-1, inactive[2]-1]= 0
+
+
+    # Act
+    mf6_wel = wel.to_mf6_pkg(active, top, bottom, k)
+    mf6_ds = mf6_wel.dataset
+
+    # Assert
+    np.testing.assert_equal(mf6_ds["cellid"].values, cellid_expected)
+
+
 @pytest.mark.parametrize("save_flows", [True, False])
 @pytest.mark.parametrize("print_input", [True, False])
 @pytest.mark.parametrize("print_flows", [True, False])
