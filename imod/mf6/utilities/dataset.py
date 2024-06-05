@@ -36,8 +36,8 @@ def remove_inactive(ds: xr.Dataset, active: xr.DataArray) -> xr.Dataset:
     cellid_zero_based = ds["cellid"].values - 1
     cellid_indexes = unstack_columns(cellid_zero_based)
     valid = active.values[cellid_indexes].astype(bool)
-    active_ds = ds.loc[{"ncellid": valid}]
-    return active_ds
+
+    return ds.loc[{"ncellid": valid}]
 
 
 def is_dataarray_none(datarray: Any) -> bool:
