@@ -7,6 +7,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 
@@ -192,3 +193,15 @@ def test_write_concentration_period_data(head_fc, concentration_fc):
             assert (
                 data.count("2") == 1755
             )  # the number 2 is in the concentration data, and in the cell indices.
+
+@pytest.mark.usefixtures("imod5_dataset")
+def test_from_imod5(imod5_dataset, tmp_path):
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset) 
+
+    my_chd = imod.mf6.ConstantHead.from_imod5_data(
+        "chd-3",
+        imod5_dataset,
+        target_dis,
+        regridder_types=None,
+    )
+    assert my_chd is not None

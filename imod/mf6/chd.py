@@ -1,10 +1,17 @@
+from dataclasses import asdict
+from typing import Optional
 import numpy as np
 
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.regrid.regrid_schemes import ConstantHeadRegridMethod
+from imod.mf6.npf import NodePropertyFlow
+from imod.mf6.regrid.regrid_schemes import ConstantHeadRegridMethod, RegridMethodType
+from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
+from imod.prepare.topsystem.allocation import ALLOCATION_OPTION
+from imod.prepare.topsystem.conductance import DISTRIBUTING_OPTION
 from imod.schemata import (
     AllInsideNoDataSchema,
     AllNoDataSchema,
@@ -15,6 +22,7 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
+from imod.typing import GridDataArray
 
 
 class ConstantHead(BoundaryCondition, IRegridPackage):
@@ -141,3 +149,34 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
+    
+    @classmethod
+    def from_imod5_data(
+        cls,
+        key: str,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        target_discretization: StructuredDiscretization,
+        regridder_types: Optional[RegridMethodType] = None,
+    ) -> "ConstantHead":
+        
+        target_idomain = target_discretization.dataset["idomain"]
+
+        data = {
+            "head": imod5_data[key]["head"],
+        }
+        ibound = imod5_data["bnd"]["ibound"]
+        data["head"] = data["head"].where(ibound  < 0)
+
+        if regridder_types is None:
+            regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
+        else:
+            regridder_settings = asdict(regridder_types, dict_factory=dict)
+
+        regrid_context = RegridderWeightsCache()
+
+        regridded_package_data = _regrid_package_data(
+            data, target_idomain, regridder_settings, regrid_context, {}
+        )
+
+
+        return ConstantHead(**regridded_package_data)       

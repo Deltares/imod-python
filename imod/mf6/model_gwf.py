@@ -244,4 +244,15 @@ class GroundwaterFlowModel(Modflow6Model):
             )
             result[drn_key] = drn_pkg
 
+        # import constant head boundaries
+        imod5_keys = list(imod5_data.keys())
+        chd_keys = [key for key in imod5_keys if key[0:3] == "chd"]
+        for chd_key in chd_keys:
+            chd_pkg = ConstantHead.from_imod5_data(
+                chd_key,
+                imod5_data,
+                dis_pkg,
+                regridder_types=regridder_types,
+            )
+            result[chd_key] = chd_pkg
         return result
