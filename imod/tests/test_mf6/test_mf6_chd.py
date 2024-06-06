@@ -194,14 +194,17 @@ def test_write_concentration_period_data(head_fc, concentration_fc):
                 data.count("2") == 1755
             )  # the number 2 is in the concentration data, and in the cell indices.
 
+
 @pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5(imod5_dataset, tmp_path):
-    target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset) 
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset)
 
-    my_chd = imod.mf6.ConstantHead.from_imod5_data(
+    chd_layer_3 = imod.mf6.ConstantHead.from_imod5_data(
         "chd-3",
         imod5_dataset,
         target_dis,
         regridder_types=None,
     )
-    assert my_chd is not None
+    errors = chd_layer_3._validate(imod.mf6.ConstantHead._write_schemata, idomain=target_dis["idomain"])
+    errors.update (chd_layer_3._validate(imod.mf6.ConstantHead._init_schemata))
+    assert len(errors) == 0
