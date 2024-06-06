@@ -405,8 +405,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         """
         Create dataset with all variables (rate, concentration), with a similar shape as the cellids.
         """
-        data_vars = ["id"]
-        data_vars.append("rate")
+        data_vars = ["id", "rate"]
         if "concentration" in wells_assigned.columns:
             data_vars.append("concentration")
 
