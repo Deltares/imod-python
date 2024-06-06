@@ -205,6 +205,8 @@ def test_from_imod5(imod5_dataset, tmp_path):
         target_dis,
         regridder_types=None,
     )
-    errors = chd_layer_3._validate(imod.mf6.ConstantHead._write_schemata, idomain=target_dis["idomain"])
-    errors.update (chd_layer_3._validate(imod.mf6.ConstantHead._init_schemata))
+    errors = chd_layer_3._validate(
+        imod.mf6.ConstantHead._write_schemata, idomain=target_dis["idomain"]
+    )
+    errors.update(chd_layer_3._validate(imod.mf6.ConstantHead._init_schemata))
     assert len(errors) == 0
