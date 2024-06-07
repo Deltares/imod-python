@@ -6,6 +6,14 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+
+[Unreleased- feature branch]
+----------------------------
+
+Changed
+~~~~~~~
+- :class:`imod.mf6.Well` now also validates that well filter top is above well filter bottom
+
 [Unreleased]
 ------------
 
