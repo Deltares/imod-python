@@ -1089,17 +1089,16 @@ class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         if len(hfb_keys) ==0:
             raise ValueError("no hfb keys present.")
         
-        first = True
+        compound_dataframe = None
         for hfb_key in hfb_keys:
             hfb_dict = imod5_data[hfb_key]
             if not list(hfb_dict.keys()) == ["geodataframe", "layer"]:
                 raise ValueError("hfb is not a LayeredHorizontalFlowBarrierResistance")
             layer = hfb_dict["layer"]
-            geometry_layer = deepcopy(hfb_dict["geodataframe"])
+            geometry_layer = hfb_dict["geodataframe"]
             geometry_layer["layer"] = layer
-            if first:
+            if compound_dataframe is None:
                 compound_dataframe = geometry_layer
-                first = False
             else:
                 compound_dataframe = compound_dataframe._append(geometry_layer)
 

@@ -452,7 +452,7 @@ def test_hfb_from_imod5(imod5_dataset, tmp_path):
     )
 
     hfb = LayeredHorizontalFlowBarrierResistance.from_imod5_dataset(imod5_dataset)
-    hfb_pack = hfb.to_mf6_pkg(
+    hfb_package = hfb.to_mf6_pkg(
         target_dis["idomain"], target_dis["top"], target_dis["bottom"], target_npf["k"]
     )
-    pass
+    assert list(np.unique(hfb_package["layer"].values)) == [3, 21]
