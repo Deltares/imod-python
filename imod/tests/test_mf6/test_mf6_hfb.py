@@ -16,7 +16,9 @@ from imod.mf6 import (
     LayeredHorizontalFlowBarrierMultiplier,
     LayeredHorizontalFlowBarrierResistance,
 )
+from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.hfb import to_connected_cells_dataset
+from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
 from imod.typing.grid import ones_like
@@ -440,3 +442,17 @@ def test_set_options(print_input, parameterizable_basic_dis):
     k = ones_like(top)
     mf6_package = hfb.to_mf6_pkg(idomain, top, bottom, k)
     assert mf6_package.dataset["print_input"].values[()] == print_input
+
+
+@pytest.mark.usefixtures("imod5_dataset")
+def test_hfb_from_imod5(imod5_dataset, tmp_path):
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset)
+    target_npf = NodePropertyFlow.from_imod5_data(
+        imod5_dataset, target_dis.dataset["idomain"]
+    )
+
+    hfb = LayeredHorizontalFlowBarrierResistance.from_imod5_dataset(imod5_dataset)
+    hfb_pack = hfb.to_mf6_pkg(
+        target_dis["idomain"], target_dis["top"], target_dis["bottom"], target_npf["k"]
+    )
+    pass

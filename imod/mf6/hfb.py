@@ -1080,5 +1080,25 @@ class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
             edge_index,
             idomain,
         )
-
         return barrier_values
+
+    @classmethod
+    def from_imod5_dataset(cls, imod5_data: dict[str, dict[str, GridDataArray]]):
+        imod5_keys = list(imod5_data.keys())
+        hfb_keys = [key for key in imod5_keys if key[0:3] == "hfb"]
+
+        first = True
+        for hfb_key in hfb_keys:
+            hfb_dict = imod5_data[hfb_key]
+            if not list(hfb_dict.keys()) == ["geodataframe", "layer"]:
+                raise ValueError
+            layer = hfb_dict["layer"]
+            geometry_layer = deepcopy(hfb_dict["geodataframe"])
+            geometry_layer["layer"] = layer
+            if first:
+                compound_dataframe = deepcopy(geometry_layer)
+                first = False
+            else:
+                compound_dataframe = compound_dataframe._append(geometry_layer)
+
+        return LayeredHorizontalFlowBarrierResistance(compound_dataframe)
