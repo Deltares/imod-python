@@ -1086,9 +1086,9 @@ class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     def from_imod5_dataset(cls, imod5_data: dict[str, dict[str, GridDataArray]]):
         imod5_keys = list(imod5_data.keys())
         hfb_keys = [key for key in imod5_keys if key[0:3] == "hfb"]
-        if len(hfb_keys) ==0:
+        if len(hfb_keys) == 0:
             raise ValueError("no hfb keys present.")
-        
+
         compound_dataframe = None
         for hfb_key in hfb_keys:
             hfb_dict = imod5_data[hfb_key]
