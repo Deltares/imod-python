@@ -1095,6 +1095,10 @@ class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
             if not list(hfb_dict.keys()) == ["geodataframe", "layer"]:
                 raise ValueError("hfb is not a LayeredHorizontalFlowBarrierResistance")
             layer = hfb_dict["layer"]
+            if layer == 0:
+                raise ValueError(
+                    "assigning to layer 0 is not supported yet for import of HFB's"
+                )
             geometry_layer = hfb_dict["geodataframe"]
             geometry_layer["layer"] = layer
             if compound_dataframe is None:
