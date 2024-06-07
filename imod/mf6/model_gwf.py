@@ -15,8 +15,9 @@ from imod.mf6.ic import InitialConditions
 from imod.mf6.model import Modflow6Model
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.rch import Recharge
+from imod.mf6.regrid.regrid_schemes import RegridMethodType
+from imod.mf6.riv import River
 from imod.mf6.sto import StorageCoefficient
-from imod.mf6.utilities.regridding_types import RegridderType
 from imod.prepare.topsystem.default_allocation_methods import (
     SimulationAllocationOptions,
     SimulationDistributingOptions,
@@ -173,7 +174,7 @@ class GroundwaterFlowModel(Modflow6Model):
         imod5_data: dict[str, dict[str, GridDataArray]],
         allocation_options: SimulationAllocationOptions,
         distributing_options: SimulationDistributingOptions,
-        regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
+        regridder_types: Optional[RegridMethodType] = None,
     ) -> "GroundwaterFlowModel":
         """
         Imports a GroundwaterFlowModel (GWF) from the data in an IMOD5 project file.
@@ -206,6 +207,7 @@ class GroundwaterFlowModel(Modflow6Model):
         """
         # first import the singleton packages
         # import discretization
+
         dis_pkg = StructuredDiscretization.from_imod5_data(imod5_data, regridder_types)
         grid = dis_pkg.dataset["idomain"]
 
@@ -244,4 +246,19 @@ class GroundwaterFlowModel(Modflow6Model):
             )
             result[drn_key] = drn_pkg
 
+        # import rivers ( and drainage to account for infiltration factor)
+        riv_keys = [key for key in imod5_keys if key[0:3] == "riv"]
+        for riv_key in riv_keys:
+            riv_pkg, drn_pkg = River.from_imod5_data(
+                riv_key,
+                imod5_data,
+                dis_pkg,
+                allocation_options.riv,
+                distributing_options.riv,
+                regridder_types,
+            )
+            if riv_pkg is not None:
+                result[riv_key + "riv"] = riv_pkg
+            if drn_pkg is not None:
+                result[riv_key + "drn"] = drn_pkg
         return result
