@@ -485,5 +485,5 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
 
     simulation.create_time_discretization(["01-01-2003", "02-01-2003"])
 
-    # write and validate the simulation
-    simulation.write(tmp_path, False, True, False)
+    # write and validate the simulation.
+    simulation.write(tmp_path, binary=False, validate=True)

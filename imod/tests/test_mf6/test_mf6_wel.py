@@ -1,4 +1,5 @@
 import pathlib
+import sys
 import tempfile
 import textwrap
 from contextlib import nullcontext as does_not_raise
@@ -10,6 +11,8 @@ import xugrid as xu
 from pytest_cases import parametrize_with_cases
 
 import imod
+from imod.logging.config import LoggerType
+from imod.logging.loglevel import LogLevel
 from imod.mf6.utilities.grid import broadcast_to_full_domain
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
@@ -177,6 +180,110 @@ def test_to_mf6_pkg__high_lvl_transient(basic_dis, well_high_lvl_test_data_trans
     np.testing.assert_equal(mf6_ds.coords["nmax_cellid"].values, nmax_cellid_expected)
     np.testing.assert_equal(mf6_ds["cellid"].values, cellid_expected)
     np.testing.assert_equal(mf6_ds["rate"].values, rate_expected)
+
+
+def test_to_mf6_pkg__logging_with_message(
+    tmp_path, basic_dis, well_high_lvl_test_data_transient
+):
+    # Arrange
+    logfile_path = tmp_path / "logfile.txt"
+    idomain, top, bottom = basic_dis
+    modified_well_fixture = list(well_high_lvl_test_data_transient)
+
+    # create an idomain where layer 1 is active and layer 2 and 3 are inactive.
+    # layer 1 has a bottom at -6, layer 2 at -35 and layer 3 at -120
+    # so only wells that have a filter top above -6 will end up in the simulation
+    active = idomain == 1
+
+    active.loc[1, :, :] = True
+    active.loc[2:, :, :] = False
+
+    # modify the well filter top and filter bottoms so that
+    # well 0 is not placed
+    # well 1 is partially placed
+    # well 2 is fully placed
+    # well 3 is partially placed
+    # wells 4 to 7 are nog placed
+    modified_well_fixture[2] = [
+        -6.0,
+        -3.0,
+        0.0,
+        0.0,
+        -6.0,
+        -6.0,
+        -6.0,
+        -6.0,
+    ]
+    modified_well_fixture[3] = [
+        -102.0,
+        -102.0,
+        -6,
+        -102.0,
+        -1020.0,
+        -1020.0,
+        -1020.0,
+        -1020.0,
+    ]
+
+    with open(logfile_path, "w") as sys.stdout:
+        imod.logging.configure(
+            LoggerType.PYTHON,
+            log_level=LogLevel.DEBUG,
+            add_default_file_handler=False,
+            add_default_stream_handler=True,
+        )
+
+        wel = imod.mf6.Well(*modified_well_fixture)
+
+        k = xr.ones_like(idomain)
+        _ = wel.to_mf6_pkg(active, top, bottom, k)
+
+    # the wells that were fully or partially placed should not appear in the log message
+    # but all the wells that are completely left out should be listed
+    with open(logfile_path, "r") as log_file:
+        log = log_file.read()
+        assert "Some wells were not placed" in log
+        assert "id = 1" not in log
+        assert "id = 2" not in log
+        assert "id = 3" not in log
+        assert "id = 0" in log
+        assert "id = 4" in log
+        assert "id = 5" in log
+        assert "id = 6" in log
+        assert "id = 7" in log
+
+
+def test_to_mf6_pkg__logging_without_message(
+    tmp_path, basic_dis, well_high_lvl_test_data_transient
+):
+    # This test activates logging, and then converts a high level well package to
+    # an MF6 package, in such a way that all the wells can be placed.
+    # Logging is active, and the log file should not include the "Some wells were not placed"
+    # message
+    logfile_path = tmp_path / "logfile.txt"
+    idomain, top, bottom = basic_dis
+
+    with open(logfile_path, "w") as sys.stdout:
+        imod.logging.configure(
+            LoggerType.PYTHON,
+            log_level=LogLevel.DEBUG,
+            add_default_file_handler=False,
+            add_default_stream_handler=True,
+        )
+
+        wel = imod.mf6.Well(*well_high_lvl_test_data_transient)
+        active = idomain == 1
+        k = xr.ones_like(idomain)
+
+        active.loc[1, :, :] = True
+        active.loc[2:, :, :] = True
+
+        # Act
+        _ = wel.to_mf6_pkg(active, top, bottom, k)
+
+    with open(logfile_path, "r") as log_file:
+        log = log_file.read()
+        assert "Some wells were not placed" not in log
 
 
 @pytest.mark.parametrize("save_flows", [True, False])
