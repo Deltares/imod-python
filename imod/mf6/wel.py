@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import textwrap
 import warnings
 from typing import Any, Optional, Tuple, Union
 
@@ -11,7 +12,8 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-from imod.logging import init_log_decorator
+from imod.logging import init_log_decorator, logger
+from imod.logging.loglevel import LogLevel
 from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6.boundary_condition import (
     BoundaryCondition,
@@ -414,7 +416,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         """
         Create dataset with all variables (rate, concentration), with a similar shape as the cellids.
         """
-        data_vars = ["rate"]
+        data_vars = ["id", "rate"]
         if "concentration" in wells_assigned.columns:
             data_vars.append("concentration")
 
@@ -548,9 +550,6 @@ class Well(BoundaryCondition, IPointDataPackage):
 
         Parameters
         ----------
-        is_partitioned: bool
-        validate: bool
-            Run validation before converting
         active: {xarry.DataArray, xugrid.UgridDataArray}
             Grid with active cells.
         top: {xarry.DataArray, xugrid.UgridDataArray}
@@ -559,6 +558,11 @@ class Well(BoundaryCondition, IPointDataPackage):
             Grid with bottom of model layers.
         k: {xarry.DataArray, xugrid.UgridDataArray}
             Grid with hydraulic conductivities.
+        validate: bool
+            Run validation before converting
+        is_partitioned: bool
+            Set to true if model has been partitioned
+
         Returns
         -------
         Mf6Wel
@@ -574,11 +578,11 @@ class Well(BoundaryCondition, IPointDataPackage):
         minimum_thickness = self.dataset["minimum_thickness"].item()
 
         wells_df = self.__create_wells_df()
+        nwells_df = len(wells_df["id"].unique())
         wells_assigned = self.__create_assigned_wells(
             wells_df, active, top, bottom, k, minimum_k, minimum_thickness
         )
 
-        nwells_df = len(wells_df["id"].unique())
         nwells_assigned = (
             0 if wells_assigned.empty else len(wells_assigned["id"].unique())
         )
@@ -602,7 +606,30 @@ class Well(BoundaryCondition, IPointDataPackage):
         ds["print_flows"] = self["print_flows"].values[()]
         ds["print_input"] = self["print_input"].values[()]
 
+        filtered_wells = [
+            id for id in wells_df["id"].unique() if id not in ds["id"].values
+        ]
+        if len(filtered_wells) > 0:
+            message = self.to_mf6_package_information(filtered_wells)
+            logger.log(loglevel=LogLevel.WARNING, message=message, additional_depth=2)
+
+        ds = ds.drop_vars("id")
+
         return Mf6Wel(**ds.data_vars)
+
+    def to_mf6_package_information(self, filtered_wells):
+        message = textwrap.dedent(
+            """Some wells were not placed in the MF6 well package. This 
+            can be due to inactive cells or permeability/thickness constraints.\n"""
+        )
+        if len(filtered_wells) < 10:
+            message += "The filtered wells are: \n"
+        else:
+            message += " The first 10 unplaced wells are: \n"
+
+        for i in range(min(10, len(filtered_wells))):
+            message += f" id = {filtered_wells[i]} x = {self.dataset['x'][int(filtered_wells[i])].values[()]}  y = {self.dataset['y'][int(filtered_wells[i])].values[()]} \n"
+        return message
 
     def mask(self, domain: GridDataArray) -> Well:
         """
