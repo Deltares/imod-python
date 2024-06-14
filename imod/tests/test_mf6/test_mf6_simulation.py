@@ -479,7 +479,7 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
         default_simulation_distributing_options,
     )
 
-    simulation["imported_model"]["output"] = OutputControl(
+    simulation["imported_model"]["oc"] = OutputControl(
         save_head="last", save_budget="last"
     )
 
