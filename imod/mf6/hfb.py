@@ -4,10 +4,11 @@ import textwrap
 import typing
 from copy import deepcopy
 from enum import Enum
-from typing import TYPE_CHECKING, Optional, Tuple
+from typing import TYPE_CHECKING, List, Optional, Tuple
 
 import cftime
 import numpy as np
+import pandas as pd
 import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
@@ -1089,7 +1090,7 @@ class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         if len(hfb_keys) == 0:
             raise ValueError("no hfb keys present.")
 
-        compound_dataframe = None
+        dataframe_ls: List[gpd.GeoDataFrame] = []
         for hfb_key in hfb_keys:
             hfb_dict = imod5_data[hfb_key]
             if not list(hfb_dict.keys()) == ["geodataframe", "layer"]:
@@ -1101,9 +1102,7 @@ class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
                 )
             geometry_layer = hfb_dict["geodataframe"]
             geometry_layer["layer"] = layer
-            if compound_dataframe is None:
-                compound_dataframe = geometry_layer
-            else:
-                compound_dataframe = compound_dataframe._append(geometry_layer)
+            dataframe_ls.append(geometry_layer)
+        compound_dataframe = pd.concat(dataframe_ls, ignore_index=True)
 
         return LayeredHorizontalFlowBarrierResistance(compound_dataframe)
