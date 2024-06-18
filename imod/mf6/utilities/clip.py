@@ -83,14 +83,15 @@ def _filter_inactive_cells(package, active):
     for var in package_vars:
         if package_vars[var].shape != ():
             if is_spatial_grid(package.dataset[var]):
-                if np.issubdtype(package.dataset[var].dtype, np.integer):
-                    package.dataset[var] = package.dataset[var].where(
-                        active > 0, other=0
-                    )
-                else:
-                    package.dataset[var] = package.dataset[var].where(
-                        active > 0, other=np.nan
-                    )
+                other = (
+                    0
+                    if np.issubdtype(package.dataset[var].dtype, np.integer)
+                    else np.nan
+                )
+
+                package.dataset[var] = package.dataset[var].where(
+                    active > 0, other=other
+                )
 
 
 @typedispatch  # type: ignore[no-redef]

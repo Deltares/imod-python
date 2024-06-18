@@ -273,13 +273,13 @@ def create_connection_data(lakes):
         )
         cell_ids.append(cell_id)
 
-    connection_data_da = {
+    connection_data_dict = {
         k: xr.DataArray(data=np.concatenate(v), dims=[CONNECTION_DIM])
         for k, v in connection_data.items()
     }
 
-    connection_data_da["connection_cell_id"] = xr.concat(cell_ids, dim=CONNECTION_DIM)
-    return connection_data_da
+    connection_data_dict["connection_cell_id"] = xr.concat(cell_ids, dim=CONNECTION_DIM)
+    return connection_data_dict
 
 
 def create_outlet_data(outlets, name_to_number):
@@ -323,10 +323,10 @@ def create_outlet_data(outlets, name_to_number):
                 value = np.nan
             outlet_data[f"outlet_{var}"].append(value)
 
-    outlet_data_da = {
+    outlet_data_dict = {
         k: xr.DataArray(data=v, dims=[OUTLET_DIM]) for k, v in outlet_data.items()
     }
-    return outlet_data_da
+    return outlet_data_dict
 
 
 def concatenate_timeseries(list_of_lakes_or_outlets, timeseries_name):
@@ -348,14 +348,16 @@ def concatenate_timeseries(list_of_lakes_or_outlets, timeseries_name):
                 list_of_indices.append(index + 1)
 
         index = index + 1
+
     if len(list_of_dataarrays) == 0:
         return None
-    if not pd.api.types.is_numeric_dtype(list_of_dataarrays[0].dtype):
-        out = xr.concat(list_of_dataarrays, join="outer", dim="index", fill_value="")
-    else:
-        out = xr.concat(
-            list_of_dataarrays, join="outer", dim="index", fill_value=np.nan
-        )
+
+    fill_value = (
+        "" if not pd.api.types.is_numeric_dtype(list_of_dataarrays[0].dtype) else np.nan
+    )
+    out = xr.concat(
+        list_of_dataarrays, join="outer", dim="index", fill_value=fill_value
+    )
 
     out = out.assign_coords(index=list_of_indices)
     return out
