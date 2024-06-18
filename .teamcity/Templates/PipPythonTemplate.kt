@@ -18,7 +18,7 @@ object PipPythonTemplate : Template({
 
     steps {
         script {
-            name = "Pip install python %python_env%"
+            name = "Pip install python"
             id = "pip_install"
             workingDir = "imod-python"
             scriptContent = """
@@ -36,9 +36,9 @@ object PipPythonTemplate : Template({
         matrix {
             param(
                 "python_env", listOf(
-                    value("py310", label = "3.10"),
-                    value("py311", label = "3.11"),
-                    value("py312", label = "3.12")
+                    value("py310", label = "python 3.10"),
+                    value("py311", label = "python 3.11"),
+                    value("py312", label = "python 3.12")
                 )
             )
         }
