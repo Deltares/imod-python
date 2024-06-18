@@ -18,9 +18,7 @@ object MainProject : Project({
     buildType(MyPy)
     buildType(UnitTests)
     buildType(Examples)
-    buildType(PipPython310)
-    buildType(PipPython311)
-    buildType(PipPython312)
+    buildType(PipPython)
     buildType(Tests)
 
     template(GitHubIntegrationTemplate)
@@ -28,9 +26,7 @@ object MainProject : Project({
     template(MyPyTemplate)
     template(UnitTestsTemplate)
     template(ExamplesTemplate)
-    template(PipPython310Template)
-    template(PipPython311Template)
-    template(PipPython312Template)
+    template(PipPythonTemplates)
 
     features {
         buildTypeCustomChart {
@@ -129,22 +125,10 @@ object Examples : BuildType({
     }
 })
 
-object PipPython310 : BuildType({
-    name = "PipPython310"
+object PipPython : BuildType({
+    name = "PipPython"
 
-    templates(PipPython310Template, GitHubIntegrationTemplate)
-})
-
-object PipPython311 : BuildType({
-    name = "PipPython311"
-
-    templates(PipPython311Template, GitHubIntegrationTemplate)
-})
-
-object PipPython312 : BuildType({
-    name = "PipPython312"
-
-    templates(PipPython312Template, GitHubIntegrationTemplate)
+    templates(PipPythonTemplates, GitHubIntegrationTemplate)
 })
 
 object Tests : BuildType({
@@ -181,13 +165,7 @@ object Tests : BuildType({
     }
 
     dependencies {
-        snapshot(PipPython310) {
-            onDependencyFailure = FailureAction.FAIL_TO_START
-        }
-        snapshot(PipPython311) {
-            onDependencyFailure = FailureAction.FAIL_TO_START
-        }
-        snapshot(PipPython312) {
+        snapshot(PipPython) {
             onDependencyFailure = FailureAction.FAIL_TO_START
         }
         snapshot(Examples) {

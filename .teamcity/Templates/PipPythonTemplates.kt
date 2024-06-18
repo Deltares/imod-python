@@ -3,37 +3,10 @@ package Templates
 import jetbrains.buildServer.configs.kotlin.DslContext
 import jetbrains.buildServer.configs.kotlin.Template
 import jetbrains.buildServer.configs.kotlin.buildSteps.script
+import jetbrains.buildServer.configs.kotlin.matrix
 
-object PipPython310Template : Template({
-    name = "PipPython310Template"
-
-    detectHangingBuilds = false
-
-    vcs {
-        root(DslContext.settingsRoot, "+:. => imod-python")
-
-        cleanCheckout = true
-    }
-
-    steps {
-        script {
-            name = "Pip install python 3.10"
-            id = "pip_install_py310"
-            workingDir = "imod-python"
-            scriptContent = """
-                    pixi run --environment py310 --frozen test_import
-                """.trimIndent()
-            formatStderrAsError = true
-        }
-    }
-
-    requirements {
-        equals("env.OS", "Windows_NT")
-    }
-})
-
-object PipPython311Template : Template({
-    name = "PipPython311Template"
+object PipPythonTemplates : Template({
+    name = "PipPythonTemplate"
 
     detectHangingBuilds = false
 
@@ -45,11 +18,11 @@ object PipPython311Template : Template({
 
     steps {
         script {
-            name = "Pip install python 3.11"
-            id = "pip_install_py311"
+            name = "Pip install python %python_env%"
+            id = "pip_install"
             workingDir = "imod-python"
             scriptContent = """
-                    pixi run --environment py311 --frozen test_import
+                    pixi run --environment %python_env% --frozen test_import
                 """.trimIndent()
             formatStderrAsError = true
         }
@@ -58,32 +31,16 @@ object PipPython311Template : Template({
     requirements {
         equals("env.OS", "Windows_NT")
     }
-})
 
-object PipPython312Template : Template({
-    name = "PipPython312Template"
-
-    detectHangingBuilds = false
-
-    vcs {
-        root(DslContext.settingsRoot, "+:. => imod-python")
-
-        cleanCheckout = true
-    }
-
-    steps {
-        script {
-            name = "Pip install python 3.12"
-            id = "pip_install_py312"
-            workingDir = "imod-python"
-            scriptContent = """
-                    pixi run --environment py312 --frozen test_import
-                """.trimIndent()
-            formatStderrAsError = true
+    features {
+        matrix {
+            param(
+                "python_env", listOf(
+                    value("py310", label = "3.10"),
+                    value("py311", label = "3.11"),
+                    value("py312", label = "3.12")
+                )
+            )
         }
-    }
-
-    requirements {
-        equals("env.OS", "Windows_NT")
     }
 })
