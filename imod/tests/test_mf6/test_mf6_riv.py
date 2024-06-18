@@ -10,8 +10,12 @@ import xugrid as xu
 from pytest_cases import parametrize_with_cases
 
 import imod
+from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.write_context import WriteContext
+from imod.prepare.topsystem.allocation import ALLOCATION_OPTION
+from imod.prepare.topsystem.conductance import DISTRIBUTING_OPTION
 from imod.schemata import ValidationError
+from imod.typing.grid import ones_like, zeros_like
 
 
 @pytest.fixture(scope="function")
@@ -387,3 +391,76 @@ def test_write_concentration_period_data(concentration_fc):
             assert (
                 data.count("2") == 1755
             )  # the number 2 is in the concentration data, and in the cell indices.
+
+
+@pytest.mark.usefixtures("imod5_dataset")
+def test_import_river_from_imod5(imod5_dataset, tmp_path):
+    globaltimes = [np.datetime64("2000-01-01")]
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset)
+
+    (riv, drn) = imod.mf6.River.from_imod5_data(
+        "riv-1",
+        imod5_dataset,
+        target_dis,
+        ALLOCATION_OPTION.at_elevation,
+        DISTRIBUTING_OPTION.by_crosscut_thickness,
+        regridder_types=None,
+    )
+
+    write_context = WriteContext(simulation_directory=tmp_path)
+    riv.write("riv", globaltimes, write_context)
+    drn.write("drn", globaltimes, write_context)
+
+    errors = riv._validate(
+        imod.mf6.River._write_schemata,
+        idomain=target_dis.dataset["idomain"],
+        bottom=target_dis.dataset["bottom"],
+    )
+    assert len(errors) == 0
+
+    errors = drn._validate(
+        imod.mf6.Drainage._write_schemata,
+        idomain=target_dis.dataset["idomain"],
+        bottom=target_dis.dataset["bottom"],
+    )
+    assert len(errors) == 0
+
+
+@pytest.mark.usefixtures("imod5_dataset")
+def test_import_river_from_imod5_infiltration_factors(imod5_dataset):
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset)
+
+    original_infiltration_factor = imod5_dataset["riv-1"]["infiltration_factor"]
+    imod5_dataset["riv-1"]["infiltration_factor"] = ones_like(
+        original_infiltration_factor
+    )
+
+    (riv, drn) = imod.mf6.River.from_imod5_data(
+        "riv-1",
+        imod5_dataset,
+        target_dis,
+        ALLOCATION_OPTION.at_elevation,
+        DISTRIBUTING_OPTION.by_crosscut_thickness,
+        regridder_types=None,
+    )
+
+    assert riv is not None
+    assert drn is None
+
+    imod5_dataset["riv-1"]["infiltration_factor"] = zeros_like(
+        original_infiltration_factor
+    )
+    (riv, drn) = imod.mf6.River.from_imod5_data(
+        "riv-1",
+        imod5_dataset,
+        target_dis,
+        ALLOCATION_OPTION.at_elevation,
+        DISTRIBUTING_OPTION.by_crosscut_thickness,
+        regridder_types=None,
+    )
+
+    assert riv is None
+    assert drn is not None
+
+    # teardown
+    imod5_dataset["riv-1"]["infiltration_factor"] = original_infiltration_factor
