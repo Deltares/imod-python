@@ -5,7 +5,7 @@ import jetbrains.buildServer.configs.kotlin.Template
 import jetbrains.buildServer.configs.kotlin.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.matrix
 
-object PipPythonTemplates : Template({
+object PipPythonTemplate : Template({
     name = "PipPythonTemplate"
 
     detectHangingBuilds = false

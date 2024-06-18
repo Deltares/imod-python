@@ -26,7 +26,7 @@ object MainProject : Project({
     template(MyPyTemplate)
     template(UnitTestsTemplate)
     template(ExamplesTemplate)
-    template(PipPythonTemplates)
+    template(PipPythonTemplate)
 
     features {
         buildTypeCustomChart {
@@ -128,7 +128,7 @@ object Examples : BuildType({
 object PipPython : BuildType({
     name = "PipPython"
 
-    templates(PipPythonTemplates, GitHubIntegrationTemplate)
+    templates(PipPythonTemplate, GitHubIntegrationTemplate)
 })
 
 object Tests : BuildType({

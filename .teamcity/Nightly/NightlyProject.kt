@@ -28,7 +28,7 @@ object NightlyLint : BuildType({
 object NightlyPipPython : BuildType({
     name = "PipPython"
 
-    templates(PipPythonTemplates)
+    templates(PipPythonTemplate)
 })
 
 object NightlyMyPy : BuildType({
