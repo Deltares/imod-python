@@ -13,8 +13,8 @@ import xugrid as xu
 
 import imod
 from imod.logging import init_log_decorator, logger
-from imod.logging.loglevel import LogLevel
 from imod.logging.logging_decorators import standard_log_decorator
+from imod.logging.loglevel import LogLevel
 from imod.mf6.boundary_condition import (
     BoundaryCondition,
     DisStructuredBoundaryCondition,
