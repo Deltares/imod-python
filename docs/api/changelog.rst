@@ -9,6 +9,11 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Fixed
+~~~~~
+- :func:`imod.formats.prj.open_projectfile_data` now reports the path to a
+  faulty IPF or IDF file in the error message.
+
 Added
 ~~~~~
 - Added objects with regrid settings. These can be used to provide custom
