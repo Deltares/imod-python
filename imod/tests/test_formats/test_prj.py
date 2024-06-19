@@ -542,7 +542,7 @@ class TestProjectFile:
         wellpath.rename(wellpath_backup)
         with open(wellpath, mode="w") as f:
             f.write("!@#$(!())\n#*@*!(!())")
-        
+
         with pytest.raises(ValueError, match="wells_l2.ipf"):
             imod.prj.open_projectfile_data(self.prj_path)
 
