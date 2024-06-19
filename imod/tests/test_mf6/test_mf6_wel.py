@@ -11,6 +11,7 @@ import xugrid as xu
 from pytest_cases import parametrize_with_cases
 
 import imod
+from imod.formats.prj.prj import open_projectfile_data
 from imod.logging.config import LoggerType
 from imod.logging.loglevel import LogLevel
 from imod.mf6.dis import StructuredDiscretization
@@ -18,6 +19,7 @@ from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.utilities.grid import broadcast_to_full_domain
 from imod.mf6.wel import Well
 from imod.mf6.write_context import WriteContext
+from imod.prepare.topsystem.default_allocation_methods import SimulationAllocationOptions, SimulationDistributingOptions
 from imod.schemata import ValidationError
 from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
 
@@ -828,3 +830,19 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
     assert wel.dataset["x"].values[0] == 197910.0
     assert wel.dataset["y"].values[0] == 362860.0
     assert np.mean(wel.dataset["rate"].values) == -323.8936170212766
+
+
+
+def test_import_from_imod5_hendrik(tmp_path):
+
+    default_simulation_allocation_options = SimulationAllocationOptions
+    default_simulation_distributing_options = SimulationDistributingOptions
+
+    prj_path = pathlib.Path("D:\\tmp\\van_hendrik\\GRAM3.1_prj\\3_1_NSTAT_RIV_mf6_edit_jh.prj")
+    imod5dict = open_projectfile_data(prj_path)
+
+    wel2 = imod.mf6.Well.from_imod5_data("wel-3", imod5dict[0])
+
+
+    pass
+

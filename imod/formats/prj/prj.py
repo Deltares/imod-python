@@ -806,9 +806,8 @@ def _read_package_ipf(
                 df_assoc["x"] = row[1]
                 df_assoc["y"] = row[2]
                 df_assoc["id"] = path_assoc.stem
-                if "filt_top" in row._fields and "filt_bot" in row._fields:
-                    df_assoc["filt_top"] = row.filt_top
-                    df_assoc["filt_bot"] = row.filt_bot
+                df_assoc["filt_top"] = row[4]
+                df_assoc["filt_bot"] = row[5]
                 dfs.append(df_assoc)
             df = pd.concat(dfs, ignore_index=True, sort=False)
         df["rate"] = df["rate"] * factor + addition

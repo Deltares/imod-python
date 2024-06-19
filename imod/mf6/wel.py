@@ -655,25 +655,59 @@ class Well(BoundaryCondition, IPointDataPackage):
         minimum_k: float = 0.1,
         minimum_thickness: float = 1.0,
     ) -> "Well":
-        wel_x = cls.panda_column_to_scalar(imod5_data[key]["dataframe"]["x"])
-        wel_y = cls.panda_column_to_scalar(imod5_data[key]["dataframe"]["y"])
-        wel_top = cls.panda_column_to_scalar(imod5_data[key]["dataframe"]["filt_top"])
-        wel_bot = cls.panda_column_to_scalar(imod5_data[key]["dataframe"]["filt_bot"])
-        rate = imod5_data[key]["dataframe"]["rate"]
+        
+        df = imod5_data[key]["dataframe"]
+        df= df.sort_values(by=['x', 'y', 'filt_top', 'filt_bot'])
+        nr_rows = df.shape[0]
+        row = 0
+        all_wells_x = []
+        all_wells_y = []
+        all_wells_top = []
+        all_wells_bot = []        
+        all_wells_rate = None
+        wel_index =1
+        while row < nr_rows:
+            x = df["x"][row]
+            y = df["y"][row]
+            filt_top = df["filt_top"][row]
+            filt_bot = df["filt_bot"][row]                 
+            well_df = df.loc[(df["x"] == x) & (df["y"] == y ) & (df["filt_top"] == filt_top) & (df["filt_bot"] == filt_bot)]
 
-        wel_rate = xr.DataArray(
-            rate,
-            dims=("time"),
-            coords={"time": imod5_data["wel-1"]["dataframe"]["time"]},
-        )
-        wel_rate = wel_rate.expand_dims(dim={"index": [1]})
+
+            wel_x = well_df["x"].values[0]
+            wel_y = well_df["y"].values[0]
+            wel_top = well_df["filt_top"].values[0]
+            wel_bot = well_df["filt_bot"].values[0]
+
+            rate = well_df["rate"]
+
+            wel_rate = xr.DataArray(
+                rate,
+                dims=("time"),
+                coords={"time":well_df["time"]},
+            )
+            wel_rate = wel_rate.expand_dims(dim="index")
+            wel_rate = wel_rate.assign_coords({"index": [wel_index]})
+            wel_rate = wel_rate.transpose()
+            
+            all_wells_x.append(wel_x)
+            all_wells_y.append(wel_y)
+            all_wells_top.append(wel_top)
+            all_wells_bot.append(wel_bot) 
+            if all_wells_rate is None:
+                all_wells_rate = wel_rate
+            else:
+                all_wells_rate = xr.merge([all_wells_rate, wel_rate])
+            row += well_df.shape[0]             
+            wel_index +=1
+            print (f"wellindex: {wel_index}")
 
         return cls(
-            x=[wel_x],
-            y=[wel_y],
-            screen_top=[wel_top],
-            screen_bottom=[wel_bot],
-            rate=wel_rate,
+            x=all_wells_x,
+            y=all_wells_y,
+            screen_top=all_wells_top,
+            screen_bottom=all_wells_bot,
+            rate=all_wells_rate["rate"],
             minimum_k=minimum_k,
             minimum_thickness=minimum_thickness,
         )
@@ -684,9 +718,9 @@ class Well(BoundaryCondition, IPointDataPackage):
         # in every row (like the x-coordinate of a well)
         # This function returns that value and checks they are all the same
 
-        if not np.all(column == column[0]):
+        if not np.all(column.values == column.values[0]):
             raise ValueError("error while converting pandas column to scalar")
-        return float(column[0])
+        return float( column.values[0])
 
 
 class WellDisStructured(DisStructuredBoundaryCondition):
