@@ -2,7 +2,7 @@ import abc
 import pathlib
 import warnings
 from copy import copy, deepcopy
-from typing import Mapping, Optional, Union
+from typing import List, Mapping, Optional, Tuple, Union
 
 import numpy as np
 import xarray as xr
@@ -369,12 +369,12 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
 
 class DisStructuredBoundaryCondition(BoundaryCondition):
     def _to_struct_array(self, arrdict, layer):
-        spec = []
+        spec: List[Tuple[str, np.int32 | np.float64]] = []
         for key in arrdict:
             if key in ["layer", "row", "column"]:
-                spec.append((key, np.int32))
+                spec.append((key, np.int32))  # type: ignore[arg-type]
             else:
-                spec.append((key, np.float64))
+                spec.append((key, np.float64))  # type: ignore[arg-type]
 
         sparse_dtype = np.dtype(spec)
         nrow = next(iter(arrdict.values())).size
@@ -391,7 +391,7 @@ class DisVerticesBoundaryCondition(BoundaryCondition):
             if key in ["layer", "cell2d"]:
                 spec.append((key, np.int32))
             else:
-                spec.append((key, np.float64))
+                spec.append((key, np.float64))  # type: ignore[arg-type]
 
         sparse_dtype = np.dtype(spec)
         nrow = next(iter(arrdict.values())).size
