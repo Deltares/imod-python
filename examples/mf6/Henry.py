@@ -133,20 +133,25 @@ gwf_model["right_boundary"] = imod.mf6.GeneralHeadBoundary(
 
 # %%
 # ... and the constant flux condition.
+from imod.prepare.layer import create_layered_top
+
+screen_top = create_layered_top(bottom, top)
 
 flux_concentration = xr.DataArray(
     data=np.full((1, nlay), min_concentration),
-    dims=["species", "cell"],
-    coords={"species": ["salinity"], "cell": layer},
+    dims=["species", "index"],
+    coords={"species": ["salinity"], "index": layer},
 )
 
-gwf_model["left_boundary"] = imod.mf6.WellDisStructured(
-    layer=layer,
-    row=np.full_like(layer, 1, dtype=int),
-    column=np.full_like(layer, 1, dtype=int),
+gwf_model["left_boundary"] = imod.mf6.Well(
+    x=np.full_like(layer, xmin, dtype=float),
+    y=np.full_like(layer, y[0], dtype=float),
+    screen_top=screen_top.values,
+    screen_bottom=bottom.values,
     rate=np.full_like(layer, 0.5 * (total_flux / nlay), dtype=float),
     concentration=flux_concentration,
     concentration_boundary_type="AUX",
+    minimum_thickness=0.002
 )
 
 # %%
