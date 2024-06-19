@@ -1,5 +1,5 @@
 import pathlib
-from typing import List
+from typing import Any, List
 
 import numpy as np
 
@@ -115,7 +115,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
 
     def render(self, directory, pkgname, globaltimes, binary):
         disdirectory = pathlib.Path(directory) / pkgname
-        d = {}
+        d: dict[str, Any] = {}
         x = self.dataset["idomain"].coords["x"]
         y = self.dataset["idomain"].coords["y"]
         dx, xmin, _ = imod.util.spatial.coord_reference(x)
