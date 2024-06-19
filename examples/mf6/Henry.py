@@ -151,7 +151,7 @@ gwf_model["left_boundary"] = imod.mf6.Well(
     rate=np.full_like(layer, 0.5 * (total_flux / nlay), dtype=float),
     concentration=flux_concentration,
     concentration_boundary_type="AUX",
-    minimum_thickness=0.002
+    minimum_thickness=0.002,
 )
 
 # %%
