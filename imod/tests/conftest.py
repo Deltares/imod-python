@@ -20,8 +20,8 @@ from .fixtures.flow_basic_unstructured_fixture import (
 from .fixtures.flow_example_fixture import imodflow_model
 from .fixtures.flow_transport_simulation_fixture import flow_transport_simulation
 from .fixtures.imod5_well_data import (
-    well_duplication_import_data,
-    well_regular_import_data,
+    well_duplication_import_prj,
+    well_regular_import_prj,
 )
 from .fixtures.mf6_circle_fixture import (
     circle_model,

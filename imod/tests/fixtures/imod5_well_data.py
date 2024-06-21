@@ -139,7 +139,7 @@ def write_files(
 
 
 @pytest.fixture(scope="session")
-def well_regular_import_data():
+def well_regular_import_prj():
     tmp_path = imod.util.temporary_directory()
     os.makedirs(tmp_path)
 
@@ -154,7 +154,7 @@ def well_regular_import_data():
 
 
 @pytest.fixture(scope="session")
-def well_duplication_import_data():
+def well_duplication_import_prj():
     tmp_path = imod.util.temporary_directory()
     os.makedirs(tmp_path)
 

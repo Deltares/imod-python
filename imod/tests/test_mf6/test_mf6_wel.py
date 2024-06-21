@@ -849,9 +849,9 @@ def test_import_and_convert_to_mf6(imod5_dataset, tmp_path):
     mf6_well.write("wel", [], write_context)
 
 
-@pytest.mark.usefixtures("well_regular_import_data")
-def test_import_multiple_wells(well_regular_import_data):
-    imod5dict = open_projectfile_data(well_regular_import_data)
+@pytest.mark.usefixtures("well_regular_import_prj")
+def test_import_multiple_wells(well_regular_import_prj):
+    imod5dict = open_projectfile_data(well_regular_import_prj)
 
     # import grid-agnostic well from imod5 data (it contains 2 packages with 3 wells each)
     wel1 = imod.mf6.Well.from_imod5_data("wel-1", imod5dict[0])
@@ -863,9 +863,9 @@ def test_import_multiple_wells(well_regular_import_data):
     assert wel2.dataset["rate"].shape == (6, 3)
 
 
-@pytest.mark.usefixtures("well_duplication_import_data")
-def test_import_from_imod5_with_duplication(well_duplication_import_data):
-    imod5dict = open_projectfile_data(well_duplication_import_data)
+@pytest.mark.usefixtures("well_duplication_import_prj")
+def test_import_from_imod5_with_duplication(well_duplication_import_prj):
+    imod5dict = open_projectfile_data(well_duplication_import_prj)
 
     # import grid-agnostic well from imod5 data (it contains 2 packages with 3 wells each)
     wel1 = imod.mf6.Well.from_imod5_data("wel-1", imod5dict[0])
