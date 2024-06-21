@@ -674,10 +674,10 @@ class Well(BoundaryCondition, IPointDataPackage):
             well_df = df.loc[(df["x"] == x) & (df["y"] == y ) & (df["filt_top"] == filt_top) & (df["filt_bot"] == filt_bot)]
 
 
-            wel_x = well_df["x"].values[0]
-            wel_y = well_df["y"].values[0]
-            wel_top = well_df["filt_top"].values[0]
-            wel_bot = well_df["filt_bot"].values[0]
+            wel_x = float(well_df["x"].values[0])
+            wel_y = float(well_df["y"].values[0])
+            wel_top = float(well_df["filt_top"].values[0])
+            wel_bot = float(well_df["filt_bot"].values[0])
 
             rate = well_df["rate"]
 

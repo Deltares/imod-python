@@ -832,17 +832,23 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
     assert np.mean(wel.dataset["rate"].values) == -323.8936170212766
 
 
+@pytest.mark.usefixtures("well_regular_import_data")
+def test_import_from_imod5(well_regular_import_data):
+    imod5dict = open_projectfile_data(well_regular_import_data)
 
-def test_import_from_imod5_hendrik(tmp_path):
+    wel1 = imod.mf6.Well.from_imod5_data("wel-1", imod5dict[0])
+    wel2 = imod.mf6.Well.from_imod5_data("wel-2", imod5dict[0])
 
-    default_simulation_allocation_options = SimulationAllocationOptions
-    default_simulation_distributing_options = SimulationDistributingOptions
+    assert(wel1 is not None)
+    assert(wel2 is not None)
 
-    prj_path = pathlib.Path("D:\\tmp\\van_hendrik\\GRAM3.1_prj\\3_1_NSTAT_RIV_mf6_edit_jh.prj")
-    imod5dict = open_projectfile_data(prj_path)
+@pytest.mark.usefixtures("well_duplication_import_data")
+def test_import_from_imod5_with_duplication(well_duplication_import_data):
 
-    wel2 = imod.mf6.Well.from_imod5_data("wel-3", imod5dict[0])
+    imod5dict = open_projectfile_data(well_duplication_import_data)
 
+    wel1 = imod.mf6.Well.from_imod5_data("wel-1", imod5dict[0])
+    wel2 = imod.mf6.Well.from_imod5_data("wel-2", imod5dict[0])
 
-    pass
-
+    assert(wel1 is not None)
+    assert(wel2 is not None)
