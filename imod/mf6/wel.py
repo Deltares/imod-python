@@ -655,15 +655,19 @@ class Well(BoundaryCondition, IPointDataPackage):
         minimum_k: float = 0.1,
         minimum_thickness: float = 1.0,
     ) -> "Well":
+        # sort dataframe to group entries belongine to each well
         df = imod5_data[key]["dataframe"]
         df = df.sort_values(by=["x", "y", "filt_top", "filt_bot"])
         nr_rows = df.shape[0]
         row = 0
+
+        # initialize well package lists
         all_wells_x = []
         all_wells_y = []
         all_wells_top = []
         all_wells_bot = []
         all_wells_rate = None
+
         well_index = 1
         while row < nr_rows:
             well_x = df["x"][row]
@@ -671,6 +675,8 @@ class Well(BoundaryCondition, IPointDataPackage):
             well_top = df["filt_top"][row]
             well_bot = df["filt_bot"][row]
             id = df["id"][row]
+
+            # create dataframe with data belongine to one well
             well_df = df.loc[
                 (df["x"] == well_x)
                 & (df["y"] == well_y)
@@ -679,8 +685,8 @@ class Well(BoundaryCondition, IPointDataPackage):
                 & (df["id"] == id)
             ]
 
+            # import the rate timeseries
             rate = well_df["rate"]
-
             well_rate = xr.DataArray(
                 rate,
                 dims=("time"),
@@ -690,6 +696,7 @@ class Well(BoundaryCondition, IPointDataPackage):
             well_rate = well_rate.assign_coords({"index": [well_index]})
             well_rate = well_rate.transpose()
 
+            # add the well to the well package lists
             all_wells_x.append(float(well_x))
             all_wells_y.append(float(well_y))
             all_wells_top.append(float(well_top))
@@ -699,6 +706,8 @@ class Well(BoundaryCondition, IPointDataPackage):
             else:
                 all_wells_rate = xr.merge([all_wells_rate, well_rate])
                 all_wells_rate = all_wells_rate["rate"]
+
+            # update counters (lines read and well index)
             row += well_df.shape[0]
             well_index += 1
 
