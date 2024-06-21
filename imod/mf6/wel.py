@@ -13,8 +13,8 @@ import xugrid as xu
 
 import imod
 from imod.logging import init_log_decorator, logger
-from imod.logging.loglevel import LogLevel
 from imod.logging.logging_decorators import standard_log_decorator
+from imod.logging.loglevel import LogLevel
 from imod.mf6.boundary_condition import (
     BoundaryCondition,
     DisStructuredBoundaryCondition,
@@ -670,8 +670,9 @@ class Well(BoundaryCondition, IPointDataPackage):
             x = df["x"][row]
             y = df["y"][row]
             filt_top = df["filt_top"][row]
-            filt_bot = df["filt_bot"][row]                 
-            well_df = df.loc[(df["x"] == x) & (df["y"] == y ) & (df["filt_top"] == filt_top) & (df["filt_bot"] == filt_bot)]
+            filt_bot = df["filt_bot"][row]   
+            id = df["id"][row]              
+            well_df = df.loc[(df["x"] == x) & (df["y"] == y ) & (df["filt_top"] == filt_top) & (df["filt_bot"] == filt_bot) & (df["id"] == id)]
 
 
             wel_x = float(well_df["x"].values[0])
@@ -698,6 +699,7 @@ class Well(BoundaryCondition, IPointDataPackage):
                 all_wells_rate = wel_rate
             else:
                 all_wells_rate = xr.merge([all_wells_rate, wel_rate])
+                all_wells_rate = all_wells_rate["rate"]
             row += well_df.shape[0]             
             wel_index +=1
             print (f"wellindex: {wel_index}")
@@ -707,7 +709,7 @@ class Well(BoundaryCondition, IPointDataPackage):
             y=all_wells_y,
             screen_top=all_wells_top,
             screen_bottom=all_wells_bot,
-            rate=all_wells_rate["rate"],
+            rate=all_wells_rate,
             minimum_k=minimum_k,
             minimum_thickness=minimum_thickness,
         )

@@ -1,14 +1,15 @@
 
 
 import os
-from pathlib import Path
 import textwrap
+from pathlib import Path
+
 import pytest
+
 import imod
 
-
 ipf_header = textwrap.dedent(\
-    f'''3
+    '''3
     18
     x
     y
@@ -95,7 +96,7 @@ def other_timeseries_string():
     19820430,-182.7713333333334
     ''')
 
-def write_files(projectfile_str, ipf1_str, ipf2_str,timeseries_wel1_str,tmp_path, other_timeseries_string ):
+def write_files(projectfile_str, ipf1_str, ipf2_str,timeseries_wel1_str,tmp_path, other_timeseries_string = None):
 
 
 

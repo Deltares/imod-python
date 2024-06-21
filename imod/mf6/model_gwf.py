@@ -19,7 +19,6 @@ from imod.mf6.rch import Recharge
 from imod.mf6.regrid.regrid_schemes import RegridMethodType
 from imod.mf6.riv import River
 from imod.mf6.sto import StorageCoefficient
-from imod.mf6.wel import Well
 from imod.prepare.topsystem.default_allocation_methods import (
     SimulationAllocationOptions,
     SimulationDistributingOptions,

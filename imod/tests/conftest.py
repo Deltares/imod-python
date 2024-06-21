@@ -19,6 +19,10 @@ from .fixtures.flow_basic_unstructured_fixture import (
 )
 from .fixtures.flow_example_fixture import imodflow_model
 from .fixtures.flow_transport_simulation_fixture import flow_transport_simulation
+from .fixtures.imod5_well_data import (
+    well_duplication_import_data,
+    well_regular_import_data,
+)
 from .fixtures.mf6_circle_fixture import (
     circle_model,
     circle_model_evt,
@@ -80,6 +84,3 @@ from .fixtures.mf6_welltest_fixture import (
 )
 from .fixtures.msw_fixture import fixed_format_parser
 from .fixtures.msw_model_fixture import coupled_mf6_model, msw_model
-
-
-from .fixtures.imod5_well_data import well_duplication_import_data, well_regular_import_data
