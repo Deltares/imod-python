@@ -35,45 +35,45 @@ ipf_header = textwrap.dedent(
 def projectfile_string(tmp_path):
     return textwrap.dedent(
         f"""\
-0001,(WEL),1, Wells,[WRA]
-2000-01-01 00:00:00
-001,002
-1,2, 000,   1.000000    ,   0.000000    ,  -999.9900    ,'{tmp_path}\ipf1.ipf'
-1,2, 000,   1.000000    ,   0.000000    ,  -999.9900    ,'{tmp_path}\ipf2.ipf'
-"""
+    0001,(WEL),1, Wells,[WRA]
+    2000-01-01 00:00:00
+    001,002
+    1,2, 000,   1.000000    ,   0.000000    ,  -999.9900    ,'{tmp_path}\ipf1.ipf'
+    1,2, 000,   1.000000    ,   0.000000    ,  -999.9900    ,'{tmp_path}\ipf2.ipf'
+    """
     )
 
 
 def ipf1_string_no_duplication():
     return textwrap.dedent(
         f"""\
-{ipf_header}
-191231.52,406381.47,timeseries_wel1,4.11,-1.69,01-PP001,0,B46D0517,"30-11-1981 00:00",13.41,13.41,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
-191171.96,406420.89,timeseries_wel1,3.78,-2.02,01-PP002,0,B46D0518,"30-11-1981 00:00",13.18,13.18,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
-191112.11,406460.02,timeseries_wel1,3.81,-1.99,01-PP003,0,B46D0519,"30-11-1981 00:00",13.21,13.21,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
-"""
+    {ipf_header}
+    191231.52,406381.47,timeseries_wel1,4.11,-1.69,01-PP001,0,B46D0517,"30-11-1981 00:00",13.41,13.41,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
+    191171.96,406420.89,timeseries_wel1,3.78,-2.02,01-PP002,0,B46D0518,"30-11-1981 00:00",13.18,13.18,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
+    191112.11,406460.02,timeseries_wel1,3.81,-1.99,01-PP003,0,B46D0519,"30-11-1981 00:00",13.21,13.21,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
+    """
     )
 
 
 def ipf1_string_duplication():
     return textwrap.dedent(
         f"""\
-{ipf_header}
-191231.52,406381.47,timeseries_wel1,4.11,-1.69,01-PP001,0,B46D0517,"30-11-1981 00:00",13.41,13.41,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
-191171.96,406420.89,timeseries_wel1,3.78,-2.02,01-PP002,0,B46D0518,"30-11-1981 00:00",13.18,13.18,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
-191231.52,406381.47,other_timeseries_wel1,4.11,-1.69,01-PP001,0,B46D0517,"30-11-1981 00:00",13.41,13.41,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
-"""
+    {ipf_header}
+    191231.52,406381.47,timeseries_wel1,4.11,-1.69,01-PP001,0,B46D0517,"30-11-1981 00:00",13.41,13.41,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
+    191171.96,406420.89,timeseries_wel1,3.78,-2.02,01-PP002,0,B46D0518,"30-11-1981 00:00",13.18,13.18,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
+    191231.52,406381.47,other_timeseries_wel1,4.11,-1.69,01-PP001,0,B46D0517,"30-11-1981 00:00",13.41,13.41,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
+    """
     )
 
 
 def ipf2_string():
     return textwrap.dedent(
         f"""\
-{ipf_header}
-191231.52,406381.47,timeseries_wel1,4.11,-1.69,01-PP001,0,B46D0517,"30-11-1981 00:00",13.41,13.41,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
-191171.96,406420.89,timeseries_wel1,3.78,-2.02,01-PP002,0,B46D0518,"30-11-1981 00:00",13.18,13.18,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
-191112.11,406460.02,timeseries_wel1,3.81,-1.99,01-PP003,0,B46D0519,"30-11-1981 00:00",13.21,13.21,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
-"""
+    {ipf_header}
+    191231.52,406381.47,timeseries_wel1,4.11,-1.69,01-PP001,0,B46D0517,"30-11-1981 00:00",13.41,13.41,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
+    191171.96,406420.89,timeseries_wel1,3.78,-2.02,01-PP002,0,B46D0518,"30-11-1981 00:00",13.18,13.18,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
+    191112.11,406460.02,timeseries_wel1,3.81,-1.99,01-PP003,0,B46D0519,"30-11-1981 00:00",13.21,13.21,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
+    """
     )
 
 
