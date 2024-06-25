@@ -151,7 +151,6 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
     @classmethod
     def from_imod5_ibound(
         cls,
-        key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_discretization: StructuredDiscretization,
         regridder_types: Optional[RegridMethodType] = None,
@@ -159,10 +158,15 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         target_idomain = target_discretization.dataset["idomain"]
 
         data = {
-            "head": imod5_data[key]["head"],
+            "head": imod5_data["shd"]["head"],
         }
         ibound = imod5_data["bnd"]["ibound"]
-        data["head"] = data["head"].where(ibound < 0)
+
+        # select locations where ibound < 0
+        data["head"] = data["head"].where(ibound < 0 )
+
+        # select locations where idomain > 0
+        data["head"] = data["head"].where(target_idomain > 0)
 
         if regridder_types is None:
             regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)

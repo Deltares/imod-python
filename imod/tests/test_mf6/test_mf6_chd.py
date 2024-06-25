@@ -199,14 +199,13 @@ def test_write_concentration_period_data(head_fc, concentration_fc):
 def test_from_ibound(imod5_dataset):
     target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset)
 
-    chd_layer_3 = imod.mf6.ConstantHead.from_imod5_ibound(
-        "chd-3",
+    chd_from_ibound = imod.mf6.ConstantHead.from_imod5_ibound(
         imod5_dataset,
         target_dis,
         regridder_types=None,
     )
-    errors = chd_layer_3._validate(
+    errors = chd_from_ibound._validate(
         imod.mf6.ConstantHead._write_schemata, idomain=target_dis["idomain"]
     )
-    errors.update(chd_layer_3._validate(imod.mf6.ConstantHead._init_schemata))
+    errors.update(chd_from_ibound._validate(imod.mf6.ConstantHead._init_schemata))
     assert len(errors) == 0
