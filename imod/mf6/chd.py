@@ -149,7 +149,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         return errors
 
     @classmethod
-    def from_imod5_data(
+    def from_imod5_ibound(
         cls,
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
