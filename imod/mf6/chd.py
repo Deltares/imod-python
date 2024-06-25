@@ -163,7 +163,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         ibound = imod5_data["bnd"]["ibound"]
 
         # select locations where ibound < 0
-        data["head"] = data["head"].where(ibound < 0 )
+        data["head"] = data["head"].where(ibound < 0)
 
         # select locations where idomain > 0
         data["head"] = data["head"].where(target_idomain > 0)
