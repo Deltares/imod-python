@@ -857,8 +857,8 @@ def test_import_multiple_wells(well_regular_import_prj):
     wel1 = imod.mf6.Well.from_imod5_data("wel-1", imod5dict[0])
     wel2 = imod.mf6.Well.from_imod5_data("wel-2", imod5dict[0])
 
-    assert np.all(wel1.x == np.array([191231.52, 191171.96, 191112.11]))
-    assert np.all(wel2.x == np.array([191231.52, 191171.96, 191112.11]))
+    assert np.all(wel1.x == np.array([191112.11, 191171.96, 191231.52]))
+    assert np.all(wel2.x == np.array([191112.11, 191171.96, 191231.52]))
     assert wel1.dataset["rate"].shape == (6, 3)
     assert wel2.dataset["rate"].shape == (6, 3)
 
@@ -871,7 +871,7 @@ def test_import_from_imod5_with_duplication(well_duplication_import_prj):
     wel1 = imod.mf6.Well.from_imod5_data("wel-1", imod5dict[0])
     wel2 = imod.mf6.Well.from_imod5_data("wel-2", imod5dict[0])
 
-    assert np.all(wel1.x == np.array([191231.52, 191171.96, 191231.52]))
-    assert np.all(wel2.x == np.array([191231.52, 191171.96, 191112.11]))
+    assert np.all(wel1.x == np.array([191171.96, 191231.52, 191231.52]))
+    assert np.all(wel2.x == np.array([191112.11, 191171.96, 191231.52]))
     assert wel1.dataset["rate"].shape == (6, 3)
     assert wel2.dataset["rate"].shape == (6, 3)
