@@ -210,7 +210,6 @@ def test_import_ipf_unique_id_and_logging(tmp_path):
 
     logfile_path = tmp_path / "logfile.txt"
 
-
     try:
         with open(logfile_path, "w") as sys.stdout:
             # start logging
