@@ -664,12 +664,15 @@ class Well(BoundaryCondition, IPointDataPackage):
         x, y, filt_top, filt_bot, id = zip(*wel_index)
         # Convert dataframes all groups to DataArrays
         da_groups = [
-            xr.DataArray(df_group["rate"], dims=("time"), coords={"time": df_group["time"]})
+            xr.DataArray(
+                df_group["rate"], dims=("time"), coords={"time": df_group["time"]}
+            )
             for df_group in df_groups
-            ]
+        ]
         # Assign index coordinates
         da_groups = [
-            da_group.expand_dims(dim="index").assign_coords(index=[i]) for i, da_group in enumerate(da_groups)
+            da_group.expand_dims(dim="index").assign_coords(index=[i])
+            for i, da_group in enumerate(da_groups)
         ]
         # Concatenate datarrays along index dimension
         well_rate = xr.concat(da_groups, dim="index")
