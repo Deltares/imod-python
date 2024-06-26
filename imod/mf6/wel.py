@@ -655,68 +655,24 @@ class Well(BoundaryCondition, IPointDataPackage):
         minimum_k: float = 0.1,
         minimum_thickness: float = 1.0,
     ) -> "Well":
-        # sort dataframe to group entries belongine to each well
         df = imod5_data[key]["dataframe"]
-        df = df.sort_values(by=["x", "y", "filt_top", "filt_bot"])
-        nr_rows = df.shape[0]
-        row = 0
 
-        # initialize well package lists
-        all_wells_x = []
-        all_wells_y = []
-        all_wells_top = []
-        all_wells_bot = []
-        all_wells_rate = None
-
-        well_index = 1
-        while row < nr_rows:
-            well_x = df["x"][row]
-            well_y = df["y"][row]
-            well_top = df["filt_top"][row]
-            well_bot = df["filt_bot"][row]
-            id = df["id"][row]
-
-            # create dataframe with data belongine to one well
-            well_df = df.loc[
-                (df["x"] == well_x)
-                & (df["y"] == well_y)
-                & (df["filt_top"] == well_top)
-                & (df["filt_bot"] == well_bot)
-                & (df["id"] == id)
+        colnames_group = ["x", "y", "filt_top", "filt_bot", "id"]
+        wel_index, df_groups = zip(*df.groupby(colnames_group))
+        x, y, filt_top, filt_bot, id = zip(*wel_index)
+        da_groups = [
+            xr.DataArray(df_group["rate"], dims=("time"), coords={"time": df_group["time"]})
+            for df_group in df_groups
             ]
-
-            # import the rate timeseries
-            rate = well_df["rate"]
-            well_rate = xr.DataArray(
-                rate,
-                dims=("time"),
-                coords={"time": well_df["time"]},
-            )
-            well_rate = well_rate.expand_dims(dim="index")
-            well_rate = well_rate.assign_coords({"index": [well_index]})
-            well_rate = well_rate.transpose()
-
-            # add the well to the well package lists
-            all_wells_x.append(float(well_x))
-            all_wells_y.append(float(well_y))
-            all_wells_top.append(float(well_top))
-            all_wells_bot.append(float(well_bot))
-            if all_wells_rate is None:
-                all_wells_rate = well_rate
-            else:
-                all_wells_rate = xr.merge([all_wells_rate, well_rate])
-                all_wells_rate = all_wells_rate["rate"]
-
-            # update counters (lines read and well index)
-            row += well_df.shape[0]
-            well_index += 1
+        da_groups = [da_group.expand_dims(dim="index").assign_coords(index=[i]) for i, da_group in enumerate(da_groups)]
+        well_rate = xr.concat(da_groups, dim="index")
 
         return cls(
-            x=all_wells_x,
-            y=all_wells_y,
-            screen_top=all_wells_top,
-            screen_bottom=all_wells_bot,
-            rate=all_wells_rate,
+            x=np.array(x, dtype=float),
+            y=np.array(y, dtype=float),
+            screen_top=np.array(filt_top, dtype=float),
+            screen_bottom=np.array(filt_bot, dtype=float),
+            rate=well_rate,
             minimum_k=minimum_k,
             minimum_thickness=minimum_thickness,
         )
