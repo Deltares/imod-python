@@ -1,9 +1,12 @@
+from typing import Optional
 import numpy as np
 
+import imod
 from imod.logging import init_log_decorator
+from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.regrid.regrid_schemes import ConstantHeadRegridMethod
+from imod.mf6.regrid.regrid_schemes import ConstantHeadRegridMethod, RegridMethodType
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -15,6 +18,7 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
+from imod.typing import GridDataArray
 
 
 class ConstantHead(BoundaryCondition, IRegridPackage):
@@ -141,3 +145,17 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
+    
+    @classmethod
+    @standard_log_decorator()
+    def from_imod5_data(
+        cls,
+        key: str,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        target_grid: GridDataArray,
+        regridder_types: Optional[RegridMethodType] = None,
+    ) -> "ConstantHead":
+        pass
+
+
+
