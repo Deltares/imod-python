@@ -3,6 +3,7 @@ Utilities for parsing a project file.
 """
 
 import shlex
+import textwrap
 from collections import defaultdict
 from datetime import datetime
 from itertools import chain
@@ -15,6 +16,8 @@ import pandas as pd
 import xarray as xr
 
 import imod
+import imod.logging
+from imod.logging.loglevel import LogLevel
 
 FilePath = Union[str, "PathLike[str]"]
 
@@ -784,6 +787,11 @@ def _read_package_ipf(
 ) -> Tuple[List[Dict[str, Any]], List[datetime]]:
     out = []
     repeats = []
+
+    # we will store in this set the tuples of (x, y, id, well_top, well_bot)
+    # which should be unique for each well
+    imported_wells = {}
+
     for entry in block_content["ipf"]:
         timestring = entry["time"]
         layer = entry["layer"]
@@ -821,6 +829,34 @@ def _read_package_ipf(
                 df_assoc["id"] = path_assoc.stem
                 df_assoc["filt_top"] = row[4]
                 df_assoc["filt_bot"] = row[5]
+
+                well_characteristics = (
+                    row[1],
+                    row[2],
+                    path_assoc.stem,
+                    row.filt_top,
+                    row.filt_bot,
+                )
+                if well_characteristics not in imported_wells.keys():
+                    imported_wells[well_characteristics] = 0
+                else:
+                    suffix = imported_wells[well_characteristics] + 1
+                    imported_wells[well_characteristics] = suffix
+                    df_assoc["id"] = df_assoc["id"] + f"_{suffix}"
+
+                    log_message = textwrap.dedent(
+                        f"""A well with the same x, y, id, filter_top and filter_bot was already imported.
+                    This happened at x  = {row[1]}, y = { row[2]}, id = {path_assoc.stem}
+                    Now the ID for this new well was appended with the suffix  _{suffix})
+                    """
+                    )
+
+                    imod.logging.logger.log(
+                        loglevel=LogLevel.WARNING,
+                        message=log_message,
+                        additional_depth=2,
+                    )
+
                 dfs.append(df_assoc)
             df = pd.concat(dfs, ignore_index=True, sort=False)
         df["rate"] = df["rate"] * factor + addition
