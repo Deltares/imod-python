@@ -834,8 +834,8 @@ def _read_package_ipf(
                     row[1],
                     row[2],
                     path_assoc.stem,
-                    row.filt_top,
-                    row.filt_bot,
+                    row[4],
+                    row[5],
                 )
                 if well_characteristics not in imported_wells.keys():
                     imported_wells[well_characteristics] = 0
