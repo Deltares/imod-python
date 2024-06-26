@@ -117,7 +117,7 @@ class PackageBase(IPackageBase, abc.ABC):
         # Replace NaNs by None
         for key, value in dataset.items():
             stripped_value = value.values[()]
-            if isinstance(stripped_value, numbers.Real) and np.isnan(stripped_value):
+            if isinstance(stripped_value, numbers.Real) and np.isnan(stripped_value):  # type: ignore[call-overload]
                 dataset[key] = None
 
         instance = cls.__new__(cls)

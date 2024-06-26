@@ -1,5 +1,5 @@
 import pathlib
-from typing import TYPE_CHECKING, Callable, Union
+from typing import TYPE_CHECKING, Callable, Iterable, Union
 
 import dask
 import numba
@@ -240,11 +240,12 @@ def rasterize(geodataframe, like, column=None, fill=np.nan, **kwargs):
     # shapes must be an iterable
     try:
         iter(shapes)
+        iterable_shapes: Iterable = shapes
     except TypeError:
-        shapes = (shapes,)
+        iterable_shapes: Iterable = (shapes,)  # type: ignore[no-redef]
 
     raster = rasterio.features.rasterize(
-        shapes,
+        iterable_shapes,
         out_shape=like.shape,
         fill=fill,
         transform=imod.util.spatial.transform(like),

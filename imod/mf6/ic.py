@@ -1,6 +1,6 @@
 import warnings
 from dataclasses import asdict
-from typing import Optional
+from typing import Any, Optional
 
 import numpy as np
 
@@ -88,7 +88,7 @@ class InitialConditions(Package, IRegridPackage):
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):
-        d = {}
+        d: dict[str, Any] = {}
 
         icdirectory = directory / pkgname
         d["layered"], d["strt"] = self._compose_values(

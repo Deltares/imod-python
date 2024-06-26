@@ -147,12 +147,15 @@ def _get_indices_1d(da, coordname, x):
     xs = np.full(ncell + 1, xmin)
     # Turn dx into array
     if isinstance(dx, float):
-        dx = np.full(ncell, dx)
+        dx_a = np.full(ncell, dx)
+    else:
+        dx_a = dx
+
     # Always increasing
     if x_decreasing:
-        xs[1:] += np.abs(dx[::-1]).cumsum()
+        xs[1:] += np.abs(dx_a[::-1]).cumsum()
     else:
-        xs[1:] += np.abs(dx).cumsum()
+        xs[1:] += np.abs(dx_a).cumsum()
 
     # From np.searchsorted docstring:
     # Find the indices into a sorted array a such that, if the corresponding
