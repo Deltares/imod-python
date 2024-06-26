@@ -8,6 +8,7 @@ create a lake package.
 import pathlib
 import textwrap
 from collections import defaultdict
+from typing import Any, Dict
 
 import jinja2
 import numpy as np
@@ -272,13 +273,13 @@ def create_connection_data(lakes):
         )
         cell_ids.append(cell_id)
 
-    connection_data = {
+    connection_data_dict = {
         k: xr.DataArray(data=np.concatenate(v), dims=[CONNECTION_DIM])
         for k, v in connection_data.items()
     }
 
-    connection_data["connection_cell_id"] = xr.concat(cell_ids, dim=CONNECTION_DIM)
-    return connection_data
+    connection_data_dict["connection_cell_id"] = xr.concat(cell_ids, dim=CONNECTION_DIM)
+    return connection_data_dict
 
 
 def create_outlet_data(outlets, name_to_number):
@@ -322,10 +323,10 @@ def create_outlet_data(outlets, name_to_number):
                 value = np.nan
             outlet_data[f"outlet_{var}"].append(value)
 
-    outlet_data = {
+    outlet_data_dict = {
         k: xr.DataArray(data=v, dims=[OUTLET_DIM]) for k, v in outlet_data.items()
     }
-    return outlet_data
+    return outlet_data_dict
 
 
 def concatenate_timeseries(list_of_lakes_or_outlets, timeseries_name):
@@ -347,14 +348,17 @@ def concatenate_timeseries(list_of_lakes_or_outlets, timeseries_name):
                 list_of_indices.append(index + 1)
 
         index = index + 1
+
     if len(list_of_dataarrays) == 0:
         return None
-    fill_value = np.nan
-    if not pd.api.types.is_numeric_dtype(list_of_dataarrays[0].dtype):
-        fill_value = ""
+
+    fill_value = (
+        "" if not pd.api.types.is_numeric_dtype(list_of_dataarrays[0].dtype) else np.nan
+    )
     out = xr.concat(
         list_of_dataarrays, join="outer", dim="index", fill_value=fill_value
     )
+
     out = out.assign_coords(index=list_of_indices)
     return out
 
@@ -1075,7 +1079,7 @@ class Lake(BoundaryCondition):
             )
         )
 
-        d = {}
+        d: Dict[str, Any] = {}
         d["nperiod"] = len(period_data_list)
         d["periods"] = period_data_list
 
@@ -1161,10 +1165,7 @@ class Lake(BoundaryCondition):
             has_barea_column = "barea" in table.coords["column"]
             if has_barea_column:
                 barea_column = table.sel({"column": "barea"})
-                has_barea_column = (
-                    barea_column.where(pd.api.types.is_numeric_dtype).count().values[()]
-                    > 0
-                )
+                has_barea_column = barea_column.notnull().any().item()
 
             columns = ["stage", "sarea", "volume"]
             if has_barea_column:

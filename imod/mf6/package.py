@@ -4,7 +4,7 @@ import abc
 import pathlib
 from collections import defaultdict
 from copy import deepcopy
-from typing import Any, Mapping, Optional, Tuple, Union
+from typing import Any, Dict, List, Mapping, Optional, Tuple, Union
 
 import cftime
 import jinja2
@@ -60,6 +60,7 @@ class Package(PackageBase, IPackage, abc.ABC):
     _write_schemata: dict[str, list[SchemaType] | Tuple[SchemaType, ...]] = {}
     _keyword_map: dict[str, str] = {}
     _regrid_method: RegridMethodType = EmptyRegridMethod()
+    _template: jinja2.Template
 
     def __init__(self, allargs: Mapping[str, GridDataArray | float | int | bool | str]):
         super().__init__(allargs)
@@ -69,7 +70,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             "Selection on packages not yet supported. To make a selection on "
             f"the xr.Dataset, call {self._pkg_id}.dataset.isel instead."
             "You can create a new package with a selection by calling "
-            f"{__class__.__name__}(**{self._pkg_id}.dataset.isel(**selection))"
+            f"{type(self).__name__}(**{self._pkg_id}.dataset.isel(**selection))"
         )
 
     def sel(self):
@@ -77,7 +78,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             "Selection on packages not yet supported. To make a selection on "
             f"the xr.Dataset, call {self._pkg_id}.dataset.sel instead. "
             "You can create a new package with a selection by calling "
-            f"{__class__.__name__}(**{self._pkg_id}.dataset.sel(**selection))"
+            f"{type(self).__name__}(**{self._pkg_id}.dataset.sel(**selection))"
         )
 
     @staticmethod
@@ -149,7 +150,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         #    nlayer = 1
 
         # This is a work around for the abovementioned issue.
-        nval = np.product(da.shape)
+        nval = np.prod(da.shape)
         header = np.zeros(13, np.int32)
         header[-3] = np.int32(nval)  # ncol
         header[-2] = np.int32(1)  # nrow
@@ -179,8 +180,8 @@ class Package(PackageBase, IPackage, abc.ABC):
         pkgname: str,
         globaltimes: Union[list[np.datetime64], np.ndarray],
         binary: bool,
-    ) -> dict[str, Any]:
-        d = {}
+    ) -> Dict[str, Any]:
+        d: Dict[str, Any] = {}
         if directory is None:
             pkg_directory = pkgname
         else:
@@ -194,7 +195,8 @@ class Package(PackageBase, IPackage, abc.ABC):
                     self.dataset[varname], pkg_directory, key, binary=binary
                 )
                 if self._valid(value):  # skip False or None
-                    d[f"{key}_layered"], d[key] = layered, value
+                    d[f"{key}_layered"] = layered
+                    d[key] = value
             else:
                 value = self[varname].values[()]
                 if self._valid(value):  # skip False or None
@@ -221,7 +223,9 @@ class Package(PackageBase, IPackage, abc.ABC):
             )
         return xy
 
-    def _compose_values(self, da, directory, name, binary):
+    def _compose_values(
+        self, da, directory, name, binary
+    ) -> Tuple[bool, Optional[List[str]]]:
         """
         Compose values of dictionary.
 
@@ -249,7 +253,7 @@ class Package(PackageBase, IPackage, abc.ABC):
                 if self._valid(value):  # skip None or False
                     values.append(f"constant {value}")
                 else:
-                    values = None
+                    return layered, None
 
         return layered, values
 

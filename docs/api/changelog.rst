@@ -57,6 +57,13 @@ Changed
   :class:`imod.mf6.regrid.StorageCoefficientRegridMethod`.
 
 
+Fixed
+~~~~~
+- :func:`imod.formats.prj.open_projectfile_data` now reports the path to a
+  faulty IPF or IDF file in the error message.
+
+
+
 
 [0.17.1] - 2024-05-16
 ---------------------

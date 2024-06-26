@@ -1,7 +1,7 @@
-import collections
 import os
+from collections import defaultdict
 from pathlib import Path
-from typing import Union
+from typing import Any, Dict, Union
 
 import numpy as np
 
@@ -154,7 +154,7 @@ class OutputControl(Package, IRegridPackage):
         return path
 
     def render(self, directory, pkgname, globaltimes, binary):
-        d = {}
+        d: dict[str, Any] = {}
 
         for output_variable in OUTPUT_EXT_MAPPING.keys():
             save = self.dataset[f"save_{output_variable}"].values[()]
@@ -163,7 +163,7 @@ class OutputControl(Package, IRegridPackage):
                 output_path = self._get_output_filepath(directory, output_variable)
                 d[varname] = output_path.as_posix()
 
-        periods = collections.defaultdict(dict)
+        periods: defaultdict[int, Dict[str, str]] = defaultdict(dict)
         for datavar in ("save_head", "save_concentration", "save_budget"):
             if self.dataset[datavar].values[()] is None:
                 continue

@@ -812,6 +812,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         flowmodel. In case of a transport model, it returns the path to the grb
         file its coupled flow model.
         """
+        if self.directory is None:
+            raise ValueError("Directory not set")
+
         model = self[modelname]
         # Get grb path
         if isinstance(model, GroundwaterTransportModel):

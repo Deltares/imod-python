@@ -512,9 +512,20 @@ def _merge_coords(headers: List[Dict[str, Any]]) -> Dict[str, np.ndarray]:
     return {k: np.unique(coords[k]) for k in coords}
 
 
+def _try_read_with_func(func, path, *args, **kwargs):
+    try:
+        return func(path, *args, **kwargs)
+    except Exception as e:
+        raise type(e)(f"{e}. Error thrown while opening file: {path}")
+
+
 def _create_datarray_from_paths(paths: List[str], headers: List[Dict[str, Any]]):
-    da = imod.formats.array_io.reading._load(
-        paths, use_cftime=False, _read=imod.idf._read, headers=headers
+    da = _try_read_with_func(
+        imod.formats.array_io.reading._load,
+        paths,
+        use_cftime=False,
+        _read=imod.idf._read,
+        headers=headers,
     )
     return da
 
@@ -786,7 +797,7 @@ def _read_package_ipf(
 
         # Ensure the columns are identifiable.
         path = Path(entry["path"])
-        ipf_df, indexcol, ext = imod.ipf._read_ipf(path)
+        ipf_df, indexcol, ext = _try_read_with_func(imod.ipf._read_ipf, path)
         if indexcol == 0:
             # No associated files
             columns = ("x", "y", "rate")
@@ -801,7 +812,9 @@ def _read_package_ipf(
             for row in ipf_df.itertuples():
                 filename = row[indexcol]
                 path_assoc = path.parent.joinpath(f"{filename}.{ext}")
-                df_assoc = imod.ipf.read_associated(path_assoc).iloc[:, :2]
+                df_assoc = _try_read_with_func(
+                    imod.ipf.read_associated, path_assoc
+                ).iloc[:, :2]
                 df_assoc.columns = ["time", "rate"]
                 df_assoc["x"] = row[1]
                 df_assoc["y"] = row[2]
