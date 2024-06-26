@@ -687,16 +687,6 @@ class Well(BoundaryCondition, IPointDataPackage):
             minimum_thickness=minimum_thickness,
         )
 
-    @classmethod
-    def panda_column_to_scalar(cls, column: pd.Series) -> float:
-        # input is a column of a pandas dataframe expected to contain the same value
-        # in every row (like the x-coordinate of a well)
-        # This function returns that value and checks they are all the same
-
-        if not np.all(column.values == column.values[0]):
-            raise ValueError("error while converting pandas column to scalar")
-        return float(column.values[0])
-
 
 class WellDisStructured(DisStructuredBoundaryCondition):
     """
