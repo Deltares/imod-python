@@ -16,9 +16,7 @@ object NightlyProject : Project({
     buildType(NightlyUnitTests)
     buildType(NightlyExamples)
     buildType(NightlyTests)
-    buildType(NightlyPipPython310)
-    buildType(NightlyPipPython311)
-    buildType(NightlyPipPython312)
+    buildType(NightlyPipPython)
 })
 
 object NightlyLint : BuildType({
@@ -27,22 +25,10 @@ object NightlyLint : BuildType({
     templates(LintTemplate)
 })
 
-object NightlyPipPython310 : BuildType({
-    name = "PipPython310"
+object NightlyPipPython : BuildType({
+    name = "PipPython"
 
-    templates(PipPython310Template)
-})
-
-object NightlyPipPython311 : BuildType({
-    name = "PipPython311"
-
-    templates(PipPython311Template)
-})
-
-object NightlyPipPython312 : BuildType({
-    name = "PipPython312"
-
-    templates(PipPython312Template)
+    templates(PipPythonTemplate)
 })
 
 object NightlyMyPy : BuildType({

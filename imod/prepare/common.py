@@ -145,7 +145,7 @@ def _reshape(src, dst, ndim_regrid):
     if ndim == ndim_regrid:
         n_iter = 1
     else:
-        n_iter = int(np.product(src_shape[:-ndim_regrid]))
+        n_iter = int(np.prod(src_shape[:-ndim_regrid]))
 
     src_itershape = (n_iter, *src_shape[-ndim_regrid:])
     dst_itershape = (n_iter, *dst_shape[-ndim_regrid:])
@@ -298,9 +298,11 @@ def _set_cellsizes(da, dims):
         dx_string = f"d{dim}"
         if dx_string not in da.coords:
             dx, _, _ = imod.util.spatial.coord_reference(da.coords[dim])
-            if isinstance(dx, (int, float)):
-                dx = np.full(da.coords[dim].size, dx)
-            da = da.assign_coords({dx_string: (dim, dx)})
+            dx_a = (
+                np.full(da.coords[dim].size, dx) if isinstance(dx, (int, float)) else dx
+            )
+            da = da.assign_coords({dx_string: (dim, dx_a)})
+
     return da
 
 

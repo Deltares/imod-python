@@ -1,6 +1,6 @@
 import abc
 from dataclasses import asdict
-from typing import Optional
+from typing import Any, Dict, Optional
 
 import numpy as np
 
@@ -35,6 +35,8 @@ class Storage(Package):
 
 
 class StorageBase(Package, IRegridPackage, abc.ABC):
+    _grid_data: Dict[str, type] = {}
+
     def get_options(self, d):
         # Skip both variables in grid_data and "transient".
         not_options = list(self._grid_data.keys())
@@ -48,8 +50,8 @@ class StorageBase(Package, IRegridPackage, abc.ABC):
                 d[varname] = v
         return d
 
-    def _render_dict(self, directory, pkgname, globaltimes, binary):
-        d = {}
+    def _render_dict(self, directory, pkgname, globaltimes, binary) -> Dict[str, Any]:
+        d: Dict[str, Any] = {}
         stodirectory = directory / pkgname
         for varname in self._grid_data:
             key = self._keyword_map.get(varname, varname)
@@ -57,7 +59,8 @@ class StorageBase(Package, IRegridPackage, abc.ABC):
                 self[varname], stodirectory, key, binary=binary
             )
             if self._valid(value):  # skip False or None
-                d[f"{key}_layered"], d[key] = layered, value
+                d[f"{key}_layered"] = layered
+                d[key] = value
 
         periods = {}
         if "time" in self.dataset["transient"].coords:
@@ -291,7 +294,6 @@ class StorageCoefficient(StorageBase):
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),
     }
-
     _template = Package._initialize_template(_pkg_id)
     _regrid_method = StorageCoefficientRegridMethod()
 
