@@ -647,6 +647,46 @@ class Well(BoundaryCondition, IPointDataPackage):
         )
         return mask_2D(self, domain_2d)
 
+    @classmethod
+    def from_imod5_data(
+        cls,
+        key: str,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        minimum_k: float = 0.1,
+        minimum_thickness: float = 1.0,
+    ) -> "Well":
+        df: pd.DataFrame = imod5_data[key]["dataframe"]
+
+        # Groupby unique wells, to get dataframes per time.
+        colnames_group = ["x", "y", "filt_top", "filt_bot", "id"]
+        wel_index, df_groups = zip(*df.groupby(colnames_group))
+        # Unpack wel indices by zipping
+        x, y, filt_top, filt_bot, id = zip(*wel_index)
+        # Convert dataframes all groups to DataArrays
+        da_groups = [
+            xr.DataArray(
+                df_group["rate"], dims=("time"), coords={"time": df_group["time"]}
+            )
+            for df_group in df_groups
+        ]
+        # Assign index coordinates
+        da_groups = [
+            da_group.expand_dims(dim="index").assign_coords(index=[i])
+            for i, da_group in enumerate(da_groups)
+        ]
+        # Concatenate datarrays along index dimension
+        well_rate = xr.concat(da_groups, dim="index")
+
+        return cls(
+            x=np.array(x, dtype=float),
+            y=np.array(y, dtype=float),
+            screen_top=np.array(filt_top, dtype=float),
+            screen_bottom=np.array(filt_bot, dtype=float),
+            rate=well_rate,
+            minimum_k=minimum_k,
+            minimum_thickness=minimum_thickness,
+        )
+
 
 class WellDisStructured(DisStructuredBoundaryCondition):
     """

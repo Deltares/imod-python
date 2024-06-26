@@ -11,9 +11,13 @@ import xugrid as xu
 from pytest_cases import parametrize_with_cases
 
 import imod
+from imod.formats.prj.prj import open_projectfile_data
 from imod.logging.config import LoggerType
 from imod.logging.loglevel import LogLevel
+from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.utilities.grid import broadcast_to_full_domain
+from imod.mf6.wel import Well
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
@@ -812,3 +816,62 @@ def test_render__concentration_dis_vertices_transient(well_test_data_transient):
             assert (
                 data.count(" 246 135") == 15
             )  # check salinity and temperature was written to period data
+
+
+@pytest.mark.usefixtures("imod5_dataset")
+def test_import_and_convert_to_mf6(imod5_dataset, tmp_path):
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset)
+    target_npf = NodePropertyFlow.from_imod5_data(
+        imod5_dataset, target_dis.dataset["idomain"]
+    )
+
+    # import grid-agnostic well from imod5 data (it contains 1 well)
+    wel = Well.from_imod5_data("wel-1", imod5_dataset)
+    assert wel.dataset["x"].values[0] == 197910.0
+    assert wel.dataset["y"].values[0] == 362860.0
+    assert np.mean(wel.dataset["rate"].values) == -323.8936170212766
+
+    # convert to a gridded well
+    top = target_dis.dataset["top"]
+    bottom = target_dis.dataset["bottom"]
+    active = target_dis.dataset["idomain"]
+    k = target_npf.dataset["k"]
+    mf6_well = wel.to_mf6_pkg(active, top, bottom, k, True)
+
+    # assert mf6 well properties
+    assert len(mf6_well.dataset["x"].values == 1)
+    assert mf6_well.dataset["x"].values[0] == 197910.0
+    assert mf6_well.dataset["y"].values[0] == 362860.0
+    assert np.mean(mf6_well.dataset["rate"].values) == -323.8936170212766
+
+    # write the package for validation
+    write_context = WriteContext(simulation_directory=tmp_path)
+    mf6_well.write("wel", [], write_context)
+
+
+@pytest.mark.usefixtures("well_regular_import_prj")
+def test_import_multiple_wells(well_regular_import_prj):
+    imod5dict = open_projectfile_data(well_regular_import_prj)
+
+    # import grid-agnostic well from imod5 data (it contains 2 packages with 3 wells each)
+    wel1 = imod.mf6.Well.from_imod5_data("wel-1", imod5dict[0])
+    wel2 = imod.mf6.Well.from_imod5_data("wel-2", imod5dict[0])
+
+    assert np.all(wel1.x == np.array([191112.11, 191171.96, 191231.52]))
+    assert np.all(wel2.x == np.array([191112.11, 191171.96, 191231.52]))
+    assert wel1.dataset["rate"].shape == (6, 3)
+    assert wel2.dataset["rate"].shape == (6, 3)
+
+
+@pytest.mark.usefixtures("well_duplication_import_prj")
+def test_import_from_imod5_with_duplication(well_duplication_import_prj):
+    imod5dict = open_projectfile_data(well_duplication_import_prj)
+
+    # import grid-agnostic well from imod5 data (it contains 2 packages with 3 wells each)
+    wel1 = imod.mf6.Well.from_imod5_data("wel-1", imod5dict[0])
+    wel2 = imod.mf6.Well.from_imod5_data("wel-2", imod5dict[0])
+
+    assert np.all(wel1.x == np.array([191171.96, 191231.52, 191231.52]))
+    assert np.all(wel2.x == np.array([191112.11, 191171.96, 191231.52]))
+    assert wel1.dataset["rate"].shape == (6, 3)
+    assert wel2.dataset["rate"].shape == (6, 3)
