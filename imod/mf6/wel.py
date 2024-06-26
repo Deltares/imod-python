@@ -655,7 +655,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         minimum_k: float = 0.1,
         minimum_thickness: float = 1.0,
     ) -> "Well":
-        df = imod5_data[key]["dataframe"]
+        df: pd.DataFrame = imod5_data[key]["dataframe"]
 
         # Groupby unique wells, to get dataframes per time.
         colnames_group = ["x", "y", "filt_top", "filt_bot", "id"]
