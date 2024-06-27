@@ -1,12 +1,15 @@
+from dataclasses import asdict
 from typing import Optional
+
 import numpy as np
 
-import imod
 from imod.logging import init_log_decorator
 from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.regrid.regrid_schemes import ConstantHeadRegridMethod, RegridMethodType
+from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -145,17 +148,68 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
-    
+
     @classmethod
     @standard_log_decorator()
     def from_imod5_data(
         cls,
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        target_grid: GridDataArray,
+        target_grid: StructuredDiscretization,
         regridder_types: Optional[RegridMethodType] = None,
     ) -> "ConstantHead":
-        pass
+        return cls._from_head_data(
+            imod5_data[key]["head"],
+            imod5_data["bnd"]["ibound"],
+            target_grid,
+            regridder_types,
+        )
 
+    @classmethod
+    @standard_log_decorator()
+    def from_imod5_shd_data(
+        cls,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        target_grid: StructuredDiscretization,
+        regridder_types: Optional[RegridMethodType] = None,
+    ) -> "ConstantHead":
+        return cls._from_head_data(
+            imod5_data["shd"]["head"],
+            imod5_data["bnd"]["ibound"],
+            target_grid,
+            regridder_types,
+        )
 
+    @classmethod
+    @standard_log_decorator()
+    def _from_head_data(
+        cls,
+        head: GridDataArray,
+        ibound: GridDataArray,
+        target_grid: StructuredDiscretization,
+        regridder_types: Optional[RegridMethodType] = None,
+    ) -> "ConstantHead":
+        target_idomain = target_grid.dataset["idomain"]
 
+        # select locations where ibound < 0
+        head = head.where(ibound < 0)
+
+        # select locations where idomain > 0
+        head = head.where(target_idomain > 0)
+
+        if regridder_types is None:
+            regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
+        else:
+            regridder_settings = asdict(regridder_types, dict_factory=dict)
+
+        regrid_context = RegridderWeightsCache()
+
+        data = {
+            "head": head,
+        }
+
+        regridded_package_data = _regrid_package_data(
+            data, target_idomain, regridder_settings, regrid_context, {}
+        )
+
+        return cls(**regridded_package_data)
