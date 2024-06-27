@@ -12,9 +12,9 @@ from imod.mf6 import (
     HorizontalFlowBarrierHydraulicCharacteristic,
     HorizontalFlowBarrierMultiplier,
     HorizontalFlowBarrierResistance,
-    LayeredHorizontalFlowBarrierHydraulicCharacteristic,
-    LayeredHorizontalFlowBarrierMultiplier,
-    LayeredHorizontalFlowBarrierResistance,
+    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic,
+    SingleLayerHorizontalFlowBarrierMultiplier,
+    SingleLayerHorizontalFlowBarrierResistance,
 )
 from imod.mf6.hfb import to_connected_cells_dataset
 from imod.mf6.utilities.regrid import RegridderWeightsCache
@@ -151,10 +151,10 @@ def test_to_mf6_creates_mf6_adapter(
 @pytest.mark.parametrize(
     "barrier_class, barrier_value_name, barrier_value, expected_hydraulic_characteristic",
     [
-        (LayeredHorizontalFlowBarrierResistance, "resistance", 1e3, 1e-3),
-        (LayeredHorizontalFlowBarrierMultiplier, "multiplier", 1.5, -1.5),
+        (SingleLayerHorizontalFlowBarrierResistance, "resistance", 1e3, 1e-3),
+        (SingleLayerHorizontalFlowBarrierMultiplier, "multiplier", 1.5, -1.5),
         (
-            LayeredHorizontalFlowBarrierHydraulicCharacteristic,
+            SingleLayerHorizontalFlowBarrierHydraulicCharacteristic,
             "hydraulic_characteristic",
             1e-3,
             1e-3,
@@ -305,7 +305,7 @@ def test_to_mf6_layered_hfb(mf6_flow_barrier_mock, basic_dis, layer, expected_va
         },
     )
 
-    hfb = LayeredHorizontalFlowBarrierResistance(geometry, print_input)
+    hfb = SingleLayerHorizontalFlowBarrierResistance(geometry, print_input)
 
     # Act.
     _ = hfb.to_mf6_pkg(idomain, top, bottom, k)
@@ -337,7 +337,7 @@ def test_to_mf6_layered_hfb__error():
         },
     )
 
-    hfb = LayeredHorizontalFlowBarrierResistance(geometry, print_input)
+    hfb = SingleLayerHorizontalFlowBarrierResistance(geometry, print_input)
     errors = hfb._validate(hfb._write_schemata)
 
     assert len(errors) > 0

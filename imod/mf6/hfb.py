@@ -673,7 +673,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
 class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
     """
-     Horizontal Flow Barrier (HFB) package
+    Horizontal Flow Barrier (HFB) package
 
     Input to the Horizontal Flow Barrier (HFB) Package is read from the file
     that has type "HFB6" in the Name File. Only one HFB Package can be
@@ -734,9 +734,9 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
         return barrier_values
 
 
-class LayeredHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
+class SingleLayerHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
     """
-     Horizontal Flow Barrier (HFB) package
+    Horizontal Flow Barrier (HFB) package
 
     Input to the Horizontal Flow Barrier (HFB) Package is read from the file
     that has type "HFB6" in the Name File. Only one HFB Package can be
@@ -748,8 +748,10 @@ class LayeredHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierB
     geometry: gpd.GeoDataFrame
         Dataframe that describes:
          - geometry: the geometries of the barriers,
-         - hydraulic_characteristic: the hydraulic characteristic of the barriers
-         - layer: model layer for the barrier
+         - hydraulic_characteristic: the hydraulic characteristic of the
+           barriers
+         - layer: model layer for the barrier, only 1 single layer can be
+           entered.
     print_input: bool
 
     Examples
@@ -804,7 +806,7 @@ class LayeredHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierB
 
 class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     """
-     Horizontal Flow Barrier (HFB) package
+    Horizontal Flow Barrier (HFB) package
 
     Input to the Horizontal Flow Barrier (HFB) Package is read from the file
     that has type "HFB6" in the Name File. Only one HFB Package can be
@@ -870,16 +872,14 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
         return barrier_values
 
 
-class LayeredHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
+class SingleLayerHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     """
-     Horizontal Flow Barrier (HFB) package
+    Horizontal Flow Barrier (HFB) package
 
     Input to the Horizontal Flow Barrier (HFB) Package is read from the file
     that has type "HFB6" in the Name File. Only one HFB Package can be
     specified for a GWF model.
     https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.2.2.pdf
-
-    If parts of the barrier overlap a layer the multiplier is applied to the entire layer.
 
     Parameters
     ----------
@@ -887,7 +887,8 @@ class LayeredHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
         Dataframe that describes:
          - geometry: the geometries of the barriers,
          - multiplier: the multiplier of the barriers
-         - layer: model layer for the barrier
+         - layer: model layer for the barrier, only 1 single layer can be
+           entered.
     print_input: bool
 
     Examples
@@ -1024,7 +1025,7 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         return barrier_values
 
 
-class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
+class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     """
     Horizontal Flow Barrier (HFB) package
 
@@ -1039,7 +1040,8 @@ class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         Dataframe that describes:
          - geometry: the geometries of the barriers,
          - resistance: the resistance of the barriers
-         - layer: model layer for the barrier
+         - layer: model layer for the barrier, only 1 single layer can be
+           entered.
     print_input: bool
 
     Examples
