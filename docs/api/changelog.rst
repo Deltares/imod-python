@@ -50,7 +50,10 @@ Changed
   :class:`imod.mf6.regrid.RiverRegridMethod`,
   :class:`imod.mf6.regrid.SpecificStorageRegridMethod`,
   :class:`imod.mf6.regrid.StorageCoefficientRegridMethod`.
-
+- Renamed ``imod.mf6.LayeredHorizontalFlowBarrier`` classes to
+  :class:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance`,
+  :class:`imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic`,
+  :class:`imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier`,
 
 
 [0.17.1] - 2024-05-16
