@@ -6,13 +6,18 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+
+[Unreleased- feature branch]
+----------------------------
+
+Changed
+~~~~~~~
+- :class:`imod.mf6.Well` now also validates that well filter top is above well filter bottom
+- :function:`open_projectfile_data` now also imports well filter top and bottom.
+- :class:`imod.mf6.Well` now logs a warning if any wells are removed during writing.
+
 [Unreleased]
 ------------
-
-Fixed
-~~~~~
-- :func:`imod.formats.prj.open_projectfile_data` now reports the path to a
-  faulty IPF or IDF file in the error message.
 
 Added
 ~~~~~
@@ -54,6 +59,13 @@ Changed
   :class:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance`,
   :class:`imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic`,
   :class:`imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier`,
+
+Fixed
+~~~~~
+- :func:`imod.formats.prj.open_projectfile_data` now reports the path to a
+  faulty IPF or IDF file in the error message.
+
+
 
 
 [0.17.1] - 2024-05-16

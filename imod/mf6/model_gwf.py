@@ -6,9 +6,23 @@ import cftime
 import numpy as np
 
 from imod.logging import init_log_decorator
+from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6 import ConstantHead
 from imod.mf6.clipped_boundary_condition_creator import create_clipped_boundary
+from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.drn import Drainage
+from imod.mf6.hfb import LayeredHorizontalFlowBarrierResistance
+from imod.mf6.ic import InitialConditions
 from imod.mf6.model import Modflow6Model
+from imod.mf6.npf import NodePropertyFlow
+from imod.mf6.rch import Recharge
+from imod.mf6.regrid.regrid_schemes import RegridMethodType
+from imod.mf6.riv import River
+from imod.mf6.sto import StorageCoefficient
+from imod.prepare.topsystem.default_allocation_methods import (
+    SimulationAllocationOptions,
+    SimulationDistributingOptions,
+)
 from imod.typing import GridDataArray
 
 
@@ -153,3 +167,106 @@ class GroundwaterFlowModel(Modflow6Model):
         transport_models_old = buoyancy_package.get_transport_model_names()
         if len(transport_models_old) == len(transport_models_per_flow_model):
             buoyancy_package.update_transport_models(transport_models_per_flow_model)
+
+    @classmethod
+    @standard_log_decorator()
+    def from_imod5_data(
+        cls,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        allocation_options: SimulationAllocationOptions,
+        distributing_options: SimulationDistributingOptions,
+        regridder_types: Optional[RegridMethodType] = None,
+    ) -> "GroundwaterFlowModel":
+        """
+        Imports a GroundwaterFlowModel (GWF) from the data in an IMOD5 project file.
+        It adds the packages for which import from imod5 is supported.
+        Some packages (like OC) must be added manually later.
+
+
+        Parameters
+        ----------
+        imod5_data: dict[str, dict[str, GridDataArray]]
+            dictionary containing the arrays mentioned in the project file as xarray datasets,
+            under the key of the package type to which it belongs
+        allocation_options: SimulationAllocationOptions
+            object containing the allocation options per package type.
+            If you want a package to have a different allocation option,
+            then it should be imported separately
+        distributing_options: SimulationDistributingOptions
+            object containing the conductivity distribution options per package type.
+            If you want a package to have a different allocation option,
+            then it should be imported separately
+        regridder_types: Optional[dict[str, dict[str, tuple[RegridderType, str]]]]
+            the first key is the package name. The second key is the array name, and the value is
+            the RegridderType tuple (method + function)
+
+        Returns
+        -------
+        A GWF model containing the packages that could be imported form IMOD5. Users must still
+        add the OC package to the model.
+
+        """
+        # first import the singleton packages
+        # import discretization
+
+        dis_pkg = StructuredDiscretization.from_imod5_data(imod5_data, regridder_types)
+        grid = dis_pkg.dataset["idomain"]
+
+        # import npf
+        npf_pkg = NodePropertyFlow.from_imod5_data(imod5_data, grid, regridder_types)
+
+        # import sto
+        sto_pkg = StorageCoefficient.from_imod5_data(imod5_data, grid, regridder_types)
+
+        # import initial conditions
+        ic_pkg = InitialConditions.from_imod5_data(imod5_data, grid, regridder_types)
+
+        # import recharge
+        rch_pkg = Recharge.from_imod5_data(imod5_data, dis_pkg, regridder_types)
+
+        result = GroundwaterFlowModel()
+        result["dis"] = dis_pkg
+        result["npf"] = npf_pkg
+        result["sto"] = sto_pkg
+        result["ic"] = ic_pkg
+        result["rch"] = rch_pkg
+
+        # now import the non-singleton packages
+        # import drainage
+        imod5_keys = list(imod5_data.keys())
+        drainage_keys = [key for key in imod5_keys if key[0:3] == "drn"]
+        for drn_key in drainage_keys:
+            drn_pkg = Drainage.from_imod5_data(
+                drn_key,
+                imod5_data,
+                dis_pkg,
+                npf_pkg,
+                allocation_options.drn,
+                distributing_option=distributing_options.drn,
+                regridder_types=regridder_types,
+            )
+            result[drn_key] = drn_pkg
+
+        # import rivers ( and drainage to account for infiltration factor)
+        riv_keys = [key for key in imod5_keys if key[0:3] == "riv"]
+        for riv_key in riv_keys:
+            riv_pkg, drn_pkg = River.from_imod5_data(
+                riv_key,
+                imod5_data,
+                dis_pkg,
+                allocation_options.riv,
+                distributing_options.riv,
+                regridder_types,
+            )
+            if riv_pkg is not None:
+                result[riv_key + "riv"] = riv_pkg
+            if drn_pkg is not None:
+                result[riv_key + "drn"] = drn_pkg
+
+        # import hfb
+        hfb_keys = [key for key in imod5_keys if key[0:3] == "hfb"]
+        if len(hfb_keys) != 0:
+            hfb = LayeredHorizontalFlowBarrierResistance.from_imod5_dataset(imod5_data)
+            result["hfb"] = hfb
+
+        return result

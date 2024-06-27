@@ -43,6 +43,16 @@ def nan_like(grid: xu.UgridDataArray, dtype=np.float32, *args, **kwargs):  # noq
 
 
 @typedispatch
+def full_like(grid: xr.DataArray, fill_value, *args, **kwargs):
+    return xr.full_like(grid, fill_value, *args, **kwargs)
+
+
+@typedispatch  # type: ignore [no-redef]
+def full_like(grid: xu.UgridDataArray, fill_value, *args, **kwargs):  # noqa: F811
+    return xu.full_like(grid, fill_value, *args, **kwargs)
+
+
+@typedispatch
 def is_unstructured(grid: xu.UgridDataArray | xu.UgridDataset) -> bool:
     return True
 
@@ -390,3 +400,30 @@ def preserve_gridtype(func):
         return x
 
     return decorator
+
+
+def is_planar_grid(
+    grid: xr.DataArray | xr.Dataset | xu.UgridDataArray | xu.UgridDataset,
+) -> bool:
+    # Returns True if the grid is planar. It has then a layer coordinate with
+    # length 1 and value 0, or an empty layer coordinate axis, or no layer coordinate at all
+    # and it should have either x, y coordinates or cellface/edge coordinates.
+    if not is_spatial_grid(grid):
+        return False
+    if "layer" not in grid.coords:
+        return True
+    if grid["layer"].shape == ():
+        return True
+    if grid["layer"][0] == 0 and len(grid["layer"]) == 1:
+        return True
+    return False
+
+
+def is_transient_data_grid(
+    grid: xr.DataArray | xr.Dataset | xu.UgridDataArray | xu.UgridDataset,
+):
+    # Returns True if there is a time coordinate on the object with more than one value.
+    if "time" in grid.coords:
+        if len(grid["time"]) > 1:
+            return True
+    return False

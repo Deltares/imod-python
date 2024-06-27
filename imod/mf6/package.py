@@ -25,6 +25,7 @@ from imod.mf6.pkgbase import (
 )
 from imod.mf6.regrid.regrid_schemes import EmptyRegridMethod, RegridMethodType
 from imod.mf6.utilities.mask import mask_package
+from imod.mf6.utilities.package import _is_valid
 from imod.mf6.utilities.regrid import (
     RegridderWeightsCache,
     _regrid_like,
@@ -80,25 +81,9 @@ class Package(PackageBase, IPackage, abc.ABC):
             f"{type(self).__name__}(**{self._pkg_id}.dataset.sel(**selection))"
         )
 
-    def _valid(self, value):
-        """
-        Filters values that are None, False, or a numpy.bool_ False.
-        Needs to be this specific, since 0.0 and 0 are valid values, but are
-        equal to a boolean False.
-        """
-        # Test singletons
-        if value is False or value is None:
-            return False
-        # Test numpy bool (not singleton)
-        elif isinstance(value, np.bool_) and not value:
-            return False
-        # When dumping to netCDF and reading back, None will have been
-        # converted into a NaN. Only check NaN if it's a floating type to avoid
-        # TypeErrors.
-        elif np.issubdtype(type(value), np.floating) and np.isnan(value):
-            return False
-        else:
-            return True
+    @staticmethod
+    def _valid(value: Any) -> bool:
+        return _is_valid(value)
 
     @staticmethod
     def _number_format(dtype: type):
@@ -656,5 +641,6 @@ class Package(PackageBase, IPackage, abc.ABC):
     def is_clipping_supported(self) -> bool:
         return True
 
-    def get_regrid_methods(self) -> RegridMethodType:
-        return deepcopy(self._regrid_method)
+    @classmethod
+    def get_regrid_methods(cls) -> RegridMethodType:
+        return deepcopy(cls._regrid_method)
