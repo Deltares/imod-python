@@ -1107,7 +1107,9 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         for hfb_key in hfb_keys:
             hfb_dict = imod5_data[hfb_key]
             if not list(hfb_dict.keys()) == ["geodataframe", "layer"]:
-                raise ValueError("hfb is not a SingleLayerHorizontalFlowBarrierResistance")
+                raise ValueError(
+                    "hfb is not a SingleLayerHorizontalFlowBarrierResistance"
+                )
             layer = hfb_dict["layer"]
             if layer == 0:
                 raise ValueError(
