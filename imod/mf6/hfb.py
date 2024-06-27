@@ -18,7 +18,7 @@ from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
 from imod.mf6.utilities.grid import broadcast_to_full_domain
-from imod.schemata import EmptyIndexesSchema
+from imod.schemata import EmptyIndexesSchema, NUniqueValueSchema
 from imod.typing import GridDataArray
 from imod.util.imports import MissingOptionalModule
 
@@ -283,7 +283,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
     _period_data = ()
     _init_schemata = {}
-    _write_schemata = {"geometry": [EmptyIndexesSchema()]}
+    _write_schemata = {"geometry": [EmptyIndexesSchema()], "layer": [NUniqueValueSchema(1)]}
 
     def __init__(
         self,
@@ -342,7 +342,6 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         top: GridDataArray,
         bottom: GridDataArray,
         k: GridDataArray,
-        validate: bool = False,
     ) -> Mf6HorizontalFlowBarrier:
         """
         Write package to Modflow 6 package.
@@ -361,16 +360,11 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             Grid with bottom of model layers.
         k: GridDataArray
             Grid with hydraulic conductivities.
-        validate: bool
-            Run validation before converting
 
         Returns
         -------
 
         """
-        if validate:
-            self._validate(self._write_schemata)
-
         top, bottom = broadcast_to_full_domain(idomain, top, bottom)
         k = idomain * k
         unstructured_grid, top, bottom, k = (
