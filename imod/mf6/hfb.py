@@ -734,7 +734,9 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
         return barrier_values
 
 
-class SingleLayerHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
+class SingleLayerHorizontalFlowBarrierHydraulicCharacteristic(
+    HorizontalFlowBarrierBase
+):
     """
     Horizontal Flow Barrier (HFB) package
 
