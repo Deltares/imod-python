@@ -507,12 +507,16 @@ class NUniqueValueSchema(BaseSchema):
     """
     Schema to validate if amount of unique values is correct.
     """
+
     def __init__(self, length: int):
         self.length = length
 
     def validate(self, obj: GridDataArray, **kwargs) -> None:
         if len(np.unique(obj)) > self.length:
-            raise ValidationError(f"Amount of unique values exceeds limit of {self.length}")
+            raise ValidationError(
+                f"Amount of unique values exceeds limit of {self.length}"
+            )
+
 
 def _notnull(obj):
     """

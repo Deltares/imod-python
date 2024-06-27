@@ -768,7 +768,10 @@ class LayeredHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierB
 
     """
 
-    _write_schemata = {"geometry": [EmptyIndexesSchema()], "layer": [NUniqueValueSchema(1)]}
+    _write_schemata = {
+        "geometry": [EmptyIndexesSchema()],
+        "layer": [NUniqueValueSchema(1)],
+    }
 
     @init_log_decorator()
     def __init__(
@@ -903,7 +906,10 @@ class LayeredHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
 
     """
 
-    _write_schemata = {"geometry": [EmptyIndexesSchema()], "layer": [NUniqueValueSchema(1)]}
+    _write_schemata = {
+        "geometry": [EmptyIndexesSchema()],
+        "layer": [NUniqueValueSchema(1)],
+    }
 
     @init_log_decorator()
     def __init__(
@@ -1053,7 +1059,10 @@ class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
 
     """
 
-    _write_schemata = {"geometry": [EmptyIndexesSchema()], "layer": [NUniqueValueSchema(1)]}
+    _write_schemata = {
+        "geometry": [EmptyIndexesSchema()],
+        "layer": [NUniqueValueSchema(1)],
+    }
 
     @init_log_decorator()
     def __init__(
