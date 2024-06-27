@@ -210,7 +210,7 @@ def test_from_imod5(imod5_dataset, tmp_path):
     assert np.count_nonzero(~np.isnan(chd3.dataset["head"].values)) == 589
     assert len(chd3.dataset["layer"].values) == 1
 
-    # write the packages for write validation    
+    # write the packages for write validation
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=False)
     chd3.write("chd3", [1], write_context)
 

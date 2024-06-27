@@ -155,13 +155,48 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         cls,
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        target_grid: StructuredDiscretization,
+        target_discretization: StructuredDiscretization,
         regridder_types: Optional[RegridMethodType] = None,
     ) -> "ConstantHead":
+        """
+        Construct a ConstantHead-package from iMOD5 data, loaded with the
+        :func:`imod.formats.prj.open_projectfile_data` function.
+
+        This function can be used if chd packages are defined in the imod5 data.
+
+        If they are not, then imod5 assumed that at all the locations where ibound
+        = -1 a chd package is active with the starting head of the simulation
+        as a constant. In that case, use the from_imod5_shd_data function instead
+        of this one.
+
+        The creation of a chd package from shd data should only be done if no chd
+        packages at all are present in the imod5_data
+
+
+
+        Parameters
+        ----------
+        key: str
+            The key used in the imod5 data dictionary that is used to refer
+            to the chd package that we want to import.
+        imod5_data: dict
+            Dictionary with iMOD5 data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
+        target_discretization:  StructuredDiscretization package
+            The grid that should be used for the new package. Does not
+            need to be identical to one of the input grids.
+        regridder_types: RegridMethodType, optional
+            Optional dataclass with regridder types for a specific variable.
+            Use this to override default regridding methods.
+
+        Returns
+        -------
+        A list of Modflow 6 Drainage packages.
+        """
         return cls._from_head_data(
             imod5_data[key]["head"],
             imod5_data["bnd"]["ibound"],
-            target_grid,
+            target_discretization,
             regridder_types,
         )
 
@@ -170,13 +205,43 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
     def from_imod5_shd_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        target_grid: StructuredDiscretization,
+        target_discretization: StructuredDiscretization,
         regridder_types: Optional[RegridMethodType] = None,
     ) -> "ConstantHead":
+        """
+        Construct a ConstantHead-package from iMOD5 data, loaded with the
+        :func:`imod.formats.prj.open_projectfile_data` function.
+
+        This function can be used if no chd packages at all are defined in the imod5 data.
+
+        In that case, imod5 assumed that at all the locations where ibound
+        = -1,  a chd package is active with the starting head of the simulation
+        as a constant.
+
+        So this function creates a single chd package that will be present at all locations where
+        ibound == -1. The assigned head will be the starting head, specified in the array "shd"
+        in the imod5 data.
+
+        Parameters
+        ----------
+        imod5_data: dict
+            Dictionary with iMOD5 data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
+        target_discretization:  StructuredDiscretization package
+            The grid that should be used for the new package. Does not
+            need to be identical to one of the input grids.
+        regridder_types: RegridMethodType, optional
+            Optional dataclass with regridder types for a specific variable.
+            Use this to override default regridding methods.
+
+        Returns
+        -------
+        A list of Modflow 6 Drainage packages.
+        """
         return cls._from_head_data(
             imod5_data["shd"]["head"],
             imod5_data["bnd"]["ibound"],
-            target_grid,
+            target_discretization,
             regridder_types,
         )
 
@@ -186,10 +251,10 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         cls,
         head: GridDataArray,
         ibound: GridDataArray,
-        target_grid: StructuredDiscretization,
+        target_discretization: StructuredDiscretization,
         regridder_types: Optional[RegridMethodType] = None,
     ) -> "ConstantHead":
-        target_idomain = target_grid.dataset["idomain"]
+        target_idomain = target_discretization.dataset["idomain"]
 
         # select locations where ibound < 0
         head = head.where(ibound < 0)
