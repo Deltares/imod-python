@@ -193,7 +193,7 @@ def test_to_mf6_creates_mf6_adapter_layered(
     hfb = barrier_class(geometry, print_input)
 
     # Act.
-    _ = hfb.to_mf6_pkg(idomain, top, bottom, k, False)
+    _ = hfb.to_mf6_pkg(idomain, top, bottom, k)
 
     # Assert.
     snapped, _ = xu.snap_to_grid(geometry, grid=idomain, max_snap_distance=0.5)
@@ -278,6 +278,69 @@ def test_to_mf6_different_z_boundaries(
     barrier_values = args["hydraulic_characteristic"].values.reshape(3, 8)
     max_values_per_layer = barrier_values.max(axis=1)
     assert_array_equal(max_values_per_layer, 1.0 / expected_values)
+
+
+@pytest.mark.parametrize(
+    "layer, expected_values",
+    [
+        (2, np.array([1e3, 1e3, 1e3, 1e3, 1e3, 1e3, 1e3, 1e3])),  # 2nd layer
+    ],
+)
+@patch("imod.mf6.mf6_hfb_adapter.Mf6HorizontalFlowBarrier.__new__", autospec=True)
+def test_to_mf6_layered_hfb(mf6_flow_barrier_mock, basic_dis, layer, expected_values):
+    # Arrange.
+    idomain, top, bottom = basic_dis
+    k = ones_like(top)
+
+    print_input = False
+
+    barrier_y = [5.5, 5.5, 5.5]
+    barrier_x = [82.0, 40.0, 0.0]
+
+    geometry = gpd.GeoDataFrame(
+        geometry=[shapely.linestrings(barrier_x, barrier_y)],
+        data={
+            "resistance": [1e3],
+            "layer": [layer],
+        },
+    )
+
+    hfb = LayeredHorizontalFlowBarrierResistance(geometry, print_input)
+
+    # Act.
+    _ = hfb.to_mf6_pkg(idomain, top, bottom, k)
+
+    # Assert.
+    _, args = mf6_flow_barrier_mock.call_args
+    barrier_values = args["hydraulic_characteristic"].values
+    assert_array_equal(barrier_values, 1.0 / expected_values)
+    expected_layer = np.full((8,), layer)
+    barrier_layer = args["layer"].values
+    assert_array_equal(barrier_layer, expected_layer)
+
+
+def test_to_mf6_layered_hfb__error():
+    """Throws error because multiple layers attached to one object."""
+    # Arrange.
+    print_input = False
+
+    barrier_y = [5.5, 5.5, 5.5]
+    barrier_x = [82.0, 40.0, 0.0]
+
+    linestring = shapely.linestrings(barrier_x, barrier_y)
+
+    geometry = gpd.GeoDataFrame(
+        geometry=[linestring, linestring],
+        data={
+            "resistance": [1e3, 1e3],
+            "layer": [1, 2],
+        },
+    )
+
+    hfb = LayeredHorizontalFlowBarrierResistance(geometry, print_input)
+    errors = hfb._validate(hfb._write_schemata)
+
+    assert len(errors) > 0
 
 
 @pytest.mark.parametrize(
