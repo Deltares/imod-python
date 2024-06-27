@@ -283,7 +283,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
     _period_data = ()
     _init_schemata = {}
-    _write_schemata = {"geometry": [EmptyIndexesSchema()], "layer": [NUniqueValueSchema(1)]}
+    _write_schemata = {"geometry": [EmptyIndexesSchema()]}
 
     def __init__(
         self,
@@ -768,6 +768,8 @@ class LayeredHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierB
 
     """
 
+    _write_schemata = {"geometry": [EmptyIndexesSchema()], "layer": [NUniqueValueSchema(1)]}
+
     @init_log_decorator()
     def __init__(
         self,
@@ -900,6 +902,8 @@ class LayeredHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     >>> hfb = imod.mf6.LayeredHorizontalFlowBarrierMultiplier(barrier_gdf)
 
     """
+
+    _write_schemata = {"geometry": [EmptyIndexesSchema()], "layer": [NUniqueValueSchema(1)]}
 
     @init_log_decorator()
     def __init__(
@@ -1048,6 +1052,8 @@ class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
 
 
     """
+
+    _write_schemata = {"geometry": [EmptyIndexesSchema()], "layer": [NUniqueValueSchema(1)]}
 
     @init_log_decorator()
     def __init__(
