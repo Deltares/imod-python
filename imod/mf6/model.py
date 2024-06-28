@@ -274,7 +274,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 elif isinstance(pkg, imod.mf6.HorizontalFlowBarrierBase):
                     top, bottom, idomain = self.__get_domain_geometry()
                     k = self.__get_k()
-                    mf6_hfb_pkg = pkg.to_mf6_pkg(idomain, top, bottom, k, validate)
+                    mf6_hfb_pkg = pkg.to_mf6_pkg(idomain, top, bottom, k)
                     mf6_hfb_pkg.write(
                         pkgname=pkg_name,
                         globaltimes=globaltimes,

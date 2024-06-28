@@ -21,9 +21,9 @@ from imod.mf6.hfb import (
     HorizontalFlowBarrierHydraulicCharacteristic,
     HorizontalFlowBarrierMultiplier,
     HorizontalFlowBarrierResistance,
-    LayeredHorizontalFlowBarrierHydraulicCharacteristic,
-    LayeredHorizontalFlowBarrierMultiplier,
-    LayeredHorizontalFlowBarrierResistance,
+    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic,
+    SingleLayerHorizontalFlowBarrierMultiplier,
+    SingleLayerHorizontalFlowBarrierResistance,
 )
 from imod.mf6.ic import InitialConditions
 from imod.mf6.ims import (
