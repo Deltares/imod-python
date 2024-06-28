@@ -1,9 +1,16 @@
+from dataclasses import asdict
+from typing import Optional
+
 import numpy as np
 
 from imod.logging import init_log_decorator
+from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.regrid.regrid_schemes import ConstantHeadRegridMethod
+from imod.mf6.regrid.regrid_schemes import ConstantHeadRegridMethod, RegridMethodType
+from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
+from imod.mf6.utilities.regridding_types import RegridderType
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -15,6 +22,7 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
+from imod.typing import GridDataArray
 
 
 class ConstantHead(BoundaryCondition, IRegridPackage):
@@ -141,3 +149,139 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
+
+    @classmethod
+    @standard_log_decorator()
+    def from_imod5_data(
+        cls,
+        key: str,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        target_discretization: StructuredDiscretization,
+        regridder_types: Optional[RegridMethodType] = None,
+    ) -> "ConstantHead":
+        """
+        Construct a ConstantHead-package from iMOD5 data, loaded with the
+        :func:`imod.formats.prj.open_projectfile_data` function.
+
+        This function can be used if chd packages are defined in the imod5 data.
+
+        If they are not, then imod5 assumed that at all the locations where ibound
+        = -1 a chd package is active with the starting head of the simulation
+        as a constant. In that case, use the from_imod5_shd_data function instead
+        of this one.
+
+        The creation of a chd package from shd data should only be done if no chd
+        packages at all are present in the imod5_data
+
+
+
+        Parameters
+        ----------
+        key: str
+            The key used in the imod5 data dictionary that is used to refer
+            to the chd package that we want to import.
+        imod5_data: dict
+            Dictionary with iMOD5 data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
+        target_discretization:  StructuredDiscretization package
+            The grid that should be used for the new package. Does not
+            need to be identical to one of the input grids.
+        regridder_types: RegridMethodType, optional
+            Optional dataclass with regridder types for a specific variable.
+            Use this to override default regridding methods.
+
+        Returns
+        -------
+        A list of Modflow 6 ConstantHead packages.
+        """
+        return cls._from_head_data(
+            imod5_data[key]["head"],
+            imod5_data["bnd"]["ibound"],
+            target_discretization,
+            regridder_types,
+        )
+
+    @classmethod
+    @standard_log_decorator()
+    def from_imod5_shd_data(
+        cls,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        target_discretization: StructuredDiscretization,
+        regridder_types: Optional[RegridMethodType] = None,
+    ) -> "ConstantHead":
+        """
+        Construct a ConstantHead-package from iMOD5 data, loaded with the
+        :func:`imod.formats.prj.open_projectfile_data` function.
+
+        This function can be used if no chd packages at all are defined in the imod5 data.
+
+        In that case, imod5 assumed that at all the locations where ibound
+        = -1,  a chd package is active with the starting head of the simulation
+        as a constant.
+
+        So this function creates a single chd package that will be present at all locations where
+        ibound == -1. The assigned head will be the starting head, specified in the array "shd"
+        in the imod5 data.
+
+        Parameters
+        ----------
+        imod5_data: dict
+            Dictionary with iMOD5 data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
+        target_discretization:  StructuredDiscretization package
+            The grid that should be used for the new package. Does not
+            need to be identical to one of the input grids.
+        regridder_types: RegridMethodType, optional
+            Optional dataclass with regridder types for a specific variable.
+            Use this to override default regridding methods.
+
+        Returns
+        -------
+        A  Modflow 6 ConstantHead package.
+        """
+        return cls._from_head_data(
+            imod5_data["shd"]["head"],
+            imod5_data["bnd"]["ibound"],
+            target_discretization,
+            regridder_types,
+        )
+
+    @classmethod
+    def _from_head_data(
+        cls,
+        head: GridDataArray,
+        ibound: GridDataArray,
+        target_discretization: StructuredDiscretization,
+        regridder_types: Optional[RegridMethodType] = None,
+    ) -> "ConstantHead":
+        target_idomain = target_discretization.dataset["idomain"]
+
+        if regridder_types is None:
+            regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
+        else:
+            regridder_settings = asdict(regridder_types, dict_factory=dict)
+
+        # appart from the arrays needed for the ConstantHead package, we will
+        # also regrid ibound.
+        regridder_settings["ibound"] = (RegridderType.OVERLAP, "mode")
+
+        regrid_context = RegridderWeightsCache()
+
+        data = {"head": head, "ibound": ibound}
+
+        regridded_package_data = _regrid_package_data(
+            data, target_idomain, regridder_settings, regrid_context, {}
+        )
+        head = regridded_package_data["head"]
+        ibound = regridded_package_data["ibound"]
+
+        # select locations where ibound < 0
+        head = head.where(ibound < 0)
+
+        # select locations where idomain > 0
+        head = head.where(target_idomain > 0)
+
+        regridded_package_data["head"] = head
+        regridded_package_data.pop("ibound")
+
+        return cls(**regridded_package_data)
