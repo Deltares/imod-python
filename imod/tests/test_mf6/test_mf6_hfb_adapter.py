@@ -5,7 +5,7 @@ import numpy as np
 import xarray as xr
 from pytest_cases import parametrize_with_cases
 
-from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
+from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier, merge_mf6_hfb_packages
 from imod.mf6.write_context import WriteContext
 
 
@@ -126,3 +126,17 @@ def test_hfb_writing_one_layer(barrier, tmp_path):
 
     data = np.loadtxt(hfb_txt_path)
     np.testing.assert_almost_equal(data, expected_hfb_data)
+
+
+@parametrize_with_cases("barrier", cases=GridBarriers)
+def test_merge_mf6_hfbs(barrier):
+    # Arrange
+    hfb1 = Mf6HorizontalFlowBarrier(**barrier)
+    hfb2 = Mf6HorizontalFlowBarrier(**barrier)
+    hfb3 = Mf6HorizontalFlowBarrier(**barrier)
+
+    hfb_total = merge_mf6_hfb_packages([hfb1, hfb2, hfb3])
+
+    expected_size = 3 * hfb1.dataset.sizes["cell_id"]
+
+    assert hfb_total.dataset.sizes["cell_id"] == expected_size

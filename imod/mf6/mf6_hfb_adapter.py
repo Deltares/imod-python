@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Union
+from typing import List, Union
 
 import numpy as np
 import xarray as xr
@@ -170,3 +170,11 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
         hfb_write_context = deepcopy(write_context)
         hfb_write_context.use_binary = False
         super().write(pkgname, globaltimes, hfb_write_context)
+
+
+def merge_mf6_hfb_packages(
+    mf6_hfb_ls: List[Mf6HorizontalFlowBarrier],
+) -> Mf6HorizontalFlowBarrier:
+    ds_ls = [hfb.dataset for hfb in mf6_hfb_ls]
+    ds_total = xr.concat(ds_ls, dim="cell_id")
+    return Mf6HorizontalFlowBarrier._from_dataset(ds_total)
