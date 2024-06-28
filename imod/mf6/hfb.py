@@ -4,11 +4,10 @@ import textwrap
 import typing
 from copy import deepcopy
 from enum import Enum
-from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING, Dict, Optional, Tuple
 
 import cftime
 import numpy as np
-import pandas as pd
 import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
@@ -1097,27 +1096,22 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         return barrier_values
 
     @classmethod
-    def from_imod5_dataset(cls, imod5_data: Dict[str, Dict[str, GridDataArray]]):
+    def from_imod5_dataset(
+        cls, key: str, imod5_data: Dict[str, Dict[str, GridDataArray]]
+    ):
         imod5_keys = list(imod5_data.keys())
-        hfb_keys = [key for key in imod5_keys if key[0:3] == "hfb"]
-        if len(hfb_keys) == 0:
-            raise ValueError("no hfb keys present.")
+        if key not in imod5_keys:
+            raise ValueError("hfb key not present.")
 
-        dataframe_ls: List[gpd.GeoDataFrame] = []
-        for hfb_key in hfb_keys:
-            hfb_dict = imod5_data[hfb_key]
-            if not list(hfb_dict.keys()) == ["geodataframe", "layer"]:
-                raise ValueError(
-                    "hfb is not a SingleLayerHorizontalFlowBarrierResistance"
-                )
-            layer = hfb_dict["layer"]
-            if layer == 0:
-                raise ValueError(
-                    "assigning to layer 0 is not supported yet for import of HFB's"
-                )
-            geometry_layer = hfb_dict["geodataframe"]
-            geometry_layer["layer"] = layer
-            dataframe_ls.append(geometry_layer)
-        compound_dataframe = pd.concat(dataframe_ls, ignore_index=True)
+        hfb_dict = imod5_data[key]
+        if not list(hfb_dict.keys()) == ["geodataframe", "layer"]:
+            raise ValueError("hfb is not a SingleLayerHorizontalFlowBarrierResistance")
+        layer = hfb_dict["layer"]
+        if layer == 0:
+            raise ValueError(
+                "assigning to layer 0 is not supported yet for import of HFB's"
+            )
+        geometry_layer = hfb_dict["geodataframe"]
+        geometry_layer["layer"] = layer
 
-        return cls(compound_dataframe)
+        return cls(geometry_layer)

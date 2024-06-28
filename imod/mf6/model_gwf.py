@@ -266,9 +266,11 @@ class GroundwaterFlowModel(Modflow6Model):
         # import hfb
         hfb_keys = [key for key in imod5_keys if key[0:3] == "hfb"]
         if len(hfb_keys) != 0:
-            hfb = SingleLayerHorizontalFlowBarrierResistance.from_imod5_dataset(
-                imod5_data
-            )
-            result["hfb"] = hfb
+            for hfb_key in hfb_keys:
+                result[hfb_key] = (
+                    SingleLayerHorizontalFlowBarrierResistance.from_imod5_dataset(
+                        hfb_key, imod5_data
+                    )
+                )
 
         return result
