@@ -516,9 +516,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             selection = selection.sel(x=x_slice, y=y_slice)
 
         cls = type(self)
-        new = cls.__new__(cls)
-        new.dataset = selection
-        return new
+        return cls._from_dataset(selection)
 
     def mask(self, mask: GridDataArray) -> Any:
         """

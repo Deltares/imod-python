@@ -65,9 +65,7 @@ def mask_2D(package: Well, domain_2d: GridDataArray) -> Well:
     selection = package.dataset.loc[{"index": is_inside_exterior}]
 
     cls = type(package)
-    new = cls.__new__(cls)
-    new.dataset = selection
-    return new
+    return cls._from_dataset(selection)
 
 
 class Well(BoundaryCondition, IPointDataPackage):

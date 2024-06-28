@@ -6,7 +6,7 @@ import inspect
 import pathlib
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union
 
 import cftime
 import jinja2
@@ -20,6 +20,7 @@ from jinja2 import Template
 import imod
 from imod.logging import standard_log_decorator
 from imod.mf6.interfaces.imodel import IModel
+from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier, merge_mf6_hfb_packages
 from imod.mf6.package import Package
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.utilities.mask import _mask_all_packages
@@ -252,6 +253,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         pkg_write_context = write_context.copy_with_new_write_directory(
             new_write_directory=modeldirectory
         )
+        mf6_hfb_ls: List[Mf6HorizontalFlowBarrier] = []
         for pkg_name, pkg in self.items():
             try:
                 if isinstance(pkg, imod.mf6.Well):
@@ -274,12 +276,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 elif isinstance(pkg, imod.mf6.HorizontalFlowBarrierBase):
                     top, bottom, idomain = self.__get_domain_geometry()
                     k = self.__get_k()
-                    mf6_hfb_pkg = pkg.to_mf6_pkg(idomain, top, bottom, k)
-                    mf6_hfb_pkg.write(
-                        pkgname=pkg_name,
-                        globaltimes=globaltimes,
-                        write_context=pkg_write_context,
-                    )
+                    mf6_hfb_ls.append(pkg.to_mf6_pkg(idomain, top, bottom, k))
                 else:
                     pkg.write(
                         pkgname=pkg_name,
@@ -288,6 +285,16 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                     )
             except Exception as e:
                 raise type(e)(f"{e}\nError occured while writing {pkg_name}")
+
+        try:
+            mf6_hfb_pkg = merge_mf6_hfb_packages(mf6_hfb_ls)
+            mf6_hfb_pkg.write(
+                pkgname=pkg_name,
+                globaltimes=globaltimes,
+                write_context=pkg_write_context,
+            )
+        except Exception as e:
+            raise type(e)(f"{e}\nError occured while writing {pkg_name}")
 
         return NestedStatusInfo(modelname)
 

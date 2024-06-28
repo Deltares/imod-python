@@ -68,6 +68,12 @@ class PackageBase(IPackageBase, abc.ABC):
         return {}
 
     @classmethod
+    def _from_dataset(cls, ds: GridDataset):
+        instance = cls.__new__(cls)
+        instance.dataset = ds
+        return instance
+
+    @classmethod
     def from_file(cls, path, **kwargs):
         """
         Loads an imod mf6 package from a file (currently only netcdf and zarr are supported).
@@ -120,6 +126,4 @@ class PackageBase(IPackageBase, abc.ABC):
             if isinstance(stripped_value, numbers.Real) and np.isnan(stripped_value):  # type: ignore[call-overload]
                 dataset[key] = None
 
-        instance = cls.__new__(cls)
-        instance.dataset = dataset
-        return instance
+        cls._from_dataset(dataset)

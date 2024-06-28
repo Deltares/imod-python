@@ -574,8 +574,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         sliced : Package
         """
         cls = type(self)
-        new = cls.__new__(cls)
-        new.dataset = copy.deepcopy(self.dataset)
+        new = cls._from_dataset(copy.deepcopy(self.dataset))
         new.line_data = self.line_data
         return new
 
