@@ -69,6 +69,10 @@ class PackageBase(IPackageBase, abc.ABC):
 
     @classmethod
     def _from_dataset(cls, ds: GridDataset):
+        """
+        Create package from dataset. Note that no initialization validation is
+        done.
+        """
         instance = cls.__new__(cls)
         instance.dataset = ds
         return instance
