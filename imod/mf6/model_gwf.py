@@ -271,4 +271,16 @@ class GroundwaterFlowModel(Modflow6Model):
             hfb = LayeredHorizontalFlowBarrierResistance.from_imod5_dataset(imod5_data)
             result["hfb"] = hfb
 
+        # import chd
+        chd_keys = [key for key in imod5_keys if key[0:3] == "chd"]
+        if len(chd_keys) == 0:
+            result["chd_from_shd"] = ConstantHead.from_imod5_shd_data(
+                imod5_data, dis_pkg, regridder_types
+            )
+        else:
+            for chd_key in chd_keys:
+                result[chd_key] = ConstantHead.from_imod5_data(
+                    chd_key, imod5_data, dis_pkg, regridder_types
+                )
+
         return result
