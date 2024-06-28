@@ -503,7 +503,7 @@ class AnyValueSchema(ValueSchema):
             )
 
 
-class NUniqueValueSchema(BaseSchema):
+class MaxNUniqueValuesSchema(BaseSchema):
     """
     Schema to validate if amount of unique values is correct.
     """

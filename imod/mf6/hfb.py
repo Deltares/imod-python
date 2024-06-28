@@ -19,7 +19,7 @@ from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
 from imod.mf6.utilities.grid import broadcast_to_full_domain
-from imod.schemata import EmptyIndexesSchema, NUniqueValueSchema
+from imod.schemata import EmptyIndexesSchema, MaxNUniqueValuesSchema
 from imod.typing import GridDataArray
 from imod.util.imports import MissingOptionalModule
 
@@ -775,7 +775,7 @@ class SingleLayerHorizontalFlowBarrierHydraulicCharacteristic(
 
     _write_schemata = {
         "geometry": [EmptyIndexesSchema()],
-        "layer": [NUniqueValueSchema(1)],
+        "layer": [MaxNUniqueValuesSchema(1)],
     }
 
     @init_log_decorator()
@@ -912,7 +912,7 @@ class SingleLayerHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
 
     _write_schemata = {
         "geometry": [EmptyIndexesSchema()],
-        "layer": [NUniqueValueSchema(1)],
+        "layer": [MaxNUniqueValuesSchema(1)],
     }
 
     @init_log_decorator()
@@ -1066,7 +1066,7 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
 
     _write_schemata = {
         "geometry": [EmptyIndexesSchema()],
-        "layer": [NUniqueValueSchema(1)],
+        "layer": [MaxNUniqueValuesSchema(1)],
     }
 
     @init_log_decorator()
