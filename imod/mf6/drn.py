@@ -1,7 +1,10 @@
 from dataclasses import asdict
-from typing import Optional
+from datetime import datetime
+import itertools
+from typing import Dict, List, Optional
 
 import numpy as np
+
 
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
@@ -32,6 +35,19 @@ from imod.schemata import (
 )
 from imod.typing import GridDataArray
 from imod.typing.grid import enforce_dim_order, is_planar_grid
+
+def expand_repetitions(
+    repeat_stress: list[datetime], time_min: datetime, time_max: datetime
+) -> Dict[datetime, datetime]:
+    expanded = {}
+    for year, date in itertools.product(
+        range(time_min.year, time_max.year + 1),
+        repeat_stress,
+    ):
+        newdate = date.replace(year=year)
+        if newdate < time_max:
+            expanded[newdate] = date
+    return expanded
 
 
 class Drainage(BoundaryCondition, IRegridPackage):
@@ -166,10 +182,13 @@ class Drainage(BoundaryCondition, IRegridPackage):
         cls,
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
+        period_data: dict[str, dict[str, GridDataArray]],        
         target_discretization: StructuredDiscretization,
         target_npf: NodePropertyFlow,
         allocation_option: ALLOCATION_OPTION,
         distributing_option: DISTRIBUTING_OPTION,
+        time_min: datetime,
+        time_max: datetime,
         regridder_types: Optional[RegridMethodType] = None,
     ) -> "Drainage":
         """
@@ -250,4 +269,12 @@ class Drainage(BoundaryCondition, IRegridPackage):
                 target_npf.dataset["k"],
                 planar_elevation,
             )
+
+    # Boundary conditions, one by one.
+
+
+        if not period_data is None:
+            repeat = period_data.get(key)
+            if repeat is not None:
+                regridded_package_data["repeat"] =  expand_repetitions(repeat, time_min, time_max)
         return Drainage(**regridded_package_data)

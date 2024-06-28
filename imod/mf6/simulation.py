@@ -1322,9 +1322,12 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
     def from_imod5_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
+        period_data: dict[str, dict[str, GridDataArray]],
         allocation_options: SimulationAllocationOptions,
         distributing_options: SimulationDistributingOptions,
+        times,
         regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
+
     ) -> "Modflow6Simulation":
         """
         Imports a GroundwaterFlowModel (GWF) from the data in an IMOD5 project file.
@@ -1357,9 +1360,11 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         # import GWF model,
         groundwaterFlowModel = GroundwaterFlowModel.from_imod5_data(
             imod5_data,
+            period_data,
             allocation_options,
             distributing_options,
-            regridder_types,
+            times, 
+            regridder_types
         )
         simulation["imported_model"] = groundwaterFlowModel
 

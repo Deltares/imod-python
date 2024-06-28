@@ -474,6 +474,8 @@ def test_html_repr(drainage):
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5(imod5_dataset, tmp_path):
+    period_data = imod5_dataset[1]
+    imod5_dataset = imod5_dataset[0]
     target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset)
     target_npf = NodePropertyFlow.from_imod5_data(
         imod5_dataset, target_dis.dataset["idomain"]
@@ -482,10 +484,13 @@ def test_from_imod5(imod5_dataset, tmp_path):
     drn_2 = imod.mf6.Drainage.from_imod5_data(
         "drn-2",
         imod5_dataset,
+        period_data,
         target_dis,
         target_npf,
         allocation_option=ALLOCATION_OPTION.at_elevation,
         distributing_option=DISTRIBUTING_OPTION.by_crosscut_thickness,
+        time_min="02-02-2002",
+        time_max="02-02-2022",
         regridder_types=None,
     )
 

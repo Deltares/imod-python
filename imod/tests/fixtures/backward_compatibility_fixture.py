@@ -8,7 +8,10 @@ import imod
 def imod5_dataset():
     tmp_path = imod.util.temporary_directory()
     data = imod.data.imod5_projectfile_data(tmp_path)
+    
+    pd =data[1]
     data = data[0]
+   
 
     _load_imod5_data_in_memory(data)
 
@@ -16,7 +19,7 @@ def imod5_dataset():
     ibound = data["bnd"]["ibound"]
     ibound = ibound.where(ibound <= 0, 1)
     data["bnd"]["ibound"] = ibound
-    return data
+    return data, pd
 
 
 def _load_imod5_data_in_memory(imod5_data):
