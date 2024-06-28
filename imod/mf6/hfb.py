@@ -4,7 +4,7 @@ import textwrap
 import typing
 from copy import deepcopy
 from enum import Enum
-from typing import TYPE_CHECKING, List, Optional, Tuple
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 
 import cftime
 import numpy as np
@@ -1097,7 +1097,7 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         return barrier_values
 
     @classmethod
-    def from_imod5_dataset(cls, imod5_data: dict[str, dict[str, GridDataArray]]):
+    def from_imod5_dataset(cls, imod5_data: Dict[str, Dict[str, GridDataArray]]):
         imod5_keys = list(imod5_data.keys())
         hfb_keys = [key for key in imod5_keys if key[0:3] == "hfb"]
         if len(hfb_keys) == 0:
