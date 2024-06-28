@@ -10,6 +10,7 @@ from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.regrid.regrid_schemes import ConstantHeadRegridMethod, RegridMethodType
 from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
+from imod.mf6.utilities.regridding_types import RegridderType
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -191,7 +192,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
 
         Returns
         -------
-        A list of Modflow 6 Drainage packages.
+        A list of Modflow 6 ConstantHead packages.
         """
         return cls._from_head_data(
             imod5_data[key]["head"],
@@ -236,7 +237,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
 
         Returns
         -------
-        A list of Modflow 6 Drainage packages.
+        A  Modflow 6 ConstantHead package.
         """
         return cls._from_head_data(
             imod5_data["shd"]["head"],
@@ -246,7 +247,6 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         )
 
     @classmethod
-    @standard_log_decorator()
     def _from_head_data(
         cls,
         head: GridDataArray,
@@ -256,25 +256,32 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
     ) -> "ConstantHead":
         target_idomain = target_discretization.dataset["idomain"]
 
+        if regridder_types is None:
+            regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
+        else:
+            regridder_settings = asdict(regridder_types, dict_factory=dict)
+
+        # appart from the arrays needed for the COnstantHead package, we will
+        # also regrid ibound.
+        regridder_settings["ibound"] = (RegridderType.OVERLAP, "mode")
+
+        regrid_context = RegridderWeightsCache()
+
+        data = {"head": head, "ibound": ibound}
+
+        regridded_package_data = _regrid_package_data(
+            data, target_idomain, regridder_settings, regrid_context, {}
+        )
+        head = regridded_package_data["head"]
+        ibound = regridded_package_data["ibound"]
+
         # select locations where ibound < 0
         head = head.where(ibound < 0)
 
         # select locations where idomain > 0
         head = head.where(target_idomain > 0)
 
-        if regridder_types is None:
-            regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
-        else:
-            regridder_settings = asdict(regridder_types, dict_factory=dict)
-
-        regrid_context = RegridderWeightsCache()
-
-        data = {
-            "head": head,
-        }
-
-        regridded_package_data = _regrid_package_data(
-            data, target_idomain, regridder_settings, regrid_context, {}
-        )
+        regridded_package_data["head"] = head
+        regridded_package_data.pop("ibound")
 
         return cls(**regridded_package_data)
