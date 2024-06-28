@@ -25,7 +25,7 @@ def create_trigrid(ibound):
     return grid
 
 
-@pytest.mark.skipif(xu_version_to_skip, reason="xugrid == 0.5.0 | xugrid < 0.4.0")
+
 @pytest.mark.usefixtures("imodflow_model")
 @pytest.mark.parametrize("create_grid", [create_quadgrid, create_trigrid])
 def test_convert_to_disv(imodflow_model, tmp_path, create_grid):
