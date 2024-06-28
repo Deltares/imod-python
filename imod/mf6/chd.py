@@ -261,7 +261,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         else:
             regridder_settings = asdict(regridder_types, dict_factory=dict)
 
-        # appart from the arrays needed for the COnstantHead package, we will
+        # appart from the arrays needed for the ConstantHead package, we will
         # also regrid ibound.
         regridder_settings["ibound"] = (RegridderType.OVERLAP, "mode")
 
