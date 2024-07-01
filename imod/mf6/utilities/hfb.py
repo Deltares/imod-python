@@ -43,8 +43,10 @@ def merge_hfb_packages(
     # Therefore groupby twice: once for cell_id, once for hydraulic_characteristic.
     cell_id_merged = barrier_dataset[["cell_id1", "cell_id2"]].groupby("cell_id").first()
     hc_merged = 1/barrier_dataset[["hydraulic_characteristic"]].groupby("cell_id").map(inverse_sum)
-
-    barrier_dataset_merged = xr.merge([cell_id_merged, hc_merged])
+    # Merge datasets into one
+    barrier_dataset_merged = xr.merge([cell_id_merged, hc_merged], join="exact")
+    # Set leftover options
     barrier_dataset_merged["print_input"] = hfb_ls[0].dataset["print_input"]
+    # Drop leftover coordinate and reset cell_id.
     barrier_dataset_merged = barrier_dataset_merged.drop_vars("edge_index").reset_coords()
     return Mf6HorizontalFlowBarrier(**barrier_dataset_merged)
