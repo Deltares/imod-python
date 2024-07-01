@@ -163,7 +163,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
         regridder_types: Optional[RegridMethodType] = None,
-        validate: bool = True
+        validate: bool = True,
     ) -> "StructuredDiscretization":
         """
         Construct package from iMOD5 data, loaded with the

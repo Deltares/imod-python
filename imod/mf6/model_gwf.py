@@ -211,7 +211,9 @@ class GroundwaterFlowModel(Modflow6Model):
         # first import the singleton packages
         # import discretization
 
-        dis_pkg = StructuredDiscretization.from_imod5_data(imod5_data, regridder_types, False)
+        dis_pkg = StructuredDiscretization.from_imod5_data(
+            imod5_data, regridder_types, False
+        )
         grid = dis_pkg.dataset["idomain"]
 
         # import npf

@@ -25,7 +25,6 @@ def create_trigrid(ibound):
     return grid
 
 
-
 @pytest.mark.usefixtures("imodflow_model")
 @pytest.mark.parametrize("create_grid", [create_quadgrid, create_trigrid])
 def test_convert_to_disv(imodflow_model, tmp_path, create_grid):

@@ -1,5 +1,6 @@
 import pathlib
 import textwrap
+from datetime import datetime
 
 import numpy as np
 import pandas as pd
@@ -8,6 +9,7 @@ import xarray as xr
 
 import imod
 import imod.mf6.drn
+from imod.formats.prj.prj import open_projectfile_data
 from imod.logging import LoggerType, LogLevel
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.npf import NodePropertyFlow
@@ -472,11 +474,14 @@ def test_html_repr(drainage):
     assert html_string.split("</div>")[0] == "<div>Drainage"
 
 
-@pytest.mark.usefixtures("imod5_dataset")
-def test_from_imod5(imod5_dataset, tmp_path):
+def test_from_imod5(tmp_path):
+    testdir = (
+        "D:\\dev\\imod_python-gh\\imod-python\\imod\\tests\\imod5_data\\iMOD5_model.prj"
+    )
+    imod5_dataset = open_projectfile_data(testdir)
     period_data = imod5_dataset[1]
     imod5_dataset = imod5_dataset[0]
-    target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset)
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset, validate=False)
     target_npf = NodePropertyFlow.from_imod5_data(
         imod5_dataset, target_dis.dataset["idomain"]
     )
@@ -489,8 +494,8 @@ def test_from_imod5(imod5_dataset, tmp_path):
         target_npf,
         allocation_option=ALLOCATION_OPTION.at_elevation,
         distributing_option=DISTRIBUTING_OPTION.by_crosscut_thickness,
-        time_min="02-02-2002",
-        time_max="02-02-2022",
+        time_min=datetime(2002, 2, 2),
+        time_max=datetime(2022, 2, 2),
         regridder_types=None,
     )
 

@@ -2,6 +2,7 @@ import pathlib
 import re
 import tempfile
 import textwrap
+from datetime import datetime
 
 import numpy as np
 import pytest
@@ -10,6 +11,7 @@ import xugrid as xu
 from pytest_cases import parametrize_with_cases
 
 import imod
+from imod.formats.prj.prj import open_projectfile_data
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.write_context import WriteContext
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION
@@ -464,3 +466,52 @@ def test_import_river_from_imod5_infiltration_factors(imod5_dataset):
 
     # teardown
     imod5_dataset["riv-1"]["infiltration_factor"] = original_infiltration_factor
+
+
+def test_import_river_from_imod5_period_data():
+    testdir = (
+        "D:\\dev\\imod_python-gh\\imod-python\\imod\\tests\\imod5_data\\iMOD5_model.prj"
+    )
+    imod5_dataset = open_projectfile_data(testdir)
+    imod5_data = imod5_dataset[0]
+    imod5_periods = imod5_dataset[1]
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_data, validate=False)
+
+    original_infiltration_factor = imod5_data["riv-1"]["infiltration_factor"]
+    imod5_data["riv-1"]["infiltration_factor"] = ones_like(original_infiltration_factor)
+
+    (riv, drn) = imod.mf6.River.from_imod5_data(
+        "riv-1",
+        imod5_data,
+        imod5_periods,
+        target_dis,
+        datetime(2002, 2, 2),
+        datetime(2022, 2, 2),
+        ALLOCATION_OPTION.at_elevation,
+        DISTRIBUTING_OPTION.by_crosscut_thickness,
+        regridder_types=None,
+    )
+
+    assert riv is not None
+    assert drn is None
+
+    imod5_data["riv-1"]["infiltration_factor"] = zeros_like(
+        original_infiltration_factor
+    )
+    (riv, drn) = imod.mf6.River.from_imod5_data(
+        "riv-1",
+        imod5_data,
+        imod5_periods,
+        target_dis,
+        datetime(2002, 2, 2),
+        datetime(2022, 2, 2),
+        ALLOCATION_OPTION.at_elevation,
+        DISTRIBUTING_OPTION.by_crosscut_thickness,
+        regridder_types=None,
+    )
+
+    assert riv is None
+    assert drn is not None
+
+    # teardown
+    imod5_dataset[0]["riv-1"]["infiltration_factor"] = original_infiltration_factor

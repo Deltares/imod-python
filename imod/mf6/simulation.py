@@ -1327,7 +1327,6 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         distributing_options: SimulationDistributingOptions,
         times,
         regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
-
     ) -> "Modflow6Simulation":
         """
         Imports a GroundwaterFlowModel (GWF) from the data in an IMOD5 project file.
@@ -1363,8 +1362,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             period_data,
             allocation_options,
             distributing_options,
-            times, 
-            regridder_types
+            times,
+            regridder_types,
         )
         simulation["imported_model"] = groundwaterFlowModel
 

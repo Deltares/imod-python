@@ -1,9 +1,18 @@
+from dataclasses import asdict
+from datetime import datetime
+from typing import Optional
+
 import numpy as np
 
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.drn import expand_repetitions
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.regrid.regrid_schemes import GeneralHeadBoundaryRegridMethod
+from imod.mf6.regrid.regrid_schemes import (
+    GeneralHeadBoundaryRegridMethod,
+    RegridMethodType,
+)
+from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -16,6 +25,7 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
+from imod.typing import GridDataArray
 
 
 class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
@@ -147,3 +157,69 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
+
+    @classmethod
+    def from_imod5_data(
+        cls,
+        key: str,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        period_data: dict[str, dict[str, GridDataArray]],
+        target_discretization,
+        time_min: datetime,
+        time_max: datetime,
+        regridder_types: Optional[RegridMethodType] = None,
+    ) -> "GeneralHeadBoundary":
+        """
+        Construct a GeneralHeadBoundary-package from iMOD5 data, loaded with the
+        :func:`imod.formats.prj.open_projectfile_data` function.
+
+        .. note::
+
+            The method expects the iMOD5 model to be fully 3D, not quasi-3D.
+
+        Parameters
+        ----------
+        imod5_data: dict
+            Dictionary with iMOD5 data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
+        target_discretization:  StructuredDiscretization package
+            The grid that should be used for the new package. Does not
+            need to be identical to one of the input grids.
+        target_npf: NodePropertyFlow package
+            The conductivity information, used to compute drainage flux
+        allocation_option: ALLOCATION_OPTION
+            allocation option.
+        distributing_option: dict[str, DISTRIBUTING_OPTION]
+            distributing option.
+        regridder_types: RegridMethodType, optional
+            Optional dataclass with regridder types for a specific variable.
+            Use this to override default regridding methods.
+
+        Returns
+        -------
+        A  Modflow 6 GeneralHeadBoundary packages.
+        """
+
+        idomain = target_discretization.dataset["idomain"]
+        data = {
+            "head": imod5_data[key]["head"],
+            "conductance": imod5_data[key]["conductance"],
+        }
+
+        if regridder_types is None:
+            regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
+        else:
+            regridder_settings = asdict(regridder_types, dict_factory=dict)
+
+        regrid_context = RegridderWeightsCache()
+
+        regridded_package_data = _regrid_package_data(
+            data, idomain, regridder_settings, regrid_context, {}
+        )
+
+        ghb = GeneralHeadBoundary(**regridded_package_data)
+        if period_data is not None:
+            repeat = period_data.get(key)
+            if repeat is not None:
+                ghb.set_repeat_stress(expand_repetitions(repeat, time_min, time_max))
+        return ghb

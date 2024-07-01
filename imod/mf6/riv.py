@@ -1,4 +1,5 @@
 from dataclasses import asdict
+from datetime import datetime
 from typing import Optional, Tuple
 
 import numpy as np
@@ -9,7 +10,7 @@ from imod.logging import init_log_decorator
 from imod.logging.loglevel import LogLevel
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
-from imod.mf6.drn import Drainage
+from imod.mf6.drn import Drainage, expand_repetitions
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.regrid.regrid_schemes import RegridMethodType, RiverRegridMethod
 from imod.mf6.utilities.regrid import (
@@ -188,7 +189,10 @@ class River(BoundaryCondition, IRegridPackage):
         cls,
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
+        period_data: dict[str, dict[str, GridDataArray]],
         target_discretization: StructuredDiscretization,
+        time_min: datetime,
+        time_max: datetime,
         allocation_option_riv: ALLOCATION_OPTION,
         distributing_option_riv: DISTRIBUTING_OPTION,
         regridder_types: Optional[RegridMethodType] = None,
@@ -319,6 +323,9 @@ class River(BoundaryCondition, IRegridPackage):
         )
         regridded_package_data["conductance"] = river_conductance
         regridded_package_data.pop("infiltration_factor")
+        regridded_package_data["bottom_elevation"] = regridded_package_data[
+            "bottom_elevation"
+        ].transpose("time", "layer", "y", "x")
 
         river_package = River(**regridded_package_data)
         # create a drainage package with the conductance we computed from the infiltration factor
@@ -339,6 +346,19 @@ class River(BoundaryCondition, IRegridPackage):
             drainage_package = drainage_package.mask(mask)
         else:
             drainage_package = None
+
+        if period_data is not None:
+            repeat = period_data.get(key)
+            if repeat is not None:
+                if river_package is not None:
+                    river_package.set_repeat_stress(
+                        expand_repetitions(repeat, time_min, time_max)
+                    )
+                if drainage_package is not None:
+                    drainage_package.set_repeat_stress(
+                        expand_repetitions(repeat, time_min, time_max)
+                    )
+
         return (river_package, drainage_package)
 
     @classmethod
