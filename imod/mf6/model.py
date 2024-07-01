@@ -20,9 +20,10 @@ from jinja2 import Template
 import imod
 from imod.logging import standard_log_decorator
 from imod.mf6.interfaces.imodel import IModel
-from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier, merge_mf6_hfb_packages
+from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
+from imod.mf6.utilities.hfb import merge_hfb_packages
 from imod.mf6.utilities.mask import _mask_all_packages
 from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_like
 from imod.mf6.validation import pkg_errors_to_status_info
@@ -254,11 +255,11 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             new_write_directory=modeldirectory
         )
         mf6_hfb_ls: List[Mf6HorizontalFlowBarrier] = []
+        top, bottom, idomain = self.__get_domain_geometry()
+        k = self.__get_k()
         for pkg_name, pkg in self.items():
             try:
                 if isinstance(pkg, imod.mf6.Well):
-                    top, bottom, idomain = self.__get_domain_geometry()
-                    k = self.__get_k()
                     mf6_well_pkg = pkg.to_mf6_pkg(
                         idomain,
                         top,
@@ -267,16 +268,13 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                         validate,
                         pkg_write_context.is_partitioned,
                     )
-
                     mf6_well_pkg.write(
                         pkgname=pkg_name,
                         globaltimes=globaltimes,
                         write_context=pkg_write_context,
                     )
                 elif isinstance(pkg, imod.mf6.HorizontalFlowBarrierBase):
-                    top, bottom, idomain = self.__get_domain_geometry()
-                    k = self.__get_k()
-                    mf6_hfb_ls.append(pkg.to_mf6_pkg(idomain, top, bottom, k))
+                    mf6_hfb_ls.append(pkg)
                 else:
                     pkg.write(
                         pkgname=pkg_name,
@@ -287,7 +285,8 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 raise type(e)(f"{e}\nError occured while writing {pkg_name}")
 
         try:
-            mf6_hfb_pkg = merge_mf6_hfb_packages(mf6_hfb_ls)
+            pkg_name = "hfb_merged"
+            mf6_hfb_pkg = merge_hfb_packages(mf6_hfb_ls)
             mf6_hfb_pkg.write(
                 pkgname=pkg_name,
                 globaltimes=globaltimes,
