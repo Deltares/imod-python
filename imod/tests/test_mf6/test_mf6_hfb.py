@@ -571,7 +571,7 @@ def test_run_multiple_hfbs(tmp_path, structured_flow_model):
     structured_flow_model["hfb-2"] = SingleLayerHorizontalFlowBarrierResistance(geometry)
     structured_flow_model["hfb-3"] = SingleLayerHorizontalFlowBarrierResistance(geometry)
     simulation_triple["GWF"] = structured_flow_model
-    simulation_single["solver"] = SolutionPresetSimple(["GWF"])
+    simulation_triple["solver"] = SolutionPresetSimple(["GWF"])
     simulation_triple.create_time_discretization(["2000-01-01", "2000-01-02"])
     simulation_triple.write(tmp_path / "triple")
     simulation_triple.run()
