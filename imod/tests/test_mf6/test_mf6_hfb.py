@@ -12,9 +12,9 @@ from imod.mf6 import (
     HorizontalFlowBarrierHydraulicCharacteristic,
     HorizontalFlowBarrierMultiplier,
     HorizontalFlowBarrierResistance,
-    LayeredHorizontalFlowBarrierHydraulicCharacteristic,
-    LayeredHorizontalFlowBarrierMultiplier,
-    LayeredHorizontalFlowBarrierResistance,
+    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic,
+    SingleLayerHorizontalFlowBarrierMultiplier,
+    SingleLayerHorizontalFlowBarrierResistance,
 )
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.hfb import to_connected_cells_dataset
@@ -153,10 +153,10 @@ def test_to_mf6_creates_mf6_adapter(
 @pytest.mark.parametrize(
     "barrier_class, barrier_value_name, barrier_value, expected_hydraulic_characteristic",
     [
-        (LayeredHorizontalFlowBarrierResistance, "resistance", 1e3, 1e-3),
-        (LayeredHorizontalFlowBarrierMultiplier, "multiplier", 1.5, -1.5),
+        (SingleLayerHorizontalFlowBarrierResistance, "resistance", 1e3, 1e-3),
+        (SingleLayerHorizontalFlowBarrierMultiplier, "multiplier", 1.5, -1.5),
         (
-            LayeredHorizontalFlowBarrierHydraulicCharacteristic,
+            SingleLayerHorizontalFlowBarrierHydraulicCharacteristic,
             "hydraulic_characteristic",
             1e-3,
             1e-3,
@@ -195,7 +195,7 @@ def test_to_mf6_creates_mf6_adapter_layered(
     hfb = barrier_class(geometry, print_input)
 
     # Act.
-    _ = hfb.to_mf6_pkg(idomain, top, bottom, k, False)
+    _ = hfb.to_mf6_pkg(idomain, top, bottom, k)
 
     # Assert.
     snapped, _ = xu.snap_to_grid(geometry, grid=idomain, max_snap_distance=0.5)
@@ -280,6 +280,69 @@ def test_to_mf6_different_z_boundaries(
     barrier_values = args["hydraulic_characteristic"].values.reshape(3, 8)
     max_values_per_layer = barrier_values.max(axis=1)
     assert_array_equal(max_values_per_layer, 1.0 / expected_values)
+
+
+@pytest.mark.parametrize(
+    "layer, expected_values",
+    [
+        (2, np.array([1e3, 1e3, 1e3, 1e3, 1e3, 1e3, 1e3, 1e3])),  # 2nd layer
+    ],
+)
+@patch("imod.mf6.mf6_hfb_adapter.Mf6HorizontalFlowBarrier.__new__", autospec=True)
+def test_to_mf6_layered_hfb(mf6_flow_barrier_mock, basic_dis, layer, expected_values):
+    # Arrange.
+    idomain, top, bottom = basic_dis
+    k = ones_like(top)
+
+    print_input = False
+
+    barrier_y = [5.5, 5.5, 5.5]
+    barrier_x = [82.0, 40.0, 0.0]
+
+    geometry = gpd.GeoDataFrame(
+        geometry=[shapely.linestrings(barrier_x, barrier_y)],
+        data={
+            "resistance": [1e3],
+            "layer": [layer],
+        },
+    )
+
+    hfb = SingleLayerHorizontalFlowBarrierResistance(geometry, print_input)
+
+    # Act.
+    _ = hfb.to_mf6_pkg(idomain, top, bottom, k)
+
+    # Assert.
+    _, args = mf6_flow_barrier_mock.call_args
+    barrier_values = args["hydraulic_characteristic"].values
+    assert_array_equal(barrier_values, 1.0 / expected_values)
+    expected_layer = np.full((8,), layer)
+    barrier_layer = args["layer"].values
+    assert_array_equal(barrier_layer, expected_layer)
+
+
+def test_to_mf6_layered_hfb__error():
+    """Throws error because multiple layers attached to one object."""
+    # Arrange.
+    print_input = False
+
+    barrier_y = [5.5, 5.5, 5.5]
+    barrier_x = [82.0, 40.0, 0.0]
+
+    linestring = shapely.linestrings(barrier_x, barrier_y)
+
+    geometry = gpd.GeoDataFrame(
+        geometry=[linestring, linestring],
+        data={
+            "resistance": [1e3, 1e3],
+            "layer": [1, 2],
+        },
+    )
+
+    hfb = SingleLayerHorizontalFlowBarrierResistance(geometry, print_input)
+    errors = hfb._validate(hfb._write_schemata)
+
+    assert len(errors) > 0
 
 
 @pytest.mark.parametrize(
@@ -451,8 +514,10 @@ def test_hfb_from_imod5(imod5_dataset, tmp_path):
         imod5_dataset, target_dis.dataset["idomain"]
     )
 
-    hfb = LayeredHorizontalFlowBarrierResistance.from_imod5_dataset(imod5_dataset)
+    hfb = SingleLayerHorizontalFlowBarrierResistance.from_imod5_dataset(
+        "hfb-3", imod5_dataset
+    )
     hfb_package = hfb.to_mf6_pkg(
         target_dis["idomain"], target_dis["top"], target_dis["bottom"], target_npf["k"]
     )
-    assert list(np.unique(hfb_package["layer"].values)) == [3, 21]
+    assert list(np.unique(hfb_package["layer"].values)) == [7]

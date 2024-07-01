@@ -486,6 +486,11 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
 
     simulation.create_time_discretization(["01-01-2003", "02-01-2003"])
 
+    # Remove HFB packages outside domain
+    # TODO: Build in support for hfb packages outside domain
+    for hfb_outside in ["hfb-24", "hfb-26"]:
+        simulation["imported_model"].pop(hfb_outside)
+
     # write and validate the simulation.
     simulation.write(tmp_path, binary=False, validate=True)
 

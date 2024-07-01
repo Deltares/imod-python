@@ -503,6 +503,21 @@ class AnyValueSchema(ValueSchema):
             )
 
 
+class MaxNUniqueValuesSchema(BaseSchema):
+    """
+    Fails if amount of unique values exceeds a limit.
+    """
+
+    def __init__(self, max_unique_values: int):
+        self.max_unique_values = max_unique_values
+
+    def validate(self, obj: GridDataArray, **kwargs) -> None:
+        if len(np.unique(obj)) > self.max_unique_values:
+            raise ValidationError(
+                f"Amount of unique values exceeds limit of {self.max_unique_values}"
+            )
+
+
 class UniqueValuesSchema(BaseSchema):
     def __init__(self, other_value: list) -> None:
         """

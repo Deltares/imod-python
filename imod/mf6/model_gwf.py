@@ -11,7 +11,7 @@ from imod.mf6 import ConstantHead
 from imod.mf6.clipped_boundary_condition_creator import create_clipped_boundary
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.drn import Drainage
-from imod.mf6.hfb import LayeredHorizontalFlowBarrierResistance
+from imod.mf6.hfb import SingleLayerHorizontalFlowBarrierResistance
 from imod.mf6.ic import InitialConditions
 from imod.mf6.model import Modflow6Model
 from imod.mf6.npf import NodePropertyFlow
@@ -268,8 +268,12 @@ class GroundwaterFlowModel(Modflow6Model):
         # import hfb
         hfb_keys = [key for key in imod5_keys if key[0:3] == "hfb"]
         if len(hfb_keys) != 0:
-            hfb = LayeredHorizontalFlowBarrierResistance.from_imod5_dataset(imod5_data)
-            result["hfb"] = hfb
+            for hfb_key in hfb_keys:
+                result[hfb_key] = (
+                    SingleLayerHorizontalFlowBarrierResistance.from_imod5_dataset(
+                        hfb_key, imod5_data
+                    )
+                )
 
         # import chd
         chd_keys = [key for key in imod5_keys if key[0:3] == "chd"]

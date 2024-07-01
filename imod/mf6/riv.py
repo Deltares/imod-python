@@ -203,6 +203,9 @@ class River(BoundaryCondition, IRegridPackage):
 
         Parameters
         ----------
+        key: str
+            Packagename of the package that needs to be converted to river
+            package.
         imod5_data: dict
             Dictionary with iMOD5 data. This can be constructed from the
             :func:`imod.formats.prj.open_projectfile_data` method.

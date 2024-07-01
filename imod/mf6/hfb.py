@@ -4,11 +4,10 @@ import textwrap
 import typing
 from copy import deepcopy
 from enum import Enum
-from typing import TYPE_CHECKING, List, Optional, Tuple
+from typing import TYPE_CHECKING, Dict, Optional, Tuple
 
 import cftime
 import numpy as np
-import pandas as pd
 import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
@@ -19,7 +18,7 @@ from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
 from imod.mf6.utilities.grid import broadcast_to_full_domain
-from imod.schemata import EmptyIndexesSchema
+from imod.schemata import EmptyIndexesSchema, MaxNUniqueValuesSchema
 from imod.typing import GridDataArray
 from imod.util.imports import MissingOptionalModule
 
@@ -343,7 +342,6 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         top: GridDataArray,
         bottom: GridDataArray,
         k: GridDataArray,
-        validate: bool = False,
     ) -> Mf6HorizontalFlowBarrier:
         """
         Write package to Modflow 6 package.
@@ -362,16 +360,11 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             Grid with bottom of model layers.
         k: GridDataArray
             Grid with hydraulic conductivities.
-        validate: bool
-            Run validation before converting
 
         Returns
         -------
 
         """
-        if validate:
-            self._validate(self._write_schemata)
-
         top, bottom = broadcast_to_full_domain(idomain, top, bottom)
         k = idomain * k
         unstructured_grid, top, bottom, k = (
@@ -680,7 +673,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
 class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
     """
-     Horizontal Flow Barrier (HFB) package
+    Horizontal Flow Barrier (HFB) package
 
     Input to the Horizontal Flow Barrier (HFB) Package is read from the file
     that has type "HFB6" in the Name File. Only one HFB Package can be
@@ -741,9 +734,11 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
         return barrier_values
 
 
-class LayeredHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
+class SingleLayerHorizontalFlowBarrierHydraulicCharacteristic(
+    HorizontalFlowBarrierBase
+):
     """
-     Horizontal Flow Barrier (HFB) package
+    Horizontal Flow Barrier (HFB) package
 
     Input to the Horizontal Flow Barrier (HFB) Package is read from the file
     that has type "HFB6" in the Name File. Only one HFB Package can be
@@ -755,8 +750,10 @@ class LayeredHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierB
     geometry: gpd.GeoDataFrame
         Dataframe that describes:
          - geometry: the geometries of the barriers,
-         - hydraulic_characteristic: the hydraulic characteristic of the barriers
-         - layer: model layer for the barrier
+         - hydraulic_characteristic: the hydraulic characteristic of the
+           barriers
+         - layer: model layer for the barrier, only 1 single layer can be
+           entered.
     print_input: bool
 
     Examples
@@ -774,6 +771,11 @@ class LayeredHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierB
     >>> hfb = imod.mf6.LayeredHorizontalFlowBarrierHydraulicCharacteristic(barrier_gdf)
 
     """
+
+    _write_schemata = {
+        "geometry": [EmptyIndexesSchema()],
+        "layer": [MaxNUniqueValuesSchema(1)],
+    }
 
     @init_log_decorator()
     def __init__(
@@ -806,7 +808,7 @@ class LayeredHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierB
 
 class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     """
-     Horizontal Flow Barrier (HFB) package
+    Horizontal Flow Barrier (HFB) package
 
     Input to the Horizontal Flow Barrier (HFB) Package is read from the file
     that has type "HFB6" in the Name File. Only one HFB Package can be
@@ -872,16 +874,14 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
         return barrier_values
 
 
-class LayeredHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
+class SingleLayerHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     """
-     Horizontal Flow Barrier (HFB) package
+    Horizontal Flow Barrier (HFB) package
 
     Input to the Horizontal Flow Barrier (HFB) Package is read from the file
     that has type "HFB6" in the Name File. Only one HFB Package can be
     specified for a GWF model.
     https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.2.2.pdf
-
-    If parts of the barrier overlap a layer the multiplier is applied to the entire layer.
 
     Parameters
     ----------
@@ -889,7 +889,8 @@ class LayeredHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
         Dataframe that describes:
          - geometry: the geometries of the barriers,
          - multiplier: the multiplier of the barriers
-         - layer: model layer for the barrier
+         - layer: model layer for the barrier, only 1 single layer can be
+           entered.
     print_input: bool
 
     Examples
@@ -907,6 +908,11 @@ class LayeredHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     >>> hfb = imod.mf6.LayeredHorizontalFlowBarrierMultiplier(barrier_gdf)
 
     """
+
+    _write_schemata = {
+        "geometry": [EmptyIndexesSchema()],
+        "layer": [MaxNUniqueValuesSchema(1)],
+    }
 
     @init_log_decorator()
     def __init__(
@@ -1021,7 +1027,7 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         return barrier_values
 
 
-class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
+class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     """
     Horizontal Flow Barrier (HFB) package
 
@@ -1036,7 +1042,8 @@ class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         Dataframe that describes:
          - geometry: the geometries of the barriers,
          - resistance: the resistance of the barriers
-         - layer: model layer for the barrier
+         - layer: model layer for the barrier, only 1 single layer can be
+           entered.
     print_input: bool
 
     Examples
@@ -1055,6 +1062,11 @@ class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
 
 
     """
+
+    _write_schemata = {
+        "geometry": [EmptyIndexesSchema()],
+        "layer": [MaxNUniqueValuesSchema(1)],
+    }
 
     @init_log_decorator()
     def __init__(
@@ -1084,25 +1096,22 @@ class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         return barrier_values
 
     @classmethod
-    def from_imod5_dataset(cls, imod5_data: dict[str, dict[str, GridDataArray]]):
+    def from_imod5_dataset(
+        cls, key: str, imod5_data: Dict[str, Dict[str, GridDataArray]]
+    ):
         imod5_keys = list(imod5_data.keys())
-        hfb_keys = [key for key in imod5_keys if key[0:3] == "hfb"]
-        if len(hfb_keys) == 0:
-            raise ValueError("no hfb keys present.")
+        if key not in imod5_keys:
+            raise ValueError("hfb key not present.")
 
-        dataframe_ls: List[gpd.GeoDataFrame] = []
-        for hfb_key in hfb_keys:
-            hfb_dict = imod5_data[hfb_key]
-            if not list(hfb_dict.keys()) == ["geodataframe", "layer"]:
-                raise ValueError("hfb is not a LayeredHorizontalFlowBarrierResistance")
-            layer = hfb_dict["layer"]
-            if layer == 0:
-                raise ValueError(
-                    "assigning to layer 0 is not supported yet for import of HFB's"
-                )
-            geometry_layer = hfb_dict["geodataframe"]
-            geometry_layer["layer"] = layer
-            dataframe_ls.append(geometry_layer)
-        compound_dataframe = pd.concat(dataframe_ls, ignore_index=True)
+        hfb_dict = imod5_data[key]
+        if not list(hfb_dict.keys()) == ["geodataframe", "layer"]:
+            raise ValueError("hfb is not a SingleLayerHorizontalFlowBarrierResistance")
+        layer = hfb_dict["layer"]
+        if layer == 0:
+            raise ValueError(
+                "assigning to layer 0 is not supported yet for import of HFB's"
+            )
+        geometry_layer = hfb_dict["geodataframe"]
+        geometry_layer["layer"] = layer
 
-        return LayeredHorizontalFlowBarrierResistance(compound_dataframe)
+        return cls(geometry_layer)
