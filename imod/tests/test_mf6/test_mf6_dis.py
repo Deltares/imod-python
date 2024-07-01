@@ -196,7 +196,9 @@ def test_write_ascii_griddata_2d_3d(idomain_and_bottom, tmp_path):
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5_data__idomain_values(imod5_dataset):
-    dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_dataset)
+    imod5_data  = imod5_dataset[0]
+    period_data  = imod5_dataset[1]    
+    dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_data)
 
     # Test if idomain has appropriate count
     assert (dis["idomain"] == -1).sum() == 371824
@@ -206,7 +208,9 @@ def test_from_imod5_data__idomain_values(imod5_dataset):
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5_data__grid_extent(imod5_dataset):
-    dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_dataset)
+    imod5_data  = imod5_dataset[0]
+    period_data  = imod5_dataset[1]        
+    dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_data)
 
     # Test if regridded to smallest grid resolution
     assert dis["top"].dx == 25.0
@@ -226,8 +230,9 @@ def test_from_imod5_data__write(imod5_dataset, tmp_path):
     directory = tmp_path / "dis_griddata"
     directory.mkdir()
     write_context = WriteContext(simulation_directory=directory)
+    imod5_data     = imod5_dataset[0]
 
-    dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_dataset)
+    dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_data)
 
     # Test if package written without ValidationError
     dis.write(pkgname="dis", globaltimes=[], write_context=write_context)

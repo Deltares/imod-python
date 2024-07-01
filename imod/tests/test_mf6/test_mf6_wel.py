@@ -820,13 +820,14 @@ def test_render__concentration_dis_vertices_transient(well_test_data_transient):
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_import_and_convert_to_mf6(imod5_dataset, tmp_path):
-    target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset)
+    data = imod5_dataset[0]
+    target_dis = StructuredDiscretization.from_imod5_data(data)
     target_npf = NodePropertyFlow.from_imod5_data(
-        imod5_dataset, target_dis.dataset["idomain"]
+        data, target_dis.dataset["idomain"]
     )
 
     # import grid-agnostic well from imod5 data (it contains 1 well)
-    wel = Well.from_imod5_data("wel-1", imod5_dataset)
+    wel = Well.from_imod5_data("wel-1", data)
     assert wel.dataset["x"].values[0] == 197910.0
     assert wel.dataset["y"].values[0] == 362860.0
     assert np.mean(wel.dataset["rate"].values) == -323.8936170212766
