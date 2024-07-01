@@ -19,8 +19,8 @@ from jinja2 import Template
 
 import imod
 from imod.logging import standard_log_decorator
+from imod.mf6.hfb import HorizontalFlowBarrierBase
 from imod.mf6.interfaces.imodel import IModel
-from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.utilities.hfb import merge_hfb_packages
@@ -32,6 +32,7 @@ from imod.schemata import ValidationError
 from imod.typing import GridDataArray
 from imod.typing.grid import is_spatial_grid
 
+HFB_PKGNAME = "hfb_merged"
 
 class Modflow6Model(collections.UserDict, IModel, abc.ABC):
     _mandatory_packages: tuple[str, ...] = ()
@@ -147,12 +148,20 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
         d = {k: v for k, v in self._options.items() if not (v is None or v is False)}
         packages = []
+        has_hfb = False
         for pkgname, pkg in self.items():
             # Add the six to the package id
             pkg_id = pkg._pkg_id
+            # Skip if hfb
+            if pkg_id == "hfb":
+                has_hfb = True
+                continue
             key = f"{pkg_id}6"
             path = dir_for_render / f"{pkgname}.{pkg_id}"
             packages.append((key, path.as_posix(), pkgname))
+        if has_hfb:
+            path = dir_for_render / f"{HFB_PKGNAME}.hfb"
+            packages.append(("hfb6", path.as_posix(), HFB_PKGNAME))
         d["packages"] = packages
         return self._template.render(d)
 
@@ -254,7 +263,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         pkg_write_context = write_context.copy_with_new_write_directory(
             new_write_directory=modeldirectory
         )
-        mf6_hfb_ls: List[Mf6HorizontalFlowBarrier] = []
+        mf6_hfb_ls: List[HorizontalFlowBarrierBase] = []
         top, bottom, idomain = self.__get_domain_geometry()
         k = self.__get_k()
         for pkg_name, pkg in self.items():
@@ -285,8 +294,8 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 raise type(e)(f"{e}\nError occured while writing {pkg_name}")
 
         try:
-            pkg_name = "hfb_merged"
-            mf6_hfb_pkg = merge_hfb_packages(mf6_hfb_ls)
+            pkg_name = HFB_PKGNAME
+            mf6_hfb_pkg = merge_hfb_packages(mf6_hfb_ls, idomain, top, bottom, k)
             mf6_hfb_pkg.write(
                 pkgname=pkg_name,
                 globaltimes=globaltimes,
