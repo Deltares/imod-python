@@ -213,7 +213,7 @@ def test_configure_xt3d(tmp_path):
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_npf_from_imod5_isotropic(imod5_dataset, tmp_path):
-    data = deepcopy(imod5_dataset)
+    data = deepcopy(imod5_dataset[0])
     # throw out kva (=vertical anisotropy array) and ani (=horizontal anisotropy array)
     data.pop("kva")
     data.pop("ani")
@@ -235,7 +235,7 @@ def test_npf_from_imod5_isotropic(imod5_dataset, tmp_path):
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_npf_from_imod5_horizontal_anisotropy(imod5_dataset, tmp_path):
-    data = deepcopy(imod5_dataset)
+    data = deepcopy(imod5_dataset[0])
     # throw out kva (=vertical anisotropy array)
     data.pop("kva")
 
@@ -269,7 +269,7 @@ def test_npf_from_imod5_horizontal_anisotropy(imod5_dataset, tmp_path):
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_npf_from_imod5_vertical_anisotropy(imod5_dataset, tmp_path):
-    data = deepcopy(imod5_dataset)
+    data = deepcopy(imod5_dataset[0])
     # throw out ani (=horizontal anisotropy array)
     data.pop("ani")
 

@@ -1,4 +1,5 @@
 from dataclasses import asdict
+from datetime import datetime
 from typing import Optional
 
 import numpy as np
@@ -32,6 +33,7 @@ from imod.schemata import (
 )
 from imod.typing import GridDataArray
 from imod.typing.grid import enforce_dim_order, is_planar_grid
+from imod.util.expand_repetitions import expand_repetitions
 
 
 class Drainage(BoundaryCondition, IRegridPackage):
@@ -166,10 +168,13 @@ class Drainage(BoundaryCondition, IRegridPackage):
         cls,
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
+        period_data: dict[str, list[datetime]],
         target_discretization: StructuredDiscretization,
         target_npf: NodePropertyFlow,
         allocation_option: ALLOCATION_OPTION,
         distributing_option: DISTRIBUTING_OPTION,
+        time_min: datetime,
+        time_max: datetime,
         regridder_types: Optional[RegridMethodType] = None,
     ) -> "Drainage":
         """
@@ -250,4 +255,10 @@ class Drainage(BoundaryCondition, IRegridPackage):
                 target_npf.dataset["k"],
                 planar_elevation,
             )
-        return Drainage(**regridded_package_data)
+
+        drn = Drainage(**regridded_package_data)
+        if period_data is not None:
+            repeat = period_data.get(key)
+            if repeat is not None:
+                drn.set_repeat_stress(expand_repetitions(repeat, time_min, time_max))
+        return drn

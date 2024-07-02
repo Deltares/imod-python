@@ -1,4 +1,5 @@
 from dataclasses import asdict
+from datetime import datetime
 from typing import Optional, Tuple
 
 import numpy as np
@@ -36,6 +37,7 @@ from imod.schemata import (
 )
 from imod.typing import GridDataArray
 from imod.typing.grid import enforce_dim_order, is_planar_grid
+from imod.util.expand_repetitions import expand_repetitions
 
 
 class River(BoundaryCondition, IRegridPackage):
@@ -188,7 +190,10 @@ class River(BoundaryCondition, IRegridPackage):
         cls,
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
+        period_data: dict[str, list[datetime]],
         target_discretization: StructuredDiscretization,
+        time_min: datetime,
+        time_max: datetime,
         allocation_option_riv: ALLOCATION_OPTION,
         distributing_option_riv: DISTRIBUTING_OPTION,
         regridder_types: Optional[RegridMethodType] = None,
@@ -319,6 +324,9 @@ class River(BoundaryCondition, IRegridPackage):
         )
         regridded_package_data["conductance"] = river_conductance
         regridded_package_data.pop("infiltration_factor")
+        regridded_package_data["bottom_elevation"] = regridded_package_data[
+            "bottom_elevation"
+        ].transpose("time", "layer", "y", "x", missing_dims="ignore")
 
         river_package = River(**regridded_package_data)
         # create a drainage package with the conductance we computed from the infiltration factor
@@ -339,6 +347,19 @@ class River(BoundaryCondition, IRegridPackage):
             drainage_package = drainage_package.mask(mask)
         else:
             drainage_package = None
+
+        if period_data is not None:
+            repeat = period_data.get(key)
+            if repeat is not None:
+                if river_package is not None:
+                    river_package.set_repeat_stress(
+                        expand_repetitions(repeat, time_min, time_max)
+                    )
+                if drainage_package is not None:
+                    drainage_package.set_repeat_stress(
+                        expand_repetitions(repeat, time_min, time_max)
+                    )
+
         return (river_package, drainage_package)
 
     @classmethod

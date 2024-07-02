@@ -331,7 +331,7 @@ def test_clip_box(rch_dict):
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
-    data = deepcopy(imod5_dataset)
+    data = deepcopy(imod5_dataset[0])
     target_discretization = StructuredDiscretization.from_imod5_data(data)
 
     # create a planar grid with time-independent recharge
@@ -352,7 +352,7 @@ def test_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
-    data = deepcopy(imod5_dataset)
+    data = deepcopy(imod5_dataset[0])
     target_discretization = StructuredDiscretization.from_imod5_data(data)
 
     # create a grid with recharge for 3 timesteps
@@ -378,7 +378,7 @@ def test_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_non_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
-    data = deepcopy(imod5_dataset)
+    data = deepcopy(imod5_dataset[0])
     target_discretization = StructuredDiscretization.from_imod5_data(data)
 
     # make the first layer of the target grid inactive
@@ -411,7 +411,7 @@ def test_non_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_non_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
-    data = deepcopy(imod5_dataset)
+    data = deepcopy(imod5_dataset[0])
     target_discretization = StructuredDiscretization.from_imod5_data(data)
     # make the first layer of the target grid inactive
     target_grid = target_discretization.dataset["idomain"]

@@ -173,8 +173,11 @@ class GroundwaterFlowModel(Modflow6Model):
     def from_imod5_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
+        period_data: dict[str, dict[str, GridDataArray]],
         allocation_options: SimulationAllocationOptions,
         distributing_options: SimulationDistributingOptions,
+        time_min,
+        time_max,
         regridder_types: Optional[RegridMethodType] = None,
     ) -> "GroundwaterFlowModel":
         """
@@ -209,7 +212,9 @@ class GroundwaterFlowModel(Modflow6Model):
         # first import the singleton packages
         # import discretization
 
-        dis_pkg = StructuredDiscretization.from_imod5_data(imod5_data, regridder_types)
+        dis_pkg = StructuredDiscretization.from_imod5_data(
+            imod5_data, regridder_types, False
+        )
         grid = dis_pkg.dataset["idomain"]
 
         # import npf
@@ -239,10 +244,13 @@ class GroundwaterFlowModel(Modflow6Model):
             drn_pkg = Drainage.from_imod5_data(
                 drn_key,
                 imod5_data,
+                period_data,
                 dis_pkg,
                 npf_pkg,
                 allocation_options.drn,
                 distributing_option=distributing_options.drn,
+                time_min=time_min,
+                time_max=time_max,
                 regridder_types=regridder_types,
             )
             result[drn_key] = drn_pkg
@@ -253,7 +261,10 @@ class GroundwaterFlowModel(Modflow6Model):
             riv_pkg, drn_pkg = River.from_imod5_data(
                 riv_key,
                 imod5_data,
+                period_data,
                 dis_pkg,
+                time_min,
+                time_max,
                 allocation_options.riv,
                 distributing_options.riv,
                 regridder_types,
