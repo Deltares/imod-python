@@ -53,9 +53,9 @@ def imod5_dataset_periods() -> tuple[dict[str, any], dict[str, list[datetime]]]:
     _load_imod5_data_in_memory(grid_data)
 
     # Fix data for ibound  as it contains floating values like 0.34, 0.25 etc.
-    ibound = data["bnd"]["ibound"]
+    ibound = grid_data["bnd"]["ibound"]
     ibound = ibound.where(ibound <= 0, 1)
-    data["bnd"]["ibound"] = ibound
+    grid_data["bnd"]["ibound"] = ibound
     return grid_data, period_data
 
 
