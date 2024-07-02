@@ -17,7 +17,10 @@ from imod.mf6 import (
     SingleLayerHorizontalFlowBarrierResistance,
 )
 from imod.mf6.dis import StructuredDiscretization
-from imod.mf6.hfb import to_connected_cells_dataset
+from imod.mf6.hfb import (
+    _prepare_barrier_dataset_for_mf6_adapter,
+    to_connected_cells_dataset,
+)
 from imod.mf6.ims import SolutionPresetSimple
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.simulation import Modflow6Simulation
@@ -92,6 +95,7 @@ def test_to_mf6_creates_mf6_adapter_init(
     expected_values = to_connected_cells_dataset(
         idomain, grid, edge_index, {barrier_value_name: expected_barrier_values}
     )
+    expected_values = _prepare_barrier_dataset_for_mf6_adapter(expected_values)
 
     mf6_flow_barrier_mock.assert_called_once()
 
@@ -220,6 +224,7 @@ def test_to_mf6_creates_mf6_adapter_layered(
     expected_values = to_connected_cells_dataset(
         idomain, grid, edge_index, {barrier_value_name: expected_barrier_values}
     )
+    expected_values = _prepare_barrier_dataset_for_mf6_adapter(expected_values)
 
     mf6_flow_barrier_mock.assert_called_once()
 
