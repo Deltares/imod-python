@@ -1,4 +1,5 @@
 from zipfile import ZipFile
+
 import pytest
 import xarray as xr
 
@@ -11,10 +12,9 @@ from imod.formats.prj.prj import open_projectfile_data
 def imod5_dataset():
     tmp_path = imod.util.temporary_directory()
     data = imod.data.imod5_projectfile_data(tmp_path)
-    
-    pd =data[1]
+
+    pd = data[1]
     data = data[0]
-   
 
     _load_imod5_data_in_memory(data)
 
@@ -33,23 +33,21 @@ def _load_imod5_data_in_memory(imod5_data):
                 vardata.load()
 
 
-
 @pytest.fixture(scope="module")
 def imod5_dataset_periods():
     tmp_path = imod.util.temporary_directory()
     fname_model = REGISTRY.fetch("iMOD5_model.zip")
 
     with ZipFile(fname_model) as archive:
-        archive.extractall(tmp_path)    
+        archive.extractall(tmp_path)
 
-    with open(tmp_path/"iMOD5_model_pooch"/"iMOD5_model.prj", "w") as f:
+    with open(tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj", "w") as f:
         f.write(period_prj)
 
-    data = open_projectfile_data(tmp_path/"iMOD5_model_pooch"/"iMOD5_model.prj")
-    
-    pd =data[1]
+    data = open_projectfile_data(tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj")
+
+    pd = data[1]
     data = data[0]
-   
 
     _load_imod5_data_in_memory(data)
 
@@ -60,7 +58,7 @@ def imod5_dataset_periods():
     return data, pd
 
 
-period_prj ="""\
+period_prj = """\
 0001,(BND),1, Boundary Condition
 001,37
 1,2,1,1.0,0.0,-999.99, '.\Database\BND\VERSION_1\IBOUND_L1.IDF' >>> (BND) Boundary Settings (IDF) <<<

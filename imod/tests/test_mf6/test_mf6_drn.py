@@ -9,7 +9,6 @@ import xarray as xr
 
 import imod
 import imod.mf6.drn
-from imod.formats.prj.prj import open_projectfile_data
 from imod.logging import LoggerType, LogLevel
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.npf import NodePropertyFlow
@@ -475,7 +474,6 @@ def test_html_repr(drainage):
 
 
 def test_from_imod5(imod5_dataset_periods, tmp_path):
-
     period_data = imod5_dataset_periods[1]
     imod5_dataset = imod5_dataset_periods[0]
     target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset, validate=False)

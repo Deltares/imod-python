@@ -822,9 +822,7 @@ def test_render__concentration_dis_vertices_transient(well_test_data_transient):
 def test_import_and_convert_to_mf6(imod5_dataset, tmp_path):
     data = imod5_dataset[0]
     target_dis = StructuredDiscretization.from_imod5_data(data)
-    target_npf = NodePropertyFlow.from_imod5_data(
-        data, target_dis.dataset["idomain"]
-    )
+    target_npf = NodePropertyFlow.from_imod5_data(data, target_dis.dataset["idomain"])
 
     # import grid-agnostic well from imod5 data (it contains 1 well)
     wel = Well.from_imod5_data("wel-1", data)

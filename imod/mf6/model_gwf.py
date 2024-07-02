@@ -177,7 +177,7 @@ class GroundwaterFlowModel(Modflow6Model):
         allocation_options: SimulationAllocationOptions,
         distributing_options: SimulationDistributingOptions,
         time_min,
-        time_max, 
+        time_max,
         regridder_types: Optional[RegridMethodType] = None,
     ) -> "GroundwaterFlowModel":
         """
@@ -249,7 +249,7 @@ class GroundwaterFlowModel(Modflow6Model):
                 npf_pkg,
                 allocation_options.drn,
                 distributing_option=distributing_options.drn,
-                time_min= time_min,
+                time_min=time_min,
                 time_max=time_max,
                 regridder_types=regridder_types,
             )
@@ -264,7 +264,7 @@ class GroundwaterFlowModel(Modflow6Model):
                 period_data,
                 dis_pkg,
                 time_min,
-                time_max,                
+                time_max,
                 allocation_options.riv,
                 distributing_options.riv,
                 regridder_types,

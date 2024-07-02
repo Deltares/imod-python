@@ -11,7 +11,6 @@ import xugrid as xu
 from pytest_cases import parametrize_with_cases
 
 import imod
-from imod.formats.prj.prj import open_projectfile_data
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.write_context import WriteContext
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION
@@ -398,20 +397,19 @@ def test_write_concentration_period_data(concentration_fc):
 @pytest.mark.usefixtures("imod5_dataset")
 def test_import_river_from_imod5(imod5_dataset, tmp_path):
     imod5_data = imod5_dataset[0]
-    period_data =  imod5_dataset[1]    
+    period_data = imod5_dataset[1]
     globaltimes = [np.datetime64("2000-01-01")]
     target_dis = StructuredDiscretization.from_imod5_data(imod5_data)
-
 
     (riv, drn) = imod.mf6.River.from_imod5_data(
         "riv-1",
         imod5_data,
         period_data,
         target_dis,
-        time_min=  datetime(2000,1,1),
-        time_max= datetime(2002,1,1),
+        time_min=datetime(2000, 1, 1),
+        time_max=datetime(2002, 1, 1),
         allocation_option_riv=ALLOCATION_OPTION.at_elevation,
-        distributing_option_riv= DISTRIBUTING_OPTION.by_crosscut_thickness,
+        distributing_option_riv=DISTRIBUTING_OPTION.by_crosscut_thickness,
         regridder_types=None,
     )
 
@@ -437,23 +435,21 @@ def test_import_river_from_imod5(imod5_dataset, tmp_path):
 @pytest.mark.usefixtures("imod5_dataset")
 def test_import_river_from_imod5_infiltration_factors(imod5_dataset):
     imod5_data = imod5_dataset[0]
-    period_data =  imod5_dataset[1]        
+    period_data = imod5_dataset[1]
     target_dis = StructuredDiscretization.from_imod5_data(imod5_data)
 
     original_infiltration_factor = imod5_data["riv-1"]["infiltration_factor"]
-    imod5_data["riv-1"]["infiltration_factor"] = ones_like(
-        original_infiltration_factor
-    )
+    imod5_data["riv-1"]["infiltration_factor"] = ones_like(original_infiltration_factor)
 
     (riv, drn) = imod.mf6.River.from_imod5_data(
         "riv-1",
         imod5_data,
-        period_data, 
+        period_data,
         target_dis,
-        time_min=  datetime(2000,1,1),
-        time_max= datetime(2002,1,1),        
+        time_min=datetime(2000, 1, 1),
+        time_max=datetime(2002, 1, 1),
         allocation_option_riv=ALLOCATION_OPTION.at_elevation,
-        distributing_option_riv= DISTRIBUTING_OPTION.by_crosscut_thickness,
+        distributing_option_riv=DISTRIBUTING_OPTION.by_crosscut_thickness,
         regridder_types=None,
     )
 
@@ -466,12 +462,12 @@ def test_import_river_from_imod5_infiltration_factors(imod5_dataset):
     (riv, drn) = imod.mf6.River.from_imod5_data(
         "riv-1",
         imod5_data,
-        period_data,         
+        period_data,
         target_dis,
-        time_min=  datetime(2000,1,1),
-        time_max= datetime(2002,1,1),                
+        time_min=datetime(2000, 1, 1),
+        time_max=datetime(2002, 1, 1),
         allocation_option_riv=ALLOCATION_OPTION.at_elevation,
-        distributing_option_riv= DISTRIBUTING_OPTION.by_crosscut_thickness,
+        distributing_option_riv=DISTRIBUTING_OPTION.by_crosscut_thickness,
         regridder_types=None,
     )
 
@@ -524,4 +520,6 @@ def test_import_river_from_imod5_period_data(imod5_dataset_periods):
     assert drn is not None
 
     # teardown
-    imod5_dataset_periods[0]["riv-1"]["infiltration_factor"] = original_infiltration_factor
+    imod5_dataset_periods[0]["riv-1"]["infiltration_factor"] = (
+        original_infiltration_factor
+    )

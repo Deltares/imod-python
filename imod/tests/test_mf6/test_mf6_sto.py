@@ -1,6 +1,5 @@
 import pathlib
 import textwrap
-from copy import deepcopy
 
 import numpy as np
 import pytest
@@ -451,7 +450,7 @@ def test_from_imod5(imod5_dataset, tmp_path):
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5_steady_state(imod5_dataset):
-    data  = imod5_dataset[0]
+    data = imod5_dataset[0]
 
     data["sto"]["storage_coefficient"].values[:] = 0
     target_grid = data["khv"]["kh"]

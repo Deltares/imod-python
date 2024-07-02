@@ -6,7 +6,6 @@ from imod.mf6.write_context import WriteContext
 
 
 def test_from_imod5(imod5_dataset_periods, tmp_path):
-
     period_data = imod5_dataset_periods[1]
     imod5_dataset = imod5_dataset_periods[0]
     target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset, validate=False)
