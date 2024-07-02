@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import List, Union
+from typing import Union
 
 import numpy as np
 import xarray as xr
