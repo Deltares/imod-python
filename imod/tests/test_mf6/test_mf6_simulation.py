@@ -481,6 +481,8 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
         period_data,
         default_simulation_allocation_options,
         default_simulation_distributing_options,
+        datetime(2000,1,1),
+        datetime(2002,1,1),       
     )
 
     simulation["imported_model"]["oc"] = OutputControl(
@@ -510,6 +512,8 @@ def test_import_from_GRAM(imod5_dataset, tmp_path):
         data[1],
         default_simulation_allocation_options,
         default_simulation_distributing_options,
+        datetime(2000,1,1),
+        datetime(2002,1,1),    
     )
 
     simulation["imported_model"]["oc"] = OutputControl(

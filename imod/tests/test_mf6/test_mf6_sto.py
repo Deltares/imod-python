@@ -433,7 +433,7 @@ def test_check_nan_in_active_cell(sy_layered, convertible, dis):
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5(imod5_dataset, tmp_path):
-    data = deepcopy(imod5_dataset)
+    data = imod5_dataset[0]
 
     target_grid = data["khv"]["kh"]
 
@@ -451,7 +451,8 @@ def test_from_imod5(imod5_dataset, tmp_path):
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5_steady_state(imod5_dataset):
-    data = deepcopy(imod5_dataset)
+    data  = imod5_dataset[0]
+
     data["sto"]["storage_coefficient"].values[:] = 0
     target_grid = data["khv"]["kh"]
 

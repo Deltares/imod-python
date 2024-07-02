@@ -176,7 +176,8 @@ class GroundwaterFlowModel(Modflow6Model):
         period_data: dict[str, dict[str, GridDataArray]],
         allocation_options: SimulationAllocationOptions,
         distributing_options: SimulationDistributingOptions,
-        times,
+        time_min,
+        time_max, 
         regridder_types: Optional[RegridMethodType] = None,
     ) -> "GroundwaterFlowModel":
         """
@@ -248,6 +249,8 @@ class GroundwaterFlowModel(Modflow6Model):
                 npf_pkg,
                 allocation_options.drn,
                 distributing_option=distributing_options.drn,
+                time_min= time_min,
+                time_max=time_max,
                 regridder_types=regridder_types,
             )
             result[drn_key] = drn_pkg
@@ -260,6 +263,8 @@ class GroundwaterFlowModel(Modflow6Model):
                 imod5_data,
                 period_data,
                 dis_pkg,
+                time_min,
+                time_max,                
                 allocation_options.riv,
                 distributing_options.riv,
                 regridder_types,
