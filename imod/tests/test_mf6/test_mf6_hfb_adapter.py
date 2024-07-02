@@ -5,7 +5,7 @@ import numpy as np
 import xarray as xr
 from pytest_cases import parametrize_with_cases
 
-from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier, merge_mf6_hfb_packages
+from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.write_context import WriteContext
 
 
