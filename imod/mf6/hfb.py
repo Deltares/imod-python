@@ -414,8 +414,15 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         -------
         Mf6HorizontalFlowBarrier
         """
-        barrier_dataset = barrier_dataset.drop_vars("edge_index").reset_coords()
+        # Set leftover options
         barrier_dataset["print_input"] = self.dataset["print_input"]
+        # Store layer to work around multiindex issue where dropping the edge_index
+        # removes the layer as well.
+        layer = barrier_dataset.coords["layer"].values
+        # Drop leftover coordinate and reset cell_id.
+        barrier_dataset = barrier_dataset.drop_vars("edge_index").reset_coords()
+        # Attach layer again
+        barrier_dataset["layer"] = ("cell_id", layer)
 
         return Mf6HorizontalFlowBarrier(**barrier_dataset.data_vars)
 
