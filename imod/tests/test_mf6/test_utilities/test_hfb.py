@@ -20,7 +20,13 @@ def modellayers_single_layer(structured_flow_model):
     dis["bottom"] = dis["bottom"].isel(x=0, y=0, drop=True)
     npf = model["npf"]
 
-    return {"idomain": dis["idomain"], "top": dis["top"], "bottom": dis["bottom"], "k": npf["k"]}
+    return {
+        "idomain": dis["idomain"],
+        "top": dis["top"],
+        "bottom": dis["bottom"],
+        "k": npf["k"],
+    }
+
 
 @pytest.mark.usefixtures("structured_flow_model")
 @pytest.fixture(scope="function")
@@ -31,7 +37,12 @@ def modellayers(structured_flow_model):
     dis["bottom"] = dis["bottom"].isel(x=0, y=0, drop=True)
     npf = model["npf"]
 
-    return {"idomain": dis["idomain"], "top": dis["top"], "bottom": dis["bottom"], "k": npf["k"]}
+    return {
+        "idomain": dis["idomain"],
+        "top": dis["top"],
+        "bottom": dis["bottom"],
+        "k": npf["k"],
+    }
 
 
 def make_layer_geometry(resistance, layer):
@@ -47,6 +58,7 @@ def make_layer_geometry(resistance, layer):
     )
     return geometry
 
+
 def make_depth_geometry(resistance, top, bot):
     barrier_y = [11.0, 5.0, -1.0]
     barrier_x = [5.0, 5.0, 5.0]
@@ -61,6 +73,7 @@ def make_depth_geometry(resistance, top, bot):
     )
     return geometry
 
+
 def test_merge_three_hfbs__single_layer(modellayers_single_layer):
     """Merge three single layer hfbs, test for lenght"""
     # Arrange
@@ -68,7 +81,9 @@ def test_merge_three_hfbs__single_layer(modellayers_single_layer):
     single_resistance = 400.0
 
     geometry = make_layer_geometry(single_resistance, 1)
-    hfb_ls = [SingleLayerHorizontalFlowBarrierResistance(geometry) for _ in range(n_barriers)]
+    hfb_ls = [
+        SingleLayerHorizontalFlowBarrierResistance(geometry) for _ in range(n_barriers)
+    ]
 
     # Act
     mf6_hfb = merge_hfb_packages(hfb_ls, **modellayers_single_layer)
@@ -77,7 +92,8 @@ def test_merge_three_hfbs__single_layer(modellayers_single_layer):
     assert mf6_hfb["cell_id"].shape == (6,)
     assert (mf6_hfb["layer"] == 1).all()
     expected_resistance = n_barriers * single_resistance
-    assert (expected_resistance == 1/mf6_hfb["hydraulic_characteristic"]).all()
+    assert (expected_resistance == 1 / mf6_hfb["hydraulic_characteristic"]).all()
+
 
 def test_merge_three_hfbs__compare_single_hfb(modellayers_single_layer):
     """
@@ -91,7 +107,9 @@ def test_merge_three_hfbs__compare_single_hfb(modellayers_single_layer):
     geometry = make_layer_geometry(single_resistance, 1)
     geometry_tripled = make_layer_geometry(n_barriers * single_resistance, 1)
 
-    hfb_ls_triple = [SingleLayerHorizontalFlowBarrierResistance(geometry) for _ in range(n_barriers)]
+    hfb_ls_triple = [
+        SingleLayerHorizontalFlowBarrierResistance(geometry) for _ in range(n_barriers)
+    ]
     hfb_ls_single = [SingleLayerHorizontalFlowBarrierResistance(geometry_tripled)]
 
     # Act
@@ -100,6 +118,7 @@ def test_merge_three_hfbs__compare_single_hfb(modellayers_single_layer):
 
     # Assert
     xr.testing.assert_equal(mf6_hfb_single.dataset, mf6_hfb_three.dataset)
+
 
 def test_merge_three_hfbs__to_mf6_pkg_single_layer(modellayers_single_layer):
     """
@@ -113,7 +132,9 @@ def test_merge_three_hfbs__to_mf6_pkg_single_layer(modellayers_single_layer):
     geometry = make_layer_geometry(single_resistance, 1)
     geometry_tripled = make_layer_geometry(n_barriers * single_resistance, 1)
 
-    hfb_ls_triple = [SingleLayerHorizontalFlowBarrierResistance(geometry) for _ in range(n_barriers)]
+    hfb_ls_triple = [
+        SingleLayerHorizontalFlowBarrierResistance(geometry) for _ in range(n_barriers)
+    ]
     hfb_ls_single = [SingleLayerHorizontalFlowBarrierResistance(geometry_tripled)]
 
     # Act
@@ -122,6 +143,7 @@ def test_merge_three_hfbs__to_mf6_pkg_single_layer(modellayers_single_layer):
 
     # Assert
     xr.testing.assert_equal(mf6_hfb_single.dataset, mf6_hfb_three.dataset)
+
 
 def test_merge_mixed_hfbs__single_layer(modellayers_single_layer):
     """Merge mix of layer hfb and depth hfb."""
@@ -136,7 +158,7 @@ def test_merge_mixed_hfbs__single_layer(modellayers_single_layer):
     geometry_depth = make_depth_geometry(single_resistance, top, bot)
 
     hfb_ls_triple = [
-        SingleLayerHorizontalFlowBarrierResistance(geometry), 
+        SingleLayerHorizontalFlowBarrierResistance(geometry),
         HorizontalFlowBarrierResistance(geometry_depth),
         HorizontalFlowBarrierResistance(geometry_depth),
     ]
@@ -148,7 +170,7 @@ def test_merge_mixed_hfbs__single_layer(modellayers_single_layer):
     assert mf6_hfb["cell_id"].shape == (6,)
     assert (mf6_hfb["layer"] == 1).all()
     expected_resistance = n_barriers * single_resistance
-    assert (expected_resistance == 1/mf6_hfb["hydraulic_characteristic"]).all()
+    assert (expected_resistance == 1 / mf6_hfb["hydraulic_characteristic"]).all()
 
 
 def test_merge_three_hfbs__multiple_single_layers(modellayers):
@@ -158,7 +180,10 @@ def test_merge_three_hfbs__multiple_single_layers(modellayers):
     single_resistance = 400.0
 
     hfb_ls = [
-        SingleLayerHorizontalFlowBarrierResistance(make_layer_geometry(single_resistance, i)) for i in range(1, n_barriers+1)
+        SingleLayerHorizontalFlowBarrierResistance(
+            make_layer_geometry(single_resistance, i)
+        )
+        for i in range(1, n_barriers + 1)
     ]
 
     # Act
@@ -168,7 +193,7 @@ def test_merge_three_hfbs__multiple_single_layers(modellayers):
     assert mf6_hfb["cell_id"].shape == (18,)
     assert np.all(np.unique(mf6_hfb["layer"]) == np.array([1, 2, 3]))
     expected_resistance = single_resistance
-    assert (expected_resistance == 1/mf6_hfb["hydraulic_characteristic"]).all()
+    assert (expected_resistance == 1 / mf6_hfb["hydraulic_characteristic"]).all()
 
 
 def test_merge_mixed_hfbs__multiple_layer(modellayers):
@@ -181,10 +206,16 @@ def test_merge_mixed_hfbs__multiple_layer(modellayers):
     single_resistance = 400.0
 
     hfb_ls = [
-        SingleLayerHorizontalFlowBarrierResistance(make_layer_geometry(single_resistance, i)) for i in range(1, n_barriers+1)
+        SingleLayerHorizontalFlowBarrierResistance(
+            make_layer_geometry(single_resistance, i)
+        )
+        for i in range(1, n_barriers + 1)
     ]
-    hfb_ls.append(HorizontalFlowBarrierResistance(make_depth_geometry(single_resistance, 10.0, -3.0)))
-
+    hfb_ls.append(
+        HorizontalFlowBarrierResistance(
+            make_depth_geometry(single_resistance, 10.0, -3.0)
+        )
+    )
 
     # Act
     mf6_hfb = merge_hfb_packages(hfb_ls, **modellayers)
@@ -193,4 +224,4 @@ def test_merge_mixed_hfbs__multiple_layer(modellayers):
     assert mf6_hfb["cell_id"].shape == (18,)
     assert np.all(np.unique(mf6_hfb["layer"]) == np.array([1, 2, 3]))
     expected_resistance = 2 * single_resistance
-    assert (expected_resistance == 1/mf6_hfb["hydraulic_characteristic"]).all()
+    assert (expected_resistance == 1 / mf6_hfb["hydraulic_characteristic"]).all()

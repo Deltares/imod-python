@@ -34,6 +34,7 @@ from imod.typing.grid import is_spatial_grid
 
 HFB_PKGNAME = "hfb_merged"
 
+
 class Modflow6Model(collections.UserDict, IModel, abc.ABC):
     _mandatory_packages: tuple[str, ...] = ()
     _model_id: Optional[str] = None

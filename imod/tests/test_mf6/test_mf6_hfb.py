@@ -534,7 +534,9 @@ def test_hfb_from_imod5(imod5_dataset, tmp_path):
 def test_run_multiple_hfbs(tmp_path, structured_flow_model):
     # Single layered model
     structured_flow_model = structured_flow_model.clip_box(layer_max=1)
-    structured_flow_model["dis"]["bottom"] = structured_flow_model["dis"]["bottom"].isel(x=0, y=0, drop=True)
+    structured_flow_model["dis"]["bottom"] = structured_flow_model["dis"][
+        "bottom"
+    ].isel(x=0, y=0, drop=True)
     # Arrange boundary conditions into something simple:
     # A linear decline from left to right, forced by chd
     structured_flow_model.pop("rch")
@@ -572,9 +574,15 @@ def test_run_multiple_hfbs(tmp_path, structured_flow_model):
     )
 
     simulation_triple = Modflow6Simulation("triple_hfb")
-    structured_flow_model["hfb-1"] = SingleLayerHorizontalFlowBarrierResistance(geometry)
-    structured_flow_model["hfb-2"] = SingleLayerHorizontalFlowBarrierResistance(geometry)
-    structured_flow_model["hfb-3"] = SingleLayerHorizontalFlowBarrierResistance(geometry)
+    structured_flow_model["hfb-1"] = SingleLayerHorizontalFlowBarrierResistance(
+        geometry
+    )
+    structured_flow_model["hfb-2"] = SingleLayerHorizontalFlowBarrierResistance(
+        geometry
+    )
+    structured_flow_model["hfb-3"] = SingleLayerHorizontalFlowBarrierResistance(
+        geometry
+    )
     simulation_triple["GWF"] = structured_flow_model
     simulation_triple["solver"] = SolutionPresetSimple(["GWF"])
     simulation_triple.create_time_discretization(["2000-01-01", "2000-01-02"])

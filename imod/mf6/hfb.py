@@ -175,8 +175,8 @@ def to_connected_cells_dataset(
             },
         )
 
-    barrier_dataset = (
-        barrier_dataset.stack(cell_id=("layer", "edge_index"), create_index=True)
+    barrier_dataset = barrier_dataset.stack(
+        cell_id=("layer", "edge_index"), create_index=True
     )
 
     return barrier_dataset.dropna("cell_id")
@@ -413,15 +413,12 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             },
         )
 
-    def _to_mf6_pkg(
-        self, 
-        barrier_dataset: xr.Dataset
-    )  -> Mf6HorizontalFlowBarrier:
+    def _to_mf6_pkg(self, barrier_dataset: xr.Dataset) -> Mf6HorizontalFlowBarrier:
         """
         Internal method, which does the following
         - final coordinate cleanup of barrier dataset
         - adds missing options to dataset
-        
+
         Parameters
         ----------
         barrier_dataset: xr.Dataset
@@ -435,7 +432,6 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         barrier_dataset["print_input"] = self.dataset["print_input"]
         barrier_dataset = _prepare_barrier_dataset_for_mf6_adapter(barrier_dataset)
         return Mf6HorizontalFlowBarrier(**barrier_dataset.data_vars)
-
 
     def to_mf6_pkg(
         self,
