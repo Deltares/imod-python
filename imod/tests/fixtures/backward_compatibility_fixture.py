@@ -1,3 +1,4 @@
+from datetime import datetime
 from zipfile import ZipFile
 
 import pytest
@@ -34,7 +35,7 @@ def _load_imod5_data_in_memory(imod5_data):
 
 
 @pytest.fixture(scope="module")
-def imod5_dataset_periods():
+def imod5_dataset_periods() -> tuple[dict[str, any], dict[str, list[datetime]]]:
     tmp_path = imod.util.temporary_directory()
     fname_model = REGISTRY.fetch("iMOD5_model.zip")
 
@@ -46,16 +47,16 @@ def imod5_dataset_periods():
 
     data = open_projectfile_data(tmp_path / "iMOD5_model_pooch" / "iMOD5_model.prj")
 
-    pd = data[1]
-    data = data[0]
+    grid_data = data[0]
+    period_data = data[1]
 
-    _load_imod5_data_in_memory(data)
+    _load_imod5_data_in_memory(grid_data)
 
     # Fix data for ibound  as it contains floating values like 0.34, 0.25 etc.
     ibound = data["bnd"]["ibound"]
     ibound = ibound.where(ibound <= 0, 1)
     data["bnd"]["ibound"] = ibound
-    return data, pd
+    return grid_data, period_data
 
 
 period_prj = """\

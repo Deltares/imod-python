@@ -10,7 +10,7 @@ from imod.logging import init_log_decorator
 from imod.logging.loglevel import LogLevel
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
-from imod.mf6.drn import Drainage, expand_repetitions
+from imod.mf6.drn import Drainage
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.regrid.regrid_schemes import RegridMethodType, RiverRegridMethod
 from imod.mf6.utilities.regrid import (
@@ -37,6 +37,7 @@ from imod.schemata import (
 )
 from imod.typing import GridDataArray
 from imod.typing.grid import enforce_dim_order, is_planar_grid
+from imod.util.expand_repetitions import expand_repetitions
 
 
 class River(BoundaryCondition, IRegridPackage):
@@ -189,7 +190,7 @@ class River(BoundaryCondition, IRegridPackage):
         cls,
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        period_data: dict[str, dict[str, GridDataArray]],
+        period_data: dict[str, list[datetime]],
         target_discretization: StructuredDiscretization,
         time_min: datetime,
         time_max: datetime,

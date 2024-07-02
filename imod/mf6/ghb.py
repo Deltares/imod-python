@@ -6,7 +6,6 @@ import numpy as np
 
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
-from imod.mf6.drn import expand_repetitions
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.regrid.regrid_schemes import (
     GeneralHeadBoundaryRegridMethod,
@@ -26,6 +25,7 @@ from imod.schemata import (
     OtherCoordsSchema,
 )
 from imod.typing import GridDataArray
+from imod.util.expand_repetitions import expand_repetitions
 
 
 class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
@@ -163,7 +163,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         cls,
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        period_data: dict[str, dict[str, GridDataArray]],
+        period_data: dict[str, list[datetime]],
         target_discretization,
         time_min: datetime,
         time_max: datetime,

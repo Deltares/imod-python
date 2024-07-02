@@ -198,7 +198,7 @@ def test_write_concentration_period_data(head_fc, concentration_fc):
 @pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5(imod5_dataset, tmp_path):
     imod5_data = imod5_dataset[0]
-    period_data = imod5_dataset[1]
+
     target_dis = StructuredDiscretization.from_imod5_data(imod5_data)
 
     chd3 = imod.mf6.ConstantHead.from_imod5_data(
@@ -220,7 +220,7 @@ def test_from_imod5(imod5_dataset, tmp_path):
 @pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5_shd(imod5_dataset, tmp_path):
     imod5_data = imod5_dataset[0]
-    period_data = imod5_dataset[1]
+
     target_dis = StructuredDiscretization.from_imod5_data(imod5_data)
 
     chd_shd = imod.mf6.ConstantHead.from_imod5_shd_data(
