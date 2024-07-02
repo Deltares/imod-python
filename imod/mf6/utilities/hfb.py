@@ -58,4 +58,4 @@ def merge_hfb_packages(
     barrier_dataset_merged = barrier_dataset_merged.drop_vars("edge_index").reset_coords()
     # Attach layer again
     barrier_dataset_merged["layer"] = ("cell_id", layer)
-    return Mf6HorizontalFlowBarrier(**barrier_dataset_merged)
+    return Mf6HorizontalFlowBarrier(**barrier_dataset_merged.data_vars)
