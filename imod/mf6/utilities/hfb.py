@@ -7,7 +7,7 @@ from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.typing import GridDataArray
 
 
-def inverse_sum(a):
+def inverse_sum(a: xr.Dataset) -> xr.Dataset:
     """Sum of the inverse"""
     return (1/a).sum()
 
@@ -26,6 +26,8 @@ def merge_hfb_packages(
     ----------
     hfb_ls: list
         List of HorizontalFlowBarrier packages. These will be merged into one.
+        Function takes settings like "print_input" from the first object in the
+        list.
     idomain: GridDataArray
             Grid with active cells.
     top: GridDataArray
@@ -54,5 +56,6 @@ def merge_hfb_packages(
     barrier_dataset_merged["print_input"] = hfb_ls[0].dataset["print_input"]
     # Drop leftover coordinate and reset cell_id.
     barrier_dataset_merged = barrier_dataset_merged.drop_vars("edge_index").reset_coords()
+    # Attach layer again
     barrier_dataset_merged["layer"] = ("cell_id", layer)
     return Mf6HorizontalFlowBarrier(**barrier_dataset_merged)
