@@ -264,11 +264,11 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             new_write_directory=modeldirectory
         )
         mf6_hfb_ls: List[HorizontalFlowBarrierBase] = []
-        top, bottom, idomain = self.__get_domain_geometry()
-        k = self.__get_k()
         for pkg_name, pkg in self.items():
             try:
                 if isinstance(pkg, imod.mf6.Well):
+                    top, bottom, idomain = self.__get_domain_geometry()
+                    k = self.__get_k()
                     mf6_well_pkg = pkg.to_mf6_pkg(
                         idomain,
                         top,
@@ -293,16 +293,19 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             except Exception as e:
                 raise type(e)(f"{e}\nError occured while writing {pkg_name}")
 
-        try:
-            pkg_name = HFB_PKGNAME
-            mf6_hfb_pkg = merge_hfb_packages(mf6_hfb_ls, idomain, top, bottom, k)
-            mf6_hfb_pkg.write(
-                pkgname=pkg_name,
-                globaltimes=globaltimes,
-                write_context=pkg_write_context,
-            )
-        except Exception as e:
-            raise type(e)(f"{e}\nError occured while writing {pkg_name}")
+        if len(mf6_hfb_ls) > 0:
+            try:
+                pkg_name = HFB_PKGNAME
+                top, bottom, idomain = self.__get_domain_geometry()
+                k = self.__get_k()
+                mf6_hfb_pkg = merge_hfb_packages(mf6_hfb_ls, idomain, top, bottom, k)
+                mf6_hfb_pkg.write(
+                    pkgname=pkg_name,
+                    globaltimes=globaltimes,
+                    write_context=pkg_write_context,
+                )
+            except Exception as e:
+                raise type(e)(f"{e}\nError occured while writing {pkg_name}")
 
         return NestedStatusInfo(modelname)
 
