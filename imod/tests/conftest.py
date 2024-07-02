@@ -1,6 +1,6 @@
 import pytest
 
-from .fixtures.backward_compatibility_fixture import imod5_dataset
+from .fixtures.backward_compatibility_fixture import imod5_dataset, imod5_dataset_periods
 from .fixtures.flow_basic_fixture import (
     basic_dis,
     basic_dis__topsystem,

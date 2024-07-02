@@ -474,13 +474,10 @@ def test_html_repr(drainage):
     assert html_string.split("</div>")[0] == "<div>Drainage"
 
 
-def test_from_imod5(tmp_path):
-    testdir = (
-        "D:\\dev\\imod_python-gh\\imod-python\\imod\\tests\\imod5_data\\iMOD5_model.prj"
-    )
-    imod5_dataset = open_projectfile_data(testdir)
-    period_data = imod5_dataset[1]
-    imod5_dataset = imod5_dataset[0]
+def test_from_imod5(imod5_dataset_periods, tmp_path):
+
+    period_data = imod5_dataset_periods[1]
+    imod5_dataset = imod5_dataset_periods[0]
     target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset, validate=False)
     target_npf = NodePropertyFlow.from_imod5_data(
         imod5_dataset, target_dis.dataset["idomain"]
