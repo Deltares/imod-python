@@ -270,6 +270,24 @@ def _vectorized_overlap(bounds_a: np.ndarray, bounds_b: np.ndarray):
     )
 
 
+def _prepare_barrier_dataset_for_mf6_adapter(dataset: xr.Dataset) -> xr.Dataset:
+    """
+    Prepare barrier dataset for the initialization of
+    Mf6HorizontalFlowBarrier.
+
+    - Reset coords to get a coordless cell_id dimension instead of a multi-index coord
+    - Assign layer as variable to dataset instead of as coord.
+    """
+    # Store layer to work around multiindex issue where dropping the edge_index
+    # removes the layer as well.
+    layer = dataset.coords["layer"].values
+    # Drop leftover coordinate and reset cell_id.
+    dataset = dataset.drop_vars("edge_index").reset_coords()
+    # Attach layer again
+    dataset["layer"] = ("cell_id", layer)
+    return dataset
+
+
 class BarrierType(Enum):
     HydraulicCharacteristic = 0
     Multiplier = 1
@@ -414,16 +432,8 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         -------
         Mf6HorizontalFlowBarrier
         """
-        # Set leftover options
         barrier_dataset["print_input"] = self.dataset["print_input"]
-        # Store layer to work around multiindex issue where dropping the edge_index
-        # removes the layer as well.
-        layer = barrier_dataset.coords["layer"].values
-        # Drop leftover coordinate and reset cell_id.
-        barrier_dataset = barrier_dataset.drop_vars("edge_index").reset_coords()
-        # Attach layer again
-        barrier_dataset["layer"] = ("cell_id", layer)
-
+        barrier_dataset = _prepare_barrier_dataset_for_mf6_adapter(barrier_dataset)
         return Mf6HorizontalFlowBarrier(**barrier_dataset.data_vars)
 
 
@@ -454,7 +464,8 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
         Returns
         -------
-
+        Mf6HorizontalFlowBarrier
+            Low level representation of the HFB package as MODFLOW 6 expects it.
         """
         barrier_dataset = self._to_connected_cells_dataset(idomain, top, bottom, k)
         return self._to_mf6_pkg(barrier_dataset)

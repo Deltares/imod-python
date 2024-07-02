@@ -2,7 +2,10 @@ from typing import List
 
 import xarray as xr
 
-from imod.mf6.hfb import HorizontalFlowBarrierBase
+from imod.mf6.hfb import (
+    HorizontalFlowBarrierBase,
+    _prepare_barrier_dataset_for_mf6_adapter,
+)
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.typing import GridDataArray
 
@@ -49,13 +52,7 @@ def merge_hfb_packages(
     cell_id_merged = cell_id_merged.transpose("cell_dims1", "cell_dims2", "cell_id")
     # Merge datasets into one
     barrier_dataset_merged = xr.merge([cell_id_merged, hc_merged], join="exact")
-    # Store layer to work around multiindex issue where dropping the edge_index
-    # removes the layer as well.
-    layer = barrier_dataset_merged.coords["layer"].values
     # Set leftover options
     barrier_dataset_merged["print_input"] = hfb_ls[0].dataset["print_input"]
-    # Drop leftover coordinate and reset cell_id.
-    barrier_dataset_merged = barrier_dataset_merged.drop_vars("edge_index").reset_coords()
-    # Attach layer again
-    barrier_dataset_merged["layer"] = ("cell_id", layer)
+    barrier_dataset_merged = _prepare_barrier_dataset_for_mf6_adapter(barrier_dataset_merged)
     return Mf6HorizontalFlowBarrier(**barrier_dataset_merged.data_vars)
