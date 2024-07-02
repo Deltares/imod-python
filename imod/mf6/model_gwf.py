@@ -243,6 +243,7 @@ class GroundwaterFlowModel(Modflow6Model):
             drn_pkg = Drainage.from_imod5_data(
                 drn_key,
                 imod5_data,
+                period_data,
                 dis_pkg,
                 npf_pkg,
                 allocation_options.drn,
@@ -257,6 +258,7 @@ class GroundwaterFlowModel(Modflow6Model):
             riv_pkg, drn_pkg = River.from_imod5_data(
                 riv_key,
                 imod5_data,
+                period_data,
                 dis_pkg,
                 allocation_options.riv,
                 distributing_options.riv,

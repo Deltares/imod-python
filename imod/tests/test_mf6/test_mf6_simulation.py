@@ -472,10 +472,13 @@ def compare_submodel_partition_info(first: PartitionInfo, second: PartitionInfo)
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_import_from_imod5(imod5_dataset, tmp_path):
+    imod5_data = imod5_dataset[0]
+    period_data =  imod5_dataset[1]          
     default_simulation_allocation_options = SimulationAllocationOptions
     default_simulation_distributing_options = SimulationDistributingOptions
     simulation = Modflow6Simulation.from_imod5_data(
-        imod5_dataset,
+        imod5_data,
+        period_data,
         default_simulation_allocation_options,
         default_simulation_distributing_options,
     )
