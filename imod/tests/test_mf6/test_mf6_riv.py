@@ -482,13 +482,9 @@ def test_import_river_from_imod5_infiltration_factors(imod5_dataset):
     imod5_data["riv-1"]["infiltration_factor"] = original_infiltration_factor
 
 
-def test_import_river_from_imod5_period_data():
-    testdir = (
-        "D:\\dev\\imod_python-gh\\imod-python\\imod\\tests\\imod5_data\\iMOD5_model.prj"
-    )
-    imod5_dataset = open_projectfile_data(testdir)
-    imod5_data = imod5_dataset[0]
-    imod5_periods = imod5_dataset[1]
+def test_import_river_from_imod5_period_data(imod5_dataset_periods):
+    imod5_data = imod5_dataset_periods[0]
+    imod5_periods = imod5_dataset_periods[1]
     target_dis = StructuredDiscretization.from_imod5_data(imod5_data, validate=False)
 
     original_infiltration_factor = imod5_data["riv-1"]["infiltration_factor"]
@@ -528,4 +524,4 @@ def test_import_river_from_imod5_period_data():
     assert drn is not None
 
     # teardown
-    imod5_dataset[0]["riv-1"]["infiltration_factor"] = original_infiltration_factor
+    imod5_dataset_periods[0]["riv-1"]["infiltration_factor"] = original_infiltration_factor

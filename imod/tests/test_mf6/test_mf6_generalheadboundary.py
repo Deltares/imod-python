@@ -1,18 +1,14 @@
 from datetime import datetime
 
 import imod
-from imod.formats.prj.prj import open_projectfile_data
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.write_context import WriteContext
 
 
-def test_from_imod5(tmp_path):
-    testdir = (
-        "D:\\dev\\imod_python-gh\\imod-python\\imod\\tests\\imod5_data\\iMOD5_model.prj"
-    )
-    imod5_dataset = open_projectfile_data(testdir)
-    period_data = imod5_dataset[1]
-    imod5_dataset = imod5_dataset[0]
+def test_from_imod5(imod5_dataset_periods, tmp_path):
+
+    period_data = imod5_dataset_periods[1]
+    imod5_dataset = imod5_dataset_periods[0]
     target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset, validate=False)
 
     ghb = imod.mf6.GeneralHeadBoundary.from_imod5_data(

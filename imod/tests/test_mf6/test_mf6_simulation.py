@@ -498,29 +498,3 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
 
     # write and validate the simulation.
     simulation.write(tmp_path, binary=False, validate=True)
-
-
-@pytest.mark.usefixtures("imod5_dataset")
-def test_import_from_GRAM(imod5_dataset, tmp_path):
-    prj_path = "D:\\tmp\\van_hendrik\\GRAM3.1_prj\\3_1_NSTAT_RIV_mf6_edit_jh.prj"
-    data = open_projectfile_data(prj_path)
-
-    default_simulation_allocation_options = SimulationAllocationOptions
-    default_simulation_distributing_options = SimulationDistributingOptions
-    simulation = Modflow6Simulation.from_imod5_data(
-        data[0],
-        data[1],
-        default_simulation_allocation_options,
-        default_simulation_distributing_options,
-        datetime(2000,1,1),
-        datetime(2002,1,1),    
-    )
-
-    simulation["imported_model"]["oc"] = OutputControl(
-        save_head="last", save_budget="last"
-    )
-
-    simulation.create_time_discretization(["01-01-2003", "02-01-2003"])
-
-    # write and validate the simulation.
-    simulation.write(tmp_path, binary=False, validate=True)
