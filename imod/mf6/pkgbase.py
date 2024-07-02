@@ -130,4 +130,4 @@ class PackageBase(IPackageBase, abc.ABC):
             if isinstance(stripped_value, numbers.Real) and np.isnan(stripped_value):  # type: ignore[call-overload]
                 dataset[key] = None
 
-        cls._from_dataset(dataset)
+        return cls._from_dataset(dataset)
