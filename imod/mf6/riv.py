@@ -214,9 +214,16 @@ class River(BoundaryCondition, IRegridPackage):
         imod5_data: dict
             Dictionary with iMOD5 data. This can be constructed from the
             :func:`imod.formats.prj.open_projectfile_data` method.
+        period_data: dict
+            Dictionary with iMOD5 period data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
         target_discretization:  StructuredDiscretization package
             The grid that should be used for the new package. Does not
             need to be identical to one of the input grids.
+        time_min: datetime
+            Begin-time of the simulation. Used for expanding period data.
+        time_max: datetime
+            End-time of the simulation. Used for expanding period data.
         allocation_option: ALLOCATION_OPTION
             allocation option.
         distributing_option: dict[str, DISTRIBUTING_OPTION]
