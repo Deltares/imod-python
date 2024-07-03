@@ -364,15 +364,19 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         """
         Method does the following
         - forces input grids to unstructured
-        - snaps lines to grid edges
-        - removes invalid edges
+        - snaps lines to cell edges
+        - remove edge values connected to cell edges
         - compute barrier values
         - remove edge values to inactive cells
         - finds connected cells in dataset
 
         Returns
         -------
-        dataset connected cells.
+        dataset with connected cells, containing:
+            - cell_id1
+            - cell_id2
+            - layer
+            - value name
         """
         top, bottom = broadcast_to_full_domain(idomain, top, bottom)
         k = idomain * k
