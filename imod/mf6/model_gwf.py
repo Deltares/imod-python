@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Optional
 
 import cftime
@@ -173,6 +174,7 @@ class GroundwaterFlowModel(Modflow6Model):
     def from_imod5_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
+        times: list[datetime],   
         allocation_options: SimulationAllocationOptions,
         distributing_options: SimulationDistributingOptions,
         regridder_types: Optional[RegridMethodType] = None,
@@ -209,7 +211,7 @@ class GroundwaterFlowModel(Modflow6Model):
         # first import the singleton packages
         # import discretization
 
-        dis_pkg = StructuredDiscretization.from_imod5_data(imod5_data, regridder_types)
+        dis_pkg = StructuredDiscretization.from_imod5_data(imod5_data, regridder_types, False)
         grid = dis_pkg.dataset["idomain"]
 
         # import npf
@@ -231,9 +233,16 @@ class GroundwaterFlowModel(Modflow6Model):
         result["ic"] = ic_pkg
         result["rch"] = rch_pkg
 
-        # now import the non-singleton packages
-        # import drainage
+        # now import the non-singleton packages'
+
+        # import wells
         imod5_keys = list(imod5_data.keys())
+        wel_keys = [key for key in imod5_keys if key[0:3] == "wel"]
+        for wel_key in wel_keys:
+            result[wel_key] = Well.from_imod5_data(wel_key,imod5_data, times )
+            
+        # import drainage
+
         drainage_keys = [key for key in imod5_keys if key[0:3] == "drn"]
         for drn_key in drainage_keys:
             drn_pkg = Drainage.from_imod5_data(
@@ -285,8 +294,4 @@ class GroundwaterFlowModel(Modflow6Model):
                     chd_key, imod5_data, dis_pkg, regridder_types
                 )
 
-        # import wells
-        wel_keys = [key for key in imod5_keys if key[0:3] == "wel"]
-        for wel_key in wel_keys:
-            result[wel_key] = Well.from_imod5_data(wel_key,imod5_data )
         return result

@@ -7,7 +7,7 @@ import warnings
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable, DefaultDict, Iterable, Optional, Union, cast
-
+from datetime import datetime
 import cftime
 import dask
 import jinja2
@@ -1322,6 +1322,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
     def from_imod5_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
+        times: list[datetime],   
         allocation_options: SimulationAllocationOptions,
         distributing_options: SimulationDistributingOptions,
         regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
@@ -1357,6 +1358,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         # import GWF model,
         groundwaterFlowModel = GroundwaterFlowModel.from_imod5_data(
             imod5_data,
+            times,
             allocation_options,
             distributing_options,
             regridder_types,

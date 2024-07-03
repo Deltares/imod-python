@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 import textwrap
 import warnings
 from typing import Any, Optional, Tuple, Union
@@ -10,7 +11,7 @@ import numpy.typing as npt
 import pandas as pd
 import xarray as xr
 import xugrid as xu
-
+from datetime import datetime
 import imod
 from imod.logging import init_log_decorator, logger
 from imod.logging.logging_decorators import standard_log_decorator
@@ -652,6 +653,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         cls,
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
+        time: list[datetime],        
         minimum_k: float = 0.1,
         minimum_thickness: float = 1.0,
     ) -> "Well":
