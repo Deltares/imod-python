@@ -17,11 +17,16 @@ from imod.mf6 import (
     SingleLayerHorizontalFlowBarrierResistance,
 )
 from imod.mf6.dis import StructuredDiscretization
-from imod.mf6.hfb import to_connected_cells_dataset
+from imod.mf6.hfb import (
+    _prepare_barrier_dataset_for_mf6_adapter,
+    to_connected_cells_dataset,
+)
+from imod.mf6.ims import SolutionPresetSimple
 from imod.mf6.npf import NodePropertyFlow
+from imod.mf6.simulation import Modflow6Simulation
 from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
-from imod.typing.grid import ones_like
+from imod.typing.grid import nan_like, ones_like
 
 
 @pytest.mark.parametrize("dis", ["basic_unstructured_dis", "basic_dis"])
@@ -90,6 +95,7 @@ def test_to_mf6_creates_mf6_adapter_init(
     expected_values = to_connected_cells_dataset(
         idomain, grid, edge_index, {barrier_value_name: expected_barrier_values}
     )
+    expected_values = _prepare_barrier_dataset_for_mf6_adapter(expected_values)
 
     mf6_flow_barrier_mock.assert_called_once()
 
@@ -218,6 +224,7 @@ def test_to_mf6_creates_mf6_adapter_layered(
     expected_values = to_connected_cells_dataset(
         idomain, grid, edge_index, {barrier_value_name: expected_barrier_values}
     )
+    expected_values = _prepare_barrier_dataset_for_mf6_adapter(expected_values)
 
     mf6_flow_barrier_mock.assert_called_once()
 
@@ -521,3 +528,67 @@ def test_hfb_from_imod5(imod5_dataset, tmp_path):
         target_dis["idomain"], target_dis["top"], target_dis["bottom"], target_npf["k"]
     )
     assert list(np.unique(hfb_package["layer"].values)) == [7]
+
+
+@pytest.mark.usefixtures("structured_flow_model")
+def test_run_multiple_hfbs(tmp_path, structured_flow_model):
+    # Single layered model
+    structured_flow_model = structured_flow_model.clip_box(layer_max=1)
+    structured_flow_model["dis"]["bottom"] = structured_flow_model["dis"][
+        "bottom"
+    ].isel(x=0, y=0, drop=True)
+    # Arrange boundary conditions into something simple:
+    # A linear decline from left to right, forced by chd
+    structured_flow_model.pop("rch")
+    chd_head = nan_like(structured_flow_model["chd"].dataset["head"])
+    chd_head[:, :, 0] = 10.0
+    chd_head[:, :, -1] = 0.0
+    structured_flow_model["chd"].dataset["head"] = chd_head
+
+    barrier_y = [11.0, 5.0, -1.0]
+    barrier_x = [5.0, 5.0, 5.0]
+
+    geometry = gpd.GeoDataFrame(
+        geometry=[shapely.linestrings(barrier_x, barrier_y)],
+        data={
+            "resistance": [1200.0],
+            "layer": [1],
+        },
+    )
+
+    simulation_single = Modflow6Simulation("single_hfb")
+    structured_flow_model["hfb"] = SingleLayerHorizontalFlowBarrierResistance(geometry)
+    simulation_single["GWF"] = structured_flow_model
+    simulation_single["solver"] = SolutionPresetSimple(["GWF"])
+    simulation_single.create_time_discretization(["2000-01-01", "2000-01-02"])
+    simulation_single.write(tmp_path / "single")
+    simulation_single.run()
+    head_single = simulation_single.open_head()
+
+    geometry = gpd.GeoDataFrame(
+        geometry=[shapely.linestrings(barrier_x, barrier_y)],
+        data={
+            "resistance": [400.0],
+            "layer": [1],
+        },
+    )
+
+    simulation_triple = Modflow6Simulation("triple_hfb")
+    structured_flow_model.pop("hfb")  # Remove high resistance HFB package now.
+    structured_flow_model["hfb-1"] = SingleLayerHorizontalFlowBarrierResistance(
+        geometry
+    )
+    structured_flow_model["hfb-2"] = SingleLayerHorizontalFlowBarrierResistance(
+        geometry
+    )
+    structured_flow_model["hfb-3"] = SingleLayerHorizontalFlowBarrierResistance(
+        geometry
+    )
+    simulation_triple["GWF"] = structured_flow_model
+    simulation_triple["solver"] = SolutionPresetSimple(["GWF"])
+    simulation_triple.create_time_discretization(["2000-01-01", "2000-01-02"])
+    simulation_triple.write(tmp_path / "triple")
+    simulation_triple.run()
+    head_triple = simulation_triple.open_head()
+
+    xr.testing.assert_equal(head_single, head_triple)
