@@ -24,7 +24,7 @@ from imod.prepare.topsystem.default_allocation_methods import (
     SimulationDistributingOptions,
 )
 from imod.typing import GridDataArray
-
+from imod.mf6.wel import Well
 
 class GroundwaterFlowModel(Modflow6Model):
     """
@@ -285,4 +285,8 @@ class GroundwaterFlowModel(Modflow6Model):
                     chd_key, imod5_data, dis_pkg, regridder_types
                 )
 
+        # import wells
+        wel_keys = [key for key in imod5_keys if key[0:3] == "wel"]
+        for wel_key in wel_keys:
+            result[wel_key] = Well.from_imod5_data(wel_key,imod5_data )
         return result
