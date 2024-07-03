@@ -574,6 +574,7 @@ def test_run_multiple_hfbs(tmp_path, structured_flow_model):
     )
 
     simulation_triple = Modflow6Simulation("triple_hfb")
+    structured_flow_model.pop("hfb")  # Remove high resistance HFB package now.
     structured_flow_model["hfb-1"] = SingleLayerHorizontalFlowBarrierResistance(
         geometry
     )
