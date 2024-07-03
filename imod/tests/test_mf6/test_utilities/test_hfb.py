@@ -14,7 +14,6 @@ from imod.mf6.utilities.hfb import merge_hfb_packages
 @pytest.mark.usefixtures("structured_flow_model")
 @pytest.fixture(scope="function")
 def modellayers_single_layer(structured_flow_model):
-    # TODO: Refactor to just use structured grid.
     model = structured_flow_model.clip_box(layer_max=1)
     dis = model["dis"]
     dis["bottom"] = dis["bottom"].isel(x=0, y=0, drop=True)
@@ -31,7 +30,6 @@ def modellayers_single_layer(structured_flow_model):
 @pytest.mark.usefixtures("structured_flow_model")
 @pytest.fixture(scope="function")
 def modellayers(structured_flow_model):
-    # TODO: Refactor to just use structured grid.
     model = structured_flow_model
     dis = model["dis"]
     dis["bottom"] = dis["bottom"].isel(x=0, y=0, drop=True)
