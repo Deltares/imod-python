@@ -272,11 +272,13 @@ def _vectorized_overlap(bounds_a: np.ndarray, bounds_b: np.ndarray):
 
 def _prepare_barrier_dataset_for_mf6_adapter(dataset: xr.Dataset) -> xr.Dataset:
     """
-    Prepare barrier dataset for the initialization of
-    Mf6HorizontalFlowBarrier.
+    Prepare barrier dataset for the initialization of Mf6HorizontalFlowBarrier.
+    The dataset is expected to have "edge_index" and "layer" coordinates and a
+    multi-index "cell_id" coordinate. The dataset contains as variables:
+    "cell_id1", "cell_id2", and "hydraulic_characteristic".
 
-    - Reset coords to get a coordless cell_id dimension instead of a multi-index coord
-    - Assign layer as variable to dataset instead of as coord.
+    - Reset coords to get a coordless "cell_id" dimension instead of a multi-index coord
+    - Assign "layer" as variable to dataset instead of as coord.
     """
     # Store layer to work around multiindex issue where dropping the edge_index
     # removes the layer as well.
