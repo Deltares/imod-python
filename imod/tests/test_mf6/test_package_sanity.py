@@ -108,3 +108,12 @@ def test_save_and_load(instance, tmp_path):
 def test_repr(instance):
     assert isinstance(instance.__repr__(), str)
     assert isinstance(instance._repr_html_(), str)
+
+
+@pytest.mark.parametrize("instance", ALL_PACKAGE_INSTANCES)
+def test_from_dataset(instance):
+    pkg_class = type(instance)
+    ds = instance.dataset
+    new_instance = pkg_class._from_dataset(ds)
+    assert isinstance(new_instance, pkg_class)
+    assert instance.dataset.equals(new_instance.dataset)
