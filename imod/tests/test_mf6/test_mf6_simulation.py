@@ -487,12 +487,12 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
         imod5_data,
         period_data,
         default_simulation_allocation_options,
-        default_simulation_distributing_options
-        datetime(2000, 1, 1),
-        datetime(2002, 1, 1),
+        default_simulation_distributing_options,
+        datelist,
     )
     simulation["imported_model"]["oc"] = OutputControl(
-        save_head="last", save_budget="last"
+        save_head="last", save_budget="last")
+    
     simulation.create_time_discretization(["01-01-2003", "02-01-2003"])
 
     # Remove HFB packages outside domain

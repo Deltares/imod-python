@@ -699,8 +699,14 @@ class Well(BoundaryCondition, IPointDataPackage):
             minimum_k=minimum_k,
             minimum_thickness=minimum_thickness,
         )
+    
+    @classmethod
     def resample_timeseries( cls, well_rate, times):
-        pass        
+        output_frame =pd.DataFrame(times)
+        output_frame = output_frame.rename(columns={0: "time"})
+        intermediate_df = pd.merge(output_frame, well_rate,how= "outer",  on ="time", ).fillna(method='ffill')
+        
+        return well_rate        
 
 
 class WellDisStructured(DisStructuredBoundaryCondition):

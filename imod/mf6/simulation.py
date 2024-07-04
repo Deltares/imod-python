@@ -1325,8 +1325,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         period_data: dict[str, dict[str, GridDataArray]],
         allocation_options: SimulationAllocationOptions,
         distributing_options: SimulationDistributingOptions,
-        time_min,
-        time_max,
+        times: list[datetime],
         regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
     ) -> "Modflow6Simulation":
         """
@@ -1363,8 +1362,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             period_data,
             allocation_options,
             distributing_options,
-            time_min,
-            time_max,
+            times,
             regridder_types,
         )
         simulation["imported_model"] = groundwaterFlowModel
