@@ -35,6 +35,23 @@ try:
 except ImportError:
     shapely = MissingOptionalModule("shapely")
 
+# https://github.com/Deltares/imod-python/blame/5523c2425fe28bf618c20d9b7de624b4e74ccc6f/imod/formats/prj/disv_conversion.py
+
+# snapped, _ = xu.snap_to_grid(lines, grid=target, max_snap_distance=0.5)
+
+#def extract_dataframe_data(snapped, dataframe):
+#    line_index = snapped["line_index"].values
+#    line_index = line_index[~np.isnan(line_index)].astype(int)
+#    sample = dataframe.iloc[line_index]
+#    coordinates, index = shapely.get_coordinates(
+#        sample.geometry, include_z=True, return_index=True
+#    )
+#    grouped = pd.DataFrame({"index": index, "z": coordinates[:, 2]}).groupby(
+#        "index"
+#    )
+#    zmin = grouped["z"].min().values
+#    zmax = grouped["z"].max().values
+#    return zmin, zmax, sample["resistance"].values
 
 @typedispatch
 def _derive_connected_cell_ids(
