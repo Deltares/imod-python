@@ -471,6 +471,8 @@ def compare_submodel_partition_info(first: PartitionInfo, second: PartitionInfo)
 
 @pytest.mark.usefixtures("imod5_dataset")
 def test_import_from_imod5(imod5_dataset, tmp_path):
+    imod5_data = imod5_dataset[0]
+    period_data = imod5_dataset[1]
     default_simulation_allocation_options = SimulationAllocationOptions
     default_simulation_distributing_options = SimulationDistributingOptions
     
@@ -482,16 +484,15 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
        
 
     simulation = Modflow6Simulation.from_imod5_data(
-        imod5_dataset,
-        datelist,
+        imod5_data,
+        period_data,
         default_simulation_allocation_options,
         default_simulation_distributing_options
+        datetime(2000, 1, 1),
+        datetime(2002, 1, 1),
     )
-
     simulation["imported_model"]["oc"] = OutputControl(
         save_head="last", save_budget="last"
-    )
-
     simulation.create_time_discretization(["01-01-2003", "02-01-2003"])
 
     # Remove HFB packages outside domain

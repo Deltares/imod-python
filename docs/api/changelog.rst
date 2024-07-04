@@ -9,6 +9,11 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 [Unreleased- feature branch]
 ----------------------------
+Fixed
+~~~~~
+- ``HorizontalFlowBarrier`` attached to :class:`imod.mf6.GroundwaterFlowModel`
+  are merged into a single horizontal flow barrier for MODFLOW 6
+
 
 Changed
 ~~~~~~~

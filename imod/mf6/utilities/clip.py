@@ -50,9 +50,7 @@ def clip_by_grid(package: IPackageBase, active: xu.UgridDataArray) -> IPackageBa
     clipped_dataset = package.dataset.isel(domain_slice, missing_dims="ignore")
 
     cls = type(package)
-    new = cls.__new__(cls)
-    new.dataset = clipped_dataset
-    return new
+    return cls._from_dataset(clipped_dataset)
 
 
 @typedispatch  # type: ignore[no-redef]
@@ -70,9 +68,7 @@ def clip_by_grid(  # noqa: F811
     selection = package.dataset.loc[{"index": is_inside_exterior}]
 
     cls = type(package)
-    new = cls.__new__(cls)
-    new.dataset = selection
-    return new
+    return cls._from_dataset(selection)
 
 
 def _filter_inactive_cells(package, active):

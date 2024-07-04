@@ -1322,9 +1322,11 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
     def from_imod5_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        times: list[datetime],   
+        period_data: dict[str, dict[str, GridDataArray]],
         allocation_options: SimulationAllocationOptions,
         distributing_options: SimulationDistributingOptions,
+        time_min,
+        time_max,
         regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
     ) -> "Modflow6Simulation":
         """
@@ -1358,9 +1360,11 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         # import GWF model,
         groundwaterFlowModel = GroundwaterFlowModel.from_imod5_data(
             imod5_data,
-            times,
+            period_data,
             allocation_options,
             distributing_options,
+            time_min,
+            time_max,
             regridder_types,
         )
         simulation["imported_model"] = groundwaterFlowModel

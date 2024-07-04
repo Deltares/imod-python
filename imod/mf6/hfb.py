@@ -175,10 +175,8 @@ def to_connected_cells_dataset(
             },
         )
 
-    barrier_dataset = (
-        barrier_dataset.stack(cell_id=("layer", "edge_index"), create_index=False)
-        .drop_vars("edge_index")
-        .reset_coords()
+    barrier_dataset = barrier_dataset.stack(
+        cell_id=("layer", "edge_index"), create_index=True
     )
 
     return barrier_dataset.dropna("cell_id")
@@ -272,6 +270,26 @@ def _vectorized_overlap(bounds_a: np.ndarray, bounds_b: np.ndarray):
     )
 
 
+def _prepare_barrier_dataset_for_mf6_adapter(dataset: xr.Dataset) -> xr.Dataset:
+    """
+    Prepare barrier dataset for the initialization of Mf6HorizontalFlowBarrier.
+    The dataset is expected to have "edge_index" and "layer" coordinates and a
+    multi-index "cell_id" coordinate. The dataset contains as variables:
+    "cell_id1", "cell_id2", and "hydraulic_characteristic".
+
+    - Reset coords to get a coordless "cell_id" dimension instead of a multi-index coord
+    - Assign "layer" as variable to dataset instead of as coord.
+    """
+    # Store layer to work around multiindex issue where dropping the edge_index
+    # removes the layer as well.
+    layer = dataset.coords["layer"].values
+    # Drop leftover coordinate and reset cell_id.
+    dataset = dataset.drop_vars("edge_index").reset_coords()
+    # Attach layer again
+    dataset["layer"] = ("cell_id", layer)
+    return dataset
+
+
 class BarrierType(Enum):
     HydraulicCharacteristic = 0
     Multiplier = 1
@@ -336,6 +354,91 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
     ):
         raise NotImplementedError()
 
+    def _to_connected_cells_dataset(
+        self,
+        idomain: GridDataArray,
+        top: GridDataArray,
+        bottom: GridDataArray,
+        k: GridDataArray,
+    ) -> xr.Dataset:
+        """
+        Method does the following
+        - forces input grids to unstructured
+        - snaps lines to cell edges
+        - remove edge values connected to cell edges
+        - compute barrier values
+        - remove edge values to inactive cells
+        - finds connected cells in dataset
+
+        Returns
+        -------
+        dataset with connected cells, containing:
+            - cell_id1
+            - cell_id2
+            - layer
+            - value name
+        """
+        top, bottom = broadcast_to_full_domain(idomain, top, bottom)
+        k = idomain * k
+        unstructured_grid, top, bottom, k = (
+            self.__to_unstructured(idomain, top, bottom, k)
+            if isinstance(idomain, xr.DataArray)
+            else [idomain, top, bottom, k]
+        )
+        snapped_dataset, edge_index = self._snap_to_grid(idomain)
+        edge_index = self.__remove_invalid_edges(unstructured_grid, edge_index)
+
+        barrier_values = self._compute_barrier_values(
+            snapped_dataset, edge_index, idomain, top, bottom, k
+        )
+        barrier_values = self.__remove_edge_values_connected_to_inactive_cells(
+            barrier_values, unstructured_grid, edge_index
+        )
+
+        if (barrier_values.size == 0) | np.isnan(barrier_values).all():
+            raise ValueError(
+                textwrap.dedent(
+                    """
+                    No barriers could be assigned to cell edges,
+                    this is caused by either one of the following:
+                    \t- Barriers fall completely outside the model grid
+                    \t- Barriers were assigned to the edge of the model domain
+                    \t- Barriers were assigned to edges of inactive cells
+                    """
+                )
+            )
+
+        return to_connected_cells_dataset(
+            idomain,
+            unstructured_grid.ugrid.grid,
+            edge_index,
+            {
+                "hydraulic_characteristic": self.__to_hydraulic_characteristic(
+                    barrier_values
+                )
+            },
+        )
+
+    def _to_mf6_pkg(self, barrier_dataset: xr.Dataset) -> Mf6HorizontalFlowBarrier:
+        """
+        Internal method, which does the following
+        - final coordinate cleanup of barrier dataset
+        - adds missing options to dataset
+
+        Parameters
+        ----------
+        barrier_dataset: xr.Dataset
+            Xarray dataset with dimensions "cell_dims1", "cell_dims2", "cell_id".
+            Additional coordinates should be "layer" and "edge_index".
+
+        Returns
+        -------
+        Mf6HorizontalFlowBarrier
+        """
+        barrier_dataset["print_input"] = self.dataset["print_input"]
+        barrier_dataset = _prepare_barrier_dataset_for_mf6_adapter(barrier_dataset)
+        return Mf6HorizontalFlowBarrier(**barrier_dataset.data_vars)
+
     def to_mf6_pkg(
         self,
         idomain: GridDataArray,
@@ -363,52 +466,11 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
         Returns
         -------
-
+        Mf6HorizontalFlowBarrier
+            Low level representation of the HFB package as MODFLOW 6 expects it.
         """
-        top, bottom = broadcast_to_full_domain(idomain, top, bottom)
-        k = idomain * k
-        unstructured_grid, top, bottom, k = (
-            self.__to_unstructured(idomain, top, bottom, k)
-            if isinstance(idomain, xr.DataArray)
-            else [idomain, top, bottom, k]
-        )
-        snapped_dataset, edge_index = self.__snap_to_grid(idomain)
-        edge_index = self.__remove_invalid_edges(unstructured_grid, edge_index)
-
-        barrier_values = self._compute_barrier_values(
-            snapped_dataset, edge_index, idomain, top, bottom, k
-        )
-        barrier_values = self.__remove_edge_values_connected_to_inactive_cells(
-            barrier_values, unstructured_grid, edge_index
-        )
-
-        if (barrier_values.size == 0) | np.isnan(barrier_values).all():
-            raise ValueError(
-                textwrap.dedent(
-                    """
-                    No barriers could be assigned to cell edges,
-                    this is caused by either one of the following:
-                    \t- Barriers fall completely outside the model grid
-                    \t- Barriers were assigned to the edge of the model domain
-                    \t- Barriers were assigned to edges of inactive cells
-                    """
-                )
-            )
-
-        barrier_dataset = to_connected_cells_dataset(
-            idomain,
-            unstructured_grid.ugrid.grid,
-            edge_index,
-            {
-                "hydraulic_characteristic": self.__to_hydraulic_characteristic(
-                    barrier_values
-                )
-            },
-        )
-
-        barrier_dataset["print_input"] = self.dataset["print_input"]
-
-        return Mf6HorizontalFlowBarrier(**barrier_dataset.data_vars)
+        barrier_dataset = self._to_connected_cells_dataset(idomain, top, bottom, k)
+        return self._to_mf6_pkg(barrier_dataset)
 
     def is_empty(self) -> bool:
         if super().is_empty():
@@ -574,8 +636,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         sliced : Package
         """
         cls = type(self)
-        new = cls.__new__(cls)
-        new.dataset = copy.deepcopy(self.dataset)
+        new = cls._from_dataset(copy.deepcopy(self.dataset))
         new.line_data = self.line_data
         return new
 
@@ -599,7 +660,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
         return unstruct, top, bottom, k
 
-    def __snap_to_grid(
+    def _snap_to_grid(
         self, idomain: GridDataArray
     ) -> Tuple[xu.UgridDataset, np.ndarray]:
         if "layer" in self.dataset:
