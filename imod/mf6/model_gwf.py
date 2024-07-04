@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Optional
 
 import cftime
@@ -173,11 +174,11 @@ class GroundwaterFlowModel(Modflow6Model):
     def from_imod5_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        period_data: dict[str, dict[str, GridDataArray]],
+        period_data: dict[str, list[datetime]],
         allocation_options: SimulationAllocationOptions,
         distributing_options: SimulationDistributingOptions,
-        time_min,
-        time_max,
+        time_min: datetime,
+        time_max: datetime,
         regridder_types: Optional[RegridMethodType] = None,
     ) -> "GroundwaterFlowModel":
         """

@@ -354,17 +354,16 @@ class River(BoundaryCondition, IRegridPackage):
         else:
             drainage_package = None
 
-        if period_data is not None:
-            repeat = period_data.get(key)
-            if repeat is not None:
-                if river_package is not None:
-                    river_package.set_repeat_stress(
-                        expand_repetitions(repeat, time_min, time_max)
-                    )
-                if drainage_package is not None:
-                    drainage_package.set_repeat_stress(
-                        expand_repetitions(repeat, time_min, time_max)
-                    )
+        repeat = period_data.get(key)
+        if repeat is not None:
+            if river_package is not None:
+                river_package.set_repeat_stress(
+                    expand_repetitions(repeat, time_min, time_max)
+                )
+            if drainage_package is not None:
+                drainage_package.set_repeat_stress(
+                    expand_repetitions(repeat, time_min, time_max)
+                )
 
         return (river_package, drainage_package)
 

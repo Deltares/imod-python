@@ -225,8 +225,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         )
 
         ghb = GeneralHeadBoundary(**regridded_package_data)
-        if period_data is not None:
-            repeat = period_data.get(key)
-            if repeat is not None:
-                ghb.set_repeat_stress(expand_repetitions(repeat, time_min, time_max))
+        repeat = period_data.get(key)
+        if repeat is not None:
+            ghb.set_repeat_stress(expand_repetitions(repeat, time_min, time_max))
         return ghb
