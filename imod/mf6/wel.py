@@ -705,8 +705,30 @@ class Well(BoundaryCondition, IPointDataPackage):
         output_frame =pd.DataFrame(times)
         output_frame = output_frame.rename(columns={0: "time"})
         intermediate_df = pd.merge(output_frame, well_rate,how= "outer",  on ="time", ).fillna(method='ffill')
-        
+
+        # compute time difference with previous row
+        time_diff_col = intermediate_df["time"].diff()
+        intermediate_df.insert(7, "time_to_next", time_diff_col.values)
+
+        output_frame = pd.merge(output_frame, intermediate_df)
+        for i in range(len(times) - 1):
+            output_frame["rate"][i] = cls.integrate_timestep_rate(intermediate_df, times[i], times[i+1])
+
+
+
         return well_rate        
+
+    @classmethod
+    def integrate_timestep_rate( cls, well_rate,  time_0, time_1):
+        delta_time = time_1 - time_0
+        timestep_data =well_rate.loc[(well_rate['time'] >= time_0) & ( well_rate['time'] < time_1 )]
+        if len(timestep_data) == 1:
+            return timestep_data["rate"].values[0]
+        else:
+            rate = 0
+            for row in range (len(timestep_data)-1):
+                rate += timestep_data["rate"].iloc[row] * timestep_data["time_to_next"].iloc[row].total_seconds()
+            return rate / delta_time.total_seconds()
 
 
 class WellDisStructured(DisStructuredBoundaryCondition):
