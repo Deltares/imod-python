@@ -70,15 +70,16 @@ def test_to_mf6_creates_mf6_adapter_init(
 
     print_input = False
 
+    barrier_z = [0.0, min(bottom.values)]
     barrier_y = [5.5, 5.5, 5.5]
     barrier_x = [82.0, 40.0, 0.0]
 
+    polygons = linestring_to_zpolygons(barrier_x, barrier_y, barrier_z)
+
     geometry = gpd.GeoDataFrame(
-        geometry=[linestrings(barrier_x, barrier_y)],
+        geometry=polygons,
         data={
-            barrier_value_name: [barrier_value],
-            "ztop": [0.0],
-            "zbottom": [min(bottom.values)],
+            "resistance": [1e3, 1e3],
         },
     )
 
@@ -121,7 +122,7 @@ def test_to_mf6_creates_mf6_adapter_init(
 
 
 @pytest.mark.parametrize("dis", ["basic_unstructured_dis", "basic_dis"])
-def test_to_mf6_creates_mf6_adapter(
+def test_hfb_regrid(
     dis,
     request,
 ):
@@ -162,9 +163,9 @@ def test_to_mf6_creates_mf6_adapter(
     hfb_clipped = hfb.regrid_like(idomain_clipped.sel(layer=1), regrid_context)
 
     # Assert
-    x, y = hfb_clipped.dataset["geometry"].values[0].xy
-    np.testing.assert_allclose(x, [50.0, 40.0, 0.0])
-    np.testing.assert_allclose(y, [5.5, 5.5, 5.5])
+    x, y = hfb_clipped.dataset["geometry"].values[1].xy #2nd polygon is clipped
+    np.testing.assert_allclose(x, [50.0, 40.0])
+    np.testing.assert_allclose(y, [5.5, 5.5])
 
 
 @pytest.mark.parametrize("dis", ["basic_unstructured_dis", "basic_dis"])
@@ -395,15 +396,16 @@ def test_to_mf6_remove_invalid_edges(
     )
     k = ones_like(top)
 
+    barrier_z = [0, -5]
     barrier_y = [0.0, 2.0]
     barrier_x = [barrier_x_loc, barrier_x_loc]
 
+    polygons = linestring_to_zpolygons(barrier_x, barrier_y, barrier_z)
+
     geometry = gpd.GeoDataFrame(
-        geometry=[linestrings(barrier_x, barrier_y)],
+        geometry=polygons,
         data={
             "resistance": [1e3],
-            "ztop": [0],
-            "zbottom": [-5],
         },
     )
 
@@ -452,15 +454,16 @@ def test_to_mf6_remove_barrier_parts_adjacent_to_inactive_cells(
     ] = inactivity_marker  # make cell inactive
     k = ones_like(top)
 
+    barrier_z = [0, -5]
     barrier_y = [0.0, 2.0]
     barrier_x = [barrier_x_loc, barrier_x_loc]
 
+    polygons = linestring_to_zpolygons(barrier_x, barrier_y, barrier_z)
+
     geometry = gpd.GeoDataFrame(
-        geometry=[linestrings(barrier_x, barrier_y)],
+        geometry=polygons,
         data={
             "resistance": [1e3],
-            "ztop": [0],
-            "zbottom": [-5],
         },
     )
 
@@ -481,8 +484,6 @@ def test_is_empty():
         geometry=[linestrings([], [])],
         data={
             "resistance": [],
-            "ztop": [],
-            "zbottom": [],
         },
     )
     hfb = HorizontalFlowBarrierResistance(geometry)
@@ -492,8 +493,6 @@ def test_is_empty():
         geometry=[linestrings([0, 0], [1, 1])],
         data={
             "resistance": [1.0],
-            "ztop": [1.0],
-            "zbottom": [1.0],
         },
     )
 
