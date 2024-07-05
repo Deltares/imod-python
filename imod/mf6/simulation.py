@@ -5,9 +5,10 @@ import pathlib
 import subprocess
 import warnings
 from copy import deepcopy
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, DefaultDict, Iterable, Optional, Union, cast
-from datetime import datetime
+
 import cftime
 import dask
 import jinja2

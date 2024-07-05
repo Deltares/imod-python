@@ -20,12 +20,13 @@ from imod.mf6.rch import Recharge
 from imod.mf6.regrid.regrid_schemes import RegridMethodType
 from imod.mf6.riv import River
 from imod.mf6.sto import StorageCoefficient
+from imod.mf6.wel import Well
 from imod.prepare.topsystem.default_allocation_methods import (
     SimulationAllocationOptions,
     SimulationDistributingOptions,
 )
 from imod.typing import GridDataArray
-from imod.mf6.wel import Well
+
 
 class GroundwaterFlowModel(Modflow6Model):
     """
@@ -242,8 +243,8 @@ class GroundwaterFlowModel(Modflow6Model):
         imod5_keys = list(imod5_data.keys())
         wel_keys = [key for key in imod5_keys if key[0:3] == "wel"]
         for wel_key in wel_keys:
-            result[wel_key] = Well.from_imod5_data(wel_key,imod5_data, times )
-            
+            result[wel_key] = Well.from_imod5_data(wel_key, imod5_data, times)
+
         # import drainage
 
         drainage_keys = [key for key in imod5_keys if key[0:3] == "drn"]

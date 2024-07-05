@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import datetime
 import textwrap
 import warnings
+from datetime import datetime
 from typing import Any, Optional, Tuple, Union
 
 import cftime
@@ -11,7 +11,7 @@ import numpy.typing as npt
 import pandas as pd
 import xarray as xr
 import xugrid as xu
-from datetime import datetime
+
 import imod
 from imod.logging import init_log_decorator, logger
 from imod.logging.logging_decorators import standard_log_decorator
@@ -39,6 +39,7 @@ from imod.schemata import (
 from imod.select.points import points_indices, points_values
 from imod.typing import GridDataArray
 from imod.typing.grid import is_spatial_grid, ones_like
+from imod.util.expand_repetitions import resample_timeseries
 from imod.util.structured import values_within_range
 
 
@@ -651,7 +652,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         cls,
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        times: list[datetime],        
+        times: list[datetime],
         minimum_k: float = 0.1,
         minimum_thickness: float = 1.0,
     ) -> "Well":
@@ -661,18 +662,15 @@ class Well(BoundaryCondition, IPointDataPackage):
         colnames_group = ["x", "y", "filt_top", "filt_bot", "id"]
         wel_index, df_groups = zip(*df.groupby(colnames_group))
 
-
         # resample per group
-
 
         # Unpack wel indices by zipping
         x, y, filt_top, filt_bot, id = zip(*wel_index)
 
-
         # resample times per group
         df_resampled_groups = []
-        for df_group in df_groups: 
-            df_group = cls.resample_timeseries( df_group, times)
+        for df_group in df_groups:
+            df_group = resample_timeseries(df_group, times)
             df_resampled_groups.append(df_group)
 
         # Convert dataframes all groups to DataArrays
@@ -689,7 +687,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         ]
         # Concatenate datarrays along index dimension
         well_rate = xr.concat(da_groups, dim="index")
- 
+
         return cls(
             x=np.array(x, dtype=float),
             y=np.array(y, dtype=float),
@@ -699,36 +697,6 @@ class Well(BoundaryCondition, IPointDataPackage):
             minimum_k=minimum_k,
             minimum_thickness=minimum_thickness,
         )
-    
-    @classmethod
-    def resample_timeseries( cls, well_rate, times):
-        output_frame =pd.DataFrame(times)
-        output_frame = output_frame.rename(columns={0: "time"})
-        intermediate_df = pd.merge(output_frame, well_rate,how= "outer",  on ="time", ).fillna(method='ffill')
-
-        # compute time difference with previous row
-        time_diff_col = intermediate_df["time"].diff()
-        intermediate_df.insert(7, "time_to_next", time_diff_col.values)
-
-        output_frame = pd.merge(output_frame, intermediate_df)
-        for i in range(len(times) - 1):
-            output_frame["rate"][i] = cls.integrate_timestep_rate(intermediate_df, times[i], times[i+1])
-
-
-
-        return well_rate        
-
-    @classmethod
-    def integrate_timestep_rate( cls, well_rate,  time_0, time_1):
-        delta_time = time_1 - time_0
-        timestep_data =well_rate.loc[(well_rate['time'] >= time_0) & ( well_rate['time'] < time_1 )]
-        if len(timestep_data) == 1:
-            return timestep_data["rate"].values[0]
-        else:
-            rate = 0
-            for row in range (len(timestep_data)-1):
-                rate += timestep_data["rate"].iloc[row] * timestep_data["time_to_next"].iloc[row].total_seconds()
-            return rate / delta_time.total_seconds()
 
 
 class WellDisStructured(DisStructuredBoundaryCondition):
@@ -1056,8 +1024,3 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         # The super method will select in the time dimension without issues.
         new = super().clip_box(time_min=time_min, time_max=time_max)
         return new
-    
-
-
-        
-

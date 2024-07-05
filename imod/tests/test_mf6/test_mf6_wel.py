@@ -3,8 +3,10 @@ import sys
 import tempfile
 import textwrap
 from contextlib import nullcontext as does_not_raise
+from datetime import datetime
 
 import numpy as np
+import pandas as pd
 import pytest
 import xarray as xr
 import xugrid as xu
@@ -21,6 +23,7 @@ from imod.mf6.wel import Well
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
+from imod.util.expand_repetitions import resample_timeseries
 
 
 def test_to_mf6_pkg__high_lvl_stationary(basic_dis, well_high_lvl_test_data_stationary):
@@ -851,10 +854,18 @@ def test_import_and_convert_to_mf6(imod5_dataset, tmp_path):
 @pytest.mark.usefixtures("well_regular_import_prj")
 def test_import_multiple_wells(well_regular_import_prj):
     imod5dict = open_projectfile_data(well_regular_import_prj)
+    times = [
+        datetime(1981, 11, 30),
+        datetime(1981, 12, 31),
+        datetime(1982, 1, 31),
+        datetime(1982, 2, 28),
+        datetime(1982, 3, 31),
+        datetime(1982, 4, 30),
+    ]
 
     # import grid-agnostic well from imod5 data (it contains 2 packages with 3 wells each)
-    wel1 = imod.mf6.Well.from_imod5_data("wel-1", imod5dict[0])
-    wel2 = imod.mf6.Well.from_imod5_data("wel-2", imod5dict[0])
+    wel1 = imod.mf6.Well.from_imod5_data("wel-1", imod5dict[0], times)
+    wel2 = imod.mf6.Well.from_imod5_data("wel-2", imod5dict[0], times)
 
     assert np.all(wel1.x == np.array([191112.11, 191171.96, 191231.52]))
     assert np.all(wel2.x == np.array([191112.11, 191171.96, 191231.52]))
@@ -865,12 +876,311 @@ def test_import_multiple_wells(well_regular_import_prj):
 @pytest.mark.usefixtures("well_duplication_import_prj")
 def test_import_from_imod5_with_duplication(well_duplication_import_prj):
     imod5dict = open_projectfile_data(well_duplication_import_prj)
-
+    times = [
+        datetime(1981, 11, 30),
+        datetime(1981, 12, 31),
+        datetime(1982, 1, 31),
+        datetime(1982, 2, 28),
+        datetime(1982, 3, 31),
+        datetime(1982, 4, 30),
+    ]
     # import grid-agnostic well from imod5 data (it contains 2 packages with 3 wells each)
-    wel1 = imod.mf6.Well.from_imod5_data("wel-1", imod5dict[0])
-    wel2 = imod.mf6.Well.from_imod5_data("wel-2", imod5dict[0])
+    wel1 = imod.mf6.Well.from_imod5_data("wel-1", imod5dict[0], times)
+    wel2 = imod.mf6.Well.from_imod5_data("wel-2", imod5dict[0], times)
 
     assert np.all(wel1.x == np.array([191171.96, 191231.52, 191231.52]))
     assert np.all(wel2.x == np.array([191112.11, 191171.96, 191231.52]))
     assert wel1.dataset["rate"].shape == (6, 3)
     assert wel2.dataset["rate"].shape == (6, 3)
+
+
+def test_timeseries_resampling():
+    data = [
+        {
+            "time": datetime(1989, 1, 1),
+            "rate": 100,
+            "x": 0,
+            "y": 0,
+            "id": "ID",
+            "filt_top": 20,
+            "filt_bot": 10,
+        },  # output time 1
+        {
+            "time": datetime(1989, 1, 3),
+            "rate": 200,
+            "x": 0,
+            "y": 0,
+            "id": "ID",
+            "filt_top": 20,
+            "filt_bot": 10,
+        },
+        {
+            "time": datetime(1989, 1, 4),
+            "rate": 300,
+            "x": 0,
+            "y": 0,
+            "id": "ID",
+            "filt_top": 20,
+            "filt_bot": 10,
+        },
+        {
+            "time": datetime(1989, 1, 5),
+            "rate": 400,
+            "x": 0,
+            "y": 0,
+            "id": "ID",
+            "filt_top": 20,
+            "filt_bot": 10,
+        },  # output time 2
+        {
+            "time": datetime(1989, 1, 6),
+            "rate": 500,
+            "x": 0,
+            "y": 0,
+            "id": "ID",
+            "filt_top": 20,
+            "filt_bot": 10,
+        },
+    ]  # output time 3
+    # initialize data of lists.
+
+    # setup panda table
+    timeseries = pd.DataFrame(
+        data, columns=["time", "rate", "x", "y", "id", "filt_top", "filt_bot"]
+    )
+
+    new_dates = [datetime(1989, 1, 1), datetime(1989, 1, 5), datetime(1989, 1, 6)]
+
+    new_timeseries = resample_timeseries(timeseries, new_dates)
+
+    expected_data = [
+        {
+            "time": datetime(1989, 1, 1),
+            "rate": 175,
+            "x": 0,
+            "y": 0,
+            "id": "ID",
+            "filt_top": 20,
+            "filt_bot": 10,
+        },
+        {
+            "time": datetime(1989, 1, 5),
+            "rate": 400,
+            "x": 0,
+            "y": 0,
+            "id": "ID",
+            "filt_top": 20,
+            "filt_bot": 10,
+        },
+        {
+            "time": datetime(1989, 1, 6),
+            "rate": 500,
+            "x": 0,
+            "y": 0,
+            "id": "ID",
+            "filt_top": 20,
+            "filt_bot": 10,
+        },
+    ]
+    # setup panda table
+    expected_timeseries = pd.DataFrame(
+        expected_data, columns=["time", "rate", "x", "y", "id", "filt_top", "filt_bot"]
+    )
+
+    assert new_timeseries.equals(expected_timeseries)
+
+
+def test_timeseries_resampling_2():
+    data = [
+        {
+            "time": datetime(1989, 1, 1, 14, 0, 0),
+            "rate": 100,
+            "x": 0,
+            "y": 0,
+            "id": "ID",
+            "filt_top": 20,
+            "filt_bot": 10,
+        },  # after output time 1
+        {
+            "time": datetime(1989, 1, 3),
+            "rate": 200,
+            "x": 0,
+            "y": 0,
+            "id": "ID",
+            "filt_top": 20,
+            "filt_bot": 10,
+        },
+        {
+            "time": datetime(1989, 1, 4),
+            "rate": 300,
+            "x": 0,
+            "y": 0,
+            "id": "ID",
+            "filt_top": 20,
+            "filt_bot": 10,
+        },
+        {
+            "time": datetime(1989, 1, 5),
+            "rate": 400,
+            "x": 0,
+            "y": 0,
+            "id": "ID",
+            "filt_top": 20,
+            "filt_bot": 10,
+        },  # output time 2
+        {
+            "time": datetime(1989, 1, 6),
+            "rate": 500,
+            "x": 0,
+            "y": 0,
+            "id": "ID",
+            "filt_top": 20,
+            "filt_bot": 10,
+        },
+    ]  # output time 3 is
+    # initialize data of lists.
+
+    # setup panda table
+    timeseries = pd.DataFrame(
+        data, columns=["time", "rate", "x", "y", "id", "filt_top", "filt_bot"]
+    )
+
+    new_dates = [datetime(1989, 1, 1), datetime(1989, 1, 5), datetime(1989, 1, 6)]
+
+    new_timeseries = resample_timeseries(timeseries, new_dates)
+
+    expected_data = [
+        {
+            "time": datetime(1989, 1, 1),
+            "rate": 160.416667,
+            "x": 0,
+            "y": 0,
+            "id": "ID",
+            "filt_top": 20,
+            "filt_bot": 10,
+        },
+        {
+            "time": datetime(1989, 1, 5),
+            "rate": 400,
+            "x": 0,
+            "y": 0,
+            "id": "ID",
+            "filt_top": 20,
+            "filt_bot": 10,
+        },
+        {
+            "time": datetime(1989, 1, 6),
+            "rate": 500,
+            "x": 0,
+            "y": 0,
+            "id": "ID",
+            "filt_top": 20,
+            "filt_bot": 10,
+        },
+    ]
+    # setup panda table
+    expected_timeseries = pd.DataFrame(
+        expected_data, columns=["time", "rate", "x", "y", "id", "filt_top", "filt_bot"]
+    )
+
+    pd.testing.assert_frame_equal(
+        new_timeseries, expected_timeseries, check_dtype=False
+    )
+
+
+def test_timeseries_resampling_3():
+    data = [
+        {
+            "time": datetime(1989, 1, 1),
+            "rate": 100,
+            "x": 0,
+            "y": 0,
+            "id": "ID",
+            "filt_top": 20,
+            "filt_bot": 10,
+        },  # output time 1
+        {
+            "time": datetime(1989, 1, 3),
+            "rate": 200,
+            "x": 0,
+            "y": 0,
+            "id": "ID",
+            "filt_top": 20,
+            "filt_bot": 10,
+        },
+        {
+            "time": datetime(1989, 1, 4),
+            "rate": 300,
+            "x": 0,
+            "y": 0,
+            "id": "ID",
+            "filt_top": 20,
+            "filt_bot": 10,
+        },
+        {
+            "time": datetime(1989, 1, 5),
+            "rate": 400,
+            "x": 0,
+            "y": 0,
+            "id": "ID",
+            "filt_top": 20,
+            "filt_bot": 10,
+        },  # output time 2
+        {
+            "time": datetime(1999, 1, 6),
+            "rate": 500,
+            "x": 0,
+            "y": 0,
+            "id": "ID",
+            "filt_top": 20,
+            "filt_bot": 10,
+        },
+    ]  # 10 years later than output time 3
+    # initialize data of lists.
+
+    # setup panda table
+    timeseries = pd.DataFrame(
+        data, columns=["time", "rate", "x", "y", "id", "filt_top", "filt_bot"]
+    )
+
+    new_dates = [datetime(1989, 1, 1), datetime(1989, 1, 5), datetime(1989, 1, 6)]
+
+    new_timeseries = resample_timeseries(timeseries, new_dates)
+
+    expected_data = [
+        {
+            "time": datetime(1989, 1, 1),
+            "rate": 175,
+            "x": 0,
+            "y": 0,
+            "id": "ID",
+            "filt_top": 20,
+            "filt_bot": 10,
+        },
+        {
+            "time": datetime(1989, 1, 5),
+            "rate": 400,
+            "x": 0,
+            "y": 0,
+            "id": "ID",
+            "filt_top": 20,
+            "filt_bot": 10,
+        },
+        {
+            "time": datetime(1989, 1, 6),
+            "rate": 400,
+            "x": 0,
+            "y": 0,
+            "id": "ID",
+            "filt_top": 20,
+            "filt_bot": 10,
+        },
+    ]
+    # setup panda table
+    expected_timeseries = pd.DataFrame(
+        expected_data, columns=["time", "rate", "x", "y", "id", "filt_top", "filt_bot"]
+    )
+
+    pd.testing.assert_frame_equal(
+        new_timeseries, expected_timeseries, check_dtype=False
+    )

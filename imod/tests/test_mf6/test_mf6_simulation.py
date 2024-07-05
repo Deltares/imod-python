@@ -475,13 +475,12 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
     period_data = imod5_dataset[1]
     default_simulation_allocation_options = SimulationAllocationOptions
     default_simulation_distributing_options = SimulationDistributingOptions
-    
+
     datelist = []
-    date = datetime(1989,1,1)
-    while date < datetime(2013,1,1):
+    date = datetime(1989, 1, 1)
+    while date < datetime(2013, 1, 1):
         datelist.append(date)
-        date = date + timedelta(days = 7)
-       
+        date = date + timedelta(days=7)
 
     simulation = Modflow6Simulation.from_imod5_data(
         imod5_data,
@@ -491,8 +490,9 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
         datelist,
     )
     simulation["imported_model"]["oc"] = OutputControl(
-        save_head="last", save_budget="last")
-    
+        save_head="last", save_budget="last"
+    )
+
     simulation.create_time_discretization(["01-01-2003", "02-01-2003"])
 
     # Remove HFB packages outside domain
@@ -504,23 +504,23 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
     simulation.write(tmp_path, binary=False, validate=True)
 
 
-def test_import_from_GRAM( tmp_path):
+def test_import_from_GRAM(tmp_path):
     default_simulation_allocation_options = SimulationAllocationOptions
     default_simulation_distributing_options = SimulationDistributingOptions
-    
+
     datelist = []
-    date = datetime(1989,1,1)
-    while date < datetime(2013,1,1):
+    date = datetime(1989, 1, 1)
+    while date < datetime(2013, 1, 1):
         datelist.append(date)
-        date = date + timedelta(days = 7)
+        date = date + timedelta(days=7)
     path = "D:\\tmp\\van_hendrik\\GRAM3.1_prj"
-    imod5_dataset = imod.data.imod5_projectfile_data(path)    
+    imod5_dataset = imod.data.imod5_projectfile_data(path)
 
     simulation = Modflow6Simulation.from_imod5_data(
         imod5_dataset[0],
         datelist,
         default_simulation_allocation_options,
-        default_simulation_distributing_options
+        default_simulation_distributing_options,
     )
 
     simulation["imported_model"]["oc"] = OutputControl(
@@ -535,4 +535,4 @@ def test_import_from_GRAM( tmp_path):
         simulation["imported_model"].pop(hfb_outside)
 
     # write and validate the simulation.
-    simulation.write(tmp_path, binary=False, validate=True)    
+    simulation.write(tmp_path, binary=False, validate=True)
