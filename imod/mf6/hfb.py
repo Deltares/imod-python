@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Dict, Optional, Tuple
 
 import cftime
 import numpy as np
+import pandas as pd
 import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
@@ -35,23 +36,6 @@ try:
 except ImportError:
     shapely = MissingOptionalModule("shapely")
 
-# https://github.com/Deltares/imod-python/blame/5523c2425fe28bf618c20d9b7de624b4e74ccc6f/imod/formats/prj/disv_conversion.py
-
-# snapped, _ = xu.snap_to_grid(lines, grid=target, max_snap_distance=0.5)
-
-#def extract_dataframe_data(snapped, dataframe):
-#    line_index = snapped["line_index"].values
-#    line_index = line_index[~np.isnan(line_index)].astype(int)
-#    sample = dataframe.iloc[line_index]
-#    coordinates, index = shapely.get_coordinates(
-#        sample.geometry, include_z=True, return_index=True
-#    )
-#    grouped = pd.DataFrame({"index": index, "z": coordinates[:, 2]}).groupby(
-#        "index"
-#    )
-#    zmin = grouped["z"].min().values
-#    zmax = grouped["z"].max().values
-#    return zmin, zmax, sample["resistance"].values
 
 @typedispatch
 def _derive_connected_cell_ids(
@@ -198,10 +182,45 @@ def to_connected_cells_dataset(
 
     return barrier_dataset.dropna("cell_id")
 
+def _make_linestring_from_polygon(dataframe):
+    coordinates, index = shapely.get_coordinates(
+        dataframe.geometry, return_index=True
+    )
+    df = pd.DataFrame({"polygon_index": index, "x": coordinates[:, 0], "y": coordinates[:, 1]})
+    df = df.drop_duplicates().reset_index(drop=True)
+    df = df.set_index("polygon_index")
+
+    linestrings = [
+        shapely.LineString(gb.values) for _, gb in df.groupby("polygon_index")
+    ]
+
+    return linestrings
+
+def _extract_hfb_bounds_from_dataframe(snapped_dataset, dataframe):
+    """
+    Extract hfb bounds from dataframe. Requires dataframe geometry to be of type
+    shapely "Z Polygon".
+    """
+    if not dataframe.geometry[0].has_z:
+        raise TypeError("GeoDataFrame geometry has no z, which is required.")
+
+    line_index = snapped_dataset["line_index"].values
+    line_index = line_index[~np.isnan(line_index)].astype(int)
+    sample = dataframe.iloc[line_index]
+    coordinates, index = shapely.get_coordinates(
+        sample.geometry, include_z=True, return_index=True
+    )
+    grouped = pd.DataFrame({"polygon_index": index, "z": coordinates[:, 2]}).groupby(
+        "polygon_index"
+    )
+    zmin = grouped["z"].min().values
+    zmax = grouped["z"].max().values
+    return zmin, zmax
 
 def _fraction_layer_overlap(
     snapped_dataset: xu.UgridDataset,
     edge_index: np.ndarray,
+    dataframe: gpd.GeoDataFrame,
     top: xu.UgridDataArray,
     bottom: xu.UgridDataArray,
 ):
@@ -217,11 +236,10 @@ def _fraction_layer_overlap(
     layer_bounds[..., 0] = typing.cast(np.ndarray, bottom_mean.values).T
     layer_bounds[..., 1] = typing.cast(np.ndarray, top_mean.values).T
 
+    zmin, zmax = _extract_hfb_bounds_from_dataframe(snapped_dataset, dataframe)
     hfb_bounds = np.empty((n_edge, n_layer, 2), dtype=float)
-    hfb_bounds[..., 0] = (
-        snapped_dataset["zbottom"].values[edge_index].reshape(n_edge, 1)
-    )
-    hfb_bounds[..., 1] = snapped_dataset["ztop"].values[edge_index].reshape(n_edge, 1)
+    hfb_bounds[..., 0] = zmin[:, np.newaxis]
+    hfb_bounds[..., 1] = zmax[:, np.newaxis]
 
     overlap = _vectorized_overlap(hfb_bounds, layer_bounds)
     height = layer_bounds[..., 1] - layer_bounds[..., 0]
@@ -557,7 +575,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             snapped_dataset[self._get_variable_name()]
         ).values[edge_index]
 
-        fraction = _fraction_layer_overlap(snapped_dataset, edge_index, top, bottom)
+        fraction = _fraction_layer_overlap(snapped_dataset, edge_index, self.line_data, top, bottom)
 
         c_aquifer = 1.0 / k_mean
         inverse_c = (fraction / resistance) + ((1.0 - fraction) / c_aquifer)
@@ -680,11 +698,15 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
     def _snap_to_grid(
         self, idomain: GridDataArray
     ) -> Tuple[xu.UgridDataset, np.ndarray]:
-        if "layer" in self.dataset:
+        if "layer" in self._get_vertical_variables():
             variable_names = [self._get_variable_name(), "geometry", "layer"]
         else:
-            variable_names = [self._get_variable_name(), "geometry", "ztop", "zbottom"]
+            variable_names = [self._get_variable_name(), "geometry"]
         barrier_dataframe = self.dataset[variable_names].to_dataframe()
+
+        if "layer" not in self._get_vertical_variables():
+            linestrings = _make_linestring_from_polygon(barrier_dataframe)
+            barrier_dataframe["geometry"] = linestrings
 
         snapped_dataset, _ = typing.cast(
             xu.UgridDataset,
@@ -764,8 +786,6 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
         Dataframe that describes:
          - geometry: the geometries of the barriers,
          - hydraulic_characteristic: the hydraulic characteristic of the barriers
-         - ztop: the top z-value of the barriers
-         - zbottom: the bottom z-value of the barriers
     print_input: bool
 
     Examples
@@ -777,8 +797,6 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
     >>>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
     >>>     data={
     >>>         "hydraulic_characteristic": [1e-3,],
-    >>>         "ztop": [10.0,],
-    >>>         "zbottom": [0.0,],
     >>>     },
     >>> )
     >>> hfb = imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic(barrier_gdf)
@@ -800,7 +818,7 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
         return "hydraulic_characteristic"
 
     def _get_vertical_variables(self) -> list:
-        return ["ztop", "zbottom"]
+        return []
 
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
@@ -901,8 +919,6 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
         Dataframe that describes:
          - geometry: the geometries of the barriers,
          - multiplier: the multiplier of the barriers
-         - ztop: the top z-value of the barriers
-         - zbottom: the bottom z-value of the barriers
     print_input: bool
 
     Examples
@@ -914,8 +930,6 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     >>>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
     >>>     data={
     >>>         "multiplier": [1.5,],
-    >>>         "ztop": [10.0,],
-    >>>         "zbottom": [0.0,],
     >>>     },
     >>> )
     >>> hfb = imod.mf6.HorizontalFlowBarrierMultiplier(barrier_gdf)
@@ -937,12 +951,12 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
         return "multiplier"
 
     def _get_vertical_variables(self) -> list:
-        return ["ztop", "zbottom"]
+        return []
 
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
     ):
-        fraction = _fraction_layer_overlap(snapped_dataset, edge_index, top, bottom)
+        fraction = _fraction_layer_overlap(snapped_dataset, edge_index, self.line_data, top, bottom)
 
         barrier_values = (
             fraction.where(fraction)
@@ -1056,8 +1070,7 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         Dataframe that describes:
          - geometry: the geometries of the barriers,
          - resistance: the resistance of the barriers
-         - ztop: the top z-value of the barriers
-         - zbottom: the bottom z-value of the barriers
+
     print_input: bool
 
     Examples
@@ -1069,8 +1082,6 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     >>>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
     >>>     data={
     >>>         "resistance": [1e3,],
-    >>>         "ztop": [10.0,],
-    >>>         "zbottom": [0.0,],
     >>>     },
     >>> )
     >>> hfb = imod.mf6.HorizontalFlowBarrierResistance(barrier_gdf)
@@ -1093,7 +1104,7 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         return "resistance"
 
     def _get_vertical_variables(self) -> list:
-        return ["ztop", "zbottom"]
+        return []
 
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
