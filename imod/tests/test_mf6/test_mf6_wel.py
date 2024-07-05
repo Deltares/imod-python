@@ -3,7 +3,7 @@ import sys
 import tempfile
 import textwrap
 from contextlib import nullcontext as does_not_raise
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import numpy as np
 import pandas as pd
@@ -827,11 +827,14 @@ def test_import_and_convert_to_mf6(imod5_dataset, tmp_path):
     target_dis = StructuredDiscretization.from_imod5_data(data)
     target_npf = NodePropertyFlow.from_imod5_data(data, target_dis.dataset["idomain"])
 
+    times = [t for t in pd.date_range(datetime(1989,1,1), datetime(2013,1,1), 8400)]
+
+
     # import grid-agnostic well from imod5 data (it contains 1 well)
-    wel = Well.from_imod5_data("wel-1", data)
+    wel = Well.from_imod5_data("wel-1", data, times)
     assert wel.dataset["x"].values[0] == 197910.0
     assert wel.dataset["y"].values[0] == 362860.0
-    assert np.mean(wel.dataset["rate"].values) == -323.8936170212766
+    assert np.mean(wel.dataset["rate"].values) == -317.1681465863472
 
     # convert to a gridded well
     top = target_dis.dataset["top"]
@@ -841,10 +844,10 @@ def test_import_and_convert_to_mf6(imod5_dataset, tmp_path):
     mf6_well = wel.to_mf6_pkg(active, top, bottom, k, True)
 
     # assert mf6 well properties
-    assert len(mf6_well.dataset["x"].values == 1)
+    assert len(mf6_well.dataset["x"].values )== 1
     assert mf6_well.dataset["x"].values[0] == 197910.0
     assert mf6_well.dataset["y"].values[0] == 362860.0
-    assert np.mean(mf6_well.dataset["rate"].values) == -323.8936170212766
+    assert np.mean(mf6_well.dataset["rate"].values) == -317.1681465863472
 
     # write the package for validation
     write_context = WriteContext(simulation_directory=tmp_path)
