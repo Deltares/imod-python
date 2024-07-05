@@ -1,12 +1,14 @@
+from itertools import pairwise
+from typing import List, Tuple
 from unittest.mock import patch
 
 import geopandas as gpd
 import numpy as np
 import pytest
-import shapely
 import xarray as xr
 import xugrid as xu
 from numpy.testing import assert_array_equal
+from shapely import Polygon, linestrings
 
 from imod.mf6 import (
     HorizontalFlowBarrierHydraulicCharacteristic,
@@ -27,6 +29,15 @@ from imod.mf6.simulation import Modflow6Simulation
 from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
 from imod.typing.grid import nan_like, ones_like
+
+
+def line_to_zpolygon(x: Tuple[float, float], y: Tuple[float, float], z: Tuple[float, float]) -> Polygon:
+    return Polygon(((x[0], y[0], z[0]), (x[0], y[0], z[1]), (x[1], y[1], z[1]), (x[1], y[1], z[0])),)
+
+def linestring_to_zpolygons(barrier_x: List[float], barrier_y: List[float], barrier_z: List[float]) -> List[Polygon]:
+    x_pairs = pairwise(barrier_x)
+    y_pairs = pairwise(barrier_y)
+    return [line_to_zpolygon(x, y, barrier_z) for x, y in zip(x_pairs, y_pairs)]
 
 
 @pytest.mark.parametrize("dis", ["basic_unstructured_dis", "basic_dis"])
@@ -63,7 +74,7 @@ def test_to_mf6_creates_mf6_adapter_init(
     barrier_x = [82.0, 40.0, 0.0]
 
     geometry = gpd.GeoDataFrame(
-        geometry=[shapely.linestrings(barrier_x, barrier_y)],
+        geometry=[linestrings(barrier_x, barrier_y)],
         data={
             barrier_value_name: [barrier_value],
             "ztop": [0.0],
@@ -125,15 +136,16 @@ def test_to_mf6_creates_mf6_adapter(
 
     print_input = False
 
+    barrier_z = [0.0, -100.0]
     barrier_y = [5.5, 5.5, 5.5]
     barrier_x = [82.0, 40.0, 0.0]
 
+    polygons = linestring_to_zpolygons(barrier_x, barrier_y, barrier_z)
+
     geometry = gpd.GeoDataFrame(
-        geometry=[shapely.linestrings(barrier_x, barrier_y)],
+        geometry=polygons,
         data={
-            barrier_value_name: [barrier_value],
-            "ztop": [0.0],
-            "zbottom": [-100.0],
+            "resistance": [1e3, 1e3],
         },
     )
 
@@ -190,7 +202,7 @@ def test_to_mf6_creates_mf6_adapter_layered(
 
     geometry = gpd.GeoDataFrame(
         geometry=[
-            shapely.linestrings(barrier_x, barrier_y),
+            linestrings(barrier_x, barrier_y),
         ],
         data={
             barrier_value_name: [barrier_value],
@@ -265,15 +277,16 @@ def test_to_mf6_different_z_boundaries(
 
     print_input = False
 
+    barrier_z = [ztop, zbottom]
     barrier_y = [5.5, 5.5, 5.5]
     barrier_x = [82.0, 40.0, 0.0]
 
+    polygons = linestring_to_zpolygons(barrier_x, barrier_y, barrier_z)
+
     geometry = gpd.GeoDataFrame(
-        geometry=[shapely.linestrings(barrier_x, barrier_y)],
+        geometry=polygons,
         data={
-            "resistance": [1e3],
-            "ztop": [ztop],
-            "zbottom": [zbottom],
+            "resistance": [1e3, 1e3],
         },
     )
 
@@ -307,7 +320,7 @@ def test_to_mf6_layered_hfb(mf6_flow_barrier_mock, basic_dis, layer, expected_va
     barrier_x = [82.0, 40.0, 0.0]
 
     geometry = gpd.GeoDataFrame(
-        geometry=[shapely.linestrings(barrier_x, barrier_y)],
+        geometry=[linestrings(barrier_x, barrier_y)],
         data={
             "resistance": [1e3],
             "layer": [layer],
@@ -336,7 +349,7 @@ def test_to_mf6_layered_hfb__error():
     barrier_y = [5.5, 5.5, 5.5]
     barrier_x = [82.0, 40.0, 0.0]
 
-    linestring = shapely.linestrings(barrier_x, barrier_y)
+    linestring = linestrings(barrier_x, barrier_y)
 
     geometry = gpd.GeoDataFrame(
         geometry=[linestring, linestring],
@@ -386,7 +399,7 @@ def test_to_mf6_remove_invalid_edges(
     barrier_x = [barrier_x_loc, barrier_x_loc]
 
     geometry = gpd.GeoDataFrame(
-        geometry=[shapely.linestrings(barrier_x, barrier_y)],
+        geometry=[linestrings(barrier_x, barrier_y)],
         data={
             "resistance": [1e3],
             "ztop": [0],
@@ -443,7 +456,7 @@ def test_to_mf6_remove_barrier_parts_adjacent_to_inactive_cells(
     barrier_x = [barrier_x_loc, barrier_x_loc]
 
     geometry = gpd.GeoDataFrame(
-        geometry=[shapely.linestrings(barrier_x, barrier_y)],
+        geometry=[linestrings(barrier_x, barrier_y)],
         data={
             "resistance": [1e3],
             "ztop": [0],
@@ -465,7 +478,7 @@ def test_to_mf6_remove_barrier_parts_adjacent_to_inactive_cells(
 
 def test_is_empty():
     geometry = gpd.GeoDataFrame(
-        geometry=[shapely.linestrings([], [])],
+        geometry=[linestrings([], [])],
         data={
             "resistance": [],
             "ztop": [],
@@ -476,7 +489,7 @@ def test_is_empty():
     assert hfb.is_empty()
 
     geometry = gpd.GeoDataFrame(
-        geometry=[shapely.linestrings([0, 0], [1, 1])],
+        geometry=[linestrings([0, 0], [1, 1])],
         data={
             "resistance": [1.0],
             "ztop": [1.0],
@@ -499,7 +512,7 @@ def test_set_options(print_input, parameterizable_basic_dis):
     hfb = HorizontalFlowBarrierResistance(
         geometry=gpd.GeoDataFrame(
             geometry=[
-                shapely.linestrings([-1000.0, 1000.0], [0.3, 0.3]),
+                linestrings([-1000.0, 1000.0], [0.3, 0.3]),
             ],
             data={
                 "resistance": [1e3],
@@ -549,7 +562,7 @@ def test_run_multiple_hfbs(tmp_path, structured_flow_model):
     barrier_x = [5.0, 5.0, 5.0]
 
     geometry = gpd.GeoDataFrame(
-        geometry=[shapely.linestrings(barrier_x, barrier_y)],
+        geometry=[linestrings(barrier_x, barrier_y)],
         data={
             "resistance": [1200.0],
             "layer": [1],
@@ -566,7 +579,7 @@ def test_run_multiple_hfbs(tmp_path, structured_flow_model):
     head_single = simulation_single.open_head()
 
     geometry = gpd.GeoDataFrame(
-        geometry=[shapely.linestrings(barrier_x, barrier_y)],
+        geometry=[linestrings(barrier_x, barrier_y)],
         data={
             "resistance": [400.0],
             "layer": [1],
