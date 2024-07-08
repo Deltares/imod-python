@@ -4,9 +4,10 @@ import textwrap
 import typing
 from copy import deepcopy
 from enum import Enum
-from typing import TYPE_CHECKING, Dict, Optional, Tuple
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 
 import cftime
+import geopandas as gpd
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -182,7 +183,11 @@ def to_connected_cells_dataset(
 
     return barrier_dataset.dropna("cell_id")
 
-def _make_linestring_from_polygon(dataframe):
+def _make_linestring_from_polygon(dataframe: gpd.GeoDataFrame) -> List[shapely.LineString]:
+    """
+    Make linestring from a polygon with one axis in the vertical dimension (z),
+    and one axis in the horizontal plane (x & y dimension). 
+    """
     coordinates, index = shapely.get_coordinates(
         dataframe.geometry, return_index=True
     )
