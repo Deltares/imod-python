@@ -3,7 +3,7 @@ import sys
 import tempfile
 import textwrap
 from contextlib import nullcontext as does_not_raise
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import numpy as np
 import pandas as pd
@@ -827,7 +827,7 @@ def test_import_and_convert_to_mf6(imod5_dataset, tmp_path):
     target_dis = StructuredDiscretization.from_imod5_data(data)
     target_npf = NodePropertyFlow.from_imod5_data(data, target_dis.dataset["idomain"])
 
-    times = [t for t in pd.date_range(datetime(1989, 1, 1), datetime(2013, 1, 1), 8400)]
+    times = list(pd.date_range(datetime(1989, 1, 1), datetime(2013, 1, 1), 8400))
 
     # import grid-agnostic well from imod5 data (it contains 1 well)
     wel = Well.from_imod5_data("wel-1", data, times)
@@ -905,7 +905,7 @@ def test_timeseries_resampling():
         {"time": datetime(1989, 1, 5), "rate": 400, "x": 0, "y": 0,"id": "ID", "filt_top": 20, "filt_bot": 10, },  # output time 2
         { "time": datetime(1989, 1, 6), "rate": 500, "x": 0,  "y": 0,"id": "ID","filt_top": 20, "filt_bot": 10,}, # output time 3
     ]  
-    # fmt: on  
+    # fmt: on
     # initialize data of lists.
 
     # setup panda table
@@ -922,7 +922,7 @@ def test_timeseries_resampling():
         { "time": datetime(1989, 1, 5), "rate": 400, "x": 0, "y": 0, "id": "ID", "filt_top": 20, "filt_bot": 10, },
         { "time": datetime(1989, 1, 6), "rate": 500, "x": 0, "y": 0,  "id": "ID",  "filt_top": 20, "filt_bot": 10,},
     ]
-    # fmt: on 
+    # fmt: on
     # setup panda table
     expected_timeseries = pd.DataFrame(
         expected_data, columns=["time", "rate", "x", "y", "id", "filt_top", "filt_bot"]
