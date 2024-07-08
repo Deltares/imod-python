@@ -501,8 +501,8 @@ def test_is_empty():
     assert hfb.is_empty()
 
     barrier_z = [0, -5]
-    barrier_y = [0.0, 2.0]
-    barrier_x = [0.0, 0.0]
+    barrier_y = [0.0, 2.0, 3.0]
+    barrier_x = [0.0, 0.0, 0.0]
 
     polygons = linestring_to_zpolygons(barrier_x, barrier_y, barrier_z)
 
