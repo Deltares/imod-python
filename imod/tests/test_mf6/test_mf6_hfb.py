@@ -9,7 +9,7 @@ import pytest
 import xarray as xr
 import xugrid as xu
 from numpy.testing import assert_array_equal
-from shapely import Polygon, linestrings
+from shapely import Polygon, get_coordinates, linestrings
 
 from imod.mf6 import (
     HorizontalFlowBarrierHydraulicCharacteristic,
@@ -21,6 +21,7 @@ from imod.mf6 import (
 )
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.hfb import (
+    _extract_hfb_bounds_from_dataframe,
     _make_linestring_from_polygon,
     _prepare_barrier_dataset_for_mf6_adapter,
     to_connected_cells_dataset,
@@ -624,3 +625,44 @@ def test_run_multiple_hfbs(tmp_path, structured_flow_model):
     head_triple = simulation_triple.open_head()
 
     xr.testing.assert_equal(head_single, head_triple)
+
+
+def test_make_linestring_from_polygon():
+    barrier_x = [-1000.0, 1000.0]
+    barrier_y = [0.3, 0.3]
+    barrier_z = [10.0, -10.0]
+
+    polygons = linestring_to_zpolygons(barrier_x, barrier_y, barrier_z)
+
+    gdf_polygons=gpd.GeoDataFrame(
+        geometry=polygons,
+        data={
+            "resistance": [1e3],
+        })
+    
+
+    linestrings = _make_linestring_from_polygon(gdf_polygons)
+
+    coordinates = get_coordinates(linestrings)
+
+    np.testing.assert_allclose(barrier_x, coordinates[:, 0])
+    np.testing.assert_allclose(barrier_y, coordinates[:, 1])
+
+
+def test_extract_hfb_bounds_from_dataframe():
+    barrier_x = [-1000.0, 0.0, 1000.0]
+    barrier_y = [0.3, 0.3, 0.3]
+    barrier_z = [10.0, -10.0]
+
+    polygons = linestring_to_zpolygons(barrier_x, barrier_y, barrier_z)
+
+    gdf_polygons=gpd.GeoDataFrame(
+        geometry=polygons,
+        data={
+            "resistance": [1e3, 1e3],
+        })
+
+    zmin, zmax = _extract_hfb_bounds_from_dataframe(gdf_polygons)
+    
+    np.testing.assert_equal(zmin, barrier_z[-1])
+    np.testing.assert_equal(zmax, barrier_z[0])
