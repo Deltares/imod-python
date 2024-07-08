@@ -1,3 +1,4 @@
+from copy import deepcopy
 from itertools import pairwise
 from typing import List, Tuple
 from unittest.mock import patch
@@ -20,6 +21,7 @@ from imod.mf6 import (
 )
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.hfb import (
+    _make_linestring_from_polygon,
     _prepare_barrier_dataset_for_mf6_adapter,
     to_connected_cells_dataset,
 )
@@ -89,7 +91,10 @@ def test_to_mf6_creates_mf6_adapter_init(
     _ = hfb.to_mf6_pkg(idomain, top, bottom, k)
 
     # Assert.
-    snapped, _ = xu.snap_to_grid(geometry, grid=idomain, max_snap_distance=0.5)
+    lines = _make_linestring_from_polygon(geometry)
+    gdf_line = deepcopy(geometry)
+    gdf_line["geometry"] = lines
+    snapped, _ = xu.snap_to_grid(gdf_line, grid=idomain, max_snap_distance=0.5)
     edge_index = np.argwhere(snapped[barrier_value_name].notnull().values).ravel()
 
     grid = (
@@ -481,7 +486,7 @@ def test_to_mf6_remove_barrier_parts_adjacent_to_inactive_cells(
 
 def test_is_empty():
     geometry = gpd.GeoDataFrame(
-        geometry=[linestrings([], [])],
+        geometry=[Polygon()],
         data={
             "resistance": [],
         },
@@ -489,10 +494,16 @@ def test_is_empty():
     hfb = HorizontalFlowBarrierResistance(geometry)
     assert hfb.is_empty()
 
+    barrier_z = [0, -5]
+    barrier_y = [0.0, 2.0]
+    barrier_x = [0.0, 0.0]
+
+    polygons = linestring_to_zpolygons(barrier_x, barrier_y, barrier_z)
+
     geometry = gpd.GeoDataFrame(
-        geometry=[linestrings([0, 0], [1, 1])],
+        geometry=polygons,
         data={
-            "resistance": [1.0],
+            "resistance": [1.0, 1.0],
         },
     )
 
@@ -508,15 +519,18 @@ def test_is_empty():
 @pytest.mark.parametrize("print_input", [True, False])
 def test_set_options(print_input, parameterizable_basic_dis):
     idomain, top, bottom = parameterizable_basic_dis
+
+    barrier_x = [-1000.0, 1000.0]
+    barrier_y = [0.3, 0.3]
+    barrier_z = [top.values[0], bottom.values[-1]]
+
+    polygons = linestring_to_zpolygons(barrier_x, barrier_y, barrier_z)
+
     hfb = HorizontalFlowBarrierResistance(
         geometry=gpd.GeoDataFrame(
-            geometry=[
-                linestrings([-1000.0, 1000.0], [0.3, 0.3]),
-            ],
+            geometry=polygons,
             data={
                 "resistance": [1e3],
-                "ztop": [10.0],
-                "zbottom": [0.0],
             },
         ),
         print_input=print_input,
