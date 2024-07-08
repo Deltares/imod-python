@@ -33,10 +33,22 @@ from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
 from imod.typing.grid import nan_like, ones_like
 
 
-def line_to_zpolygon(x: Tuple[float, float], y: Tuple[float, float], z: Tuple[float, float]) -> Polygon:
-    return Polygon(((x[0], y[0], z[0]), (x[0], y[0], z[1]), (x[1], y[1], z[1]), (x[1], y[1], z[0])),)
+def line_to_zpolygon(
+    x: Tuple[float, float], y: Tuple[float, float], z: Tuple[float, float]
+) -> Polygon:
+    return Polygon(
+        (
+            (x[0], y[0], z[0]),
+            (x[0], y[0], z[1]),
+            (x[1], y[1], z[1]),
+            (x[1], y[1], z[0]),
+        ),
+    )
 
-def linestring_to_zpolygons(barrier_x: List[float], barrier_y: List[float], barrier_z: List[float]) -> List[Polygon]:
+
+def linestring_to_zpolygons(
+    barrier_x: List[float], barrier_y: List[float], barrier_z: List[float]
+) -> List[Polygon]:
     x_pairs = pairwise(barrier_x)
     y_pairs = pairwise(barrier_y)
     return [line_to_zpolygon(x, y, barrier_z) for x, y in zip(x_pairs, y_pairs)]
@@ -168,7 +180,7 @@ def test_hfb_regrid(
     hfb_clipped = hfb.regrid_like(idomain_clipped.sel(layer=1), regrid_context)
 
     # Assert
-    x, y = hfb_clipped.dataset["geometry"].values[1].xy #2nd polygon is clipped
+    x, y = hfb_clipped.dataset["geometry"].values[1].xy  # 2nd polygon is clipped
     np.testing.assert_allclose(x, [50.0, 40.0])
     np.testing.assert_allclose(y, [5.5, 5.5])
 

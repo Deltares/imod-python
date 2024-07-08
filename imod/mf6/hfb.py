@@ -183,15 +183,18 @@ def to_connected_cells_dataset(
 
     return barrier_dataset.dropna("cell_id")
 
-def _make_linestring_from_polygon(dataframe: gpd.GeoDataFrame) -> List[shapely.LineString]:
+
+def _make_linestring_from_polygon(
+    dataframe: gpd.GeoDataFrame,
+) -> List[shapely.LineString]:
     """
     Make linestring from a polygon with one axis in the vertical dimension (z),
-    and one axis in the horizontal plane (x & y dimension). 
+    and one axis in the horizontal plane (x & y dimension).
     """
-    coordinates, index = shapely.get_coordinates(
-        dataframe.geometry, return_index=True
+    coordinates, index = shapely.get_coordinates(dataframe.geometry, return_index=True)
+    df = pd.DataFrame(
+        {"polygon_index": index, "x": coordinates[:, 0], "y": coordinates[:, 1]}
     )
-    df = pd.DataFrame({"polygon_index": index, "x": coordinates[:, 0], "y": coordinates[:, 1]})
     df = df.drop_duplicates().reset_index(drop=True)
     df = df.set_index("polygon_index")
 
@@ -200,6 +203,7 @@ def _make_linestring_from_polygon(dataframe: gpd.GeoDataFrame) -> List[shapely.L
     ]
 
     return linestrings
+
 
 def _extract_hfb_bounds_from_dataframe(snapped_dataset, dataframe):
     """
@@ -221,6 +225,7 @@ def _extract_hfb_bounds_from_dataframe(snapped_dataset, dataframe):
     zmin = grouped["z"].min().values
     zmax = grouped["z"].max().values
     return zmin, zmax
+
 
 def _fraction_layer_overlap(
     snapped_dataset: xu.UgridDataset,
@@ -580,7 +585,9 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             snapped_dataset[self._get_variable_name()]
         ).values[edge_index]
 
-        fraction = _fraction_layer_overlap(snapped_dataset, edge_index, self.line_data, top, bottom)
+        fraction = _fraction_layer_overlap(
+            snapped_dataset, edge_index, self.line_data, top, bottom
+        )
 
         c_aquifer = 1.0 / k_mean
         inverse_c = (fraction / resistance) + ((1.0 - fraction) / c_aquifer)
@@ -961,7 +968,9 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
     ):
-        fraction = _fraction_layer_overlap(snapped_dataset, edge_index, self.line_data, top, bottom)
+        fraction = _fraction_layer_overlap(
+            snapped_dataset, edge_index, self.line_data, top, bottom
+        )
 
         barrier_values = (
             fraction.where(fraction)
