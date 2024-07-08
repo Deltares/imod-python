@@ -205,19 +205,21 @@ def _make_linestring_from_polygon(
     return linestrings
 
 
-def _extract_hfb_bounds_from_dataframe(snapped_dataset, dataframe):
+def _select_dataframe_with_snapped_line_index(snapped_dataset: xr.Dataset, dataframe: gpd.GeoDataFrame):
+    line_index = snapped_dataset["line_index"].values
+    line_index = line_index[~np.isnan(line_index)].astype(int)
+    return dataframe.iloc[line_index]
+
+def _extract_hfb_bounds_from_dataframe(dataframe: gpd.GeoDataFrame):
     """
     Extract hfb bounds from dataframe. Requires dataframe geometry to be of type
     shapely "Z Polygon".
     """
-    if not dataframe.geometry[0].has_z:
+    if not dataframe.geometry.has_z.all():
         raise TypeError("GeoDataFrame geometry has no z, which is required.")
 
-    line_index = snapped_dataset["line_index"].values
-    line_index = line_index[~np.isnan(line_index)].astype(int)
-    sample = dataframe.iloc[line_index]
     coordinates, index = shapely.get_coordinates(
-        sample.geometry, include_z=True, return_index=True
+        dataframe.geometry, include_z=True, return_index=True
     )
     grouped = pd.DataFrame({"polygon_index": index, "z": coordinates[:, 2]}).groupby(
         "polygon_index"
@@ -246,7 +248,7 @@ def _fraction_layer_overlap(
     layer_bounds[..., 0] = typing.cast(np.ndarray, bottom_mean.values).T
     layer_bounds[..., 1] = typing.cast(np.ndarray, top_mean.values).T
 
-    zmin, zmax = _extract_hfb_bounds_from_dataframe(snapped_dataset, dataframe)
+    zmin, zmax = _extract_hfb_bounds_from_dataframe(dataframe)
     hfb_bounds = np.empty((n_edge, n_layer, 2), dtype=float)
     hfb_bounds[..., 0] = zmin[:, np.newaxis]
     hfb_bounds[..., 1] = zmax[:, np.newaxis]
@@ -585,8 +587,9 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             snapped_dataset[self._get_variable_name()]
         ).values[edge_index]
 
+        dataframe = _select_dataframe_with_snapped_line_index(snapped_dataset, self.line_data)
         fraction = _fraction_layer_overlap(
-            snapped_dataset, edge_index, self.line_data, top, bottom
+            snapped_dataset, edge_index, dataframe, top, bottom
         )
 
         c_aquifer = 1.0 / k_mean
@@ -968,8 +971,9 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
     ):
+        dataframe = _select_dataframe_with_snapped_line_index(snapped_dataset, self.line_data)
         fraction = _fraction_layer_overlap(
-            snapped_dataset, edge_index, self.line_data, top, bottom
+            snapped_dataset, edge_index, dataframe, top, bottom
         )
 
         barrier_values = (
