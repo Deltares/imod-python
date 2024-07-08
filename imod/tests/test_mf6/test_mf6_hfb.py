@@ -93,7 +93,7 @@ def test_to_mf6_creates_mf6_adapter_init(
     geometry = gpd.GeoDataFrame(
         geometry=polygons,
         data={
-            "resistance": [1e3, 1e3],
+            barrier_value_name: [barrier_value, barrier_value],
         },
     )
 
@@ -143,12 +143,6 @@ def test_hfb_regrid(
     dis,
     request,
 ):
-    barrier_class, barrier_value_name, barrier_value = (
-        HorizontalFlowBarrierResistance,
-        "resistance",
-        1e3,
-    )
-
     # Arrange
     idomain, _, _ = request.getfixturevalue(dis)
 
@@ -167,7 +161,7 @@ def test_hfb_regrid(
         },
     )
 
-    hfb = barrier_class(geometry, print_input)
+    hfb = HorizontalFlowBarrierResistance(geometry, print_input)
 
     # Act
     if isinstance(idomain, xu.UgridDataArray):
