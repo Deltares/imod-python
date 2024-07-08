@@ -667,3 +667,21 @@ def test_extract_hfb_bounds_from_dataframe():
 
     np.testing.assert_equal(zmin, barrier_z[-1])
     np.testing.assert_equal(zmax, barrier_z[0])
+
+
+def test_extract_hfb_bounds_from_dataframe__fails():
+    """Test if function throws error when providing a line."""
+    barrier_x = [-1000.0, 0.0, 1000.0]
+    barrier_y = [0.3, 0.3, 0.3]
+
+    line_data = linestrings(barrier_x, barrier_y)
+
+    gdf_polygons = gpd.GeoDataFrame(
+        geometry=[line_data],
+        data={
+            "resistance": [1e3],
+        },
+    )
+
+    with pytest.raises(TypeError):
+        _extract_hfb_bounds_from_dataframe(gdf_polygons)
