@@ -634,12 +634,12 @@ def test_make_linestring_from_polygon():
 
     polygons = linestring_to_zpolygons(barrier_x, barrier_y, barrier_z)
 
-    gdf_polygons=gpd.GeoDataFrame(
+    gdf_polygons = gpd.GeoDataFrame(
         geometry=polygons,
         data={
             "resistance": [1e3],
-        })
-    
+        },
+    )
 
     linestrings = _make_linestring_from_polygon(gdf_polygons)
 
@@ -656,13 +656,14 @@ def test_extract_hfb_bounds_from_dataframe():
 
     polygons = linestring_to_zpolygons(barrier_x, barrier_y, barrier_z)
 
-    gdf_polygons=gpd.GeoDataFrame(
+    gdf_polygons = gpd.GeoDataFrame(
         geometry=polygons,
         data={
             "resistance": [1e3, 1e3],
-        })
+        },
+    )
 
     zmin, zmax = _extract_hfb_bounds_from_dataframe(gdf_polygons)
-    
+
     np.testing.assert_equal(zmin, barrier_z[-1])
     np.testing.assert_equal(zmax, barrier_z[0])

@@ -205,10 +205,13 @@ def _make_linestring_from_polygon(
     return linestrings
 
 
-def _select_dataframe_with_snapped_line_index(snapped_dataset: xr.Dataset, dataframe: gpd.GeoDataFrame):
+def _select_dataframe_with_snapped_line_index(
+    snapped_dataset: xr.Dataset, dataframe: gpd.GeoDataFrame
+):
     line_index = snapped_dataset["line_index"].values
     line_index = line_index[~np.isnan(line_index)].astype(int)
     return dataframe.iloc[line_index]
+
 
 def _extract_hfb_bounds_from_dataframe(dataframe: gpd.GeoDataFrame):
     """
@@ -587,7 +590,9 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             snapped_dataset[self._get_variable_name()]
         ).values[edge_index]
 
-        dataframe = _select_dataframe_with_snapped_line_index(snapped_dataset, self.line_data)
+        dataframe = _select_dataframe_with_snapped_line_index(
+            snapped_dataset, self.line_data
+        )
         fraction = _fraction_layer_overlap(
             snapped_dataset, edge_index, dataframe, top, bottom
         )
@@ -971,7 +976,9 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
     ):
-        dataframe = _select_dataframe_with_snapped_line_index(snapped_dataset, self.line_data)
+        dataframe = _select_dataframe_with_snapped_line_index(
+            snapped_dataset, self.line_data
+        )
         fraction = _fraction_layer_overlap(
             snapped_dataset, edge_index, dataframe, top, bottom
         )
