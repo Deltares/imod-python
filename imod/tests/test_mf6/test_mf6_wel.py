@@ -827,8 +827,7 @@ def test_import_and_convert_to_mf6(imod5_dataset, tmp_path):
     target_dis = StructuredDiscretization.from_imod5_data(data)
     target_npf = NodePropertyFlow.from_imod5_data(data, target_dis.dataset["idomain"])
 
-    times = [t for t in pd.date_range(datetime(1989,1,1), datetime(2013,1,1), 8400)]
-
+    times = [t for t in pd.date_range(datetime(1989, 1, 1), datetime(2013, 1, 1), 8400)]
 
     # import grid-agnostic well from imod5 data (it contains 1 well)
     wel = Well.from_imod5_data("wel-1", data, times)
@@ -844,7 +843,7 @@ def test_import_and_convert_to_mf6(imod5_dataset, tmp_path):
     mf6_well = wel.to_mf6_pkg(active, top, bottom, k, True)
 
     # assert mf6 well properties
-    assert len(mf6_well.dataset["x"].values )== 1
+    assert len(mf6_well.dataset["x"].values) == 1
     assert mf6_well.dataset["x"].values[0] == 197910.0
     assert mf6_well.dataset["y"].values[0] == 362860.0
     assert np.mean(mf6_well.dataset["rate"].values) == -317.1681465863472
@@ -898,53 +897,15 @@ def test_import_from_imod5_with_duplication(well_duplication_import_prj):
 
 
 def test_timeseries_resampling():
+    # fmt: off
     data = [
-        {
-            "time": datetime(1989, 1, 1),
-            "rate": 100,
-            "x": 0,
-            "y": 0,
-            "id": "ID",
-            "filt_top": 20,
-            "filt_bot": 10,
-        },  # output time 1
-        {
-            "time": datetime(1989, 1, 3),
-            "rate": 200,
-            "x": 0,
-            "y": 0,
-            "id": "ID",
-            "filt_top": 20,
-            "filt_bot": 10,
-        },
-        {
-            "time": datetime(1989, 1, 4),
-            "rate": 300,
-            "x": 0,
-            "y": 0,
-            "id": "ID",
-            "filt_top": 20,
-            "filt_bot": 10,
-        },
-        {
-            "time": datetime(1989, 1, 5),
-            "rate": 400,
-            "x": 0,
-            "y": 0,
-            "id": "ID",
-            "filt_top": 20,
-            "filt_bot": 10,
-        },  # output time 2
-        {
-            "time": datetime(1989, 1, 6),
-            "rate": 500,
-            "x": 0,
-            "y": 0,
-            "id": "ID",
-            "filt_top": 20,
-            "filt_bot": 10,
-        },
-    ]  # output time 3
+        {  "time": datetime(1989, 1, 1), "rate": 100, "x": 0,"y": 0, "id": "ID", "filt_top": 20, "filt_bot": 10, },  # output time 1
+        {"time": datetime(1989, 1, 3), "rate": 200, "x": 0, "y": 0,  "id": "ID", "filt_top": 20, "filt_bot": 10,},
+        { "time": datetime(1989, 1, 4), "rate": 300, "x": 0, "y": 0, "id": "ID", "filt_top": 20, "filt_bot": 10, },
+        {"time": datetime(1989, 1, 5), "rate": 400, "x": 0, "y": 0,"id": "ID", "filt_top": 20, "filt_bot": 10, },  # output time 2
+        { "time": datetime(1989, 1, 6), "rate": 500, "x": 0,  "y": 0,"id": "ID","filt_top": 20, "filt_bot": 10,}, # output time 3
+    ]  
+    # fmt: on  
     # initialize data of lists.
 
     # setup panda table
@@ -955,36 +916,13 @@ def test_timeseries_resampling():
     new_dates = [datetime(1989, 1, 1), datetime(1989, 1, 5), datetime(1989, 1, 6)]
 
     new_timeseries = resample_timeseries(timeseries, new_dates)
-
+    # fmt: off
     expected_data = [
-        {
-            "time": datetime(1989, 1, 1),
-            "rate": 175,
-            "x": 0,
-            "y": 0,
-            "id": "ID",
-            "filt_top": 20,
-            "filt_bot": 10,
-        },
-        {
-            "time": datetime(1989, 1, 5),
-            "rate": 400,
-            "x": 0,
-            "y": 0,
-            "id": "ID",
-            "filt_top": 20,
-            "filt_bot": 10,
-        },
-        {
-            "time": datetime(1989, 1, 6),
-            "rate": 500,
-            "x": 0,
-            "y": 0,
-            "id": "ID",
-            "filt_top": 20,
-            "filt_bot": 10,
-        },
+        { "time": datetime(1989, 1, 1), "rate": 175, "x": 0, "y": 0, "id": "ID", "filt_top": 20, "filt_bot": 10, },
+        { "time": datetime(1989, 1, 5), "rate": 400, "x": 0, "y": 0, "id": "ID", "filt_top": 20, "filt_bot": 10, },
+        { "time": datetime(1989, 1, 6), "rate": 500, "x": 0, "y": 0,  "id": "ID",  "filt_top": 20, "filt_bot": 10,},
     ]
+    # fmt: on 
     # setup panda table
     expected_timeseries = pd.DataFrame(
         expected_data, columns=["time", "rate", "x", "y", "id", "filt_top", "filt_bot"]
@@ -994,53 +932,15 @@ def test_timeseries_resampling():
 
 
 def test_timeseries_resampling_2():
+    # fmt: off
     data = [
-        {
-            "time": datetime(1989, 1, 1, 14, 0, 0),
-            "rate": 100,
-            "x": 0,
-            "y": 0,
-            "id": "ID",
-            "filt_top": 20,
-            "filt_bot": 10,
-        },  # after output time 1
-        {
-            "time": datetime(1989, 1, 3),
-            "rate": 200,
-            "x": 0,
-            "y": 0,
-            "id": "ID",
-            "filt_top": 20,
-            "filt_bot": 10,
-        },
-        {
-            "time": datetime(1989, 1, 4),
-            "rate": 300,
-            "x": 0,
-            "y": 0,
-            "id": "ID",
-            "filt_top": 20,
-            "filt_bot": 10,
-        },
-        {
-            "time": datetime(1989, 1, 5),
-            "rate": 400,
-            "x": 0,
-            "y": 0,
-            "id": "ID",
-            "filt_top": 20,
-            "filt_bot": 10,
-        },  # output time 2
-        {
-            "time": datetime(1989, 1, 6),
-            "rate": 500,
-            "x": 0,
-            "y": 0,
-            "id": "ID",
-            "filt_top": 20,
-            "filt_bot": 10,
-        },
-    ]  # output time 3 is
+        { "time": datetime(1989, 1, 1, 14, 0, 0), "rate": 100, "x": 0, "y": 0, "id": "ID",  "filt_top": 20,  "filt_bot": 10, },  # after output time 1
+        {"time": datetime(1989, 1, 3),  "rate": 200, "x": 0, "y": 0, "id": "ID", "filt_top": 20, "filt_bot": 10, },
+        { "time": datetime(1989, 1, 4), "rate": 300, "x": 0, "y": 0, "id": "ID", "filt_top": 20, "filt_bot": 10, },
+        {"time": datetime(1989, 1, 5),  "rate": 400, "x": 0, "y": 0, "id": "ID", "filt_top": 20, "filt_bot": 10, },  # output time 2
+        {"time": datetime(1989, 1, 6),  "rate": 500, "x": 0, "y": 0, "id": "ID", "filt_top": 20, "filt_bot": 10, }, # output time 3 is
+    ]  
+    # fmt: on
     # initialize data of lists.
 
     # setup panda table
@@ -1051,36 +951,13 @@ def test_timeseries_resampling_2():
     new_dates = [datetime(1989, 1, 1), datetime(1989, 1, 5), datetime(1989, 1, 6)]
 
     new_timeseries = resample_timeseries(timeseries, new_dates)
-
+    # fmt: off
     expected_data = [
-        {
-            "time": datetime(1989, 1, 1),
-            "rate": 160.416667,
-            "x": 0,
-            "y": 0,
-            "id": "ID",
-            "filt_top": 20,
-            "filt_bot": 10,
-        },
-        {
-            "time": datetime(1989, 1, 5),
-            "rate": 400,
-            "x": 0,
-            "y": 0,
-            "id": "ID",
-            "filt_top": 20,
-            "filt_bot": 10,
-        },
-        {
-            "time": datetime(1989, 1, 6),
-            "rate": 500,
-            "x": 0,
-            "y": 0,
-            "id": "ID",
-            "filt_top": 20,
-            "filt_bot": 10,
-        },
+        { "time": datetime(1989, 1, 1), "rate": 160.416667, "x": 0,"y": 0, "id": "ID", "filt_top": 20,"filt_bot": 10, },
+        { "time": datetime(1989, 1, 5), "rate": 400, "x": 0,"y": 0, "id": "ID", "filt_top": 20,"filt_bot": 10,},
+        { "time": datetime(1989, 1, 6), "rate": 500, "x": 0, "y": 0,"id": "ID","filt_top": 20, "filt_bot": 10,},
     ]
+    # fmt: on
     # setup panda table
     expected_timeseries = pd.DataFrame(
         expected_data, columns=["time", "rate", "x", "y", "id", "filt_top", "filt_bot"]
@@ -1092,53 +969,15 @@ def test_timeseries_resampling_2():
 
 
 def test_timeseries_resampling_3():
+    # fmt: off
     data = [
-        {
-            "time": datetime(1989, 1, 1),
-            "rate": 100,
-            "x": 0,
-            "y": 0,
-            "id": "ID",
-            "filt_top": 20,
-            "filt_bot": 10,
-        },  # output time 1
-        {
-            "time": datetime(1989, 1, 3),
-            "rate": 200,
-            "x": 0,
-            "y": 0,
-            "id": "ID",
-            "filt_top": 20,
-            "filt_bot": 10,
-        },
-        {
-            "time": datetime(1989, 1, 4),
-            "rate": 300,
-            "x": 0,
-            "y": 0,
-            "id": "ID",
-            "filt_top": 20,
-            "filt_bot": 10,
-        },
-        {
-            "time": datetime(1989, 1, 5),
-            "rate": 400,
-            "x": 0,
-            "y": 0,
-            "id": "ID",
-            "filt_top": 20,
-            "filt_bot": 10,
-        },  # output time 2
-        {
-            "time": datetime(1999, 1, 6),
-            "rate": 500,
-            "x": 0,
-            "y": 0,
-            "id": "ID",
-            "filt_top": 20,
-            "filt_bot": 10,
-        },
+        { "time": datetime(1989, 1, 1), "rate": 100, "x": 0, "y": 0, "id": "ID", "filt_top": 20, "filt_bot": 10,},  # output time 1
+        { "time": datetime(1989, 1, 3), "rate": 200, "x": 0, "y": 0, "id": "ID", "filt_top": 20, "filt_bot": 10,  },
+        { "time": datetime(1989, 1, 4), "rate": 300, "x": 0, "y": 0, "id": "ID", "filt_top": 20,"filt_bot": 10,},
+        {  "time": datetime(1989, 1, 5),  "rate": 400, "x": 0, "y": 0, "id": "ID", "filt_top": 20, "filt_bot": 10, },  # output time 2
+        {  "time": datetime(1999, 1, 6), "rate": 500,  "x": 0,"y": 0, "id": "ID","filt_top": 20, "filt_bot": 10,},
     ]  # 10 years later than output time 3
+    # fmt: on
     # initialize data of lists.
 
     # setup panda table
@@ -1150,35 +989,13 @@ def test_timeseries_resampling_3():
 
     new_timeseries = resample_timeseries(timeseries, new_dates)
 
+    # fmt: off
     expected_data = [
-        {
-            "time": datetime(1989, 1, 1),
-            "rate": 175,
-            "x": 0,
-            "y": 0,
-            "id": "ID",
-            "filt_top": 20,
-            "filt_bot": 10,
-        },
-        {
-            "time": datetime(1989, 1, 5),
-            "rate": 400,
-            "x": 0,
-            "y": 0,
-            "id": "ID",
-            "filt_top": 20,
-            "filt_bot": 10,
-        },
-        {
-            "time": datetime(1989, 1, 6),
-            "rate": 400,
-            "x": 0,
-            "y": 0,
-            "id": "ID",
-            "filt_top": 20,
-            "filt_bot": 10,
-        },
+        {"time": datetime(1989, 1, 1), "rate": 175,"x": 0,"y": 0, "id": "ID", "filt_top": 20, "filt_bot": 10},
+        {"time": datetime(1989, 1, 5), "rate": 400,"x": 0, "y": 0, "id": "ID", "filt_top": 20, "filt_bot": 10, },
+        {"time": datetime(1989, 1, 6), "rate": 400,  "x": 0, "y": 0, "id": "ID","filt_top": 20, "filt_bot": 10, },
     ]
+    # fmt: on
     # setup panda table
     expected_timeseries = pd.DataFrame(
         expected_data, columns=["time", "rate", "x", "y", "id", "filt_top", "filt_bot"]
