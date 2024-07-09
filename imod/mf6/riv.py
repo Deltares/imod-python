@@ -197,7 +197,7 @@ class River(BoundaryCondition, IRegridPackage):
         allocation_option_riv: ALLOCATION_OPTION,
         distributing_option_riv: DISTRIBUTING_OPTION,
         regridder_types: Optional[RegridMethodType] = None,
-        regrid_context: RegridderWeightsCache = RegridderWeightsCache(), 
+        regrid_context: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> Tuple[Optional["River"], Optional[Drainage]]:
         """
         Construct a river-package from iMOD5 data, loaded with the

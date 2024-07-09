@@ -158,7 +158,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_discretization: StructuredDiscretization,
         regridder_types: Optional[RegridMethodType] = None,
-        regrid_context: RegridderWeightsCache = RegridderWeightsCache(),        
+        regrid_context: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "ConstantHead":
         """
         Construct a ConstantHead-package from iMOD5 data, loaded with the
@@ -200,7 +200,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
             imod5_data["bnd"]["ibound"],
             target_discretization,
             regridder_types,
-            regrid_context
+            regrid_context,
         )
 
     @classmethod
@@ -210,7 +210,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_discretization: StructuredDiscretization,
         regridder_types: Optional[RegridMethodType] = None,
-        regrid_context: RegridderWeightsCache = RegridderWeightsCache(),         
+        regrid_context: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "ConstantHead":
         """
         Construct a ConstantHead-package from iMOD5 data, loaded with the
@@ -247,7 +247,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
             imod5_data["bnd"]["ibound"],
             target_discretization,
             regridder_types,
-            regrid_context
+            regrid_context,
         )
 
     @classmethod
@@ -257,7 +257,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         ibound: GridDataArray,
         target_discretization: StructuredDiscretization,
         regridder_types: Optional[RegridMethodType] = None,
-        regrid_context: RegridderWeightsCache = RegridderWeightsCache(),              
+        regrid_context: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "ConstantHead":
         target_idomain = target_discretization.dataset["idomain"]
 

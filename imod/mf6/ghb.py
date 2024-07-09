@@ -167,9 +167,8 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         target_discretization,
         time_min: datetime,
         time_max: datetime,
-        regrid_context: RegridderWeightsCache = RegridderWeightsCache(), 
+        regrid_context: RegridderWeightsCache = RegridderWeightsCache(),
         regridder_types: Optional[RegridMethodType] = None,
-
     ) -> "GeneralHeadBoundary":
         """
         Construct a GeneralHeadBoundary-package from iMOD5 data, loaded with the

@@ -102,7 +102,7 @@ class InitialConditions(Package, IRegridPackage):
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_grid: GridDataArray,
         regridder_types: Optional[RegridMethodType] = None,
-        regrid_context: RegridderWeightsCache = RegridderWeightsCache(),           
+        regrid_context: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "InitialConditions":
         """
         Construct an InitialConditions-package from iMOD5 data, loaded with the

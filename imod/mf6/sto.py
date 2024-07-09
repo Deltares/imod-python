@@ -328,7 +328,7 @@ class StorageCoefficient(StorageBase):
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_grid: GridDataArray,
         regridder_types: Optional[RegridMethodType] = None,
-        regrid_context: RegridderWeightsCache = RegridderWeightsCache(),            
+        regrid_context: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "StorageCoefficient":
         """
         Construct a StorageCoefficient-package from iMOD5 data, loaded with the

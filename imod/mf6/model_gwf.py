@@ -180,7 +180,7 @@ class GroundwaterFlowModel(Modflow6Model):
         distributing_options: SimulationDistributingOptions,
         time_min: datetime,
         time_max: datetime,
-        regridder_types: Optional[RegridMethodType] = None,        
+        regridder_types: Optional[RegridMethodType] = None,
     ) -> "GroundwaterFlowModel":
         """
         Imports a GroundwaterFlowModel (GWF) from the data in an IMOD5 project file.
@@ -213,24 +213,32 @@ class GroundwaterFlowModel(Modflow6Model):
         """
         # first import the singleton packages
         # import discretization
-
-        dis_pkg = StructuredDiscretization.from_imod5_data(
-            imod5_data, regridder_types, False
-        )
-        grid = dis_pkg.dataset["idomain"]
         regrid_context = RegridderWeightsCache()
 
+        dis_pkg = StructuredDiscretization.from_imod5_data(
+            imod5_data, regridder_types, regrid_context, False
+        )
+        grid = dis_pkg.dataset["idomain"]
+
         # import npf
-        npf_pkg = NodePropertyFlow.from_imod5_data(imod5_data, grid, regridder_types, regrid_context)
+        npf_pkg = NodePropertyFlow.from_imod5_data(
+            imod5_data, grid, regridder_types, regrid_context
+        )
 
         # import sto
-        sto_pkg = StorageCoefficient.from_imod5_data(imod5_data, grid, regridder_types, regrid_context)
+        sto_pkg = StorageCoefficient.from_imod5_data(
+            imod5_data, grid, regridder_types, regrid_context
+        )
 
         # import initial conditions
-        ic_pkg = InitialConditions.from_imod5_data(imod5_data, grid, regridder_types, regrid_context)
+        ic_pkg = InitialConditions.from_imod5_data(
+            imod5_data, grid, regridder_types, regrid_context
+        )
 
         # import recharge
-        rch_pkg = Recharge.from_imod5_data(imod5_data, dis_pkg, regridder_types, regrid_context)
+        rch_pkg = Recharge.from_imod5_data(
+            imod5_data, dis_pkg, regridder_types, regrid_context
+        )
 
         result = GroundwaterFlowModel()
         result["dis"] = dis_pkg
@@ -255,7 +263,7 @@ class GroundwaterFlowModel(Modflow6Model):
                 time_min=time_min,
                 time_max=time_max,
                 regridder_types=regridder_types,
-                regrid_context= regrid_context
+                regrid_context=regrid_context,
             )
             result[drn_key] = drn_pkg
 
@@ -272,7 +280,7 @@ class GroundwaterFlowModel(Modflow6Model):
                 allocation_options.riv,
                 distributing_options.riv,
                 regridder_types,
-                regrid_context
+                regrid_context,
             )
             if riv_pkg is not None:
                 result[riv_key + "riv"] = riv_pkg
