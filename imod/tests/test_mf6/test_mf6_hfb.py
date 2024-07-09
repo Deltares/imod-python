@@ -34,9 +34,17 @@ from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
 from imod.typing.grid import nan_like, ones_like
 
 
-def line_to_zpolygon(
+def line_to_square_zpolygon(
     x: Tuple[float, float], y: Tuple[float, float], z: Tuple[float, float]
 ) -> Polygon:
+    """
+    Creates polygon as follows:
+
+    xy0,z0 -- xy1,z0
+       |        |
+       |        |
+    xy0,z1 -- xy1,z1
+    """
     return Polygon(
         (
             (x[0], y[0], z[0]),
@@ -47,7 +55,7 @@ def line_to_zpolygon(
     )
 
 
-def linestring_to_zpolygons(
+def linestring_to_square_zpolygons(
     barrier_x: List[float],
     barrier_y: List[float],
     barrier_ztop: List[float],
@@ -56,7 +64,46 @@ def linestring_to_zpolygons(
     x_pairs = pairwise(barrier_x)
     y_pairs = pairwise(barrier_y)
     z_pairs = zip(barrier_ztop, barrier_zbottom)
-    return [line_to_zpolygon(x, y, z) for x, y, z in zip(x_pairs, y_pairs, z_pairs)]
+    return [line_to_square_zpolygon(x, y, z) for x, y, z in zip(x_pairs, y_pairs, z_pairs)]
+
+
+def line_to_trapezoid_zpolygon(
+    x: Tuple[float, float], y: Tuple[float, float], zt: Tuple[float, float], zb: Tuple[float, float],
+) -> Polygon:
+    """
+    Creates polygon as follows:
+
+    xy0,zt0 
+       |    \
+       |     \
+       |      xy1,zt1
+       |         |
+       |         |
+       |      xy1,zb1
+       |     /   
+       |    /    
+    xy0,zb0  
+    """
+    return Polygon(
+        (
+            (x[0], y[0], zt[0]),
+            (x[0], y[0], zb[1]),
+            (x[1], y[1], zt[1]),
+            (x[1], y[1], zb[0]),
+        ),
+    )
+
+def linestring_to_trapezoid_zpolygons(
+    barrier_x: List[float],
+    barrier_y: List[float],
+    barrier_ztop: List[float],
+    barrier_zbottom: List[float],
+) -> List[Polygon]:
+    x_pairs = pairwise(barrier_x)
+    y_pairs = pairwise(barrier_y)
+    zt_pairs = pairwise(barrier_ztop) 
+    zb_pairs = pairwise(barrier_zbottom)
+    return [line_to_trapezoid_zpolygon(x, y, zt, zb) for x, y, zt, zb in zip(x_pairs, y_pairs, zt_pairs, zb_pairs)]
 
 
 @pytest.mark.parametrize("dis", ["basic_unstructured_dis", "basic_dis"])
@@ -94,7 +141,7 @@ def test_to_mf6_creates_mf6_adapter_init(
     barrier_y = [5.5, 5.5, 5.5]
     barrier_x = [82.0, 40.0, 0.0]
 
-    polygons = linestring_to_zpolygons(
+    polygons = linestring_to_square_zpolygons(
         barrier_x, barrier_y, barrier_ztop, barrier_zbottom
     )
 
@@ -161,7 +208,7 @@ def test_hfb_regrid(
     barrier_y = [5.5, 5.5, 5.5]
     barrier_x = [82.0, 40.0, 0.0]
 
-    polygons = linestring_to_zpolygons(
+    polygons = linestring_to_square_zpolygons(
         barrier_x, barrier_y, barrier_ztop, barrier_zbottom
     )
 
@@ -304,7 +351,7 @@ def test_to_mf6_different_constant_z_boundaries(
     barrier_y = [5.5, 5.5, 5.5]
     barrier_x = [82.0, 40.0, 0.0]
 
-    polygons = linestring_to_zpolygons(
+    polygons = linestring_to_square_zpolygons(
         barrier_x, barrier_y, barrier_ztop, barrier_zbottom
     )
 
@@ -351,22 +398,26 @@ def test_to_mf6_different_constant_z_boundaries(
     ],
 )
 @patch("imod.mf6.mf6_hfb_adapter.Mf6HorizontalFlowBarrier.__new__", autospec=True)
-def test_to_mf6_different_varying_z_boundaries(
+def test_to_mf6_different_varying_square_z_boundaries(
     mf6_flow_barrier_mock, basic_dis, barrier_ztop, barrier_zbottom, expected_values
 ):
+    """
+    Test with square zpolygons with varying bounds. The second barrier is a
+    barrier that is so short it should be ignored.
+    """
     # Arrange.
     idomain, top, bottom = basic_dis
     k = ones_like(top)
 
     print_input = False
 
-    # Work around issue where only diagonal hfb lines are only
+    # Insert second barrier values, which need to be ignored
     barrier_ztop.insert(1, min(barrier_ztop))
     barrier_zbottom.insert(1, max(barrier_zbottom))
     barrier_y = [5.5, 5.5, 5.5, 5.5]
     barrier_x = [0.0, 40.0, 41.0, 82.0]
 
-    polygons = linestring_to_zpolygons(
+    polygons = linestring_to_square_zpolygons(
         barrier_x, barrier_y, barrier_ztop, barrier_zbottom
     )
 
@@ -386,6 +437,68 @@ def test_to_mf6_different_varying_z_boundaries(
     _, args = mf6_flow_barrier_mock.call_args
     barrier_values = args["hydraulic_characteristic"].values.reshape(3, 8)
     assert_array_equal(barrier_values[:, 3:5], 1.0 / expected_values.T)
+
+
+
+@pytest.mark.parametrize(
+    "barrier_ztop, barrier_zbottom, expected_values",
+    [
+        (
+            [2.5, -2.5, -7.5],
+            [
+                -35.0,
+                -35.0,
+                -35.0,
+            ],
+            np.array([[1e3, 1e3, 1], [1, 3e3, 1]]),
+        ),  # 1st and 2nd layer, 2nd layer
+        (
+            [200.0, 0.0, 0.0],
+            [-270.0, -35.0, -35.0],
+            np.array([[1e3, 1e3, 1e3], [3e3, 3e3, 1]]),
+        ),  # ztop out of bounds, 1st and 2nd layer,
+        (
+            [0.0, 200.0, 200.0],
+            [-400.0, 50.0, 50.0],
+            np.array([[1e3, 1e3, 1e3], [1, 1, 1]]),
+        ),  # zbottom out of bounds, z-range has no overlap with the domain
+    ],
+)
+@patch("imod.mf6.mf6_hfb_adapter.Mf6HorizontalFlowBarrier.__new__", autospec=True)
+def test_to_mf6_different_trapezoid_z_boundaries(
+    mf6_flow_barrier_mock, basic_dis, barrier_ztop, barrier_zbottom, expected_values
+):
+    # Arrange.
+    idomain, top, bottom = basic_dis
+    k = ones_like(top)
+
+    print_input = False
+
+    barrier_y = [5.5, 5.5, 5.5]
+    barrier_x = [0.0, 40.0, 82.0]
+
+    polygons = linestring_to_trapezoid_zpolygons(
+        barrier_x, barrier_y, barrier_ztop, barrier_zbottom
+    )
+
+    geometry = gpd.GeoDataFrame(
+        geometry=polygons,
+        data={
+            "resistance": [1e3, 3e3],
+        },
+    )
+
+    hfb = HorizontalFlowBarrierResistance(geometry, print_input)
+
+    # Act.
+    _ = hfb.to_mf6_pkg(idomain, top, bottom, k)
+
+    # Assert.
+    _, args = mf6_flow_barrier_mock.call_args
+    barrier_values = args["hydraulic_characteristic"].values.reshape(3, 8)
+    assert_array_equal(barrier_values[:, 3:5], 1.0 / expected_values.T)
+
+
 
 
 @pytest.mark.parametrize(
@@ -486,7 +599,7 @@ def test_to_mf6_remove_invalid_edges(
     barrier_y = [0.0, 2.0]
     barrier_x = [barrier_x_loc, barrier_x_loc]
 
-    polygons = linestring_to_zpolygons(
+    polygons = linestring_to_square_zpolygons(
         barrier_x, barrier_y, barrier_ztop, barrier_zbottom
     )
 
@@ -551,7 +664,7 @@ def test_to_mf6_remove_barrier_parts_adjacent_to_inactive_cells(
     barrier_y = [0.0, 2.0]
     barrier_x = [barrier_x_loc, barrier_x_loc]
 
-    polygons = linestring_to_zpolygons(
+    polygons = linestring_to_square_zpolygons(
         barrier_x, barrier_y, barrier_ztop, barrier_zbottom
     )
 
@@ -589,7 +702,7 @@ def test_is_empty():
     barrier_y = [0.0, 2.0, 3.0]
     barrier_x = [0.0, 0.0, 0.0]
 
-    polygons = linestring_to_zpolygons(
+    polygons = linestring_to_square_zpolygons(
         barrier_x, barrier_y, barrier_ztop, barrier_zbottom
     )
 
@@ -618,7 +731,7 @@ def test_set_options(print_input, parameterizable_basic_dis):
     barrier_ztop = [top.values[0]]
     barrier_zbottom = [bottom.values[-1]]
 
-    polygons = linestring_to_zpolygons(
+    polygons = linestring_to_square_zpolygons(
         barrier_x, barrier_y, barrier_ztop, barrier_zbottom
     )
 
@@ -722,7 +835,7 @@ def test_make_linestring_from_polygon():
     barrier_ztop = [10.0]
     barrier_zbottom = [-10.0]
 
-    polygons = linestring_to_zpolygons(
+    polygons = linestring_to_square_zpolygons(
         barrier_x, barrier_y, barrier_ztop, barrier_zbottom
     )
 
@@ -747,7 +860,7 @@ def test_extract_hfb_bounds_from_dataframe():
     barrier_ztop = [10.0, 10.0]
     barrier_zbottom = [-10.0, -10.0]
 
-    polygons = linestring_to_zpolygons(
+    polygons = linestring_to_square_zpolygons(
         barrier_x, barrier_y, barrier_ztop, barrier_zbottom
     )
 
