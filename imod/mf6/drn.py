@@ -176,7 +176,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
         time_min: datetime,
         time_max: datetime,
         regridder_types: Optional[RegridMethodType] = None,
-        regrid_context: RegridderWeightsCache = RegridderWeightsCache(),
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "Drainage":
         """
         Construct a drainage-package from iMOD5 data, loaded with the
@@ -232,7 +232,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
             regridder_settings = asdict(regridder_types, dict_factory=dict)
 
         regridded_package_data = _regrid_package_data(
-            data, target_idomain, regridder_settings, regrid_context, {}
+            data, target_idomain, regridder_settings, regrid_cache, {}
         )
 
         conductance = regridded_package_data["conductance"]

@@ -213,31 +213,31 @@ class GroundwaterFlowModel(Modflow6Model):
         """
         # first import the singleton packages
         # import discretization
-        regrid_context = RegridderWeightsCache()
+        regrid_cache = RegridderWeightsCache()
 
         dis_pkg = StructuredDiscretization.from_imod5_data(
-            imod5_data, regridder_types, regrid_context, False
+            imod5_data, regridder_types, regrid_cache, False
         )
         grid = dis_pkg.dataset["idomain"]
 
         # import npf
         npf_pkg = NodePropertyFlow.from_imod5_data(
-            imod5_data, grid, regridder_types, regrid_context
+            imod5_data, grid, regridder_types, regrid_cache
         )
 
         # import sto
         sto_pkg = StorageCoefficient.from_imod5_data(
-            imod5_data, grid, regridder_types, regrid_context
+            imod5_data, grid, regridder_types, regrid_cache
         )
 
         # import initial conditions
         ic_pkg = InitialConditions.from_imod5_data(
-            imod5_data, grid, regridder_types, regrid_context
+            imod5_data, grid, regridder_types, regrid_cache
         )
 
         # import recharge
         rch_pkg = Recharge.from_imod5_data(
-            imod5_data, dis_pkg, regridder_types, regrid_context
+            imod5_data, dis_pkg, regridder_types, regrid_cache
         )
 
         result = GroundwaterFlowModel()
@@ -263,7 +263,7 @@ class GroundwaterFlowModel(Modflow6Model):
                 time_min=time_min,
                 time_max=time_max,
                 regridder_types=regridder_types,
-                regrid_context=regrid_context,
+                regrid_cache=regrid_cache,
             )
             result[drn_key] = drn_pkg
 
@@ -280,7 +280,7 @@ class GroundwaterFlowModel(Modflow6Model):
                 allocation_options.riv,
                 distributing_options.riv,
                 regridder_types,
-                regrid_context,
+                regrid_cache,
             )
             if riv_pkg is not None:
                 result[riv_key + "riv"] = riv_pkg
@@ -301,12 +301,12 @@ class GroundwaterFlowModel(Modflow6Model):
         chd_keys = [key for key in imod5_keys if key[0:3] == "chd"]
         if len(chd_keys) == 0:
             result["chd_from_shd"] = ConstantHead.from_imod5_shd_data(
-                imod5_data, dis_pkg, regridder_types, regrid_context
+                imod5_data, dis_pkg, regridder_types, regrid_cache
             )
         else:
             for chd_key in chd_keys:
                 result[chd_key] = ConstantHead.from_imod5_data(
-                    chd_key, imod5_data, dis_pkg, regridder_types, regrid_context
+                    chd_key, imod5_data, dis_pkg, regridder_types, regrid_cache
                 )
 
         return result

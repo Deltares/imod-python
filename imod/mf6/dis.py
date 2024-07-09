@@ -163,7 +163,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
         regridder_types: Optional[RegridMethodType] = None,
-        regrid_context: RegridderWeightsCache = RegridderWeightsCache(),
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
         validate: bool = True,
     ) -> "StructuredDiscretization":
         """
@@ -206,7 +206,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
             regridder_settings = asdict(regridder_types, dict_factory=dict)
 
         new_package_data = _regrid_package_data(
-            data, target_grid, regridder_settings, regrid_context
+            data, target_grid, regridder_settings, regrid_cache
         )
 
         # Validate iMOD5 data

@@ -167,7 +167,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         target_discretization,
         time_min: datetime,
         time_max: datetime,
-        regrid_context: RegridderWeightsCache = RegridderWeightsCache(),
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
         regridder_types: Optional[RegridMethodType] = None,
     ) -> "GeneralHeadBoundary":
         """
@@ -220,7 +220,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
             regridder_settings = asdict(regridder_types, dict_factory=dict)
 
         regridded_package_data = _regrid_package_data(
-            data, idomain, regridder_settings, regrid_context, {}
+            data, idomain, regridder_settings, regrid_cache, {}
         )
 
         ghb = GeneralHeadBoundary(**regridded_package_data)

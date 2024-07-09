@@ -161,7 +161,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
         imod5_data: dict[str, dict[str, GridDataArray]],
         dis_pkg: StructuredDiscretization,
         regridder_types: Optional[RegridMethodType] = None,
-        regrid_context: RegridderWeightsCache = RegridderWeightsCache(),
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "Recharge":
         """
         Construct an rch-package from iMOD5 data, loaded with the
@@ -201,7 +201,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
             regridder_settings = asdict(regridder_types, dict_factory=dict)
 
         new_package_data = _regrid_package_data(
-            data, new_idomain, regridder_settings, regrid_context, {}
+            data, new_idomain, regridder_settings, regrid_cache, {}
         )
 
         # if rate has only layer 0, then it is planar.

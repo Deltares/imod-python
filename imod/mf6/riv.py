@@ -197,7 +197,7 @@ class River(BoundaryCondition, IRegridPackage):
         allocation_option_riv: ALLOCATION_OPTION,
         distributing_option_riv: DISTRIBUTING_OPTION,
         regridder_types: Optional[RegridMethodType] = None,
-        regrid_context: RegridderWeightsCache = RegridderWeightsCache(),
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> Tuple[Optional["River"], Optional[Drainage]]:
         """
         Construct a river-package from iMOD5 data, loaded with the
@@ -268,7 +268,7 @@ class River(BoundaryCondition, IRegridPackage):
 
         # regrid the input data
         regridded_package_data = _regrid_package_data(
-            data, target_idomain, regridder_settings, regrid_context, {}
+            data, target_idomain, regridder_settings, regrid_cache, {}
         )
 
         conductance = regridded_package_data["conductance"]

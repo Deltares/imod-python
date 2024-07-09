@@ -145,9 +145,9 @@ def test_to_mf6_creates_mf6_adapter(
     else:
         idomain_clipped = idomain.sel(x=slice(None, 54.0))
 
-    regrid_context = RegridderWeightsCache()
+    regrid_cache = RegridderWeightsCache()
 
-    hfb_clipped = hfb.regrid_like(idomain_clipped.sel(layer=1), regrid_context)
+    hfb_clipped = hfb.regrid_like(idomain_clipped.sel(layer=1), regrid_cache)
 
     # Assert
     x, y = hfb_clipped.dataset["geometry"].values[0].xy
