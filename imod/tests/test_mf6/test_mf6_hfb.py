@@ -48,7 +48,10 @@ def line_to_zpolygon(
 
 
 def linestring_to_zpolygons(
-    barrier_x: List[float], barrier_y: List[float], barrier_ztop: List[float], barrier_zbottom: List[float]
+    barrier_x: List[float],
+    barrier_y: List[float],
+    barrier_ztop: List[float],
+    barrier_zbottom: List[float],
 ) -> List[Polygon]:
     x_pairs = pairwise(barrier_x)
     y_pairs = pairwise(barrier_y)
@@ -158,7 +161,9 @@ def test_hfb_regrid(
     barrier_y = [5.5, 5.5, 5.5]
     barrier_x = [82.0, 40.0, 0.0]
 
-    polygons = linestring_to_zpolygons(barrier_x, barrier_y, barrier_ztop, barrier_zbottom)
+    polygons = linestring_to_zpolygons(
+        barrier_x, barrier_y, barrier_ztop, barrier_zbottom
+    )
 
     geometry = gpd.GeoDataFrame(
         geometry=polygons,
@@ -299,7 +304,9 @@ def test_to_mf6_different_constant_z_boundaries(
     barrier_y = [5.5, 5.5, 5.5]
     barrier_x = [82.0, 40.0, 0.0]
 
-    polygons = linestring_to_zpolygons(barrier_x, barrier_y, barrier_ztop, barrier_zbottom)
+    polygons = linestring_to_zpolygons(
+        barrier_x, barrier_y, barrier_ztop, barrier_zbottom
+    )
 
     geometry = gpd.GeoDataFrame(
         geometry=polygons,
@@ -323,9 +330,24 @@ def test_to_mf6_different_constant_z_boundaries(
 @pytest.mark.parametrize(
     "barrier_ztop, barrier_zbottom, expected_values",
     [
-        ([0.0, -5.0], [-35.0, -35.0,], np.array([[1e3, 1e3, 1], [1, 1e3, 1]])),  # 1st and 2nd layer, 2nd layer
-        ([100.0, 0.0], [-135.0, -35.0], np.array([[1e3, 1e3, 1e3], [1e3, 1e3, 1]])),  # ztop out of bounds, 1st and 2nd layer,
-        ([0.0, 100.0], [-200.0, 50.0], np.array([[1e3, 1e3, 1e3], [1, 1, 1]])),  # zbottom out of bounds, z-range has no overlap with the domain
+        (
+            [0.0, -5.0],
+            [
+                -35.0,
+                -35.0,
+            ],
+            np.array([[1e3, 1e3, 1], [1, 1e3, 1]]),
+        ),  # 1st and 2nd layer, 2nd layer
+        (
+            [100.0, 0.0],
+            [-135.0, -35.0],
+            np.array([[1e3, 1e3, 1e3], [1e3, 1e3, 1]]),
+        ),  # ztop out of bounds, 1st and 2nd layer,
+        (
+            [0.0, 100.0],
+            [-200.0, 50.0],
+            np.array([[1e3, 1e3, 1e3], [1, 1, 1]]),
+        ),  # zbottom out of bounds, z-range has no overlap with the domain
     ],
 )
 @patch("imod.mf6.mf6_hfb_adapter.Mf6HorizontalFlowBarrier.__new__", autospec=True)
@@ -338,13 +360,15 @@ def test_to_mf6_different_varying_z_boundaries(
 
     print_input = False
 
-    # Work around issue where only diagonal hfb lines are only 
+    # Work around issue where only diagonal hfb lines are only
     barrier_ztop.insert(1, min(barrier_ztop))
     barrier_zbottom.insert(1, max(barrier_zbottom))
     barrier_y = [5.5, 5.5, 5.5, 5.5]
     barrier_x = [0.0, 40.0, 41.0, 82.0]
 
-    polygons = linestring_to_zpolygons(barrier_x, barrier_y, barrier_ztop, barrier_zbottom)
+    polygons = linestring_to_zpolygons(
+        barrier_x, barrier_y, barrier_ztop, barrier_zbottom
+    )
 
     geometry = gpd.GeoDataFrame(
         geometry=polygons,
@@ -462,7 +486,9 @@ def test_to_mf6_remove_invalid_edges(
     barrier_y = [0.0, 2.0]
     barrier_x = [barrier_x_loc, barrier_x_loc]
 
-    polygons = linestring_to_zpolygons(barrier_x, barrier_y, barrier_ztop, barrier_zbottom)
+    polygons = linestring_to_zpolygons(
+        barrier_x, barrier_y, barrier_ztop, barrier_zbottom
+    )
 
     geometry = gpd.GeoDataFrame(
         geometry=polygons,
@@ -516,12 +542,18 @@ def test_to_mf6_remove_barrier_parts_adjacent_to_inactive_cells(
     ] = inactivity_marker  # make cell inactive
     k = ones_like(top)
 
-    barrier_ztop = [0.0, ]
-    barrier_zbottom = [-5.0,]
+    barrier_ztop = [
+        0.0,
+    ]
+    barrier_zbottom = [
+        -5.0,
+    ]
     barrier_y = [0.0, 2.0]
     barrier_x = [barrier_x_loc, barrier_x_loc]
 
-    polygons = linestring_to_zpolygons(barrier_x, barrier_y, barrier_ztop, barrier_zbottom)
+    polygons = linestring_to_zpolygons(
+        barrier_x, barrier_y, barrier_ztop, barrier_zbottom
+    )
 
     geometry = gpd.GeoDataFrame(
         geometry=polygons,
@@ -557,7 +589,9 @@ def test_is_empty():
     barrier_y = [0.0, 2.0, 3.0]
     barrier_x = [0.0, 0.0, 0.0]
 
-    polygons = linestring_to_zpolygons(barrier_x, barrier_y, barrier_ztop, barrier_zbottom)
+    polygons = linestring_to_zpolygons(
+        barrier_x, barrier_y, barrier_ztop, barrier_zbottom
+    )
 
     geometry = gpd.GeoDataFrame(
         geometry=polygons,
@@ -584,7 +618,9 @@ def test_set_options(print_input, parameterizable_basic_dis):
     barrier_ztop = [top.values[0]]
     barrier_zbottom = [bottom.values[-1]]
 
-    polygons = linestring_to_zpolygons(barrier_x, barrier_y, barrier_ztop, barrier_zbottom)
+    polygons = linestring_to_zpolygons(
+        barrier_x, barrier_y, barrier_ztop, barrier_zbottom
+    )
 
     hfb = HorizontalFlowBarrierResistance(
         geometry=gpd.GeoDataFrame(
@@ -686,7 +722,9 @@ def test_make_linestring_from_polygon():
     barrier_ztop = [10.0]
     barrier_zbottom = [-10.0]
 
-    polygons = linestring_to_zpolygons(barrier_x, barrier_y, barrier_ztop, barrier_zbottom)
+    polygons = linestring_to_zpolygons(
+        barrier_x, barrier_y, barrier_ztop, barrier_zbottom
+    )
 
     gdf_polygons = gpd.GeoDataFrame(
         geometry=polygons,
@@ -709,7 +747,9 @@ def test_extract_hfb_bounds_from_dataframe():
     barrier_ztop = [10.0, 10.0]
     barrier_zbottom = [-10.0, -10.0]
 
-    polygons = linestring_to_zpolygons(barrier_x, barrier_y, barrier_ztop, barrier_zbottom)
+    polygons = linestring_to_zpolygons(
+        barrier_x, barrier_y, barrier_ztop, barrier_zbottom
+    )
 
     gdf_polygons = gpd.GeoDataFrame(
         geometry=polygons,
