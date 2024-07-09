@@ -460,6 +460,7 @@ class NodePropertyFlow(Package, IRegridPackage):
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_grid: GridDataArray,
         regridder_types: Optional[RegridMethodType] = None,
+        regrid_context: RegridderWeightsCache = RegridderWeightsCache(),         
     ) -> "NodePropertyFlow":
         """
         Construct an npf-package from iMOD5 data, loaded with the
@@ -516,8 +517,6 @@ class NodePropertyFlow(Package, IRegridPackage):
             regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
         else:
             regridder_settings = asdict(regridder_types, dict_factory=dict)
-
-        regrid_context = RegridderWeightsCache()
 
         new_package_data = _regrid_package_data(
             data, target_grid, regridder_settings, regrid_context, {}

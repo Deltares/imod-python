@@ -161,6 +161,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
         imod5_data: dict[str, dict[str, GridDataArray]],
         dis_pkg: StructuredDiscretization,
         regridder_types: Optional[RegridMethodType] = None,
+        regrid_context: RegridderWeightsCache = RegridderWeightsCache(),      
     ) -> "Recharge":
         """
         Construct an rch-package from iMOD5 data, loaded with the
@@ -198,8 +199,6 @@ class Recharge(BoundaryCondition, IRegridPackage):
             regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
         else:
             regridder_settings = asdict(regridder_types, dict_factory=dict)
-
-        regrid_context = RegridderWeightsCache()
 
         new_package_data = _regrid_package_data(
             data, new_idomain, regridder_settings, regrid_context, {}

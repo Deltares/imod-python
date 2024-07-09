@@ -197,6 +197,7 @@ class River(BoundaryCondition, IRegridPackage):
         allocation_option_riv: ALLOCATION_OPTION,
         distributing_option_riv: DISTRIBUTING_OPTION,
         regridder_types: Optional[RegridMethodType] = None,
+        regrid_context: RegridderWeightsCache = RegridderWeightsCache(), 
     ) -> Tuple[Optional["River"], Optional[Drainage]]:
         """
         Construct a river-package from iMOD5 data, loaded with the
@@ -264,8 +265,6 @@ class River(BoundaryCondition, IRegridPackage):
             regridder_settings = asdict(regridder_types, dict_factory=dict)
         if "infiltration_factor" not in regridder_settings.keys():
             regridder_settings["infiltration_factor"] = (RegridderType.OVERLAP, "mean")
-
-        regrid_context = RegridderWeightsCache()
 
         # regrid the input data
         regridded_package_data = _regrid_package_data(

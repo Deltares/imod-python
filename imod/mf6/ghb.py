@@ -167,7 +167,9 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         target_discretization,
         time_min: datetime,
         time_max: datetime,
+        regrid_context: RegridderWeightsCache = RegridderWeightsCache(), 
         regridder_types: Optional[RegridMethodType] = None,
+
     ) -> "GeneralHeadBoundary":
         """
         Construct a GeneralHeadBoundary-package from iMOD5 data, loaded with the
@@ -217,8 +219,6 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
             regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
         else:
             regridder_settings = asdict(regridder_types, dict_factory=dict)
-
-        regrid_context = RegridderWeightsCache()
 
         regridded_package_data = _regrid_package_data(
             data, idomain, regridder_settings, regrid_context, {}
