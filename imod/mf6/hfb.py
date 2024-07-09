@@ -237,6 +237,11 @@ def _extract_hfb_bounds_from_dataframe(dataframe: gpd.GeoDataFrame):
     coordinates, index = shapely.get_coordinates(
         dataframe.geometry, include_z=True, return_index=True
     )
+    # Skip every 5th element, this is the final (duplicate) point.
+    to_keep = np.mod(np.arange(coordinates.shape[0]), 5)!=4
+    coordinates = coordinates[to_keep, :]
+    index = index[to_keep]
+
     df_polygon_lookup = pd.DataFrame({"polygon_index": index, "z": coordinates[:, 2]})
     df_polygon_lookup = df_polygon_lookup.set_index("polygon_index")
     # Sort values to be able to take the lowest and second lowest values in
