@@ -361,10 +361,10 @@ def test_to_mf6_different_varying_z_boundaries(
     print_input = False
 
     # Work around issue where only diagonal hfb lines are only
-    barrier_ztop.insert(1, min(barrier_ztop))
-    barrier_zbottom.insert(1, max(barrier_zbottom))
-    barrier_y = [5.5, 5.5, 5.5, 5.5]
-    barrier_x = [0.0, 40.0, 41.0, 82.0]
+    # barrier_ztop.insert(1, min(barrier_ztop))
+    # barrier_zbottom.insert(1, max(barrier_zbottom))
+    barrier_y = [5.5, 5.5, 5.5]
+    barrier_x = [0.0, 40.0, 82.0]
 
     polygons = linestring_to_zpolygons(
         barrier_x, barrier_y, barrier_ztop, barrier_zbottom
@@ -373,7 +373,7 @@ def test_to_mf6_different_varying_z_boundaries(
     geometry = gpd.GeoDataFrame(
         geometry=polygons,
         data={
-            "resistance": [1e3, 1e3, 1e3],
+            "resistance": [1e3, 1e3],
         },
     )
 
