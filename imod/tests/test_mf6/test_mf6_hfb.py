@@ -64,11 +64,16 @@ def linestring_to_square_zpolygons(
     x_pairs = pairwise(barrier_x)
     y_pairs = pairwise(barrier_y)
     z_pairs = zip(barrier_ztop, barrier_zbottom)
-    return [line_to_square_zpolygon(x, y, z) for x, y, z in zip(x_pairs, y_pairs, z_pairs)]
+    return [
+        line_to_square_zpolygon(x, y, z) for x, y, z in zip(x_pairs, y_pairs, z_pairs)
+    ]
 
 
 def line_to_trapezoid_zpolygon(
-    x: Tuple[float, float], y: Tuple[float, float], zt: Tuple[float, float], zb: Tuple[float, float],
+    x: Tuple[float, float],
+    y: Tuple[float, float],
+    zt: Tuple[float, float],
+    zb: Tuple[float, float],
 ) -> Polygon:
     """
     Creates polygon as follows:
@@ -93,6 +98,7 @@ def line_to_trapezoid_zpolygon(
         ),
     )
 
+
 def linestring_to_trapezoid_zpolygons(
     barrier_x: List[float],
     barrier_y: List[float],
@@ -101,9 +107,12 @@ def linestring_to_trapezoid_zpolygons(
 ) -> List[Polygon]:
     x_pairs = pairwise(barrier_x)
     y_pairs = pairwise(barrier_y)
-    zt_pairs = pairwise(barrier_ztop) 
+    zt_pairs = pairwise(barrier_ztop)
     zb_pairs = pairwise(barrier_zbottom)
-    return [line_to_trapezoid_zpolygon(x, y, zt, zb) for x, y, zt, zb in zip(x_pairs, y_pairs, zt_pairs, zb_pairs)]
+    return [
+        line_to_trapezoid_zpolygon(x, y, zt, zb)
+        for x, y, zt, zb in zip(x_pairs, y_pairs, zt_pairs, zb_pairs)
+    ]
 
 
 @pytest.mark.parametrize("dis", ["basic_unstructured_dis", "basic_dis"])
@@ -439,7 +448,6 @@ def test_to_mf6_different_varying_square_z_boundaries(
     assert_array_equal(barrier_values[:, 3:5], 1.0 / expected_values.T)
 
 
-
 @pytest.mark.parametrize(
     "barrier_ztop, barrier_zbottom, expected_values",
     [
@@ -497,8 +505,6 @@ def test_to_mf6_different_trapezoid_z_boundaries(
     _, args = mf6_flow_barrier_mock.call_args
     barrier_values = args["hydraulic_characteristic"].values.reshape(3, 8)
     assert_array_equal(barrier_values[:, 3:5], 1.0 / expected_values.T)
-
-
 
 
 @pytest.mark.parametrize(

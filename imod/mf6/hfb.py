@@ -238,7 +238,7 @@ def _extract_hfb_bounds_from_dataframe(dataframe: gpd.GeoDataFrame):
         dataframe.geometry, include_z=True, return_index=True
     )
     # Skip every 5th element, this is the final (duplicate) point.
-    to_keep = np.mod(np.arange(coordinates.shape[0]), 5)!=4
+    to_keep = np.mod(np.arange(coordinates.shape[0]), 5) != 4
     coordinates = coordinates[to_keep, :]
     index = index[to_keep]
 
@@ -759,12 +759,12 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         snapped_dataset_rows: List[xr.Dataset] = []
         for index in barrier_dataframe.index:
             # Force to pd.DataFrame instead of pd.Series for xu.snap_to_grid.
-            row_df = barrier_dataframe.loc[index:index] 
+            row_df = barrier_dataframe.loc[index:index]
             snapped_dataset_row, _ = typing.cast(
                 xu.UgridDataset,
                 xu.snap_to_grid(row_df, grid=idomain, max_snap_distance=0.5),
             )
-            snapped_dataset_row["line_index"] += index # Set to original line index.
+            snapped_dataset_row["line_index"] += index  # Set to original line index.
             snapped_dataset_rows.append(snapped_dataset_row)
         snapped_dataset = xu.merge(snapped_dataset_rows)
 
