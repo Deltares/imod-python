@@ -217,6 +217,19 @@ def _extract_hfb_bounds_from_dataframe(dataframe: gpd.GeoDataFrame):
     """
     Extract hfb bounds from dataframe. Requires dataframe geometry to be of type
     shapely "Z Polygon".
+
+    For the upper z bounds, function takes the average of the depth of the two
+    upper nodes. The same holds for the lower z bounds, but then with the two
+    lower nodes.
+
+    As a visual representation, this happens for each z bound:
+
+    .                 .
+     \         >>>
+      \   .    >>>     ---  .
+       \ /     >>>         -
+        .                 .
+
     """
     if not dataframe.geometry.has_z.all():
         raise TypeError("GeoDataFrame geometry has no z, which is required.")
@@ -224,12 +237,18 @@ def _extract_hfb_bounds_from_dataframe(dataframe: gpd.GeoDataFrame):
     coordinates, index = shapely.get_coordinates(
         dataframe.geometry, include_z=True, return_index=True
     )
-    grouped = pd.DataFrame({"polygon_index": index, "z": coordinates[:, 2]}).groupby(
-        "polygon_index"
-    )
-    zmin = grouped["z"].min().values
-    zmax = grouped["z"].max().values
-    return zmin, zmax
+    df_polygon_lookup = pd.DataFrame({"polygon_index": index, "z": coordinates[:, 2]})
+    df_polygon_lookup = df_polygon_lookup.set_index("polygon_index")
+    # Sort values to be able to take the lowest and second lowest values in
+    # the groupby by taking the first [.nth(0)] and second row [.nth(1)].
+    df_polygon_lookup = df_polygon_lookup.sort_values("z", ascending=True)
+
+    grouped = df_polygon_lookup.groupby("polygon_index")
+    # Take the average of the lowest and second lowest as lower bound
+    zlower = (grouped["z"].nth(0) + grouped["z"].nth(1)) / 2
+    # Take the average of the highest and second highest as upper bound
+    zupper = (grouped["z"].nth(-1) + grouped["z"].nth(-2)) / 2
+    return zlower.values, zupper.values
 
 
 def _fraction_layer_overlap(
