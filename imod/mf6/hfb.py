@@ -747,10 +747,22 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             linestrings = _make_linestring_from_polygon(barrier_dataframe)
             barrier_dataframe["geometry"] = linestrings
 
-        snapped_dataset, _ = typing.cast(
-            xu.UgridDataset,
-            xu.snap_to_grid(barrier_dataframe, grid=idomain, max_snap_distance=0.5),
-        )
+        # Work around issue where xu.snap_to_grid cannot handle snapping a
+        # dataset with multiple lines appropriately. This can be later replaced
+        # to a single call to xu.snap_to_grid if this bug is fixed:
+        # <link_to_github_issue_here>
+        snapped_dataset_rows: List[xr.Dataset] = []
+        for index in barrier_dataframe.index:
+            # Force to pd.DataFrame instead of pd.Series for xu.snap_to_grid.
+            row_df = barrier_dataframe.loc[index:index] 
+            snapped_dataset_row, _ = typing.cast(
+                xu.UgridDataset,
+                xu.snap_to_grid(row_df, grid=idomain, max_snap_distance=0.5),
+            )
+            snapped_dataset_row["line_index"] += index # Set to original line index.
+            snapped_dataset_rows.append(snapped_dataset_row)
+        snapped_dataset = xu.merge(snapped_dataset_rows)
+
         edge_index = np.argwhere(
             snapped_dataset[self._get_variable_name()].notnull().values
         ).ravel()

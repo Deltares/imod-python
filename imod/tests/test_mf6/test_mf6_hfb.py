@@ -336,12 +336,12 @@ def test_to_mf6_different_constant_z_boundaries(
                 -35.0,
                 -35.0,
             ],
-            np.array([[1e3, 1e3, 1], [1, 1e3, 1]]),
+            np.array([[1e3, 1e3, 1], [1, 3e3, 1]]),
         ),  # 1st and 2nd layer, 2nd layer
         (
             [100.0, 0.0],
             [-135.0, -35.0],
-            np.array([[1e3, 1e3, 1e3], [1e3, 1e3, 1]]),
+            np.array([[1e3, 1e3, 1e3], [3e3, 3e3, 1]]),
         ),  # ztop out of bounds, 1st and 2nd layer,
         (
             [0.0, 100.0],
@@ -373,7 +373,7 @@ def test_to_mf6_different_varying_z_boundaries(
     geometry = gpd.GeoDataFrame(
         geometry=polygons,
         data={
-            "resistance": [1e3, 1e3, 1e3],
+            "resistance": [1e3, 2e3, 3e3],
         },
     )
 
