@@ -155,7 +155,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_discretization: StructuredDiscretization,
-        regridder_types: Optional[RegridMethodType] = None,
+        regridder_types: Optional[ConstantHeadRegridMethod] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "ConstantHead":
         """
@@ -207,7 +207,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_discretization: StructuredDiscretization,
-        regridder_types: Optional[RegridMethodType] = None,
+        regridder_types: Optional[ConstantHeadRegridMethod] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "ConstantHead":
         """
@@ -232,7 +232,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         target_discretization:  StructuredDiscretization package
             The grid that should be used for the new package. Does not
             need to be identical to one of the input grids.
-        regridder_types: RegridMethodType, optional
+        regridder_types: ConstantHeadRegridMethod, optional
             Optional dataclass with regridder types for a specific variable.
             Use this to override default regridding methods.
 
