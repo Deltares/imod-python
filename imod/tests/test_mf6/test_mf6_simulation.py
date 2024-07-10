@@ -1,8 +1,8 @@
-from collections import defaultdict
 import os
 import re
 import sys
 import textwrap
+from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime
 from filecmp import dircmp
@@ -20,7 +20,11 @@ import imod
 from imod.mf6.model import Modflow6Model
 from imod.mf6.multimodel.modelsplitter import PartitionInfo
 from imod.mf6.oc import OutputControl
-from imod.mf6.regrid.regrid_schemes import DiscretizationRegridMethod, NodePropertyFlowRegridMethod, StorageCoefficientRegridMethod
+from imod.mf6.regrid.regrid_schemes import (
+    DiscretizationRegridMethod,
+    NodePropertyFlowRegridMethod,
+    StorageCoefficientRegridMethod,
+)
 from imod.mf6.simulation import Modflow6Simulation
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo
 from imod.prepare.topsystem.default_allocation_methods import (
@@ -507,14 +511,14 @@ def test_import_from_imod5_nonstandard_regridding(imod5_dataset, tmp_path):
     period_data = imod5_dataset[1]
     default_simulation_allocation_options = SimulationAllocationOptions
     default_simulation_distributing_options = SimulationDistributingOptions
-    
+
     def def_value():
         return None
-    regridding_option = defaultdict(def_value)
-    regridding_option ["npf"] = NodePropertyFlowRegridMethod()
-    regridding_option ["dis"] = DiscretizationRegridMethod()
-    regridding_option ["sto"] = StorageCoefficientRegridMethod()
 
+    regridding_option = defaultdict(def_value)
+    regridding_option["npf"] = NodePropertyFlowRegridMethod()
+    regridding_option["dis"] = DiscretizationRegridMethod()
+    regridding_option["sto"] = StorageCoefficientRegridMethod()
 
     simulation = Modflow6Simulation.from_imod5_data(
         imod5_data,
@@ -523,7 +527,7 @@ def test_import_from_imod5_nonstandard_regridding(imod5_dataset, tmp_path):
         default_simulation_distributing_options,
         datetime(2000, 1, 1),
         datetime(2002, 1, 1),
-        regridding_option
+        regridding_option,
     )
 
     simulation["imported_model"]["oc"] = OutputControl(

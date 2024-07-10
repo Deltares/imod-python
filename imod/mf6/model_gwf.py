@@ -181,7 +181,7 @@ class GroundwaterFlowModel(Modflow6Model):
         distributing_options: SimulationDistributingOptions,
         time_min: datetime,
         time_max: datetime,
-        regridder_types:defaultdict[str, RegridMethodType],
+        regridder_types: defaultdict[str, RegridMethodType],
     ) -> "GroundwaterFlowModel":
         """
         Imports a GroundwaterFlowModel (GWF) from the data in an IMOD5 project file.

@@ -1,5 +1,4 @@
 import pathlib
-from dataclasses import asdict
 from typing import Any, List, Optional
 
 import numpy as np

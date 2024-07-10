@@ -1,5 +1,4 @@
 import warnings
-from dataclasses import asdict
 from typing import Optional
 
 import numpy as np

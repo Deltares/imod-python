@@ -1,4 +1,3 @@
-from dataclasses import asdict
 from datetime import datetime
 from typing import Optional
 
@@ -228,7 +227,6 @@ class Drainage(BoundaryCondition, IRegridPackage):
 
         if regridder_types is None:
             regridder_types = DrainageRegridMethod()
-
 
         regridded_package_data = _regrid_package_data(
             data, target_idomain, regridder_types, regrid_cache, {}

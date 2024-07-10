@@ -1,5 +1,4 @@
 import warnings
-from dataclasses import asdict
 from typing import Any, Optional
 
 import numpy as np
@@ -135,7 +134,6 @@ class InitialConditions(Package, IRegridPackage):
 
         if regridder_types is None:
             regridder_types = InitialConditionsRegridMethod()
-
 
         new_package_data = _regrid_package_data(
             data, target_grid, regridder_types, regrid_cache, {}

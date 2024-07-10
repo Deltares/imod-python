@@ -314,15 +314,13 @@ def _regrid_like(
         remove_expanded_auxiliary_variables_from_dataset(package)
 
     if regridder_types is None:
-        regridder_settings = asdict(package.get_regrid_methods(), dict_factory=dict)
-    else:
-        regridder_settings = asdict(regridder_types, dict_factory=dict)
+        regridder_types = package._regrid_method
 
-    new_package_data = package.get_non_grid_data(list(regridder_settings.keys()))
+    new_package_data = package.get_non_grid_data(regridder_types.asdict().keys())
     new_package_data = _regrid_package_data(
         package.dataset,
         target_grid,
-        regridder_settings,
+        regridder_types,
         regrid_cache,
         new_package_data=new_package_data,
     )

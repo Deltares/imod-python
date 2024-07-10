@@ -1,5 +1,4 @@
 import abc
-from dataclasses import asdict
 from typing import Any, Dict, Optional
 
 import numpy as np

@@ -4,6 +4,7 @@ import collections
 import pathlib
 import subprocess
 import warnings
+from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable, DefaultDict, Iterable, Optional, Union, cast
@@ -42,7 +43,6 @@ from imod.mf6.ssm import SourceSinkMixing
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.utilities.mask import _mask_all_models
 from imod.mf6.utilities.regrid import _regrid_like
-from imod.mf6.utilities.regridding_types import RegridderType
 from imod.mf6.write_context import WriteContext
 from imod.prepare.topsystem.default_allocation_methods import (
     SimulationAllocationOptions,
@@ -56,7 +56,6 @@ from imod.typing.grid import (
     is_unstructured,
     merge_partitions,
 )
-from collections import defaultdict
 
 OUTPUT_FUNC_MAPPING: dict[str, Callable] = {
     "head": open_hds,
@@ -1329,7 +1328,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         distributing_options: SimulationDistributingOptions,
         time_min,
         time_max,
-        regridder_types: Optional[defaultdict[str, RegridMethodType]] = None,
+        regridder_types: Optional[defaultdict[str, RegridMethodType]] = defaultdict(
+            lambda: None
+        ),
     ) -> "Modflow6Simulation":
         """
         Imports a GroundwaterFlowModel (GWF) from the data in an IMOD5 project file.

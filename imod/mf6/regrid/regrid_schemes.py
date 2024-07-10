@@ -20,9 +20,8 @@ class RegridMethodType(Protocol):
 
     __dataclass_fields__: ClassVar[dict]
 
-    def asdict(self)-> dict:
+    def asdict(self) -> dict:
         return vars(self)
-
 
 
 @dataclass(config=_CONFIG)

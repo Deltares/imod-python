@@ -1,4 +1,3 @@
-from dataclasses import asdict
 from typing import Optional
 
 import numpy as np
@@ -10,7 +9,6 @@ from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.regrid.regrid_schemes import ConstantHeadRegridMethod, RegridMethodType
 from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
-from imod.mf6.utilities.regridding_types import RegridderType
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,

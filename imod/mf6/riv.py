@@ -1,4 +1,3 @@
-from dataclasses import asdict
 from datetime import datetime
 from typing import Optional, Tuple
 
@@ -14,7 +13,6 @@ from imod.mf6.drn import Drainage
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.regrid.regrid_schemes import RegridMethodType, RiverRegridMethod
 from imod.mf6.utilities.regrid import (
-    RegridderType,
     RegridderWeightsCache,
     _regrid_package_data,
 )
