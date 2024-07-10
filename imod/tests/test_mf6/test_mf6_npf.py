@@ -8,6 +8,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.mf6.utilities.regridding_types import RegridderType
 from imod.schemata import ValidationError
 
 
@@ -293,3 +294,39 @@ def test_npf_from_imod5_vertical_anisotropy(imod5_dataset, tmp_path):
     assert "angle1" not in rendered_npf
     assert "angle2" not in rendered_npf
     assert "angle3" not in rendered_npf
+
+
+@pytest.mark.usefixtures("imod5_dataset")
+def test_npf_from_imod5_settings(imod5_dataset, tmp_path):
+    data = deepcopy(imod5_dataset[0])
+    # throw out kva (=vertical anisotropy array) and ani (=horizontal anisotropy array)
+    data.pop("kva")
+    data.pop("ani")
+
+    # move the coordinates a bit so that it doesn't match the grid of k (and the regridding settings will matter)
+    target_grid = data["khv"]["kh"]
+    x = target_grid["x"].values
+    x += 50
+    y = target_grid["y"].values
+    y += 50
+    target_grid = target_grid.assign_coords({"x": x, "y": y})
+
+    settings = imod.mf6.NodePropertyFlow.get_regrid_methods()
+    settings_1 = deepcopy(settings)
+    settings_1.k = (
+        RegridderType.OVERLAP,
+        "harmonic_mean",
+    )
+    npf_1 = imod.mf6.NodePropertyFlow.from_imod5_data(data, target_grid, settings_1)
+
+    settings_2 = deepcopy(settings)
+    settings_2.k = (
+        RegridderType.OVERLAP,
+        "mode",
+    )
+    npf_2 = imod.mf6.NodePropertyFlow.from_imod5_data(data, target_grid, settings_2)
+
+    # assert that different settings lead to different results.
+    diff = npf_1.dataset["k"] - npf_2.dataset["k"]
+    diff = xr.where(np.isnan(diff), 0, diff)
+    assert diff.values.max() > 0.1
