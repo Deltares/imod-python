@@ -196,9 +196,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
 
         # first regrid the inputs to the target grid.
         if regridder_types is None:
-            regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
-        else:
-            regridder_settings = asdict(regridder_types, dict_factory=dict)
+            regridder_settings = RechargeRegridMethod()
 
         new_package_data = _regrid_package_data(
             data, new_idomain, regridder_settings, regrid_cache, {}

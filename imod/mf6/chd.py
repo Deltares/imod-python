@@ -262,18 +262,12 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         target_idomain = target_discretization.dataset["idomain"]
 
         if regridder_types is None:
-            regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
-        else:
-            regridder_settings = asdict(regridder_types, dict_factory=dict)
-
-        # appart from the arrays needed for the ConstantHead package, we will
-        # also regrid ibound.
-        regridder_settings["ibound"] = (RegridderType.OVERLAP, "mode")
+            regridder_types = ConstantHeadRegridMethod()
 
         data = {"head": head, "ibound": ibound}
 
         regridded_package_data = _regrid_package_data(
-            data, target_idomain, regridder_settings, regrid_cache, {}
+            data, target_idomain, regridder_types, regrid_cache, {}
         )
         head = regridded_package_data["head"]
         ibound = regridded_package_data["ibound"]

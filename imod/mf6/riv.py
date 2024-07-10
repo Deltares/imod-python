@@ -260,15 +260,11 @@ class River(BoundaryCondition, IRegridPackage):
 
         # set up regridder methods
         if regridder_types is None:
-            regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
-        else:
-            regridder_settings = asdict(regridder_types, dict_factory=dict)
-        if "infiltration_factor" not in regridder_settings.keys():
-            regridder_settings["infiltration_factor"] = (RegridderType.OVERLAP, "mean")
+            regridder_types = RiverRegridMethod()
 
         # regrid the input data
         regridded_package_data = _regrid_package_data(
-            data, target_idomain, regridder_settings, regrid_cache, {}
+            data, target_idomain, regridder_types, regrid_cache, {}
         )
 
         conductance = regridded_package_data["conductance"]

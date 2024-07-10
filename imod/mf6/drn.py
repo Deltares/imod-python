@@ -227,12 +227,11 @@ class Drainage(BoundaryCondition, IRegridPackage):
         is_planar = is_planar_grid(data["elevation"])
 
         if regridder_types is None:
-            regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
-        else:
-            regridder_settings = asdict(regridder_types, dict_factory=dict)
+            regridder_types = DrainageRegridMethod()
+
 
         regridded_package_data = _regrid_package_data(
-            data, target_idomain, regridder_settings, regrid_cache, {}
+            data, target_idomain, regridder_types, regrid_cache, {}
         )
 
         conductance = regridded_package_data["conductance"]

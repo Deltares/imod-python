@@ -201,12 +201,10 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         target_grid = create_smallest_target_grid(*data.values())
 
         if regridder_types is None:
-            regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
-        else:
-            regridder_settings = asdict(regridder_types, dict_factory=dict)
+            regridder_types = DiscretizationRegridMethod()
 
         new_package_data = _regrid_package_data(
-            data, target_grid, regridder_settings, regrid_cache
+            data, target_grid, regridder_types, regrid_cache
         )
 
         # Validate iMOD5 data

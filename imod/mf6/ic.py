@@ -134,11 +134,10 @@ class InitialConditions(Package, IRegridPackage):
         }
 
         if regridder_types is None:
-            regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
-        else:
-            regridder_settings = asdict(regridder_types, dict_factory=dict)
+            regridder_types = InitialConditionsRegridMethod()
+
 
         new_package_data = _regrid_package_data(
-            data, target_grid, regridder_settings, regrid_cache, {}
+            data, target_grid, regridder_types, regrid_cache, {}
         )
         return cls(**new_package_data)

@@ -37,6 +37,7 @@ from imod.mf6.multimodel.exchange_creator_unstructured import (
 from imod.mf6.multimodel.modelsplitter import create_partition_info, slice_model
 from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
+from imod.mf6.regrid.regrid_schemes import RegridMethodType
 from imod.mf6.ssm import SourceSinkMixing
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.utilities.mask import _mask_all_models
@@ -55,6 +56,7 @@ from imod.typing.grid import (
     is_unstructured,
     merge_partitions,
 )
+from collections import defaultdict
 
 OUTPUT_FUNC_MAPPING: dict[str, Callable] = {
     "head": open_hds,
@@ -1327,7 +1329,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         distributing_options: SimulationDistributingOptions,
         time_min,
         time_max,
-        regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
+        regridder_types: Optional[defaultdict[str, RegridMethodType]] = None,
     ) -> "Modflow6Simulation":
         """
         Imports a GroundwaterFlowModel (GWF) from the data in an IMOD5 project file.

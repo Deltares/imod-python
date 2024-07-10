@@ -20,6 +20,10 @@ class RegridMethodType(Protocol):
 
     __dataclass_fields__: ClassVar[dict]
 
+    def asdict(self)-> dict:
+        return vars(self)
+
+
 
 @dataclass(config=_CONFIG)
 class ConstantHeadRegridMethod(RegridMethodType):
@@ -51,6 +55,7 @@ class ConstantHeadRegridMethod(RegridMethodType):
         "mean",
     )  # TODO: should be set to barycentric once supported
     concentration: _RegridVarType = (RegridderType.OVERLAP, "mean")
+    ibound: _RegridVarType = (RegridderType.OVERLAP, "mode")
 
 
 @dataclass(config=_CONFIG)
@@ -404,6 +409,7 @@ class RiverRegridMethod(RegridMethodType):
     conductance: _RegridVarType = (RegridderType.RELATIVEOVERLAP, "conductance")
     bottom_elevation: _RegridVarType = (RegridderType.OVERLAP, "mean")
     concentration: _RegridVarType = (RegridderType.OVERLAP, "mean")
+    infiltration_factor: _RegridVarType = (RegridderType.OVERLAP, "mean")
 
 
 @dataclass(config=_CONFIG)
