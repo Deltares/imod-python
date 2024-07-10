@@ -200,7 +200,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         target_grid = create_smallest_target_grid(*data.values())
 
         if regridder_types is None:
-            regridder_types = DiscretizationRegridMethod()
+            regridder_types = StructuredDiscretization.get_regrid_methods()
 
         new_package_data = _regrid_package_data(
             data, target_grid, regridder_types, regrid_cache

@@ -513,7 +513,7 @@ class NodePropertyFlow(Package, IRegridPackage):
         icelltype = zeros_like(target_grid, dtype=int)
 
         if regridder_types is None:
-            regridder_types = NodePropertyFlowRegridMethod()
+            regridder_types = NodePropertyFlow.get_regrid_methods()
 
         new_package_data = _regrid_package_data(
             data, target_grid, regridder_types, regrid_cache, {}

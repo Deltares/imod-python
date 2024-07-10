@@ -258,8 +258,7 @@ class River(BoundaryCondition, IRegridPackage):
 
         # set up regridder methods
         if regridder_types is None:
-            regridder_types = RiverRegridMethod()
-
+            regridder_types = River.get_regrid_methods()
         # regrid the input data
         regridded_package_data = _regrid_package_data(
             data, target_idomain, regridder_types, regrid_cache, {}

@@ -226,7 +226,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
         is_planar = is_planar_grid(data["elevation"])
 
         if regridder_types is None:
-            regridder_types = DrainageRegridMethod()
+            regridder_types = Drainage.get_regrid_methods()
 
         regridded_package_data = _regrid_package_data(
             data, target_idomain, regridder_types, regrid_cache, {}

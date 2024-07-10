@@ -260,7 +260,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         target_idomain = target_discretization.dataset["idomain"]
 
         if regridder_types is None:
-            regridder_types = ConstantHeadRegridMethod()
+            regridder_types = ConstantHead.get_regrid_methods()
 
         data = {"head": head, "ibound": ibound}
 

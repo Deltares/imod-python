@@ -360,7 +360,7 @@ class StorageCoefficient(StorageBase):
         }
 
         if regridder_types is None:
-            regridder_types = StorageCoefficientRegridMethod()
+            regridder_types = StorageCoefficient.get_regrid_methods()
 
         new_package_data = _regrid_package_data(
             data, target_grid, regridder_types, regrid_cache, {}

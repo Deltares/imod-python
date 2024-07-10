@@ -133,7 +133,7 @@ class InitialConditions(Package, IRegridPackage):
         }
 
         if regridder_types is None:
-            regridder_types = InitialConditionsRegridMethod()
+            regridder_types = InitialConditions.get_regrid_methods()
 
         new_package_data = _regrid_package_data(
             data, target_grid, regridder_types, regrid_cache, {}
