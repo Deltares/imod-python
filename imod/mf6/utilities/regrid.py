@@ -144,7 +144,7 @@ def _regrid_array(
     da: GridDataArray,
     regridder_collection: RegridderWeightsCache,
     regridder_name: Union[RegridderType, BaseRegridder],
-    regridder_function: str,
+    regridder_function: Optional[str],
     target_grid: GridDataArray,
 ) -> Optional[GridDataArray]:
     """
@@ -211,7 +211,7 @@ def _regrid_package_data(
         varname,
         regridder_type_and_function,
     ) in settings_dict.items():
-        regridder_function = None
+        regridder_function: Optional[str] = None
         regridder_name = regridder_type_and_function[0]
         if len(regridder_type_and_function) > 1:
             regridder_function = regridder_type_and_function[1]
