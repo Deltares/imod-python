@@ -8,7 +8,7 @@ from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.npf import NodePropertyFlow
-from imod.mf6.regrid.regrid_schemes import DrainageRegridMethod, RegridMethodType
+from imod.mf6.regrid.regrid_schemes import DrainageRegridMethod
 from imod.mf6.utilities.regrid import (
     RegridderWeightsCache,
     _regrid_package_data,
@@ -174,7 +174,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
         distributing_option: DISTRIBUTING_OPTION,
         time_min: datetime,
         time_max: datetime,
-        regridder_types: Optional[RegridMethodType] = None,
+        regridder_types: Optional[DrainageRegridMethod] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "Drainage":
         """
@@ -206,7 +206,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
             Begin-time of the simulation. Used for expanding period data.
         time_max: datetime
             End-time of the simulation. Used for expanding period data.
-        regridder_types: RegridMethodType, optional
+        regridder_types: DrainageRegridMethod, optional
             Optional dataclass with regridder types for a specific variable.
             Use this to override default regridding methods.
 

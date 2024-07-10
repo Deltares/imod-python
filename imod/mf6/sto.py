@@ -7,7 +7,6 @@ from imod.logging import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.regrid.regrid_schemes import (
-    RegridMethodType,
     SpecificStorageRegridMethod,
     StorageCoefficientRegridMethod,
 )
@@ -326,7 +325,7 @@ class StorageCoefficient(StorageBase):
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_grid: GridDataArray,
-        regridder_types: Optional[RegridMethodType] = None,
+        regridder_types: Optional[StorageCoefficientRegridMethod] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "StorageCoefficient":
         """
@@ -345,7 +344,7 @@ class StorageCoefficient(StorageBase):
         target_grid: GridDataArray
             The grid that should be used for the new package. Does not
             need to be identical to one of the input grids.
-        regridder_types: RegridMethodType, optional
+        regridder_types: StorageCoefficientRegridMethod, optional
             Optional dataclass with regridder types for a specific variable.
             Use this to override default regridding methods.
 

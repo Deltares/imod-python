@@ -254,7 +254,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         head: GridDataArray,
         ibound: GridDataArray,
         target_discretization: StructuredDiscretization,
-        regridder_types: Optional[RegridMethodType] = None,
+        regridder_types: Optional[ConstantHeadRegridMethod] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "ConstantHead":
         target_idomain = target_discretization.dataset["idomain"]

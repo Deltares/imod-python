@@ -8,7 +8,6 @@ from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.regrid.regrid_schemes import (
     InitialConditionsRegridMethod,
-    RegridMethodType,
 )
 from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
 from imod.mf6.validation import PKG_DIMS_SCHEMA
@@ -100,7 +99,7 @@ class InitialConditions(Package, IRegridPackage):
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_grid: GridDataArray,
-        regridder_types: Optional[RegridMethodType] = None,
+        regridder_types: Optional[InitialConditionsRegridMethod] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "InitialConditions":
         """

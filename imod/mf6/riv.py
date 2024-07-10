@@ -11,7 +11,7 @@ from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.drn import Drainage
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.regrid.regrid_schemes import RegridMethodType, RiverRegridMethod
+from imod.mf6.regrid.regrid_schemes import RiverRegridMethod
 from imod.mf6.utilities.regrid import (
     RegridderWeightsCache,
     _regrid_package_data,
@@ -194,7 +194,7 @@ class River(BoundaryCondition, IRegridPackage):
         time_max: datetime,
         allocation_option_riv: ALLOCATION_OPTION,
         distributing_option_riv: DISTRIBUTING_OPTION,
-        regridder_types: Optional[RegridMethodType] = None,
+        regridder_types: Optional[RiverRegridMethod] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> Tuple[Optional["River"], Optional[Drainage]]:
         """
@@ -227,7 +227,7 @@ class River(BoundaryCondition, IRegridPackage):
             allocation option.
         distributing_option: dict[str, DISTRIBUTING_OPTION]
             distributing option.
-        regridder_types: RegridMethodType, optional
+        regridder_types: RiverRegridMethod, optional
             Optional dataclass with regridder types for a specific variable.
             Use this to override default regridding methods.
 

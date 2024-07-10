@@ -9,7 +9,6 @@ from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.regrid.regrid_schemes import (
     NodePropertyFlowRegridMethod,
-    RegridMethodType,
 )
 from imod.mf6.utilities.imod5_converter import fill_missing_layers
 from imod.mf6.utilities.regrid import (
@@ -458,7 +457,7 @@ class NodePropertyFlow(Package, IRegridPackage):
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_grid: GridDataArray,
-        regridder_types: Optional[RegridMethodType] = None,
+        regridder_types: Optional[NodePropertyFlowRegridMethod] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "NodePropertyFlow":
         """
