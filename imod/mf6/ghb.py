@@ -7,12 +7,15 @@ import numpy as np
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
+from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.regrid.regrid_schemes import (
     GeneralHeadBoundaryRegridMethod,
     RegridMethodType,
 )
 from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
+from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_ghb_cells
+from imod.prepare.topsystem.conductance import DISTRIBUTING_OPTION, distribute_ghb_conductance
 from imod.schemata import (
     AllInsideNoDataSchema,
     AllNoDataSchema,
@@ -25,6 +28,7 @@ from imod.schemata import (
     OtherCoordsSchema,
 )
 from imod.typing import GridDataArray
+from imod.typing.grid import is_planar_grid
 from imod.util.expand_repetitions import expand_repetitions
 
 
@@ -165,9 +169,13 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         imod5_data: dict[str, dict[str, GridDataArray]],
         period_data: dict[str, list[datetime]],
         target_discretization,
+        target_npf: NodePropertyFlow,        
         time_min: datetime,
         time_max: datetime,
+        allocation_option: ALLOCATION_OPTION,
+        distributing_option: DISTRIBUTING_OPTION,  
         regridder_types: Optional[RegridMethodType] = None,
+      
     ) -> "GeneralHeadBoundary":
         """
         Construct a GeneralHeadBoundary-package from iMOD5 data, loaded with the
@@ -206,13 +214,18 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         -------
         A  Modflow 6 GeneralHeadBoundary packages.
         """
+        target_top = target_discretization.dataset["top"]
+        target_bottom = target_discretization.dataset["bottom"]
+        target_idomain = target_discretization.dataset["idomain"]
 
         idomain = target_discretization.dataset["idomain"]
         data = {
             "head": imod5_data[key]["head"],
             "conductance": imod5_data[key]["conductance"],
         }
+        is_planar = is_planar_grid(data["conductance"])
 
+        
         if regridder_types is None:
             regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
         else:
@@ -223,6 +236,27 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         regridded_package_data = _regrid_package_data(
             data, idomain, regridder_settings, regrid_context, {}
         )
+        if is_planar:
+            conductance = regridded_package_data["conductance"]
+            head = regridded_package_data["head"]
+            k = target_npf.dataset["k"]
+
+            ghb_alocation = allocate_ghb_cells(
+                allocation_option,
+                target_idomain == 1,
+                target_top,
+                target_bottom,
+                head,
+            )
+            
+            regridded_package_data["conductance"] = distribute_ghb_conductance(
+                distributing_option,
+                ghb_alocation,
+                conductance,
+                target_top,
+                target_bottom,
+                k
+            )     
 
         ghb = GeneralHeadBoundary(**regridded_package_data)
         repeat = period_data.get(key)

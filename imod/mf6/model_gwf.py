@@ -6,6 +6,7 @@ from typing import Optional
 import cftime
 import numpy as np
 
+from imod.flow.ghb import GeneralHeadBoundary
 from imod.logging import init_log_decorator
 from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6 import ConstantHead
@@ -238,8 +239,26 @@ class GroundwaterFlowModel(Modflow6Model):
         result["rch"] = rch_pkg
 
         # now import the non-singleton packages
-        # import drainage
+        # import ghb
         imod5_keys = list(imod5_data.keys())
+        ghb_keys = [key for key in imod5_keys if key[0:3] == "ghb"]
+        for ghb_key in ghb_keys:
+            ghb_pkg = GeneralHeadBoundary.from_imod5_data(
+                ghb_key,
+                imod5_data,
+                period_data,
+                dis_pkg,
+                npf_pkg,      
+                time_min,
+                time_max,
+                allocation_options.ghb,
+                distributing_options.ghb,  
+                regridder_types,                
+            )
+            result[ghb_key] = ghb_pkg
+
+        # import drainage
+
         drainage_keys = [key for key in imod5_keys if key[0:3] == "drn"]
         for drn_key in drainage_keys:
             drn_pkg = Drainage.from_imod5_data(
