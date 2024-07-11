@@ -112,7 +112,13 @@ def fill(da, invalid=None, by=None):
 
 
 def laplace_interpolate(
-    source, ibound=None, close=0.01, mxiter=5, iter1=50, relax=0.98
+    source,
+    ibound=None,
+    close=0.01,
+    mxiter=5,
+    iter1=250,
+    relax=0.98,
+    rhs=None,
 ):
     """
     Fills gaps in `source` by interpolating from existing values using Laplace
@@ -128,11 +134,15 @@ def laplace_interpolate(
         Closure criteration of iterative solver. Should be one to two orders
         of magnitude smaller than desired accuracy.
     mxiter : int
-        Outer iterations of iterative solver.
+        Outer iterations of iterative solver. Only required to avoid numerical
+        breakdown.
     iter1 : int
-        Inner iterations of iterative solver. Should not exceed 50.
+        Inner iterations of iterative solver.
     relax : float
         Iterative solver relaxation parameter. Should be between 0 and 1.
+    rhs : xr.DataArray of floats with dims (y, x).
+        Right-hand-side of the linear system of equations: Laplace equation if
+        zero, Poisson equation if nonzero.
 
     Returns
     -------
@@ -143,19 +153,24 @@ def laplace_interpolate(
         close, close * 1.0e6, mxiter, iter1, relax
     )
 
-    if not source.dims == ("y", "x"):
+    if source.dims != ("y", "x"):
         raise ValueError('source dims must be ("y", "x")')
+    if rhs is not None:
+        if rhs.dims != ("y", "x"):
+            raise ValueError('rhs dims must be ("y", "x")')
+        if rhs.shape != source.shape:
+            raise ValueError("ibound and rhs must have the same shape")
 
     # expand dims to make 3d
     source3d = source.expand_dims("layer")
     if ibound is None:
-        iboundv = xr.full_like(source3d, 1, dtype=np.int32).values
+        iboundv = xr.full_like(source3d, 1, dtype=np.int32).to_numpy()
     else:
         if not ibound.dims == ("y", "x"):
             raise ValueError('ibound dims must be ("y", "x")')
         if not ibound.shape == source.shape:
             raise ValueError("ibound and source must have the same shape")
-        iboundv = ibound.expand_dims("layer").astype(np.int32).values
+        iboundv = ibound.expand_dims("layer").astype(np.int32).to_numpy()
 
     has_data = source3d.notnull().values
     iboundv[has_data] = -1
@@ -171,7 +186,10 @@ def laplace_interpolate(
     cc = np.ones(shape)
     cr = np.ones(shape)
     cv = np.ones(shape)
-    rhs = np.zeros(shape)
+    if rhs is None:
+        rhsv = np.zeros(shape)
+    else:
+        rhsv = rhs.expand_dims("layer").astype(np.float64).to_numpy().copy()
     hcof = np.zeros(shape)
     # Solver work arrays
     res = np.zeros(nodes)
@@ -191,7 +209,7 @@ def laplace_interpolate(
             cr=cr,
             cv=cv,
             ibound=iboundv,
-            rhs=rhs,
+            rhs=rhsv,
             hcof=hcof,
             res=res,
             cd=cd,
