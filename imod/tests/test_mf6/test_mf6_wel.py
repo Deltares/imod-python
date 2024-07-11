@@ -874,3 +874,90 @@ def test_import_from_imod5_with_duplication(well_duplication_import_prj):
     assert np.all(wel2.x == np.array([191112.11, 191171.96, 191231.52]))
     assert wel1.dataset["rate"].shape == (6, 3)
     assert wel2.dataset["rate"].shape == (6, 3)
+
+
+@pytest.mark.parametrize("layer", [0, 1])
+@pytest.mark.usefixtures("well_regular_import_prj")
+def test_logmessage_for_layer_assignment_import_imod5(
+    tmp_path, well_regular_import_prj, layer
+):
+    imod5dict = open_projectfile_data(well_regular_import_prj)
+
+    logfile_path = tmp_path / "logfile.txt"
+    imod5dict[0]["wel-1"]["layer"] = layer
+
+    try:
+        with open(logfile_path, "w") as sys.stdout:
+            # start logging
+            imod.logging.configure(
+                LoggerType.PYTHON,
+                log_level=LogLevel.WARNING,
+                add_default_file_handler=False,
+                add_default_stream_handler=True,
+            )
+
+            _ = imod.mf6.Well.from_imod5_data("wel-1", imod5dict[0])
+
+    finally:
+        # turn the logger off again
+        imod.logging.configure(
+            LoggerType.NULL,
+            log_level=LogLevel.WARNING,
+            add_default_file_handler=False,
+            add_default_stream_handler=False,
+        )
+
+    # import grid-agnostic well from imod5 data (it contains 2 packages with 3 wells each)
+    with open(logfile_path, "r") as log_file:
+        log = log_file.read()
+        message_required = layer != 0
+        message_present = (
+            "In well wel-1 a layer was assigned, but this is not\nsupported" in log
+        )
+        assert message_required == message_present
+
+
+@pytest.mark.parametrize("remove", ["filt_top", "filt_bot", None])
+@pytest.mark.usefixtures("well_regular_import_prj")
+def test_logmessage_for_missing_filter_settings(
+    tmp_path, well_regular_import_prj, remove
+):
+    imod5dict = open_projectfile_data(well_regular_import_prj)
+    logfile_path = tmp_path / "logfile.txt"
+    if remove is not None:
+        imod5dict[0]["wel-1"]["dataframe"] = imod5dict[0]["wel-1"]["dataframe"].drop(
+            remove, axis=1
+        )
+
+    try:
+        with open(logfile_path, "w") as sys.stdout:
+            # start logging
+            imod.logging.configure(
+                LoggerType.PYTHON,
+                log_level=LogLevel.WARNING,
+                add_default_file_handler=False,
+                add_default_stream_handler=True,
+            )
+
+            _ = imod.mf6.Well.from_imod5_data("wel-1", imod5dict[0])
+    except Exception:
+        assert remove is not None
+
+    finally:
+        # turn the logger off again
+        imod.logging.configure(
+            LoggerType.NULL,
+            log_level=LogLevel.WARNING,
+            add_default_file_handler=False,
+            add_default_stream_handler=False,
+        )
+
+    # import grid-agnostic well from imod5 data (it contains 2 packages with 3 wells each)
+    with open(logfile_path, "r") as log_file:
+        log = log_file.read()
+        message_required = remove is not None
+        message_present = (
+            "In well wel-1 the filt_top and filt_bot columns were not both found;"
+            in log
+        )
+        assert message_required == message_present
