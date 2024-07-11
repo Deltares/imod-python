@@ -1328,7 +1328,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         distributing_options: SimulationDistributingOptions,
         time_min,
         time_max,
-        regridder_types: defaultdict[str, Optional[RegridMethodType]]= defaultdict(
+        regridder_types: defaultdict[str, Optional[RegridMethodType]] = defaultdict(
             lambda: None
         ),
     ) -> "Modflow6Simulation":
