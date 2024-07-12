@@ -102,7 +102,9 @@ def clip_by_grid(package: ILineDataPackage, active: GridDataArray) -> ILineDataP
     return clipped_package
 
 
-def clip_line_gdf_by_grid(gdf: gpd.GeoDataFrame, active: GridDataArray) -> gpd.GeoDataFrame:
+def clip_line_gdf_by_grid(
+    gdf: gpd.GeoDataFrame, active: GridDataArray
+) -> gpd.GeoDataFrame:
     """Clip GeoDataFrame by bounding polygon of grid"""
     # Clip line with polygon
     bounding_gdf = bounding_polygon(active)
