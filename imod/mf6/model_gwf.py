@@ -181,7 +181,7 @@ class GroundwaterFlowModel(Modflow6Model):
         distributing_options: SimulationDistributingOptions,
         time_min: datetime,
         time_max: datetime,
-        regridder_types: defaultdict[str, Optional[RegridMethodType]],
+        regridder_types: dict[str,RegridMethodType],
     ) -> "GroundwaterFlowModel":
         """
         Imports a GroundwaterFlowModel (GWF) from the data in an IMOD5 project file.
@@ -216,28 +216,28 @@ class GroundwaterFlowModel(Modflow6Model):
         regrid_cache = RegridderWeightsCache()
 
         dis_pkg = StructuredDiscretization.from_imod5_data(
-            imod5_data, regridder_types["dis"], regrid_cache, False
+            imod5_data, regridder_types.get("dis"), regrid_cache, False
         )
         grid = dis_pkg.dataset["idomain"]
 
         # import npf
         npf_pkg = NodePropertyFlow.from_imod5_data(
-            imod5_data, grid, regridder_types["npf"], regrid_cache
+            imod5_data, grid, regridder_types.get("npf"), regrid_cache
         )
 
         # import sto
         sto_pkg = StorageCoefficient.from_imod5_data(
-            imod5_data, grid, regridder_types["sto"], regrid_cache
+            imod5_data, grid, regridder_types.get("sto"), regrid_cache
         )
 
         # import initial conditions
         ic_pkg = InitialConditions.from_imod5_data(
-            imod5_data, grid, regridder_types["ic"], regrid_cache
+            imod5_data, grid, regridder_types.get("ic"), regrid_cache
         )
 
         # import recharge
         rch_pkg = Recharge.from_imod5_data(
-            imod5_data, dis_pkg, regridder_types["rch"], regrid_cache
+            imod5_data, dis_pkg, regridder_types.get("rch"), regrid_cache
         )
 
         result = GroundwaterFlowModel()
@@ -262,7 +262,7 @@ class GroundwaterFlowModel(Modflow6Model):
                 distributing_option=distributing_options.drn,
                 time_min=time_min,
                 time_max=time_max,
-                regridder_types=regridder_types[drn_key],
+                regridder_types=regridder_types.get(drn_key),
                 regrid_cache=regrid_cache,
             )
             result[drn_key] = drn_pkg
@@ -279,7 +279,7 @@ class GroundwaterFlowModel(Modflow6Model):
                 time_max,
                 allocation_options.riv,
                 distributing_options.riv,
-                regridder_types[riv_key],
+                regridder_types.get(riv_key),
                 regrid_cache,
             )
             if riv_pkg is not None:
@@ -301,12 +301,12 @@ class GroundwaterFlowModel(Modflow6Model):
         chd_keys = [key for key in imod5_keys if key[0:3] == "chd"]
         if len(chd_keys) == 0:
             result["chd_from_shd"] = ConstantHead.from_imod5_shd_data(
-                imod5_data, dis_pkg, regridder_types["chd_from_shd"], regrid_cache
+                imod5_data, dis_pkg, regridder_types.get("chd_from_shd"), regrid_cache
             )
         else:
             for chd_key in chd_keys:
                 result[chd_key] = ConstantHead.from_imod5_data(
-                    chd_key, imod5_data, dis_pkg, regridder_types[chd_key], regrid_cache
+                    chd_key, imod5_data, dis_pkg, regridder_types.get(chd_key), regrid_cache
                 )
 
         return result
