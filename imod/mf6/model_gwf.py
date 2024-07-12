@@ -181,7 +181,7 @@ class GroundwaterFlowModel(Modflow6Model):
         distributing_options: SimulationDistributingOptions,
         time_min: datetime,
         time_max: datetime,
-        regridder_types: defaultdict[str, RegridMethodType],
+        regridder_types: defaultdict[str, Optional[RegridMethodType]],
     ) -> "GroundwaterFlowModel":
         """
         Imports a GroundwaterFlowModel (GWF) from the data in an IMOD5 project file.
@@ -202,9 +202,8 @@ class GroundwaterFlowModel(Modflow6Model):
             object containing the conductivity distribution options per package type.
             If you want a package to have a different allocation option,
             then it should be imported separately
-        regridder_types: Optional[dict[str, RegridMethodType]]
-            the first key is the package name. The second key is the array name, and the value is
-            the RegridderType tuple (method + function)
+        regridder_types:  defaultdict[str, Optional[RegridMethodType]]
+            the key is the package name. The value is a subclass of RegridMethodType.
 
         Returns
         -------
