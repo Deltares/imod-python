@@ -1348,9 +1348,14 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             object containing the conductivity distribution options per package type.
             If you want a package to have a different allocation option,
             then it should be imported separately
-        regridder_types: Optional[dict[str, dict[str, tuple[RegridderType, str]]]]
-            the first key is the package name. The second key is the array name, and the value is
-            the RegridderType tuple (method + function)
+        time_min: datetime
+            Begin-time of the simulation.
+        time_max: datetime
+            End-time of the simulation.
+        regridder_types: dict[str, RegridMethodType]
+            the key is the package name. The value is the RegridMethodType
+            object containing the settings for regridding the package with the
+            specified key
 
         Returns
         -------

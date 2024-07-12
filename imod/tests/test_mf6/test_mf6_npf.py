@@ -299,9 +299,6 @@ def test_npf_from_imod5_vertical_anisotropy(imod5_dataset, tmp_path):
 @pytest.mark.usefixtures("imod5_dataset")
 def test_npf_from_imod5_settings(imod5_dataset, tmp_path):
     data = deepcopy(imod5_dataset[0])
-    # throw out kva (=vertical anisotropy array) and ani (=horizontal anisotropy array)
-    data.pop("kva")
-    data.pop("ani")
 
     # move the coordinates a bit so that it doesn't match the grid of k (and the regridding settings will matter)
     target_grid = data["khv"]["kh"]

@@ -201,7 +201,11 @@ class GroundwaterFlowModel(Modflow6Model):
             object containing the conductivity distribution options per package type.
             If you want a package to have a different allocation option,
             then it should be imported separately
-        regridder_types:  defaultdict[str, Optional[RegridMethodType]]
+        time_min: datetime
+            Begin-time of the simulation.
+        time_max: datetime
+            End-time of the simulation.
+        regridder_types:  dict[str, RegridMethodType]
             the key is the package name. The value is a subclass of RegridMethodType.
 
         Returns
