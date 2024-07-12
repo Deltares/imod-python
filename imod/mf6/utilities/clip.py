@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 
+import geopandas as gpd
 import numpy as np
 import xarray as xr
 import xugrid as xu
@@ -93,10 +94,19 @@ def _filter_inactive_cells(package, active):
 @typedispatch  # type: ignore[no-redef]
 def clip_by_grid(package: ILineDataPackage, active: GridDataArray) -> ILineDataPackage:  # noqa: F811
     """Clip LineDataPackage outside unstructured/structured grid."""
+    clipped_line_data = clip_line_gdf_by_grid(package.line_data, active)
 
+    # Create new instance
+    clipped_package = deepcopy(package)
+    clipped_package.line_data = clipped_line_data
+    return clipped_package
+
+
+def clip_line_gdf_by_grid(gdf: gpd.GeoDataFrame, active: GridDataArray) -> gpd.GeoDataFrame:
+    """Clip GeoDataFrame by bounding polygon of grid"""
     # Clip line with polygon
     bounding_gdf = bounding_polygon(active)
-    clipped_line_data = package.line_data.clip(bounding_gdf)
+    clipped_line_data = gdf.clip(bounding_gdf)
 
     # Catch edge case: when line crosses only vertex of polygon, a point
     # or multipoint is returned. Drop these.
@@ -107,9 +117,4 @@ def clip_by_grid(package: ILineDataPackage, active: GridDataArray) -> ILineDataP
     clipped_line_data = clipped_line_data[~is_points]
 
     # Convert MultiLineStrings to LineStrings
-    clipped_line_data = clipped_line_data.explode("geometry", ignore_index=True)
-
-    # Create new instance
-    clipped_package = deepcopy(package)
-    clipped_package.line_data = clipped_line_data
-    return clipped_package
+    return clipped_line_data.explode("geometry", ignore_index=True)

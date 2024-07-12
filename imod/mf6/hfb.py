@@ -19,6 +19,7 @@ from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
+from imod.mf6.utilities.clip import clip_line_gdf_by_grid
 from imod.mf6.utilities.grid import broadcast_to_full_domain
 from imod.schemata import EmptyIndexesSchema, MaxNUniqueValuesSchema
 from imod.typing import GridDataArray
@@ -752,6 +753,10 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             linestrings = _make_linestring_from_polygon(barrier_dataframe)
             barrier_dataframe["geometry"] = linestrings
 
+        barrier_dataframe = clip_line_gdf_by_grid(
+            gpd.GeoDataFrame(barrier_dataframe), idomain.sel(layer=1)
+        )
+
         # Work around issue where xu.snap_to_grid cannot handle snapping a
         # dataset with multiple lines appropriately. This can be later replaced
         # to a single call to xu.snap_to_grid if this bug is fixed:
@@ -1259,7 +1264,9 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         layer = hfb_dict["layer"]
         if layer == 0:
             raise ValueError(
-                "assigning to layer 0 is not supported yet for import of HFB's"
+                "assigning to layer 0 is not supported for "
+                "SingleLayerHorizontalFlowBarrierResistance. "
+                "Try HorizontalFlowBarrierResistance class."
             )
         geometry_layer = hfb_dict["geodataframe"]
         geometry_layer["layer"] = layer
