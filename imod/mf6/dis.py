@@ -8,7 +8,7 @@ from imod.logging import init_log_decorator, standard_log_decorator
 from imod.mf6.interfaces.imaskingsettings import IMaskingSettings
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
-from imod.mf6.regrid.regrid_schemes import DiscretizationRegridMethod
+from imod.mf6.regrid.regrid_schemes import DiscretizationRegridMethod, RegridMethodType
 from imod.mf6.utilities.grid import create_smallest_target_grid
 from imod.mf6.utilities.imod5_converter import convert_ibound_to_idomain
 from imod.mf6.utilities.regrid import (
