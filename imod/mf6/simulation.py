@@ -7,7 +7,6 @@ import warnings
 from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
-from types import NoneType
 from typing import Any, Callable, DefaultDict, Iterable, Optional, Union, cast
 
 import cftime
@@ -1359,7 +1358,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         """
         simulation = Modflow6Simulation("imported_simulation")
         defaultdict_regridder_types: defaultdict[str, Optional[RegridMethodType]] = (
-            defaultdict(NoneType)
+            defaultdict(lambda: None)
         )
         if regridder_types is not None:
             defaultdict_regridder_types.update(regridder_types)
