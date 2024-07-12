@@ -75,11 +75,14 @@ def resample_timeseries(well_rate: pd.DataFrame, times: list[datetime]) -> pd.Da
     # so we fill them in here. Keep rate to zero and pad the location columns with
     # the first entry.
     location_columns = ["x", "y", "id", "filt_top", "filt_bot"]
-    time_before_start_input = intermediate_df["time"].values < well_rate["time"].values[0]
+    time_before_start_input = (
+        intermediate_df["time"].values < well_rate["time"].values[0]
+    )
     if time_before_start_input[0]:
-           intermediate_df.loc[time_before_start_input, "rate"] = 0.0
-           intermediate_df.loc[time_before_start_input, location_columns] = (well_rate.loc[0, location_columns],)
-
+        intermediate_df.loc[time_before_start_input, "rate"] = 0.0
+        intermediate_df.loc[time_before_start_input, location_columns] = (
+            well_rate.loc[0, location_columns],
+        )
 
     # compute time difference from perious to current row
     time_diff_col = intermediate_df["time"].diff()
@@ -89,16 +92,20 @@ def resample_timeseries(well_rate: pd.DataFrame, times: list[datetime]) -> pd.Da
     intermediate_df["time_to_next"] = intermediate_df["time_to_next"].shift(-1)
 
     # Integrate by grouping by the period number
-    intermediate_df["duration_seconds"] = intermediate_df["time_to_next"].dt.total_seconds()
-    intermediate_df["volume"] = intermediate_df["rate"] * intermediate_df["duration_seconds"]
+    intermediate_df["duration_sec"] = intermediate_df["time_to_next"].dt.total_seconds()
+    intermediate_df["volume"] = (
+        intermediate_df["rate"] * intermediate_df["duration_sec"]
+    )
     intermediate_df["period_nr"] = intermediate_df["time"].isin(times).cumsum()
     gb = intermediate_df.groupby("period_nr")
 
-    output_frame["rate"] = (gb["volume"].sum() / gb["duration_seconds"].sum()).reset_index(drop=True)
+    output_frame["rate"] = (
+        gb["volume"].sum() / gb["duration_seconds"].sum()
+    ).reset_index(drop=True)
     # If last value is nan (fell outside range), pad with last well rate.
     if np.isnan(output_frame["rate"].values[-1]):
         output_frame["rate"].values[-1] = well_rate["rate"].values[-1]
 
     columns_to_merge = ["time"] + location_columns
-    
+
     return pd.merge(output_frame, intermediate_df[columns_to_merge], on="time")
