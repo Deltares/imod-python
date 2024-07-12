@@ -71,65 +71,34 @@ def resample_timeseries(well_rate: pd.DataFrame, times: list[datetime]) -> pd.Da
         on="time",
     ).fillna(method="ffill")
 
-    # the entries before the start of the well timeseries do not have data yet, so we fill them in here
-    if intermediate_df["time"].values[0] < well_rate["time"].values[0]:
-        intermediate_df.loc[intermediate_df["time"] < well_rate["time"][0], "rate"] = (
-            0.0
-        )
-        intermediate_df.loc[intermediate_df["time"] < well_rate["time"][0], "x"] = (
-            well_rate["x"][0]
-        )
-        intermediate_df.loc[intermediate_df["time"] < well_rate["time"][0], "y"] = (
-            well_rate["y"][0]
-        )
-        intermediate_df.loc[intermediate_df["time"] < well_rate["time"][0], "id"] = (
-            well_rate["id"][0]
-        )
-        intermediate_df.loc[
-            intermediate_df["time"] < well_rate["time"][0], "filt_top"
-        ] = well_rate["filt_top"][0]
-        intermediate_df.loc[
-            intermediate_df["time"] < well_rate["time"][0], "filt_bot"
-        ] = well_rate["filt_bot"][0]
+    # The entries before the start of the well timeseries do not have data yet,
+    # so we fill them in here. Keep rate to zero and pad the location columns with
+    # the first entry.
+    location_columns = ["x", "y", "id", "filt_top", "filt_bot"]
+    time_before_start_input = intermediate_df["time"].values < well_rate["time"].values[0]
+    if time_before_start_input[0]:
+           intermediate_df.loc[time_before_start_input, "rate"] = 0.0
+           intermediate_df.loc[time_before_start_input, location_columns] = (well_rate.loc[0, location_columns],)
+
 
     # compute time difference from perious to current row
     time_diff_col = intermediate_df["time"].diff()
     intermediate_df.insert(7, "time_to_next", time_diff_col.values)
 
     # shift the new column 1 place down so that they become the time to the next row
-    intermediate_df["time_to_next"][0:-1] = intermediate_df["time_to_next"][1:]
-    intermediate_df["time_to_next"][-1] = (
-        np.nan
-    )  # the last one isn't used for anything but set it to NaN anyway
+    intermediate_df["time_to_next"] = intermediate_df["time_to_next"].shift(-1)
 
-    output_frame = pd.merge(output_frame, intermediate_df)
-    for i in range(len(times) - 1):
-        output_frame["rate"][i] = integrate_timestep_rate(
-            intermediate_df, times[i], times[i + 1]
-        )
+    # Integrate by grouping by the period number
+    intermediate_df["duration_seconds"] = intermediate_df["time_to_next"].dt.total_seconds()
+    intermediate_df["volume"] = intermediate_df["rate"] * intermediate_df["duration_seconds"]
+    intermediate_df["period_nr"] = intermediate_df["time"].isin(times).cumsum()
+    gb = intermediate_df.groupby("period_nr")
 
-    return output_frame.drop("time_to_next", axis=1)
+    output_frame["rate"] = (gb["volume"].sum() / gb["duration_seconds"].sum()).reset_index(drop=True)
+    # If last value is nan (fell outside range), pad with last well rate.
+    if np.isnan(output_frame["rate"].values[-1]):
+        output_frame["rate"].values[-1] = well_rate["rate"].values[-1]
 
-
-def integrate_timestep_rate(
-    well_rate: pd.DataFrame, time_0: datetime, time_1: datetime
-) -> float:
-    """
-    Given a dataframe "well_rate", computes the pumping rate between time_0 and time_1
-    that best matches the pumping rate in "well_rate" if the pumping rate were constant
-    between time_0 and time_1.
-    """
-    delta_time = time_1 - time_0
-    timestep_data = well_rate.loc[
-        (well_rate["time"] >= time_0) & (well_rate["time"] < time_1)
-    ]
-    if len(timestep_data) == 1:
-        return timestep_data["rate"].values[0]
-    else:
-        rate = 0
-        for row in range(len(timestep_data)):
-            rate += (
-                timestep_data["rate"].iloc[row]
-                * timestep_data["time_to_next"].iloc[row].total_seconds()
-            )
-        return rate / delta_time.total_seconds()
+    columns_to_merge = ["time"] + location_columns
+    
+    return pd.merge(output_frame, intermediate_df[columns_to_merge], on="time")
