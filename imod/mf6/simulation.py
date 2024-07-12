@@ -4,7 +4,6 @@ import collections
 import pathlib
 import subprocess
 import warnings
-from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable, DefaultDict, Iterable, Optional, Union, cast
@@ -1357,7 +1356,6 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         -------
         """
         simulation = Modflow6Simulation("imported_simulation")
-
 
         # import GWF model,
         groundwaterFlowModel = GroundwaterFlowModel.from_imod5_data(

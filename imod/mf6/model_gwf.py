@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections import defaultdict
 from datetime import datetime
 from typing import Optional
 
@@ -181,7 +180,7 @@ class GroundwaterFlowModel(Modflow6Model):
         distributing_options: SimulationDistributingOptions,
         time_min: datetime,
         time_max: datetime,
-        regridder_types: dict[str,RegridMethodType],
+        regridder_types: dict[str, RegridMethodType],
     ) -> "GroundwaterFlowModel":
         """
         Imports a GroundwaterFlowModel (GWF) from the data in an IMOD5 project file.
@@ -306,7 +305,11 @@ class GroundwaterFlowModel(Modflow6Model):
         else:
             for chd_key in chd_keys:
                 result[chd_key] = ConstantHead.from_imod5_data(
-                    chd_key, imod5_data, dis_pkg, regridder_types.get(chd_key), regrid_cache
+                    chd_key,
+                    imod5_data,
+                    dis_pkg,
+                    regridder_types.get(chd_key),
+                    regrid_cache,
                 )
 
         return result
