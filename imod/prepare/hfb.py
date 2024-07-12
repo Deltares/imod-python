@@ -53,7 +53,7 @@ def linestring_to_square_zpolygons(
                       |            |
                       |            |
                    xy1,zb1 ---- xy2,zb1
-    
+
     Parameters
     ----------
     barrier_x: list of floats
@@ -64,7 +64,7 @@ def linestring_to_square_zpolygons(
         top of barrier, length N-1
     barrier_zbot: list of floats
         bottom of barrier, length N-1
-    
+
     Returns
     -------
     List of polygons with z dimension.
@@ -116,18 +116,18 @@ def linestring_to_trapezoid_zpolygons(
     """
     Create trapezoid vertical polygons from linestrings, with a varying ztop and
     zbottom over the line. These are shaped as follows::
-    
-        xy0,zt0           xy2,zt2 
+
+        xy0,zt0           xy2,zt2
         |    \          /    |
         |     \        /     |
         |      xy1,zt1       |
         |         |          |
         |         |          |
         |      xy1,zb1 -- xy2,zb2
-        |     /   
-        |    /    
+        |     /
+        |    /
         xy0,zb0
-    
+
     Parameters
     ----------
     barrier_x: list of floats
@@ -138,7 +138,7 @@ def linestring_to_trapezoid_zpolygons(
         top of barrier, length N
     barrier_zbot: list of floats
         bottom of barrier, length N
-    
+
     Returns
     -------
     List of polygons with z dimension.
