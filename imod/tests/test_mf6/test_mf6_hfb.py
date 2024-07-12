@@ -1,6 +1,4 @@
 from copy import deepcopy
-from itertools import pairwise
-from typing import List, Tuple
 from unittest.mock import patch
 
 import geopandas as gpd
@@ -30,89 +28,12 @@ from imod.mf6.ims import SolutionPresetSimple
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.simulation import Modflow6Simulation
 from imod.mf6.utilities.regrid import RegridderWeightsCache
+from imod.prepare.hfb import (
+    linestring_to_square_zpolygons,
+    linestring_to_trapezoid_zpolygons,
+)
 from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
 from imod.typing.grid import nan_like, ones_like
-
-
-def line_to_square_zpolygon(
-    x: Tuple[float, float], y: Tuple[float, float], z: Tuple[float, float]
-) -> Polygon:
-    """
-    Creates polygon as follows:
-
-    xy0,z0 -- xy1,z0
-       |        |
-       |        |
-    xy0,z1 -- xy1,z1
-    """
-    return Polygon(
-        (
-            (x[0], y[0], z[0]),
-            (x[0], y[0], z[1]),
-            (x[1], y[1], z[1]),
-            (x[1], y[1], z[0]),
-        ),
-    )
-
-
-def linestring_to_square_zpolygons(
-    barrier_x: List[float],
-    barrier_y: List[float],
-    barrier_ztop: List[float],
-    barrier_zbottom: List[float],
-) -> List[Polygon]:
-    x_pairs = pairwise(barrier_x)
-    y_pairs = pairwise(barrier_y)
-    z_pairs = zip(barrier_ztop, barrier_zbottom)
-    return [
-        line_to_square_zpolygon(x, y, z) for x, y, z in zip(x_pairs, y_pairs, z_pairs)
-    ]
-
-
-def line_to_trapezoid_zpolygon(
-    x: Tuple[float, float],
-    y: Tuple[float, float],
-    zt: Tuple[float, float],
-    zb: Tuple[float, float],
-) -> Polygon:
-    """
-    Creates polygon as follows:
-
-    xy0,zt0 
-       |    \
-       |     \
-       |      xy1,zt1
-       |         |
-       |         |
-       |      xy1,zb1
-       |     /   
-       |    /    
-    xy0,zb0  
-    """
-    return Polygon(
-        (
-            (x[0], y[0], zt[0]),
-            (x[0], y[0], zb[1]),
-            (x[1], y[1], zt[1]),
-            (x[1], y[1], zb[0]),
-        ),
-    )
-
-
-def linestring_to_trapezoid_zpolygons(
-    barrier_x: List[float],
-    barrier_y: List[float],
-    barrier_ztop: List[float],
-    barrier_zbottom: List[float],
-) -> List[Polygon]:
-    x_pairs = pairwise(barrier_x)
-    y_pairs = pairwise(barrier_y)
-    zt_pairs = pairwise(barrier_ztop)
-    zb_pairs = pairwise(barrier_zbottom)
-    return [
-        line_to_trapezoid_zpolygon(x, y, zt, zb)
-        for x, y, zt, zb in zip(x_pairs, y_pairs, zt_pairs, zb_pairs)
-    ]
 
 
 @pytest.mark.parametrize("dis", ["basic_unstructured_dis", "basic_dis"])
