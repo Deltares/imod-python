@@ -1,5 +1,4 @@
 import warnings
-from dataclasses import asdict
 from typing import Any, Optional
 
 import numpy as np
@@ -9,7 +8,6 @@ from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.regrid.regrid_schemes import (
     InitialConditionsRegridMethod,
-    RegridMethodType,
 )
 from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
 from imod.mf6.validation import PKG_DIMS_SCHEMA
@@ -101,7 +99,8 @@ class InitialConditions(Package, IRegridPackage):
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_grid: GridDataArray,
-        regridder_types: Optional[RegridMethodType] = None,
+        regridder_types: Optional[InitialConditionsRegridMethod] = None,
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "InitialConditions":
         """
         Construct an InitialConditions-package from iMOD5 data, loaded with the
@@ -133,13 +132,9 @@ class InitialConditions(Package, IRegridPackage):
         }
 
         if regridder_types is None:
-            regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
-        else:
-            regridder_settings = asdict(regridder_types, dict_factory=dict)
-
-        regrid_context = RegridderWeightsCache()
+            regridder_types = InitialConditions.get_regrid_methods()
 
         new_package_data = _regrid_package_data(
-            data, target_grid, regridder_settings, regrid_context, {}
+            data, target_grid, regridder_types, regrid_cache, {}
         )
         return cls(**new_package_data)

@@ -1,4 +1,3 @@
-from dataclasses import asdict
 from typing import Optional
 
 import numpy as np
@@ -7,7 +6,7 @@ from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.regrid.regrid_schemes import RechargeRegridMethod, RegridMethodType
+from imod.mf6.regrid.regrid_schemes import RechargeRegridMethod
 from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_rch_cells
@@ -160,7 +159,8 @@ class Recharge(BoundaryCondition, IRegridPackage):
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
         dis_pkg: StructuredDiscretization,
-        regridder_types: Optional[RegridMethodType] = None,
+        regridder_types: Optional[RechargeRegridMethod] = None,
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "Recharge":
         """
         Construct an rch-package from iMOD5 data, loaded with the
@@ -178,7 +178,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
         dis_pkg: GridDataArray
             The discretization package for the simulation. Its grid does not
             need to be identical to one of the input grids.
-        regridder_types: RegridMethodType, optional
+        regridder_types: RechargeRegridMethod, optional
             Optional dataclass with regridder types for a specific variable.
             Use this to override default regridding methods.
 
@@ -195,14 +195,10 @@ class Recharge(BoundaryCondition, IRegridPackage):
 
         # first regrid the inputs to the target grid.
         if regridder_types is None:
-            regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
-        else:
-            regridder_settings = asdict(regridder_types, dict_factory=dict)
-
-        regrid_context = RegridderWeightsCache()
+            regridder_settings = Recharge.get_regrid_methods()
 
         new_package_data = _regrid_package_data(
-            data, new_idomain, regridder_settings, regrid_context, {}
+            data, new_idomain, regridder_settings, regrid_cache, {}
         )
 
         # if rate has only layer 0, then it is planar.

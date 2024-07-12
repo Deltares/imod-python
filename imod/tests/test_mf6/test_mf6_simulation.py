@@ -19,6 +19,11 @@ import imod
 from imod.mf6.model import Modflow6Model
 from imod.mf6.multimodel.modelsplitter import PartitionInfo
 from imod.mf6.oc import OutputControl
+from imod.mf6.regrid.regrid_schemes import (
+    DiscretizationRegridMethod,
+    NodePropertyFlowRegridMethod,
+    StorageCoefficientRegridMethod,
+)
 from imod.mf6.simulation import Modflow6Simulation
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo
 from imod.prepare.topsystem.default_allocation_methods import (
@@ -489,6 +494,43 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
         default_simulation_distributing_options,
         datelist,
     )
+    simulation["imported_model"]["oc"] = OutputControl(
+        save_head="last", save_budget="last"
+    )
+
+    simulation.create_time_discretization(["01-01-2003", "02-01-2003"])
+
+    # Remove HFB packages outside domain
+    # TODO: Build in support for hfb packages outside domain
+    for hfb_outside in ["hfb-24", "hfb-26"]:
+        simulation["imported_model"].pop(hfb_outside)
+
+    # write and validate the simulation.
+    simulation.write(tmp_path, binary=False, validate=True)
+
+
+@pytest.mark.usefixtures("imod5_dataset")
+def test_import_from_imod5_nonstandard_regridding(imod5_dataset, tmp_path):
+    imod5_data = imod5_dataset[0]
+    period_data = imod5_dataset[1]
+    default_simulation_allocation_options = SimulationAllocationOptions
+    default_simulation_distributing_options = SimulationDistributingOptions
+
+    regridding_option = {}
+    regridding_option["npf"] = NodePropertyFlowRegridMethod()
+    regridding_option["dis"] = DiscretizationRegridMethod()
+    regridding_option["sto"] = StorageCoefficientRegridMethod()
+
+    simulation = Modflow6Simulation.from_imod5_data(
+        imod5_data,
+        period_data,
+        default_simulation_allocation_options,
+        default_simulation_distributing_options,
+        datetime(2000, 1, 1),
+        datetime(2002, 1, 1),
+        regridding_option,
+    )
+
     simulation["imported_model"]["oc"] = OutputControl(
         save_head="last", save_budget="last"
     )

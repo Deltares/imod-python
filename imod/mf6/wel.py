@@ -656,6 +656,31 @@ class Well(BoundaryCondition, IPointDataPackage):
         minimum_k: float = 0.1,
         minimum_thickness: float = 1.0,
     ) -> "Well":
+        if "layer" in imod5_data[key].keys():
+            if imod5_data[key]["layer"] != 0:
+                log_msg = textwrap.dedent(
+                    f"""
+                    In well {key} a layer was assigned, but this is not
+                    supported. Assignment will be done based on filter_top and
+                    filter_bottom, and the chosen layer ({imod5_data[key]["layer"]})
+                    will be ignored."""
+                )
+                logger.log(
+                    loglevel=LogLevel.WARNING, message=log_msg, additional_depth=2
+                )
+
+        if (
+            "filt_top" not in imod5_data[key]["dataframe"].columns
+            or "filt_bot" not in imod5_data[key]["dataframe"].columns
+        ):
+            log_msg = textwrap.dedent(
+                f"""
+                In well {key} the filt_top and filt_bot columns were not both found;
+                this is not supported for import."""
+            )
+            logger.log(loglevel=LogLevel.ERROR, message=log_msg, additional_depth=2)
+            raise ValueError(log_msg)
+
         df: pd.DataFrame = imod5_data[key]["dataframe"]
 
         # Groupby unique wells, to get dataframes per time.

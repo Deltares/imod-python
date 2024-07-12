@@ -99,9 +99,9 @@ def resample_timeseries(well_rate: pd.DataFrame, times: list[datetime]) -> pd.Da
     intermediate_df["period_nr"] = intermediate_df["time"].isin(times).cumsum()
     gb = intermediate_df.groupby("period_nr")
 
-    output_frame["rate"] = (
-        gb["volume"].sum() / gb["duration_seconds"].sum()
-    ).reset_index(drop=True)
+    output_frame["rate"] = (gb["volume"].sum() / gb["duration_sec"].sum()).reset_index(
+        drop=True
+    )
     # If last value is nan (fell outside range), pad with last well rate.
     if np.isnan(output_frame["rate"].values[-1]):
         output_frame["rate"].values[-1] = well_rate["rate"].values[-1]

@@ -1,5 +1,4 @@
 import warnings
-from dataclasses import asdict
 from typing import Optional
 
 import numpy as np
@@ -10,7 +9,6 @@ from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.regrid.regrid_schemes import (
     NodePropertyFlowRegridMethod,
-    RegridMethodType,
 )
 from imod.mf6.utilities.imod5_converter import fill_missing_layers
 from imod.mf6.utilities.regrid import (
@@ -459,7 +457,8 @@ class NodePropertyFlow(Package, IRegridPackage):
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_grid: GridDataArray,
-        regridder_types: Optional[RegridMethodType] = None,
+        regridder_types: Optional[NodePropertyFlowRegridMethod] = None,
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "NodePropertyFlow":
         """
         Construct an npf-package from iMOD5 data, loaded with the
@@ -513,14 +512,10 @@ class NodePropertyFlow(Package, IRegridPackage):
         icelltype = zeros_like(target_grid, dtype=int)
 
         if regridder_types is None:
-            regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
-        else:
-            regridder_settings = asdict(regridder_types, dict_factory=dict)
-
-        regrid_context = RegridderWeightsCache()
+            regridder_types = NodePropertyFlow.get_regrid_methods()
 
         new_package_data = _regrid_package_data(
-            data, target_grid, regridder_settings, regrid_context, {}
+            data, target_grid, regridder_types, regrid_cache, {}
         )
         new_package_data["icelltype"] = icelltype
 
