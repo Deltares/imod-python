@@ -29,9 +29,9 @@ def test_timeseries_resampling():
     new_timeseries = resample_timeseries(timeseries, new_dates)
     # fmt: off
     expected_data = [
-        { "time": datetime(1989, 1, 1), "rate": 175, "x": 0, "y": 0, "id": "ID", "filt_top": 20, "filt_bot": 10, },
-        { "time": datetime(1989, 1, 5), "rate": 400, "x": 0, "y": 0, "id": "ID", "filt_top": 20, "filt_bot": 10, },
-        { "time": datetime(1989, 1, 6), "rate": 500, "x": 0, "y": 0,  "id": "ID",  "filt_top": 20, "filt_bot": 10,},
+        { "time": datetime(1989, 1, 1), "rate": 175.0, "x": 0, "y": 0, "id": "ID", "filt_top": 20, "filt_bot": 10, },
+        { "time": datetime(1989, 1, 5), "rate": 400.0, "x": 0, "y": 0, "id": "ID", "filt_top": 20, "filt_bot": 10, },
+        { "time": datetime(1989, 1, 6), "rate": 500.0, "x": 0, "y": 0,  "id": "ID",  "filt_top": 20, "filt_bot": 10,},
     ]
     # fmt: on
     # setup panda table
