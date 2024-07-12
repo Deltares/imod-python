@@ -1,12 +1,20 @@
 from itertools import pairwise
-from typing import List, Tuple
+from typing import TYPE_CHECKING, List, Tuple
 
-from shapely import Polygon
+from imod.util.imports import MissingOptionalModule
+
+if TYPE_CHECKING:
+    import shapely
+else:
+    try:
+        import shapely
+    except ImportError:
+        shapely = MissingOptionalModule("shapely")
 
 
 def _line_to_square_zpolygon(
     x: Tuple[float, float], y: Tuple[float, float], z: Tuple[float, float]
-) -> Polygon:
+) -> shapely.Polygon:
     """
     Creates polygon as follows:
 
@@ -16,7 +24,7 @@ def _line_to_square_zpolygon(
        |         |
     xy0,z1 -- xy1,z1
     """
-    return Polygon(
+    return shapely.Polygon(
         (
             (x[0], y[0], z[0]),
             (x[0], y[0], z[1]),
@@ -31,7 +39,7 @@ def linestring_to_square_zpolygons(
     barrier_y: List[float],
     barrier_ztop: List[float],
     barrier_zbottom: List[float],
-) -> List[Polygon]:
+) -> List[shapely.Polygon]:
     """
     Create square vertical polygons from linestrings, with a varying ztop and
     zbottom over the line. Note: If the lists of x and y values of length N, the
@@ -74,7 +82,7 @@ def _line_to_trapezoid_zpolygon(
     y: Tuple[float, float],
     zt: Tuple[float, float],
     zb: Tuple[float, float],
-) -> Polygon:
+) -> shapely.Polygon:
     """
     Creates polygon as follows:
 
@@ -89,7 +97,7 @@ def _line_to_trapezoid_zpolygon(
        |    /    
     xy0,zb0  
     """
-    return Polygon(
+    return shapely.Polygon(
         (
             (x[0], y[0], zt[0]),
             (x[0], y[0], zb[1]),
@@ -104,7 +112,7 @@ def linestring_to_trapezoid_zpolygons(
     barrier_y: List[float],
     barrier_ztop: List[float],
     barrier_zbottom: List[float],
-) -> List[Polygon]:
+) -> List[shapely.Polygon]:
     """
     Create trapezoid vertical polygons from linestrings, with a varying ztop and
     zbottom over the line. These are shaped as follows::
