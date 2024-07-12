@@ -1,4 +1,3 @@
-from dataclasses import asdict
 from typing import Optional
 
 import numpy as np
@@ -8,9 +7,8 @@ from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.regrid.regrid_schemes import ConstantHeadRegridMethod, RegridMethodType
+from imod.mf6.regrid.regrid_schemes import ConstantHeadRegridMethod
 from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
-from imod.mf6.utilities.regridding_types import RegridderType
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -157,7 +155,8 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_discretization: StructuredDiscretization,
-        regridder_types: Optional[RegridMethodType] = None,
+        regridder_types: Optional[ConstantHeadRegridMethod] = None,
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "ConstantHead":
         """
         Construct a ConstantHead-package from iMOD5 data, loaded with the
@@ -199,6 +198,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
             imod5_data["bnd"]["ibound"],
             target_discretization,
             regridder_types,
+            regrid_cache,
         )
 
     @classmethod
@@ -207,7 +207,8 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_discretization: StructuredDiscretization,
-        regridder_types: Optional[RegridMethodType] = None,
+        regridder_types: Optional[ConstantHeadRegridMethod] = None,
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "ConstantHead":
         """
         Construct a ConstantHead-package from iMOD5 data, loaded with the
@@ -231,7 +232,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         target_discretization:  StructuredDiscretization package
             The grid that should be used for the new package. Does not
             need to be identical to one of the input grids.
-        regridder_types: RegridMethodType, optional
+        regridder_types: ConstantHeadRegridMethod, optional
             Optional dataclass with regridder types for a specific variable.
             Use this to override default regridding methods.
 
@@ -244,6 +245,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
             imod5_data["bnd"]["ibound"],
             target_discretization,
             regridder_types,
+            regrid_cache,
         )
 
     @classmethod
@@ -252,25 +254,18 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         head: GridDataArray,
         ibound: GridDataArray,
         target_discretization: StructuredDiscretization,
-        regridder_types: Optional[RegridMethodType] = None,
+        regridder_types: Optional[ConstantHeadRegridMethod] = None,
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "ConstantHead":
         target_idomain = target_discretization.dataset["idomain"]
 
         if regridder_types is None:
-            regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
-        else:
-            regridder_settings = asdict(regridder_types, dict_factory=dict)
-
-        # appart from the arrays needed for the ConstantHead package, we will
-        # also regrid ibound.
-        regridder_settings["ibound"] = (RegridderType.OVERLAP, "mode")
-
-        regrid_context = RegridderWeightsCache()
+            regridder_types = ConstantHead.get_regrid_methods()
 
         data = {"head": head, "ibound": ibound}
 
         regridded_package_data = _regrid_package_data(
-            data, target_idomain, regridder_settings, regrid_context, {}
+            data, target_idomain, regridder_types, regrid_cache, {}
         )
         head = regridded_package_data["head"]
         ibound = regridded_package_data["ibound"]

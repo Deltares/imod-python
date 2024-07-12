@@ -100,10 +100,10 @@ regridded_k_2.sel(layer=1).plot(y="y", yincrease=False, ax=ax)
 # because initializing a regridder is costly.
 
 regridder_types = NodePropertyFlowRegridMethod(k=(RegridderType.CENTROIDLOCATOR,))
-regrid_context = RegridderWeightsCache()
+regrid_cache = RegridderWeightsCache()
 npf_regridded = model["npf"].regrid_like(
     target_grid=target_grid,
-    regrid_context=regrid_context,
+    regrid_cache=regrid_cache,
     regridder_types=regridder_types,
 )
 new_model["npf"] = npf_regridded

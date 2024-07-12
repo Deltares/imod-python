@@ -1,4 +1,3 @@
-from dataclasses import asdict
 from datetime import datetime
 from typing import Optional
 
@@ -9,7 +8,7 @@ from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.npf import NodePropertyFlow
-from imod.mf6.regrid.regrid_schemes import DrainageRegridMethod, RegridMethodType
+from imod.mf6.regrid.regrid_schemes import DrainageRegridMethod
 from imod.mf6.utilities.regrid import (
     RegridderWeightsCache,
     _regrid_package_data,
@@ -175,7 +174,8 @@ class Drainage(BoundaryCondition, IRegridPackage):
         distributing_option: DISTRIBUTING_OPTION,
         time_min: datetime,
         time_max: datetime,
-        regridder_types: Optional[RegridMethodType] = None,
+        regridder_types: Optional[DrainageRegridMethod] = None,
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "Drainage":
         """
         Construct a drainage-package from iMOD5 data, loaded with the
@@ -206,7 +206,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
             Begin-time of the simulation. Used for expanding period data.
         time_max: datetime
             End-time of the simulation. Used for expanding period data.
-        regridder_types: RegridMethodType, optional
+        regridder_types: DrainageRegridMethod, optional
             Optional dataclass with regridder types for a specific variable.
             Use this to override default regridding methods.
 
@@ -226,14 +226,10 @@ class Drainage(BoundaryCondition, IRegridPackage):
         is_planar = is_planar_grid(data["elevation"])
 
         if regridder_types is None:
-            regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
-        else:
-            regridder_settings = asdict(regridder_types, dict_factory=dict)
-
-        regrid_context = RegridderWeightsCache()
+            regridder_types = Drainage.get_regrid_methods()
 
         regridded_package_data = _regrid_package_data(
-            data, target_idomain, regridder_settings, regrid_context, {}
+            data, target_idomain, regridder_types, regrid_cache, {}
         )
 
         conductance = regridded_package_data["conductance"]

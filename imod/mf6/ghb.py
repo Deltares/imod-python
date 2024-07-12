@@ -1,4 +1,3 @@
-from dataclasses import asdict
 from datetime import datetime
 from typing import Optional
 
@@ -167,6 +166,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         target_discretization,
         time_min: datetime,
         time_max: datetime,
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
         regridder_types: Optional[RegridMethodType] = None,
     ) -> "GeneralHeadBoundary":
         """
@@ -214,14 +214,10 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         }
 
         if regridder_types is None:
-            regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
-        else:
-            regridder_settings = asdict(regridder_types, dict_factory=dict)
-
-        regrid_context = RegridderWeightsCache()
+            regridder_types = GeneralHeadBoundaryRegridMethod()
 
         regridded_package_data = _regrid_package_data(
-            data, idomain, regridder_settings, regrid_context, {}
+            data, idomain, regridder_types, regrid_cache, {}
         )
 
         ghb = GeneralHeadBoundary(**regridded_package_data)

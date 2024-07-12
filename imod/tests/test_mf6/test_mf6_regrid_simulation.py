@@ -67,7 +67,7 @@ def test_regrid_with_custom_method(circle_model):
     regrid_method = ConstantHeadRegridMethod(
         head=(RegridderType.BARYCENTRIC,), concentration=(RegridderType.BARYCENTRIC,)
     )
-    regrid_context = RegridderWeightsCache()
+    regrid_cache = RegridderWeightsCache()
     simulation_regridded["GWF_1"]["chd"] = chd_pkg.regrid_like(
-        idomain, regrid_context=regrid_context, regridder_types=regrid_method
+        idomain, regrid_cache=regrid_cache, regridder_types=regrid_method
     )
