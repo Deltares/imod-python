@@ -1,19 +1,23 @@
 from functools import wraps
 from time import time
+from typing import Callable, ParamSpec, TypeVar
 
 from imod.logging.loglevel import LogLevel
+
+T = TypeVar("T")
+P = ParamSpec("P")
 
 
 def standard_log_decorator(
     start_level: LogLevel = LogLevel.INFO, end_level: LogLevel = LogLevel.DEBUG
-):
+) -> Callable[[Callable[P, T]], Callable[P, T]]:
     """
     Decorator to print log messages announcing the beginning and end of the decorated method
     """
 
-    def decorator(fun):
+    def decorator(fun: Callable[P, T]) -> Callable[P, T]:
         @wraps(fun)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: P.args, **kwargs: P.kwargs):
             from imod.logging import logger
 
             # anounce start of function
@@ -40,14 +44,14 @@ def standard_log_decorator(
 
 def init_log_decorator(
     start_level: LogLevel = LogLevel.INFO, end_level: LogLevel = LogLevel.DEBUG
-):
+) -> Callable[[Callable[P, T]], Callable[P, T]]:
     """
     Decorator to print log messages announcing the beginning and end of initialization methods
     """
 
-    def decorator(fun):
+    def decorator(fun: Callable[P, T]) -> Callable[P, T]:
         @wraps(fun)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: P.args, **kwargs: P.kwargs):
             from imod.logging import logger
 
             # anounce start of function
