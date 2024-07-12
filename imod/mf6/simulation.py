@@ -1358,7 +1358,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         -------
         """
         simulation = Modflow6Simulation("imported_simulation")
-        defaultdict_regridder_types: defaultdict[str, Optional[RegridMethodType]] = defaultdict(NoneType)
+        defaultdict_regridder_types: defaultdict[str, Optional[RegridMethodType]] = (
+            defaultdict(NoneType)
+        )
         if regridder_types is not None:
             defaultdict_regridder_types.update(regridder_types)
 
