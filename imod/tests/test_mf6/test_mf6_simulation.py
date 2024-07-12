@@ -2,12 +2,10 @@ import os
 import re
 import sys
 import textwrap
-from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime
 from filecmp import dircmp
 from pathlib import Path
-from types import NoneType
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -513,7 +511,7 @@ def test_import_from_imod5_nonstandard_regridding(imod5_dataset, tmp_path):
     default_simulation_allocation_options = SimulationAllocationOptions
     default_simulation_distributing_options = SimulationDistributingOptions
 
-    regridding_option = defaultdict(NoneType)
+    regridding_option = {}
     regridding_option["npf"] = NodePropertyFlowRegridMethod()
     regridding_option["dis"] = DiscretizationRegridMethod()
     regridding_option["sto"] = StorageCoefficientRegridMethod()
