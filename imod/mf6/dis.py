@@ -1,5 +1,4 @@
 import pathlib
-from dataclasses import asdict
 from typing import Any, List, Optional
 
 import numpy as np
@@ -163,6 +162,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
         regridder_types: Optional[RegridMethodType] = None,
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
         validate: bool = True,
     ) -> "StructuredDiscretization":
         """
@@ -182,7 +182,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         imod5_data: dict
             Dictionary with iMOD5 data. This can be constructed from the
             :func:`imod.formats.prj.open_projectfile_data` method.
-        regridder_types: RegridMethodType, optional
+        regridder_types: DiscretizationRegridMethod, optional
             Optional dataclass with regridder types for a specific variable.
             Use this to override default regridding methods.
 
@@ -200,13 +200,10 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         target_grid = create_smallest_target_grid(*data.values())
 
         if regridder_types is None:
-            regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
-        else:
-            regridder_settings = asdict(regridder_types, dict_factory=dict)
-        regrid_context = RegridderWeightsCache()
+            regridder_types = StructuredDiscretization.get_regrid_methods()
 
         new_package_data = _regrid_package_data(
-            data, target_grid, regridder_settings, regrid_context
+            data, target_grid, regridder_types, regrid_cache
         )
 
         # Validate iMOD5 data

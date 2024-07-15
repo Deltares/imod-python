@@ -1,5 +1,4 @@
 import abc
-from dataclasses import asdict
 from typing import Any, Dict, Optional
 
 import numpy as np
@@ -8,7 +7,6 @@ from imod.logging import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.regrid.regrid_schemes import (
-    RegridMethodType,
     SpecificStorageRegridMethod,
     StorageCoefficientRegridMethod,
 )
@@ -327,7 +325,8 @@ class StorageCoefficient(StorageBase):
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
         target_grid: GridDataArray,
-        regridder_types: Optional[RegridMethodType] = None,
+        regridder_types: Optional[StorageCoefficientRegridMethod] = None,
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "StorageCoefficient":
         """
         Construct a StorageCoefficient-package from iMOD5 data, loaded with the
@@ -345,7 +344,7 @@ class StorageCoefficient(StorageBase):
         target_grid: GridDataArray
             The grid that should be used for the new package. Does not
             need to be identical to one of the input grids.
-        regridder_types: RegridMethodType, optional
+        regridder_types: StorageCoefficientRegridMethod, optional
             Optional dataclass with regridder types for a specific variable.
             Use this to override default regridding methods.
 
@@ -360,14 +359,10 @@ class StorageCoefficient(StorageBase):
         }
 
         if regridder_types is None:
-            regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
-        else:
-            regridder_settings = asdict(regridder_types, dict_factory=dict)
-
-        regrid_context = RegridderWeightsCache()
+            regridder_types = StorageCoefficient.get_regrid_methods()
 
         new_package_data = _regrid_package_data(
-            data, target_grid, regridder_settings, regrid_context, {}
+            data, target_grid, regridder_types, regrid_cache, {}
         )
 
         new_package_data["convertible"] = zeros_like(target_grid, dtype=int)

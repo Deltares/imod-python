@@ -57,9 +57,9 @@ def test_mf6_package_regrid_with_lakes(rectangle_with_lakes, tmp_path):
     simulation = rectangle_with_lakes
     package = simulation["GWF_1"]["lake"]
     new_grid = finer_grid(simulation["GWF_1"].domain)
-    regrid_context = RegridderWeightsCache()
+    regrid_cache = RegridderWeightsCache()
     with pytest.raises(ValueError, match="package(.+)not be regridded"):
-        _ = package.regrid_like(new_grid, regrid_context)
+        _ = package.regrid_like(new_grid, regrid_cache)
 
 
 @pytest.mark.usefixtures("rectangle_with_lakes")
