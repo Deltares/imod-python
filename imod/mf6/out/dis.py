@@ -255,7 +255,7 @@ def open_imeth6_budgets(
     return xr.DataArray(daskarr, coords, ("time", "layer", "y", "x"), name=name)
 
 
-@numba.njit
+@numba.njit  # type: ignore[misc]
 def dis_indices(
     ia: IntArray,
     ja: IntArray,

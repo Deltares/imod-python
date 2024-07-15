@@ -291,7 +291,7 @@ def open_imeth6_budgets(
     return xu.UgridDataArray(da, grid)
 
 
-@numba.njit
+@numba.njit  # type: ignore[misc]
 def disv_lower_index(
     ia: IntArray,
     ja: IntArray,

@@ -51,9 +51,6 @@ pypi-publish = { cmd = "rm --recursive --force dist && python -m build && twine 
 mypy_lint = { cmd ="mypy", depends_on = ["install"]}
 mypy_report = { cmd ="mypy | mypy2junit > mypy-report.xml", depends_on = ["install"]}
 
-
-
-
 [dependencies]
 # Keep empty or undefined to create an empty default environment.
 
