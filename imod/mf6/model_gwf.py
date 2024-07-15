@@ -261,12 +261,12 @@ class GroundwaterFlowModel(Modflow6Model):
                 imod5_data,
                 period_data,
                 dis_pkg,
-                npf_pkg,      
+                npf_pkg,
                 time_min,
                 time_max,
                 allocation_options.ghb,
-                distributing_options.ghb,  
-                regridder_types,                
+                distributing_options.ghb,
+                regridder_types,
             )
             result[ghb_key] = ghb_pkg
 

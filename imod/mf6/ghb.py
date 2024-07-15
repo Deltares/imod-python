@@ -14,7 +14,10 @@ from imod.mf6.regrid.regrid_schemes import (
 from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_ghb_cells
-from imod.prepare.topsystem.conductance import DISTRIBUTING_OPTION, distribute_ghb_conductance
+from imod.prepare.topsystem.conductance import (
+    DISTRIBUTING_OPTION,
+    distribute_ghb_conductance,
+)
 from imod.schemata import (
     AllInsideNoDataSchema,
     AllNoDataSchema,
@@ -168,14 +171,13 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         imod5_data: dict[str, dict[str, GridDataArray]],
         period_data: dict[str, list[datetime]],
         target_discretization,
-        target_npf: NodePropertyFlow,        
+        target_npf: NodePropertyFlow,
         time_min: datetime,
         time_max: datetime,
         allocation_option: ALLOCATION_OPTION,
-        distributing_option: DISTRIBUTING_OPTION,  
-        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),        
+        distributing_option: DISTRIBUTING_OPTION,
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
         regridder_types: Optional[RegridMethodType] = None,
-      
     ) -> "GeneralHeadBoundary":
         """
         Construct a GeneralHeadBoundary-package from iMOD5 data, loaded with the
@@ -197,7 +199,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
             The grid that should be used for the new package. Does not
             need to be identical to one of the input grids.
         target_npf: NodePropertyFlow package
-            The conductivity information, used to compute drainage flux
+            The conductivity information, used to compute GHB flux
         allocation_option: ALLOCATION_OPTION
             allocation option.
         distributing_option: dict[str, DISTRIBUTING_OPTION]
@@ -225,7 +227,6 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         }
         is_planar = is_planar_grid(data["conductance"])
 
-        
         if regridder_types is None:
             regridder_types = GeneralHeadBoundaryRegridMethod()
 
@@ -244,15 +245,15 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
                 target_bottom,
                 head,
             )
-            
+
             regridded_package_data["conductance"] = distribute_ghb_conductance(
                 distributing_option,
                 ghb_alocation,
                 conductance,
                 target_top,
                 target_bottom,
-                k
-            )     
+                k,
+            )
 
         ghb = GeneralHeadBoundary(**regridded_package_data)
         repeat = period_data.get(key)
