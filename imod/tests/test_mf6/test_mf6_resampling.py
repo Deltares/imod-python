@@ -11,7 +11,7 @@ def test_timeseries_resampling():
     timeseries = pd.DataFrame(
         {}, columns=["time", "rate", "x", "y", "id", "filt_top", "filt_bot"]
     )
-   
+
     timeseries["time"] = [datetime(1989, 1, i) for i in [1, 3, 4, 5, 6]]
     timeseries["rate"] = [i * 100 for i in range(1, 6)]
     timeseries["x"] = 0
@@ -19,7 +19,6 @@ def test_timeseries_resampling():
     timeseries["id"] = "ID"
     timeseries["filt_top"] = 20
     timeseries["filt_bot"] = 10
-
 
     new_dates = [datetime(1989, 1, 1), datetime(1989, 1, 5), datetime(1989, 1, 6)]
 
