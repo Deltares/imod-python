@@ -110,7 +110,6 @@ strict = true
 
 # These shouldn't be too much additional work, but may be tricky to
 # get passing if you use a lot of untyped libraries
-disallow_untyped_decorators = false
 disallow_any_generics = false
 
 # These next few are various gradations of forcing use of type annotations

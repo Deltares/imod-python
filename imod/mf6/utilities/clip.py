@@ -90,7 +90,7 @@ def _filter_inactive_cells(package, active):
                 )
 
 
-@typedispatch  # type: ignore[no-redef]
+@typedispatch  # type: ignore[no-redef, misc]
 def clip_by_grid(package: ILineDataPackage, active: GridDataArray) -> ILineDataPackage:  # noqa: F811
     """Clip LineDataPackage outside unstructured/structured grid."""
 
