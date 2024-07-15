@@ -3,13 +3,14 @@ import re
 import sys
 import textwrap
 from copy import deepcopy
-from datetime import datetime, timedelta
+from datetime import datetime
 from filecmp import dircmp
 from pathlib import Path
 from unittest import mock
 from unittest.mock import MagicMock
 
 import numpy as np
+import pandas as pd
 import pytest
 import rasterio
 import xarray as xr
@@ -481,11 +482,7 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
     default_simulation_allocation_options = SimulationAllocationOptions
     default_simulation_distributing_options = SimulationDistributingOptions
 
-    datelist = []
-    date = datetime(1989, 1, 1)
-    while date < datetime(2013, 1, 1):
-        datelist.append(date)
-        date = date + timedelta(days=7)
+    datelist = pd.date_range(start="1/1/1989", end="1/1/2013", freq="W")
 
     simulation = Modflow6Simulation.from_imod5_data(
         imod5_data,
@@ -520,14 +517,14 @@ def test_import_from_imod5_nonstandard_regridding(imod5_dataset, tmp_path):
     regridding_option["npf"] = NodePropertyFlowRegridMethod()
     regridding_option["dis"] = DiscretizationRegridMethod()
     regridding_option["sto"] = StorageCoefficientRegridMethod()
+    times = pd.date_range(start="1/1/2018", end="12/1/2018", freq="ME")
 
     simulation = Modflow6Simulation.from_imod5_data(
         imod5_data,
         period_data,
         default_simulation_allocation_options,
         default_simulation_distributing_options,
-        datetime(2000, 1, 1),
-        datetime(2002, 1, 1),
+        times,
         regridding_option,
     )
 
