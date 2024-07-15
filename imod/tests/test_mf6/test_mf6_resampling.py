@@ -8,21 +8,18 @@ from imod.util.expand_repetitions import resample_timeseries
 def test_timeseries_resampling():
     # In this test, we resample a timeseries for a coarser output discretization.
     # The output times are a subset of the input times.
-    # fmt: off
-    data = [
-        {  "time": datetime(1989, 1, 1), "rate": 100, "x": 0,"y": 0, "id": "ID", "filt_top": 20, "filt_bot": 10, },  # output time 1
-        {"time": datetime(1989, 1, 3), "rate": 200, "x": 0, "y": 0,  "id": "ID", "filt_top": 20, "filt_bot": 10,},
-        { "time": datetime(1989, 1, 4), "rate": 300, "x": 0, "y": 0, "id": "ID", "filt_top": 20, "filt_bot": 10, },
-        {"time": datetime(1989, 1, 5), "rate": 400, "x": 0, "y": 0,"id": "ID", "filt_top": 20, "filt_bot": 10, },  # output time 2
-        { "time": datetime(1989, 1, 6), "rate": 500, "x": 0,  "y": 0,"id": "ID","filt_top": 20, "filt_bot": 10,}, # output time 3
-    ]  
-    # fmt: on
-    # initialize data of lists.
-
-    # setup panda table
     timeseries = pd.DataFrame(
-        data, columns=["time", "rate", "x", "y", "id", "filt_top", "filt_bot"]
+        {}, columns=["time", "rate", "x", "y", "id", "filt_top", "filt_bot"]
     )
+   
+    timeseries["time"] = [datetime(1989, 1, i) for i in [1, 3, 4, 5, 6]]
+    timeseries["rate"] = [i * 100 for i in range(1, 6)]
+    timeseries["x"] = 0
+    timeseries["y"] = 0
+    timeseries["id"] = "ID"
+    timeseries["filt_top"] = 20
+    timeseries["filt_bot"] = 10
+
 
     new_dates = [datetime(1989, 1, 1), datetime(1989, 1, 5), datetime(1989, 1, 6)]
 
