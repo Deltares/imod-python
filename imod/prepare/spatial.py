@@ -119,6 +119,8 @@ def laplace_interpolate(
     iter1=250,
     relax=0.98,
     rhs=None,
+    robin_value=None,
+    robin_coefficient=None,
 ):
     """
     Fills gaps in `source` by interpolating from existing values using Laplace
@@ -127,7 +129,7 @@ def laplace_interpolate(
     Parameters
     ----------
     source : xr.DataArray of floats with dims (y, x)
-        Data values to interpolate.
+        Data values to interpolate. (MODFLOW CHD values.)
     ibound : xr.DataArray of bool with dims (y, x)
         Precomputed array which marks where to interpolate.
     close : float
@@ -142,38 +144,49 @@ def laplace_interpolate(
         Iterative solver relaxation parameter. Should be between 0 and 1.
     rhs : xr.DataArray of floats with dims (y, x).
         Right-hand-side of the linear system of equations: Laplace equation if
-        zero, Poisson equation if nonzero.
+        zero, Poisson equation if nonzero. (MODFLOW WEL rate value.)
+    robin_value : xr.DataArray of floats with dims (y, x).
+        Robin boundary value. (MODFLOW GHB head values.)
+    robin_coefficient: xr.DataArray of floats with dims (y, x).
+        Robin boundary coefficient. (MODFLOW GHB conductance values.)
 
     Returns
     -------
     interpolated : xr.DataArray with dims (y, x)
         source, with interpolated values where ibound equals 1
     """
-    solver = pcg.PreconditionedConjugateGradientSolver(
-        close, close * 1.0e6, mxiter, iter1, relax
-    )
+
+    def _check(da: xr.DataArray, name: str) -> None:
+        if da.dims != ("y", "x"):
+            raise ValueError(f'{name} dims must be ("y", "x")')
+        if da.shape != source.shape:
+            raise ValueError(f"source and {name} must have the same shape")
 
     if source.dims != ("y", "x"):
         raise ValueError('source dims must be ("y", "x")')
     if rhs is not None:
-        if rhs.dims != ("y", "x"):
-            raise ValueError('rhs dims must be ("y", "x")')
-        if rhs.shape != source.shape:
-            raise ValueError("ibound and rhs must have the same shape")
+        _check(rhs, "rhs")
+
+    if (robin_value is None) ^ (robin_coefficient is None):
+        raise ValueError("Provide both robin_value and robin_coefficient, or neither.")
+    if robin_value is not None:
+        _check(robin_value, "robin_value")
+        _check(robin_coefficient, "robin_coefficient")
+        if (robin_value.isnull() != robin_coefficient.isnull()).any():
+            raise ValueError(
+                "robin_value and robin_coefficient must be consistent in terms "
+                "of nodata (NaN) values."
+            )
 
     # expand dims to make 3d
     source3d = source.expand_dims("layer")
     if ibound is None:
         iboundv = xr.full_like(source3d, 1, dtype=np.int32).to_numpy()
+        iboundv[source3d.notnull().values] = -1
     else:
-        if not ibound.dims == ("y", "x"):
-            raise ValueError('ibound dims must be ("y", "x")')
-        if not ibound.shape == source.shape:
-            raise ValueError("ibound and source must have the same shape")
+        _check(ibound, "ibound")
         iboundv = ibound.expand_dims("layer").astype(np.int32).to_numpy()
 
-    has_data = source3d.notnull().values
-    iboundv[has_data] = -1
     hnew = source3d.fillna(0.0).values.astype(
         np.float64
     )  # Set start interpolated estimate to 0.0
@@ -190,7 +203,24 @@ def laplace_interpolate(
         rhsv = np.zeros(shape)
     else:
         rhsv = rhs.expand_dims("layer").astype(np.float64).to_numpy().copy()
-    hcof = np.zeros(shape)
+
+    if robin_value is None:
+        hcof = np.zeros(shape)
+    else:
+        hcof = (
+            -robin_coefficient.fillna(0.0)
+            .expand_dims("layer")
+            .astype(np.float64)
+            .to_numpy()
+        )
+        rhsv -= (
+            (robin_coefficient * robin_value)
+            .fillna(0.0)
+            .expand_dims("layer")
+            .astype(np.float64)
+            .to_numpy()
+        )
+
     # Solver work arrays
     res = np.zeros(nodes)
     cd = np.zeros(nodes)
@@ -199,6 +229,10 @@ def laplace_interpolate(
     p = np.zeros(nodes)
 
     # Picard iteration
+    solver = pcg.PreconditionedConjugateGradientSolver(
+        close, close * 1.0e6, mxiter, iter1, relax
+    )
+
     converged = False
     outer_iteration = 0
     while not converged and outer_iteration < mxiter:
