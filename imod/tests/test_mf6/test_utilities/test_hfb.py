@@ -8,7 +8,7 @@ from imod.mf6.hfb import (
     HorizontalFlowBarrierResistance,
     SingleLayerHorizontalFlowBarrierResistance,
 )
-from imod.mf6.utilities.hfb import merge_hfb_packages
+from imod.mf6.utilities.mf6hfb import merge_hfb_packages
 
 
 @pytest.mark.usefixtures("structured_flow_model")

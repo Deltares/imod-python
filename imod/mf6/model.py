@@ -23,8 +23,8 @@ from imod.mf6.hfb import HorizontalFlowBarrierBase
 from imod.mf6.interfaces.imodel import IModel
 from imod.mf6.package import Package
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
-from imod.mf6.utilities.hfb import merge_hfb_packages
 from imod.mf6.utilities.mask import _mask_all_packages
+from imod.mf6.utilities.mf6hfb import merge_hfb_packages
 from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_like
 from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.write_context import WriteContext
