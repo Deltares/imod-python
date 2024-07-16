@@ -207,10 +207,10 @@ def _make_linestring_from_polygon(
 
 
 def _select_dataframe_with_snapped_line_index(
-    snapped_dataset: xr.Dataset, dataframe: gpd.GeoDataFrame
+    snapped_dataset: xr.Dataset, edge_index: np.ndarray, dataframe: gpd.GeoDataFrame
 ):
     line_index = snapped_dataset["line_index"].values
-    line_index = line_index[~np.isnan(line_index)].astype(int)
+    line_index = line_index[edge_index].astype(int)
     return dataframe.iloc[line_index]
 
 
@@ -616,7 +616,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         ).values[edge_index]
 
         dataframe = _select_dataframe_with_snapped_line_index(
-            snapped_dataset, self.line_data
+            snapped_dataset, edge_index, self.line_data
         )
         fraction = _fraction_layer_overlap(
             snapped_dataset, edge_index, dataframe, top, bottom
@@ -1018,7 +1018,7 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
         self, snapped_dataset, edge_index, idomain, top, bottom, k
     ):
         dataframe = _select_dataframe_with_snapped_line_index(
-            snapped_dataset, self.line_data
+            snapped_dataset, edge_index, self.line_data
         )
         fraction = _fraction_layer_overlap(
             snapped_dataset, edge_index, dataframe, top, bottom
