@@ -12,6 +12,10 @@ from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.interfaces.ipackagebase import IPackageBase
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.utilities.grid import get_active_domain_slice
+from imod.mf6.utilities.hfb import (
+    hfb_zlinestrings_to_zpolygons,
+    hfb_zpolygons_to_zlinestrings,
+)
 from imod.typing import GridDataArray
 from imod.typing.grid import bounding_polygon, is_spatial_grid
 from imod.util.imports import MissingOptionalModule
@@ -108,7 +112,16 @@ def clip_line_gdf_by_grid(
     """Clip GeoDataFrame by bounding polygon of grid"""
     # Clip line with polygon
     bounding_gdf = bounding_polygon(active)
-    clipped_line_data = gdf.clip(bounding_gdf)
+
+    if gdf.has_z.any():
+        # Shapely returns z linestrings when clipping our vertical z polygons.
+        # To work around this convert polygons to zlinestrings to clip.
+        # Consequently construct polygons from these clipped linestrings.
+        gdf_linestrings = hfb_zpolygons_to_zlinestrings(gdf)
+        clipped_linestrings = gdf_linestrings.clip(bounding_gdf)
+        clipped_line_data = hfb_zlinestrings_to_zpolygons(clipped_linestrings)
+    else:
+        clipped_line_data = gdf.clip(bounding_gdf)
 
     # Catch edge case: when line crosses only vertex of polygon, a point
     # or multipoint is returned. Drop these.
