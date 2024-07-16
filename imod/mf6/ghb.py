@@ -30,7 +30,7 @@ from imod.schemata import (
     OtherCoordsSchema,
 )
 from imod.typing import GridDataArray
-from imod.typing.grid import is_planar_grid
+from imod.typing.grid import enforce_dim_order, is_planar_grid
 from imod.util.expand_repetitions import expand_repetitions
 
 
@@ -202,12 +202,15 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
             The conductivity information, used to compute GHB flux
         allocation_option: ALLOCATION_OPTION
             allocation option.
-        distributing_option: dict[str, DISTRIBUTING_OPTION]
-            distributing option.
         time_min: datetime
             Begin-time of the simulation. Used for expanding period data.
         time_max: datetime
             End-time of the simulation. Used for expanding period data.
+        distributing_option: dict[str, DISTRIBUTING_OPTION]
+            distributing option.
+        regrid_cache:Optional RegridderWeightsCache
+            stores regridder weights for different regridders. Can be used to speed up regridding,
+            if the same regridders are used several times for regridding different arrays.
         regridder_types: RegridMethodType, optional
             Optional dataclass with regridder types for a specific variable.
             Use this to override default regridding methods.
@@ -235,7 +238,8 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         )
         if is_planar:
             conductance = regridded_package_data["conductance"]
-            head = regridded_package_data["head"]
+
+            planar_head = regridded_package_data["head"]
             k = target_npf.dataset["k"]
 
             ghb_alocation = allocate_ghb_cells(
@@ -243,8 +247,17 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
                 target_idomain == 1,
                 target_top,
                 target_bottom,
-                head,
+                planar_head,
             )
+
+            layered_head = planar_head.where(ghb_alocation)
+            layered_head = enforce_dim_order(layered_head)
+
+            regridded_package_data["head"] = layered_head
+
+            if "layer" in conductance.coords:
+                conductance = conductance.isel({"layer": 0})
+                conductance = conductance.drop_vars("layer")
 
             regridded_package_data["conductance"] = distribute_ghb_conductance(
                 distributing_option,
