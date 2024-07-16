@@ -117,16 +117,16 @@ def linestring_to_trapezoid_zpolygons(
     Create trapezoid vertical polygons from linestrings, with a varying ztop and
     zbottom over the line. These are shaped as follows::
 
-        xy0,zt0           xy2,zt2
-        |    \          /    |
-        |     \        /     |
-        |      xy1,zt1       |
-        |         |          |
-        |         |          |
-        |      xy1,zb1 -- xy2,zb2
-        |     /
-        |    /
-        xy0,zb0
+    xy0,zt0              xy2,zt2
+       |    \          /    |
+       |     \        /     |
+       |      xy1,zt1       |
+       |         |          |
+       |         |          |
+       |      xy1,zb1 -- xy2,zb2
+       |     /
+       |    /
+    xy0,zb0
 
     Parameters
     ----------
