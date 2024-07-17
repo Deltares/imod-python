@@ -763,8 +763,9 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         # <link_to_github_issue_here>
         snapped_dataset_rows: List[xr.Dataset] = []
         for index in barrier_dataframe.index:
-            # Force to pd.DataFrame instead of pd.Series for xu.snap_to_grid.
-            row_df = barrier_dataframe.loc[index:index]
+            # Index with list to return pd.DataFrame instead of pd.Series for
+            # xu.snap_to_grid.
+            row_df = barrier_dataframe.loc[[index]]
             snapped_dataset_row, _ = typing.cast(
                 xu.UgridDataset,
                 xu.snap_to_grid(row_df, grid=idomain, max_snap_distance=0.5),
