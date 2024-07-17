@@ -701,10 +701,10 @@ class Well(BoundaryCondition, IPointDataPackage):
         well_rate = xr.concat(da_groups, dim="index")
 
         return cls(
-            x=np.array(x, dtype=float),
-            y=np.array(y, dtype=float),
-            screen_top=np.array(filt_top, dtype=float),
-            screen_bottom=np.array(filt_bot, dtype=float),
+            x=list(np.array(x, dtype=float)),
+            y=list(np.array(y, dtype=float)),
+            screen_top=list(np.array(filt_top, dtype=float)),
+            screen_bottom=list(np.array(filt_bot, dtype=float)),
             rate=well_rate,
             minimum_k=minimum_k,
             minimum_thickness=minimum_thickness,
