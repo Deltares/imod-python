@@ -742,7 +742,9 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             variable_names = [self._get_variable_name(), "geometry", "layer"]
         else:
             variable_names = [self._get_variable_name(), "geometry"]
-        barrier_dataframe = gpd.GeoDataFrame(self.dataset[variable_names].to_dataframe())
+        barrier_dataframe = gpd.GeoDataFrame(
+            self.dataset[variable_names].to_dataframe()
+        )
 
         if "layer" not in self._get_vertical_variables():
             lower, _ = _extract_hfb_bounds_from_zpolygons(barrier_dataframe)
