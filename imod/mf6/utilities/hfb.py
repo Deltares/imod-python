@@ -83,13 +83,11 @@ def _flip_linestrings(df: pd.DataFrame):
     # This new index denotes unique nodes
     df_reset = df.reset_index()
     # Set to multi-index to prepare sort
-    df_multi = df_reset.set_index(["parts", df_reset.index])
+    df_multi = df_reset.set_index(["index", "parts", df_reset.index])
     # Sort, only reverse newly added index.
-    df_sorted = df_multi.sort_index(level=[0,1],ascending=[True,False],axis=0)
+    df_sorted = df_multi.sort_index(level=[0,1,2],ascending=[True,True,False],axis=0)
     # Drop index added for sorting
-    df_sorted = df_sorted.reset_index(level=1, drop=True)
-    # Set index again
-    return df_sorted.set_index(["index", df_sorted.index])
+    return df_sorted.reset_index(level=2, drop=True)
 
 def hfb_zlinestrings_to_zpolygons(bounds_gdf: gpd.GeoSeries) -> gpd.GeoDataFrame:
     """
@@ -106,6 +104,9 @@ def hfb_zlinestrings_to_zpolygons(bounds_gdf: gpd.GeoSeries) -> gpd.GeoDataFrame
         return bounds_gdf
 
     coordinates = bounds_gdf.get_coordinates(include_z=True)
+    # Sort index to ascending everywhere to be able to assign flip upper bound
+    # linestrings without errors.
+    coordinates = coordinates.sort_index(level=[0,1,2],ascending=[True,True,True],axis=0)
     # Reverse upper bound to prevent bowtie polygon from being made.
     coordinates.loc["upper"] = _flip_linestrings(coordinates.loc["upper"]).values
     # Drop index with "upper" and "lower" in it.
