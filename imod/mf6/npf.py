@@ -1,4 +1,5 @@
 import warnings
+from copy import deepcopy
 from typing import Optional
 
 import numpy as np
@@ -520,3 +521,7 @@ class NodePropertyFlow(Package, IRegridPackage):
         new_package_data["icelltype"] = icelltype
 
         return NodePropertyFlow(**new_package_data, validate= True)
+
+    @classmethod
+    def get_regrid_methods(cls) -> NodePropertyFlowRegridMethod:
+        return deepcopy(cls._regrid_method)

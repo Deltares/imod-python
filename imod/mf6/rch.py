@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Optional
 
 import numpy as np
@@ -217,3 +218,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
             new_package_data["rate"] = rch_rate
 
         return Recharge(**new_package_data, validate= True, fixed_cell = False)
+
+    @classmethod
+    def get_regrid_methods(cls) -> RechargeRegridMethod:
+        return deepcopy(cls._regrid_method)

@@ -1,3 +1,4 @@
+from copy import deepcopy
 import warnings
 from typing import Any, Optional
 
@@ -138,3 +139,7 @@ class InitialConditions(Package, IRegridPackage):
             data, target_grid, regridder_types, regrid_cache, {}
         )
         return cls(**new_package_data, validate= True)
+
+    @classmethod
+    def get_regrid_methods(cls) -> InitialConditionsRegridMethod:
+        return deepcopy(cls._regrid_method)

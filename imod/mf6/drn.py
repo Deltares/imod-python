@@ -1,3 +1,4 @@
+from copy import deepcopy
 from datetime import datetime
 from typing import Optional
 
@@ -264,3 +265,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
         if repeat is not None:
             drn.set_repeat_stress(expand_repetitions(repeat, time_min, time_max))
         return drn
+
+    @classmethod
+    def get_regrid_methods(cls) -> DrainageRegridMethod:
+        return deepcopy(cls._regrid_method)

@@ -1,3 +1,4 @@
+from copy import deepcopy
 from datetime import datetime
 from typing import Optional
 
@@ -225,3 +226,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         if repeat is not None:
             ghb.set_repeat_stress(expand_repetitions(repeat, time_min, time_max))
         return ghb
+
+    @classmethod
+    def get_regrid_methods(cls) -> GeneralHeadBoundaryRegridMethod:
+        return deepcopy(cls._regrid_method)

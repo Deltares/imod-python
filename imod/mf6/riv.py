@@ -1,3 +1,4 @@
+from copy import deepcopy
 from datetime import datetime
 from typing import Optional, Tuple
 
@@ -438,3 +439,7 @@ class River(BoundaryCondition, IRegridPackage):
         drainage_conductance = drainage_conductance.where(drainage_conductance > 0)
         river_conductance = river_conductance.where(river_conductance > 0)
         return drainage_conductance, river_conductance
+
+    @classmethod
+    def get_regrid_methods(cls) -> RiverRegridMethod:
+        return deepcopy(cls._regrid_method)
