@@ -19,7 +19,7 @@ from imod.mf6 import (
 )
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.hfb import (
-    _extract_hfb_bounds_from_dataframe,
+    _extract_mean_hfb_bounds_from_dataframe,
     _make_linestring_from_polygon,
     _prepare_barrier_dataset_for_mf6_adapter,
     to_connected_cells_dataset,
@@ -802,7 +802,7 @@ def test_extract_hfb_bounds_from_dataframe():
         },
     )
 
-    zmin, zmax = _extract_hfb_bounds_from_dataframe(gdf_polygons)
+    zmin, zmax = _extract_mean_hfb_bounds_from_dataframe(gdf_polygons)
 
     np.testing.assert_equal(zmin, barrier_zbottom)
     np.testing.assert_equal(zmax, barrier_ztop)
@@ -823,4 +823,4 @@ def test_extract_hfb_bounds_from_dataframe__fails():
     )
 
     with pytest.raises(TypeError):
-        _extract_hfb_bounds_from_dataframe(gdf_polygons)
+        _extract_mean_hfb_bounds_from_dataframe(gdf_polygons)

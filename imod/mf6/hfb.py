@@ -21,6 +21,10 @@ from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
 from imod.mf6.utilities.clip import clip_line_gdf_by_grid
 from imod.mf6.utilities.grid import broadcast_to_full_domain
+from imod.mf6.utilities.hfb import (
+    _create_zlinestring_from_bound_df,
+    _extract_hfb_bounds_from_zpolygons,
+)
 from imod.schemata import EmptyIndexesSchema, MaxNUniqueValuesSchema
 from imod.typing import GridDataArray
 from imod.util.imports import MissingOptionalModule
@@ -214,7 +218,7 @@ def _select_dataframe_with_snapped_line_index(
     return dataframe.iloc[line_index]
 
 
-def _extract_hfb_bounds_from_dataframe(dataframe: gpd.GeoDataFrame):
+def _extract_mean_hfb_bounds_from_dataframe(dataframe: gpd.GeoDataFrame):
     """
     Extract hfb bounds from dataframe. Requires dataframe geometry to be of type
     shapely "Z Polygon".
@@ -235,26 +239,17 @@ def _extract_hfb_bounds_from_dataframe(dataframe: gpd.GeoDataFrame):
     if not dataframe.geometry.has_z.all():
         raise TypeError("GeoDataFrame geometry has no z, which is required.")
 
-    coordinates, index = shapely.get_coordinates(
-        dataframe.geometry, include_z=True, return_index=True
-    )
-    # Skip every 5th element, this is the final (duplicate) point.
-    to_keep = np.mod(np.arange(coordinates.shape[0]), 5) != 4
-    coordinates = coordinates[to_keep, :]
-    index = index[to_keep]
+    lower, upper = _extract_hfb_bounds_from_zpolygons(dataframe)
+    # Compute means inbetween nodes.
+    lower_mean = lower.groupby("index")["z"].mean()
+    upper_mean = upper.groupby("index")["z"].mean()
 
-    df_polygon_lookup = pd.DataFrame({"polygon_index": index, "z": coordinates[:, 2]})
-    df_polygon_lookup = df_polygon_lookup.set_index("polygon_index")
-    # Sort values to be able to take the lowest and second lowest values in
-    # the groupby by taking the first [.nth(0)] and second row [.nth(1)].
-    df_polygon_lookup = df_polygon_lookup.sort_values("z", ascending=True)
+    # Assign to dataframe to map means to right index.
+    test = dataframe.copy()
+    test["lower"] = lower_mean
+    test["upper"] = upper_mean
 
-    grouped = df_polygon_lookup.groupby("polygon_index")
-    # Take the average of the lowest and second lowest as lower bound
-    zlower = (grouped["z"].nth(0) + grouped["z"].nth(1)) / 2
-    # Take the average of the highest and second highest as upper bound
-    zupper = (grouped["z"].nth(-1) + grouped["z"].nth(-2)) / 2
-    return zlower.values, zupper.values
+    return test["lower"], test["upper"]
 
 
 def _fraction_layer_overlap(
@@ -276,10 +271,10 @@ def _fraction_layer_overlap(
     layer_bounds[..., 0] = typing.cast(np.ndarray, bottom_mean.values).T
     layer_bounds[..., 1] = typing.cast(np.ndarray, top_mean.values).T
 
-    zmin, zmax = _extract_hfb_bounds_from_dataframe(dataframe)
+    zmin, zmax = _extract_mean_hfb_bounds_from_dataframe(dataframe)
     hfb_bounds = np.empty((n_edge, n_layer, 2), dtype=float)
-    hfb_bounds[..., 0] = zmin[:, np.newaxis]
-    hfb_bounds[..., 1] = zmax[:, np.newaxis]
+    hfb_bounds[..., 0] = zmin.values[:, np.newaxis]
+    hfb_bounds[..., 1] = zmax.values[:, np.newaxis]
 
     overlap = _vectorized_overlap(hfb_bounds, layer_bounds)
     height = layer_bounds[..., 1] - layer_bounds[..., 0]
@@ -747,14 +742,15 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             variable_names = [self._get_variable_name(), "geometry", "layer"]
         else:
             variable_names = [self._get_variable_name(), "geometry"]
-        barrier_dataframe = self.dataset[variable_names].to_dataframe()
+        barrier_dataframe = gpd.GeoDataFrame(self.dataset[variable_names].to_dataframe())
 
         if "layer" not in self._get_vertical_variables():
-            linestrings = _make_linestring_from_polygon(barrier_dataframe)
-            barrier_dataframe["geometry"] = linestrings
+            lower, _ = _extract_hfb_bounds_from_zpolygons(barrier_dataframe)
+            linestring = _create_zlinestring_from_bound_df(lower)
+            barrier_dataframe["geometry"] = linestring
 
         barrier_dataframe = clip_line_gdf_by_grid(
-            gpd.GeoDataFrame(barrier_dataframe), idomain.sel(layer=1)
+            barrier_dataframe, idomain.sel(layer=1)
         )
 
         # Work around issue where xu.snap_to_grid cannot handle snapping a
