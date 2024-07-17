@@ -520,7 +520,7 @@ class NodePropertyFlow(Package, IRegridPackage):
         )
         new_package_data["icelltype"] = icelltype
 
-        return NodePropertyFlow(**new_package_data, validate= True)
+        return NodePropertyFlow(**new_package_data, validate=True)
 
     @classmethod
     def get_regrid_methods(cls) -> NodePropertyFlowRegridMethod:

@@ -1,6 +1,7 @@
 import itertools
 from datetime import datetime
 from typing import Dict, List
+
 import numpy as np
 
 
@@ -12,7 +13,7 @@ def expand_repetitions(
         range(time_min.year, time_max.year + 1),
         repeat_stress,
     ):
-        newdate =np.datetime64( date.replace(year=year))
+        newdate = np.datetime64(date.replace(year=year))
         if newdate < time_max:
-            expanded[newdate] = np.datetime64(date) 
+            expanded[newdate] = np.datetime64(date)
     return expanded

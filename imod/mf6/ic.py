@@ -1,5 +1,5 @@
-from copy import deepcopy
 import warnings
+from copy import deepcopy
 from typing import Any, Optional
 
 import numpy as np
@@ -138,7 +138,7 @@ class InitialConditions(Package, IRegridPackage):
         new_package_data = _regrid_package_data(
             data, target_grid, regridder_types, regrid_cache, {}
         )
-        return cls(**new_package_data, validate= True)
+        return cls(**new_package_data, validate=True)
 
     @classmethod
     def get_regrid_methods(cls) -> InitialConditionsRegridMethod:

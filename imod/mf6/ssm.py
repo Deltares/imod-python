@@ -1,4 +1,3 @@
-from typing import Optional
 import numpy as np
 
 from imod.logging import init_log_decorator, logger
@@ -167,7 +166,7 @@ class SourceSinkMixing(BoundaryCondition, IRegridPackage):
             save_flows=save_flows,
             validate=validate,
         )
-    
-    @classmethod   
+
+    @classmethod
     def get_regrid_methods(cls) -> RegridMethodType:
         return EmptyRegridMethod()

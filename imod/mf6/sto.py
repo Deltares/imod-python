@@ -1,6 +1,6 @@
 import abc
 from copy import deepcopy
-from typing import Any, Dict, Optional, cast
+from typing import Any, Dict, Optional
 
 import numpy as np
 
@@ -194,8 +194,7 @@ class SpecificStorage(StorageBase):
     def render(self, directory, pkgname, globaltimes, binary):
         d = self._render_dict(directory, pkgname, globaltimes, binary)
         return self._template.render(d)
-    
-    
+
     @classmethod
     def get_regrid_methods(cls) -> SpecificStorageRegridMethod:
         return deepcopy(cls._regrid_method)
@@ -368,7 +367,7 @@ class StorageCoefficient(StorageBase):
             regridder_types = StorageCoefficient.get_regrid_methods()
 
         new_package_data = _regrid_package_data(
-            data, target_grid,  regridder_types, regrid_cache, {}
+            data, target_grid, regridder_types, regrid_cache, {}
         )
 
         new_package_data["convertible"] = zeros_like(target_grid, dtype=int)
@@ -377,8 +376,8 @@ class StorageCoefficient(StorageBase):
         )
         new_package_data["specific_yield"] = None
 
-        return cls(**new_package_data, validate = True, save_flows= False)
-    
+        return cls(**new_package_data, validate=True, save_flows=False)
+
     @classmethod
     def get_regrid_methods(cls) -> StorageCoefficientRegridMethod:
-         return deepcopy(cls._regrid_method)
+        return deepcopy(cls._regrid_method)

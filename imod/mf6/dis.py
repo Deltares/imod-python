@@ -226,7 +226,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         # Assume iMOD5 data provided as fully 3D and not Quasi-3D
         new_package_data["top"] = new_package_data["top"].sel(layer=1, drop=True)
 
-        return cls(**new_package_data, validate= True)
+        return cls(**new_package_data, validate=True)
 
     @classmethod
     def get_regrid_methods(cls) -> DiscretizationRegridMethod:

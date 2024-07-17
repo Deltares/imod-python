@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Optional, cast
+from typing import Optional
 
 import numpy as np
 
@@ -8,7 +8,6 @@ from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.package import Package
 from imod.mf6.regrid.regrid_schemes import ConstantHeadRegridMethod
 from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
@@ -281,8 +280,8 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         regridded_package_data["head"] = head
         regridded_package_data.pop("ibound")
 
-        return cls(**regridded_package_data, validate= True)
+        return cls(**regridded_package_data, validate=True)
 
     @classmethod
     def get_regrid_methods(cls) -> ConstantHeadRegridMethod:
-         return deepcopy(cls._regrid_method)
+        return deepcopy(cls._regrid_method)
