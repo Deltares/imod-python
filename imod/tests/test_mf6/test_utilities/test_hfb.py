@@ -9,6 +9,7 @@ from imod.mf6.hfb import (
     SingleLayerHorizontalFlowBarrierResistance,
 )
 from imod.mf6.utilities.mf6hfb import merge_hfb_packages
+from imod.prepare.hfb import linestring_to_square_zpolygons
 
 
 @pytest.mark.usefixtures("structured_flow_model")
@@ -60,13 +61,17 @@ def make_layer_geometry(resistance, layer):
 def make_depth_geometry(resistance, top, bot):
     barrier_y = [11.0, 5.0, -1.0]
     barrier_x = [5.0, 5.0, 5.0]
+    barrier_ztop = [top, top]
+    barrier_zbottom = [bot, bot]
+
+    polygons = linestring_to_square_zpolygons(
+        barrier_x, barrier_y, barrier_ztop, barrier_zbottom
+    )
 
     geometry = gpd.GeoDataFrame(
-        geometry=[shapely.linestrings(barrier_x, barrier_y)],
+        geometry=polygons,
         data={
-            "resistance": [resistance],
-            "ztop": [top],
-            "zbottom": [bot],
+            "resistance": [resistance, resistance],
         },
     )
     return geometry
@@ -149,7 +154,7 @@ def test_merge_mixed_hfbs__single_layer(modellayers_single_layer):
     n_barriers = 3
     single_resistance = 400.0
 
-    top = modellayers_single_layer["top"].values
+    top = float(modellayers_single_layer["top"].values)
     bot = modellayers_single_layer["bottom"].values[0]
 
     geometry = make_layer_geometry(single_resistance, 1)
