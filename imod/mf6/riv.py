@@ -327,7 +327,7 @@ class River(BoundaryCondition, IRegridPackage):
             regridded_package_data["bottom_elevation"]
         )
 
-        river_package = River(**regridded_package_data)
+        river_package = River(**regridded_package_data, validate= True)
         # create a drainage package with the conductance we computed from the infiltration factor
         drainage_package = cls.create_infiltration_factor_drain(
             regridded_package_data["stage"],

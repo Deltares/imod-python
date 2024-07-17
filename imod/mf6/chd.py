@@ -279,4 +279,4 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         regridded_package_data["head"] = head
         regridded_package_data.pop("ibound")
 
-        return cls(**regridded_package_data)
+        return cls(**regridded_package_data, validate= True)

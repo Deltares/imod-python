@@ -216,4 +216,4 @@ class Recharge(BoundaryCondition, IRegridPackage):
             rch_rate = enforce_dim_order(rch_rate)
             new_package_data["rate"] = rch_rate
 
-        return Recharge(**new_package_data)
+        return Recharge(**new_package_data, validate= True, fixed_cell = False)

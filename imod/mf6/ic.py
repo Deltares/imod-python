@@ -118,7 +118,7 @@ class InitialConditions(Package, IRegridPackage):
         target_grid: GridDataArray
             The grid that should be used for the new package. Does not
             need to be identical to one of the input grids.
-        regridder_types: RegridMethodType, optional
+        regridder_types: InitialConditionsRegridMethod, optional
             Optional dataclass with regridder types for a specific variable.
             Use this to override default regridding methods.
 
@@ -137,4 +137,4 @@ class InitialConditions(Package, IRegridPackage):
         new_package_data = _regrid_package_data(
             data, target_grid, regridder_types, regrid_cache, {}
         )
-        return cls(**new_package_data)
+        return cls(**new_package_data, validate= True)
