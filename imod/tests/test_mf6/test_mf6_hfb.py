@@ -164,11 +164,11 @@ def test_hfb_regrid(
     # Assert
     geometries = hfb_clipped.dataset["geometry"].values.ravel()
 
-    xyz_arr = get_coordinates(geometries[0], include_z = True)  # 2nd polygon is clipped
+    xyz_arr = get_coordinates(geometries[0], include_z=True)  # 2nd polygon is clipped
 
-    np.testing.assert_allclose(xyz_arr[:, 0], [40., 50., 50., 40., 40.])
+    np.testing.assert_allclose(xyz_arr[:, 0], [40.0, 50.0, 50.0, 40.0, 40.0])
     np.testing.assert_allclose(xyz_arr[:, 1], [5.5, 5.5, 5.5, 5.5, 5.5])
-    np.testing.assert_allclose(xyz_arr[:, 2], [-100., -100., 0., 0., -100.])
+    np.testing.assert_allclose(xyz_arr[:, 2], [-100.0, -100.0, 0.0, 0.0, -100.0])
 
 
 @pytest.mark.parametrize("dis", ["basic_unstructured_dis", "basic_dis"])

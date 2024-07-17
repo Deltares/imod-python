@@ -140,6 +140,7 @@ class HorizontalFlowBarrierCases:
             },
         )
 
+
 def is_expected_hfb_partition_combination_fail(current_cases):
     """
     Helper function for all expected failures

@@ -21,20 +21,30 @@ except ImportError:
 def _create_zlinestring_from_bound_df(bound: pd.DataFrame) -> gpd.GeoDataFrame:
     """Create geodataframe with linestring geometry from dataframe with bounds."""
     # Each linestring has its own index, therefore groupby index.
-    linestrings = [(g[0], shapely.LineString(g[1].values)) for g in bound.groupby('index')]
-    return gpd.GeoDataFrame(linestrings, columns=["index", "geometry"], geometry="geometry").set_index("index")
+    linestrings = [
+        (g[0], shapely.LineString(g[1].values)) for g in bound.groupby("index")
+    ]
+    return gpd.GeoDataFrame(
+        linestrings, columns=["index", "geometry"], geometry="geometry"
+    ).set_index("index")
+
 
 def _create_zpolygon_from_polygon_df(polygon_df: pd.DataFrame) -> gpd.GeoDataFrame:
     """Create geodataframe with polygon geometry from dataframe with polygon nodes."""
-    index_names = ["index", 'parts']
-    polygons = [(g[0], shapely.Polygon(g[1].values)) for g in polygon_df.groupby(index_names)]
+    index_names = ["index", "parts"]
+    polygons = [
+        (g[0], shapely.Polygon(g[1].values)) for g in polygon_df.groupby(index_names)
+    ]
     index_tuples, polygons_data = list(zip(*polygons))
     multi_index = pd.MultiIndex.from_tuples(index_tuples, names=index_names)
-    return gpd.GeoDataFrame(polygons_data, columns=["geometry"], index=multi_index, geometry="geometry")
+    return gpd.GeoDataFrame(
+        polygons_data, columns=["geometry"], index=multi_index, geometry="geometry"
+    )
+
 
 def _extract_hfb_bounds_from_zpolygons(
-        dataframe: gpd.GeoDataFrame
-    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    dataframe: gpd.GeoDataFrame,
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Extract hfb bounds from dataframe. Requires dataframe geometry to be of type
     shapely "Z Polygon".
@@ -51,9 +61,10 @@ def _extract_hfb_bounds_from_zpolygons(
 
     return lower, upper
 
+
 def hfb_zpolygons_to_zlinestrings(dataframe: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     """
-    Convert GeoDataFrame with zpolygons to zlinestrings. 
+    Convert GeoDataFrame with zpolygons to zlinestrings.
 
     Paramaters
     ----------
@@ -62,7 +73,7 @@ def hfb_zpolygons_to_zlinestrings(dataframe: gpd.GeoDataFrame) -> gpd.GeoDataFra
 
     Returns
     -------
-    GeoDataFrame with upper and lower bound as linestrings. 
+    GeoDataFrame with upper and lower bound as linestrings.
         The multi-index denotes whether linestring designates "upper" or "lower"
         bound.
     """
@@ -71,9 +82,16 @@ def hfb_zpolygons_to_zlinestrings(dataframe: gpd.GeoDataFrame) -> gpd.GeoDataFra
     lower_gdf = _create_zlinestring_from_bound_df(lower)
     upper_gdf = _create_zlinestring_from_bound_df(upper)
 
-    bounds_gdf = pd.concat([lower_gdf, upper_gdf], keys=["lower", "upper",])
+    bounds_gdf = pd.concat(
+        [lower_gdf, upper_gdf],
+        keys=[
+            "lower",
+            "upper",
+        ],
+    )
 
     return bounds_gdf
+
 
 def _flip_linestrings(df: pd.DataFrame):
     """
@@ -85,9 +103,12 @@ def _flip_linestrings(df: pd.DataFrame):
     # Set to multi-index to prepare sort
     df_multi = df_reset.set_index(["index", "parts", df_reset.index])
     # Sort, only reverse newly added index.
-    df_sorted = df_multi.sort_index(level=[0,1,2],ascending=[True,True,False],axis=0)
+    df_sorted = df_multi.sort_index(
+        level=[0, 1, 2], ascending=[True, True, False], axis=0
+    )
     # Drop index added for sorting
     return df_sorted.reset_index(level=2, drop=True)
+
 
 def hfb_zlinestrings_to_zpolygons(bounds_gdf: gpd.GeoSeries) -> gpd.GeoDataFrame:
     """
@@ -106,7 +127,9 @@ def hfb_zlinestrings_to_zpolygons(bounds_gdf: gpd.GeoSeries) -> gpd.GeoDataFrame
     coordinates = bounds_gdf.get_coordinates(include_z=True)
     # Sort index to ascending everywhere to be able to assign flip upper bound
     # linestrings without errors.
-    coordinates = coordinates.sort_index(level=[0,1,2],ascending=[True,True,True],axis=0)
+    coordinates = coordinates.sort_index(
+        level=[0, 1, 2], ascending=[True, True, True], axis=0
+    )
     # Reverse upper bound to prevent bowtie polygon from being made.
     coordinates.loc["upper"] = _flip_linestrings(coordinates.loc["upper"]).values
     # Drop index with "upper" and "lower" in it.
