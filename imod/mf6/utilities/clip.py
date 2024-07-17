@@ -140,7 +140,7 @@ def clip_line_gdf_by_grid(
     # Clip line with polygon
     bounding_gdf = bounding_polygon(active)
 
-    if gdf.has_z.any():
+    if (shapely.get_type_id(gdf.geometry) == shapely.GeometryType.POLYGON).any():
         # Shapely returns z linestrings when clipping our vertical z polygons.
         # To work around this convert polygons to zlinestrings to clip.
         # Consequently construct polygons from these clipped linestrings.
