@@ -26,8 +26,11 @@ def _create_zlinestring_from_bound_df(bound: pd.DataFrame) -> gpd.GeoDataFrame:
 
 def _create_zpolygon_from_polygon_df(polygon_df: pd.DataFrame) -> gpd.GeoDataFrame:
     """Create geodataframe with polygon geometry from dataframe with polygon nodes."""
-    polygons = [(g[0], shapely.Polygon(g[1].values)) for g in polygon_df.groupby('index')]
-    return gpd.GeoDataFrame(polygons, columns=["index", "geometry"], geometry="geometry").set_index("index")
+    index_names = ["index", 'parts']
+    polygons = [(g[0], shapely.Polygon(g[1].values)) for g in polygon_df.groupby(index_names)]
+    index_tuples, polygons_data = list(zip(*polygons))
+    multi_index = pd.MultiIndex.from_tuples(index_tuples, names=index_names)
+    return gpd.GeoDataFrame(polygons_data, columns=["geometry"], index=multi_index, geometry="geometry")
 
 def _extract_hfb_bounds_from_zpolygons(
         dataframe: gpd.GeoDataFrame
@@ -80,11 +83,13 @@ def _flip_linestrings(df: pd.DataFrame):
     # This new index denotes unique nodes
     df_reset = df.reset_index()
     # Set to multi-index to prepare sort
-    df_multi = df_reset.set_index(["index", df_reset.index])
+    df_multi = df_reset.set_index(["parts", df_reset.index])
     # Sort, only reverse newly added index.
     df_sorted = df_multi.sort_index(level=[0,1],ascending=[True,False],axis=0)
     # Drop index added for sorting
-    return df_sorted.reset_index(level=1, drop=True)
+    df_sorted = df_sorted.reset_index(level=1, drop=True)
+    # Set index again
+    return df_sorted.set_index(["index", df_sorted.index])
 
 def hfb_zlinestrings_to_zpolygons(bounds_gdf: gpd.GeoSeries) -> gpd.GeoDataFrame:
     """

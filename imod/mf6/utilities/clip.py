@@ -105,6 +105,29 @@ def clip_by_grid(package: ILineDataPackage, active: GridDataArray) -> ILineDataP
     clipped_package.line_data = clipped_line_data
     return clipped_package
 
+def _clip_linestring(gdf_linestrings: gpd.GeoDataFrame, bounding_gdf: gpd.GeoDataFrame):
+    clipped_line_data = gdf_linestrings.clip(bounding_gdf)
+    
+    # Catch edge case: when line crosses only vertex of polygon, a point
+    # or multipoint is returned. Drop these.
+    type_ids = shapely.get_type_id(clipped_line_data.geometry)
+    is_points = (type_ids == shapely.GeometryType.POINT) | (
+        type_ids == shapely.GeometryType.MULTIPOINT
+    )
+    clipped_line_data = clipped_line_data[~is_points]
+
+    if clipped_line_data.index.shape[0] == 0:
+        # Shortcut if GeoDataFrame is empty
+        return clipped_line_data
+
+    # Convert MultiLineStrings to LineStrings, index parts of MultiLineStrings
+    clipped_line_data = clipped_line_data.explode("geometry", ignore_index=False, index_parts=True)
+    if clipped_line_data.index.nlevels == 3:
+        index_names = ["bound", "index", "parts"]
+    else:
+        index_names = ["index", "parts"]
+    clipped_line_data.index = clipped_line_data.index.set_names(index_names)
+    return clipped_line_data
 
 def clip_line_gdf_by_grid(
     gdf: gpd.GeoDataFrame, active: GridDataArray
@@ -118,18 +141,7 @@ def clip_line_gdf_by_grid(
         # To work around this convert polygons to zlinestrings to clip.
         # Consequently construct polygons from these clipped linestrings.
         gdf_linestrings = hfb_zpolygons_to_zlinestrings(gdf)
-        clipped_linestrings = gdf_linestrings.clip(bounding_gdf)
-        clipped_line_data = hfb_zlinestrings_to_zpolygons(clipped_linestrings)
+        clipped_linestrings = _clip_linestring(gdf_linestrings, bounding_gdf)
+        return hfb_zlinestrings_to_zpolygons(clipped_linestrings)
     else:
-        clipped_line_data = gdf.clip(bounding_gdf)
-
-    # Catch edge case: when line crosses only vertex of polygon, a point
-    # or multipoint is returned. Drop these.
-    type_ids = shapely.get_type_id(clipped_line_data.geometry)
-    is_points = (type_ids == shapely.GeometryType.POINT) | (
-        type_ids == shapely.GeometryType.MULTIPOINT
-    )
-    clipped_line_data = clipped_line_data[~is_points]
-
-    # Convert MultiLineStrings to LineStrings
-    return clipped_line_data.explode("geometry", ignore_index=True)
+        return _clip_linestring(gdf, bounding_gdf)

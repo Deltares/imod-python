@@ -552,7 +552,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             return True
 
         linestrings = self.dataset["geometry"]
-        only_empty_lines = all(ls.is_empty for ls in linestrings.values)
+        only_empty_lines = all(ls.is_empty for ls in linestrings.values.ravel())
         return only_empty_lines
 
     def _resistance_layer(
@@ -769,7 +769,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
                 xu.UgridDataset,
                 xu.snap_to_grid(row_df, grid=idomain, max_snap_distance=0.5),
             )
-            snapped_dataset_row["line_index"] += index  # Set to original line index.
+            snapped_dataset_row["line_index"] += index[0]  # Set to original line index.
             snapped_dataset_rows.append(snapped_dataset_row)
         snapped_dataset = xu.merge(snapped_dataset_rows)
 
