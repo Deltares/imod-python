@@ -362,7 +362,7 @@ class StorageCoefficient(StorageBase):
             regridder_types = StorageCoefficient.get_regrid_methods()
 
         new_package_data = _regrid_package_data(
-            data, target_grid, regridder_types, regrid_cache, {}
+            data, target_grid,  regridder_types, regrid_cache, {}
         )
 
         new_package_data["convertible"] = zeros_like(target_grid, dtype=int)
@@ -371,4 +371,4 @@ class StorageCoefficient(StorageBase):
         )
         new_package_data["specific_yield"] = None
 
-        return cls(**new_package_data)
+        return cls(**new_package_data, validate = True, save_flows= False)
