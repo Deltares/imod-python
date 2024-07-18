@@ -8,7 +8,7 @@ import pandas as pd
 
 def expand_repetitions(
     repeat_stress: List[datetime], time_min: datetime, time_max: datetime
-) -> Dict[datetime, datetime]:
+) -> Dict[np.datetime64, np.datetime64]:
     """
     Given a list of repeat stresses,  and the start and end time of the simulation,
     this function returns a dictionary indicating what repeat stress should be used
@@ -38,9 +38,9 @@ def expand_repetitions(
         range(time_min.year, time_max.year + 1),
         repeat_stress,
     ):
-        newdate = date.replace(year=year)
+        newdate = np.datetime64(date.replace(year=year))
         if newdate < time_max:
-            expanded[newdate] = date
+            expanded[newdate] = np.datetime64(date)
     return expanded
 
 

@@ -1,3 +1,4 @@
+from copy import deepcopy
 from datetime import datetime
 from typing import Optional, Tuple
 
@@ -327,7 +328,9 @@ class River(BoundaryCondition, IRegridPackage):
             regridded_package_data["bottom_elevation"]
         )
 
-        river_package = River(**regridded_package_data)
+        river_package = River(**regridded_package_data, validate=True)
+        optional_river_package: Optional[River] = None
+        optional_drainage_package: Optional[Drainage] = None
         # create a drainage package with the conductance we computed from the infiltration factor
         drainage_package = cls.create_infiltration_factor_drain(
             regridded_package_data["stage"],
@@ -336,29 +339,29 @@ class River(BoundaryCondition, IRegridPackage):
         # remove River package if its mask is False everywhere
         mask = ~np.isnan(river_conductance)
         if np.any(mask):
-            river_package = river_package.mask(mask)
+            optional_river_package = river_package.mask(mask)
         else:
-            river_package = None
+            optional_river_package = None
 
         # remove Drainage package if its mask is False everywhere
         mask = ~np.isnan(drain_conductance)
         if np.any(mask):
-            drainage_package = drainage_package.mask(mask)
+            optional_drainage_package = drainage_package.mask(mask)
         else:
-            drainage_package = None
+            optional_drainage_package = None
 
         repeat = period_data.get(key)
         if repeat is not None:
-            if river_package is not None:
-                river_package.set_repeat_stress(
+            if optional_river_package is not None:
+                optional_river_package.set_repeat_stress(
                     expand_repetitions(repeat, time_min, time_max)
                 )
-            if drainage_package is not None:
-                drainage_package.set_repeat_stress(
+            if optional_drainage_package is not None:
+                optional_drainage_package.set_repeat_stress(
                     expand_repetitions(repeat, time_min, time_max)
                 )
 
-        return (river_package, drainage_package)
+        return (optional_river_package, optional_drainage_package)
 
     @classmethod
     def create_infiltration_factor_drain(
@@ -436,3 +439,7 @@ class River(BoundaryCondition, IRegridPackage):
         drainage_conductance = drainage_conductance.where(drainage_conductance > 0)
         river_conductance = river_conductance.where(river_conductance > 0)
         return drainage_conductance, river_conductance
+
+    @classmethod
+    def get_regrid_methods(cls) -> RiverRegridMethod:
+        return deepcopy(cls._regrid_method)
