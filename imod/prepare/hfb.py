@@ -68,6 +68,23 @@ def linestring_to_square_zpolygons(
     Returns
     -------
     List of polygons with z dimension.
+
+    Examples
+    --------
+
+    >>> x = [-10.0, 0.0, 10.0]
+    >>> y = [10.0, 0.0, -10.0]
+    >>> ztop = [10.0, 20.0]
+    >>> zbot = [-10.0, -20.0]
+    >>> polygons = linestring_to_square_zpolygons(x, y, ztop, zbot)
+
+    You can use these polygons to construct horizontal flow barriers:
+
+    >>> geometry = gpd.GeoDataFrame(geometry=polygons, data={
+    >>>         "resistance": [1e3, 1e3],
+    >>>     },
+    >>> )
+    >>> hfb = imod.mf6.HorizontalFlowBarrierResistance(geometry, print_input)
     """
     n = len(barrier_x)
     expected_lengths = (n, n, n - 1, n - 1)
@@ -157,6 +174,23 @@ def linestring_to_trapezoid_zpolygons(
     Returns
     -------
     List of polygons with z dimension.
+
+    Examples
+    --------
+
+    >>> x = [-10.0, 0.0, 10.0]
+    >>> y = [10.0, 0.0, -10.0]
+    >>> ztop = [10.0, 20.0, 15.0]
+    >>> zbot = [-10.0, -20.0, 0.0]
+    >>> polygons = linestring_to_trapezoid_zpolygons(x, y, ztop, zbot)
+
+    You can use these polygons to construct horizontal flow barriers:
+
+    >>> geometry = gpd.GeoDataFrame(geometry=polygons, data={
+    >>>         "resistance": [1e3, 1e3],
+    >>>     },
+    >>> )
+    >>> hfb = imod.mf6.HorizontalFlowBarrierResistance(geometry, print_input)
     """
 
     n = len(barrier_x)
