@@ -93,7 +93,7 @@ def hfb_zpolygons_to_zlinestrings(dataframe: gpd.GeoDataFrame) -> gpd.GeoDataFra
     return bounds_gdf
 
 
-def _flip_linestrings(df: pd.DataFrame):
+def _flip_linestrings(df: pd.DataFrame) -> pd.DataFrame:
     """
     Flip linestrings, preserve linestring order.
     """

@@ -37,16 +37,20 @@ else:
     except ImportError:
         gpd = MissingOptionalModule("geopandas")
 
-try:
+
+if TYPE_CHECKING:
     import shapely
-except ImportError:
-    shapely = MissingOptionalModule("shapely")
+else:
+    try:
+        import shapely
+    except ImportError:
+        shapely = MissingOptionalModule("shapely")
 
 
 @typedispatch
 def _derive_connected_cell_ids(
     idomain: xr.DataArray, grid: xu.Ugrid2d, edge_index: np.ndarray
-):
+) -> xr.Dataset:
     """
     Derive the cell ids of the connected cells of an edge on a structured grid.
 
@@ -95,7 +99,7 @@ def _derive_connected_cell_ids(
 @typedispatch  # type: ignore[no-redef]
 def _derive_connected_cell_ids(
     _: xu.UgridDataArray, grid: xu.Ugrid2d, edge_index: np.ndarray
-):
+) -> xr.Dataset:
     """
     Derive the cell ids of the connected cells of an edge on an unstructured grid.
 
@@ -218,7 +222,9 @@ def _select_dataframe_with_snapped_line_index(
     return dataframe.iloc[line_index]
 
 
-def _extract_mean_hfb_bounds_from_dataframe(dataframe: gpd.GeoDataFrame):
+def _extract_mean_hfb_bounds_from_dataframe(
+    dataframe: gpd.GeoDataFrame,
+) -> Tuple[pd.Series, pd.Series]:
     """
     Extract hfb bounds from dataframe. Requires dataframe geometry to be of type
     shapely "Z Polygon".
@@ -258,7 +264,7 @@ def _fraction_layer_overlap(
     dataframe: gpd.GeoDataFrame,
     top: xu.UgridDataArray,
     bottom: xu.UgridDataArray,
-):
+) -> xr.DataArray:
     """
     Computes the fraction a barrier occupies inside a layer.
     """
@@ -313,7 +319,7 @@ def _mean_left_and_right(
     return xr.concat((uda_left, uda_right), dim="two").mean("two")
 
 
-def _vectorized_overlap(bounds_a: np.ndarray, bounds_b: np.ndarray):
+def _vectorized_overlap(bounds_a: np.ndarray, bounds_b: np.ndarray) -> np.ndarray:
     """
     Vectorized overlap computation. Returns the overlap of 2 vectors along the same axis.
     If there is no overlap zero will be returned.

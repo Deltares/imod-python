@@ -106,7 +106,9 @@ def clip_by_grid(package: ILineDataPackage, active: GridDataArray) -> ILineDataP
     return clipped_package
 
 
-def _clip_linestring(gdf_linestrings: gpd.GeoDataFrame, bounding_gdf: gpd.GeoDataFrame):
+def _clip_linestring(
+    gdf_linestrings: gpd.GeoDataFrame, bounding_gdf: gpd.GeoDataFrame
+) -> gpd.GeoDataFrame:
     clipped_line_data = gdf_linestrings.clip(bounding_gdf)
 
     # Catch edge case: when line crosses only vertex of polygon, a point
