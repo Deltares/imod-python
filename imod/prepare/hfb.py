@@ -69,6 +69,21 @@ def linestring_to_square_zpolygons(
     -------
     List of polygons with z dimension.
     """
+    n = len(barrier_x)
+    expected_lengths = (n, n, n - 1, n - 1)
+    actual_lengths = (
+        len(barrier_x),
+        len(barrier_y),
+        len(barrier_ztop),
+        len(barrier_zbottom),
+    )
+    if expected_lengths != actual_lengths:
+        raise ValueError(
+            "Lengths of barrier data, not properly made. For lengths: (x, y,"
+            f" ztop, zbottom). Expected lengths: {expected_lengths}, received"
+            f" lengths: {actual_lengths}"
+        )
+
     x_pairs = pairwise(barrier_x)
     y_pairs = pairwise(barrier_y)
     z_pairs = zip(barrier_ztop, barrier_zbottom)
@@ -143,6 +158,22 @@ def linestring_to_trapezoid_zpolygons(
     -------
     List of polygons with z dimension.
     """
+
+    n = len(barrier_x)
+    expected_lengths = (n, n, n, n)
+    actual_lengths = (
+        len(barrier_x),
+        len(barrier_y),
+        len(barrier_ztop),
+        len(barrier_zbottom),
+    )
+    if expected_lengths != actual_lengths:
+        raise ValueError(
+            "Lengths of barrier data, not properly made. For lengths: (x, y,"
+            f" ztop, zbottom). Expected lengths: {expected_lengths}, received"
+            f" lengths: {actual_lengths}"
+        )
+
     x_pairs = pairwise(barrier_x)
     y_pairs = pairwise(barrier_y)
     zt_pairs = pairwise(barrier_ztop)
