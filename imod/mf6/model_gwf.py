@@ -300,7 +300,7 @@ class GroundwaterFlowModel(Modflow6Model):
         # import rivers ( and drainage to account for infiltration factor)
         riv_keys = [key for key in imod5_keys if key[0:3] == "riv"]
         for riv_key in riv_keys:
-            riv_pkg, drn_pakg = River.from_imod5_data(
+            riv_pkg, riv_drn_pkg = River.from_imod5_data(
                 riv_key,
                 imod5_data,
                 period_data,
@@ -314,8 +314,8 @@ class GroundwaterFlowModel(Modflow6Model):
             )
             if riv_pkg is not None:
                 result[riv_key + "riv"] = riv_pkg
-            if drn_pakg is not None:
-                result[riv_key + "drn"] = drn_pakg
+            if riv_drn_pkg is not None:
+                result[riv_key + "drn"] = riv_drn_pkg
 
         # import hfb
         hfb_keys = [key for key in imod5_keys if key[0:3] == "hfb"]
