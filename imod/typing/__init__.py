@@ -22,15 +22,16 @@ GEOPANDAS_CONFIRMED = False
 if TYPE_CHECKING:
     try:
         import geopandas as gpd
+
         GEOPANDAS_CONFIRMED = True
     except ImportError:
-        pass 
+        pass
 
 if GEOPANDAS_CONFIRMED:
     GeoDataFrameType = gpd.GeoDataFrame
     GeoSeriesType = gpd.GeoSeries
 else:
-    GeoDataFrameType = TypeVar('GeoDataFrameType')
+    GeoDataFrameType = TypeVar("GeoDataFrameType")
     GeoSeriesType = TypeVar("GeoSeriesType")
 
 
@@ -38,13 +39,14 @@ SHAPELY_CONFIRMED = False
 if TYPE_CHECKING:
     try:
         import shapely
+
         SHAPELY_CONFIRMED = True
     except ImportError:
-        pass 
+        pass
 
 if SHAPELY_CONFIRMED:
     PolygonType = shapely.Polygon
     LineStringType = shapely.LineString
 else:
-    PolygonType = TypeVar('PolygonType')
+    PolygonType = TypeVar("PolygonType")
     LineStringType = TypeVar("LineStringType")
