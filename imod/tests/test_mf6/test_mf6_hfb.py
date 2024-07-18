@@ -788,8 +788,8 @@ def test_make_linestring_from_polygon():
 def test_extract_hfb_bounds_from_dataframe():
     barrier_x = [-1000.0, 0.0, 1000.0]
     barrier_y = [0.3, 0.3, 0.3]
-    barrier_ztop = [10.0, 10.0]
-    barrier_zbottom = [-10.0, -10.0]
+    barrier_ztop = [10.0, 20.0]
+    barrier_zbottom = [-10.0, -30.0]
 
     polygons = linestring_to_square_zpolygons(
         barrier_x, barrier_y, barrier_ztop, barrier_zbottom
@@ -804,8 +804,8 @@ def test_extract_hfb_bounds_from_dataframe():
 
     zmin, zmax = _extract_mean_hfb_bounds_from_dataframe(gdf_polygons)
 
-    np.testing.assert_equal(zmin, barrier_zbottom)
-    np.testing.assert_equal(zmax, barrier_ztop)
+    np.testing.assert_equal(zmin.values, barrier_zbottom)
+    np.testing.assert_equal(zmax.values, barrier_ztop)
 
 
 def test_extract_hfb_bounds_from_dataframe__fails():
@@ -818,7 +818,7 @@ def test_extract_hfb_bounds_from_dataframe__fails():
     gdf_polygons = gpd.GeoDataFrame(
         geometry=[line_data],
         data={
-            "resistance": [1e3],
+            "resistance": [1e3, 1e3],
         },
     )
 
