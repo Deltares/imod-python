@@ -1,24 +1,15 @@
 import pickle
 import textwrap
 from functools import wraps
-from typing import TYPE_CHECKING, Callable, Mapping, ParamSpec, Sequence, TypeVar, cast
+from typing import Callable, Mapping, ParamSpec, Sequence, TypeVar, cast
 
 import numpy as np
 import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
 
-from imod.typing import GridDataArray, GridDataset, structured
-from imod.util.imports import MissingOptionalModule
+from imod.typing import GeoDataFrameType, GridDataArray, GridDataset, structured
 from imod.util.spatial import _polygonize
-
-if TYPE_CHECKING:
-    import geopandas as gpd
-else:
-    try:
-        import geopandas as gpd
-    except ImportError:
-        gpd = MissingOptionalModule("geopandas")
 
 T = TypeVar("T")
 P = ParamSpec("P")
@@ -246,7 +237,7 @@ def merge_with_dictionary(
 
 
 @typedispatch
-def bounding_polygon(active: xr.DataArray) -> gpd.GeoDataFrame:
+def bounding_polygon(active: xr.DataArray) -> GeoDataFrameType:
     """Return bounding polygon of active cells"""
     to_polygonize = active.where(active, other=np.nan)
     polygons_gdf = _polygonize(to_polygonize)
@@ -256,7 +247,7 @@ def bounding_polygon(active: xr.DataArray) -> gpd.GeoDataFrame:
 
 
 @typedispatch  # type: ignore[no-redef]
-def bounding_polygon(active: xu.UgridDataArray) -> gpd.GeoDataFrame:  # noqa: F811
+def bounding_polygon(active: xu.UgridDataArray) -> GeoDataFrameType:  # noqa: F811
     """Return bounding polygon of active cells"""
     active_indices = np.where(active > 0)[0]
     domain_slice = {f"{active.ugrid.grid.face_dimension}": active_indices}

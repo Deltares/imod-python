@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from copy import deepcopy
 
-import geopandas as gpd
 import numpy as np
 import xarray as xr
 import xugrid as xu
@@ -16,7 +15,7 @@ from imod.mf6.utilities.hfb import (
     hfb_zlinestrings_to_zpolygons,
     hfb_zpolygons_to_zlinestrings,
 )
-from imod.typing import GridDataArray
+from imod.typing import GeoDataFrameType, GridDataArray
 from imod.typing.grid import bounding_polygon, is_spatial_grid
 from imod.util.imports import MissingOptionalModule
 
@@ -107,8 +106,8 @@ def clip_by_grid(package: ILineDataPackage, active: GridDataArray) -> ILineDataP
 
 
 def _clip_linestring(
-    gdf_linestrings: gpd.GeoDataFrame, bounding_gdf: gpd.GeoDataFrame
-) -> gpd.GeoDataFrame:
+    gdf_linestrings: GeoDataFrameType, bounding_gdf: GeoDataFrameType
+) -> GeoDataFrameType:
     clipped_line_data = gdf_linestrings.clip(bounding_gdf)
 
     # Catch edge case: when line crosses only vertex of polygon, a point
@@ -136,8 +135,8 @@ def _clip_linestring(
 
 
 def clip_line_gdf_by_grid(
-    gdf: gpd.GeoDataFrame, active: GridDataArray
-) -> gpd.GeoDataFrame:
+    gdf: GeoDataFrameType, active: GridDataArray
+) -> GeoDataFrameType:
     """Clip GeoDataFrame by bounding polygon of grid"""
     # Clip line with polygon
     bounding_gdf = bounding_polygon(active)

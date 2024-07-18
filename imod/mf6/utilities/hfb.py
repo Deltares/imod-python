@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, Tuple
 
 import pandas as pd
 
+from imod.typing import GeoDataFrameType, GeoSeriesType
 from imod.util.imports import MissingOptionalModule
 
 if TYPE_CHECKING:
@@ -18,7 +19,7 @@ except ImportError:
     shapely = MissingOptionalModule("shapely")
 
 
-def _create_zlinestring_from_bound_df(bound: pd.DataFrame) -> gpd.GeoDataFrame:
+def _create_zlinestring_from_bound_df(bound: pd.DataFrame) -> GeoDataFrameType:
     """Create geodataframe with linestring geometry from dataframe with bounds."""
     # Each linestring has its own index, therefore groupby index.
     linestrings = [
@@ -29,7 +30,7 @@ def _create_zlinestring_from_bound_df(bound: pd.DataFrame) -> gpd.GeoDataFrame:
     ).set_index("index")
 
 
-def _create_zpolygon_from_polygon_df(polygon_df: pd.DataFrame) -> gpd.GeoDataFrame:
+def _create_zpolygon_from_polygon_df(polygon_df: pd.DataFrame) -> GeoDataFrameType:
     """Create geodataframe with polygon geometry from dataframe with polygon nodes."""
     index_names = ["index", "parts"]
     polygons = [
@@ -43,7 +44,7 @@ def _create_zpolygon_from_polygon_df(polygon_df: pd.DataFrame) -> gpd.GeoDataFra
 
 
 def _extract_hfb_bounds_from_zpolygons(
-    dataframe: gpd.GeoDataFrame,
+    dataframe: GeoDataFrameType,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Extract hfb bounds from dataframe. Requires dataframe geometry to be of type
@@ -62,7 +63,7 @@ def _extract_hfb_bounds_from_zpolygons(
     return lower, upper
 
 
-def hfb_zpolygons_to_zlinestrings(dataframe: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+def hfb_zpolygons_to_zlinestrings(dataframe: GeoDataFrameType) -> GeoDataFrameType:
     """
     Convert GeoDataFrame with zpolygons to zlinestrings.
 
@@ -110,7 +111,7 @@ def _flip_linestrings(df: pd.DataFrame) -> pd.DataFrame:
     return df_sorted.reset_index(level=2, drop=True)
 
 
-def hfb_zlinestrings_to_zpolygons(bounds_gdf: gpd.GeoSeries) -> gpd.GeoDataFrame:
+def hfb_zlinestrings_to_zpolygons(bounds_gdf: GeoSeriesType) -> GeoDataFrameType:
     """
     Convert zlinestrings of bounds_gdf to zpolygons
 

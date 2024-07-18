@@ -7,7 +7,6 @@ from enum import Enum
 from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 
 import cftime
-import geopandas as gpd
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -26,7 +25,7 @@ from imod.mf6.utilities.hfb import (
     _extract_hfb_bounds_from_zpolygons,
 )
 from imod.schemata import EmptyIndexesSchema, MaxNUniqueValuesSchema
-from imod.typing import GridDataArray
+from imod.typing import GeoDataFrameType, GridDataArray, LineStringType
 from imod.util.imports import MissingOptionalModule
 
 if TYPE_CHECKING:
@@ -194,8 +193,8 @@ def to_connected_cells_dataset(
 
 
 def _make_linestring_from_polygon(
-    dataframe: gpd.GeoDataFrame,
-) -> List[shapely.LineString]:
+    dataframe: GeoDataFrameType,
+) -> List[LineStringType]:
     """
     Make linestring from a polygon with one axis in the vertical dimension (z),
     and one axis in the horizontal plane (x & y dimension).
@@ -215,7 +214,7 @@ def _make_linestring_from_polygon(
 
 
 def _select_dataframe_with_snapped_line_index(
-    snapped_dataset: xr.Dataset, edge_index: np.ndarray, dataframe: gpd.GeoDataFrame
+    snapped_dataset: xr.Dataset, edge_index: np.ndarray, dataframe: GeoDataFrameType
 ):
     line_index = snapped_dataset["line_index"].values
     line_index = line_index[edge_index].astype(int)
@@ -223,7 +222,7 @@ def _select_dataframe_with_snapped_line_index(
 
 
 def _extract_mean_hfb_bounds_from_dataframe(
-    dataframe: gpd.GeoDataFrame,
+    dataframe: GeoDataFrameType,
 ) -> Tuple[pd.Series, pd.Series]:
     """
     Extract hfb bounds from dataframe. Requires dataframe geometry to be of type
@@ -261,7 +260,7 @@ def _extract_mean_hfb_bounds_from_dataframe(
 def _fraction_layer_overlap(
     snapped_dataset: xu.UgridDataset,
     edge_index: np.ndarray,
-    dataframe: gpd.GeoDataFrame,
+    dataframe: GeoDataFrameType,
     top: xu.UgridDataArray,
     bottom: xu.UgridDataArray,
 ) -> xr.DataArray:
@@ -395,7 +394,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         ] + self._get_vertical_variables()
 
     @property
-    def line_data(self) -> "gpd.GeoDataFrame":
+    def line_data(self) -> GeoDataFrameType:
         variables_for_gdf = self._get_variable_names_for_gdf()
         return gpd.GeoDataFrame(
             self.dataset[variables_for_gdf].to_dataframe(),
@@ -403,7 +402,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         )
 
     @line_data.setter
-    def line_data(self, value: "gpd.GeoDataFrame") -> None:
+    def line_data(self, value: GeoDataFrameType) -> None:
         variables_for_gdf = self._get_variable_names_for_gdf()
         self.dataset = self.dataset.merge(
             value.to_xarray(), overwrite_vars=variables_for_gdf, join="right"
