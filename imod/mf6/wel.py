@@ -79,13 +79,13 @@ class Well(BoundaryCondition, IPointDataPackage):
     Parameters
     ----------
 
-    y: float or list of floats
+    y: float or list of floats or np.array of floats
         is the y location of the well.
-    x: float or list of floats
+    x: float or list of floats or np.array of floats
         is the x location of the well.
-    screen_top: float or list of floats
+    screen_top: float or list of floats or np.array of floats
         is the top of the well screen.
-    screen_bottom: float or list of floats
+    screen_bottom: float or list of floats or np.array of floats
         is the bottom of the well screen.
     rate: float, list of floats or xr.DataArray
         is the volumetric well rate. A positive value indicates well
@@ -193,10 +193,10 @@ class Well(BoundaryCondition, IPointDataPackage):
     @init_log_decorator()
     def __init__(
         self,
-        x: list[float],
-        y: list[float],
-        screen_top: list[float],
-        screen_bottom: list[float],
+        x: np.ndarray | list[float],
+        y: np.ndarray | list[float],
+        screen_top: np.ndarray | list[float],
+        screen_bottom: np.ndarray | list[float],
         rate: list[float] | xr.DataArray,
         concentration: Optional[list[float] | xr.DataArray] = None,
         concentration_boundary_type="aux",
