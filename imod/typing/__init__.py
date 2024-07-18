@@ -18,35 +18,17 @@ IntArray: TypeAlias = np.ndarray
 
 
 # Types for optional dependencies.
-GEOPANDAS_CONFIRMED = False
+
 if TYPE_CHECKING:
-    try:
-        import geopandas as gpd
+    import geopandas as gpd
+    import shapely
 
-        GEOPANDAS_CONFIRMED = True
-    except ImportError:
-        pass
-
-if GEOPANDAS_CONFIRMED:
-    GeoDataFrameType = gpd.GeoDataFrame
-    GeoSeriesType = gpd.GeoSeries
+    GeoDataFrameType: TypeAlias = gpd.GeoDataFrame
+    GeoSeriesType: TypeAlias = gpd.GeoSeries
+    PolygonType: TypeAlias = shapely.Polygon
+    LineStringType: TypeAlias = shapely.LineString
 else:
     GeoDataFrameType = TypeVar("GeoDataFrameType")
     GeoSeriesType = TypeVar("GeoSeriesType")
-
-
-SHAPELY_CONFIRMED = False
-if TYPE_CHECKING:
-    try:
-        import shapely
-
-        SHAPELY_CONFIRMED = True
-    except ImportError:
-        pass
-
-if SHAPELY_CONFIRMED:
-    PolygonType = shapely.Polygon
-    LineStringType = shapely.LineString
-else:
     PolygonType = TypeVar("PolygonType")
     LineStringType = TypeVar("LineStringType")
