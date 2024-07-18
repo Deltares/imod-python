@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import textwrap
 import warnings
+from datetime import datetime
 from typing import Any, Optional, Tuple, Union
 
 import cftime
@@ -38,6 +39,7 @@ from imod.schemata import (
 from imod.select.points import points_indices, points_values
 from imod.typing import GridDataArray
 from imod.typing.grid import is_spatial_grid, ones_like
+from imod.util.expand_repetitions import resample_timeseries
 from imod.util.structured import values_within_range
 
 
@@ -650,6 +652,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         cls,
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
+        times: list[datetime],
         minimum_k: float = 0.1,
         minimum_thickness: float = 1.0,
     ) -> "Well":
@@ -683,14 +686,24 @@ class Well(BoundaryCondition, IPointDataPackage):
         # Groupby unique wells, to get dataframes per time.
         colnames_group = ["x", "y", "filt_top", "filt_bot", "id"]
         wel_index, df_groups = zip(*df.groupby(colnames_group))
+
+        # resample per group
+
         # Unpack wel indices by zipping
         x, y, filt_top, filt_bot, id = zip(*wel_index)
+
+        # resample times per group
+        df_resampled_groups = []
+        for df_group in df_groups:
+            df_group = resample_timeseries(df_group, times)
+            df_resampled_groups.append(df_group)
+
         # Convert dataframes all groups to DataArrays
         da_groups = [
             xr.DataArray(
                 df_group["rate"], dims=("time"), coords={"time": df_group["time"]}
             )
-            for df_group in df_groups
+            for df_group in df_resampled_groups
         ]
         # Assign index coordinates
         da_groups = [

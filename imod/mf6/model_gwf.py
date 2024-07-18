@@ -31,6 +31,7 @@ from imod.mf6.regrid.regrid_schemes import (
 from imod.mf6.riv import River
 from imod.mf6.sto import StorageCoefficient
 from imod.mf6.utilities.regrid import RegridderWeightsCache
+from imod.mf6.wel import Well
 from imod.prepare.topsystem.default_allocation_methods import (
     SimulationAllocationOptions,
     SimulationDistributingOptions,
@@ -188,8 +189,7 @@ class GroundwaterFlowModel(Modflow6Model):
         period_data: dict[str, list[datetime]],
         allocation_options: SimulationAllocationOptions,
         distributing_options: SimulationDistributingOptions,
-        time_min: datetime,
-        time_max: datetime,
+        times: list[datetime],
         regridder_types: dict[str, RegridMethodType],
     ) -> "GroundwaterFlowModel":
         """
@@ -275,9 +275,16 @@ class GroundwaterFlowModel(Modflow6Model):
         result["ic"] = ic_pkg
         result["rch"] = rch_pkg
 
-        # now import the non-singleton packages
-        # import drainage
+        # now import the non-singleton packages'
+
+        # import wells
         imod5_keys = list(imod5_data.keys())
+        wel_keys = [key for key in imod5_keys if key[0:3] == "wel"]
+        for wel_key in wel_keys:
+            result[wel_key] = Well.from_imod5_data(wel_key, imod5_data, times)
+
+        # import drainage
+
         drainage_keys = [key for key in imod5_keys if key[0:3] == "drn"]
         for drn_key in drainage_keys:
             drn_pkg = Drainage.from_imod5_data(
@@ -288,8 +295,8 @@ class GroundwaterFlowModel(Modflow6Model):
                 npf_pkg,
                 allocation_options.drn,
                 distributing_option=distributing_options.drn,
-                time_min=time_min,
-                time_max=time_max,
+                time_min=times[0],
+                time_max=times[-1],
                 regridder_types=cast(
                     DrainageRegridMethod, regridder_types.get(drn_key)
                 ),
@@ -305,8 +312,8 @@ class GroundwaterFlowModel(Modflow6Model):
                 imod5_data,
                 period_data,
                 dis_pkg,
-                time_min,
-                time_max,
+                times[0],
+                times[-1],
                 allocation_options.riv,
                 distributing_options.riv,
                 cast(RiverRegridMethod, regridder_types.get(riv_key)),
