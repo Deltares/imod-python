@@ -1,7 +1,7 @@
 import pickle
 import textwrap
 from functools import wraps
-from typing import TYPE_CHECKING, Callable, Mapping, Sequence
+from typing import TYPE_CHECKING, Callable, Mapping, ParamSpec, Sequence, TypeVar, cast
 
 import numpy as np
 import xarray as xr
@@ -19,6 +19,9 @@ else:
         import geopandas as gpd
     except ImportError:
         gpd = MissingOptionalModule("geopandas")
+
+T = TypeVar("T")
+P = ParamSpec("P")
 
 
 @typedispatch
@@ -376,7 +379,7 @@ def _enforce_unstructured(obj: GridDataArray, ugrid2d=xu.Ugrid2d) -> xu.UgridDat
     return xu.UgridDataArray(xr.DataArray(obj), ugrid2d)
 
 
-def preserve_gridtype(func):
+def preserve_gridtype(func: Callable[P, T]) -> Callable[P, T]:
     """
     Decorator to preserve gridtype, this is to work around the following xugrid
     behavior:
@@ -391,13 +394,14 @@ def preserve_gridtype(func):
     """
 
     @wraps(func)
-    def decorator(*args, **kwargs):
+    def decorator(*args: P.args, **kwargs: P.kwargs):
         unstructured = False
         grid = None
         for arg in args:
             if is_unstructured(arg):
                 unstructured = True
-                grid = arg.ugrid.grid
+                ds = cast(xu.UgridDataArray | xu.UgridDataset, arg)
+                grid = ds.ugrid.grid
 
         x = func(*args, **kwargs)
 

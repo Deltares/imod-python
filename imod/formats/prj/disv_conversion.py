@@ -5,7 +5,6 @@ project files.
 
 from __future__ import annotations
 
-import itertools
 import pickle
 from collections import Counter
 from datetime import datetime
@@ -21,6 +20,7 @@ from imod.mf6.model import Modflow6Model
 from imod.mf6.utilities.package import get_repeat_stress
 from imod.prepare.layer import get_upper_active_grid_cells
 from imod.typing import GridDataArray
+from imod.util.expand_repetitions import expand_repetitions
 from imod.util.imports import MissingOptionalModule
 
 try:
@@ -664,20 +664,6 @@ PKG_CONVERSION = {
     "riv": create_riv,
     "wel": create_wel,
 }
-
-
-def expand_repetitions(
-    repeat_stress: List[datetime], time_min: datetime, time_max: datetime
-) -> Dict[datetime, datetime]:
-    expanded = {}
-    for year, date in itertools.product(
-        range(time_min.year, time_max.year + 1),
-        repeat_stress,
-    ):
-        newdate = date.replace(year=year)
-        if newdate < time_max:
-            expanded[newdate] = date
-    return expanded
 
 
 def convert_to_disv(

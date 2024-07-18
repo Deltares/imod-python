@@ -37,11 +37,11 @@ from imod.mf6.multimodel.exchange_creator_unstructured import (
 from imod.mf6.multimodel.modelsplitter import create_partition_info, slice_model
 from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
+from imod.mf6.regrid.regrid_schemes import RegridMethodType
 from imod.mf6.ssm import SourceSinkMixing
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.utilities.mask import _mask_all_models
 from imod.mf6.utilities.regrid import _regrid_like
-from imod.mf6.utilities.regridding_types import RegridderType
 from imod.mf6.write_context import WriteContext
 from imod.prepare.topsystem.default_allocation_methods import (
     SimulationAllocationOptions,
@@ -1322,9 +1322,12 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
     def from_imod5_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
+        period_data: dict[str, dict[str, GridDataArray]],
         allocation_options: SimulationAllocationOptions,
         distributing_options: SimulationDistributingOptions,
-        regridder_types: Optional[dict[str, tuple[RegridderType, str]]] = None,
+        time_min,
+        time_max,
+        regridder_types: dict[str, RegridMethodType] = {},
     ) -> "Modflow6Simulation":
         """
         Imports a GroundwaterFlowModel (GWF) from the data in an IMOD5 project file.
@@ -1345,9 +1348,14 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             object containing the conductivity distribution options per package type.
             If you want a package to have a different allocation option,
             then it should be imported separately
-        regridder_types: Optional[dict[str, dict[str, tuple[RegridderType, str]]]]
-            the first key is the package name. The second key is the array name, and the value is
-            the RegridderType tuple (method + function)
+        time_min: datetime
+            Begin-time of the simulation.
+        time_max: datetime
+            End-time of the simulation.
+        regridder_types: dict[str, RegridMethodType]
+            the key is the package name. The value is the RegridMethodType
+            object containing the settings for regridding the package with the
+            specified key
 
         Returns
         -------
@@ -1357,8 +1365,11 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         # import GWF model,
         groundwaterFlowModel = GroundwaterFlowModel.from_imod5_data(
             imod5_data,
+            period_data,
             allocation_options,
             distributing_options,
+            time_min,
+            time_max,
             regridder_types,
         )
         simulation["imported_model"] = groundwaterFlowModel

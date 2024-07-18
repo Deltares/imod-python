@@ -543,7 +543,7 @@ class Package(PackageBase, IPackage, abc.ABC):
     def regrid_like(
         self,
         target_grid: GridDataArray,
-        regrid_context: RegridderWeightsCache,
+        regrid_cache: RegridderWeightsCache,
         regridder_types: Optional[RegridMethodType] = None,
     ) -> "Package":
         """
@@ -570,7 +570,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         ----------
         target_grid: xr.DataArray or xu.UgridDataArray
             a grid defined over the same discretization as the one we want to regrid the package to.
-        regrid_context: RegridderWeightsCache, optional
+        regrid_cache: RegridderWeightsCache, optional
             stores regridder weights for different regridders. Can be used to speed up regridding,
             if the same regridders are used several times for regridding different arrays.
         regridder_types: RegridMethodType, optional
@@ -583,7 +583,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         similar to the one used in input argument "target_grid"
         """
         try:
-            result = _regrid_like(self, target_grid, regrid_context, regridder_types)
+            result = _regrid_like(self, target_grid, regrid_cache, regridder_types)
         except ValueError as e:
             raise e
         except Exception:

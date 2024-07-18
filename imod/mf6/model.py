@@ -524,7 +524,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         self,
         target_grid: GridDataArray,
         validate: bool = True,
-        regrid_context: Optional[RegridderWeightsCache] = None,
+        regrid_cache: Optional[RegridderWeightsCache] = None,
     ) -> "Modflow6Model":
         """
         Creates a model by regridding the packages of this model to another discretization.
@@ -538,7 +538,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             a grid defined over the same discretization as the one we want to regrid the package to
         validate: bool
             set to true to validate the regridded packages
-        regrid_context: Optional RegridderWeightsCache
+        regrid_cache: Optional RegridderWeightsCache
             stores regridder weights for different regridders. Can be used to speed up regridding,
             if the same regridders are used several times for regridding different arrays.
 
@@ -547,7 +547,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         a model with similar packages to the input model, and with all the data-arrays regridded to another discretization,
         similar to the one used in input argument "target_grid"
         """
-        return _regrid_like(self, target_grid, validate, regrid_context)
+        return _regrid_like(self, target_grid, validate, regrid_cache)
 
     def mask_all_packages(
         self,

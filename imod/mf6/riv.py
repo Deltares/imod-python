@@ -1,4 +1,4 @@
-from dataclasses import asdict
+from datetime import datetime
 from typing import Optional, Tuple
 
 import numpy as np
@@ -11,9 +11,8 @@ from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.drn import Drainage
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.regrid.regrid_schemes import RegridMethodType, RiverRegridMethod
+from imod.mf6.regrid.regrid_schemes import RiverRegridMethod
 from imod.mf6.utilities.regrid import (
-    RegridderType,
     RegridderWeightsCache,
     _regrid_package_data,
 )
@@ -36,6 +35,7 @@ from imod.schemata import (
 )
 from imod.typing import GridDataArray
 from imod.typing.grid import enforce_dim_order, is_planar_grid
+from imod.util.expand_repetitions import expand_repetitions
 
 
 class River(BoundaryCondition, IRegridPackage):
@@ -188,10 +188,14 @@ class River(BoundaryCondition, IRegridPackage):
         cls,
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
+        period_data: dict[str, list[datetime]],
         target_discretization: StructuredDiscretization,
+        time_min: datetime,
+        time_max: datetime,
         allocation_option_riv: ALLOCATION_OPTION,
         distributing_option_riv: DISTRIBUTING_OPTION,
-        regridder_types: Optional[RegridMethodType] = None,
+        regridder_types: Optional[RiverRegridMethod] = None,
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> Tuple[Optional["River"], Optional[Drainage]]:
         """
         Construct a river-package from iMOD5 data, loaded with the
@@ -209,14 +213,21 @@ class River(BoundaryCondition, IRegridPackage):
         imod5_data: dict
             Dictionary with iMOD5 data. This can be constructed from the
             :func:`imod.formats.prj.open_projectfile_data` method.
+        period_data: dict
+            Dictionary with iMOD5 period data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
         target_discretization:  StructuredDiscretization package
             The grid that should be used for the new package. Does not
             need to be identical to one of the input grids.
+        time_min: datetime
+            Begin-time of the simulation. Used for expanding period data.
+        time_max: datetime
+            End-time of the simulation. Used for expanding period data.
         allocation_option: ALLOCATION_OPTION
             allocation option.
         distributing_option: dict[str, DISTRIBUTING_OPTION]
             distributing option.
-        regridder_types: RegridMethodType, optional
+        regridder_types: RiverRegridMethod, optional
             Optional dataclass with regridder types for a specific variable.
             Use this to override default regridding methods.
 
@@ -247,17 +258,10 @@ class River(BoundaryCondition, IRegridPackage):
 
         # set up regridder methods
         if regridder_types is None:
-            regridder_settings = asdict(cls.get_regrid_methods(), dict_factory=dict)
-        else:
-            regridder_settings = asdict(regridder_types, dict_factory=dict)
-        if "infiltration_factor" not in regridder_settings.keys():
-            regridder_settings["infiltration_factor"] = (RegridderType.OVERLAP, "mean")
-
-        regrid_context = RegridderWeightsCache()
-
+            regridder_types = River.get_regrid_methods()
         # regrid the input data
         regridded_package_data = _regrid_package_data(
-            data, target_idomain, regridder_settings, regrid_context, {}
+            data, target_idomain, regridder_types, regrid_cache, {}
         )
 
         conductance = regridded_package_data["conductance"]
@@ -319,6 +323,9 @@ class River(BoundaryCondition, IRegridPackage):
         )
         regridded_package_data["conductance"] = river_conductance
         regridded_package_data.pop("infiltration_factor")
+        regridded_package_data["bottom_elevation"] = enforce_dim_order(
+            regridded_package_data["bottom_elevation"]
+        )
 
         river_package = River(**regridded_package_data)
         # create a drainage package with the conductance we computed from the infiltration factor
@@ -339,6 +346,18 @@ class River(BoundaryCondition, IRegridPackage):
             drainage_package = drainage_package.mask(mask)
         else:
             drainage_package = None
+
+        repeat = period_data.get(key)
+        if repeat is not None:
+            if river_package is not None:
+                river_package.set_repeat_stress(
+                    expand_repetitions(repeat, time_min, time_max)
+                )
+            if drainage_package is not None:
+                drainage_package.set_repeat_stress(
+                    expand_repetitions(repeat, time_min, time_max)
+                )
+
         return (river_package, drainage_package)
 
     @classmethod
