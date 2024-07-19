@@ -10,6 +10,7 @@ from unittest import mock
 from unittest.mock import MagicMock
 
 import numpy as np
+import pandas as pd
 import pytest
 import rasterio
 import xarray as xr
@@ -480,15 +481,16 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
     period_data = imod5_dataset[1]
     default_simulation_allocation_options = SimulationAllocationOptions
     default_simulation_distributing_options = SimulationDistributingOptions
+
+    datelist = pd.date_range(start="1/1/1989", end="1/1/2013", freq="W")
+
     simulation = Modflow6Simulation.from_imod5_data(
         imod5_data,
         period_data,
         default_simulation_allocation_options,
         default_simulation_distributing_options,
-        datetime(2000, 1, 1),
-        datetime(2002, 1, 1),
+        datelist,
     )
-
     simulation["imported_model"]["oc"] = OutputControl(
         save_head="last", save_budget="last"
     )
@@ -515,14 +517,14 @@ def test_import_from_imod5_nonstandard_regridding(imod5_dataset, tmp_path):
     regridding_option["npf"] = NodePropertyFlowRegridMethod()
     regridding_option["dis"] = DiscretizationRegridMethod()
     regridding_option["sto"] = StorageCoefficientRegridMethod()
+    times = pd.date_range(start="1/1/2018", end="12/1/2018", freq="ME")
 
     simulation = Modflow6Simulation.from_imod5_data(
         imod5_data,
         period_data,
         default_simulation_allocation_options,
         default_simulation_distributing_options,
-        datetime(2000, 1, 1),
-        datetime(2002, 1, 1),
+        times,
         regridding_option,
     )
 

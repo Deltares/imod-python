@@ -5,6 +5,7 @@ import pathlib
 import subprocess
 import warnings
 from copy import deepcopy
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, DefaultDict, Iterable, Optional, Union, cast
 
@@ -1325,8 +1326,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         period_data: dict[str, dict[str, GridDataArray]],
         allocation_options: SimulationAllocationOptions,
         distributing_options: SimulationDistributingOptions,
-        time_min,
-        time_max,
+        times: list[datetime],
         regridder_types: dict[str, RegridMethodType] = {},
     ) -> "Modflow6Simulation":
         """
@@ -1368,8 +1368,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             period_data,
             allocation_options,
             distributing_options,
-            time_min,
-            time_max,
+            times,
             regridder_types,
         )
         simulation["imported_model"] = groundwaterFlowModel
