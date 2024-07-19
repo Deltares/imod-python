@@ -5,6 +5,7 @@ import cftime
 import dateutil
 import numpy as np
 import pandas as pd
+from imod.typing.datetime import api_datetimetype, internal_datetimetype
 
 DATETIME_FORMATS = {
     14: "%Y%m%d%H%M%S",
@@ -44,8 +45,8 @@ def _check_year(year: int) -> None:
 
 
 def to_datetime_internal(
-    time: cftime.datetime | np.datetime64 | str, use_cftime: bool
-) -> np.datetime64 | cftime.datetime:
+    time: api_datetimetype, use_cftime: bool
+) -> internal_datetimetype:
     """
     Check whether time is cftime object, else convert to datetime64 series.
 
@@ -81,6 +82,11 @@ def to_datetime_internal(
         return cftime.DatetimeProlepticGregorian(*time.timetuple()[:6])
     else:
         return np.datetime64(time, "ns")
+
+def to_datetime_list_internal(
+    times: list[api_datetimetype], use_cftime: bool
+) -> list[internal_datetimetype]:
+    return [to_datetime_internal(time, use_cftime) for time in times ]
 
 
 def timestep_duration(times: np.ndarray, use_cftime: bool):

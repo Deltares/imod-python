@@ -26,6 +26,7 @@ from imod.schemata import (
 )
 from imod.typing import GridDataArray
 from imod.util.expand_repetitions import expand_repetitions
+from imod.util.time import api_datetimetype
 
 
 class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
@@ -165,8 +166,8 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         imod5_data: dict[str, dict[str, GridDataArray]],
         period_data: dict[str, list[datetime]],
         target_discretization,
-        time_min: datetime,
-        time_max: datetime,
+        time_min: api_datetimetype,
+        time_max: api_datetimetype,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
         regridder_types: Optional[RegridMethodType] = None,
     ) -> "GeneralHeadBoundary":

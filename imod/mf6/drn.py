@@ -33,6 +33,7 @@ from imod.schemata import (
 )
 from imod.typing import GridDataArray
 from imod.typing.grid import enforce_dim_order, is_planar_grid
+from imod.typing.datetime import api_datetimetype
 from imod.util.expand_repetitions import expand_repetitions
 
 
@@ -173,8 +174,8 @@ class Drainage(BoundaryCondition, IRegridPackage):
         target_npf: NodePropertyFlow,
         allocation_option: ALLOCATION_OPTION,
         distributing_option: DISTRIBUTING_OPTION,
-        time_min: datetime,
-        time_max: datetime,
+        time_min: api_datetimetype,
+        time_max: api_datetimetype,
         regridder_types: Optional[DrainageRegridMethod] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "Drainage":

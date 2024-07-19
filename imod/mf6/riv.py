@@ -37,7 +37,7 @@ from imod.schemata import (
 from imod.typing import GridDataArray
 from imod.typing.grid import enforce_dim_order, is_planar_grid
 from imod.util.expand_repetitions import expand_repetitions
-
+from imod.typing.datetime import api_datetimetype
 
 class River(BoundaryCondition, IRegridPackage):
     """
@@ -191,8 +191,8 @@ class River(BoundaryCondition, IRegridPackage):
         imod5_data: dict[str, dict[str, GridDataArray]],
         period_data: dict[str, list[datetime]],
         target_discretization: StructuredDiscretization,
-        time_min: datetime,
-        time_max: datetime,
+        time_min: api_datetimetype,
+        time_max: api_datetimetype,
         allocation_option_riv: ALLOCATION_OPTION,
         distributing_option_riv: DISTRIBUTING_OPTION,
         regridder_types: Optional[RiverRegridMethod] = None,

@@ -11,7 +11,7 @@ import numpy.typing as npt
 import pandas as pd
 import xarray as xr
 import xugrid as xu
-
+from imod.typing.datetime import api_datetimetype
 import imod
 from imod.logging import init_log_decorator, logger
 from imod.logging.logging_decorators import standard_log_decorator
@@ -652,7 +652,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         cls,
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        times: list[datetime],
+        times: list[api_datetimetype],
         minimum_k: float = 0.1,
         minimum_thickness: float = 1.0,
     ) -> "Well":

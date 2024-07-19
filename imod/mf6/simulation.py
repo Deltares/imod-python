@@ -8,7 +8,7 @@ from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, DefaultDict, Iterable, Optional, Union, cast
-
+from imod.typing.datetime import api_datetimetype
 import cftime
 import dask
 import jinja2
@@ -56,6 +56,7 @@ from imod.typing.grid import (
     is_unstructured,
     merge_partitions,
 )
+import pandas as pd
 
 OUTPUT_FUNC_MAPPING: dict[str, Callable] = {
     "head": open_hds,
@@ -113,7 +114,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         )
         self.create_time_discretization(additional_times=times)
 
-    def create_time_discretization(self, additional_times, validate: bool = True):
+    def create_time_discretization(self, additional_times:list[api_datetimetype], validate: bool = True):
         """
         Collect all unique times from model packages and additional given
         `times`. These unique times are used as stress periods in the model. All
@@ -1326,7 +1327,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         period_data: dict[str, dict[str, GridDataArray]],
         allocation_options: SimulationAllocationOptions,
         distributing_options: SimulationDistributingOptions,
-        times: list[datetime],
+        times: list[api_datetimetype],
         regridder_types: dict[str, RegridMethodType] = {},
     ) -> "Modflow6Simulation":
         """
@@ -1360,6 +1361,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         Returns
         -------
         """
+        internal_times = imod.util.time.to_datetime_internal_list(times)
         simulation = Modflow6Simulation("imported_simulation")
 
         # import GWF model,
@@ -1368,7 +1370,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             period_data,
             allocation_options,
             distributing_options,
-            times,
+            internal_times,
             regridder_types,
         )
         simulation["imported_model"] = groundwaterFlowModel

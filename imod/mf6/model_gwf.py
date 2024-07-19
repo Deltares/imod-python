@@ -5,6 +5,7 @@ from typing import Optional, cast
 
 import cftime
 import numpy as np
+from imod.typing.datetime import api_datetimetype
 
 from imod.logging import init_log_decorator
 from imod.logging.logging_decorators import standard_log_decorator
@@ -37,7 +38,7 @@ from imod.prepare.topsystem.default_allocation_methods import (
     SimulationDistributingOptions,
 )
 from imod.typing import GridDataArray
-
+from imod.util.time import to_datetime_internal_list
 
 class GroundwaterFlowModel(Modflow6Model):
     """
@@ -189,7 +190,7 @@ class GroundwaterFlowModel(Modflow6Model):
         period_data: dict[str, list[datetime]],
         allocation_options: SimulationAllocationOptions,
         distributing_options: SimulationDistributingOptions,
-        times: list[datetime],
+        times: list[api_datetimetype],
         regridder_types: dict[str, RegridMethodType],
     ) -> "GroundwaterFlowModel":
         """
@@ -224,6 +225,8 @@ class GroundwaterFlowModel(Modflow6Model):
         add the OC package to the model.
 
         """
+
+        internal_times = to_datetime_internal_list(times)        
         # first import the singleton packages
         # import discretization
         regrid_cache = RegridderWeightsCache()
@@ -281,7 +284,7 @@ class GroundwaterFlowModel(Modflow6Model):
         imod5_keys = list(imod5_data.keys())
         wel_keys = [key for key in imod5_keys if key[0:3] == "wel"]
         for wel_key in wel_keys:
-            result[wel_key] = Well.from_imod5_data(wel_key, imod5_data, times)
+            result[wel_key] = Well.from_imod5_data(wel_key, imod5_data, internal_times)
 
         # import drainage
 
@@ -295,8 +298,8 @@ class GroundwaterFlowModel(Modflow6Model):
                 npf_pkg,
                 allocation_options.drn,
                 distributing_option=distributing_options.drn,
-                time_min=times[0],
-                time_max=times[-1],
+                time_min=internal_times[0],
+                time_max=internal_times[-1],
                 regridder_types=cast(
                     DrainageRegridMethod, regridder_types.get(drn_key)
                 ),
@@ -312,8 +315,8 @@ class GroundwaterFlowModel(Modflow6Model):
                 imod5_data,
                 period_data,
                 dis_pkg,
-                times[0],
-                times[-1],
+                internal_times[0],
+                internal_times[-1],
                 allocation_options.riv,
                 distributing_options.riv,
                 cast(RiverRegridMethod, regridder_types.get(riv_key)),
