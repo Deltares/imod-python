@@ -1,5 +1,4 @@
 from copy import deepcopy
-from datetime import datetime
 from typing import Optional, Tuple
 
 import numpy as np
@@ -35,9 +34,10 @@ from imod.schemata import (
     OtherCoordsSchema,
 )
 from imod.typing import GridDataArray
+from imod.typing.datetime import api_datetimetype
 from imod.typing.grid import enforce_dim_order, is_planar_grid
 from imod.util.expand_repetitions import expand_repetitions
-from imod.typing.datetime import api_datetimetype
+
 
 class River(BoundaryCondition, IRegridPackage):
     """
@@ -189,7 +189,7 @@ class River(BoundaryCondition, IRegridPackage):
         cls,
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        period_data: dict[str, list[datetime]],
+        period_data: dict[str, list[api_datetimetype]],
         target_discretization: StructuredDiscretization,
         time_min: api_datetimetype,
         time_max: api_datetimetype,

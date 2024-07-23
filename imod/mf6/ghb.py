@@ -1,5 +1,4 @@
 from copy import deepcopy
-from datetime import datetime
 from typing import Optional
 
 import numpy as np
@@ -164,7 +163,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         cls,
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        period_data: dict[str, list[datetime]],
+        period_data: dict[str, list[api_datetimetype]],
         target_discretization,
         time_min: api_datetimetype,
         time_max: api_datetimetype,

@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-from datetime import datetime
 from typing import Optional, cast
 
 import cftime
 import numpy as np
-from imod.typing.datetime import api_datetimetype
 
 from imod.logging import init_log_decorator
 from imod.logging.logging_decorators import standard_log_decorator
@@ -38,7 +36,9 @@ from imod.prepare.topsystem.default_allocation_methods import (
     SimulationDistributingOptions,
 )
 from imod.typing import GridDataArray
-from imod.util.time import to_datetime_internal_list
+from imod.typing.datetime import api_datetimetype
+from imod.util.time import to_datetime_list_internal
+
 
 class GroundwaterFlowModel(Modflow6Model):
     """
@@ -187,7 +187,7 @@ class GroundwaterFlowModel(Modflow6Model):
     def from_imod5_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        period_data: dict[str, list[datetime]],
+        period_data: dict[str, list[api_datetimetype]],
         allocation_options: SimulationAllocationOptions,
         distributing_options: SimulationDistributingOptions,
         times: list[api_datetimetype],
@@ -226,7 +226,7 @@ class GroundwaterFlowModel(Modflow6Model):
 
         """
 
-        internal_times = to_datetime_internal_list(times)        
+        internal_times = to_datetime_list_internal(times)
         # first import the singleton packages
         # import discretization
         regrid_cache = RegridderWeightsCache()

@@ -5,6 +5,7 @@ import cftime
 import dateutil
 import numpy as np
 import pandas as pd
+
 from imod.typing.datetime import api_datetimetype, internal_datetimetype
 
 DATETIME_FORMATS = {
@@ -83,10 +84,11 @@ def to_datetime_internal(
     else:
         return np.datetime64(time, "ns")
 
+
 def to_datetime_list_internal(
-    times: list[api_datetimetype], use_cftime: bool
+    times: list[api_datetimetype], use_cftime: bool = False
 ) -> list[internal_datetimetype]:
-    return [to_datetime_internal(time, use_cftime) for time in times ]
+    return [to_datetime_internal(time, use_cftime) for time in times]
 
 
 def timestep_duration(times: np.ndarray, use_cftime: bool):

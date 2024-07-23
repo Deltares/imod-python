@@ -5,10 +5,9 @@ import pathlib
 import subprocess
 import warnings
 from copy import deepcopy
-from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, DefaultDict, Iterable, Optional, Union, cast
-from imod.typing.datetime import api_datetimetype
+
 import cftime
 import dask
 import jinja2
@@ -50,13 +49,13 @@ from imod.prepare.topsystem.default_allocation_methods import (
 )
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
+from imod.typing.datetime import api_datetimetype
 from imod.typing.grid import (
     concat,
     is_equal,
     is_unstructured,
     merge_partitions,
 )
-import pandas as pd
 
 OUTPUT_FUNC_MAPPING: dict[str, Callable] = {
     "head": open_hds,
@@ -114,7 +113,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         )
         self.create_time_discretization(additional_times=times)
 
-    def create_time_discretization(self, additional_times:list[api_datetimetype], validate: bool = True):
+    def create_time_discretization(
+        self, additional_times: list[api_datetimetype], validate: bool = True
+    ):
         """
         Collect all unique times from model packages and additional given
         `times`. These unique times are used as stress periods in the model. All
@@ -1361,7 +1362,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         Returns
         -------
         """
-        internal_times = imod.util.time.to_datetime_internal_list(times)
+        internal_times = imod.util.time.to_datetime_list_internal(times)
         simulation = Modflow6Simulation("imported_simulation")
 
         # import GWF model,

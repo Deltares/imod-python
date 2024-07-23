@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import textwrap
 import warnings
-from datetime import datetime
 from typing import Any, Optional, Tuple, Union
 
 import cftime
@@ -11,7 +10,7 @@ import numpy.typing as npt
 import pandas as pd
 import xarray as xr
 import xugrid as xu
-from imod.typing.datetime import api_datetimetype
+
 import imod
 from imod.logging import init_log_decorator, logger
 from imod.logging.logging_decorators import standard_log_decorator
@@ -38,6 +37,7 @@ from imod.schemata import (
 )
 from imod.select.points import points_indices, points_values
 from imod.typing import GridDataArray
+from imod.typing.datetime import api_datetimetype
 from imod.typing.grid import is_spatial_grid, ones_like
 from imod.util.expand_repetitions import resample_timeseries
 from imod.util.structured import values_within_range
