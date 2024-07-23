@@ -41,6 +41,7 @@ from imod.typing.datetime import api_datetimetype
 from imod.typing.grid import is_spatial_grid, ones_like
 from imod.util.expand_repetitions import resample_timeseries
 from imod.util.structured import values_within_range
+from imod.util.time import to_datetime_list_internal
 
 
 def _assign_dims(arg: Any) -> Tuple | xr.DataArray:
@@ -656,6 +657,10 @@ class Well(BoundaryCondition, IPointDataPackage):
         minimum_k: float = 0.1,
         minimum_thickness: float = 1.0,
     ) -> "Well":
+        
+        # convert times to internal representation of times
+        itimes = to_datetime_list_internal(times)
+
         if "layer" in imod5_data[key].keys():
             if imod5_data[key]["layer"] != 0:
                 log_msg = textwrap.dedent(
@@ -695,7 +700,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         # resample times per group
         df_resampled_groups = []
         for df_group in df_groups:
-            df_group = resample_timeseries(df_group, times)
+            df_group = resample_timeseries(df_group, itimes)
             df_resampled_groups.append(df_group)
 
         # Convert dataframes all groups to DataArrays
