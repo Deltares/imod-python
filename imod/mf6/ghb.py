@@ -25,7 +25,7 @@ from imod.schemata import (
 )
 from imod.typing import GridDataArray
 from imod.util.expand_repetitions import expand_repetitions
-from imod.util.time import api_datetimetype
+from imod.util.time import api_datetimetype, to_datetime_internal
 
 
 class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
@@ -207,7 +207,9 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         -------
         A  Modflow 6 GeneralHeadBoundary packages.
         """
-
+        itime_min = to_datetime_internal(time_min)
+        itime_max = to_datetime_internal(time_max)
+        
         idomain = target_discretization.dataset["idomain"]
         data = {
             "head": imod5_data[key]["head"],
@@ -224,7 +226,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         ghb = GeneralHeadBoundary(**regridded_package_data, validate=True)
         repeat = period_data.get(key)
         if repeat is not None:
-            ghb.set_repeat_stress(expand_repetitions(repeat, time_min, time_max))
+            ghb.set_repeat_stress(expand_repetitions(repeat, itime_min, itime_max))
         return ghb
 
     @classmethod

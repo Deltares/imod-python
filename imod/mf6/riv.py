@@ -37,6 +37,7 @@ from imod.typing import GridDataArray
 from imod.typing.datetime import api_datetimetype
 from imod.typing.grid import enforce_dim_order, is_planar_grid
 from imod.util.expand_repetitions import expand_repetitions
+from imod.util.time import to_datetime_internal
 
 
 class River(BoundaryCondition, IRegridPackage):
@@ -239,7 +240,9 @@ class River(BoundaryCondition, IRegridPackage):
         Both the river package and the drainage package can be None,
         this can happen if the infiltration factor is 0 or 1 everywhere.
         """
-
+        itime_min = to_datetime_internal(time_min)
+        itime_max = to_datetime_internal(time_max)
+        
         logger = logging.logger
         # gather discretrizations
         target_top = target_discretization.dataset["top"]
@@ -354,11 +357,11 @@ class River(BoundaryCondition, IRegridPackage):
         if repeat is not None:
             if optional_river_package is not None:
                 optional_river_package.set_repeat_stress(
-                    expand_repetitions(repeat, time_min, time_max)
+                    expand_repetitions(repeat, itime_min, itime_max)
                 )
             if optional_drainage_package is not None:
                 optional_drainage_package.set_repeat_stress(
-                    expand_repetitions(repeat, time_min, time_max)
+                    expand_repetitions(repeat, itime_min, itime_max)
                 )
 
         return (optional_river_package, optional_drainage_package)

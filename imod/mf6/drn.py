@@ -31,9 +31,10 @@ from imod.schemata import (
     OtherCoordsSchema,
 )
 from imod.typing import GridDataArray
-from imod.typing.datetime import api_datetimetype
+from imod.typing.datetime import api_datetimetype, internal_datetimetype
 from imod.typing.grid import enforce_dim_order, is_planar_grid
 from imod.util.expand_repetitions import expand_repetitions
+from imod.util.time import to_datetime_internal
 
 
 class Drainage(BoundaryCondition, IRegridPackage):
@@ -168,7 +169,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
         cls,
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        period_data: dict[str, list[api_datetimetype]],
+        period_data: dict[str, list[internal_datetimetype]],
         target_discretization: StructuredDiscretization,
         target_npf: NodePropertyFlow,
         allocation_option: ALLOCATION_OPTION,
@@ -215,6 +216,8 @@ class Drainage(BoundaryCondition, IRegridPackage):
         -------
         A Modflow 6 Drainage package.
         """
+        itime_min = to_datetime_internal(time_min)
+        itime_max = to_datetime_internal(time_max)
 
         target_top = target_discretization.dataset["top"]
         target_bottom = target_discretization.dataset["bottom"]
@@ -263,7 +266,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
         drn = Drainage(**regridded_package_data, validate=True)
         repeat = period_data.get(key)
         if repeat is not None:
-            drn.set_repeat_stress(expand_repetitions(repeat, time_min, time_max))
+            drn.set_repeat_stress(expand_repetitions(repeat, itime_min, itime_max))
         return drn
 
     @classmethod
