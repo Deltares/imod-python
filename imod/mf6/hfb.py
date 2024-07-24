@@ -216,6 +216,11 @@ def _make_linestring_from_polygon(
 def _select_dataframe_with_snapped_line_index(
     snapped_dataset: xr.Dataset, edge_index: np.ndarray, dataframe: GeoDataFrameType
 ):
+    """
+    Select dataframe rows with line indices of snapped edges. Usually, the
+    broadcasting results in a larger dataframe where individual rows of input
+    dataframe are repeated for multiple edges.
+    """
     line_index = snapped_dataset["line_index"].values
     line_index = line_index[edge_index].astype(int)
     return dataframe.iloc[line_index]
