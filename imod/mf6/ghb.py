@@ -1,3 +1,4 @@
+from copy import deepcopy
 from datetime import datetime
 from typing import Optional
 
@@ -220,8 +221,12 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
             data, idomain, regridder_types, regrid_cache, {}
         )
 
-        ghb = GeneralHeadBoundary(**regridded_package_data)
+        ghb = GeneralHeadBoundary(**regridded_package_data, validate=True)
         repeat = period_data.get(key)
         if repeat is not None:
             ghb.set_repeat_stress(expand_repetitions(repeat, time_min, time_max))
         return ghb
+
+    @classmethod
+    def get_regrid_methods(cls) -> GeneralHeadBoundaryRegridMethod:
+        return deepcopy(cls._regrid_method)

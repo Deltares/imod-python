@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import textwrap
 import warnings
+from datetime import datetime
 from typing import Any, Optional, Tuple, Union
 
 import cftime
@@ -38,6 +39,7 @@ from imod.schemata import (
 from imod.select.points import points_indices, points_values
 from imod.typing import GridDataArray
 from imod.typing.grid import is_spatial_grid, ones_like
+from imod.util.expand_repetitions import resample_timeseries
 from imod.util.structured import values_within_range
 
 
@@ -79,13 +81,13 @@ class Well(BoundaryCondition, IPointDataPackage):
     Parameters
     ----------
 
-    y: float or list of floats
+    y: float or list of floats or np.array of floats
         is the y location of the well.
-    x: float or list of floats
+    x: float or list of floats or np.array of floats
         is the x location of the well.
-    screen_top: float or list of floats
+    screen_top: float or list of floats or np.array of floats
         is the top of the well screen.
-    screen_bottom: float or list of floats
+    screen_bottom: float or list of floats or np.array of floats
         is the bottom of the well screen.
     rate: float, list of floats or xr.DataArray
         is the volumetric well rate. A positive value indicates well
@@ -193,10 +195,10 @@ class Well(BoundaryCondition, IPointDataPackage):
     @init_log_decorator()
     def __init__(
         self,
-        x: list[float],
-        y: list[float],
-        screen_top: list[float],
-        screen_bottom: list[float],
+        x: np.ndarray | list[float],
+        y: np.ndarray | list[float],
+        screen_top: np.ndarray | list[float],
+        screen_bottom: np.ndarray | list[float],
         rate: list[float] | xr.DataArray,
         concentration: Optional[list[float] | xr.DataArray] = None,
         concentration_boundary_type="aux",
@@ -650,6 +652,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         cls,
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
+        times: list[datetime],
         minimum_k: float = 0.1,
         minimum_thickness: float = 1.0,
     ) -> "Well":
@@ -683,14 +686,24 @@ class Well(BoundaryCondition, IPointDataPackage):
         # Groupby unique wells, to get dataframes per time.
         colnames_group = ["x", "y", "filt_top", "filt_bot", "id"]
         wel_index, df_groups = zip(*df.groupby(colnames_group))
+
+        # resample per group
+
         # Unpack wel indices by zipping
         x, y, filt_top, filt_bot, id = zip(*wel_index)
+
+        # resample times per group
+        df_resampled_groups = []
+        for df_group in df_groups:
+            df_group = resample_timeseries(df_group, times)
+            df_resampled_groups.append(df_group)
+
         # Convert dataframes all groups to DataArrays
         da_groups = [
             xr.DataArray(
                 df_group["rate"], dims=("time"), coords={"time": df_group["time"]}
             )
-            for df_group in df_groups
+            for df_group in df_resampled_groups
         ]
         # Assign index coordinates
         da_groups = [
