@@ -31,7 +31,7 @@ def concat_layered_chd_packages(
     that this on output only contains the packages that were not merged.
     """
 
-    candidate_keys = [k for k in dict_packages.keys() if name in k]
+    candidate_keys = [k for k in dict_packages.keys() if name in k[0 : len(name)]]
     if len(candidate_keys) == 0:
         return None
 
