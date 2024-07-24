@@ -21,13 +21,25 @@ except ImportError:
 
 def _create_zlinestring_from_bound_df(bound: pd.DataFrame) -> GeoDataFrameType:
     """Create geodataframe with linestring geometry from dataframe with bounds."""
+    # Make sure only x, y, z or x, y in columns
+    columns = sorted({"x", "y", "z"} & set(bound.columns))
+    index_names = list(bound.index.names)
+    # Prevent multiindex to be created by avoiding list
+    if bound.index.name:
+        index_to_group = bound.index.name
+    else:
+        index_to_group = index_names
     # Each linestring has its own index, therefore groupby index.
-    linestrings = [
-        (g[0], shapely.LineString(g[1].values)) for g in bound.groupby("index")
+    mapping_linestrings = [
+        (g[0], shapely.LineString(g[1][columns].values)) for g in bound.groupby(index_to_group)
     ]
-    return gpd.GeoDataFrame(
-        linestrings, columns=["index", "geometry"], geometry="geometry"
-    ).set_index("index")
+    index, linestrings= zip(*mapping_linestrings)
+
+    gdf = gpd.GeoDataFrame(
+        linestrings, index=index, columns=["geometry"], geometry="geometry"
+    )
+    gdf.index = gdf.index.set_names(index_names)
+    return gdf
 
 
 def _create_zpolygon_from_polygon_df(polygon_df: pd.DataFrame) -> GeoDataFrameType:
@@ -55,7 +67,8 @@ def _extract_hfb_bounds_from_zpolygons(
 
     coordinates = dataframe.geometry.get_coordinates(include_z=True)
 
-    grouped = coordinates.reset_index().groupby(["index", "x", "y"])
+    groupby_names = list(dataframe.index.names) + ["x", "y"]
+    grouped = coordinates.reset_index().groupby(groupby_names)
 
     lower = grouped.min().reset_index(["x", "y"])
     upper = grouped.max().reset_index(["x", "y"])

@@ -251,8 +251,9 @@ def _extract_mean_hfb_bounds_from_dataframe(
 
     lower, upper = _extract_hfb_bounds_from_zpolygons(dataframe)
     # Compute means inbetween nodes.
-    lower_mean = lower.groupby("index")["z"].mean()
-    upper_mean = upper.groupby("index")["z"].mean()
+    index_names = lower.index.names
+    lower_mean = lower.groupby(index_names)["z"].mean()
+    upper_mean = upper.groupby(index_names)["z"].mean()
 
     # Assign to dataframe to map means to right index.
     df_to_broadcast = dataframe.copy()
@@ -759,7 +760,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         if "layer" not in self._get_vertical_variables():
             lower, _ = _extract_hfb_bounds_from_zpolygons(barrier_dataframe)
             linestring = _create_zlinestring_from_bound_df(lower)
-            barrier_dataframe["geometry"] = linestring
+            barrier_dataframe["geometry"] = linestring["geometry"]
 
         barrier_dataframe = clip_line_gdf_by_grid(
             barrier_dataframe, idomain.sel(layer=1)
