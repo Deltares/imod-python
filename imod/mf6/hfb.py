@@ -255,11 +255,11 @@ def _extract_mean_hfb_bounds_from_dataframe(
     upper_mean = upper.groupby("index")["z"].mean()
 
     # Assign to dataframe to map means to right index.
-    test = dataframe.copy()
-    test["lower"] = lower_mean
-    test["upper"] = upper_mean
+    df_to_broadcast = dataframe.copy()
+    df_to_broadcast["lower"] = lower_mean
+    df_to_broadcast["upper"] = upper_mean
 
-    return test["lower"], test["upper"]
+    return df_to_broadcast["lower"], df_to_broadcast["upper"]
 
 
 def _fraction_layer_overlap(
