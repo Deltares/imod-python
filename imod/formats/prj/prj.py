@@ -3,12 +3,13 @@ Utilities for parsing a project file.
 """
 
 import shlex
+import textwrap
 from collections import defaultdict
 from datetime import datetime
 from itertools import chain
 from os import PathLike
 from pathlib import Path
-from typing import Any, Dict, List, Sequence, Tuple, Union
+from typing import Any, Dict, List, NamedTuple, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -782,9 +783,149 @@ def _read_package_gen(
 def _read_package_ipf(
     block_content: Dict[str, Any], periods: Dict[str, datetime]
 ) -> Tuple[List[Dict[str, Any]], List[datetime]]:
+    # We start by reading all the results.
+    # Next check whether the WEL section is internally consistent.
+    # Separate out the IPFs with associated external time series: these may be
+    # defined only once. Apply addition and factor values.
+    # Then, iterate over the "simple" IPFs. Apply addition and factor values.
+    # Set a unique ID.
+    # For the next timestamp, set rate to 0.0 to "turn off" the IPF.
+    class IpfResult(NamedTuple):
+        df: pd.DataFrame
+        associated: bool
+        indexcol: int
+        ext: str
+
+    def _read_ipf_data(path: Path) -> pd.DataFrame:
+        ipf_df, indexcol, ext = _try_read_with_func(imod.ipf._read_ipf, path)
+        # We may need top and bottom columns
+        df = ipf_df.iloc[:, :5]
+        if indexcol == 0:
+            associated = False
+        return IpfResult(df, associated, indexcol, ext)
+
+    def _read_assoc_files(ipf_result: IpfResult, layer: int):
+        ipf_df = ipf_result.df
+        indexcol = ipf_result.indexcol
+        ext = ipf_result.ext
+
+        dfs = []
+        # Iterate over every row of the "mother" IPF.
+        # Duplicate the x, y, id, top, bottom data for the time series.
+        for row in ipf_df.itertuples():
+            filename = row[indexcol]
+            path_assoc = path.parent.joinpath(f"{filename}.{ext}")
+            df_assoc = _try_read_with_func(imod.ipf.read_associated, path_assoc).iloc[
+                :, :2
+            ]
+            df_assoc.columns = ["time", "rate"]
+            df_assoc["x"] = row[1]
+            df_assoc["y"] = row[2]
+            df_assoc["id"] = path_assoc.stem
+            if layer <= 0:
+                df_assoc["top"] = row[4]
+                df_assoc["bottom"] = row[5]
+            dfs.append(df_assoc)
+        df = pd.concat(dfs, ignore_index=True, sort=False)
+        df["rate"] = df["rate"] * factor + addition
+        return
+
+    def _check_consistency(ipf_content, dataframes) -> None:
+        # If IPFs contain associated data, they should be present in ALL blocks.
+        # Try to present a concrete and helpful error message.
+
+        grouped: defaultdict[str, list] = defaultdict(list)
+        for entry in ipf_content:
+            grouped[entry["path"]] = entry
+
+        all_times = {entry["time"] for entry in ipf_content}
+        problems = defaultdict(list)
+        for path, ipfread in dataframes.items():
+            if ipfread.assoc_df is not None:
+                times = set()
+                factors = set()
+                additions = set()
+                for entry in grouped[path]:
+                    times.add(entry["time"])
+                    factors.add(entry["factors"])
+                    additions.add(entry["addition"])
+
+                missing_times = all_times - times
+                n_factors = len(factors)
+                n_additions = len(additions)
+                if missing_times:
+                    missing = ", ".join(missing_times)
+                    problems[path].append(
+                        f"* IPF is missing from the following stress periods:\n{missing}"
+                    )
+                if n_factors > 1:
+                    problems[path].append(
+                        f"* More than one factor specified: {', '.join(factors)}"
+                    )
+                if n_additions > 1:
+                    problems[path].append(
+                        f"* More than one addition specified: {', '.join(additions)}"
+                    )
+
+        message = textwrap.dedent(
+            """Any IPF file with associated time series (txt) files:
+
+            * must be present in ALL stress periods blocks for the WEL package;
+            * must have the same factor value for all blocks;
+            * must have the same addition value for all blocks.
+            """
+        )
+        if problems:
+            errors = [message]
+            for path, values in problems.items():
+                errors.append(f"Found for {path}:")
+                errors.extend(values)
+            raise ValueError("\n".join(errors))
+
+        return
+
+    # Make sure we only read the IPF files once.
+    # Set comprehension for getting the uniques:
+    ipf_content = block_content["ipf"]
+    unique_paths: set = {entry["path"] for entry in ipf_content}
+    dataframes = {path: _read_ipf_data(Path(path)) for path in unique_paths}
+    _check_consistency(ipf_content, dataframes)
+
+    # We can greatly simplify the logic by filtering out associated entries.
+    # Then, we can deal with the associated entries separate from the simple
+    # entries.
+    first_time = ipf_content[0]["time"]
+    simple_entries = []
+    assoc_entries = []
+    for entry in ipf_content:
+        path = entry["path"]
+        ipf_result = dataframes[path]
+        if not ipf_result.associated:
+            simple_entries.append((entry, ipf_result))
+        # For the associated entries, they are present in all blocks. So
+        # looking at the first timestamp is sufficient.
+        elif entry["time"] == first_time:
+            assoc_entries.append((entry, ipf_result))
+
+    # Associated entries do not allow repeats: all time varying data must be stored
+    # in the external files.
     out = []
+    for entry, ipf_result in assoc_entries:
+        factor = entry["factor"]
+        addition = entry["addition"]
+        layer = entry["layer"]
+        df = _read_assoc_files(ipf_result, layer)
+        df["rate"] = df["rate"] * factor + addition
+        d = {
+            "dataframe": df,
+            "layer": layer,
+            "time": entry["time"],
+        }
+        out.append(d)
+
+    # The simple entries do allow repeats.
     repeats = []
-    for entry in block_content["ipf"]:
+    for entry, ipf_result in simple_entries:
         timestring = entry["time"]
         layer = entry["layer"]
         time = periods.get(timestring)
@@ -795,43 +936,24 @@ def _read_package_ipf(
         else:
             repeats.append(time)
 
-        # Ensure the columns are identifiable.
-        path = Path(entry["path"])
-        ipf_df, indexcol, ext = _try_read_with_func(imod.ipf._read_ipf, path)
-        if indexcol == 0:
-            # No associated files
-            columns = ("x", "y", "rate")
-            if layer <= 0:
-                df = ipf_df.iloc[:, :5]
-                columns = columns + ("top", "bottom")
-            else:
-                df = ipf_df.iloc[:, :3]
-            df.columns = columns
+        # Make sure to copy the pre-read dataframe! Otherwise the factor and
+        # addition application may mutate the pre-read dataframe.
+        columns = ("x", "y", "rate")
+        if layer <= 0:
+            df = ipf_result.df.iloc[:, :5].copy()
+            columns = columns + ("top", "bottom")
         else:
-            dfs = []
-            for row in ipf_df.itertuples():
-                filename = row[indexcol]
-                path_assoc = path.parent.joinpath(f"{filename}.{ext}")
-                df_assoc = _try_read_with_func(
-                    imod.ipf.read_associated, path_assoc
-                ).iloc[:, :2]
-                df_assoc.columns = ["time", "rate"]
-                df_assoc["x"] = row[1]
-                df_assoc["y"] = row[2]
-                df_assoc["id"] = path_assoc.stem
-                if layer <= 0:
-                    df_assoc["top"] = row[4]
-                    df_assoc["bottom"] = row[5]
-                dfs.append(df_assoc)
-            df = pd.concat(dfs, ignore_index=True, sort=False)
-        df["rate"] = df["rate"] * factor + addition
+            df = ipf_result.df.iloc[:, :3].copy()
 
+        df["rate"] = df["rate"] * factor + addition
+        df.columns = columns
         d = {
             "dataframe": df,
             "layer": layer,
             "time": time,
         }
         out.append(d)
+
     repeats = sorted(repeats)
     return out, repeats
 
@@ -961,6 +1083,8 @@ def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
     prj_data = {}
     repeat_stress = {}
     for key, block_content in content.items():
+        if not block_content["active"]:
+            continue
         repeats = None
         try:
             if key == "(hfb)":
