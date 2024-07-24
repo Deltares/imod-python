@@ -18,7 +18,6 @@ IntArray: TypeAlias = np.ndarray
 
 
 # Types for optional dependencies.
-
 if TYPE_CHECKING:
     import geopandas as gpd
     import shapely
