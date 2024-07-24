@@ -25,6 +25,9 @@ Prepare model input
     zonal_aggregate_polygons
     zonal_aggregate_raster
 
+    linestring_to_square_zpolygons,
+    linestring_to_trapezoid_zpolygons,
+
     assign_wells
 
     get_lower_active_grid_cells
