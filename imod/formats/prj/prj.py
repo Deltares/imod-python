@@ -845,14 +845,17 @@ def _read_package_ipf(
                 times = set()
                 factors = set()
                 additions = set()
+                layers = set()
                 for entry in grouped[path]:
                     times.add(entry["time"])
                     factors.add(entry["factors"])
                     additions.add(entry["addition"])
+                    layers.add(entry["layer"])
 
                 missing_times = all_times - times
                 n_factors = len(factors)
                 n_additions = len(additions)
+                n_layers = len(layers)
                 if missing_times:
                     missing = ", ".join(missing_times)
                     problems[path].append(
@@ -865,6 +868,10 @@ def _read_package_ipf(
                 if n_additions > 1:
                     problems[path].append(
                         f"* More than one addition specified: {', '.join(additions)}"
+                    )
+                if n_layers > 1:
+                    problems[path].append(
+                        f"* More than one layer specified: {', '.join(layers)}"
                     )
 
         message = textwrap.dedent(
