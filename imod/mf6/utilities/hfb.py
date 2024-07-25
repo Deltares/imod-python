@@ -45,7 +45,11 @@ def _create_zlinestring_from_bound_df(bound: pd.DataFrame) -> GeoDataFrameType:
 
 
 def _create_zpolygon_from_polygon_df(polygon_df: pd.DataFrame) -> GeoDataFrameType:
-    """Create geodataframe with polygon geometry from dataframe with polygon nodes."""
+    """
+    Create geodataframe with polygon geometry from dataframe with polygon
+    nodes. The dataframe with nodes must have a multi-index with name ["index",
+    "parts"]
+    """
     index_names = ["index", "parts"]
     polygons = [
         (g[0], shapely.Polygon(g[1].values)) for g in polygon_df.groupby(index_names)
@@ -64,16 +68,18 @@ def _prepare_index_names(
     Prepare index names, if single index, index should be named 'index', if
     multi-index, it should be '(index, parts)'; where 'index' refers to the line
     index of the original linestrings provided by user and 'parts' to segment of
-    this linestring after clipping.
+    this linestring after clipping. If the line index was not named 'index', but
+    is None, this function sets it to 'index'. This is aligned with how pandas
+    names an unnamed index when calling df.reset_index().
     """
     index_names = dataframe.index.names
 
     match index_names:
         case ["index"] | ["index", "parts"]:
             return dataframe
-        case [None]:
+        case [None]:  # Unnamed line index
             new_index_names = ["index"]
-        case [None, "parts"]:
+        case [None, "parts"]:  # Unnamed line index
             new_index_names = ["index", "parts"]
         case _:
             raise IndexError(
