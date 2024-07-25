@@ -6,13 +6,15 @@ from pathlib import Path
 import geopandas as gpd
 import numpy as np
 import pytest
-import shapely
 import xarray as xr
 from pytest_cases import case, parametrize_with_cases
 
 import imod
 from imod.mf6 import Modflow6Simulation
 from imod.mf6.wel import Well
+from imod.prepare.hfb import (
+    linestring_to_square_zpolygons,
+)
 from imod.typing.grid import zeros_like
 
 
@@ -132,13 +134,17 @@ class HorizontalFlowBarrierCases:
         # Vertical line at x = 52500.0
         barrier_y = [0.0, 52500.0]
         barrier_x = [52500.0, 52500.0]
+        barrier_ztop = [10.0]
+        barrier_zbottom = [0.0]
+
+        polygons = linestring_to_square_zpolygons(
+            barrier_x, barrier_y, barrier_ztop, barrier_zbottom
+        )
 
         return gpd.GeoDataFrame(
-            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            geometry=polygons,
             data={
                 "resistance": [10.0],
-                "ztop": [10.0],
-                "zbottom": [0.0],
             },
         )
 
@@ -146,13 +152,17 @@ class HorizontalFlowBarrierCases:
         # Horizontal line at y = 52500.0
         barrier_x = [0.0, 52500.0]
         barrier_y = [52500.0, 52500.0]
+        barrier_ztop = [10.0]
+        barrier_zbottom = [0.0]
+
+        polygons = linestring_to_square_zpolygons(
+            barrier_x, barrier_y, barrier_ztop, barrier_zbottom
+        )
 
         return gpd.GeoDataFrame(
-            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            geometry=polygons,
             data={
                 "resistance": [10.0],
-                "ztop": [10.0],
-                "zbottom": [0.0],
             },
         )
 
@@ -160,13 +170,17 @@ class HorizontalFlowBarrierCases:
         # Horizontal line at y = -100.0 running outside domain
         barrier_x = [0.0, 1_000_000.0]
         barrier_y = [52500.0, 52500.0]
+        barrier_ztop = [10.0]
+        barrier_zbottom = [0.0]
+
+        polygons = linestring_to_square_zpolygons(
+            barrier_x, barrier_y, barrier_ztop, barrier_zbottom
+        )
 
         return gpd.GeoDataFrame(
-            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            geometry=polygons,
             data={
                 "resistance": [10.0],
-                "ztop": [10.0],
-                "zbottom": [0.0],
             },
         )
 
@@ -174,13 +188,17 @@ class HorizontalFlowBarrierCases:
         # Diagonal line
         barrier_y = [0.0, 52500.0]
         barrier_x = [0.0, 52500.0]
+        barrier_ztop = [10.0]
+        barrier_zbottom = [0.0]
+
+        polygons = linestring_to_square_zpolygons(
+            barrier_x, barrier_y, barrier_ztop, barrier_zbottom
+        )
 
         return gpd.GeoDataFrame(
-            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            geometry=polygons,
             data={
                 "resistance": [10.0],
-                "ztop": [10.0],
-                "zbottom": [0.0],
             },
         )
 

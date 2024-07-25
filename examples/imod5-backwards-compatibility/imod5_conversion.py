@@ -47,6 +47,10 @@ data_prj["rch"]["rate"] = data_prj["rch"]["rate"].sel(layer=1)
 data_prj["drn-1"]["conductance"] = data_prj["drn-1"]["conductance"].sel(layer=1)
 data_prj["drn-1"]["elevation"] = data_prj["drn-1"]["elevation"].sel(layer=1)
 
+# Pop broken hfbs
+data_prj.pop("hfb-24")
+data_prj.pop("hfb-26")
+
 # %%
 # Target grid
 # -----------

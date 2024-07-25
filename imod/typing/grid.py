@@ -8,7 +8,7 @@ import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
 
-from imod.typing import GridDataArray, GridDataset, structured
+from imod.typing import GeoDataFrameType, GridDataArray, GridDataset, structured
 from imod.util.spatial import _polygonize
 
 T = TypeVar("T")
@@ -237,7 +237,7 @@ def merge_with_dictionary(
 
 
 @typedispatch
-def bounding_polygon(active: xr.DataArray):
+def bounding_polygon(active: xr.DataArray) -> GeoDataFrameType:
     """Return bounding polygon of active cells"""
     to_polygonize = active.where(active, other=np.nan)
     polygons_gdf = _polygonize(to_polygonize)
@@ -247,7 +247,7 @@ def bounding_polygon(active: xr.DataArray):
 
 
 @typedispatch  # type: ignore[no-redef]
-def bounding_polygon(active: xu.UgridDataArray):  # noqa: F811
+def bounding_polygon(active: xu.UgridDataArray) -> GeoDataFrameType:  # noqa: F811
     """Return bounding polygon of active cells"""
     active_indices = np.where(active > 0)[0]
     domain_slice = {f"{active.ugrid.grid.face_dimension}": active_indices}

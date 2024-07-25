@@ -4,10 +4,11 @@ import textwrap
 import typing
 from copy import deepcopy
 from enum import Enum
-from typing import TYPE_CHECKING, Dict, Optional, Tuple
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 
 import cftime
 import numpy as np
+import pandas as pd
 import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
@@ -17,9 +18,15 @@ from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
+from imod.mf6.utilities.clip import clip_line_gdf_by_grid
 from imod.mf6.utilities.grid import broadcast_to_full_domain
+from imod.mf6.utilities.hfb import (
+    _create_zlinestring_from_bound_df,
+    _extract_hfb_bounds_from_zpolygons,
+    _prepare_index_names,
+)
 from imod.schemata import EmptyIndexesSchema, MaxNUniqueValuesSchema
-from imod.typing import GridDataArray
+from imod.typing import GeoDataFrameType, GridDataArray, LineStringType
 from imod.util.imports import MissingOptionalModule
 
 if TYPE_CHECKING:
@@ -30,16 +37,20 @@ else:
     except ImportError:
         gpd = MissingOptionalModule("geopandas")
 
-try:
+
+if TYPE_CHECKING:
     import shapely
-except ImportError:
-    shapely = MissingOptionalModule("shapely")
+else:
+    try:
+        import shapely
+    except ImportError:
+        shapely = MissingOptionalModule("shapely")
 
 
 @typedispatch
 def _derive_connected_cell_ids(
     idomain: xr.DataArray, grid: xu.Ugrid2d, edge_index: np.ndarray
-):
+) -> xr.Dataset:
     """
     Derive the cell ids of the connected cells of an edge on a structured grid.
 
@@ -88,7 +99,7 @@ def _derive_connected_cell_ids(
 @typedispatch  # type: ignore[no-redef]
 def _derive_connected_cell_ids(
     _: xu.UgridDataArray, grid: xu.Ugrid2d, edge_index: np.ndarray
-):
+) -> xr.Dataset:
     """
     Derive the cell ids of the connected cells of an edge on an unstructured grid.
 
@@ -182,12 +193,86 @@ def to_connected_cells_dataset(
     return barrier_dataset.dropna("cell_id")
 
 
+def _make_linestring_from_polygon(
+    dataframe: GeoDataFrameType,
+) -> List[LineStringType]:
+    """
+    Make linestring from a polygon with one axis in the vertical dimension (z),
+    and one axis in the horizontal plane (x & y dimension).
+    """
+    coordinates, index = shapely.get_coordinates(dataframe.geometry, return_index=True)
+    df = pd.DataFrame(
+        {"polygon_index": index, "x": coordinates[:, 0], "y": coordinates[:, 1]}
+    )
+    df = df.drop_duplicates().reset_index(drop=True)
+    df = df.set_index("polygon_index")
+
+    linestrings = [
+        shapely.LineString(gb.values) for _, gb in df.groupby("polygon_index")
+    ]
+
+    return linestrings
+
+
+def _select_dataframe_with_snapped_line_index(
+    snapped_dataset: xr.Dataset, edge_index: np.ndarray, dataframe: GeoDataFrameType
+):
+    """
+    Select dataframe rows with line indices of snapped edges. Usually, the
+    broadcasting results in a larger dataframe where individual rows of input
+    dataframe are repeated for multiple edges.
+    """
+    line_index = snapped_dataset["line_index"].values
+    line_index = line_index[edge_index].astype(int)
+    return dataframe.iloc[line_index]
+
+
+def _extract_mean_hfb_bounds_from_dataframe(
+    dataframe: GeoDataFrameType,
+) -> Tuple[pd.Series, pd.Series]:
+    """
+    Extract hfb bounds from dataframe. Requires dataframe geometry to be of type
+    shapely "Z Polygon".
+
+    For the upper z bounds, function takes the average of the depth of the two
+    upper nodes. The same holds for the lower z bounds, but then with the two
+    lower nodes.
+
+    As a visual representation, this happens for each z bound:
+
+    .                 .
+     \         >>>
+      \   .    >>>     ---  .
+       \ /     >>>         -
+        .                 .
+
+    """
+    dataframe = _prepare_index_names(dataframe)
+
+    if not dataframe.geometry.has_z.all():
+        raise TypeError("GeoDataFrame geometry has no z, which is required.")
+
+    lower, upper = _extract_hfb_bounds_from_zpolygons(dataframe)
+    # Compute means inbetween nodes.
+    index_names = lower.index.names
+    lower_mean = lower.groupby(index_names)["z"].mean()
+    upper_mean = upper.groupby(index_names)["z"].mean()
+
+    # Assign to dataframe to map means to right index.
+    df_to_broadcast = dataframe.copy()
+    df_to_broadcast["lower"] = lower_mean
+    df_to_broadcast["upper"] = upper_mean
+
+    return df_to_broadcast["lower"], df_to_broadcast["upper"]
+
+
 def _fraction_layer_overlap(
     snapped_dataset: xu.UgridDataset,
     edge_index: np.ndarray,
+    dataframe: GeoDataFrameType,
     top: xu.UgridDataArray,
     bottom: xu.UgridDataArray,
-):
+) -> xr.DataArray:
     """
     Computes the fraction a barrier occupies inside a layer.
     """
@@ -200,11 +285,10 @@ def _fraction_layer_overlap(
     layer_bounds[..., 0] = typing.cast(np.ndarray, bottom_mean.values).T
     layer_bounds[..., 1] = typing.cast(np.ndarray, top_mean.values).T
 
+    zmin, zmax = _extract_mean_hfb_bounds_from_dataframe(dataframe)
     hfb_bounds = np.empty((n_edge, n_layer, 2), dtype=float)
-    hfb_bounds[..., 0] = (
-        snapped_dataset["zbottom"].values[edge_index].reshape(n_edge, 1)
-    )
-    hfb_bounds[..., 1] = snapped_dataset["ztop"].values[edge_index].reshape(n_edge, 1)
+    hfb_bounds[..., 0] = zmin.values[:, np.newaxis]
+    hfb_bounds[..., 1] = zmax.values[:, np.newaxis]
 
     overlap = _vectorized_overlap(hfb_bounds, layer_bounds)
     height = layer_bounds[..., 1] - layer_bounds[..., 0]
@@ -243,7 +327,7 @@ def _mean_left_and_right(
     return xr.concat((uda_left, uda_right), dim="two").mean("two")
 
 
-def _vectorized_overlap(bounds_a: np.ndarray, bounds_b: np.ndarray):
+def _vectorized_overlap(bounds_a: np.ndarray, bounds_b: np.ndarray) -> np.ndarray:
     """
     Vectorized overlap computation. Returns the overlap of 2 vectors along the same axis.
     If there is no overlap zero will be returned.
@@ -319,7 +403,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         ] + self._get_vertical_variables()
 
     @property
-    def line_data(self) -> "gpd.GeoDataFrame":
+    def line_data(self) -> GeoDataFrameType:
         variables_for_gdf = self._get_variable_names_for_gdf()
         return gpd.GeoDataFrame(
             self.dataset[variables_for_gdf].to_dataframe(),
@@ -327,7 +411,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         )
 
     @line_data.setter
-    def line_data(self, value: "gpd.GeoDataFrame") -> None:
+    def line_data(self, value: GeoDataFrameType) -> None:
         variables_for_gdf = self._get_variable_names_for_gdf()
         self.dataset = self.dataset.merge(
             value.to_xarray(), overwrite_vars=variables_for_gdf, join="right"
@@ -477,7 +561,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             return True
 
         linestrings = self.dataset["geometry"]
-        only_empty_lines = all(ls.is_empty for ls in linestrings.values)
+        only_empty_lines = all(ls.is_empty for ls in linestrings.values.ravel())
         return only_empty_lines
 
     def _resistance_layer(
@@ -540,7 +624,12 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             snapped_dataset[self._get_variable_name()]
         ).values[edge_index]
 
-        fraction = _fraction_layer_overlap(snapped_dataset, edge_index, top, bottom)
+        dataframe = _select_dataframe_with_snapped_line_index(
+            snapped_dataset, edge_index, self.line_data
+        )
+        fraction = _fraction_layer_overlap(
+            snapped_dataset, edge_index, dataframe, top, bottom
+        )
 
         c_aquifer = 1.0 / k_mean
         inverse_c = (fraction / resistance) + ((1.0 - fraction) / c_aquifer)
@@ -663,16 +752,40 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
     def _snap_to_grid(
         self, idomain: GridDataArray
     ) -> Tuple[xu.UgridDataset, np.ndarray]:
-        if "layer" in self.dataset:
+        if "layer" in self._get_vertical_variables():
             variable_names = [self._get_variable_name(), "geometry", "layer"]
         else:
-            variable_names = [self._get_variable_name(), "geometry", "ztop", "zbottom"]
-        barrier_dataframe = self.dataset[variable_names].to_dataframe()
-
-        snapped_dataset, _ = typing.cast(
-            xu.UgridDataset,
-            xu.snap_to_grid(barrier_dataframe, grid=idomain, max_snap_distance=0.5),
+            variable_names = [self._get_variable_name(), "geometry"]
+        barrier_dataframe = gpd.GeoDataFrame(
+            self.dataset[variable_names].to_dataframe()
         )
+
+        if "layer" not in self._get_vertical_variables():
+            lower, _ = _extract_hfb_bounds_from_zpolygons(barrier_dataframe)
+            linestring = _create_zlinestring_from_bound_df(lower)
+            barrier_dataframe["geometry"] = linestring["geometry"]
+
+        barrier_dataframe = clip_line_gdf_by_grid(
+            barrier_dataframe, idomain.sel(layer=1)
+        )
+
+        # Work around issue where xu.snap_to_grid cannot handle snapping a
+        # dataset with multiple lines appropriately. This can be later replaced
+        # to a single call to xu.snap_to_grid if this bug is fixed:
+        # <link_to_github_issue_here>
+        snapped_dataset_rows: List[xr.Dataset] = []
+        for index in barrier_dataframe.index:
+            # Index with list to return pd.DataFrame instead of pd.Series for
+            # xu.snap_to_grid.
+            row_df = barrier_dataframe.loc[[index]]
+            snapped_dataset_row, _ = typing.cast(
+                xu.UgridDataset,
+                xu.snap_to_grid(row_df, grid=idomain, max_snap_distance=0.5),
+            )
+            snapped_dataset_row["line_index"] += index[0]  # Set to original line index.
+            snapped_dataset_rows.append(snapped_dataset_row)
+        snapped_dataset = xu.merge(snapped_dataset_rows)
+
         edge_index = np.argwhere(
             snapped_dataset[self._get_variable_name()].notnull().values
         ).ravel()
@@ -747,21 +860,20 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
         Dataframe that describes:
          - geometry: the geometries of the barriers,
          - hydraulic_characteristic: the hydraulic characteristic of the barriers
-         - ztop: the top z-value of the barriers
-         - zbottom: the bottom z-value of the barriers
     print_input: bool
 
     Examples
     --------
 
-    >>> barrier_x = [-1000.0, 0.0, 1000.0]
-    >>> barrier_y = [500.0, 250.0, 500.0]
+    >>> x = [-10.0, 0.0, 10.0]
+    >>> y = [10.0, 0.0, -10.0]
+    >>> ztop = [10.0, 20.0, 15.0]
+    >>> zbot = [-10.0, -20.0, 0.0]
+    >>> polygons = linestring_to_trapezoid_zpolygons(x, y, ztop, zbot)
     >>> barrier_gdf = gpd.GeoDataFrame(
-    >>>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
+    >>>     geometry=polygons,
     >>>     data={
-    >>>         "hydraulic_characteristic": [1e-3,],
-    >>>         "ztop": [10.0,],
-    >>>         "zbottom": [0.0,],
+    >>>         "resistance": [1e-3, 1e-3],
     >>>     },
     >>> )
     >>> hfb = imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic(barrier_gdf)
@@ -783,7 +895,7 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
         return "hydraulic_characteristic"
 
     def _get_vertical_variables(self) -> list:
-        return ["ztop", "zbottom"]
+        return []
 
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
@@ -884,21 +996,20 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
         Dataframe that describes:
          - geometry: the geometries of the barriers,
          - multiplier: the multiplier of the barriers
-         - ztop: the top z-value of the barriers
-         - zbottom: the bottom z-value of the barriers
     print_input: bool
 
     Examples
     --------
 
-    >>> barrier_x = [-1000.0, 0.0, 1000.0]
-    >>> barrier_y = [500.0, 250.0, 500.0]
+    >>> x = [-10.0, 0.0, 10.0]
+    >>> y = [10.0, 0.0, -10.0]
+    >>> ztop = [10.0, 20.0, 15.0]
+    >>> zbot = [-10.0, -20.0, 0.0]
+    >>> polygons = linestring_to_trapezoid_zpolygons(x, y, ztop, zbot)
     >>> barrier_gdf = gpd.GeoDataFrame(
-    >>>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
+    >>>     geometry=polygons,
     >>>     data={
-    >>>         "multiplier": [1.5,],
-    >>>         "ztop": [10.0,],
-    >>>         "zbottom": [0.0,],
+    >>>         "multiplier": [10.0, 10.0],
     >>>     },
     >>> )
     >>> hfb = imod.mf6.HorizontalFlowBarrierMultiplier(barrier_gdf)
@@ -920,12 +1031,17 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
         return "multiplier"
 
     def _get_vertical_variables(self) -> list:
-        return ["ztop", "zbottom"]
+        return []
 
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
     ):
-        fraction = _fraction_layer_overlap(snapped_dataset, edge_index, top, bottom)
+        dataframe = _select_dataframe_with_snapped_line_index(
+            snapped_dataset, edge_index, self.line_data
+        )
+        fraction = _fraction_layer_overlap(
+            snapped_dataset, edge_index, dataframe, top, bottom
+        )
 
         barrier_values = (
             fraction.where(fraction)
@@ -1039,21 +1155,21 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         Dataframe that describes:
          - geometry: the geometries of the barriers,
          - resistance: the resistance of the barriers
-         - ztop: the top z-value of the barriers
-         - zbottom: the bottom z-value of the barriers
+
     print_input: bool
 
     Examples
     --------
 
-    >>> barrier_x = [-1000.0, 0.0, 1000.0]
-    >>> barrier_y = [500.0, 250.0, 500.0]
+    >>> x = [-10.0, 0.0, 10.0]
+    >>> y = [10.0, 0.0, -10.0]
+    >>> ztop = [10.0, 20.0, 15.0]
+    >>> zbot = [-10.0, -20.0, 0.0]
+    >>> polygons = linestring_to_trapezoid_zpolygons(x, y, ztop, zbot)
     >>> barrier_gdf = gpd.GeoDataFrame(
-    >>>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
+    >>>     geometry=polygons,
     >>>     data={
-    >>>         "resistance": [1e3,],
-    >>>         "ztop": [10.0,],
-    >>>         "zbottom": [0.0,],
+    >>>         "resistance": [1e3, 1e3],
     >>>     },
     >>> )
     >>> hfb = imod.mf6.HorizontalFlowBarrierResistance(barrier_gdf)
@@ -1076,7 +1192,7 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         return "resistance"
 
     def _get_vertical_variables(self) -> list:
-        return ["ztop", "zbottom"]
+        return []
 
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
@@ -1170,7 +1286,9 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         layer = hfb_dict["layer"]
         if layer == 0:
             raise ValueError(
-                "assigning to layer 0 is not supported yet for import of HFB's"
+                "assigning to layer 0 is not supported for "
+                "SingleLayerHorizontalFlowBarrierResistance. "
+                "Try HorizontalFlowBarrierResistance class."
             )
         geometry_layer = hfb_dict["geodataframe"]
         geometry_layer["layer"] = layer

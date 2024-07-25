@@ -9,17 +9,38 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 [Unreleased- feature branch]
 ----------------------------
+
 Fixed
 ~~~~~
-- ``HorizontalFlowBarrier`` attached to :class:`imod.mf6.GroundwaterFlowModel`
-  are merged into a single horizontal flow barrier for MODFLOW 6
+- Multiple ``HorizontalFlowBarrier`` objects attached to
+  :class:`imod.mf6.GroundwaterFlowModel` are merged into a single horizontal
+  flow barrier for MODFLOW 6
 
 
 Changed
 ~~~~~~~
 - :class:`imod.mf6.Well` now also validates that well filter top is above well filter bottom
-- :function:`open_projectfile_data` now also imports well filter top and bottom.
+- :func:`open_projectfile_data` now also imports well filter top and bottom.
 - :class:`imod.mf6.Well` now logs a warning if any wells are removed during writing.
+- :class:`imod.mf6.HorizontalFlowBarrierResistance`,
+  :class:`imod.mf6.HorizontalFlowBarrierMultiplier`,
+  :class:`imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic` now uses
+  vertical Polygons instead of Linestrings as geometry, and ``"ztop"`` and
+  ``"zbottom"`` variables are not used anymore. See
+  :func:`imod.prepare.linestring_to_square_zpolygons` and
+  :func:`imod.prepare.linestring_to_trapezoid_zpolygons` to generate these
+  polygons.
+
+Added
+~~~~~
+
+- :func:`imod.prepare.linestring_to_square_zpolygons` and
+  :func:`imod.prepare.linestring_to_trapezoid_zpolygons` to generate
+  vertical polygons that can be used to specify horizontal flow barriers, specifically:
+  :class:`imod.mf6.HorizontalFlowBarrierResistance`,
+  :class:`imod.mf6.HorizontalFlowBarrierMultiplier`,
+  :class:`imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic`.
+
 
 [Unreleased]
 ------------
@@ -310,9 +331,12 @@ Added
 - Added Python 3.11 support.
 - The GWF-GWF exchange options are derived from user created packages (NPF, OC) and
   set automatically.
-- Added the ``simulation_start_time`` and ``time_unit`` arguments. To the ``Modflow6Simulation.open_`` methods, and ``imod.mf6.out.open_`` functions. This converts the ``"time"`` coordinate to datetimes.
-- added :meth:`imod.mf6.Modflow6Simulation.mask_all_models`  to apply a mask to all models under a simulation,
-provided the simulation is not split and the models use the same discretization. 
+- Added the ``simulation_start_time`` and ``time_unit`` arguments. To the
+  ``Modflow6Simulation.open_`` methods, and ``imod.mf6.out.open_`` functions.
+  This converts the ``"time"`` coordinate to datetimes.
+- added :meth:`imod.mf6.Modflow6Simulation.mask_all_models` to apply a mask to
+  all models under a simulation, provided the simulation is not split and the
+  models use the same discretization. 
 
 
 Changed
