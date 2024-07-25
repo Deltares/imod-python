@@ -12,7 +12,7 @@ from imod.mf6.interfaces.ipackagebase import IPackageBase
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.utilities.grid import get_active_domain_slice
 from imod.mf6.utilities.hfb import (
-    hfb_zlinestrings_to_zpolygons,
+    clipped_hfb_zlinestrings_to_zpolygons,
     hfb_zpolygons_to_zlinestrings,
 )
 from imod.typing import GeoDataFrameType, GridDataArray
@@ -147,6 +147,6 @@ def clip_line_gdf_by_grid(
         # Consequently construct polygons from these clipped linestrings.
         gdf_linestrings = hfb_zpolygons_to_zlinestrings(gdf)
         clipped_linestrings = _clip_linestring(gdf_linestrings, bounding_gdf)
-        return hfb_zlinestrings_to_zpolygons(clipped_linestrings)
+        return clipped_hfb_zlinestrings_to_zpolygons(clipped_linestrings)
     else:
         return _clip_linestring(gdf, bounding_gdf)

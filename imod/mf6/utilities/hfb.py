@@ -161,9 +161,9 @@ def _flip_linestrings(df: pd.DataFrame) -> pd.DataFrame:
     return df_sorted.reset_index(level=2, drop=True)
 
 
-def hfb_zlinestrings_to_zpolygons(bounds_gdf: GeoSeriesType) -> GeoDataFrameType:
+def clipped_hfb_zlinestrings_to_zpolygons(bounds_gdf: GeoSeriesType) -> GeoDataFrameType:
     """
-    Convert zlinestrings of bounds_gdf to zpolygons
+    Convert clipped zlinestrings provided with bounds_gdf to zpolygons
 
     Parameters
     ----------
