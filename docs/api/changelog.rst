@@ -9,6 +9,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 [Unreleased- feature branch]
 ----------------------------
+
 Fixed
 ~~~~~
 - Multiple ``HorizontalFlowBarrier`` objects attached to
