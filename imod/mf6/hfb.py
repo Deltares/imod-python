@@ -23,6 +23,7 @@ from imod.mf6.utilities.grid import broadcast_to_full_domain
 from imod.mf6.utilities.hfb import (
     _create_zlinestring_from_bound_df,
     _extract_hfb_bounds_from_zpolygons,
+    _prepare_index_names,
 )
 from imod.schemata import EmptyIndexesSchema, MaxNUniqueValuesSchema
 from imod.typing import GeoDataFrameType, GridDataArray, LineStringType
@@ -246,6 +247,8 @@ def _extract_mean_hfb_bounds_from_dataframe(
         .                 .
 
     """
+    dataframe = _prepare_index_names(dataframe)
+
     if not dataframe.geometry.has_z.all():
         raise TypeError("GeoDataFrame geometry has no z, which is required.")
 

@@ -21,6 +21,7 @@ except ImportError:
 
 def _create_zlinestring_from_bound_df(bound: pd.DataFrame) -> GeoDataFrameType:
     """Create geodataframe with linestring geometry from dataframe with bounds."""
+    bound = _prepare_index_names(bound)
     # Make sure only x, y, z or x, y in columns
     columns = sorted({"x", "y", "z"} & set(bound.columns))
     index_names = list(bound.index.names)
@@ -31,9 +32,10 @@ def _create_zlinestring_from_bound_df(bound: pd.DataFrame) -> GeoDataFrameType:
         index_to_group = index_names
     # Each linestring has its own index, therefore groupby index.
     mapping_linestrings = [
-        (g[0], shapely.LineString(g[1][columns].values)) for g in bound.groupby(index_to_group)
+        (g[0], shapely.LineString(g[1][columns].values))
+        for g in bound.groupby(index_to_group)
     ]
-    index, linestrings= zip(*mapping_linestrings)
+    index, linestrings = zip(*mapping_linestrings)
 
     gdf = gpd.GeoDataFrame(
         linestrings, index=index, columns=["geometry"], geometry="geometry"
@@ -55,6 +57,33 @@ def _create_zpolygon_from_polygon_df(polygon_df: pd.DataFrame) -> GeoDataFrameTy
     )
 
 
+def _prepare_index_names(
+    dataframe: GeoDataFrameType,
+) -> GeoDataFrameType:
+    """
+    Prepare index names, if single index, index should be named 'index', if
+    multi-index, it should be '(index, parts)'; where 'index' refers to the line
+    index of the original linestrings provided by user and 'parts' to segment of
+    this linestring after clipping.
+    """
+    index_names = dataframe.index.names
+
+    match index_names:
+        case ["index"] | ["index", "parts"]:
+            return dataframe
+        case [None]:
+            new_index_names = ["index"]
+        case [None, "parts"]:
+            new_index_names = ["index", "parts"]
+        case _:
+            raise IndexError(
+                f"Index names should be ['index'] or ['index', 'parts']. Got {index_names}"
+            )
+
+    dataframe.index = dataframe.index.set_names(new_index_names)
+    return dataframe
+
+
 def _extract_hfb_bounds_from_zpolygons(
     dataframe: GeoDataFrameType,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
@@ -62,6 +91,8 @@ def _extract_hfb_bounds_from_zpolygons(
     Extract hfb bounds from dataframe. Requires dataframe geometry to be of type
     shapely "Z Polygon".
     """
+    dataframe = _prepare_index_names(dataframe)
+
     if not dataframe.geometry.has_z.all():
         raise TypeError("GeoDataFrame geometry has no z, which is required.")
 
