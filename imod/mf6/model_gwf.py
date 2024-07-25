@@ -6,13 +6,13 @@ from typing import Optional, cast
 import cftime
 import numpy as np
 
-from imod.flow.ghb import GeneralHeadBoundary
 from imod.logging import init_log_decorator
 from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6 import ConstantHead
 from imod.mf6.clipped_boundary_condition_creator import create_clipped_boundary
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.drn import Drainage
+from imod.mf6.ghb import GeneralHeadBoundary
 from imod.mf6.hfb import SingleLayerHorizontalFlowBarrierResistance
 from imod.mf6.ic import InitialConditions
 from imod.mf6.model import Modflow6Model
@@ -22,6 +22,7 @@ from imod.mf6.regrid.regrid_schemes import (
     ConstantHeadRegridMethod,
     DiscretizationRegridMethod,
     DrainageRegridMethod,
+    GeneralHeadBoundaryRegridMethod,
     InitialConditionsRegridMethod,
     NodePropertyFlowRegridMethod,
     RechargeRegridMethod,
@@ -285,7 +286,6 @@ class GroundwaterFlowModel(Modflow6Model):
         for wel_key in wel_keys:
             result[wel_key] = Well.from_imod5_data(wel_key, imod5_data, times)
 
-                    
         imod5_keys = list(imod5_data.keys())
         ghb_keys = [key for key in imod5_keys if key[0:3] == "ghb"]
         for ghb_key in ghb_keys:
@@ -295,11 +295,14 @@ class GroundwaterFlowModel(Modflow6Model):
                 period_data,
                 dis_pkg,
                 npf_pkg,
-                time_min,
-                time_max,
+                times[0],
+                times[-1],
                 allocation_options.ghb,
                 distributing_options.ghb,
-                regridder_types,
+                regridder_types=cast(
+                    GeneralHeadBoundaryRegridMethod, regridder_types.get(ghb_key)
+                ),
+                regrid_cache=regrid_cache,
             )
             result[ghb_key] = ghb_pkg
 
