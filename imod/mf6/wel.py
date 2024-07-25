@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import abc
 import textwrap
 import warnings
 from datetime import datetime
@@ -70,7 +71,148 @@ def mask_2D(package: Well, domain_2d: GridDataArray) -> Well:
     return cls._from_dataset(selection)
 
 
-class Well(BoundaryCondition, IPointDataPackage):
+class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
+    """
+    Abstract base class for grid agnostic wells
+    """
+
+    @property
+    def x(self) -> npt.NDArray[np.float64]:
+        return self.dataset["x"].values
+
+    @property
+    def y(self) -> npt.NDArray[np.float64]:
+        return self.dataset["y"].values
+
+    @classmethod
+    def is_grid_agnostic_package(cls) -> bool:
+        return True
+
+    def __create_cellid(self, wells_assigned: pd.DataFrame, active: xr.DataArray):
+        like = ones_like(active)
+
+        # Groupby index and select first, to unset any duplicate records
+        # introduced by the multi-indexed "time" dimension.
+        df_for_cellid = wells_assigned.groupby("index").first()
+        d_for_cellid = df_for_cellid[["x", "y", "layer"]].to_dict("list")
+
+        return self.__derive_cellid_from_points(like, **d_for_cellid)
+
+    def __create_dataset_vars(
+        self, wells_assigned: pd.DataFrame, wells_df: pd.DataFrame, cellid: xr.DataArray
+    ) -> xr.Dataset:
+        """
+        Create dataset with all variables (rate, concentration), with a similar shape as the cellids.
+        """
+        data_vars = ["id", "rate"]
+        if "concentration" in wells_assigned.columns:
+            data_vars.append("concentration")
+
+        ds_vars = wells_assigned[data_vars].to_xarray()
+        # "rate" variable in conversion from multi-indexed DataFrame to xarray
+        # DataArray results in duplicated values for "rate" along dimension
+        # "species". Select first species to reduce this again.
+        index_names = wells_df.index.names
+        if "species" in index_names:
+            ds_vars["rate"] = ds_vars["rate"].isel(species=0)
+
+        # Carefully rename the dimension and set coordinates
+        d_rename = {"index": "ncellid"}
+        ds_vars = ds_vars.rename_dims(**d_rename).rename_vars(**d_rename)
+        ds_vars = ds_vars.assign_coords(**{"ncellid": cellid.coords["ncellid"].values})
+
+        return ds_vars
+
+    @staticmethod
+    def __derive_cellid_from_points(
+        dst_grid: GridDataArray,
+        x: list,
+        y: list,
+        layer: list,
+    ) -> GridDataArray:
+        """
+        Create DataArray with Modflow6 cell identifiers based on x, y coordinates
+        in a dataframe. For structured grid this DataArray contains 3 columns:
+        ``layer, row, column``. For unstructured grids, this contains 2 columns:
+        ``layer, cell2d``.
+        See also: https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.4.0.pdf#page=35
+
+        Note
+        ----
+        The "layer" coordinate should already be provided in the dataframe.
+        To determine the layer coordinate based on screen depts, look at
+        :func:`imod.prepare.wells.assign_wells`.
+
+        Parameters
+        ----------
+        dst_grid: {xr.DataArray, xu.UgridDataArray}
+            Destination grid to map the points to based on their x and y coordinates.
+        x: {list, np.array}
+            array-like with x-coordinates
+        y: {list, np.array}
+            array-like with y-coordinates
+        layer: {list, np.array}
+            array-like with layer-coordinates
+
+        Returns
+        -------
+        cellid : xr.DataArray
+            2D DataArray with a ``ncellid`` rows and 3 to 2 columns, depending
+            on whether on a structured or unstructured grid."""
+
+        # Find indices belonging to x, y coordinates
+        indices_cell2d = points_indices(dst_grid, out_of_bounds="ignore", x=x, y=y)
+        # Convert cell2d indices from 0-based to 1-based.
+        indices_cell2d = {dim: index + 1 for dim, index in indices_cell2d.items()}
+        # Prepare layer indices, for later concatenation
+
+        if isinstance(dst_grid, xu.UgridDataArray):
+            indices_layer = xr.DataArray(
+                layer, coords=indices_cell2d["mesh2d_nFaces"].coords
+            )
+            face_dim = dst_grid.ugrid.grid.face_dimension
+            indices_cell2d_dims = [face_dim]
+            cell2d_coords = ["cell2d"]
+        else:
+            indices_layer = xr.DataArray(layer, coords=indices_cell2d["x"].coords)
+            indices_cell2d_dims = ["y", "x"]
+            cell2d_coords = ["row", "column"]
+
+        # Prepare cellid array of the right shape.
+        cellid_ls = [indices_layer] + [
+            indices_cell2d[dim] for dim in indices_cell2d_dims
+        ]
+        cellid = xr.concat(cellid_ls, dim="nmax_cellid")
+        # Rename generic dimension name "index" to ncellid.
+        cellid = cellid.rename(index="ncellid")
+        # Put dimensions in right order after concatenation.
+        cellid = cellid.transpose("ncellid", "nmax_cellid")
+        # Assign extra coordinate names.
+        coords = {
+            "nmax_cellid": ["layer"] + cell2d_coords,
+            "x": ("ncellid", x),
+            "y": ("ncellid", y),
+        }
+        cellid = cellid.assign_coords(**coords)
+
+        return cellid
+
+    def render(self, directory, pkgname, globaltimes, binary):
+        raise NotImplementedError(
+            f"{self.__class__.__name__} is a grid-agnostic package and does not have a render method. To render the package, first convert to a Modflow6 package by calling pkg.to_mf6_pkg()"
+        )
+
+    def write(
+        self,
+        pkgname: str,
+        globaltimes: Union[list[np.datetime64], np.ndarray],
+        write_context: WriteContext,
+    ):
+        raise NotImplementedError(
+            "To write a wel package first convert it to a MF6 well using to_mf6_pkg."
+        )
+
+class Well(GridAgnosticWell):
     """
     Agnostic WEL package, which accepts x, y and a top and bottom of the well screens.
 
@@ -160,14 +302,6 @@ class Well(BoundaryCondition, IPointDataPackage):
     >>> imod.mf6.Well(x, y, screen_top, screen_bottom, rate_transient)
     """
 
-    @property
-    def x(self) -> npt.NDArray[np.float64]:
-        return self.dataset["x"].values
-
-    @property
-    def y(self) -> npt.NDArray[np.float64]:
-        return self.dataset["y"].values
-
     _pkg_id = "wel"
 
     _auxiliary_data = {"concentration": "species"}
@@ -241,10 +375,6 @@ class Well(BoundaryCondition, IPointDataPackage):
         index_coord = np.arange(self.dataset.dims["index"])
         self.dataset = self.dataset.assign_coords(index=index_coord)
         self._validate_init_schemata(validate)
-
-    @classmethod
-    def is_grid_agnostic_package(cls) -> bool:
-        return True
 
     def clip_box(
         self,
@@ -350,16 +480,6 @@ class Well(BoundaryCondition, IPointDataPackage):
 
         return value
 
-    def write(
-        self,
-        pkgname: str,
-        globaltimes: Union[list[np.datetime64], np.ndarray],
-        write_context: WriteContext,
-    ):
-        raise NotImplementedError(
-            "To write a wel package first convert it to a MF6 well using to_mf6_pkg."
-        )
-
     def __create_wells_df(self) -> pd.DataFrame:
         wells_df = self.dataset.to_dataframe()
         wells_df = wells_df.rename(
@@ -410,119 +530,6 @@ class Well(BoundaryCondition, IPointDataPackage):
 
         return wells_assigned
 
-    def __create_dataset_vars(
-        self, wells_assigned: pd.DataFrame, wells_df: pd.DataFrame, cellid: xr.DataArray
-    ) -> xr.Dataset:
-        """
-        Create dataset with all variables (rate, concentration), with a similar shape as the cellids.
-        """
-        data_vars = ["id", "rate"]
-        if "concentration" in wells_assigned.columns:
-            data_vars.append("concentration")
-
-        ds_vars = wells_assigned[data_vars].to_xarray()
-        # "rate" variable in conversion from multi-indexed DataFrame to xarray
-        # DataArray results in duplicated values for "rate" along dimension
-        # "species". Select first species to reduce this again.
-        index_names = wells_df.index.names
-        if "species" in index_names:
-            ds_vars["rate"] = ds_vars["rate"].isel(species=0)
-
-        # Carefully rename the dimension and set coordinates
-        d_rename = {"index": "ncellid"}
-        ds_vars = ds_vars.rename_dims(**d_rename).rename_vars(**d_rename)
-        ds_vars = ds_vars.assign_coords(**{"ncellid": cellid.coords["ncellid"].values})
-
-        return ds_vars
-
-    def __create_cellid(self, wells_assigned: pd.DataFrame, active: xr.DataArray):
-        like = ones_like(active)
-
-        # Groupby index and select first, to unset any duplicate records
-        # introduced by the multi-indexed "time" dimension.
-        df_for_cellid = wells_assigned.groupby("index").first()
-        d_for_cellid = df_for_cellid[["x", "y", "layer"]].to_dict("list")
-
-        return self.__derive_cellid_from_points(like, **d_for_cellid)
-
-    @staticmethod
-    def __derive_cellid_from_points(
-        dst_grid: GridDataArray,
-        x: list,
-        y: list,
-        layer: list,
-    ) -> GridDataArray:
-        """
-        Create DataArray with Modflow6 cell identifiers based on x, y coordinates
-        in a dataframe. For structured grid this DataArray contains 3 columns:
-        ``layer, row, column``. For unstructured grids, this contains 2 columns:
-        ``layer, cell2d``.
-        See also: https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.4.0.pdf#page=35
-
-        Note
-        ----
-        The "layer" coordinate should already be provided in the dataframe.
-        To determine the layer coordinate based on screen depts, look at
-        :func:`imod.prepare.wells.assign_wells`.
-
-        Parameters
-        ----------
-        dst_grid: {xr.DataArray, xu.UgridDataArray}
-            Destination grid to map the points to based on their x and y coordinates.
-        x: {list, np.array}
-            array-like with x-coordinates
-        y: {list, np.array}
-            array-like with y-coordinates
-        layer: {list, np.array}
-            array-like with layer-coordinates
-
-        Returns
-        -------
-        cellid : xr.DataArray
-            2D DataArray with a ``ncellid`` rows and 3 to 2 columns, depending
-            on whether on a structured or unstructured grid."""
-
-        # Find indices belonging to x, y coordinates
-        indices_cell2d = points_indices(dst_grid, out_of_bounds="ignore", x=x, y=y)
-        # Convert cell2d indices from 0-based to 1-based.
-        indices_cell2d = {dim: index + 1 for dim, index in indices_cell2d.items()}
-        # Prepare layer indices, for later concatenation
-
-        if isinstance(dst_grid, xu.UgridDataArray):
-            indices_layer = xr.DataArray(
-                layer, coords=indices_cell2d["mesh2d_nFaces"].coords
-            )
-            face_dim = dst_grid.ugrid.grid.face_dimension
-            indices_cell2d_dims = [face_dim]
-            cell2d_coords = ["cell2d"]
-        else:
-            indices_layer = xr.DataArray(layer, coords=indices_cell2d["x"].coords)
-            indices_cell2d_dims = ["y", "x"]
-            cell2d_coords = ["row", "column"]
-
-        # Prepare cellid array of the right shape.
-        cellid_ls = [indices_layer] + [
-            indices_cell2d[dim] for dim in indices_cell2d_dims
-        ]
-        cellid = xr.concat(cellid_ls, dim="nmax_cellid")
-        # Rename generic dimension name "index" to ncellid.
-        cellid = cellid.rename(index="ncellid")
-        # Put dimensions in right order after concatenation.
-        cellid = cellid.transpose("ncellid", "nmax_cellid")
-        # Assign extra coordinate names.
-        coords = {
-            "nmax_cellid": ["layer"] + cell2d_coords,
-            "x": ("ncellid", x),
-            "y": ("ncellid", y),
-        }
-        cellid = cellid.assign_coords(**coords)
-
-        return cellid
-
-    def render(self, directory, pkgname, globaltimes, binary):
-        raise NotImplementedError(
-            f"{self.__class__.__name__} is a grid-agnostic package and does not have a render method. To render the package, first convert to a Modflow6 package by calling pkg.to_mf6_pkg()"
-        )
 
     def to_mf6_pkg(
         self,
