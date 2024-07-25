@@ -16,7 +16,7 @@ def concat_layered_chd_packages(
     ----------
     name: str
         The name of the package that was split over layers.
-        If they are called "chd-1" and so on then set name to "chd
+        If they are called "chd-1" and so on then set name to "chd"
     dict_packages: dict[str, ConstantHead]
         dictionary  with package names as key and the packages as values
     remove_merged_packages: bool = True
