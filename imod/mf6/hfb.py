@@ -865,12 +865,15 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
     Examples
     --------
 
-    >>> barrier_x = [-1000.0, 0.0, 1000.0]
-    >>> barrier_y = [500.0, 250.0, 500.0]
+    >>> x = [-10.0, 0.0, 10.0]
+    >>> y = [10.0, 0.0, -10.0]
+    >>> ztop = [10.0, 20.0, 15.0]
+    >>> zbot = [-10.0, -20.0, 0.0]
+    >>> polygons = linestring_to_trapezoid_zpolygons(x, y, ztop, zbot)
     >>> barrier_gdf = gpd.GeoDataFrame(
-    >>>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
+    >>>     geometry=polygons,
     >>>     data={
-    >>>         "hydraulic_characteristic": [1e-3,],
+    >>>         "resistance": [1e-3, 1e-3],
     >>>     },
     >>> )
     >>> hfb = imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic(barrier_gdf)
@@ -998,12 +1001,15 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     Examples
     --------
 
-    >>> barrier_x = [-1000.0, 0.0, 1000.0]
-    >>> barrier_y = [500.0, 250.0, 500.0]
+    >>> x = [-10.0, 0.0, 10.0]
+    >>> y = [10.0, 0.0, -10.0]
+    >>> ztop = [10.0, 20.0, 15.0]
+    >>> zbot = [-10.0, -20.0, 0.0]
+    >>> polygons = linestring_to_trapezoid_zpolygons(x, y, ztop, zbot)
     >>> barrier_gdf = gpd.GeoDataFrame(
-    >>>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
+    >>>     geometry=polygons,
     >>>     data={
-    >>>         "multiplier": [1.5,],
+    >>>         "multiplier": [10.0, 10.0],
     >>>     },
     >>> )
     >>> hfb = imod.mf6.HorizontalFlowBarrierMultiplier(barrier_gdf)
@@ -1155,12 +1161,15 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     Examples
     --------
 
-    >>> barrier_x = [-1000.0, 0.0, 1000.0]
-    >>> barrier_y = [500.0, 250.0, 500.0]
+    >>> x = [-10.0, 0.0, 10.0]
+    >>> y = [10.0, 0.0, -10.0]
+    >>> ztop = [10.0, 20.0, 15.0]
+    >>> zbot = [-10.0, -20.0, 0.0]
+    >>> polygons = linestring_to_trapezoid_zpolygons(x, y, ztop, zbot)
     >>> barrier_gdf = gpd.GeoDataFrame(
-    >>>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
+    >>>     geometry=polygons,
     >>>     data={
-    >>>         "resistance": [1e3,],
+    >>>         "resistance": [1e3, 1e3],
     >>>     },
     >>> )
     >>> hfb = imod.mf6.HorizontalFlowBarrierResistance(barrier_gdf)
