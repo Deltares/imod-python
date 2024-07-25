@@ -817,7 +817,7 @@ def test_extract_hfb_bounds_from_dataframe__fails():
     line_data = linestrings(barrier_x, barrier_y)
 
     gdf_polygons = gpd.GeoDataFrame(
-        geometry=[line_data],
+        geometry=[line_data, line_data],
         data={
             "resistance": [1e3, 1e3],
         },
