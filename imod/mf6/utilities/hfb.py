@@ -25,7 +25,7 @@ def _create_zlinestring_from_bound_df(bound: pd.DataFrame) -> GeoDataFrameType:
     # Make sure only x, y, z or x, y in columns
     columns = sorted({"x", "y", "z"} & set(bound.columns))
     index_names = list(bound.index.names)
-    # Prevent multiindex to be created by avoiding list
+    # Prevent multiindex to be created in groupby by avoiding list
     if bound.index.name:
         index_to_group = bound.index.name
     else:
