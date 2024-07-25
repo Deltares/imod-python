@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Optional
 
 import numpy as np
@@ -282,4 +283,8 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         regridded_package_data["head"] = head
         regridded_package_data.pop("ibound")
 
-        return cls(**regridded_package_data)
+        return cls(**regridded_package_data, validate=True)
+
+    @classmethod
+    def get_regrid_methods(cls) -> ConstantHeadRegridMethod:
+        return deepcopy(cls._regrid_method)
