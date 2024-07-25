@@ -11,8 +11,9 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 ----------------------------
 Fixed
 ~~~~~
-- ``HorizontalFlowBarrier`` attached to :class:`imod.mf6.GroundwaterFlowModel`
-  are merged into a single horizontal flow barrier for MODFLOW 6
+- Multiple ``HorizontalFlowBarrier`` objects attached to
+  :class:`imod.mf6.GroundwaterFlowModel` are merged into a single horizontal
+  flow barrier for MODFLOW 6
 
 
 Changed
@@ -20,6 +21,25 @@ Changed
 - :class:`imod.mf6.Well` now also validates that well filter top is above well filter bottom
 - :function:`open_projectfile_data` now also imports well filter top and bottom.
 - :class:`imod.mf6.Well` now logs a warning if any wells are removed during writing.
+- :class:`imod.mf6.HorizontalFlowBarrierResistance`,
+  :class:`imod.mf6.HorizontalFlowBarrierMultiplier`,
+  :class:`imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic` now uses
+  vertical Polygons instead of Linestrings as geometry, and ``"ztop"`` and
+  ``"zbottom"`` variables are not used anymore. See
+  :function:`imod.prepare.linestring_to_square_zpolygons` and
+  :function:`imod.prepare.linestring_to_trapezoid_zpolygons` to generate these
+  polygons.
+
+Added
+~~~~~
+
+- :function:`imod.prepare.linestring_to_square_zpolygons` and
+  :function:`imod.prepare.linestring_to_trapezoid_zpolygons` to generate
+  vertical polygons that can be used to specify horizontal flow barriers, specifically:
+  :class:`imod.mf6.HorizontalFlowBarrierResistance`,
+  :class:`imod.mf6.HorizontalFlowBarrierMultiplier`,
+  :class:`imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic`.
+
 
 [Unreleased]
 ------------
