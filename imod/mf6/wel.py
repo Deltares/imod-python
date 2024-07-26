@@ -88,7 +88,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
     def is_grid_agnostic_package(cls) -> bool:
         return True
 
-    def __create_cellid(self, wells_assigned: pd.DataFrame, active: xr.DataArray):
+    def _create_cellid(self, wells_assigned: pd.DataFrame, active: xr.DataArray):
         like = ones_like(active)
 
         # Groupby index and select first, to unset any duplicate records
@@ -96,9 +96,9 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         df_for_cellid = wells_assigned.groupby("index").first()
         d_for_cellid = df_for_cellid[["x", "y", "layer"]].to_dict("list")
 
-        return self.__derive_cellid_from_points(like, **d_for_cellid)
+        return self._derive_cellid_from_points(like, **d_for_cellid)
 
-    def __create_dataset_vars(
+    def _create_dataset_vars(
         self, wells_assigned: pd.DataFrame, wells_df: pd.DataFrame, cellid: xr.DataArray
     ) -> xr.Dataset:
         """
@@ -124,7 +124,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         return ds_vars
 
     @staticmethod
-    def __derive_cellid_from_points(
+    def _derive_cellid_from_points(
         dst_grid: GridDataArray,
         x: list,
         y: list,
@@ -603,9 +603,9 @@ class Well(GridAgnosticWell):
             )
 
         ds = xr.Dataset()
-        ds["cellid"] = self.__create_cellid(wells_assigned, active)
+        ds["cellid"] = self._create_cellid(wells_assigned, active)
 
-        ds_vars = self.__create_dataset_vars(wells_assigned, wells_df, ds["cellid"])
+        ds_vars = self._create_dataset_vars(wells_assigned, wells_df, ds["cellid"])
         ds = ds.assign(**ds_vars.data_vars)
 
         ds = remove_inactive(ds, active)
