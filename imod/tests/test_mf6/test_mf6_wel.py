@@ -59,14 +59,16 @@ class GridAgnosticWellCases:
         return obj, dims_expected, cellid_expected, rate_expected
 
     def case_well_stationary_multilevel(self, well_high_lvl_test_data_stationary):
-        x, y, screen_top, _, rate_wel, concentration = well_high_lvl_test_data_stationary
+        x, y, screen_top, _, rate_wel, concentration = (
+            well_high_lvl_test_data_stationary
+        )
         screen_bottom = [-20.0] * 8
         obj = imod.mf6.Well(x, y, screen_top, screen_bottom, rate_wel, concentration)
         dims_expected = {
-                "ncellid": 12,
-                "nmax_cellid": 3,
-                "species": 2,
-            }
+            "ncellid": 12,
+            "nmax_cellid": 3,
+            "species": 2,
+        }
         cellid_expected = np.array(
             [
                 [1, 1, 9],
@@ -164,11 +166,10 @@ class GridAgnosticWellCases:
 
 
 @parametrize_with_cases(
-    ["wel", "dims_expected", "cellid_expected", "rate_expected"], cases=GridAgnosticWellCases
+    ["wel", "dims_expected", "cellid_expected", "rate_expected"],
+    cases=GridAgnosticWellCases,
 )
-def test_to_mf6_pkg(
-    basic_dis, wel, dims_expected, cellid_expected, rate_expected
-):
+def test_to_mf6_pkg(basic_dis, wel, dims_expected, cellid_expected, rate_expected):
     # Arrange
     idomain, top, bottom = basic_dis
     active = idomain == 1
@@ -465,7 +466,12 @@ class ClipBoxCases:
         clip_arguments = {"layer_max": 2, "bottom": bottom}
 
         expected_dims = {"index": 4, "species": 2}
-        return clip_arguments, expected_dims, pytest.raises(ValueError), does_not_raise()
+        return (
+            clip_arguments,
+            expected_dims,
+            pytest.raises(ValueError),
+            does_not_raise(),
+        )
 
     @staticmethod
     def case_clip_missing_bottom(parameterizable_basic_dis):
@@ -473,7 +479,12 @@ class ClipBoxCases:
         clip_arguments = {"layer_max": 2, "top": top}
 
         expected_dims = {"index": 4, "species": 2}
-        return clip_arguments, expected_dims, pytest.raises(ValueError), does_not_raise()
+        return (
+            clip_arguments,
+            expected_dims,
+            pytest.raises(ValueError),
+            does_not_raise(),
+        )
 
 
 @pytest.mark.parametrize(
@@ -531,7 +542,6 @@ def test_clip_box__well_stationary(
 def test_clip_box__layered_well_stationary(
     well_high_lvl_test_data_stationary, clip_box_args, expected_dims, _, expectation
 ):
-
     x, y, _, _, rate_wel, concentration = well_high_lvl_test_data_stationary
     layer = [1, 1, 1, 1, 9, 9, 9, 9]
     wel = imod.mf6.LayeredWell(x, y, layer, rate_wel, concentration)
