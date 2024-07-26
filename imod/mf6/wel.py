@@ -72,8 +72,8 @@ def mask_2D(package: GridAgnosticWell, domain_2d: GridDataArray) -> GridAgnostic
 
 
 def _prepare_well_rates_from_groups(
-        df_groups: pd.api.typing.DataFrameGroupBy, times: list[datetime]
-    ) -> xr.DataArray:
+    df_groups: pd.api.typing.DataFrameGroupBy, times: list[datetime]
+) -> xr.DataArray:
     """
     Prepare well rates from dataframe groups, grouped by unique well locations.
     """

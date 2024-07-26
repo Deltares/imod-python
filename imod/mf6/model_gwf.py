@@ -285,7 +285,9 @@ class GroundwaterFlowModel(Modflow6Model):
             if layer == 0:
                 result[wel_key] = Well.from_imod5_data(wel_key, imod5_data, times)
             else:
-                result[wel_key] = LayeredWell.from_imod5_data(wel_key, imod5_data, times)
+                result[wel_key] = LayeredWell.from_imod5_data(
+                    wel_key, imod5_data, times
+                )
 
         # import drainage
 
