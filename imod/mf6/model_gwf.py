@@ -30,6 +30,7 @@ from imod.mf6.regrid.regrid_schemes import (
 )
 from imod.mf6.riv import River
 from imod.mf6.sto import StorageCoefficient
+from imod.mf6.utilities.chd_concat import concat_layered_chd_packages
 from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.mf6.wel import Well
 from imod.prepare.topsystem.default_allocation_methods import (
@@ -344,13 +345,21 @@ class GroundwaterFlowModel(Modflow6Model):
                 regrid_cache,
             )
         else:
+            chd_packages = {}
             for chd_key in chd_keys:
-                result[chd_key] = ConstantHead.from_imod5_data(
+                chd_packages[chd_key] = ConstantHead.from_imod5_data(
                     chd_key,
                     imod5_data,
                     dis_pkg,
                     cast(ConstantHeadRegridMethod, regridder_types.get(chd_key)),
                     regrid_cache,
                 )
+            merged_chd = concat_layered_chd_packages(
+                "chd", chd_packages, remove_merged_packages=True
+            )
+            if merged_chd is not None:
+                result["chd_merged"] = merged_chd
+            for key, chd_package in chd_packages.items():
+                result[key] = chd_package
 
         return result
