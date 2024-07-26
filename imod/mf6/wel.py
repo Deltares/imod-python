@@ -328,8 +328,8 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
 
         for i in range(min(10, len(filtered_wells))):
             ids = filtered_wells[i]
-            x = self.dataset['x'][int(filtered_wells[i])].values[()]
-            y = self.dataset['y'][int(filtered_wells[i])].values[()]
+            x = self.dataset["x"][int(filtered_wells[i])].values[()]
+            y = self.dataset["y"][int(filtered_wells[i])].values[()]
             message += f" id = {ids} x = {x}  y = {y} \n"
         return message
 
@@ -644,7 +644,6 @@ class Well(GridAgnosticWell):
         bottom = like * bottom
         top_2d = (like * top).sel(layer=1)
         top_3d = bottom.shift(layer=1).fillna(top_2d)
-
         k = like * k
 
         index_names = wells_df.index.names
@@ -965,7 +964,7 @@ class LayeredWell(GridAgnosticWell):
         bottom: GridDataArray,
         k: GridDataArray,
     ):
-        raise NotImplementedError("Method in abstract base class called")
+        return wells_df
 
 
 class WellDisStructured(DisStructuredBoundaryCondition):
