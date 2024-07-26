@@ -39,4 +39,4 @@ class SimulationDistributingOptions:
 
     drn: DISTRIBUTING_OPTION = DISTRIBUTING_OPTION.by_corrected_transmissivity
     riv: DISTRIBUTING_OPTION = DISTRIBUTING_OPTION.by_corrected_transmissivity
-    ghb: DISTRIBUTING_OPTION = DISTRIBUTING_OPTION.by_corrected_transmissivity
+    ghb: DISTRIBUTING_OPTION = DISTRIBUTING_OPTION.by_layer_thickness
