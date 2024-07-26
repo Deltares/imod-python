@@ -71,6 +71,30 @@ def mask_2D(package: GridAgnosticWell, domain_2d: GridDataArray) -> GridAgnostic
     return cls._from_dataset(selection)
 
 
+def _prepare_well_rates_from_groups(
+        df_groups: pd.api.typing.DataFrameGroupBy, times: list[datetime]
+    ) -> xr.DataArray:
+    """
+    Prepare well rates from dataframe groups, grouped by unique well locations.
+    """
+    # Resample times per group
+    df_resampled_groups = [
+        resample_timeseries(df_group, times) for df_group in df_groups
+    ]
+    # Convert dataframes all groups to DataArrays
+    da_groups = [
+        xr.DataArray(df_group["rate"], dims=("time"), coords={"time": df_group["time"]})
+        for df_group in df_resampled_groups
+    ]
+    # Assign index coordinates
+    da_groups = [
+        da_group.expand_dims(dim="index").assign_coords(index=[i])
+        for i, da_group in enumerate(da_groups)
+    ]
+    # Concatenate datarrays along index dimension
+    return xr.concat(da_groups, dim="index")
+
+
 class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
     """
     Abstract base class for grid agnostic wells
@@ -673,23 +697,20 @@ class Well(GridAgnosticWell):
         minimum_k: float = 0.1,
         minimum_thickness: float = 1.0,
     ) -> "Well":
-        if "layer" in imod5_data[key].keys():
-            if imod5_data[key]["layer"] != 0:
-                log_msg = textwrap.dedent(
-                    f"""
-                    In well {key} a layer was assigned, but this is not
-                    supported. Assignment will be done based on filter_top and
-                    filter_bottom, and the chosen layer ({imod5_data[key]["layer"]})
-                    will be ignored."""
-                )
-                logger.log(
-                    loglevel=LogLevel.WARNING, message=log_msg, additional_depth=2
-                )
+        pkg_data = imod5_data[key]
+        if "layer" in pkg_data.keys() and (pkg_data["layer"] != 0):
+            log_msg = textwrap.dedent(
+                f"""
+                In well {key} a layer was assigned, but this is not
+                supported. Assignment will be done based on filter_top and
+                filter_bottom, and the chosen layer ({pkg_data["layer"]})
+                will be ignored."""
+            )
+            logger.log(loglevel=LogLevel.WARNING, message=log_msg, additional_depth=2)
 
-        if (
-            "filt_top" not in imod5_data[key]["dataframe"].columns
-            or "filt_bot" not in imod5_data[key]["dataframe"].columns
-        ):
+        df: pd.DataFrame = pkg_data["dataframe"]
+
+        if "filt_top" not in df.columns or "filt_bot" not in df.columns:
             log_msg = textwrap.dedent(
                 f"""
                 In well {key} the filt_top and filt_bot columns were not both found;
@@ -698,37 +719,13 @@ class Well(GridAgnosticWell):
             logger.log(loglevel=LogLevel.ERROR, message=log_msg, additional_depth=2)
             raise ValueError(log_msg)
 
-        df: pd.DataFrame = imod5_data[key]["dataframe"]
-
         # Groupby unique wells, to get dataframes per time.
         colnames_group = ["x", "y", "filt_top", "filt_bot", "id"]
         wel_index, df_groups = zip(*df.groupby(colnames_group))
 
-        # resample per group
-
         # Unpack wel indices by zipping
         x, y, filt_top, filt_bot, id = zip(*wel_index)
-
-        # resample times per group
-        df_resampled_groups = []
-        for df_group in df_groups:
-            df_group = resample_timeseries(df_group, times)
-            df_resampled_groups.append(df_group)
-
-        # Convert dataframes all groups to DataArrays
-        da_groups = [
-            xr.DataArray(
-                df_group["rate"], dims=("time"), coords={"time": df_group["time"]}
-            )
-            for df_group in df_resampled_groups
-        ]
-        # Assign index coordinates
-        da_groups = [
-            da_group.expand_dims(dim="index").assign_coords(index=[i])
-            for i, da_group in enumerate(da_groups)
-        ]
-        # Concatenate datarrays along index dimension
-        well_rate = xr.concat(da_groups, dim="index")
+        well_rate = _prepare_well_rates_from_groups(df_groups, times)
 
         return cls(
             x=np.array(x, dtype=float),
@@ -965,6 +962,42 @@ class LayeredWell(GridAgnosticWell):
         k: GridDataArray,
     ):
         return wells_df
+
+    @classmethod
+    def from_imod5_data(
+        cls,
+        key: str,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        times: list[datetime],
+        minimum_k: float = 0.1,
+        minimum_thickness: float = 1.0,
+    ) -> "LayeredWell":
+        pkg_data = imod5_data[key]
+
+        if ("layer" not in pkg_data.keys()) or (pkg_data["layer"] == 0):
+            log_msg = textwrap.dedent(
+                f"""In well {key} no layer was assigned, but this is required."""
+            )
+            logger.log(loglevel=LogLevel.ERROR, message=log_msg, additional_depth=2)
+
+        df: pd.DataFrame = pkg_data["dataframe"]
+
+        # Groupby unique wells, to get dataframes per time.
+        colnames_group = ["x", "y", "layer", "id"]
+        wel_index, df_groups = zip(*df.groupby(colnames_group))
+
+        # Unpack wel indices by zipping
+        x, y, layer, id = zip(*wel_index)
+        well_rate = _prepare_well_rates_from_groups(df_groups, times)
+
+        return cls(
+            x=np.array(x, dtype=float),
+            y=np.array(y, dtype=float),
+            layer=np.array(layer, dtype=int),
+            rate=well_rate,
+            minimum_k=minimum_k,
+            minimum_thickness=minimum_thickness,
+        )
 
 
 class WellDisStructured(DisStructuredBoundaryCondition):
