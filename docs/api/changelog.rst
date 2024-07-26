@@ -40,6 +40,8 @@ Added
   :class:`imod.mf6.HorizontalFlowBarrierResistance`,
   :class:`imod.mf6.HorizontalFlowBarrierMultiplier`,
   :class:`imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic`.
+- :class:`imod.mf6.LayeredWell` to specify wells directly to layers instead
+  assigning them with filter depths.
 
 
 [Unreleased]
