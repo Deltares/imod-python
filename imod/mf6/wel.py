@@ -327,7 +327,10 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             message += " The first 10 unplaced wells are: \n"
 
         for i in range(min(10, len(filtered_wells))):
-            message += f" id = {filtered_wells[i]} x = {self.dataset['x'][int(filtered_wells[i])].values[()]}  y = {self.dataset['y'][int(filtered_wells[i])].values[()]} \n"
+            ids = filtered_wells[i]
+            x = self.dataset['x'][int(filtered_wells[i])].values[()]
+            y = self.dataset['y'][int(filtered_wells[i])].values[()]
+            message += f" id = {ids} x = {x}  y = {y} \n"
         return message
 
     def _create_wells_df(self):
