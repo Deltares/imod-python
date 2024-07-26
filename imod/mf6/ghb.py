@@ -257,8 +257,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
             regridded_package_data["head"] = layered_head
 
             if "layer" in conductance.coords:
-                conductance = conductance.isel({"layer": 0})
-                conductance = conductance.drop_vars("layer")
+                conductance = conductance.isel({"layer": 0}, drop=True)
 
             regridded_package_data["conductance"] = distribute_ghb_conductance(
                 distributing_option,
