@@ -280,7 +280,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
 
         wells_df = self._create_wells_df()
         nwells_df = len(wells_df["id"].unique())
-        wells_assigned = self._create_assigned_wells(wells_df, active, top, bottom, k)
+        wells_assigned = self._assign_wells_to_layers(wells_df, active, top, bottom, k)
 
         nwells_assigned = (
             0 if wells_assigned.empty else len(wells_assigned["id"].unique())
@@ -336,7 +336,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
     def _create_wells_df(self):
         raise NotImplementedError("Method in abstract base class called")
 
-    def _create_assigned_wells(
+    def _assign_wells_to_layers(
         self,
         wells_df: pd.DataFrame,
         active: GridDataArray,
@@ -630,7 +630,7 @@ class Well(GridAgnosticWell):
         kwargs["screen_top"] = self.dataset["screen_top"]
         return Package._validate(self, schemata, **kwargs)
 
-    def _create_assigned_wells(
+    def _assign_wells_to_layers(
         self,
         wells_df: pd.DataFrame,
         active: GridDataArray,
@@ -956,7 +956,7 @@ class LayeredWell(GridAgnosticWell):
     def _create_wells_df(self) -> pd.DataFrame:
         return self.dataset.to_dataframe()
 
-    def _create_assigned_wells(
+    def _assign_wells_to_layers(
         self,
         wells_df: pd.DataFrame,
         active: GridDataArray,
