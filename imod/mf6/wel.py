@@ -816,7 +816,7 @@ class LayeredWell(GridAgnosticWell):
     >>> x = [81.0, 82.0]
     >>> rate = [1.0, 1.0]
 
-    >>> imod.mf6.Well(x, y, layer, rate)
+    >>> imod.mf6.LayeredWell(x, y, layer, rate)
 
     For a transient well:
 
@@ -825,7 +825,7 @@ class LayeredWell(GridAgnosticWell):
     >>> rate_factor_time = xr.DataArray([0.5, 1.0], coords={"time": weltimes}, dims=("time",))
     >>> rate_transient = rate_factor_time * xr.DataArray(rate, dims=("index",))
 
-    >>> imod.mf6.Well(x, y, layer, rate_transient)
+    >>> imod.mf6.LayeredWell(x, y, layer, rate_transient)
     """
 
     _pkg_id = "wel"
