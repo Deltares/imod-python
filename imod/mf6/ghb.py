@@ -243,7 +243,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
             planar_head = regridded_package_data["head"]
             k = target_npf.dataset["k"]
 
-            ghb_alocation = allocate_ghb_cells(
+            ghb_allocation = allocate_ghb_cells(
                 allocation_option,
                 target_idomain == 1,
                 target_top,
@@ -251,7 +251,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
                 planar_head,
             )
 
-            layered_head = planar_head.where(ghb_alocation)
+            layered_head = planar_head.where(ghb_allocation)
             layered_head = enforce_dim_order(layered_head)
 
             regridded_package_data["head"] = layered_head
@@ -261,7 +261,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
 
             regridded_package_data["conductance"] = distribute_ghb_conductance(
                 distributing_option,
-                ghb_alocation,
+                ghb_allocation,
                 conductance,
                 target_top,
                 target_bottom,
