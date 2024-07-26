@@ -34,39 +34,154 @@ times = [
 ]
 
 
-def test_to_mf6_pkg__high_lvl_stationary(basic_dis, well_high_lvl_test_data_stationary):
+class GridAgnosticWellCases:
+    def case_well_stationary(self, well_high_lvl_test_data_stationary):
+        obj = imod.mf6.Well(*well_high_lvl_test_data_stationary)
+        dims_expected = {
+            "ncellid": 8,
+            "nmax_cellid": 3,
+            "species": 2,
+        }
+        cellid_expected = np.array(
+            [
+                [1, 1, 9],
+                [1, 2, 9],
+                [1, 1, 8],
+                [1, 2, 8],
+                [2, 3, 7],
+                [2, 4, 7],
+                [2, 3, 6],
+                [2, 4, 6],
+            ],
+            dtype=np.int64,
+        )
+        rate_expected = np.array(np.ones((8,), dtype=np.float32))
+        return obj, dims_expected, cellid_expected, rate_expected
+
+    def case_well_stationary_multilevel(self, well_high_lvl_test_data_stationary):
+        x, y, screen_top, _, rate_wel, concentration = well_high_lvl_test_data_stationary
+        screen_bottom = [-20.0] * 8
+        obj = imod.mf6.Well(x, y, screen_top, screen_bottom, rate_wel, concentration)
+        dims_expected = {
+                "ncellid": 12,
+                "nmax_cellid": 3,
+                "species": 2,
+            }
+        cellid_expected = np.array(
+            [
+                [1, 1, 9],
+                [1, 2, 9],
+                [1, 1, 8],
+                [1, 2, 8],
+                [2, 1, 9],
+                [2, 2, 9],
+                [2, 1, 8],
+                [2, 2, 8],
+                [2, 3, 7],
+                [2, 4, 7],
+                [2, 3, 6],
+                [2, 4, 6],
+            ],
+            dtype=np.int64,
+        )
+        rate_expected = np.array([0.25] * 4 + [0.75] * 4 + [1.0] * 4)
+        return obj, dims_expected, cellid_expected, rate_expected
+
+    def case_well_transient(self, well_high_lvl_test_data_transient):
+        obj = imod.mf6.Well(*well_high_lvl_test_data_transient)
+        dims_expected = {
+            "ncellid": 8,
+            "time": 5,
+            "nmax_cellid": 3,
+            "species": 2,
+        }
+        cellid_expected = np.array(
+            [
+                [1, 1, 9],
+                [1, 2, 9],
+                [1, 1, 8],
+                [1, 2, 8],
+                [2, 3, 7],
+                [2, 4, 7],
+                [2, 3, 6],
+                [2, 4, 6],
+            ],
+            dtype=np.int64,
+        )
+        rate_expected = np.outer(np.ones((8,), dtype=np.float32), np.arange(5) + 1)
+        return obj, dims_expected, cellid_expected, rate_expected
+
+    def case_layered_well_stationary(self, well_high_lvl_test_data_stationary):
+        x, y, _, _, rate_wel, concentration = well_high_lvl_test_data_stationary
+        layer = [1, 1, 1, 1, 2, 2, 2, 2]
+        obj = imod.mf6.LayeredWell(x, y, layer, rate_wel, concentration)
+        dims_expected = {
+            "ncellid": 8,
+            "nmax_cellid": 3,
+            "species": 2,
+        }
+        cellid_expected = np.array(
+            [
+                [1, 1, 9],
+                [1, 2, 9],
+                [1, 1, 8],
+                [1, 2, 8],
+                [2, 3, 7],
+                [2, 4, 7],
+                [2, 3, 6],
+                [2, 4, 6],
+            ],
+            dtype=np.int64,
+        )
+        rate_expected = np.array(np.ones((8,), dtype=np.float32))
+        return obj, dims_expected, cellid_expected, rate_expected
+
+    def case_layered_well_transient(self, well_high_lvl_test_data_transient):
+        x, y, _, _, rate_wel, concentration = well_high_lvl_test_data_transient
+        layer = [1, 1, 1, 1, 2, 2, 2, 2]
+        obj = imod.mf6.LayeredWell(x, y, layer, rate_wel, concentration)
+        dims_expected = {
+            "ncellid": 8,
+            "time": 5,
+            "nmax_cellid": 3,
+            "species": 2,
+        }
+        cellid_expected = np.array(
+            [
+                [1, 1, 9],
+                [1, 2, 9],
+                [1, 1, 8],
+                [1, 2, 8],
+                [2, 3, 7],
+                [2, 4, 7],
+                [2, 3, 6],
+                [2, 4, 6],
+            ],
+            dtype=np.int64,
+        )
+        rate_expected = np.outer(np.ones((8,), dtype=np.float32), np.arange(5) + 1)
+        return obj, dims_expected, cellid_expected, rate_expected
+
+
+@parametrize_with_cases(
+    ["wel", "dims_expected", "cellid_expected", "rate_expected"], cases=GridAgnosticWellCases
+)
+def test_to_mf6_pkg(
+    basic_dis, wel, dims_expected, cellid_expected, rate_expected
+):
     # Arrange
     idomain, top, bottom = basic_dis
-    wel = imod.mf6.Well(*well_high_lvl_test_data_stationary)
     active = idomain == 1
     k = xr.ones_like(idomain)
 
     nmax_cellid_expected = np.array(["layer", "row", "column"])
-    cellid_expected = np.array(
-        [
-            [1, 1, 9],
-            [1, 2, 9],
-            [1, 1, 8],
-            [1, 2, 8],
-            [2, 3, 7],
-            [2, 4, 7],
-            [2, 3, 6],
-            [2, 4, 6],
-        ],
-        dtype=np.int64,
-    )
-    rate_expected = np.array(np.ones((8,), dtype=np.float32))
 
     # Act
     mf6_wel = wel.to_mf6_pkg(active, top, bottom, k)
     mf6_ds = mf6_wel.dataset
 
     # Assert
-    assert dict(mf6_ds.dims) == {
-        "ncellid": 8,
-        "nmax_cellid": 3,
-        "species": 2,
-    }
+    assert dict(mf6_ds.dims) == dims_expected
     np.testing.assert_equal(mf6_ds.coords["nmax_cellid"].values, nmax_cellid_expected)
     np.testing.assert_equal(mf6_ds["cellid"].values, cellid_expected)
     np.testing.assert_equal(mf6_ds["rate"].values, rate_expected)
@@ -107,94 +222,6 @@ def test_to_mf6_pkg__validate_filter_top(well_high_lvl_test_data_stationary):
         str(errors["screen_bottom"][0])
         == "not all values comply with criterion: < screen_top"
     )
-
-
-def test_to_mf6_pkg__high_lvl_multilevel(basic_dis, well_high_lvl_test_data_stationary):
-    """
-    Test with stationary wells where the first 4 well screens extend over 2 layers.
-    Rates are distributed based on the fraction of the screen length in each layer.
-    In this case: The first layer should get 0.25, the second 0.75.
-    """
-    # Arrange
-    idomain, top, bottom = basic_dis
-    x, y, screen_top, _, rate_wel, concentration = well_high_lvl_test_data_stationary
-    screen_bottom = [-20.0] * 8
-    wel = imod.mf6.Well(x, y, screen_top, screen_bottom, rate_wel, concentration)
-    active = idomain == 1
-    k = xr.ones_like(idomain)
-
-    nmax_cellid_expected = np.array(["layer", "row", "column"])
-    cellid_expected = np.array(
-        [
-            [1, 1, 9],
-            [1, 2, 9],
-            [1, 1, 8],
-            [1, 2, 8],
-            [2, 1, 9],
-            [2, 2, 9],
-            [2, 1, 8],
-            [2, 2, 8],
-            [2, 3, 7],
-            [2, 4, 7],
-            [2, 3, 6],
-            [2, 4, 6],
-        ],
-        dtype=np.int64,
-    )
-    rate_expected = np.array([0.25] * 4 + [0.75] * 4 + [1.0] * 4)
-
-    # Act
-    mf6_wel = wel.to_mf6_pkg(active, top, bottom, k)
-    mf6_ds = mf6_wel.dataset
-
-    # Assert
-    assert dict(mf6_ds.dims) == {
-        "ncellid": 12,
-        "nmax_cellid": 3,
-        "species": 2,
-    }
-    np.testing.assert_equal(mf6_ds.coords["nmax_cellid"].values, nmax_cellid_expected)
-    np.testing.assert_equal(mf6_ds["cellid"].values, cellid_expected)
-    np.testing.assert_equal(mf6_ds["rate"].values, rate_expected)
-
-
-def test_to_mf6_pkg__high_lvl_transient(basic_dis, well_high_lvl_test_data_transient):
-    # Arrange
-    idomain, top, bottom = basic_dis
-    wel = imod.mf6.Well(*well_high_lvl_test_data_transient)
-    active = idomain == 1
-    k = xr.ones_like(idomain)
-
-    nmax_cellid_expected = np.array(["layer", "row", "column"])
-    cellid_expected = np.array(
-        [
-            [1, 1, 9],
-            [1, 2, 9],
-            [1, 1, 8],
-            [1, 2, 8],
-            [2, 3, 7],
-            [2, 4, 7],
-            [2, 3, 6],
-            [2, 4, 6],
-        ],
-        dtype=np.int64,
-    )
-    rate_expected = np.outer(np.ones((8,), dtype=np.float32), np.arange(5) + 1)
-
-    # Act
-    mf6_wel = wel.to_mf6_pkg(active, top, bottom, k)
-    mf6_ds = mf6_wel.dataset
-
-    # Assert
-    assert dict(mf6_wel.dataset.dims) == {
-        "ncellid": 8,
-        "time": 5,
-        "nmax_cellid": 3,
-        "species": 2,
-    }
-    np.testing.assert_equal(mf6_ds.coords["nmax_cellid"].values, nmax_cellid_expected)
-    np.testing.assert_equal(mf6_ds["cellid"].values, cellid_expected)
-    np.testing.assert_equal(mf6_ds["rate"].values, rate_expected)
 
 
 def test_to_mf6_pkg__logging_with_message(
@@ -350,7 +377,7 @@ class ClipBoxCases:
         }
 
         expected_dims = {"index": 3, "species": 2}
-        return clip_arguments, expected_dims, does_not_raise()
+        return clip_arguments, expected_dims, does_not_raise(), does_not_raise()
 
     @staticmethod
     def case_clip_layer_max(parameterizable_basic_dis):
@@ -358,7 +385,7 @@ class ClipBoxCases:
         clip_arguments = {"layer_max": 2, "bottom": bottom, "top": top}
 
         expected_dims = {"index": 4, "species": 2}
-        return clip_arguments, expected_dims, does_not_raise()
+        return clip_arguments, expected_dims, does_not_raise(), does_not_raise()
 
     @staticmethod
     def case_clip_layer_min(parameterizable_basic_dis):
@@ -366,7 +393,7 @@ class ClipBoxCases:
         clip_arguments = {"layer_min": 5, "bottom": bottom, "top": top}
 
         expected_dims = {"index": 4, "species": 2}
-        return clip_arguments, expected_dims, does_not_raise()
+        return clip_arguments, expected_dims, does_not_raise(), does_not_raise()
 
     @staticmethod
     def case_clip_layer_min_layer_max(parameterizable_basic_dis):
@@ -374,7 +401,7 @@ class ClipBoxCases:
         clip_arguments = {"layer_min": 1, "layer_max": 1, "bottom": bottom, "top": top}
 
         expected_dims = {"index": 4, "species": 2}
-        return clip_arguments, expected_dims, does_not_raise()
+        return clip_arguments, expected_dims, does_not_raise(), does_not_raise()
 
     @staticmethod
     def case_clip_top_is_scalar(parameterizable_basic_dis):
@@ -383,7 +410,7 @@ class ClipBoxCases:
         clip_arguments = {"layer_max": 2, "bottom": bottom, "top": top}
 
         expected_dims = {"index": 4, "species": 2}
-        return clip_arguments, expected_dims, does_not_raise()
+        return clip_arguments, expected_dims, does_not_raise(), does_not_raise()
 
     @staticmethod
     def case_clip_top_is_non_layered_structuredgrid(parameterizable_basic_dis):
@@ -394,7 +421,7 @@ class ClipBoxCases:
         clip_arguments = {"layer_max": 2, "bottom": bottom, "top": top}
 
         expected_dims = {"index": 4, "species": 2}
-        return clip_arguments, expected_dims, does_not_raise()
+        return clip_arguments, expected_dims, does_not_raise(), does_not_raise()
 
     @staticmethod
     def case_clip_top_is_layered_structuredgrid(parameterizable_basic_dis):
@@ -404,7 +431,7 @@ class ClipBoxCases:
         clip_arguments = {"layer_max": 2, "bottom": bottom, "top": top}
 
         expected_dims = {"index": 4, "species": 2}
-        return clip_arguments, expected_dims, does_not_raise()
+        return clip_arguments, expected_dims, does_not_raise(), does_not_raise()
 
     @staticmethod
     def case_clip_top_is_non_layered_unstructuredgrid(parameterizable_basic_dis):
@@ -418,7 +445,7 @@ class ClipBoxCases:
         clip_arguments = {"layer_max": 2, "bottom": bottom, "top": top}
 
         expected_dims = {"index": 4, "species": 2}
-        return clip_arguments, expected_dims, does_not_raise()
+        return clip_arguments, expected_dims, does_not_raise(), does_not_raise()
 
     @staticmethod
     def case_clip_top_is_layered_unstructuredgrid(parameterizable_basic_dis):
@@ -430,23 +457,23 @@ class ClipBoxCases:
         clip_arguments = {"layer_max": 2, "bottom": bottom, "top": top}
 
         expected_dims = {"index": 4, "species": 2}
-        return clip_arguments, expected_dims, does_not_raise()
+        return clip_arguments, expected_dims, does_not_raise(), does_not_raise()
 
     @staticmethod
     def case_clip_missing_top(parameterizable_basic_dis):
         _, _, bottom = parameterizable_basic_dis
         clip_arguments = {"layer_max": 2, "bottom": bottom}
 
-        expected_dims = {}
-        return clip_arguments, expected_dims, pytest.raises(ValueError)
+        expected_dims = {"index": 4, "species": 2}
+        return clip_arguments, expected_dims, pytest.raises(ValueError), does_not_raise()
 
     @staticmethod
     def case_clip_missing_bottom(parameterizable_basic_dis):
         _, top, _ = parameterizable_basic_dis
         clip_arguments = {"layer_max": 2, "top": top}
 
-        expected_dims = {}
-        return clip_arguments, expected_dims, pytest.raises(ValueError)
+        expected_dims = {"index": 4, "species": 2}
+        return clip_arguments, expected_dims, pytest.raises(ValueError), does_not_raise()
 
 
 @pytest.mark.parametrize(
@@ -466,13 +493,48 @@ class ClipBoxCases:
     indirect=True,
 )
 @parametrize_with_cases(
-    ("clip_box_args", "expected_dims", "expectation"), cases=ClipBoxCases
+    ("clip_box_args", "expected_dims", "expectation", "_"), cases=ClipBoxCases
 )
-def test_clip_box__high_lvl_stationary(
-    well_high_lvl_test_data_stationary, clip_box_args, expected_dims, expectation
+def test_clip_box__well_stationary(
+    well_high_lvl_test_data_stationary, clip_box_args, expected_dims, expectation, _
 ):
     # Arrange
     wel = imod.mf6.Well(*well_high_lvl_test_data_stationary)
+
+    with expectation:
+        # Act
+        ds = wel.clip_box(**clip_box_args).dataset
+
+        # Assert
+        assert dict(ds.dims) == expected_dims
+
+
+@pytest.mark.parametrize(
+    "parameterizable_basic_dis",
+    [
+        BasicDisSettings(
+            nlay=10,
+            zstop=-10.0,
+            xstart=50.0,
+            xstop=100.0,
+            ystart=50.0,
+            ystop=100.0,
+            nrow=10,
+            ncol=10,
+        )
+    ],
+    indirect=True,
+)
+@parametrize_with_cases(
+    ("clip_box_args", "expected_dims", "_", "expectation"), cases=ClipBoxCases
+)
+def test_clip_box__layered_well_stationary(
+    well_high_lvl_test_data_stationary, clip_box_args, expected_dims, _, expectation
+):
+
+    x, y, _, _, rate_wel, concentration = well_high_lvl_test_data_stationary
+    layer = [1, 1, 1, 1, 9, 9, 9, 9]
+    wel = imod.mf6.LayeredWell(x, y, layer, rate_wel, concentration)
 
     with expectation:
         # Act
@@ -550,7 +612,7 @@ def test_derive_cellid_from_points(basic_dis, well_high_lvl_test_data_stationary
     )
 
     # Act
-    cellid = imod.mf6.wel.Well._Well__derive_cellid_from_points(idomain, x, y, layer)
+    cellid = imod.mf6.wel.Well._derive_cellid_from_points(idomain, x, y, layer)
 
     # Assert
     np.testing.assert_array_equal(cellid, cellid_expected)
