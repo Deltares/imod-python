@@ -288,10 +288,31 @@ class GroundwaterFlowModel(Modflow6Model):
         # now import the non-singleton packages'
 
         # import wells
+        # import wells
         imod5_keys = list(imod5_data.keys())
         wel_keys = [key for key in imod5_keys if key[0:3] == "wel"]
         for wel_key in wel_keys:
             result[wel_key] = Well.from_imod5_data(wel_key, imod5_data, times)
+
+        imod5_keys = list(imod5_data.keys())
+        ghb_keys = [key for key in imod5_keys if key[0:3] == "ghb"]
+        for ghb_key in ghb_keys:
+            ghb_pkg = GeneralHeadBoundary.from_imod5_data(
+                ghb_key,
+                imod5_data,
+                period_data,
+                dis_pkg,
+                npf_pkg,
+                times[0],
+                times[-1],
+                allocation_options.ghb,
+                distributing_options.ghb,
+                regridder_types=cast(
+                    GeneralHeadBoundaryRegridMethod, regridder_types.get(ghb_key)
+                ),
+                regrid_cache=regrid_cache,
+            )
+            result[ghb_key] = ghb_pkg
 
         # import drainage
 

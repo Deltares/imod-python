@@ -20,6 +20,7 @@ class SimulationAllocationOptions:
 
     drn: ALLOCATION_OPTION = ALLOCATION_OPTION.first_active_to_elevation
     riv: ALLOCATION_OPTION = ALLOCATION_OPTION.stage_to_riv_bot
+    ghb: ALLOCATION_OPTION = ALLOCATION_OPTION.at_elevation
 
 
 @dataclass()
@@ -38,3 +39,4 @@ class SimulationDistributingOptions:
 
     drn: DISTRIBUTING_OPTION = DISTRIBUTING_OPTION.by_corrected_transmissivity
     riv: DISTRIBUTING_OPTION = DISTRIBUTING_OPTION.by_corrected_transmissivity
+    ghb: DISTRIBUTING_OPTION = DISTRIBUTING_OPTION.by_corrected_transmissivity
