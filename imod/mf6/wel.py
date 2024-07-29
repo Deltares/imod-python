@@ -123,7 +123,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         return self._derive_cellid_from_points(like, **d_for_cellid)
 
     def _create_dataset_vars(
-        self, wells_assigned: pd.DataFrame, wells_df: pd.DataFrame, cellid: xr.DataArray
+        self, wells_assigned: pd.DataFrame, cellid: xr.DataArray
     ) -> xr.Dataset:
         """
         Create dataset with all variables (rate, concentration), with a similar shape as the cellids.
@@ -136,7 +136,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         # "rate" variable in conversion from multi-indexed DataFrame to xarray
         # DataArray results in duplicated values for "rate" along dimension
         # "species". Select first species to reduce this again.
-        index_names = wells_df.index.names
+        index_names = wells_assigned.index.names
         if "species" in index_names:
             ds_vars["rate"] = ds_vars["rate"].isel(species=0)
 
@@ -321,7 +321,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         ds = xr.Dataset()
         ds["cellid"] = self._create_cellid(wells_assigned, active)
 
-        ds_vars = self._create_dataset_vars(wells_assigned, wells_df, ds["cellid"])
+        ds_vars = self._create_dataset_vars(wells_assigned, ds["cellid"])
         ds = ds.assign(**ds_vars.data_vars)
 
         ds = remove_inactive(ds, active)
