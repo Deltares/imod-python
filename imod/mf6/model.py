@@ -268,7 +268,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         mf6_hfb_ls: List[HorizontalFlowBarrierBase] = []
         for pkg_name, pkg in self.items():
             try:
-                if isinstance(pkg, GridAgnosticWell):
+                if issubclass(type(pkg), GridAgnosticWell):
                     top, bottom, idomain = self.__get_domain_geometry()
                     k = self.__get_k()
                     mf6_well_pkg = pkg.to_mf6_pkg(
@@ -284,7 +284,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                         globaltimes=globaltimes,
                         write_context=pkg_write_context,
                     )
-                elif isinstance(pkg, imod.mf6.HorizontalFlowBarrierBase):
+                elif issubclass(type(pkg), imod.mf6.HorizontalFlowBarrierBase):
                     mf6_hfb_ls.append(pkg)
                 else:
                     pkg.write(
