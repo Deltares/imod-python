@@ -384,15 +384,15 @@ class Well(GridAgnosticWell):
     Parameters
     ----------
 
-    y: float or list of floats or np.array of floats
+    y: list of floats or np.array of floats
         is the y location of the well.
-    x: float or list of floats or np.array of floats
+    x: list of floats or np.array of floats
         is the x location of the well.
-    screen_top: float or list of floats or np.array of floats
+    screen_top: list of floats or np.array of floats
         is the top of the well screen.
-    screen_bottom: float or list of floats or np.array of floats
+    screen_bottom: list of floats or np.array of floats
         is the bottom of the well screen.
-    rate: float, list of floats or xr.DataArray
+    rate: list of floats or xr.DataArray
         is the volumetric well rate. A positive value indicates well
         (injection) and a negative value indicates discharge (extraction) (q).
         If provided as DataArray, an ``"index"`` dimension is required and an
@@ -747,20 +747,21 @@ class LayeredWell(GridAgnosticWell):
     """
     Agnostic WEL package, which accepts x, y and layers.
 
-    This package can be written to any provided model grid.
-    Any number of WEL Packages can be specified for a single groundwater flow model.
+    This package can be written to any provided model grid, given that it has
+    enough layers. Any number of WEL Packages can be specified for a single
+    groundwater flow model.
     https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=63
 
     Parameters
     ----------
 
-    y: float or list of floats or np.array of floats
+    y: list of floats or np.array of floats
         is the y location of the well.
-    x: float or list of floats or np.array of floats
+    x: list of floats or np.array of floats
         is the x location of the well.
-    layer: int or list of ints or np.array of ints
+    layer: list of ints or np.array of ints
         is the layer of the well.
-    rate: float, list of floats or xr.DataArray
+    rate: list of floats or xr.DataArray
         is the volumetric well rate. A positive value indicates well
         (injection) and a negative value indicates discharge (extraction) (q).
         If provided as DataArray, an ``"index"`` dimension is required and an
