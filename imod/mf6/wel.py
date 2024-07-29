@@ -703,10 +703,11 @@ class Well(GridAgnosticWell):
         if "layer" in pkg_data.keys() and (pkg_data["layer"] != 0):
             log_msg = textwrap.dedent(
                 f"""
-                In well {key} a layer was assigned, but this is not
-                supported. Assignment will be done based on filter_top and
-                filter_bottom, and the chosen layer ({pkg_data["layer"]})
-                will be ignored."""
+                In well {key} a layer was assigned, but this is not supported.
+                Assignment will be done based on filter_top and filter_bottom,
+                and the chosen layer ({pkg_data["layer"]}) will be ignored. To
+                specify by layer, use imod.mf6.LayeredWell.
+                """
             )
             logger.log(loglevel=LogLevel.WARNING, message=log_msg, additional_depth=2)
 
@@ -715,8 +716,10 @@ class Well(GridAgnosticWell):
         if "filt_top" not in df.columns or "filt_bot" not in df.columns:
             log_msg = textwrap.dedent(
                 f"""
-                In well {key} the filt_top and filt_bot columns were not both found;
-                this is not supported for import."""
+                In well {key} the filt_top and filt_bot columns were not both
+                found; this is not supported for import. To specify by layer,
+                use imod.mf6.LayeredWell.
+                """
             )
             logger.log(loglevel=LogLevel.ERROR, message=log_msg, additional_depth=2)
             raise ValueError(log_msg)
