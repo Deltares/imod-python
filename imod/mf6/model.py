@@ -27,6 +27,7 @@ from imod.mf6.utilities.mask import _mask_all_packages
 from imod.mf6.utilities.mf6hfb import merge_hfb_packages
 from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_like
 from imod.mf6.validation import pkg_errors_to_status_info
+from imod.mf6.wel import GridAgnosticWell
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray
@@ -267,7 +268,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         mf6_hfb_ls: List[HorizontalFlowBarrierBase] = []
         for pkg_name, pkg in self.items():
             try:
-                if isinstance(pkg, imod.mf6.Well):
+                if isinstance(pkg, GridAgnosticWell):
                     top, bottom, idomain = self.__get_domain_geometry()
                     k = self.__get_k()
                     mf6_well_pkg = pkg.to_mf6_pkg(
