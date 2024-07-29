@@ -982,6 +982,9 @@ class LayeredWell(GridAgnosticWell):
 
         df: pd.DataFrame = pkg_data["dataframe"]
 
+        # Add layer to dataframe.
+        df["layer"] = pkg_data["layer"]
+
         # Groupby unique wells, to get dataframes per time.
         colnames_group = ["x", "y", "layer", "id"]
         wel_index, unique_well_groups = zip(*df.groupby(colnames_group))
