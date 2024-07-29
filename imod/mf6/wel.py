@@ -72,14 +72,14 @@ def mask_2D(package: GridAgnosticWell, domain_2d: GridDataArray) -> GridAgnostic
 
 
 def _prepare_well_rates_from_groups(
-    df_groups: pd.api.typing.DataFrameGroupBy, times: list[datetime]
+    unique_well_groups: pd.api.typing.DataFrameGroupBy, times: list[datetime]
 ) -> xr.DataArray:
     """
     Prepare well rates from dataframe groups, grouped by unique well locations.
     """
     # Resample times per group
     df_resampled_groups = [
-        resample_timeseries(df_group, times) for df_group in df_groups
+        resample_timeseries(df_group, times) for df_group in unique_well_groups
     ]
     # Convert dataframes all groups to DataArrays
     da_groups = [
@@ -721,11 +721,11 @@ class Well(GridAgnosticWell):
 
         # Groupby unique wells, to get dataframes per time.
         colnames_group = ["x", "y", "filt_top", "filt_bot", "id"]
-        wel_index, df_groups = zip(*df.groupby(colnames_group))
+        wel_index, unique_well_groups = zip(*df.groupby(colnames_group))
 
         # Unpack wel indices by zipping
         x, y, filt_top, filt_bot, id = zip(*wel_index)
-        well_rate = _prepare_well_rates_from_groups(df_groups, times)
+        well_rate = _prepare_well_rates_from_groups(unique_well_groups, times)
 
         return cls(
             x=np.array(x, dtype=float),
@@ -984,11 +984,11 @@ class LayeredWell(GridAgnosticWell):
 
         # Groupby unique wells, to get dataframes per time.
         colnames_group = ["x", "y", "layer", "id"]
-        wel_index, df_groups = zip(*df.groupby(colnames_group))
+        wel_index, unique_well_groups = zip(*df.groupby(colnames_group))
 
         # Unpack wel indices by zipping
         x, y, layer, id = zip(*wel_index)
-        well_rate = _prepare_well_rates_from_groups(df_groups, times)
+        well_rate = _prepare_well_rates_from_groups(unique_well_groups, times)
 
         return cls(
             x=np.array(x, dtype=float),
