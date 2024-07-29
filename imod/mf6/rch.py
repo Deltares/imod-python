@@ -208,10 +208,12 @@ class Recharge(BoundaryCondition, IRegridPackage):
         # if rate has only layer 0, then it is planar.
         if is_planar_grid(new_package_data["rate"]):
             if "layer" in new_package_data["rate"].dims:
-                planar_rate_regridded = new_package_data["rate"].isel(layer=0, drop=True)
+                planar_rate_regridded = new_package_data["rate"].isel(
+                    layer=0, drop=True
+                )
             else:
                 planar_rate_regridded = new_package_data["rate"]
-                
+
             # create an array indicating in which cells rch is active
             is_rch_cell = allocate_rch_cells(
                 ALLOCATION_OPTION.at_first_active,

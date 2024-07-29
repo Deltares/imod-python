@@ -270,7 +270,7 @@ class GroundwaterFlowModel(Modflow6Model):
 
         # import recharge
         rch_pkg = None
-        if "rch" in imod5_data.keys():        
+        if "rch" in imod5_data.keys():
             rch_pkg = Recharge.from_imod5_data(
                 imod5_data,
                 dis_pkg,
@@ -284,7 +284,7 @@ class GroundwaterFlowModel(Modflow6Model):
         if sto_pkg is not None:
             result["sto"] = sto_pkg
         result["ic"] = ic_pkg
-        if rch_pkg is not None:        
+        if rch_pkg is not None:
             result["rch"] = rch_pkg
 
         # now import the non-singleton packages'
@@ -295,7 +295,7 @@ class GroundwaterFlowModel(Modflow6Model):
         for wel_key in wel_keys:
             result[wel_key] = Well.from_imod5_data(wel_key, imod5_data, times)
 
-        # import ghb's 
+        # import ghb's
         imod5_keys = list(imod5_data.keys())
         ghb_keys = [key for key in imod5_keys if key[0:3] == "ghb"]
         for ghb_key in ghb_keys:
@@ -394,10 +394,13 @@ class GroundwaterFlowModel(Modflow6Model):
             for key, chd_package in chd_packages.items():
                 result[key] = chd_package
 
-
         if "sto" not in result.keys():
             zeros = zeros_like(grid, dtype=float)
-            result["sto"] = StorageCoefficient(storage_coefficient=zeros, specific_yield=zeros, transient=False, convertible= zeros.astype(int) )
-
+            result["sto"] = StorageCoefficient(
+                storage_coefficient=zeros,
+                specific_yield=zeros,
+                transient=False,
+                convertible=zeros.astype(int),
+            )
 
         return result
