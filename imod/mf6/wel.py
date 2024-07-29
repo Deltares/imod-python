@@ -367,7 +367,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         top: GridDataArray,
         bottom: GridDataArray,
         k: GridDataArray,
-    ):
+    ) -> pd.DataFrame:
         raise NotImplementedError("Method in abstract base class called")
 
 
@@ -661,7 +661,7 @@ class Well(GridAgnosticWell):
         top: GridDataArray,
         bottom: GridDataArray,
         k: GridDataArray,
-    ):
+    ) -> pd.DataFrame:
         # Ensure top, bottom & k
         # are broadcasted to 3d grid
         like = ones_like(active)
@@ -960,7 +960,7 @@ class LayeredWell(GridAgnosticWell):
         top: GridDataArray,
         bottom: GridDataArray,
         k: GridDataArray,
-    ):
+    ) -> pd.DataFrame:
         return wells_df
 
     @classmethod
