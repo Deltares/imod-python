@@ -112,7 +112,9 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
     def is_grid_agnostic_package(cls) -> bool:
         return True
 
-    def _create_cellid(self, wells_assigned: pd.DataFrame, active: xr.DataArray):
+    def _create_cellid(
+        self, wells_assigned: pd.DataFrame, active: xr.DataArray
+    ) -> GridDataArray:
         like = ones_like(active)
 
         # Groupby index and select first, to unset any duplicate records
@@ -340,7 +342,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
 
         return Mf6Wel(**ds.data_vars)
 
-    def to_mf6_package_information(self, filtered_wells):
+    def to_mf6_package_information(self, filtered_wells: pd.DataFrame) -> str:
         message = textwrap.dedent(
             """Some wells were not placed in the MF6 well package. This 
             can be due to inactive cells or permeability/thickness constraints.\n"""
@@ -357,7 +359,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             message += f" id = {ids} x = {x}  y = {y} \n"
         return message
 
-    def _create_wells_df(self):
+    def _create_wells_df(self) -> pd.DataFrame:
         raise NotImplementedError("Method in abstract base class called")
 
     def _assign_wells_to_layers(
