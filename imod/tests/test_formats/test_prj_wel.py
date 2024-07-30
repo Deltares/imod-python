@@ -1,9 +1,11 @@
 from shutil import copytree
 from textwrap import dedent
 
+import numpy as np
 from pytest_cases import parametrize_with_cases
 
 from imod.formats.prj import open_projectfile_data
+from imod.mf6 import LayeredWell
 
 
 class WellPrjCases:
@@ -11,7 +13,7 @@ class WellPrjCases:
         return dedent(
             """
             0001,(WEL),1
-            1900-01-01
+            2000-01-01
             001,001
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
             """
@@ -21,13 +23,13 @@ class WellPrjCases:
         return dedent(
             """
             0003,(WEL),1
-            1900-01-01
+            2000-01-01
             001,001
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
-            1900-01-02
+            2000-01-02
             001,001
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple2.ipf"
-            1900-01-03
+            2000-01-03
             001,001
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple3.ipf"
             """
@@ -37,7 +39,7 @@ class WellPrjCases:
         return dedent(
             """
             0001,(WEL),1
-            1900-01-01
+            2000-01-01
             001,001
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
             """
@@ -47,13 +49,13 @@ class WellPrjCases:
        return dedent(
             """
             0003,(WEL),1
-            1900-01-01
+            2000-01-01
             001,001
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
-            1900-01-02
+            2000-01-02
             001,001
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
-            1900-01-03
+            2000-01-03
             001,001
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
             """
@@ -64,13 +66,13 @@ class WellPrjCases:
        return dedent(
             """
             0003,(WEL),1
-            1900-01-01
+            2000-01-01
             001,001
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
-            1900-01-02
+            2000-01-02
             001,001
             1,2, 001, 0.5, 0.0, -999.9900 ,"ipf/associated.ipf"
-            1900-01-03
+            2000-01-03
             001,001
             1,2, 001, 0.2, 0.0, -999.9900 ,"ipf/associated.ipf"
             """
@@ -82,7 +84,7 @@ class WellPrjCases:
         return dedent(
             """
             0001,(WEL),1
-            1900-01-01
+            2000-01-01
             001,002
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
             1,2, 002, 0.75, 0.0, -999.9900 ,"ipf/associated.ipf"
@@ -93,7 +95,7 @@ class WellPrjCases:
         return dedent(
             """
             0001,(WEL),1
-            1900-01-01
+            2000-01-01
             001,002
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
@@ -104,14 +106,14 @@ class WellPrjCases:
         return dedent(
             """
             0003,(WEL),1
-            1900-01-01
+            2000-01-01
             001,001
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
-            1900-01-02
+            2000-01-02
             001,002
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
-            1900-01-03
+            2000-01-03
             001,001
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
             """
@@ -125,10 +127,10 @@ class WellPrjCases:
         return dedent(
             """
             0002,(WEL),1
-            1900-01-01
+            2000-01-01
             001,001
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
-            1900-01-02
+            2000-01-02
             001,001
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
             """
@@ -147,6 +149,8 @@ def test_import_wells(wel_case, tmp_path, current_cases):
     src = r"c:\Users\engelen\projects_wdir\imod-python\imod5_wel\ipf"
     copytree(src, tmp_path/"ipf")
 
+    times = [np.datetime64("2000-01-01"), np.datetime64("2000-01-02"), np.datetime64("2000-01-03")]
+
     # Act
-    data = open_projectfile_data(wel_file)
-    pass
+    data, _ = open_projectfile_data(wel_file)
+    well = LayeredWell.from_imod5_data("wel-1", data, times)
