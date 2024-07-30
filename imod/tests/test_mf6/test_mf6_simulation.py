@@ -546,7 +546,6 @@ def test_import_from_imod5_nonstandard_regridding(imod5_dataset, tmp_path):
 @pytest.mark.usefixtures("imod5_dataset")
 def test_import_from_imod5_no_storage_no_recharge(imod5_dataset, tmp_path):
     # this test imports an imod5 simulation, but it has no recharge and no storage package.
-    # The imported simulation should have a storage package, but no recharge.
     imod5_data = imod5_dataset[0]
     imod5_data.pop("sto")
     imod5_data.pop("rch")
