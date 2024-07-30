@@ -541,3 +541,45 @@ def test_import_from_imod5_nonstandard_regridding(imod5_dataset, tmp_path):
 
     # write and validate the simulation.
     simulation.write(tmp_path, binary=False, validate=True)
+
+
+@pytest.mark.usefixtures("imod5_dataset")
+def test_import_from_imod5_no_storage_no_recharge(imod5_dataset, tmp_path):
+    # this test imports an imod5 simulation, but it has no recharge and no storage package.
+    imod5_data = imod5_dataset[0]
+    imod5_data.pop("sto")
+    imod5_data.pop("rch")
+    period_data = imod5_dataset[1]
+
+    default_simulation_allocation_options = SimulationAllocationOptions
+    default_simulation_distributing_options = SimulationDistributingOptions
+
+    times = pd.date_range(start="1/1/2018", end="12/1/2018", freq="ME")
+
+    simulation = Modflow6Simulation.from_imod5_data(
+        imod5_data,
+        period_data,
+        default_simulation_allocation_options,
+        default_simulation_distributing_options,
+        times,
+    )
+
+    simulation["imported_model"]["oc"] = OutputControl(
+        save_head="last", save_budget="last"
+    )
+
+    simulation.create_time_discretization(["01-01-2003", "02-01-2003"])
+
+    # Remove HFB packages outside domain
+    # TODO: Build in support for hfb packages outside domain
+    for hfb_outside in ["hfb-24", "hfb-26"]:
+        simulation["imported_model"].pop(hfb_outside)
+
+    # check storage is present and rch is absent
+    assert not simulation["imported_model"]["sto"].dataset["transient"].values[()]
+    package_keys = simulation["imported_model"].keys()
+    for key in package_keys:
+        assert key[0:3] != "rch"
+
+    # write and validate the simulation.
+    simulation.write(tmp_path, binary=False, validate=True)
