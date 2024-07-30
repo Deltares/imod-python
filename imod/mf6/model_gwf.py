@@ -35,8 +35,6 @@ from imod.mf6.sto import StorageCoefficient
 from imod.mf6.utilities.chd_concat import concat_layered_chd_packages
 from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.mf6.wel import Well
-from imod.prepare.topsystem.allocation import ALLOCATION_OPTION
-from imod.prepare.topsystem.conductance import DISTRIBUTING_OPTION
 from imod.prepare.topsystem.default_allocation_methods import (
     SimulationAllocationOptions,
     SimulationDistributingOptions,
@@ -347,8 +345,8 @@ class GroundwaterFlowModel(Modflow6Model):
                 dis_pkg,
                 times[0],
                 times[-1],
-                ALLOCATION_OPTION.at_elevation,
-                DISTRIBUTING_OPTION.by_crosscut_thickness,
+                allocation_options.riv,
+                distributing_options.riv,
                 cast(RiverRegridMethod, regridder_types.get(riv_key)),
                 regrid_cache,
             )

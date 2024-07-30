@@ -1,6 +1,7 @@
 import numbers
 
 import numpy as np
+import xarray as xr
 from fastcore.dispatch import typedispatch
 from xarray.core.utils import is_scalar
 
@@ -129,3 +130,12 @@ def _adjust_mask_for_unlayered_data(
         array_mask = mask.isel(layer=0)
 
     return array_mask
+
+
+def mask_arrays(arrays: dict[str, GridDataArray]) -> GridDataArray:
+    for k1 in arrays.keys():
+        for k2 in arrays.keys():
+            if k1 == k2:
+                continue
+            arrays[k2] = xr.where(~np.isnan(arrays[k1]), arrays[k2], np.nan)
+    return arrays
