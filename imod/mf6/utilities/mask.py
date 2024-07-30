@@ -1,9 +1,10 @@
 import numbers
 
 import numpy as np
+import xarray as xr
 from fastcore.dispatch import typedispatch
 from xarray.core.utils import is_scalar
-import xarray as xr
+
 from imod.mf6.auxiliary_variables import (
     expand_transient_auxiliary_variables,
     remove_expanded_auxiliary_variables_from_dataset,
@@ -130,12 +131,10 @@ def _adjust_mask_for_unlayered_data(
 
     return array_mask
 
-def mask_arrays(
-    arrays: dict[str, GridDataArray]
-) -> GridDataArray:
-    
+
+def mask_arrays(arrays: dict[str, GridDataArray]) -> GridDataArray:
     for k1 in arrays.keys():
-        for  k2 in arrays.keys():
+        for k2 in arrays.keys():
             if k1 == k2:
                 continue
             arrays[k2] = xr.where(~np.isnan(arrays[k1]), arrays[k2], np.nan)

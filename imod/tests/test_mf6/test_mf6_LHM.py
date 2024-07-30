@@ -1,22 +1,30 @@
-
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import pandas as pd
+
 import imod
 from imod.formats.prj.prj import open_projectfile_data
 from imod.logging.config import LoggerType
 from imod.logging.loglevel import LogLevel
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.oc import OutputControl
-from imod.mf6.regrid.regrid_schemes import DiscretizationRegridMethod, NodePropertyFlowRegridMethod, StorageCoefficientRegridMethod
+from imod.mf6.regrid.regrid_schemes import (
+    DiscretizationRegridMethod,
+    NodePropertyFlowRegridMethod,
+    StorageCoefficientRegridMethod,
+)
 from imod.mf6.simulation import Modflow6Simulation
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION
 from imod.prepare.topsystem.conductance import DISTRIBUTING_OPTION
-from imod.prepare.topsystem.default_allocation_methods import SimulationAllocationOptions, SimulationDistributingOptions
+from imod.prepare.topsystem.default_allocation_methods import (
+    SimulationAllocationOptions,
+    SimulationDistributingOptions,
+)
 
-def test_mf6_LHM( tmp_path):
-    logfile_path = tmp_path / "logfile.txt"    
+
+def test_mf6_LHM(tmp_path):
+    logfile_path = tmp_path / "logfile.txt"
     with open(logfile_path, "w") as sys.stdout:
         imod.logging.configure(
             LoggerType.PYTHON,
@@ -50,16 +58,17 @@ def test_mf6_LHM( tmp_path):
             save_head="last", save_budget="last"
         )
 
-
-        for k , package in simulation["imported_model"].items():
+        for k, package in simulation["imported_model"].items():
             package.dataset.load()
-        simulation.write(tmp_path, binary=False, validate=True)    
+        simulation.write(tmp_path, binary=False, validate=True)
     pass
 
-def test_mf6_river( tmp_path):
-    
+
+def test_mf6_river(tmp_path):
     LHM_dir = Path("D:\\tmp\\LHM\\MODFLOW6_MODEL\\MODFLOW6_MODEL")
-    data = open_projectfile_data(LHM_dir / "LHM4.3_stationair_gekalibreerd_bruinkool_fluxes_mf6.prj")
+    data = open_projectfile_data(
+        LHM_dir / "LHM4.3_stationair_gekalibreerd_bruinkool_fluxes_mf6.prj"
+    )
 
     imod5_data = data[0]
     period_data = data[1]

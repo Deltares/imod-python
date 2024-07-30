@@ -1383,7 +1383,5 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         # cleanup packages for validation
         idomain = groundwaterFlowModel.domain
         simulation.mask_all_models(idomain)
-        simulation.create_time_discretization(
-            additional_times=times
-        )
+        simulation.create_time_discretization(additional_times=times)
         return simulation
