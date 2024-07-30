@@ -42,6 +42,7 @@ HIGH_LEVEL_PACKAGES = [
     imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic,
     imod.mf6.HorizontalFlowBarrierMultiplier,
     imod.mf6.HorizontalFlowBarrierResistance,
+    imod.mf6.LayeredWell,
 ]
 
 

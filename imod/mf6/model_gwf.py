@@ -12,6 +12,7 @@ from imod.mf6 import ConstantHead
 from imod.mf6.clipped_boundary_condition_creator import create_clipped_boundary
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.drn import Drainage
+from imod.mf6.ghb import GeneralHeadBoundary
 from imod.mf6.hfb import SingleLayerHorizontalFlowBarrierResistance
 from imod.mf6.ic import InitialConditions
 from imod.mf6.model import Modflow6Model
@@ -21,6 +22,7 @@ from imod.mf6.regrid.regrid_schemes import (
     ConstantHeadRegridMethod,
     DiscretizationRegridMethod,
     DrainageRegridMethod,
+    GeneralHeadBoundaryRegridMethod,
     InitialConditionsRegridMethod,
     NodePropertyFlowRegridMethod,
     RechargeRegridMethod,
@@ -30,6 +32,7 @@ from imod.mf6.regrid.regrid_schemes import (
 )
 from imod.mf6.riv import River
 from imod.mf6.sto import StorageCoefficient
+from imod.mf6.utilities.chd_concat import concat_layered_chd_packages
 from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.mf6.wel import LayeredWell, Well
 from imod.prepare.topsystem.default_allocation_methods import (
@@ -278,6 +281,7 @@ class GroundwaterFlowModel(Modflow6Model):
         # now import the non-singleton packages'
 
         # import wells
+        # import wells
         imod5_keys = list(imod5_data.keys())
         wel_keys = [key for key in imod5_keys if key[0:3] == "wel"]
         for wel_key in wel_keys:
@@ -288,6 +292,26 @@ class GroundwaterFlowModel(Modflow6Model):
                 result[wel_key] = LayeredWell.from_imod5_data(
                     wel_key, imod5_data, times
                 )
+
+        imod5_keys = list(imod5_data.keys())
+        ghb_keys = [key for key in imod5_keys if key[0:3] == "ghb"]
+        for ghb_key in ghb_keys:
+            ghb_pkg = GeneralHeadBoundary.from_imod5_data(
+                ghb_key,
+                imod5_data,
+                period_data,
+                dis_pkg,
+                npf_pkg,
+                times[0],
+                times[-1],
+                allocation_options.ghb,
+                distributing_options.ghb,
+                regridder_types=cast(
+                    GeneralHeadBoundaryRegridMethod, regridder_types.get(ghb_key)
+                ),
+                regrid_cache=regrid_cache,
+            )
+            result[ghb_key] = ghb_pkg
 
         # import drainage
 
@@ -350,13 +374,21 @@ class GroundwaterFlowModel(Modflow6Model):
                 regrid_cache,
             )
         else:
+            chd_packages = {}
             for chd_key in chd_keys:
-                result[chd_key] = ConstantHead.from_imod5_data(
+                chd_packages[chd_key] = ConstantHead.from_imod5_data(
                     chd_key,
                     imod5_data,
                     dis_pkg,
                     cast(ConstantHeadRegridMethod, regridder_types.get(chd_key)),
                     regrid_cache,
                 )
+            merged_chd = concat_layered_chd_packages(
+                "chd", chd_packages, remove_merged_packages=True
+            )
+            if merged_chd is not None:
+                result["chd_merged"] = merged_chd
+            for key, chd_package in chd_packages.items():
+                result[key] = chd_package
 
         return result

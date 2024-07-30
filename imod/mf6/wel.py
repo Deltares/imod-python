@@ -112,7 +112,9 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
     def is_grid_agnostic_package(cls) -> bool:
         return True
 
-    def _create_cellid(self, wells_assigned: pd.DataFrame, active: xr.DataArray):
+    def _create_cellid(
+        self, wells_assigned: pd.DataFrame, active: xr.DataArray
+    ) -> GridDataArray:
         like = ones_like(active)
 
         # Groupby index and select first, to unset any duplicate records
@@ -123,7 +125,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         return self._derive_cellid_from_points(like, **d_for_cellid)
 
     def _create_dataset_vars(
-        self, wells_assigned: pd.DataFrame, wells_df: pd.DataFrame, cellid: xr.DataArray
+        self, wells_assigned: pd.DataFrame, cellid: xr.DataArray
     ) -> xr.Dataset:
         """
         Create dataset with all variables (rate, concentration), with a similar shape as the cellids.
@@ -136,7 +138,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         # "rate" variable in conversion from multi-indexed DataFrame to xarray
         # DataArray results in duplicated values for "rate" along dimension
         # "species". Select first species to reduce this again.
-        index_names = wells_df.index.names
+        index_names = wells_assigned.index.names
         if "species" in index_names:
             ds_vars["rate"] = ds_vars["rate"].isel(species=0)
 
@@ -321,7 +323,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         ds = xr.Dataset()
         ds["cellid"] = self._create_cellid(wells_assigned, active)
 
-        ds_vars = self._create_dataset_vars(wells_assigned, wells_df, ds["cellid"])
+        ds_vars = self._create_dataset_vars(wells_assigned, ds["cellid"])
         ds = ds.assign(**ds_vars.data_vars)
 
         ds = remove_inactive(ds, active)
@@ -340,7 +342,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
 
         return Mf6Wel(**ds.data_vars)
 
-    def to_mf6_package_information(self, filtered_wells):
+    def to_mf6_package_information(self, filtered_wells: pd.DataFrame) -> str:
         message = textwrap.dedent(
             """Some wells were not placed in the MF6 well package. This 
             can be due to inactive cells or permeability/thickness constraints.\n"""
@@ -357,7 +359,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             message += f" id = {ids} x = {x}  y = {y} \n"
         return message
 
-    def _create_wells_df(self):
+    def _create_wells_df(self) -> pd.DataFrame:
         raise NotImplementedError("Method in abstract base class called")
 
     def _assign_wells_to_layers(
@@ -367,7 +369,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         top: GridDataArray,
         bottom: GridDataArray,
         k: GridDataArray,
-    ):
+    ) -> pd.DataFrame:
         raise NotImplementedError("Method in abstract base class called")
 
 
@@ -382,15 +384,15 @@ class Well(GridAgnosticWell):
     Parameters
     ----------
 
-    y: float or list of floats or np.array of floats
+    y: list of floats or np.array of floats
         is the y location of the well.
-    x: float or list of floats or np.array of floats
+    x: list of floats or np.array of floats
         is the x location of the well.
-    screen_top: float or list of floats or np.array of floats
+    screen_top: list of floats or np.array of floats
         is the top of the well screen.
-    screen_bottom: float or list of floats or np.array of floats
+    screen_bottom: list of floats or np.array of floats
         is the bottom of the well screen.
-    rate: float, list of floats or xr.DataArray
+    rate: list of floats or xr.DataArray
         is the volumetric well rate. A positive value indicates well
         (injection) and a negative value indicates discharge (extraction) (q).
         If provided as DataArray, an ``"index"`` dimension is required and an
@@ -661,7 +663,7 @@ class Well(GridAgnosticWell):
         top: GridDataArray,
         bottom: GridDataArray,
         k: GridDataArray,
-    ):
+    ) -> pd.DataFrame:
         # Ensure top, bottom & k
         # are broadcasted to 3d grid
         like = ones_like(active)
@@ -701,10 +703,11 @@ class Well(GridAgnosticWell):
         if "layer" in pkg_data.keys() and (pkg_data["layer"] != 0):
             log_msg = textwrap.dedent(
                 f"""
-                In well {key} a layer was assigned, but this is not
-                supported. Assignment will be done based on filter_top and
-                filter_bottom, and the chosen layer ({pkg_data["layer"]})
-                will be ignored."""
+                In well {key} a layer was assigned, but this is not supported.
+                Assignment will be done based on filter_top and filter_bottom,
+                and the chosen layer ({pkg_data["layer"]}) will be ignored. To
+                specify by layer, use imod.mf6.LayeredWell.
+                """
             )
             logger.log(loglevel=LogLevel.WARNING, message=log_msg, additional_depth=2)
 
@@ -713,8 +716,10 @@ class Well(GridAgnosticWell):
         if "filt_top" not in df.columns or "filt_bot" not in df.columns:
             log_msg = textwrap.dedent(
                 f"""
-                In well {key} the filt_top and filt_bot columns were not both found;
-                this is not supported for import."""
+                In well {key} the filt_top and filt_bot columns were not both
+                found; this is not supported for import. To specify by layer,
+                use imod.mf6.LayeredWell.
+                """
             )
             logger.log(loglevel=LogLevel.ERROR, message=log_msg, additional_depth=2)
             raise ValueError(log_msg)
@@ -742,20 +747,21 @@ class LayeredWell(GridAgnosticWell):
     """
     Agnostic WEL package, which accepts x, y and layers.
 
-    This package can be written to any provided model grid.
-    Any number of WEL Packages can be specified for a single groundwater flow model.
+    This package can be written to any provided model grid, given that it has
+    enough layers. Any number of WEL Packages can be specified for a single
+    groundwater flow model.
     https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=63
 
     Parameters
     ----------
 
-    y: float or list of floats or np.array of floats
+    y: list of floats or np.array of floats
         is the y location of the well.
-    x: float or list of floats or np.array of floats
+    x: list of floats or np.array of floats
         is the x location of the well.
-    layer: int or list of ints or np.array of ints
+    layer: list of ints or np.array of ints
         is the layer of the well.
-    rate: float, list of floats or xr.DataArray
+    rate: list of floats or xr.DataArray
         is the volumetric well rate. A positive value indicates well
         (injection) and a negative value indicates discharge (extraction) (q).
         If provided as DataArray, an ``"index"`` dimension is required and an
@@ -960,7 +966,7 @@ class LayeredWell(GridAgnosticWell):
         top: GridDataArray,
         bottom: GridDataArray,
         k: GridDataArray,
-    ):
+    ) -> pd.DataFrame:
         return wells_df
 
     @classmethod
