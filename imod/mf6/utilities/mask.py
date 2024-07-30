@@ -132,7 +132,7 @@ def _adjust_mask_for_unlayered_data(
     return array_mask
 
 
-def mask_arrays(arrays: dict[str, GridDataArray]) -> GridDataArray:
+def mask_arrays(arrays: dict[str, GridDataArray]) -> dict[str, GridDataArray]:
     for k1 in arrays.keys():
         for k2 in arrays.keys():
             if k1 == k2:

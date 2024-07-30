@@ -581,5 +581,5 @@ def test_import_from_imod5_no_storage_no_recharge(imod5_dataset, tmp_path):
     for key in package_keys:
         assert key[0:3] != "rch"
 
-    # write and validate the simulation.        
+    # write and validate the simulation.
     simulation.write(tmp_path, binary=False, validate=True)
