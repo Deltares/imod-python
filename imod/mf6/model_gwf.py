@@ -347,8 +347,8 @@ class GroundwaterFlowModel(Modflow6Model):
                 dis_pkg,
                 times[0],
                 times[-1],
-                ALLOCATION_OPTION.at_elevation,
-                DISTRIBUTING_OPTION.by_crosscut_thickness,
+                allocation_options.riv,
+                distributing_options.riv,
                 cast(RiverRegridMethod, regridder_types.get(riv_key)),
                 regrid_cache,
             )

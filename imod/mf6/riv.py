@@ -13,6 +13,7 @@ from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.drn import Drainage
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.regrid.regrid_schemes import RiverRegridMethod
+from imod.mf6.utilities.mask import mask_arrays
 from imod.mf6.utilities.regrid import (
     RegridderWeightsCache,
     _regrid_package_data,
@@ -260,6 +261,7 @@ class River(BoundaryCondition, IRegridPackage):
         }
         is_planar_conductance = is_planar_grid(data["conductance"])
 
+
         # set up regridder methods
         if regridder_types is None:
             regridder_types = River.get_regrid_methods()
@@ -331,13 +333,19 @@ class River(BoundaryCondition, IRegridPackage):
             regridded_package_data["bottom_elevation"]
         )
 
+        target_bottom_subset = target_bottom.sel({"layer": regridded_package_data["bottom_elevation"].coords["layer"]})
+        regridded_package_data["bottom_elevation"] = xr.where(regridded_package_data["bottom_elevation"] > target_bottom_subset, regridded_package_data["bottom_elevation"], target_bottom_subset)        
+        regridded_package_data = mask_arrays(regridded_package_data)
+        regridded_package_data["stage"] = xr.where(regridded_package_data["stage"] > regridded_package_data["bottom_elevation"], regridded_package_data["stage"], regridded_package_data["bottom_elevation"])        
         river_package = River(**regridded_package_data, validate=True)
         optional_river_package: Optional[River] = None
         optional_drainage_package: Optional[Drainage] = None
         # create a drainage package with the conductance we computed from the infiltration factor
+        drainage_arrays = { "stage": regridded_package_data["stage"], "conductance":drain_conductance }
+        drainage_arrays = mask_arrays(drainage_arrays)
         drainage_package = cls.create_infiltration_factor_drain(
-            regridded_package_data["stage"],
-            drain_conductance,
+            drainage_arrays["stage"],
+            drainage_arrays[ "conductance"],
         )
         # remove River package if its mask is False everywhere
         mask = ~np.isnan(river_conductance)

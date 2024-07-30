@@ -25,7 +25,7 @@ def test_mf6_LHM( tmp_path):
             add_default_stream_handler=True,
         )
         LHM_dir = Path("D:\\tmp\\LHM\\MODFLOW6_MODEL\\MODFLOW6_MODEL")
-        data = open_projectfile_data(LHM_dir / "LHM4.3_noriv.prj")
+        data = open_projectfile_data(LHM_dir / "LHM4.3_withriv.prj")
 
         imod5_data = data[0]
         period_data = data[1]
