@@ -1,6 +1,9 @@
+from shutil import copytree
 from textwrap import dedent
 
 from pytest_cases import parametrize_with_cases
+
+from imod.formats.prj import open_projectfile_data
 
 
 class WellPrjCases:
@@ -9,23 +12,24 @@ class WellPrjCases:
             """
             0001,(WEL),1
             1900-01-01
-            001,002
-            1,2, 001, 1.0, 0.0, -999.9900 ,"simple.ipf"
+            001,001
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
             """
         )
 
     def case_simple__all(self):
         return dedent(
             """
+            0003,(WEL),1
             1900-01-01
             001,001
-            1,2, 001, 1.0, 0.0, -999.9900 ,"simple1.ipf"
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
             1900-01-02
             001,001
-            1,2, 001, 1.0, 0.0, -999.9900 ,"simple2.ipf"
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple2.ipf"
             1900-01-03
             001,001
-            1,2, 001, 1.0, 0.0, -999.9900 ,"simple3.ipf"
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple3.ipf"
             """
         )
 
@@ -35,23 +39,23 @@ class WellPrjCases:
             0001,(WEL),1
             1900-01-01
             001,001
-            1,2, 001, 1.0, 0.0, -999.9900 ,"associated.ipf"
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
             """
         )
     
     def case_associated__all(self):
        return dedent(
             """
-            0001,(WEL),1
+            0003,(WEL),1
             1900-01-01
             001,001
-            1,2, 001, 1.0, 0.0, -999.9900 ,"associated.ipf"
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
             1900-01-02
             001,001
-            1,2, 001, 1.0, 0.0, -999.9900 ,"associated.ipf"
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
             1900-01-03
             001,001
-            1,2, 001, 1.0, 0.0, -999.9900 ,"associated.ipf"
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
             """
        )
 
@@ -59,16 +63,16 @@ class WellPrjCases:
        """FAIL: Varying factor over time"""
        return dedent(
             """
-            0001,(WEL),1
+            0003,(WEL),1
             1900-01-01
             001,001
-            1,2, 001, 1.0, 0.0, -999.9900 ,"associated.ipf"
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
             1900-01-02
             001,001
-            1,2, 001, 0.5, 0.0, -999.9900 ,"associated.ipf"
+            1,2, 001, 0.5, 0.0, -999.9900 ,"ipf/associated.ipf"
             1900-01-03
             001,001
-            1,2, 001, 0.2, 0.0, -999.9900 ,"associated.ipf"
+            1,2, 001, 0.2, 0.0, -999.9900 ,"ipf/associated.ipf"
             """
        )
 
@@ -80,8 +84,8 @@ class WellPrjCases:
             0001,(WEL),1
             1900-01-01
             001,002
-            1,2, 001, 1.0, 0.0, -999.9900 ,"associated.ipf"
-            1,2, 002, 0.75, 0.0, -999.9900 ,"associated.ipf"
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
+            1,2, 002, 0.75, 0.0, -999.9900 ,"ipf/associated.ipf"
             """
         )
 
@@ -91,25 +95,25 @@ class WellPrjCases:
             0001,(WEL),1
             1900-01-01
             001,002
-            1,2, 001, 1.0, 0.0, -999.9900 ,"simple.ipf"
-            1,2, 001, 1.0, 0.0, -999.9900 ,"associated.ipf"
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
             """
         )
 
     def case_mixed__all(self):
         return dedent(
             """
-            0001,(WEL),1
+            0003,(WEL),1
             1900-01-01
             001,001
-            1,2, 001, 1.0, 0.0, -999.9900 ,"associated.ipf"
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
             1900-01-02
             001,002
-            1,2, 001, 1.0, 0.0, -999.9900 ,"associated.ipf"
-            1,2, 001, 1.0, 0.0, -999.9900 ,"simple.ipf"
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
             1900-01-03
             001,001
-            1,2, 001, 1.0, 0.0, -999.9900 ,"associated.ipf"
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
             """
         )
 
@@ -120,12 +124,29 @@ class WellPrjCases:
         """
         return dedent(
             """
-            0001,(WEL),1
+            0002,(WEL),1
             1900-01-01
             001,001
-            1,2, 001, 1.0, 0.0, -999.9900 ,"simple.ipf"
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
             1900-01-02
             001,001
-            1,2, 001, 1.0, 0.0, -999.9900 ,"associated.ipf"
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
             """
         )
+
+
+@parametrize_with_cases("wel_case", cases=WellPrjCases)
+def test_import_wells(wel_case, tmp_path, current_cases):
+    # Arrange
+    case_name = current_cases["wel_case"].id
+    wel_file = tmp_path / f"{case_name}.prj"
+    
+    with open(wel_file, "w") as f:
+        f.write(wel_case)
+    
+    src = r"c:\Users\engelen\projects_wdir\imod-python\imod5_wel\ipf"
+    copytree(src, tmp_path/"ipf")
+
+    # Act
+    data = open_projectfile_data(wel_file)
+    pass
