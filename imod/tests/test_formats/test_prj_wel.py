@@ -160,4 +160,4 @@ def test_import_wells(wel_case, well_mixed_ipfs, tmp_path, current_cases):
 
     # Act
     data, _ = open_projectfile_data(wel_file)
-    #well = LayeredWell.from_imod5_data("wel-1", data, times)
+    LayeredWell.from_imod5_data("wel-1", data, times)
