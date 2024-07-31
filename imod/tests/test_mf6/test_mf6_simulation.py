@@ -17,6 +17,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.mf6 import LayeredWell, Well
 from imod.mf6.model import Modflow6Model
 from imod.mf6.multimodel.modelsplitter import PartitionInfo
 from imod.mf6.oc import OutputControl
@@ -507,7 +508,37 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
 
 
 @pytest.mark.usefixtures("imod5_dataset")
-def test_import_from_imod5_nonstandard_regridding(imod5_dataset, tmp_path):
+def test_import_from_imod5__correct_well_type(imod5_dataset):
+    # Unpack
+    imod5_data = imod5_dataset[0]
+    period_data = imod5_dataset[1]
+    # Temporarily change layer number to 0, to force Well object instead of
+    # LayeredWell
+    original_wel_layer = imod5_data["wel-1"]["layer"]
+    imod5_data["wel-1"]["layer"] = 0
+    # Other arrangement
+    default_simulation_allocation_options = SimulationAllocationOptions
+    default_simulation_distributing_options = SimulationDistributingOptions
+    datelist = pd.date_range(start="1/1/1989", end="1/1/2013", freq="W")
+
+    # Act
+    simulation = Modflow6Simulation.from_imod5_data(
+        imod5_data,
+        period_data,
+        default_simulation_allocation_options,
+        default_simulation_distributing_options,
+        datelist,
+    )
+    # Set layer back to right value (before AssertionError might be thrown)
+    imod5_data["wel-1"]["layer"] = original_wel_layer
+    # Assert
+    assert isinstance(simulation["imported_model"]["wel-1"], Well)
+    assert isinstance(simulation["imported_model"]["wel-2"], LayeredWell)
+    assert isinstance(simulation["imported_model"]["wel-3"], LayeredWell)
+
+
+@pytest.mark.usefixtures("imod5_dataset")
+def test_import_from_imod5__nonstandard_regridding(imod5_dataset, tmp_path):
     imod5_data = imod5_dataset[0]
     period_data = imod5_dataset[1]
     default_simulation_allocation_options = SimulationAllocationOptions
