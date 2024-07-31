@@ -266,6 +266,14 @@ GRIDLESS_PACKAGES = [
         print_flows=True,
         validate=True,
     ),
+    imod.mf6.LayeredWell(
+        x=[1.0, 6002.0],
+        y=[3.0, 5004.0],
+        layer=[1,2],
+        rate=[1.0, 3.0],
+        print_flows=True,
+        validate=True,
+    ),
     imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic(
         geometry=gpd.GeoDataFrame(
             geometry=[

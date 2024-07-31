@@ -202,7 +202,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         }
 
         data["top"] = ones_like(data["idomain"]) * data["top"]
-        data["bottom"] = ones_like(data["idomain"]) * data["top"]       
+        data["bottom"] = ones_like(data["idomain"]) * data["bottom"]       
 
         target_grid = create_smallest_target_grid(*data.values())
 
