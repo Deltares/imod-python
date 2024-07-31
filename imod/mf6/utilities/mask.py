@@ -133,9 +133,9 @@ def _adjust_mask_for_unlayered_data(
 
 
 def mask_arrays(arrays: dict[str, GridDataArray]) -> dict[str, GridDataArray]:
-    for k1 in arrays.keys():
-        for k2 in arrays.keys():
-            if k1 == k2:
-                continue
-            arrays[k2] = xr.where(~np.isnan(arrays[k1]), arrays[k2], np.nan)
-    return arrays
+    masks = [~np.isnan(array) for array in arrays.values()]
+    # Get total mask across all arrays
+    total_mask = xr.concat(masks, dim="arrays").any("arrays")
+    # Mask arrays with total mask
+    arrays_masked = {key: array.where(total_mask) for key, array in arrays.items()}
+    return arrays_masked
