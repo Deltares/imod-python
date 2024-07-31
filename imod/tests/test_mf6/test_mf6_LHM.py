@@ -70,6 +70,8 @@ def test_mf6_river(tmp_path):
         LHM_dir / "LHM4.3_stationair_gekalibreerd_bruinkool_fluxes_mf6.prj"
     )
 
+
+
     imod5_data = data[0]
     period_data = data[1]
     default_simulation_allocation_options = SimulationAllocationOptions
@@ -93,3 +95,48 @@ def test_mf6_river(tmp_path):
         regridder_types=None,
     )
     riv._validate()
+
+
+def test_mf6_frans(tmp_path):
+    prj_dir = Path("D:\\dev\\imod_python-gh\\vanFrans\\e400_iMOD5\\f01_basic_tests\\c01_WEL")
+    data = open_projectfile_data(
+        prj_dir / "c01_WEL_T1__root__.prj"
+    )
+
+    logfile_path = tmp_path / "logfile.txt"
+    with open(logfile_path, "w") as sys.stdout:
+        imod.logging.configure(
+            LoggerType.PYTHON,
+            log_level=LogLevel.DEBUG,
+            add_default_file_handler=False,
+            add_default_stream_handler=True,
+        )    
+
+        imod5_data = data[0]
+        period_data = data[1]
+        default_simulation_allocation_options = SimulationAllocationOptions
+        default_simulation_distributing_options = SimulationDistributingOptions
+
+        regridding_option = {}
+        regridding_option["npf"] = NodePropertyFlowRegridMethod()
+        regridding_option["dis"] = DiscretizationRegridMethod()
+        regridding_option["sto"] = StorageCoefficientRegridMethod()
+        times = pd.date_range(start="1/1/2018", end="12/1/2018", freq="ME")
+
+        simulation = Modflow6Simulation.from_imod5_data(
+            imod5_data,
+            period_data,
+            default_simulation_allocation_options,
+            default_simulation_distributing_options,
+            times,
+            regridding_option,
+        )
+        simulation["imported_model"]["oc"] = OutputControl(
+            save_head="last", save_budget="last"
+        )
+
+        for k, package in simulation["imported_model"].items():
+            package.dataset.load()
+        simulation.write(tmp_path, binary=False, validate=True)
+
+

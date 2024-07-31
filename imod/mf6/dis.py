@@ -28,7 +28,7 @@ from imod.schemata import (
     UniqueValuesSchema,
     ValidationError,
 )
-from imod.typing.grid import GridDataArray
+from imod.typing.grid import GridDataArray, ones_like
 
 
 class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
@@ -200,6 +200,9 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
             "top": imod5_data["top"]["top"],
             "bottom": imod5_data["bot"]["bottom"],
         }
+
+        data["top"] = ones_like(data["idomain"]) * data["top"]
+        data["bottom"] = ones_like(data["idomain"]) * data["top"]       
 
         target_grid = create_smallest_target_grid(*data.values())
 
