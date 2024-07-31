@@ -332,21 +332,6 @@ class River(BoundaryCondition, IRegridPackage):
             regridded_package_data["bottom_elevation"]
         )
 
-        target_bottom_subset = target_bottom.sel(
-            {"layer": regridded_package_data["bottom_elevation"].coords["layer"]}
-        )
-        regridded_package_data["bottom_elevation"] = xr.where(
-            regridded_package_data["bottom_elevation"] > target_bottom_subset,
-            regridded_package_data["bottom_elevation"],
-            target_bottom_subset,
-        )
-        regridded_package_data = mask_arrays(regridded_package_data)
-        regridded_package_data["stage"] = xr.where(
-            regridded_package_data["stage"]
-            > regridded_package_data["bottom_elevation"],
-            regridded_package_data["stage"],
-            regridded_package_data["bottom_elevation"],
-        )
         river_package = River(**regridded_package_data, validate=True)
         optional_river_package: Optional[River] = None
         optional_drainage_package: Optional[Drainage] = None
