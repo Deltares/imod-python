@@ -808,12 +808,12 @@ def _read_package_ipf(
         ipf_df, indexcol, ext = _try_read_with_func(imod.ipf._read_ipf, path)
         if indexcol == 0:
             # No associated files
-            columns = ("x", "y", "rate")
+            columns = ("x", "y", "rate", "id")
             if layer <= 0:
                 df = ipf_df.iloc[:, :5]
                 columns = columns + ("top", "bottom")
             else:
-                df = ipf_df.iloc[:, :3]
+                df = ipf_df.iloc[:, :4]
             df.columns = columns
         else:
             dfs = []
