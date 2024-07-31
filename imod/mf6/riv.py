@@ -340,7 +340,7 @@ class River(BoundaryCondition, IRegridPackage):
             "stage": regridded_package_data["stage"],
             "conductance": drain_conductance,
         }
-        drainage_arrays = mask_arrays(drainage_arrays)
+
         drainage_package = cls.create_infiltration_factor_drain(
             drainage_arrays["stage"],
             drainage_arrays["conductance"],
