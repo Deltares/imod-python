@@ -132,15 +132,15 @@ def _adjust_mask_for_unlayered_data(
     return array_mask
 
 
-def mask_arrays(arrays: dict[str, GridDataArray]) -> dict[str, GridDataArray]:
+def mask_arrays(arrays: dict[str, xr.DataArray]) -> dict[str, xr.DataArray]:
     """
-    This function takes a dictionary of GridDataArrays. The arrays are assumed to have the same
+    This function takes a dictionary of xr.DataArrays. The arrays are assumed to have the same
     coordinates. When a np.nan value is found in any array, the other arrays are also
     set to np.nan at the same coordinates.
     """
-    masks = [~np.isnan(array) for array in arrays.values()]
+    masks = [xr.DataArray(~np.isnan(array)) for array in arrays.values()]
     # Get total mask across all arrays
-    total_mask = xr.concat(masks, dim="arrays").all("arrays")
+    total_mask = xr.concat(masks[:], dim="arrays").all("arrays")
     # Mask arrays with total mask
     arrays_masked = {key: array.where(total_mask) for key, array in arrays.items()}
     return arrays_masked
