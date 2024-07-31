@@ -13,7 +13,6 @@ from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.drn import Drainage
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.regrid.regrid_schemes import RiverRegridMethod
-from imod.mf6.utilities.mask import mask_arrays
 from imod.mf6.utilities.regrid import (
     RegridderWeightsCache,
     _regrid_package_data,
