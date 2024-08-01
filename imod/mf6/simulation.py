@@ -1348,10 +1348,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             object containing the conductivity distribution options per package type.
             If you want a package to have a different allocation option,
             then it should be imported separately
-        time_min: datetime
-            Begin-time of the simulation.
-        time_max: datetime
-            End-time of the simulation.
+        times:  list[datetime]
+            time discretization of the model to be imported.
         regridder_types: dict[str, RegridMethodType]
             the key is the package name. The value is the RegridMethodType
             object containing the settings for regridding the package with the
@@ -1383,5 +1381,5 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         # cleanup packages for validation
         idomain = groundwaterFlowModel.domain
         simulation.mask_all_models(idomain)
-
+        simulation.create_time_discretization(additional_times=times)
         return simulation
