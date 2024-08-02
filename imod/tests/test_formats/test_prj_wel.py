@@ -201,3 +201,8 @@ def test_import_wells(wel_case, expected, well_mixed_ipfs, tmp_path, current_cas
             open_projectfile_data(wel_file)
     else:
         data, _ = open_projectfile_data(wel_file)
+        assert len(set(expected.keys()) ^ set(data.keys())) == 0
+        for key, time_expected in expected.items():
+            assert "time" in data[key]
+            time_actual = data[key]["time"]
+            assert time_actual == time_expected
