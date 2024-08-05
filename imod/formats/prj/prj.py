@@ -522,21 +522,24 @@ def _try_read_with_func(func, path, *args, **kwargs):
         raise type(e)(f"{e}. Error thrown while opening file: {path}")
 
 
-def _create_arithmetic_dataarray(
+def _get_array_transformation_parameters(
     headers: List[Dict[str, Any]], key: str, dim: str
 ) -> xr.DataArray:
-    return xr.DataArray(
-        data=[header[key] for header in headers],
-        dims=(dim,),
-        coords={dim: [header[dim] for header in headers]},
-    )
+    if dim in headers[0].keys():
+        return xr.DataArray(
+            data=[header[key] for header in headers],
+            dims=(dim,),
+            coords={dim: [header[dim] for header in headers]},
+        )
+    else:
+        return headers[0][key]
 
 
 def _create_datarray_from_paths(
     paths: List[str], headers: List[Dict[str, Any]], dim: str
 ) -> xr.DataArray:
-    factor = _create_arithmetic_dataarray(headers, "factor", dim)
-    addition = _create_arithmetic_dataarray(headers, "addition", dim)
+    factor = _get_array_transformation_parameters(headers, "factor", dim)
+    addition = _get_array_transformation_parameters(headers, "addition", dim)
     da = _try_read_with_func(
         imod.formats.array_io.reading._load,
         paths,
@@ -550,8 +553,8 @@ def _create_datarray_from_paths(
 def _create_dataarray_from_values(
     values: List[float], headers: List[Dict[str, Any]], dim: str
 ):
-    factor = _create_arithmetic_dataarray(headers, "factor", dim)
-    addition = _create_arithmetic_dataarray(headers, "addition", dim)
+    factor = _get_array_transformation_parameters(headers, "factor", dim)
+    addition = _get_array_transformation_parameters(headers, "addition", dim)
     coords = _merge_coords(headers)
     firstdims = headers[0]["dims"]
     shape = [len(coord) for coord in coords.values()]
