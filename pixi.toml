@@ -52,6 +52,7 @@ mypy_lint = { cmd ="mypy", depends_on = ["install"]}
 mypy_report = { cmd ="mypy | mypy2junit > mypy-report.xml", depends_on = ["install"]}
 
 [dependencies]
+snakeviz = ">=2.2.0,<2.3"
 # Keep empty or undefined to create an empty default environment.
 
 [feature.base.dependencies]
