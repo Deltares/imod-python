@@ -535,7 +535,7 @@ def _get_array_transformation_parameters(
         return headers[0][key]
 
 
-def _create_datarray_from_paths(
+def _create_dataarray_from_paths(
     paths: List[str], headers: List[Dict[str, Any]], dim: str
 ) -> xr.DataArray:
     factor = _get_array_transformation_parameters(headers, "factor", dim)
@@ -586,14 +586,14 @@ def _create_dataarray(
 
     if paths_valid and values_valid:
         # Both lists contain entries: mixed case.
-        dap = _create_datarray_from_paths(paths_valid, headers_paths, dim=dim)
-        dav = _create_dataarray_from_values(values_valid, headers_values)
+        dap = _create_dataarray_from_paths(paths_valid, headers_paths, dim=dim)
+        dav = _create_dataarray_from_values(values_valid, headers_values, dim=dim)
         dap.name = "tmp"
         dav.name = "tmp"
         da = xr.merge((dap, dav), join="outer")["tmp"]
     elif paths_valid:
         # Only paths provided
-        da = _create_datarray_from_paths(paths_valid, headers_paths, dim=dim)
+        da = _create_dataarray_from_paths(paths_valid, headers_paths, dim=dim)
     elif values_valid:
         # Only scalar values provided
         da = _create_dataarray_from_values(values_valid, headers_values, dim=dim)
