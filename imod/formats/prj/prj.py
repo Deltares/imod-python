@@ -5,6 +5,7 @@ Utilities for parsing a project file.
 import shlex
 import textwrap
 from collections import defaultdict
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from itertools import chain
 from os import PathLike
@@ -782,10 +783,22 @@ def _read_package_gen(
     return out
 
 
+@dataclass
+class IpfResult:
+    dataframe: list[pd.DataFrame] = field(default_factory=list)
+    layer: list[int] = field(default_factory=list)
+    time: list[str] = field(default_factory=list)
+
+    def append(self, dataframe: pd.DataFrame, layer: int, time: str):
+        self.dataframe.append(dataframe)
+        self.layer.append(layer)
+        self.time.append(time)
+
+
 def _read_package_ipf(
     block_content: Dict[str, Any], periods: Dict[str, datetime]
 ) -> Tuple[List[Dict[str, Any]], List[datetime]]:
-    out = []
+    out = defaultdict(IpfResult)
     repeats = []
 
     # we will store in this set the tuples of (x, y, id, well_top, well_bot)
@@ -861,14 +874,11 @@ def _read_package_ipf(
             df = pd.concat(dfs, ignore_index=True, sort=False)
         df["rate"] = df["rate"] * factor + addition
 
-        d = {
-            "dataframe": df,
-            "layer": layer,
-            "time": time,
-        }
-        out.append(d)
+        out[path.stem].append(df, layer, time)
+
+    out_dict_ls: list[dict] = {key: asdict(o) for key, o in out.items()}
     repeats = sorted(repeats)
-    return out, repeats
+    return out_dict_ls, repeats
 
 
 def read_projectfile(path: FilePath) -> Dict[str, Any]:
@@ -1021,7 +1031,12 @@ def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
             raise type(e)(f"{e}. Errored while opening/reading data entries for: {key}")
 
         strippedkey = key.strip("(").strip(")")
-        if len(data) > 1:
+        if strippedkey == "wel":
+            for key, d in data.items():
+                named_key = f"{strippedkey}-{key}"
+                prj_data[named_key] = d
+                repeat_stress[named_key] = repeats
+        elif len(data) > 1:
             for i, da in enumerate(data):
                 numbered_key = f"{strippedkey}-{i + 1}"
                 prj_data[numbered_key] = da
