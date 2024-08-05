@@ -18,9 +18,8 @@ import xarray as xr
 import imod
 import imod.logging
 from imod.logging.loglevel import LogLevel
-
 FilePath = Union[str, "PathLike[str]"]
-
+from sys import exit
 
 KEYS = {
     "(bnd)": ("ibound",),
@@ -587,8 +586,13 @@ def apply_factor_and_addition(headers, da):
             for header in headers:
                 if np.datetime64(header["time"]) == time:
                     header_per_time[time].append(header)
-
+                    break
+        counter = 0
         for time in da.coords["time"]:
+            print(f"=================={time}")
+            counter = counter + 1
+            if counter > 100:
+                exit()
             da.loc[{"time": time}] = apply_factor_and_addition(
                 header_per_time[np.datetime64(time.values)],
                 da.sel(time=time, drop=True),
@@ -605,9 +609,10 @@ def apply_factor_and_addition_per_layer(headers, da):
         header_per_layer[header["layer"]] = header
     addition_values = [header_per_layer[lay]["addition"] for lay in layer]
     factor_values = [header_per_layer[lay]["factor"] for lay in layer]
-    addition = xr.DataArray(addition_values, coords={"layer": layer}, dims=("layer"))
-    factor = xr.DataArray(factor_values, coords={"layer": layer}, dims=("layer",))
-    da = da * factor + addition
+    if not (all([f == 1.0 for f in factor_values]) and all([a == 0.0 for a in addition_values])):
+        addition = xr.DataArray(addition_values, coords={"layer": layer}, dims=("layer"))
+        factor = xr.DataArray(factor_values, coords={"layer": layer}, dims=("layer",))
+        da = da * factor + addition
     return da
 
 
@@ -758,6 +763,7 @@ def _open_boundary_condition_idf(
         for i, (paths, headers, values) in enumerate(
             zip(system_paths.values(), system_headers.values(), system_values.values())
         ):
+            print(f"=============={i}")
             das[i][variable] = _create_dataarray(paths, headers, values)
 
     repeats = sorted(all_repeats)
@@ -808,7 +814,7 @@ def _read_package_ipf(
         ipf_df, indexcol, ext = _try_read_with_func(imod.ipf._read_ipf, path)
         if indexcol == 0:
             # No associated files
-            columns = ("x", "y", "rate", "id")
+            columns = ("x", "y", "rate")
             if layer <= 0:
                 df = ipf_df.iloc[:, :5]
                 columns = columns + ("top", "bottom")
@@ -858,7 +864,8 @@ def _read_package_ipf(
                     )
 
                 dfs.append(df_assoc)
-            df = pd.concat(dfs, ignore_index=True, sort=False)
+            if len(dfs) > 0:
+                df = pd.concat(dfs, ignore_index=True, sort=False)
         df["rate"] = df["rate"] * factor + addition
 
         d = {

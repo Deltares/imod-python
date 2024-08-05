@@ -292,12 +292,13 @@ class GroundwaterFlowModel(Modflow6Model):
         wel_keys = [key for key in imod5_keys if key[0:3] == "wel"]
         for wel_key in wel_keys:
             layer = imod5_data[wel_key]["layer"]
-            if layer == 0:
-                result[wel_key] = Well.from_imod5_data(wel_key, imod5_data, times)
-            else:
-                result[wel_key] = LayeredWell.from_imod5_data(
-                    wel_key, imod5_data, times
-                )
+            if len(imod5_data[wel_key]["dataframe"]) > 0:
+                if layer == 0:
+                    result[wel_key] = Well.from_imod5_data(wel_key, imod5_data, times)
+                else:
+                    result[wel_key] = LayeredWell.from_imod5_data(
+                        wel_key, imod5_data, times
+                    )
 
         # import ghb's
         imod5_keys = list(imod5_data.keys())
