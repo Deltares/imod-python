@@ -15,6 +15,7 @@ from imod.mf6.regrid.regrid_schemes import (
     StorageCoefficientRegridMethod,
 )
 from imod.mf6.simulation import Modflow6Simulation
+from imod.mf6.utilities.mask import mask_arrays
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION
 from imod.prepare.topsystem.conductance import DISTRIBUTING_OPTION
 from imod.prepare.topsystem.default_allocation_methods import (
@@ -445,6 +446,9 @@ def test_mf6_Mipwa(tmp_path):
         simulation["imported_model"]["oc"] = OutputControl(
             save_head="last", save_budget="last"
         )
+
+        mask_arrays(simulation["imported_model"]["drn-12"])
+
 
         for k, package in simulation["imported_model"].items():
             package.dataset.load()
