@@ -71,7 +71,7 @@ class TimeDiscretization(Package):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def render(self):
+    def render(self, directory, pkgname, globaltimes, binary):
         start_date_time = iso8601(self.dataset["time"].values[0])
         d = {
             "time_units": "days",
@@ -118,8 +118,13 @@ class TimeDiscretization(Package):
                 f"Got {da.dims}. Can be at max ('time', )."
             )
 
-    def write(self, directory, name):
-        timedis_content = self.render()
-        timedis_path = directory / f"{name}.tdis"
+    def write(self, pkgname, globaltimes, write_context):
+        timedis_content = self.render(
+            write_context.write_directory,
+            pkgname,
+            globaltimes,
+            write_context.use_binary,
+        )
+        timedis_path = write_context.write_directory / f"{pkgname}.tdis"
         with open(timedis_path, "w") as f:
             f.write(timedis_content)

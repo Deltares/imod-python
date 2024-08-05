@@ -83,7 +83,7 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
 
-    def render(self, directory, pkgname, binary):
+    def render(self, directory, pkgname, globaltimes, binary):
         disdirectory = directory / pkgname
         d = {}
         grid = self.dataset.ugrid.grid
@@ -129,7 +129,9 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
 
     def write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
         dir_for_render = write_context.get_formatted_write_directory()
-        content = self.render(dir_for_render, pkgname, write_context.use_binary)
+        content = self.render(
+            dir_for_render, pkgname, globaltimes, write_context.use_binary
+        )
         filename = write_context.write_directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
             f.write(content)
