@@ -553,9 +553,9 @@ def _create_dataarray_from_paths(
         for d in factor.dims:
             if d not in da.dims:
                 if len(factor.coords[d]) == 1:
-                    factor = factor.isel({d:0}).drop(d)
-                    addition = addition.isel({d:0}).drop(d)
-    
+                    factor = factor.isel({d: 0}).drop(d)
+                    addition = addition.isel({d: 0}).drop(d)
+
     return da * factor + addition
 
 
