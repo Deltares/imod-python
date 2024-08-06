@@ -277,9 +277,11 @@ class WellReadCases:
 
 
 # pytest_cases doesn't support any "zipped test cases", instead it takes the
-# outer product of cases, when providing multiple case sets. To support this, we
-# would like to retrieve all function arguments from the case classes and to zip
-# them together, something like zip(input_args,expected).
+# outer product of cases, when providing multiple case sets.
+# https://github.com/smarie/python-pytest-cases/issues/284 
+# To support this, we would like to retrieve all function arguments from the
+# case classes and to zip them together, something like
+# zip(input_args,expected).
 def case_args_to_parametrize(cases, prefix):
     """Manually retrieve all case args of a set in cases."""
 
