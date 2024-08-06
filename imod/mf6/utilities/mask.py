@@ -1,6 +1,7 @@
 import numbers
 
 import numpy as np
+import xarray as xr
 from fastcore.dispatch import typedispatch
 from xarray.core.utils import is_scalar
 
@@ -129,3 +130,17 @@ def _adjust_mask_for_unlayered_data(
         array_mask = mask.isel(layer=0)
 
     return array_mask
+
+
+def mask_arrays(arrays: dict[str, xr.DataArray]) -> dict[str, xr.DataArray]:
+    """
+    This function takes a dictionary of xr.DataArrays. The arrays are assumed to have the same
+    coordinates. When a np.nan value is found in any array, the other arrays are also
+    set to np.nan at the same coordinates.
+    """
+    masks = [xr.DataArray(~np.isnan(array)) for array in arrays.values()]
+    # Get total mask across all arrays
+    total_mask = xr.concat(masks[:], dim="arrays").all("arrays")
+    # Mask arrays with total mask
+    arrays_masked = {key: array.where(total_mask) for key, array in arrays.items()}
+    return arrays_masked

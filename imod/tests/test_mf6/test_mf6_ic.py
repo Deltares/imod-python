@@ -1,5 +1,6 @@
 import pathlib
 import textwrap
+from copy import deepcopy
 
 import pytest
 
@@ -40,3 +41,17 @@ def test_validate_false():
 def test_wrong_arguments():
     with pytest.raises(ValueError):
         imod.mf6.InitialConditions(head=0.0, start=1.0)
+
+
+@pytest.mark.usefixtures("imod5_dataset")
+def test_from_imod5(imod5_dataset, tmp_path):
+    data = deepcopy(imod5_dataset[0])
+
+    target_grid = data["khv"]["kh"]
+
+    ic = imod.mf6.InitialConditions.from_imod5_data(data, target_grid)
+
+    ic._validate_init_schemata(True)
+
+    rendered_ic = ic.render(tmp_path, "ic", None, False)
+    assert "strt" in rendered_ic

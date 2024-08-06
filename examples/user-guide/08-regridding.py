@@ -191,9 +191,9 @@ axes[1].set_ylabel("regridded")
 # undergo custom regridding at this stage.
 from imod.mf6.utilities.regrid import RegridderWeightsCache
 
-regrid_context = RegridderWeightsCache()
+regrid_cache = RegridderWeightsCache()
 
-regrid_context
+regrid_cache
 
 # %%
 # Regrid the recharge package with a custom regridder. In this case we opt
@@ -206,7 +206,7 @@ regridder_types = RechargeRegridMethod(rate=(RegridderType.CENTROIDLOCATOR,))
 
 regridded_recharge = original_rch_package.regrid_like(
     target_grid,
-    regrid_context=regrid_context,
+    regrid_cache=regrid_cache,
     regridder_types=regridder_types,
 )
 

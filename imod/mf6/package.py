@@ -25,6 +25,7 @@ from imod.mf6.pkgbase import (
 )
 from imod.mf6.regrid.regrid_schemes import EmptyRegridMethod, RegridMethodType
 from imod.mf6.utilities.mask import mask_package
+from imod.mf6.utilities.package import _is_valid
 from imod.mf6.utilities.regrid import (
     RegridderWeightsCache,
     _regrid_like,
@@ -80,25 +81,9 @@ class Package(PackageBase, IPackage, abc.ABC):
             f"{type(self).__name__}(**{self._pkg_id}.dataset.sel(**selection))"
         )
 
-    def _valid(self, value):
-        """
-        Filters values that are None, False, or a numpy.bool_ False.
-        Needs to be this specific, since 0.0 and 0 are valid values, but are
-        equal to a boolean False.
-        """
-        # Test singletons
-        if value is False or value is None:
-            return False
-        # Test numpy bool (not singleton)
-        elif isinstance(value, np.bool_) and not value:
-            return False
-        # When dumping to netCDF and reading back, None will have been
-        # converted into a NaN. Only check NaN if it's a floating type to avoid
-        # TypeErrors.
-        elif np.issubdtype(type(value), np.floating) and np.isnan(value):
-            return False
-        else:
-            return True
+    @staticmethod
+    def _valid(value: Any) -> bool:
+        return _is_valid(value)
 
     @staticmethod
     def _number_format(dtype: type):
@@ -531,9 +516,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             selection = selection.sel(x=x_slice, y=y_slice)
 
         cls = type(self)
-        new = cls.__new__(cls)
-        new.dataset = selection
-        return new
+        return cls._from_dataset(selection)
 
     def mask(self, mask: GridDataArray) -> Any:
         """
@@ -560,7 +543,7 @@ class Package(PackageBase, IPackage, abc.ABC):
     def regrid_like(
         self,
         target_grid: GridDataArray,
-        regrid_context: RegridderWeightsCache,
+        regrid_cache: RegridderWeightsCache,
         regridder_types: Optional[RegridMethodType] = None,
     ) -> "Package":
         """
@@ -587,7 +570,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         ----------
         target_grid: xr.DataArray or xu.UgridDataArray
             a grid defined over the same discretization as the one we want to regrid the package to.
-        regrid_context: RegridderWeightsCache, optional
+        regrid_cache: RegridderWeightsCache, optional
             stores regridder weights for different regridders. Can be used to speed up regridding,
             if the same regridders are used several times for regridding different arrays.
         regridder_types: RegridMethodType, optional
@@ -600,7 +583,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         similar to the one used in input argument "target_grid"
         """
         try:
-            result = _regrid_like(self, target_grid, regrid_context, regridder_types)
+            result = _regrid_like(self, target_grid, regrid_cache, regridder_types)
         except ValueError as e:
             raise e
         except Exception:
@@ -656,5 +639,6 @@ class Package(PackageBase, IPackage, abc.ABC):
     def is_clipping_supported(self) -> bool:
         return True
 
-    def get_regrid_methods(self) -> RegridMethodType:
-        return deepcopy(self._regrid_method)
+    @classmethod
+    def get_regrid_methods(cls) -> RegridMethodType:
+        return deepcopy(cls._regrid_method)

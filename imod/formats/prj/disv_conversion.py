@@ -5,11 +5,10 @@ project files.
 
 from __future__ import annotations
 
-import itertools
 import pickle
 from collections import Counter
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple, cast
+from typing import Dict, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -21,6 +20,7 @@ from imod.mf6.model import Modflow6Model
 from imod.mf6.utilities.package import get_repeat_stress
 from imod.prepare.layer import get_upper_active_grid_cells
 from imod.typing import GridDataArray
+from imod.util.expand_repetitions import expand_repetitions
 from imod.util.imports import MissingOptionalModule
 
 try:
@@ -646,28 +646,11 @@ def create_hfb(
         geometry=dataframe["geometry"].values,
         data={
             "resistance": dataframe["resistance"].values,
-            "ztop": np.ones_like(dataframe["geometry"].values) * top.max().values,
-            "zbottom": np.ones_like(dataframe["geometry"].values) * bottom.min().values,
+            "layer": value["layer"],
         },
     )
 
-    model[key] = imod.mf6.HorizontalFlowBarrierResistance(barrier_gdf)
-
-
-def merge_hfbs(
-    horizontal_flow_barriers: List[imod.mf6.HorizontalFlowBarrierResistance],
-):
-    datasets = []
-    for horizontal_flow_barrier in horizontal_flow_barriers:
-        datasets.append(horizontal_flow_barrier.dataset)
-
-    combined_dataset = xr.concat(datasets, "index")
-    combined_dataset.coords["index"] = np.arange(combined_dataset.sizes["index"])
-
-    combined_dataframe = cast(gpd.GeoDataFrame, combined_dataset.to_dataframe())
-    combined_dataframe.drop("print_input", axis=1, inplace=True)  # noqa: PD002
-
-    return imod.mf6.HorizontalFlowBarrierResistance(combined_dataframe)
+    model[key] = imod.mf6.SingleLayerHorizontalFlowBarrierResistance(barrier_gdf)
 
 
 PKG_CONVERSION = {
@@ -681,20 +664,6 @@ PKG_CONVERSION = {
     "riv": create_riv,
     "wel": create_wel,
 }
-
-
-def expand_repetitions(
-    repeat_stress: List[datetime], time_min: datetime, time_max: datetime
-) -> Dict[datetime, datetime]:
-    expanded = {}
-    for year, date in itertools.product(
-        range(time_min.year, time_max.year + 1),
-        repeat_stress,
-    ):
-        newdate = date.replace(year=year)
-        if newdate < time_max:
-            expanded[newdate] = date
-    return expanded
 
 
 def convert_to_disv(
@@ -816,13 +785,6 @@ def convert_to_disv(
             )
         except Exception as e:
             raise type(e)(f"{e}\nduring conversion of {key}")
-
-    # Treat hfb's separately: they must be merged into one,
-    # as MODFLOW6 only supports a single HFB.
-    hfb_keys = [key for key in model.keys() if key.split("-")[0] == "hfb"]
-    hfbs = [model.pop(key) for key in hfb_keys]
-    if hfbs:
-        model["hfb"] = merge_hfbs(hfbs)
 
     transient = any("time" in pkg.dataset.dims for pkg in model.values())
     if transient and (time_min is not None or time_max is not None):

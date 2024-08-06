@@ -21,9 +21,9 @@ from imod.mf6.hfb import (
     HorizontalFlowBarrierHydraulicCharacteristic,
     HorizontalFlowBarrierMultiplier,
     HorizontalFlowBarrierResistance,
-    LayeredHorizontalFlowBarrierHydraulicCharacteristic,
-    LayeredHorizontalFlowBarrierMultiplier,
-    LayeredHorizontalFlowBarrierResistance,
+    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic,
+    SingleLayerHorizontalFlowBarrierMultiplier,
+    SingleLayerHorizontalFlowBarrierResistance,
 )
 from imod.mf6.ic import InitialConditions
 from imod.mf6.ims import (
@@ -49,5 +49,5 @@ from imod.mf6.sto import SpecificStorage, Storage, StorageCoefficient
 from imod.mf6.timedis import TimeDiscretization
 from imod.mf6.utilities.regrid import RegridderType, RegridderWeightsCache
 from imod.mf6.uzf import UnsaturatedZoneFlow
-from imod.mf6.wel import Well, WellDisStructured, WellDisVertices
+from imod.mf6.wel import LayeredWell, Well, WellDisStructured, WellDisVertices
 from imod.mf6.write_context import WriteContext

@@ -25,7 +25,7 @@ def grid_data_structured(
     dims = ("layer", "y", "x")
     layer = np.arange(1, nlayer + 1)
 
-    coords = {"layer": layer, "y": y, "x": x, "dx": cellsize, "dy": cellsize}
+    coords = {"layer": layer, "y": y, "x": x, "dx": cellsize, "dy": -cellsize}
 
     structured_grid_data = xr.DataArray(
         np.ones(shape, dtype=dtype) * value, coords=coords, dims=dims

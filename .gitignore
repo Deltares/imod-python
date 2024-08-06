@@ -140,3 +140,6 @@ examples/data
 # pixi environments
 .pixi
 
+/imod/tests/mydask.png
+/imod/tests/unittest_report.xml
+/imod/tests/examples_report.xml

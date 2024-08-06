@@ -8,6 +8,9 @@ import xarray as xr
 import imod
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
+from imod.tests.fixtures.backward_compatibility_fixture import (
+    _load_imod5_data_in_memory,
+)
 
 
 @pytest.fixture(scope="function")
@@ -189,3 +192,65 @@ def test_write_ascii_griddata_2d_3d(idomain_and_bottom, tmp_path):
     with open(directory / "dis/botm.dat") as f:
         bottom_content = f.readlines()
     assert len(bottom_content) == 1
+
+
+@pytest.mark.usefixtures("imod5_dataset")
+def test_from_imod5_data__idomain_values(imod5_dataset):
+    imod5_data = imod5_dataset[0]
+
+    dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_data)
+
+    # Test if idomain has appropriate count
+    assert (dis["idomain"] == -1).sum() == 371824
+    assert (dis["idomain"] == 0).sum() == 176912
+    assert (dis["idomain"] == 1).sum() == 703936
+
+
+@pytest.mark.usefixtures("imod5_dataset")
+def test_from_imod5_data__grid_extent(imod5_dataset):
+    imod5_data = imod5_dataset[0]
+
+    dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_data)
+
+    # Test if regridded to smallest grid resolution
+    assert dis["top"].dx == 25.0
+    assert dis["top"].dy == -25.0
+    assert (dis.dataset.coords["x"][1] - dis.dataset.coords["x"][0]) == 25.0
+    assert (dis.dataset.coords["y"][1] - dis.dataset.coords["y"][0]) == -25.0
+
+    # Test extent
+    assert dis.dataset.coords["y"].min() == 360712.5
+    assert dis.dataset.coords["y"].max() == 365287.5
+    assert dis.dataset.coords["x"].min() == 194712.5
+    assert dis.dataset.coords["x"].max() == 199287.5
+
+
+@pytest.mark.usefixtures("imod5_dataset")
+def test_from_imod5_data__write(imod5_dataset, tmp_path):
+    directory = tmp_path / "dis_griddata"
+    directory.mkdir()
+    write_context = WriteContext(simulation_directory=directory)
+    imod5_data = imod5_dataset[0]
+
+    dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_data)
+
+    # Test if package written without ValidationError
+    dis.write(pkgname="dis", globaltimes=[], write_context=write_context)
+
+    # Assert if files written
+    assert (directory / "dis/top.dat").exists()
+    assert (directory / "dis/botm.dat").exists()
+
+
+def test_from_imod5_data__validation_error(tmp_path):
+    # don't use the fixture "imod5_dataset" for this test, because we don't want the
+    # ibound cleanup. Without this cleanup we get a validation error,
+    # which is what we want to test here.
+
+    tmp_path = imod.util.temporary_directory()
+    data = imod.data.imod5_projectfile_data(tmp_path)
+    data = data[0]
+
+    _load_imod5_data_in_memory(data)
+    with pytest.raises(ValidationError):
+        imod.mf6.StructuredDiscretization.from_imod5_data(data)
