@@ -14,6 +14,7 @@ from imod.formats.prj import open_projectfile_data
 
 class WellPrjCases:
     """Cases for projectfile well records"""
+
     def case_simple__first(self):
         return dedent(
             """
@@ -135,8 +136,10 @@ class WellPrjCases:
             """
         )
 
+
 class WellReadCases:
     """Expected cases as interpreted by ``imod.formats.prj.open_projectfile_data``"""
+
     def case_simple__first(self):
         return {
             "wel-simple1": {
@@ -146,6 +149,7 @@ class WellReadCases:
                 "addition": [0.0],
             },
         }
+
     def case_simple__all(self):
         return {
             "wel-simple1": {
@@ -167,6 +171,7 @@ class WellReadCases:
                 "addition": [0.0],
             },
         }
+
     def case_associated__first(self):
         return {
             "wel-associated": {
@@ -176,6 +181,7 @@ class WellReadCases:
                 "addition": [0.0],
             }
         }
+
     def case_associated__all(self):
         return {
             "wel-associated": {
@@ -189,6 +195,7 @@ class WellReadCases:
                 "addition": [0.0, 0.0, 0.0],
             },
         }
+
     def case_associated__all_varying_factors(self):
         return {
             "wel-associated": {
@@ -202,6 +209,7 @@ class WellReadCases:
                 "addition": [0.0, 0.0, 0.0],
             },
         }
+
     def case_associated__multiple_layers_different_factors(self):
         return {
             "wel-associated": {
@@ -214,6 +222,7 @@ class WellReadCases:
                 "addition": [0.0, 0.0],
             },
         }
+
     def case_mixed__first(self):
         return {
             "wel-simple1": {
@@ -229,6 +238,7 @@ class WellReadCases:
                 "addition": [0.0],
             },
         }
+
     def case_mixed__all(self):
         return {
             "wel-associated": {
@@ -248,7 +258,8 @@ class WellReadCases:
                 "addition": [0.0],
             },
         }
-    def case_mixed__associated_second(self):    
+
+    def case_mixed__associated_second(self):
         return {
             "wel-associated": {
                 "time": [datetime(2000, 1, 2)],
@@ -264,27 +275,33 @@ class WellReadCases:
             },
         }
 
+
 # pytest_cases doesn't support any "zipped test cases", instead it takes the
 # outer product of cases, when providing multiple case sets. To support this, we
 # would like to retrieve all function arguments from the case classes and to zip
 # them together, something like zip(input_args,expected).
 def case_args_to_parametrize(cases, prefix):
     """Manually retrieve all case args of a set in cases."""
+
     # Decorate some dummy function to be able to call ``get_all_cases``. For some
     # reason, pytest_cases requires a decorated function (despite telling us
     # differently in the docs.)
     @parametrize_with_cases("case", cases=cases)
     def f(case):
         return case
-    
+
     all_cases = get_all_cases(f, cases=cases)
     return get_parametrize_args(f, all_cases, prefix)
+
 
 PRJ_ARGS = case_args_to_parametrize(WellPrjCases, "case_")
 READ_ARGS = case_args_to_parametrize(WellReadCases, "case_")
 
-@parametrize("wel_case, expected",argvalues=list(zip(PRJ_ARGS, READ_ARGS)))
-def test_open_projectfile_data_wells(wel_case, expected, well_mixed_ipfs, tmp_path, request):
+
+@parametrize("wel_case, expected", argvalues=list(zip(PRJ_ARGS, READ_ARGS)))
+def test_open_projectfile_data_wells(
+    wel_case, expected, well_mixed_ipfs, tmp_path, request
+):
     # Arrange
     case_name = request.node.callspec.id
     wel_file = tmp_path / f"{case_name}.prj"
