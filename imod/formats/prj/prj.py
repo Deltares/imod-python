@@ -5,7 +5,8 @@ Utilities for parsing a project file.
 import shlex
 import textwrap
 from collections import defaultdict
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
+from dataclasses import field as data_field
 from datetime import datetime
 from itertools import chain
 from os import PathLike
@@ -785,14 +786,25 @@ def _read_package_gen(
 
 @dataclass
 class IpfResult:
-    dataframe: list[pd.DataFrame] = field(default_factory=list)
-    layer: list[int] = field(default_factory=list)
-    time: list[str] = field(default_factory=list)
+    dataframe: list[pd.DataFrame] = data_field(default_factory=list)
+    layer: list[int] = data_field(default_factory=list)
+    time: list[str] = data_field(default_factory=list)
+    factor: list[float] = data_field(default_factory=list)
+    addition: list[float] = data_field(default_factory=list)
 
-    def append(self, dataframe: pd.DataFrame, layer: int, time: str):
+    def append(
+        self,
+        dataframe: pd.DataFrame,
+        layer: int,
+        time: str,
+        factor: float,
+        addition: float,
+    ):
         self.dataframe.append(dataframe)
         self.layer.append(layer)
         self.time.append(time)
+        self.factor.append(factor)
+        self.addition.append(addition)
 
 
 def _read_package_ipf(
@@ -874,7 +886,7 @@ def _read_package_ipf(
             df = pd.concat(dfs, ignore_index=True, sort=False)
         df["rate"] = df["rate"] * factor + addition
 
-        out[path.stem].append(df, layer, time)
+        out[path.stem].append(df, layer, time, factor, addition)
 
     out_dict_ls: list[dict] = {key: asdict(o) for key, o in out.items()}
     repeats = sorted(repeats)
