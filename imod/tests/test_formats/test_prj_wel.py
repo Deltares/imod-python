@@ -264,22 +264,23 @@ class WellReadCases:
             },
         }
 
-# Decorate some dummy function to be able to call ``get_all_cases``. For some
-# reason, pytest_cases requires a decorated function (despite telling us
-# differently in the docs.)
-@parametrize_with_cases("case", cases=WellPrjCases)
-def prj_cases(case):
-    return case
+# pytest_cases doesn't support any "zipped test cases", instead it takes the
+# outer product of cases, when providing multiple case sets. To support 
+# This we require the following workaround.
+def case_args_to_parametrize(cases, prefix):
+    """Manually retrieve all case args of a set in cases."""
+    # Decorate some dummy function to be able to call ``get_all_cases``. For some
+    # reason, pytest_cases requires a decorated function (despite telling us
+    # differently in the docs.)
+    @parametrize_with_cases("case", cases=cases)
+    def f(case):
+        return case
+    
+    all_cases = get_all_cases(f, cases=cases)
+    return get_parametrize_args(f, all_cases, prefix)
 
-@parametrize_with_cases("case", cases=WellReadCases)
-def read_cases(case):
-    return case
-
-PRJ_CASES = get_all_cases(prj_cases, cases=WellPrjCases)
-READ_CASES = get_all_cases(read_cases, cases=WellReadCases)
-
-PRJ_ARGS = get_parametrize_args(prj_cases, PRJ_CASES, "case_")
-READ_ARGS = get_parametrize_args(read_cases, READ_CASES, "case_")
+PRJ_ARGS = case_args_to_parametrize(WellPrjCases, "case_")
+READ_ARGS = case_args_to_parametrize(WellReadCases, "case_")
 
 @parametrize("wel_case, expected",argvalues=list(zip(PRJ_ARGS, READ_ARGS)))
 def test_open_projectfile_data_wells(wel_case, expected, well_mixed_ipfs, tmp_path, request):
