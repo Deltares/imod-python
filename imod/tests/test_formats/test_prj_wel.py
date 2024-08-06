@@ -2,8 +2,6 @@ from datetime import datetime
 from shutil import copyfile
 from textwrap import dedent
 
-import pytest
-import xarray as xr
 from pytest_cases import parametrize_with_cases
 
 from imod.formats.prj import open_projectfile_data
@@ -19,7 +17,14 @@ class WellPrjCases:
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
             """
         )
-        expected = {"wel-simple1": {"time": [datetime(2000, 1, 1)]}}
+        expected = {
+            "wel-simple1": {
+                "time": [datetime(2000, 1, 1)],
+                "layer": [1],
+                "factor": [1.0],
+                "addition": [0.0],
+            },
+        }
         return prj_string, expected
 
     def case_simple__all(self):
@@ -39,9 +44,24 @@ class WellPrjCases:
             """
         )
         expected = {
-            "wel-simple1": {"time": [datetime(2000, 1, 1), datetime(2000, 1, 2)]},
-            "wel-simple2": {"time": [datetime(2000, 1, 2)]},
-            "wel-simple3": {"time": [datetime(2000, 1, 3)]},
+            "wel-simple1": {
+                "time": [datetime(2000, 1, 1), datetime(2000, 1, 2)],
+                "layer": [1, 1],
+                "factor": [1.0, 1.0],
+                "addition": [0.0, 0.0],
+            },
+            "wel-simple2": {
+                "time": [datetime(2000, 1, 2)],
+                "layer": [1],
+                "factor": [1.0],
+                "addition": [0.0],
+            },
+            "wel-simple3": {
+                "time": [datetime(2000, 1, 3)],
+                "layer": [1],
+                "factor": [1.0],
+                "addition": [0.0],
+            },
         }
         return prj_string, expected
 
@@ -54,7 +74,14 @@ class WellPrjCases:
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
             """
         )
-        expected = {"wel-associated": {"time": [datetime(2000, 1, 1)]}}
+        expected = {
+            "wel-associated": {
+                "time": [datetime(2000, 1, 1)],
+                "layer": [1],
+                "factor": [1.0],
+                "addition": [0.0],
+            }
+        }
         return prj_string, expected
 
     def case_associated__all(self):
@@ -78,13 +105,15 @@ class WellPrjCases:
                     datetime(2000, 1, 1),
                     datetime(2000, 1, 2),
                     datetime(2000, 1, 3),
-                ]
+                ],
+                "layer": [1, 1, 1],
+                "factor": [1.0, 1.0, 1.0],
+                "addition": [0.0, 0.0, 0.0],
             },
         }
         return prj_string, expected
 
-    def case_associated__all_fails(self):
-        """FAIL: Varying factor over time"""
+    def case_associated__all_varying_factors(self):
         prj_string = dedent(
             """
             0003,(WEL),1
@@ -99,11 +128,21 @@ class WellPrjCases:
             1,2, 001, 0.2, 0.0, -999.9900 ,"ipf/associated.ipf"
             """
         )
-        expected = "FAIL"
+        expected = {
+            "wel-associated": {
+                "time": [
+                    datetime(2000, 1, 1),
+                    datetime(2000, 1, 2),
+                    datetime(2000, 1, 3),
+                ],
+                "layer": [1, 1, 1],
+                "factor": [1.0, 0.5, 0.2],
+                "addition": [0.0, 0.0, 0.0],
+            },
+        }
         return prj_string, expected
 
-    def case_associated__fail(self):
-        """FAIL: Assign same file to multiple layers"""
+    def case_associated__multiple_layers_different_factors(self):
         prj_string = dedent(
             """
             0001,(WEL),1
@@ -113,7 +152,17 @@ class WellPrjCases:
             1,2, 002, 0.75, 0.0, -999.9900 ,"ipf/associated.ipf"
             """
         )
-        expected = "FAIL"
+        expected = {
+            "wel-associated": {
+                "time": [
+                    datetime(2000, 1, 1),
+                    datetime(2000, 1, 1),
+                ],
+                "layer": [1, 2],
+                "factor": [1.0, 0.75],
+                "addition": [0.0, 0.0],
+            },
+        }
         return prj_string, expected
 
     def case_mixed__first(self):
@@ -127,8 +176,18 @@ class WellPrjCases:
             """
         )
         expected = {
-            "wel-simple1": {"time": [datetime(2000, 1, 1)]},
-            "wel-associated": {"time": [datetime(2000, 1, 1)]},
+            "wel-simple1": {
+                "time": [datetime(2000, 1, 1)],
+                "layer": [1],
+                "factor": [1.0],
+                "addition": [0.0],
+            },
+            "wel-associated": {
+                "time": [datetime(2000, 1, 1)],
+                "layer": [1],
+                "factor": [1.0],
+                "addition": [0.0],
+            },
         }
         return prj_string, expected
 
@@ -154,17 +213,21 @@ class WellPrjCases:
                     datetime(2000, 1, 1),
                     datetime(2000, 1, 2),
                     datetime(2000, 1, 3),
-                ]
+                ],
+                "layer": [1, 1, 1],
+                "factor": [1.0, 1.0, 1.0],
+                "addition": [0.0, 0.0, 0.0],
             },
-            "wel-simple1": {"time": [datetime(2000, 1, 2)]},
+            "wel-simple1": {
+                "time": [datetime(2000, 1, 2)],
+                "layer": [1],
+                "factor": [1.0],
+                "addition": [0.0],
+            },
         }
         return prj_string, expected
 
-    def case_mixed__fails(self):
-        """
-        FAIL: Associated ipf defined not in first timestep or all
-        timesteps.
-        """
+    def case_mixed__associated_second(self):
         prj_string = dedent(
             """
             0002,(WEL),1
@@ -176,74 +239,21 @@ class WellPrjCases:
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
             """
         )
-        expected = "FAIL"
+        expected = {
+            "wel-associated": {
+                "time": [datetime(2000, 1, 2)],
+                "layer": [1],
+                "factor": [1.0],
+                "addition": [0.0],
+            },
+            "wel-simple1": {
+                "time": [datetime(2000, 1, 1)],
+                "layer": [1],
+                "factor": [1.0],
+                "addition": [0.0],
+            },
+        }
         return prj_string, expected
-
-
-class WellIMOD5Cases:
-    def case_simple__first(self):
-        dataframe = {"wel-simple1": {"time": [datetime(2000, 1, 1)]}}
-        expected = {"wel-simple1": [datetime(2000, 1, 1)]}
-        return dataframe, expected
-
-    def case_simple__all(self):
-        dataframe = {
-            "wel-simple1": {"time": [datetime(2000, 1, 1), datetime(2000, 1, 2)]},
-            "wel-simple2": {"time": [datetime(2000, 1, 2)]},
-            "wel-simple3": {"time": [datetime(2000, 1, 3)]},
-        }
-        expected = { # Add extra timestep with 0.0 rate assigned
-            "wel-simple1": [datetime(2000, 1, 1), datetime(2000, 1, 2), datetime(2000, 1, 3)],
-            "wel-simple2": [datetime(2000, 1, 2), datetime(2000, 1, 3)],
-            "wel-simple3": [datetime(2000, 1, 3)],
-        }
-        return dataframe, expected
-
-    def case_associated__first(self):
-        dataframe = {"wel-associated": {"time": [datetime(2000, 1, 1)]}}
-        expected = {"wel-associated": [datetime(2000, 1, 1)]}
-        return dataframe, expected
-
-    def case_associated__all(self):
-        dataframe = {
-            "wel-associated": {
-                "time": [
-                    datetime(2000, 1, 1),
-                    datetime(2000, 1, 2),
-                    datetime(2000, 1, 3),
-                ]
-            },
-        }
-        expected = {"wel-associated": [datetime(2000, 1, 1)]}
-        return dataframe, expected
-
-    def case_mixed__first(self):
-        dataframe = {
-            "wel-simple1": {"time": [datetime(2000, 1, 1)]},
-            "wel-associated": {"time": [datetime(2000, 1, 1)]},
-        }
-        expected = {
-            "wel-simple1": [datetime(2000, 1, 1), datetime(2000, 1, 2)],
-            "wel-associated": [datetime(2000, 1, 1)]
-        }
-        return dataframe, expected
-
-    def case_mixed__all(self):
-        dataframe = {
-            "wel-associated": {
-                "time": [
-                    datetime(2000, 1, 1),
-                    datetime(2000, 1, 2),
-                    datetime(2000, 1, 3),
-                ]
-            },
-            "wel-simple1": {"time": [datetime(2000, 1, 2)]},
-        }
-        expected = {
-            "wel-simple1": [datetime(2000, 1, 2), datetime(2000, 1, 3)],
-            "wel-associated": [datetime(2000, 1, 1)]
-        }
-        return dataframe, expected
 
 
 @parametrize_with_cases("wel_case, expected", cases=WellPrjCases)
@@ -263,13 +273,12 @@ def test_import_wells(wel_case, expected, well_mixed_ipfs, tmp_path, current_cas
         copyfile(p, ipf_dir / p.name)
 
     # Act
-    if expected == "FAIL":
-        with pytest.raises(ValueError):
-            open_projectfile_data(wel_file)
-    else:
-        data, _ = open_projectfile_data(wel_file)
-        assert len(set(expected.keys()) ^ set(data.keys())) == 0
-        for key, wel_expected in expected.items():
-            assert "time" in data[key]
-            time_actual = data[key]["time"]
-            assert time_actual == wel_expected["time"]
+    data, _ = open_projectfile_data(wel_file)
+    assert len(set(expected.keys()) ^ set(data.keys())) == 0
+    for key, wel_expected in expected.items():
+        assert "time" in data[key]
+        actual = data[key]
+        assert actual["time"] == wel_expected["time"]
+        assert actual["layer"] == wel_expected["layer"]
+        assert actual["addition"] == wel_expected["addition"]
+        assert actual["factor"] == wel_expected["factor"]
