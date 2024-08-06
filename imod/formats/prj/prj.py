@@ -549,7 +549,7 @@ def _create_dataarray_from_paths(
     )
 
     # remove coordinates in factor and addition but not in da
-    if isinstance( factor,  xr.DataArray):
+    if isinstance(factor, xr.DataArray):
         missing_dims = set(factor.dims) - set(da.dims)
         if missing_dims:
             factor = factor.isel({d: 0 for d in missing_dims}, drop=True)
