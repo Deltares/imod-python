@@ -50,24 +50,14 @@ class Model(collections.UserDict):
                 pass
                 # grouped = value.groupby(["x", "y"])
                 # x = grouped["x"].first()
-                # y = grouped["y"].first()
-            # Select appropriate datasets
-            if "x" in value.dims and "y" in value.dims:
-                for varname in value.data_vars:
-                    da = value[varname]
-                    if "x" in da.dims and "y" in da.dims:
+                # y = .dims:
                         if da.isnull().all():
                             continue
 
-                        imod.visualize.spatial.imshow_topview(
-                            da=da,
-                            name=varname,
-                            directory=directory / key,
-                            cmap=cmap,
-                            overlays=overlays,
+                        imorlays,
                             quantile_colorscale=quantile_colorscale,
                             figsize=figsize,
-                        )
+                        
 
     def sel(self, **dimensions):
         selmodel = type(self)(self.modelname, self.check)
