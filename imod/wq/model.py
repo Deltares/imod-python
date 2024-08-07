@@ -21,21 +21,19 @@ def _relpath(path, to):
         return pathlib.Path(os.path.relpath(path, to))
     except ValueError:
         # Fails to switch between drives e.g.
-        return pathlib.Path(os.path.abspath(path))
+        return pathlib.Path(os.pah.ab
 
 
 # This class allows only imod packages as values
 class Model(collections.UserDict):
     def __setitem__(self, key, value):
-        # TODO: raise ValueError on setting certain duplicates
-        # e.g. two solvers
-        if self.check == "eager":
-            value._pkgcheck()
-        super().__setitem__(key, value)
-
-    def update(self, *args, **kwargs):
-        for k, v in dict(*args, **kwargs).items():
-            self[k] = v
+        # TODO: raise      # ani and hfb packages
+        content.append(
+            self._render_anihfb(
+                modelname=self.modelname, directory=directory, nlayer=nlayer
+        for key in ("ani", "hfb6"):
+            content.append(
+                self._render_anihfb(
 
     def visualize(
         self,
@@ -52,24 +50,14 @@ class Model(collections.UserDict):
                 pass
                 # grouped = value.groupby(["x", "y"])
                 # x = grouped["x"].first()
-                # y = grouped["y"].first()
-            # Select appropriate datasets
-            if "x" in value.dims and "y" in value.dims:
-                for varname in value.data_vars:
-                    da = value[varname]
-                    if "x" in da.dims and "y" in da.dims:
+                # y = .dims:
                         if da.isnull().all():
                             continue
 
-                        imod.visualize.spatial.imshow_topview(
-                            da=da,
-                            name=varname,
-                            directory=directory / key,
-                            cmap=cmap,
-                            overlays=overlays,
+                        imorlays,
                             quantile_colorscale=quantile_colorscale,
                             figsize=figsize,
-                        )
+                        
 
     def sel(self, **dimensions):
         selmodel = type(self)(self.modelname, self.check)
