@@ -834,7 +834,7 @@ def _read_package_ipf(
         ipf_df, indexcol, ext = _try_read_with_func(imod.ipf._read_ipf, path)
         if indexcol == 0:
             # No associated files
-            has_associated=False
+            has_associated = False
             columns = ("x", "y", "rate")
             if layer <= 0:
                 df = ipf_df.iloc[:, :5]
@@ -843,7 +843,7 @@ def _read_package_ipf(
                 df = ipf_df.iloc[:, :3]
             df.columns = columns
         else:
-            has_associated=True
+            has_associated = True
             dfs = []
             for row in ipf_df.itertuples():
                 filename = row[indexcol]
