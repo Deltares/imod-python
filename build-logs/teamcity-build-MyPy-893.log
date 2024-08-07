@@ -1,0 +1,139 @@
+Build 'iMOD6 / iMOD Python / Windows / MyPy' #893, branch 'pull/1145'
+Triggered 2024-08-07 16:33:23 by 'Snapshot dependency; Git; iMOD6 / iMOD Python / Windows / Tests, build #1230'
+Started 2024-08-07 16:33:25 on agent 'c-teamcity22027'
+Is running with status NORMAL 'Step 1/2'
+VCS revisions: 'iMOD6_IMODPython_ImodPython' (Git, instance id 1892): '665e03e3385e3fa4d8c3e9fa194c8ed21cad73d7' (branch: 'refs/pull/1145/head', checkout rules: '+:. => imod-python')
+TeamCity URL https://dpcbuild.deltares.nl/buildConfiguration/iMOD6_IMODPython_Windows_MyPy/4286070 
+TeamCity server version is 2024.07 (build 160569), server timezone: CEST (UTC+02:00)
+
+[16:33:23]E: bt10486 (running for 2m:20s)
+[16:33:23]i: TeamCity server version is 2024.07 (build 160569)
+[16:33:23] : Collecting changes in 2 VCS roots (1s)
+[16:33:23] :	 [Collecting changes in 2 VCS roots] VCS Root details
+[16:33:23] :		 [VCS Root details] "imod-python" {instance id=1892, parent internal id=1382, parent id=iMOD6_IMODPython_ImodPython, description: "git@github.com:Deltares/imod-python.git#refs/heads/master"}
+[16:33:23] :		 [VCS Root details] "MetaSwap_LookupTable" {instance id=1510, parent internal id=1267, parent id=iMOD6_IMODPython_MetaSwapLookupTable, description: "svn: https://repos.deltares.nl/repos/DSCTestbench/trunk/cases/e150_metaswap/f00_common/c00_common/LHM2016_v01vrz"}
+[16:33:23]i:	 [Collecting changes in 2 VCS roots] Loading current repository state for VCS root 'imod-python' (1s)
+[16:33:23]i:	 [Collecting changes in 2 VCS roots] Loading current repository state for VCS root 'MetaSwap_LookupTable'
+[16:33:24]i:	 [Collecting changes in 2 VCS roots] Detecting changes in VCS root 'MetaSwap_LookupTable' (used in 'Build Pages', 'Examples' and 1 other configuration)
+[16:33:24]i:	 [Collecting changes in 2 VCS roots] Will collect changes for 'MetaSwap_LookupTable' starting from revision 26411
+[16:33:24] :	 [Collecting changes in 2 VCS roots] Compute revision for 'imod-python'
+[16:33:24] :		 [Compute revision for 'imod-python'] Upper limit revision: 665e03e3385e3fa4d8c3e9fa194c8ed21cad73d7
+[16:33:24]i:		 [Compute revision for 'imod-python'] MaxModId = 649160
+[16:33:24] :		 [Compute revision for 'imod-python'] Computed revision: 665e03e3385e3fa4d8c3e9fa194c8ed21cad73d7
+[16:33:24] :	 [Collecting changes in 2 VCS roots] Compute revision for 'imod-python'
+[16:33:24] :		 [Compute revision for 'imod-python'] Upper limit revision: 665e03e3385e3fa4d8c3e9fa194c8ed21cad73d7
+[16:33:24]i:		 [Compute revision for 'imod-python'] MaxModId = 649160
+[16:33:24] :		 [Compute revision for 'imod-python'] Will use revision: 85d4d7df56759c2a408438a0a4960eda4129a40c from the previous build with id 4191092 as a fallback
+[16:33:24] :		 [Compute revision for 'imod-python'] Computing the revision of the commit matched by the checkout rules:
++:.teamcity
+ starting with: 665e03e3385e3fa4d8c3e9fa194c8ed21cad73d7 and ending with: [85d4d7df56759c2a408438a0a4960eda4129a40c]
+[16:33:24] :		 [Compute revision for 'imod-python'] Could not find VCS commits reachable from the [665e03e3385e3fa4d8c3e9fa194c8ed21cad73d7] and matched by the checkout rules
+[16:33:24] :		 [Compute revision for 'imod-python'] Will use the fallback revision: 85d4d7df56759c2a408438a0a4960eda4129a40c
+[16:33:24] :		 [Compute revision for 'imod-python'] Computed revision: 85d4d7df56759c2a408438a0a4960eda4129a40c
+[16:33:24]W: Finalize build settings
+[16:33:24]W:	 [Finalize build settings] Retrieve settings, revision: 85d4d7df56759c2a408438a0a4960eda4129a40c
+[16:33:24] :		 [Retrieve settings, revision: 85d4d7df56759c2a408438a0a4960eda4129a40c] Load project model
+[16:33:24]W:		 [Retrieve settings, revision: 85d4d7df56759c2a408438a0a4960eda4129a40c] Read build settings from revision 85d4d7df56759c2a408438a0a4960eda4129a40c
+[16:33:24]W:			 [Read build settings from revision 85d4d7df56759c2a408438a0a4960eda4129a40c] Last changes in TeamCity settings were not committed to VCS, use current settings from TeamCity server
+[16:33:24] : The build is removed from the queue to be prepared for the start
+[16:33:24] : Starting the build on the agent "c-teamcity22027"
+[16:33:25]i: Agent time zone: Europe/Amsterdam
+[16:33:25]i: Agent is running under JRE: 17.0.8+9-LTS-211
+[16:33:25] : Updating tools for build
+[16:33:25] :	 [Updating tools for build] Tools are not required for the build
+[16:33:25] : Clearing temporary directory: D:\buildAgent\temp\buildTmp
+[16:33:25]W: Failed to delete empty directory: D:\buildAgent\temp\buildTmp
+[16:33:26] : Publishing internal artifacts
+[16:33:26] :	 [Publishing internal artifacts] Publishing 1 file using [WebPublisher]
+[16:33:26] :	 [Publishing internal artifacts] Publishing 1 file using [ArtifactsCachePublisherImpl]
+[16:33:26]i:	 [Publishing internal artifacts] Will publish 1 artifact(s) to TeamCity node with id MAIN_SERVER
+[16:33:26] : Clean build enabled: removing old files from D:\buildAgent\work\dbbb0459d1bf1711
+[16:33:40] : Checkout directory: D:\buildAgent\work\dbbb0459d1bf1711
+[16:33:40] : Updating sources: auto checkout (on agent) (6s)
+[16:33:40] :	 [Updating sources] Will use agent side checkout
+[16:33:40] :	 [Updating sources] Full checkout enforced. Reason: ["Delete all files before the build" turned on]
+[16:33:40] :	 [Updating sources] VCS Root: imod-python (6s)
+[16:33:40] :		 [VCS Root: imod-python] checkout rules: =>imod-python; revision: 665e03e3385e3fa4d8c3e9fa194c8ed21cad73d7
+[16:33:40]i:		 [VCS Root: imod-python] Mirrors enabled via VCS root settings
+[16:33:40] :		 [VCS Root: imod-python] Git version: 2.37.2.0
+[16:33:40] :		 [VCS Root: imod-python] Update git mirror (D:\buildAgent\system\git\git-A2FF8EA3.git) (5s)
+[16:33:40] :			 [Update git mirror (D:\buildAgent\system\git\git-A2FF8EA3.git)] "C:\Program Files\Git\bin\git.exe" config http.sslCAInfo
+[16:33:40] :			 [Update git mirror (D:\buildAgent\system\git\git-A2FF8EA3.git)] "C:\Program Files\Git\bin\git.exe" config --unset http.sslCAInfo
+[16:33:40] :			 [Update git mirror (D:\buildAgent\system\git\git-A2FF8EA3.git)] "C:\Program Files\Git\bin\git.exe" show-ref
+[16:33:41] :			 [Update git mirror (D:\buildAgent\system\git\git-A2FF8EA3.git)] "C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred2658050661363155640.bat ls-remote origin
+[16:33:43] :			 [Update git mirror (D:\buildAgent\system\git\git-A2FF8EA3.git)] "C:\Program Files\Git\bin\git.exe" show-ref refs/pull/1145/head
+[16:33:43] :			 [Update git mirror (D:\buildAgent\system\git\git-A2FF8EA3.git)] "C:\Program Files\Git\bin\git.exe" log -n1 --pretty=format:%H%x20%s 665e03e3385e3fa4d8c3e9fa194c8ed21cad73d7 --
+[16:33:43]i:			 [Update git mirror (D:\buildAgent\system\git\git-A2FF8EA3.git)] fatal: bad object 665e03e3385e3fa4d8c3e9fa194c8ed21cad73d7
+[16:33:43] :			 [Update git mirror (D:\buildAgent\system\git\git-A2FF8EA3.git)] 'git fetch' required: commit '665e03e3385e3fa4d8c3e9fa194c8ed21cad73d7' is not found in the local repository clone.
+[16:33:43] :			 [Update git mirror (D:\buildAgent\system\git\git-A2FF8EA3.git)] "C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred13388645060145010888.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head (2s)
+[16:33:45]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred13388645060145010888.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Enumerating objects: 5, done.        
+[16:33:45]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred13388645060145010888.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Counting objects:  20% (1/5)        
+[16:33:45]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred13388645060145010888.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Counting objects:  40% (2/5)        
+[16:33:45]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred13388645060145010888.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Counting objects:  60% (3/5)        
+[16:33:45]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred13388645060145010888.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Counting objects:  80% (4/5)        
+[16:33:45]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred13388645060145010888.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Counting objects: 100% (5/5)        
+[16:33:45]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred13388645060145010888.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Counting objects: 100% (5/5), done.        
+[16:33:45]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred13388645060145010888.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Compressing objects:  20% (1/5)        
+[16:33:45]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred13388645060145010888.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Compressing objects:  40% (2/5)        
+[16:33:45]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred13388645060145010888.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Compressing objects:  60% (3/5)        
+[16:33:45]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred13388645060145010888.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Compressing objects:  80% (4/5)        
+[16:33:45]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred13388645060145010888.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Compressing objects: 100% (5/5)        
+[16:33:45]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred13388645060145010888.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Compressing objects: 100% (5/5), done.        
+[16:33:45]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred13388645060145010888.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Total 5 (delta 0), reused 0 (delta 0), pack-reused 0        
+[16:33:45]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred13388645060145010888.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] From github.com:Deltares/imod-python
+[16:33:45]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred13388645060145010888.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head]    8364f63c..665e03e3  refs/pull/1145/head -> refs/pull/1145/head
+[16:33:45] :			 [Update git mirror (D:\buildAgent\system\git\git-A2FF8EA3.git)] "C:\Program Files\Git\bin\git.exe" log -n1 --pretty=format:%H%x20%s 665e03e3385e3fa4d8c3e9fa194c8ed21cad73d7 --
+[16:33:45] :			 [Update git mirror (D:\buildAgent\system\git\git-A2FF8EA3.git)] "C:\Program Files\Git\bin\git.exe" pack-refs --all
+[16:33:45] :		 [VCS Root: imod-python] Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python) (1s)
+[16:33:45] :			 [Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python)] The .git directory is missing in 'D:\buildAgent\work\dbbb0459d1bf1711\imod-python'. Running 'git init'...
+[16:33:45] :			 [Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python)] "C:\Program Files\Git\bin\git.exe" init --initial-branch=main
+[16:33:45] :			 [Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python)] "C:\Program Files\Git\bin\git.exe" config lfs.storage D:\buildAgent\system\git\git-A2FF8EA3.git\lfs
+[16:33:46] :			 [Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python)] "C:\Program Files\Git\bin\git.exe" config core.sparseCheckout true
+[16:33:46] :			 [Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python)] "C:\Program Files\Git\bin\git.exe" config http.sslCAInfo
+[16:33:46] :			 [Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python)] "C:\Program Files\Git\bin\git.exe" config --unset http.sslCAInfo
+[16:33:46] :			 [Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python)] "C:\Program Files\Git\bin\git.exe" show-ref
+[16:33:46] :			 [Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python)] "C:\Program Files\Git\bin\git.exe" show-ref refs/pull/1145/head
+[16:33:46] :			 [Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python)] "C:\Program Files\Git\bin\git.exe" log -n1 --pretty=format:%H%x20%s 665e03e3385e3fa4d8c3e9fa194c8ed21cad73d7 --
+[16:33:46] :			 [Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python)] No 'git fetch' required: commit '665e03e3385e3fa4d8c3e9fa194c8ed21cad73d7' is in the local repository clone pointed by 'refs/pull/1145/head'.
+[16:33:46] :			 [Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python)] "C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred6668629045295310058.bat checkout -q -f 665e03e3385e3fa4d8c3e9fa194c8ed21cad73d7
+[16:33:47] :			 [Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python)] Cleaning imod-python in D:\buildAgent\work\dbbb0459d1bf1711\imod-python the file set ALL_UNTRACKED
+[16:33:47] :			 [Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python)] "C:\Program Files\Git\bin\git.exe" clean -f -d -x
+[16:33:47] : Build preparation done
+[16:33:47]E: Step 1/2: MyPy analysis (Command Line) (running for 1m:56s)
+[16:33:47] :	 [Step 1/2] Ant JUnit report watcher
+[16:33:47] :		 [Ant JUnit report watcher] Watching paths:
+[16:33:47] :		 [Ant JUnit report watcher] imod-python/*.xml
+[16:33:47]i:	 [Step 1/2] Content of D:\buildAgent\temp\agentTmp\custom_script18307646081326496008.cmd file: 
+@echo off
+rem This is a custom script written by TeamCity using windows-1252 charset.
+pixi run --environment default --frozen mypy_report
+pixi run --environment default --frozen mypy
+[16:33:47] :	 [Step 1/2] Starting: D:\buildAgent\temp\agentTmp\custom_script18307646081326496008.cmd 
+[16:33:47] :	 [Step 1/2] in directory: D:\buildAgent\work\dbbb0459d1bf1711\imod-python
+[16:33:47]E:	 [Step 1/2] Pixi task (install in default): python -m pip install --no-deps --editable .
+[16:35:26] :	 [Step 1/2] Obtaining file:///D:/buildAgent/work/dbbb0459d1bf1711/imod-python
+[16:35:26] :	 [Step 1/2]   Installing build dependencies: started
+[16:35:30] :	 [Step 1/2]   Installing build dependencies: finished with status 'done'
+[16:35:30] :	 [Step 1/2]   Checking if build backend supports build_editable: started
+[16:35:30] :	 [Step 1/2]   Checking if build backend supports build_editable: finished with status 'done'
+[16:35:30] :	 [Step 1/2]   Getting requirements to build editable: started
+[16:35:30] :	 [Step 1/2]   Getting requirements to build editable: finished with status 'done'
+[16:35:30] :	 [Step 1/2]   Installing backend dependencies: started
+[16:35:33] :	 [Step 1/2]   Installing backend dependencies: finished with status 'done'
+[16:35:33] :	 [Step 1/2]   Preparing editable metadata (pyproject.toml): started
+[16:35:34] :	 [Step 1/2]   Preparing editable metadata (pyproject.toml): finished with status 'done'
+[16:35:34] :	 [Step 1/2] Building wheels for collected packages: imod
+[16:35:34] :	 [Step 1/2]   Building editable for imod (pyproject.toml): started
+[16:35:34] :	 [Step 1/2]   Building editable for imod (pyproject.toml): finished with status 'done'
+[16:35:34] :	 [Step 1/2]   Created wheel for imod: filename=imod-0.17.1-py3-none-any.whl size=4187 sha256=f91378c5c52dbfdb1388463d1cc322362ae0492fadbeed59b65924a5a329b677
+[16:35:34] :	 [Step 1/2]   Stored in directory: D:\buildAgent\temp\buildTmp\pip-ephem-wheel-cache-g53e3a57\wheels\03\e0\34\c189bf8cc5f265267b81ae3c052140ef74d6acdb65f2ad0265
+[16:35:34] :	 [Step 1/2] Successfully built imod
+[16:35:34] :	 [Step 1/2] Installing collected packages: imod
+[16:35:34] :	 [Step 1/2] Successfully installed imod-0.17.1
+[16:35:34]E:	 [Step 1/2] 
+[16:35:34]E:	 [Step 1/2] Pixi task (mypy_report in default): mypy | mypy2junit > mypy-report.xml
+[16:35:38]F:	 [Step 1/2] 
+[16:35:38]F:		 [] imod\wq\model.py:28
+[16:35:38]F:			 [imod\wq\model.py:28] WARNING: Mypy error on imod\wq\model.py:28
+[16:35:38]F:			 [imod\wq\model.py:28] imod\wq\model.py:28: error: invalid syntax  [syntax]
+Current time: 16:35:43
