@@ -114,8 +114,7 @@ def test_regrid_scaling_factor(fixed_format_parser):
     scaling_factors, index, svat = setup_scaling_factor()
     new_grid = get_new_grid()
 
-    old_grid = scaling_factors.dataset["scale_soil_moisture"].isel(subunit=0)
-    regrid_context = RegridderWeightsCache(old_grid, new_grid)
+    regrid_context = RegridderWeightsCache()
 
     regridded_scaling_factor = scaling_factors.regrid_like(new_grid, regrid_context)
 

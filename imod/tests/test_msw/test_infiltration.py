@@ -225,7 +225,7 @@ def test_regrid():
     )
     new_grid.values[:,:,:] = 1
 
-    regrid_context = RegridderWeightsCache(infiltration.dataset["infiltration_capacity"], new_grid)
+    regrid_context = RegridderWeightsCache()
     regridded = infiltration.regrid_like(new_grid, regrid_context )
     assert_almost_equal(regridded.dataset.coords["x"].values, x)
     assert_almost_equal(regridded.dataset.coords["y"].values, y)

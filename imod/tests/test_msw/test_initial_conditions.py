@@ -51,7 +51,7 @@ def test_initial_conditions_equilibrium_regrid():
     # fmt: off
     new_grid = get_new_grid()
 
-    regrid_context = RegridderWeightsCache(new_grid, new_grid)
+    regrid_context = RegridderWeightsCache()
     regridded = ic.regrid_like(new_grid, regrid_context )
 
     assert is_empty(regridded.dataset)
@@ -76,7 +76,7 @@ def test_initial_conditions_percolation_regrid():
 
     new_grid = get_new_grid()
 
-    regrid_context = RegridderWeightsCache(new_grid, new_grid)
+    regrid_context = RegridderWeightsCache()
     regridded = ic.regrid_like(new_grid, regrid_context)
     assert is_empty(regridded.dataset)
 
@@ -100,7 +100,7 @@ def test_initial_conditions_rootzone_regrid():
 
     new_grid = get_new_grid()
 
-    regrid_context = RegridderWeightsCache(new_grid, new_grid)
+    regrid_context = RegridderWeightsCache()
     regridded = ic.regrid_like(new_grid, regrid_context)
     assert regridded.dataset["initial_pF"] == 2.2
 

@@ -96,7 +96,7 @@ def test_landuse_options_regrid():
     options = create_landuse_dict()
     lu_options = LanduseOptions(**options)
 
-    regrid_context = RegridderWeightsCache(new_grid, new_grid)
+    regrid_context = RegridderWeightsCache()
     regridded_land_use = lu_options.regrid_like(new_grid, regrid_context)
 
     assert len(regridded_land_use.dataset.coords.keys()) == 1
