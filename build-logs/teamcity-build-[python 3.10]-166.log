@@ -1,0 +1,272 @@
+Build 'iMOD6 / iMOD Python / Windows / PipPython (auto-generated) / [python 3.10]' #166, branch 'pull/1145'
+Triggered 2024-08-07 16:33:24 by 'Snapshot dependency; Git; iMOD6 / iMOD Python / Windows / PipPython, build #166'
+Started 2024-08-07 16:33:25 on agent 'c-teamcity21452'
+Is running with status FAILURE 'Exit code 1 (Step: Pip install python (Command Line)); Step 1/2'
+VCS revisions: 'iMOD6_IMODPython_ImodPython' (Git, instance id 1892): '665e03e3385e3fa4d8c3e9fa194c8ed21cad73d7' (branch: 'refs/pull/1145/head', checkout rules: '+:. => imod-python')
+TeamCity URL https://dpcbuild.deltares.nl/buildConfiguration/iMOD6_IMODPython_Windows_PipPython_virtual_Batch_1258835577_1/4286074 
+TeamCity server version is 2024.07 (build 160569), server timezone: CEST (UTC+02:00)
+
+[16:33:24]E: bt11590 (running for 1m:02s)
+[16:33:24]i: TeamCity server version is 2024.07 (build 160569)
+[16:33:24] : The build is removed from the queue to be prepared for the start
+[16:33:24] : Starting the build on the agent "c-teamcity21452"
+[16:33:25]i: Agent time zone: Europe/Amsterdam
+[16:33:25]i: Agent is running under JRE: 17.0.8+9-LTS-211
+[16:33:25] : Updating tools for build
+[16:33:25] :	 [Updating tools for build] Tools are not required for the build
+[16:33:25] : Clearing temporary directory: D:\buildAgent\temp\buildTmp
+[16:33:25]W: Failed to delete empty directory: D:\buildAgent\temp\buildTmp
+[16:33:25] : Publishing internal artifacts
+[16:33:25] :	 [Publishing internal artifacts] Publishing 1 file using [WebPublisher]
+[16:33:25] :	 [Publishing internal artifacts] Publishing 1 file using [ArtifactsCachePublisherImpl]
+[16:33:25]i:	 [Publishing internal artifacts] Will publish 1 artifact(s) to TeamCity node with id MAIN_SERVER
+[16:33:25] : Clean build enabled: removing old files from D:\buildAgent\work\dbbb0459d1bf1711
+[16:33:29] : Checkout directory: D:\buildAgent\work\dbbb0459d1bf1711
+[16:33:29] : Updating sources: auto checkout (on agent) (6s)
+[16:33:29] :	 [Updating sources] Will use agent side checkout
+[16:33:29] :	 [Updating sources] Full checkout enforced. Reason: ["Delete all files before the build" turned on]
+[16:33:29] :	 [Updating sources] VCS Root: imod-python (6s)
+[16:33:29] :		 [VCS Root: imod-python] checkout rules: =>imod-python; revision: 665e03e3385e3fa4d8c3e9fa194c8ed21cad73d7
+[16:33:29]i:		 [VCS Root: imod-python] Mirrors enabled via VCS root settings
+[16:33:29] :		 [VCS Root: imod-python] Git version: 2.37.2.0
+[16:33:29] :		 [VCS Root: imod-python] Update git mirror (D:\buildAgent\system\git\git-A2FF8EA3.git) (5s)
+[16:33:29] :			 [Update git mirror (D:\buildAgent\system\git\git-A2FF8EA3.git)] "C:\Program Files\Git\bin\git.exe" config http.sslCAInfo
+[16:33:29] :			 [Update git mirror (D:\buildAgent\system\git\git-A2FF8EA3.git)] "C:\Program Files\Git\bin\git.exe" config --unset http.sslCAInfo
+[16:33:29] :			 [Update git mirror (D:\buildAgent\system\git\git-A2FF8EA3.git)] "C:\Program Files\Git\bin\git.exe" show-ref
+[16:33:29] :			 [Update git mirror (D:\buildAgent\system\git\git-A2FF8EA3.git)] "C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred10617841758651559613.bat ls-remote origin
+[16:33:31] :			 [Update git mirror (D:\buildAgent\system\git\git-A2FF8EA3.git)] "C:\Program Files\Git\bin\git.exe" show-ref refs/pull/1145/head
+[16:33:31] :			 [Update git mirror (D:\buildAgent\system\git\git-A2FF8EA3.git)] "C:\Program Files\Git\bin\git.exe" log -n1 --pretty=format:%H%x20%s 665e03e3385e3fa4d8c3e9fa194c8ed21cad73d7 --
+[16:33:31]i:			 [Update git mirror (D:\buildAgent\system\git\git-A2FF8EA3.git)] fatal: bad object 665e03e3385e3fa4d8c3e9fa194c8ed21cad73d7
+[16:33:31] :			 [Update git mirror (D:\buildAgent\system\git\git-A2FF8EA3.git)] 'git fetch' required: commit '665e03e3385e3fa4d8c3e9fa194c8ed21cad73d7' is not found in the local repository clone.
+[16:33:31] :			 [Update git mirror (D:\buildAgent\system\git\git-A2FF8EA3.git)] "C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred9143811481976974276.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head (2s)
+[16:33:34]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred9143811481976974276.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Enumerating objects: 5, done.        
+[16:33:34]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred9143811481976974276.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Counting objects:  20% (1/5)        
+[16:33:34]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred9143811481976974276.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Counting objects:  40% (2/5)        
+[16:33:34]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred9143811481976974276.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Counting objects:  60% (3/5)        
+[16:33:34]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred9143811481976974276.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Counting objects:  80% (4/5)        
+[16:33:34]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred9143811481976974276.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Counting objects: 100% (5/5)        
+[16:33:34]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred9143811481976974276.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Counting objects: 100% (5/5), done.        
+[16:33:34]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred9143811481976974276.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Compressing objects:  20% (1/5)        
+[16:33:34]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred9143811481976974276.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Compressing objects:  40% (2/5)        
+[16:33:34]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred9143811481976974276.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Compressing objects:  60% (3/5)        
+[16:33:34]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred9143811481976974276.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Compressing objects:  80% (4/5)        
+[16:33:34]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred9143811481976974276.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Compressing objects: 100% (5/5)        
+[16:33:34]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred9143811481976974276.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Compressing objects: 100% (5/5), done.        
+[16:33:34]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred9143811481976974276.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] remote: Total 5 (delta 0), reused 0 (delta 0), pack-reused 0        
+[16:33:34]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred9143811481976974276.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head] From github.com:Deltares/imod-python
+[16:33:34]i:				 ["C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred9143811481976974276.bat fetch --progress --recurse-submodules=no origin +refs/pull/1145/head:refs/pull/1145/head]    8364f63c..665e03e3  refs/pull/1145/head -> refs/pull/1145/head
+[16:33:34] :			 [Update git mirror (D:\buildAgent\system\git\git-A2FF8EA3.git)] "C:\Program Files\Git\bin\git.exe" log -n1 --pretty=format:%H%x20%s 665e03e3385e3fa4d8c3e9fa194c8ed21cad73d7 --
+[16:33:34] :			 [Update git mirror (D:\buildAgent\system\git\git-A2FF8EA3.git)] "C:\Program Files\Git\bin\git.exe" pack-refs --all
+[16:33:34] :		 [VCS Root: imod-python] Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python) (1s)
+[16:33:34] :			 [Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python)] The .git directory is missing in 'D:\buildAgent\work\dbbb0459d1bf1711\imod-python'. Running 'git init'...
+[16:33:34] :			 [Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python)] "C:\Program Files\Git\bin\git.exe" init --initial-branch=main
+[16:33:34] :			 [Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python)] "C:\Program Files\Git\bin\git.exe" config lfs.storage D:\buildAgent\system\git\git-A2FF8EA3.git\lfs
+[16:33:34] :			 [Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python)] "C:\Program Files\Git\bin\git.exe" config core.sparseCheckout true
+[16:33:34] :			 [Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python)] "C:\Program Files\Git\bin\git.exe" config http.sslCAInfo
+[16:33:34] :			 [Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python)] "C:\Program Files\Git\bin\git.exe" config --unset http.sslCAInfo
+[16:33:34] :			 [Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python)] "C:\Program Files\Git\bin\git.exe" show-ref
+[16:33:35] :			 [Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python)] "C:\Program Files\Git\bin\git.exe" show-ref refs/pull/1145/head
+[16:33:35] :			 [Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python)] "C:\Program Files\Git\bin\git.exe" log -n1 --pretty=format:%H%x20%s 665e03e3385e3fa4d8c3e9fa194c8ed21cad73d7 --
+[16:33:35] :			 [Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python)] No 'git fetch' required: commit '665e03e3385e3fa4d8c3e9fa194c8ed21cad73d7' is in the local repository clone pointed by 'refs/pull/1145/head'.
+[16:33:35] :			 [Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python)] "C:\Program Files\Git\bin\git.exe" -c credential.helper= -c credential.helper=D:/buildAgent/temp/buildTmp/cred8565423670428241848.bat checkout -q -f 665e03e3385e3fa4d8c3e9fa194c8ed21cad73d7
+[16:33:35] :			 [Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python)] Cleaning imod-python in D:\buildAgent\work\dbbb0459d1bf1711\imod-python the file set ALL_UNTRACKED
+[16:33:35] :			 [Update checkout directory (D:\buildAgent\work\dbbb0459d1bf1711\imod-python)] "C:\Program Files\Git\bin\git.exe" clean -f -d -x
+[16:33:35] : Build preparation done
+[16:33:35]E: Step 1/2: Pip install python (Command Line) (running for 52s)
+[16:33:35]i:	 [Step 1/2] Content of D:\buildAgent\temp\agentTmp\custom_script12779046846348671028.cmd file: 
+@echo off
+rem This is a custom script written by TeamCity using windows-1252 charset.
+pixi run --environment py310 --frozen test_import
+[16:33:35] :	 [Step 1/2] Starting: D:\buildAgent\temp\agentTmp\custom_script12779046846348671028.cmd 
+[16:33:35] :	 [Step 1/2] in directory: D:\buildAgent\work\dbbb0459d1bf1711\imod-python
+[16:33:36]E:	 [Step 1/2] Pixi task (install_with_deps in py310): python -m pip install --editable .
+[16:33:39] :	 [Step 1/2] Obtaining file:///D:/buildAgent/work/dbbb0459d1bf1711/imod-python
+[16:33:39] :	 [Step 1/2]   Installing build dependencies: started
+[16:33:41] :	 [Step 1/2]   Installing build dependencies: finished with status 'done'
+[16:33:41] :	 [Step 1/2]   Checking if build backend supports build_editable: started
+[16:33:41] :	 [Step 1/2]   Checking if build backend supports build_editable: finished with status 'done'
+[16:33:41] :	 [Step 1/2]   Getting requirements to build editable: started
+[16:33:41] :	 [Step 1/2]   Getting requirements to build editable: finished with status 'done'
+[16:33:41] :	 [Step 1/2]   Installing backend dependencies: started
+[16:33:42] :	 [Step 1/2]   Installing backend dependencies: finished with status 'done'
+[16:33:42] :	 [Step 1/2]   Preparing editable metadata (pyproject.toml): started
+[16:33:42] :	 [Step 1/2]   Preparing editable metadata (pyproject.toml): finished with status 'done'
+[16:33:42] :	 [Step 1/2] Collecting affine (from imod==0.17.1)
+[16:33:42] :	 [Step 1/2]   Using cached affine-2.4.0-py3-none-any.whl.metadata (4.0 kB)
+[16:33:43] :	 [Step 1/2] Collecting cftime>=1 (from imod==0.17.1)
+[16:33:43] :	 [Step 1/2]   Using cached cftime-1.6.4-cp310-cp310-win_amd64.whl.metadata (8.9 kB)
+[16:33:43] :	 [Step 1/2] Collecting dask (from imod==0.17.1)
+[16:33:43] :	 [Step 1/2]   Using cached dask-2024.8.0-py3-none-any.whl.metadata (3.8 kB)
+[16:33:43] :	 [Step 1/2] Collecting fastcore (from imod==0.17.1)
+[16:33:43] :	 [Step 1/2]   Using cached fastcore-1.6.3-py3-none-any.whl.metadata (3.4 kB)
+[16:33:43] :	 [Step 1/2] Collecting jinja2 (from imod==0.17.1)
+[16:33:43] :	 [Step 1/2]   Using cached jinja2-3.1.4-py3-none-any.whl.metadata (2.6 kB)
+[16:33:43] :	 [Step 1/2] Collecting loguru (from imod==0.17.1)
+[16:33:43] :	 [Step 1/2]   Using cached loguru-0.7.2-py3-none-any.whl.metadata (23 kB)
+[16:33:43] :	 [Step 1/2] Collecting matplotlib (from imod==0.17.1)
+[16:33:43] :	 [Step 1/2]   Using cached matplotlib-3.9.1.post1-cp310-cp310-win_amd64.whl.metadata (11 kB)
+[16:33:43] :	 [Step 1/2] Collecting numba (from imod==0.17.1)
+[16:33:43] :	 [Step 1/2]   Using cached numba-0.60.0-cp310-cp310-win_amd64.whl.metadata (2.8 kB)
+[16:33:43] :	 [Step 1/2] Collecting numpy (from imod==0.17.1)
+[16:33:43] :	 [Step 1/2]   Using cached numpy-2.0.1-cp310-cp310-win_amd64.whl.metadata (60 kB)
+[16:33:44] :	 [Step 1/2] Collecting pandas (from imod==0.17.1)
+[16:33:44] :	 [Step 1/2]   Using cached pandas-2.2.2-cp310-cp310-win_amd64.whl.metadata (19 kB)
+[16:33:44] :	 [Step 1/2] Collecting pooch (from imod==0.17.1)
+[16:33:44] :	 [Step 1/2]   Using cached pooch-1.8.2-py3-none-any.whl.metadata (10 kB)
+[16:33:44] :	 [Step 1/2] Collecting pydantic (from imod==0.17.1)
+[16:33:44] :	 [Step 1/2]   Using cached pydantic-2.8.2-py3-none-any.whl.metadata (125 kB)
+[16:33:44] :	 [Step 1/2] Collecting scipy (from imod==0.17.1)
+[16:33:44] :	 [Step 1/2]   Using cached scipy-1.14.0-cp310-cp310-win_amd64.whl.metadata (60 kB)
+[16:33:44] :	 [Step 1/2] Collecting tomli-w (from imod==0.17.1)
+[16:33:44] :	 [Step 1/2]   Using cached tomli_w-1.0.0-py3-none-any.whl.metadata (4.9 kB)
+[16:33:44] :	 [Step 1/2] Collecting tomli>=1.1.0 (from imod==0.17.1)
+[16:33:44] :	 [Step 1/2]   Using cached tomli-2.0.1-py3-none-any.whl.metadata (8.9 kB)
+[16:33:44] :	 [Step 1/2] Collecting toolz (from imod==0.17.1)
+[16:33:44] :	 [Step 1/2]   Using cached toolz-0.12.1-py3-none-any.whl.metadata (5.1 kB)
+[16:33:44] :	 [Step 1/2] Collecting tqdm (from imod==0.17.1)
+[16:33:44] :	 [Step 1/2]   Using cached tqdm-4.66.5-py3-none-any.whl.metadata (57 kB)
+[16:33:44] :	 [Step 1/2] Collecting xarray>=2023.08.0 (from imod==0.17.1)
+[16:33:44] :	 [Step 1/2]   Using cached xarray-2024.7.0-py3-none-any.whl.metadata (11 kB)
+[16:33:44] :	 [Step 1/2] Collecting xugrid>=0.9.0 (from imod==0.17.1)
+[16:33:44] :	 [Step 1/2]   Using cached xugrid-0.11.0-py3-none-any.whl.metadata (3.6 kB)
+[16:33:44] :	 [Step 1/2] Collecting packaging>=23.1 (from xarray>=2023.08.0->imod==0.17.1)
+[16:33:44] :	 [Step 1/2]   Using cached packaging-24.1-py3-none-any.whl.metadata (3.2 kB)
+[16:33:45] :	 [Step 1/2] Collecting python-dateutil>=2.8.2 (from pandas->imod==0.17.1)
+[16:33:45] :	 [Step 1/2]   Using cached python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+[16:33:45] :	 [Step 1/2] Collecting pytz>=2020.1 (from pandas->imod==0.17.1)
+[16:33:45] :	 [Step 1/2]   Using cached pytz-2024.1-py2.py3-none-any.whl.metadata (22 kB)
+[16:33:45] :	 [Step 1/2] Collecting tzdata>=2022.7 (from pandas->imod==0.17.1)
+[16:33:45] :	 [Step 1/2]   Using cached tzdata-2024.1-py2.py3-none-any.whl.metadata (1.4 kB)
+[16:33:45] :	 [Step 1/2] Collecting numba-celltree (from xugrid>=0.9.0->imod==0.17.1)
+[16:33:45] :	 [Step 1/2]   Using cached numba_celltree-0.1.8-py3-none-any.whl.metadata (7.0 kB)
+[16:33:45] :	 [Step 1/2] Collecting click>=8.1 (from dask->imod==0.17.1)
+[16:33:45] :	 [Step 1/2]   Using cached click-8.1.7-py3-none-any.whl.metadata (3.0 kB)
+[16:33:45] :	 [Step 1/2] Collecting cloudpickle>=1.5.0 (from dask->imod==0.17.1)
+[16:33:45] :	 [Step 1/2]   Using cached cloudpickle-3.0.0-py3-none-any.whl.metadata (7.0 kB)
+[16:33:45] :	 [Step 1/2] Collecting fsspec>=2021.09.0 (from dask->imod==0.17.1)
+[16:33:45] :	 [Step 1/2]   Using cached fsspec-2024.6.1-py3-none-any.whl.metadata (11 kB)
+[16:33:45] :	 [Step 1/2] Collecting partd>=1.4.0 (from dask->imod==0.17.1)
+[16:33:45] :	 [Step 1/2]   Using cached partd-1.4.2-py3-none-any.whl.metadata (4.6 kB)
+[16:33:45] :	 [Step 1/2] Collecting pyyaml>=5.3.1 (from dask->imod==0.17.1)
+[16:33:45] :	 [Step 1/2]   Using cached PyYAML-6.0.2-cp310-cp310-win_amd64.whl.metadata (2.1 kB)
+[16:33:45] :	 [Step 1/2] Collecting importlib-metadata>=4.13.0 (from dask->imod==0.17.1)
+[16:33:45] :	 [Step 1/2]   Using cached importlib_metadata-8.2.0-py3-none-any.whl.metadata (4.7 kB)
+[16:33:45] :	 [Step 1/2] Collecting MarkupSafe>=2.0 (from jinja2->imod==0.17.1)
+[16:33:45] :	 [Step 1/2]   Using cached MarkupSafe-2.1.5-cp310-cp310-win_amd64.whl.metadata (3.1 kB)
+[16:33:45] :	 [Step 1/2] Collecting colorama>=0.3.4 (from loguru->imod==0.17.1)
+[16:33:45] :	 [Step 1/2]   Using cached colorama-0.4.6-py2.py3-none-any.whl.metadata (17 kB)
+[16:33:45] :	 [Step 1/2] Collecting win32-setctime>=1.0.0 (from loguru->imod==0.17.1)
+[16:33:45] :	 [Step 1/2]   Using cached win32_setctime-1.1.0-py3-none-any.whl.metadata (2.3 kB)
+[16:33:45] :	 [Step 1/2] Collecting contourpy>=1.0.1 (from matplotlib->imod==0.17.1)
+[16:33:45] :	 [Step 1/2]   Using cached contourpy-1.2.1-cp310-cp310-win_amd64.whl.metadata (5.8 kB)
+[16:33:45] :	 [Step 1/2] Collecting cycler>=0.10 (from matplotlib->imod==0.17.1)
+[16:33:45] :	 [Step 1/2]   Using cached cycler-0.12.1-py3-none-any.whl.metadata (3.8 kB)
+[16:33:46] :	 [Step 1/2] Collecting fonttools>=4.22.0 (from matplotlib->imod==0.17.1)
+[16:33:46] :	 [Step 1/2]   Using cached fonttools-4.53.1-cp310-cp310-win_amd64.whl.metadata (165 kB)
+[16:33:46] :	 [Step 1/2] Collecting kiwisolver>=1.3.1 (from matplotlib->imod==0.17.1)
+[16:33:46] :	 [Step 1/2]   Using cached kiwisolver-1.4.5-cp310-cp310-win_amd64.whl.metadata (6.5 kB)
+[16:33:46] :	 [Step 1/2] Collecting pillow>=8 (from matplotlib->imod==0.17.1)
+[16:33:46] :	 [Step 1/2]   Using cached pillow-10.4.0-cp310-cp310-win_amd64.whl.metadata (9.3 kB)
+[16:33:46] :	 [Step 1/2] Collecting pyparsing>=2.3.1 (from matplotlib->imod==0.17.1)
+[16:33:46] :	 [Step 1/2]   Using cached pyparsing-3.1.2-py3-none-any.whl.metadata (5.1 kB)
+[16:33:46] :	 [Step 1/2] Collecting llvmlite<0.44,>=0.43.0dev0 (from numba->imod==0.17.1)
+[16:33:46] :	 [Step 1/2]   Using cached llvmlite-0.43.0-cp310-cp310-win_amd64.whl.metadata (4.9 kB)
+[16:33:46] :	 [Step 1/2] Collecting platformdirs>=2.5.0 (from pooch->imod==0.17.1)
+[16:33:46] :	 [Step 1/2]   Using cached platformdirs-4.2.2-py3-none-any.whl.metadata (11 kB)
+[16:33:46] :	 [Step 1/2] Collecting requests>=2.19.0 (from pooch->imod==0.17.1)
+[16:33:46] :	 [Step 1/2]   Using cached requests-2.32.3-py3-none-any.whl.metadata (4.6 kB)
+[16:33:46] :	 [Step 1/2] Collecting annotated-types>=0.4.0 (from pydantic->imod==0.17.1)
+[16:33:46] :	 [Step 1/2]   Using cached annotated_types-0.7.0-py3-none-any.whl.metadata (15 kB)
+[16:33:47] :	 [Step 1/2] Collecting pydantic-core==2.20.1 (from pydantic->imod==0.17.1)
+[16:33:47] :	 [Step 1/2]   Using cached pydantic_core-2.20.1-cp310-none-win_amd64.whl.metadata (6.7 kB)
+[16:33:47] :	 [Step 1/2] Collecting typing-extensions>=4.6.1 (from pydantic->imod==0.17.1)
+[16:33:47] :	 [Step 1/2]   Using cached typing_extensions-4.12.2-py3-none-any.whl.metadata (3.0 kB)
+[16:33:48] :	 [Step 1/2] Collecting zipp>=0.5 (from importlib-metadata>=4.13.0->dask->imod==0.17.1)
+[16:33:48] :	 [Step 1/2]   Using cached zipp-3.19.2-py3-none-any.whl.metadata (3.6 kB)
+[16:33:48] :	 [Step 1/2] Collecting locket (from partd>=1.4.0->dask->imod==0.17.1)
+[16:33:48] :	 [Step 1/2]   Using cached locket-1.0.0-py2.py3-none-any.whl.metadata (2.8 kB)
+[16:33:48] :	 [Step 1/2] Collecting six>=1.5 (from python-dateutil>=2.8.2->pandas->imod==0.17.1)
+[16:33:48] :	 [Step 1/2]   Using cached six-1.16.0-py2.py3-none-any.whl.metadata (1.8 kB)
+[16:33:48] :	 [Step 1/2] Collecting charset-normalizer<4,>=2 (from requests>=2.19.0->pooch->imod==0.17.1)
+[16:33:48] :	 [Step 1/2]   Using cached charset_normalizer-3.3.2-cp310-cp310-win_amd64.whl.metadata (34 kB)
+[16:33:48] :	 [Step 1/2] Collecting idna<4,>=2.5 (from requests>=2.19.0->pooch->imod==0.17.1)
+[16:33:48] :	 [Step 1/2]   Using cached idna-3.7-py3-none-any.whl.metadata (9.9 kB)
+[16:33:48] :	 [Step 1/2] Collecting urllib3<3,>=1.21.1 (from requests>=2.19.0->pooch->imod==0.17.1)
+[16:33:48] :	 [Step 1/2]   Using cached urllib3-2.2.2-py3-none-any.whl.metadata (6.4 kB)
+[16:33:48] :	 [Step 1/2] Collecting certifi>=2017.4.17 (from requests>=2.19.0->pooch->imod==0.17.1)
+[16:33:48] :	 [Step 1/2]   Using cached certifi-2024.7.4-py3-none-any.whl.metadata (2.2 kB)
+[16:33:49] :	 [Step 1/2] Using cached cftime-1.6.4-cp310-cp310-win_amd64.whl (189 kB)
+[16:33:49] :	 [Step 1/2] Using cached numpy-2.0.1-cp310-cp310-win_amd64.whl (16.6 MB)
+[16:33:49] :	 [Step 1/2] Using cached tomli-2.0.1-py3-none-any.whl (12 kB)
+[16:33:49] :	 [Step 1/2] Using cached xarray-2024.7.0-py3-none-any.whl (1.2 MB)
+[16:33:49] :	 [Step 1/2] Using cached pandas-2.2.2-cp310-cp310-win_amd64.whl (11.6 MB)
+[16:33:49] :	 [Step 1/2] Using cached xugrid-0.11.0-py3-none-any.whl (124 kB)
+[16:33:49] :	 [Step 1/2] Using cached affine-2.4.0-py3-none-any.whl (15 kB)
+[16:33:49] :	 [Step 1/2] Using cached dask-2024.8.0-py3-none-any.whl (1.2 MB)
+[16:33:49] :	 [Step 1/2] Using cached toolz-0.12.1-py3-none-any.whl (56 kB)
+[16:33:49] :	 [Step 1/2] Using cached fastcore-1.6.3-py3-none-any.whl (76 kB)
+[16:33:49] :	 [Step 1/2] Using cached jinja2-3.1.4-py3-none-any.whl (133 kB)
+[16:33:49] :	 [Step 1/2] Using cached loguru-0.7.2-py3-none-any.whl (62 kB)
+[16:33:49] :	 [Step 1/2] Using cached matplotlib-3.9.1.post1-cp310-cp310-win_amd64.whl (8.0 MB)
+[16:33:49] :	 [Step 1/2] Using cached numba-0.60.0-cp310-cp310-win_amd64.whl (2.7 MB)
+[16:33:49] :	 [Step 1/2] Using cached pooch-1.8.2-py3-none-any.whl (64 kB)
+[16:33:49] :	 [Step 1/2] Using cached pydantic-2.8.2-py3-none-any.whl (423 kB)
+[16:33:49] :	 [Step 1/2] Using cached pydantic_core-2.20.1-cp310-none-win_amd64.whl (1.9 MB)
+[16:33:49] :	 [Step 1/2] Using cached scipy-1.14.0-cp310-cp310-win_amd64.whl (44.8 MB)
+[16:33:49] :	 [Step 1/2] Using cached tomli_w-1.0.0-py3-none-any.whl (6.0 kB)
+[16:33:49] :	 [Step 1/2] Using cached tqdm-4.66.5-py3-none-any.whl (78 kB)
+[16:33:49] :	 [Step 1/2] Using cached annotated_types-0.7.0-py3-none-any.whl (13 kB)
+[16:33:49] :	 [Step 1/2] Using cached click-8.1.7-py3-none-any.whl (97 kB)
+[16:33:49] :	 [Step 1/2] Using cached cloudpickle-3.0.0-py3-none-any.whl (20 kB)
+[16:33:49] :	 [Step 1/2] Using cached colorama-0.4.6-py2.py3-none-any.whl (25 kB)
+[16:33:49] :	 [Step 1/2] Using cached contourpy-1.2.1-cp310-cp310-win_amd64.whl (187 kB)
+[16:33:49] :	 [Step 1/2] Using cached cycler-0.12.1-py3-none-any.whl (8.3 kB)
+[16:33:49] :	 [Step 1/2] Using cached fonttools-4.53.1-cp310-cp310-win_amd64.whl (2.2 MB)
+[16:33:49] :	 [Step 1/2] Using cached fsspec-2024.6.1-py3-none-any.whl (177 kB)
+[16:33:49] :	 [Step 1/2] Using cached importlib_metadata-8.2.0-py3-none-any.whl (25 kB)
+[16:33:49] :	 [Step 1/2] Using cached kiwisolver-1.4.5-cp310-cp310-win_amd64.whl (56 kB)
+[16:33:49] :	 [Step 1/2] Using cached llvmlite-0.43.0-cp310-cp310-win_amd64.whl (28.1 MB)
+[16:33:49] :	 [Step 1/2] Using cached MarkupSafe-2.1.5-cp310-cp310-win_amd64.whl (17 kB)
+[16:33:49] :	 [Step 1/2] Using cached packaging-24.1-py3-none-any.whl (53 kB)
+[16:33:49] :	 [Step 1/2] Using cached partd-1.4.2-py3-none-any.whl (18 kB)
+[16:33:49] :	 [Step 1/2] Using cached pillow-10.4.0-cp310-cp310-win_amd64.whl (2.6 MB)
+[16:33:49] :	 [Step 1/2] Using cached platformdirs-4.2.2-py3-none-any.whl (18 kB)
+[16:33:49] :	 [Step 1/2] Using cached pyparsing-3.1.2-py3-none-any.whl (103 kB)
+[16:33:49] :	 [Step 1/2] Using cached python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+[16:33:49] :	 [Step 1/2] Using cached pytz-2024.1-py2.py3-none-any.whl (505 kB)
+[16:33:49] :	 [Step 1/2] Using cached PyYAML-6.0.2-cp310-cp310-win_amd64.whl (161 kB)
+[16:33:49] :	 [Step 1/2] Using cached requests-2.32.3-py3-none-any.whl (64 kB)
+[16:33:49] :	 [Step 1/2] Using cached typing_extensions-4.12.2-py3-none-any.whl (37 kB)
+[16:33:49] :	 [Step 1/2] Using cached tzdata-2024.1-py2.py3-none-any.whl (345 kB)
+[16:33:49] :	 [Step 1/2] Using cached win32_setctime-1.1.0-py3-none-any.whl (3.6 kB)
+[16:33:49] :	 [Step 1/2] Using cached numba_celltree-0.1.8-py3-none-any.whl (34 kB)
+[16:33:49] :	 [Step 1/2] Using cached certifi-2024.7.4-py3-none-any.whl (162 kB)
+[16:33:49] :	 [Step 1/2] Using cached charset_normalizer-3.3.2-cp310-cp310-win_amd64.whl (100 kB)
+[16:33:49] :	 [Step 1/2] Using cached idna-3.7-py3-none-any.whl (66 kB)
+[16:33:49] :	 [Step 1/2] Using cached six-1.16.0-py2.py3-none-any.whl (11 kB)
+[16:33:49] :	 [Step 1/2] Using cached urllib3-2.2.2-py3-none-any.whl (121 kB)
+[16:33:49] :	 [Step 1/2] Using cached zipp-3.19.2-py3-none-any.whl (9.0 kB)
+[16:33:49] :	 [Step 1/2] Using cached locket-1.0.0-py2.py3-none-any.whl (4.4 kB)
+[16:33:50] :	 [Step 1/2] Building wheels for collected packages: imod
+[16:33:50] :	 [Step 1/2]   Building editable for imod (pyproject.toml): started
+[16:33:50] :	 [Step 1/2]   Building editable for imod (pyproject.toml): finished with status 'done'
+[16:33:50] :	 [Step 1/2]   Created wheel for imod: filename=imod-0.17.1-py3-none-any.whl size=4187 sha256=f91378c5c52dbfdb1388463d1cc322362ae0492fadbeed59b65924a5a329b677
+[16:33:50] :	 [Step 1/2]   Stored in directory: D:\buildAgent\temp\buildTmp\pip-ephem-wheel-cache-lql6tagi\wheels\bc\0e\c0\adcec2e358f7bf6a8c8c9e4f2a502ad352f3bb323858be4b38
+[16:33:50] :	 [Step 1/2] Successfully built imod
+[16:33:50] :	 [Step 1/2] Installing collected packages: pytz, zipp, win32-setctime, urllib3, tzdata, typing-extensions, toolz, tomli-w, tomli, six, pyyaml, pyparsing, platformdirs, pillow, packaging, numpy, MarkupSafe, locket, llvmlite, kiwisolver, idna, fsspec, fonttools, cycler, colorama, cloudpickle, charset-normalizer, certifi, annotated-types, affine, tqdm, scipy, requests, python-dateutil, pydantic-core, partd, numba, loguru, jinja2, importlib-metadata, fastcore, contourpy, click, cftime, pydantic, pooch, pandas, numba-celltree, matplotlib, dask, xarray, xugrid, imod
+[16:34:23] :	 [Step 1/2] Successfully installed MarkupSafe-2.1.5 affine-2.4.0 annotated-types-0.7.0 certifi-2024.7.4 cftime-1.6.4 charset-normalizer-3.3.2 click-8.1.7 cloudpickle-3.0.0 colorama-0.4.6 contourpy-1.2.1 cycler-0.12.1 dask-2024.8.0 fastcore-1.6.3 fonttools-4.53.1 fsspec-2024.6.1 idna-3.7 imod-0.17.1 importlib-metadata-8.2.0 jinja2-3.1.4 kiwisolver-1.4.5 llvmlite-0.43.0 locket-1.0.0 loguru-0.7.2 matplotlib-3.9.1.post1 numba-0.60.0 numba-celltree-0.1.8 numpy-2.0.1 packaging-24.1 pandas-2.2.2 partd-1.4.2 pillow-10.4.0 platformdirs-4.2.2 pooch-1.8.2 pydantic-2.8.2 pydantic-core-2.20.1 pyparsing-3.1.2 python-dateutil-2.9.0.post0 pytz-2024.1 pyyaml-6.0.2 requests-2.32.3 scipy-1.14.0 six-1.16.0 tomli-2.0.1 tomli-w-1.0.0 toolz-0.12.1 tqdm-4.66.5 typing-extensions-4.12.2 tzdata-2024.1 urllib3-2.2.2 win32-setctime-1.1.0 xarray-2024.7.0 xugrid-0.11.0 zipp-3.19.2
+[16:34:24]E:	 [Step 1/2] 
+[16:34:24]E:	 [Step 1/2] Pixi task (test_import in py310): python -c "import imod"
+[16:34:27]E:	 [Step 1/2] Traceback (most recent call last):
+[16:34:27]E:	 [Step 1/2]   File "<string>", line 1, in <module>
+[16:34:27]E:	 [Step 1/2]   File "D:\buildAgent\work\dbbb0459d1bf1711\imod-python\imod\__init__.py", line 2, in <module>
+[16:34:27]E:	 [Step 1/2]     from imod import (
+[16:34:27]E:	 [Step 1/2]   File "D:\buildAgent\work\dbbb0459d1bf1711\imod-python\imod\wq\__init__.py", line 31, in <module>
+[16:34:27]E:	 [Step 1/2]     from imod.wq.model import SeawatModel
+[16:34:27]E:	 [Step 1/2]   File "D:\buildAgent\work\dbbb0459d1bf1711\imod-python\imod\wq\model.py", line 28
+[16:34:27]E:	 [Step 1/2]     class Model(collections.UserDict):
+[16:34:27]E:	 [Step 1/2]     ^^^^^
+[16:34:27]E:	 [Step 1/2] SyntaxError: invalid syntax
+[16:34:27]W:	 [Step 1/2] Process exited with code 1
+[16:34:27]E:	 [Step 1/2] Process exited with code 1 (Step: Pip install python (Command Line))
+Current time: 16:34:27
