@@ -3,7 +3,8 @@ from __future__ import annotations
 import abc
 import pathlib
 from collections import defaultdict
-from typing import Any, Mapping, Optional, Tuple, Union
+from copy import deepcopy
+from typing import Any, Dict, List, Mapping, Optional, Tuple, Union
 
 import cftime
 import jinja2
@@ -22,9 +23,9 @@ from imod.mf6.pkgbase import (
     TRANSPORT_PACKAGES,
     PackageBase,
 )
-from imod.mf6.utilities.mask import _mask
+from imod.mf6.regrid.regrid_schemes import EmptyRegridMethod, RegridMethodType
+from imod.mf6.utilities.mask import mask_package
 from imod.mf6.utilities.regrid import (
-    RegridderType,
     RegridderWeightsCache,
     _regrid_like,
 )
@@ -57,6 +58,8 @@ class Package(PackageBase, IPackage, abc.ABC):
     _init_schemata: dict[str, list[SchemaType] | Tuple[SchemaType, ...]] = {}
     _write_schemata: dict[str, list[SchemaType] | Tuple[SchemaType, ...]] = {}
     _keyword_map: dict[str, str] = {}
+    _regrid_method: RegridMethodType = EmptyRegridMethod()
+    _template: jinja2.Template
 
     def __init__(self, allargs: Mapping[str, GridDataArray | float | int | bool | str]):
         super().__init__(allargs)
@@ -66,7 +69,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             "Selection on packages not yet supported. To make a selection on "
             f"the xr.Dataset, call {self._pkg_id}.dataset.isel instead."
             "You can create a new package with a selection by calling "
-            f"{__class__.__name__}(**{self._pkg_id}.dataset.isel(**selection))"
+            f"{type(self).__name__}(**{self._pkg_id}.dataset.isel(**selection))"
         )
 
     def sel(self):
@@ -74,7 +77,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             "Selection on packages not yet supported. To make a selection on "
             f"the xr.Dataset, call {self._pkg_id}.dataset.sel instead. "
             "You can create a new package with a selection by calling "
-            f"{__class__.__name__}(**{self._pkg_id}.dataset.sel(**selection))"
+            f"{type(self).__name__}(**{self._pkg_id}.dataset.sel(**selection))"
         )
 
     def _valid(self, value):
@@ -162,7 +165,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         #    nlayer = 1
 
         # This is a work around for the abovementioned issue.
-        nval = np.product(da.shape)
+        nval = np.prod(da.shape)
         header = np.zeros(13, np.int32)
         header[-3] = np.int32(nval)  # ncol
         header[-2] = np.int32(1)  # nrow
@@ -192,8 +195,8 @@ class Package(PackageBase, IPackage, abc.ABC):
         pkgname: str,
         globaltimes: Union[list[np.datetime64], np.ndarray],
         binary: bool,
-    ) -> dict[str, Any]:
-        d = {}
+    ) -> Dict[str, Any]:
+        d: Dict[str, Any] = {}
         if directory is None:
             pkg_directory = pkgname
         else:
@@ -207,7 +210,8 @@ class Package(PackageBase, IPackage, abc.ABC):
                     self.dataset[varname], pkg_directory, key, binary=binary
                 )
                 if self._valid(value):  # skip False or None
-                    d[f"{key}_layered"], d[key] = layered, value
+                    d[f"{key}_layered"] = layered
+                    d[key] = value
             else:
                 value = self[varname].values[()]
                 if self._valid(value):  # skip False or None
@@ -234,7 +238,9 @@ class Package(PackageBase, IPackage, abc.ABC):
             )
         return xy
 
-    def _compose_values(self, da, directory, name, binary):
+    def _compose_values(
+        self, da, directory, name, binary
+    ) -> Tuple[bool, Optional[List[str]]]:
         """
         Compose values of dictionary.
 
@@ -262,7 +268,7 @@ class Package(PackageBase, IPackage, abc.ABC):
                 if self._valid(value):  # skip None or False
                     values.append(f"constant {value}")
                 else:
-                    values = None
+                    return layered, None
 
         return layered, values
 
@@ -549,41 +555,44 @@ class Package(PackageBase, IPackage, abc.ABC):
             The package with part masked.
         """
 
-        return _mask(self, mask)
+        return mask_package(self, mask)
 
     def regrid_like(
         self,
         target_grid: GridDataArray,
         regrid_context: RegridderWeightsCache,
-        regridder_types: Optional[dict[str, Tuple[RegridderType, str]]] = None,
+        regridder_types: Optional[RegridMethodType] = None,
     ) -> "Package":
         """
-        Creates a package of the same type as this package, based on another discretization.
-        It regrids all the arrays in this package to the desired discretization, and leaves the options
-        unmodified. At the moment only regridding to a different planar grid is supported, meaning
-        ``target_grid`` has different ``"x"`` and ``"y"`` or different ``cell2d`` coords.
+        Creates a package of the same type as this package, based on another
+        discretization. It regrids all the arrays in this package to the desired
+        discretization, and leaves the options unmodified. At the moment only
+        regridding to a different planar grid is supported, meaning
+        ``target_grid`` has different ``"x"`` and ``"y"`` or different
+        ``cell2d`` coords.
 
-        The regridding methods can be specified in the _regrid_method attribute of the package. These are the defaults
-        that specify how each array should be regridded. These defaults can be overridden using the input
-        parameters of this function.
+        The default regridding methods are specified in the ``_regrid_method``
+        attribute of the package. These defaults can be overridden using the
+        input parameters of this function.
 
         Examples
         --------
         To regrid the npf package with a non-default method for the k-field, call regrid_like with these arguments:
 
-        >>> new_npf = npf.regrid_like(like, {"k": (imod.RegridderType.OVERLAP, "mean")})
+        >>> regridder_types = imod.mf6.regrid.NodePropertyFlowRegridMethod(k=(imod.RegridderType.OVERLAP, "mean"))
+        >>> new_npf = npf.regrid_like(like,  RegridderWeightsCache, regridder_types)
 
 
         Parameters
         ----------
         target_grid: xr.DataArray or xu.UgridDataArray
-            a grid defined over the same discretization as the one we want to regrid the package to
-        regridder_types: dict(str->(regridder type,str))
-           dictionary mapping arraynames (str) to a tuple of regrid type (a specialization class of BaseRegridder) and function name (str)
-            this dictionary can be used to override the default mapping method.
-        regrid_context: Optional RegridderWeightsCache
+            a grid defined over the same discretization as the one we want to regrid the package to.
+        regrid_context: RegridderWeightsCache, optional
             stores regridder weights for different regridders. Can be used to speed up regridding,
             if the same regridders are used several times for regridding different arrays.
+        regridder_types: RegridMethodType, optional
+            dictionary mapping arraynames (str) to a tuple of regrid type (a specialization class of BaseRegridder) and function name (str)
+            this dictionary can be used to override the default mapping method.
 
         Returns
         -------
@@ -597,11 +606,6 @@ class Package(PackageBase, IPackage, abc.ABC):
         except Exception:
             raise ValueError("package could not be regridded.")
         return result
-
-    def _skip_masking_dataarray(self, array_name: str) -> bool:
-        if hasattr(self, "_skip_mask_arrays"):
-            return array_name in self._skip_mask_arrays
-        return False
 
     @classmethod
     def is_grid_agnostic_package(cls) -> bool:
@@ -651,3 +655,6 @@ class Package(PackageBase, IPackage, abc.ABC):
 
     def is_clipping_supported(self) -> bool:
         return True
+
+    def get_regrid_methods(self) -> RegridMethodType:
+        return deepcopy(self._regrid_method)

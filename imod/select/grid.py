@@ -15,7 +15,7 @@ def _reduce_grid_except_dims(
     grid: GridDataArray, preserve_dims: List[str]
 ) -> GridDataArray:
     to_reduce = {dim: 0 for dim in grid.dims if dim not in preserve_dims}
-    return grid.isel(**to_reduce)
+    return grid.isel(**to_reduce)  # type: ignore [misc, arg-type]
 
 
 def _validate_grid(grid):
@@ -51,7 +51,7 @@ def _grid_boundary_xy(grid: object) -> None:
     )
 
 
-@typedispatch
+@typedispatch  # type: ignore [no-redef]
 def _grid_boundary_xy(grid: xr.DataArray) -> xr.DataArray:
     _validate_grid(grid)
     like_2d = _reduce_grid_except_dims(grid, ["x", "y"])
@@ -60,7 +60,7 @@ def _grid_boundary_xy(grid: xr.DataArray) -> xr.DataArray:
     return boundary_grid
 
 
-@typedispatch
+@typedispatch  # type: ignore [no-redef]
 def _grid_boundary_xy(grid: xu.UgridDataArray) -> xu.UgridDataArray:
     _validate_grid(grid)
     like_2d = _reduce_grid_except_dims(grid, [grid.grid.face_dimension])

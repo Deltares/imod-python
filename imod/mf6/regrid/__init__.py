@@ -1,0 +1,16 @@
+from imod.mf6.regrid.regrid_schemes import (
+    ConstantHeadRegridMethod,
+    DiscretizationRegridMethod,
+    DispersionRegridMethod,
+    DrainageRegridMethod,
+    EmptyRegridMethod,
+    EvapotranspirationRegridMethod,
+    GeneralHeadBoundaryRegridMethod,
+    InitialConditionsRegridMethod,
+    MobileStorageTransferRegridMethod,
+    NodePropertyFlowRegridMethod,
+    RechargeRegridMethod,
+    RiverRegridMethod,
+    SpecificStorageRegridMethod,
+    StorageCoefficientRegridMethod,
+)

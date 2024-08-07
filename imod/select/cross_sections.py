@@ -232,14 +232,14 @@ def _draw_line(xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax):
 
     # Because of numerical precision, extremely small segments might be
     # included. Those are filtered out here.
-    ixs = np.array(ixs)
-    iys = np.array(iys)
-    dxs = np.array(dxs)
-    dys = np.array(dys)
-    segment_length = np.array(segment_length)
-    use = np.abs(segment_length) > 1.0e-6
+    ixs_a = np.array(ixs)
+    iys_a = np.array(iys)
+    dxs_a = np.array(dxs)
+    dys_a = np.array(dys)
+    segment_length_a = np.array(segment_length)
+    use = np.abs(segment_length_a) > 1.0e-6
 
-    return ixs[use], iys[use], segment_length[use], dxs[use], dys[use]
+    return ixs_a[use], iys_a[use], segment_length_a[use], dxs_a[use], dys_a[use]
 
 
 def _bounding_box(xmin, xmax, ymin, ymax):
@@ -253,9 +253,9 @@ def _bounding_box(xmin, xmax, ymin, ymax):
 def _cross_section(data, linecoords):
     dx, xmin, xmax, dy, ymin, ymax = imod.util.spatial.spatial_reference(data)
     if isinstance(dx, float):
-        dx = np.full(data.x.size, dx)
+        dx_a = np.full(data.x.size, dx)
     if isinstance(dy, float):
-        dy = np.full(data.y.size, dy)
+        dy_a = np.full(data.y.size, dy)
     x_decreasing = data.indexes["x"].is_monotonic_decreasing
     y_decreasing = data.indexes["y"].is_monotonic_decreasing
 
@@ -266,19 +266,19 @@ def _cross_section(data, linecoords):
     xs = np.full(ncol + 1, xmin)
     # Always increasing
     if x_decreasing:
-        xs[1:] += np.abs(dx[::-1]).cumsum()
+        xs[1:] += np.abs(dx_a[::-1]).cumsum()
     else:
-        xs[1:] += np.abs(dx).cumsum()
+        xs[1:] += np.abs(dx_a).cumsum()
     if y_decreasing:
-        ys[1:] += np.abs(dy[::-1]).cumsum()
+        ys[1:] += np.abs(dy_a[::-1]).cumsum()
     else:
-        ys[1:] += np.abs(dy).cumsum()
+        ys[1:] += np.abs(dy_a).cumsum()
 
     ixs = []
     iys = []
     sdxs = []
     sdys = []
-    segments = []
+    segments_list = []
 
     bounding_box = _bounding_box(xmin, xmax, ymin, ymax)
     for start, end in zip(linecoords[:-1], linecoords[1:]):
@@ -302,7 +302,7 @@ def _cross_section(data, linecoords):
         iys.append(j)
         sdxs.append(sdx)
         sdys.append(sdy)
-        segments.append(segment_length)
+        segments_list.append(segment_length)
 
     if len(ixs) == 0:
         raise ValueError("Linestring does not intersect data")
@@ -312,7 +312,7 @@ def _cross_section(data, linecoords):
     iys = np.concatenate(iys)
     sdxs = np.concatenate(sdxs)
     sdys = np.concatenate(sdys)
-    segments = np.concatenate(segments)
+    segments = np.concatenate(segments_list)
 
     # Flip around indexes
     if x_decreasing:

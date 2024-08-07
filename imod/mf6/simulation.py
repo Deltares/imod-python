@@ -25,6 +25,7 @@ from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwfgwt import GWFGWT
 from imod.mf6.gwtgwt import GWTGWT
 from imod.mf6.ims import Solution
+from imod.mf6.interfaces.imodel import IModel
 from imod.mf6.interfaces.isimulation import ISimulation
 from imod.mf6.model import Modflow6Model
 from imod.mf6.model_gwf import GroundwaterFlowModel
@@ -156,11 +157,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         >>> simulation["time_discretization"]["n_timesteps"] = 5
         """
         self.use_cftime = any(
-            [
-                model._use_cftime()
-                for model in self.values()
-                if isinstance(model, Modflow6Model)
-            ]
+            model._use_cftime()
+            for model in self.values()
+            if isinstance(model, Modflow6Model)
         )
 
         times = [
@@ -174,7 +173,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         # np.unique also sorts
         times = np.unique(np.hstack(times))
 
-        duration = imod.util.time.timestep_duration(times, self.use_cftime)
+        duration = imod.util.time.timestep_duration(times, self.use_cftime)  # type: ignore
         # Generate time discretization, just rely on default arguments
         # Probably won't be used that much anyway?
         timestep_duration = xr.DataArray(
@@ -194,7 +193,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 model_name_file = pathlib.Path(
                     write_context.root_directory / pathlib.Path(f"{key}", f"{key}.nam")
                 ).as_posix()
-                models.append((value.model_id(), model_name_file, key))
+                models.append((value.model_id, model_name_file, key))
             elif isinstance(value, Package):
                 if value._pkg_id == "tdis":
                     d["tdis6"] = f"{key}.tdis"
@@ -577,7 +576,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             )
 
         if output in ["head", "budget-flow"]:
-            return self._open_single_output(modelnames, output, **settings)
+            return self._open_single_output(list(modelnames), output, **settings)
         elif output in ["concentration", "budget-transport"]:
             return self._concat_species(output, **settings)
         else:
@@ -632,7 +631,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         exchange_budgets = cbc[exchange_names].to_array().sum(dim="variable")
         cbc = cbc.drop_vars(exchange_names)
         # "gwf-gwf" or "gwt-gwt"
-        exchange_key = exchange_names[0].split("_")[0]
+        exchange_key = exchange_names[0].split("_")[1]
         cbc[exchange_key] = exchange_budgets
         return cbc
 
@@ -808,6 +807,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         flowmodel. In case of a transport model, it returns the path to the grb
         file its coupled flow model.
         """
+        if self.directory is None:
+            raise ValueError("Directory not set")
+
         model = self[modelname]
         # Get grb path
         if isinstance(model, GroundwaterTransportModel):
@@ -824,8 +826,33 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
     @standard_log_decorator()
     def dump(
-        self, directory=".", validate: bool = True, mdal_compliant: bool = False
+        self,
+        directory=".",
+        validate: bool = True,
+        mdal_compliant: bool = False,
+        crs=None,
     ) -> None:
+        """
+        Dump simulation to files. Writes a model definition as .TOML file, which
+        points to data for each package. Each package is stored as a separate
+        NetCDF. Structured grids are saved as regular NetCDFs, unstructured
+        grids are saved as UGRID NetCDF. Structured grids are always made GDAL
+        compliant, unstructured grids can be made MDAL compliant optionally.
+
+        Parameters
+        ----------
+        directory: str or Path, optional
+            directory to dump simulation into. Defaults to current working directory.
+        validate: bool, optional
+            Whether to validate simulation data. Defaults to True.
+        mdal_compliant: bool, optional
+            Convert data with
+            :func:`imod.prepare.spatial.mdal_compliant_ugrid2d` to MDAL
+            compliant unstructured grids. Defaults to False.
+        crs: Any, optional
+            Anything accepted by rasterio.crs.CRS.from_user_input
+            Requires ``rioxarray`` installed.
+        """
         directory = pathlib.Path(directory)
         directory.mkdir(parents=True, exist_ok=True)
 
@@ -833,7 +860,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         for key, value in self.items():
             cls_name = type(value).__name__
             if isinstance(value, Modflow6Model):
-                model_toml_path = value.dump(directory, key, validate, mdal_compliant)
+                model_toml_path = value.dump(
+                    directory, key, validate, mdal_compliant, crs
+                )
                 toml_content[cls_name][key] = model_toml_path.relative_to(
                     directory
                 ).as_posix()
@@ -877,7 +906,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         simulation = Modflow6Simulation(name=toml_path.stem)
         for key, entry in toml_content.items():
-            if not key in ["gwtgwf_exchanges", "split_exchanges"]:
+            if key not in ["gwtgwf_exchanges", "split_exchanges"]:
                 item_cls = classes[key]
                 for name, filename in entry.items():
                     path = toml_path.parent / filename
@@ -905,11 +934,11 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 result.append(exchange.get_specification())
         return result
 
-    def get_models_of_type(self, modeltype):
+    def get_models_of_type(self, model_id) -> dict[str, IModel]:
         return {
             k: v
             for k, v in self.items()
-            if isinstance(v, Modflow6Model) and (v.model_id() == modeltype)
+            if isinstance(v, Modflow6Model) and (v.model_id == model_id)
         }
 
     def get_models(self):

@@ -1,12 +1,13 @@
-from typing import Optional, Tuple
+from typing import List
 
 import numpy as np
 import pandas as pd
 
 from imod.logging import init_log_decorator
+from imod.mf6.interfaces.imaskingsettings import IMaskingSettings
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
-from imod.mf6.utilities.regrid import RegridderType
+from imod.mf6.regrid.regrid_schemes import DiscretizationRegridMethod
 from imod.mf6.validation import DisBottomSchema
 from imod.mf6.write_context import WriteContext
 from imod.schemata import (
@@ -19,7 +20,7 @@ from imod.schemata import (
 )
 
 
-class VerticesDiscretization(Package, IRegridPackage):
+class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
     """
     Discretization by Vertices (DISV).
 
@@ -66,14 +67,11 @@ class VerticesDiscretization(Package, IRegridPackage):
     _grid_data = {"top": np.float64, "bottom": np.float64, "idomain": np.int32}
     _keyword_map = {"bottom": "botm"}
     _template = Package._initialize_template(_pkg_id)
+    _regrid_method = DiscretizationRegridMethod()
 
-    _regrid_method = {
-        "top": (RegridderType.OVERLAP, "mean"),
-        "bottom": (RegridderType.OVERLAP, "mean"),
-        "idomain": (RegridderType.OVERLAP, "mode"),
-    }
-
-    _skip_mask_arrays = ["bottom"]
+    @property
+    def skip_variables(self) -> List[str]:
+        return ["bottom"]
 
     @init_log_decorator()
     def __init__(self, top, bottom, idomain, validate: bool = True):
@@ -156,6 +154,3 @@ class VerticesDiscretization(Package, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method

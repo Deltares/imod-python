@@ -1,12 +1,15 @@
 import abc
-from typing import Optional, Tuple
+from typing import Any, Dict
 
 import numpy as np
 
 from imod.logging import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
-from imod.mf6.utilities.regrid import RegridderType
+from imod.mf6.regrid.regrid_schemes import (
+    SpecificStorageRegridMethod,
+    StorageCoefficientRegridMethod,
+)
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
@@ -27,6 +30,8 @@ class Storage(Package):
 
 
 class StorageBase(Package, IRegridPackage, abc.ABC):
+    _grid_data: Dict[str, type] = {}
+
     def get_options(self, d):
         # Skip both variables in grid_data and "transient".
         not_options = list(self._grid_data.keys())
@@ -40,8 +45,8 @@ class StorageBase(Package, IRegridPackage, abc.ABC):
                 d[varname] = v
         return d
 
-    def _render_dict(self, directory, pkgname, globaltimes, binary):
-        d = {}
+    def _render_dict(self, directory, pkgname, globaltimes, binary) -> Dict[str, Any]:
+        d: Dict[str, Any] = {}
         stodirectory = directory / pkgname
         for varname in self._grid_data:
             key = self._keyword_map.get(varname, varname)
@@ -49,7 +54,8 @@ class StorageBase(Package, IRegridPackage, abc.ABC):
                 self[varname], stodirectory, key, binary=binary
             )
             if self._valid(value):  # skip False or None
-                d[f"{key}_layered"], d[key] = layered, value
+                d[f"{key}_layered"] = layered
+                d[key] = value
 
         periods = {}
         if "time" in self.dataset["transient"].coords:
@@ -158,13 +164,8 @@ class SpecificStorage(StorageBase):
         ),
     }
 
-    _regrid_method = {
-        "convertible": (RegridderType.OVERLAP, "mode"),
-        "specific_storage": (RegridderType.OVERLAP, "mean"),
-        "specific_yield": (RegridderType.OVERLAP, "mean"),
-    }
-
     _template = Package._initialize_template(_pkg_id)
+    _regrid_method = SpecificStorageRegridMethod()
 
     @init_log_decorator()
     def __init__(
@@ -189,9 +190,6 @@ class SpecificStorage(StorageBase):
     def render(self, directory, pkgname, globaltimes, binary):
         d = self._render_dict(directory, pkgname, globaltimes, binary)
         return self._template.render(d)
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method
 
 
 class StorageCoefficient(StorageBase):
@@ -296,13 +294,8 @@ class StorageCoefficient(StorageBase):
         ),
     }
 
-    _regrid_method = {
-        "convertible": (RegridderType.OVERLAP, "mode"),
-        "storage_coefficient": (RegridderType.OVERLAP, "mean"),
-        "specific_yield": (RegridderType.OVERLAP, "mean"),
-    }
-
     _template = Package._initialize_template(_pkg_id)
+    _regrid_method = StorageCoefficientRegridMethod()
 
     @init_log_decorator()
     def __init__(
@@ -328,6 +321,3 @@ class StorageCoefficient(StorageBase):
         d = self._render_dict(directory, pkgname, globaltimes, binary)
         d["storagecoefficient"] = True
         return self._template.render(d)
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method

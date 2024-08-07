@@ -1,6 +1,6 @@
 import os
 import struct
-from typing import Any, BinaryIO, Dict, List, Optional, Tuple
+from typing import Any, BinaryIO, Dict, List, Optional, Tuple, cast
 
 import dask
 import numba
@@ -12,7 +12,13 @@ import xugrid as xu
 from imod.mf6.utilities.dataset import assign_datetime_coords
 
 from . import cbc
-from .common import FilePath, FloatArray, IntArray, _to_nan
+from .common import (
+    FilePath,
+    FloatArray,
+    IntArray,
+    _to_nan,
+    get_first_header_advanced_package,
+)
 
 
 def _ugrid_iavert_javert(
@@ -229,6 +235,7 @@ def open_imeth6_budgets(
     grb_content: dict,
     header_list: List[cbc.Imeth6Header],
     return_variable: str = "budget",
+    return_id: np.ndarray | None = None,
 ) -> xu.UgridDataArray:
     """
     Open the data for an imeth==6 budget section.
@@ -242,6 +249,8 @@ def open_imeth6_budgets(
     cbc_path: str, pathlib.Path
     grb_content: dict
     header_list: List[Imeth1Header]
+    return_variable: str
+    return_id: np.ndarray | None
 
     Returns
     -------
@@ -253,13 +262,20 @@ def open_imeth6_budgets(
         + [(name, np.float64) for name in header_list[0].auxtxt]
     )
     shape = (grb_content["nlayer"], grb_content["ncells_per_layer"])
-    size = np.product(shape)
+    size = np.prod(shape)
     dask_list = []
     time = np.empty(len(header_list), dtype=np.float64)
     for i, header in enumerate(header_list):
         time[i] = header.totim
         a = dask.delayed(cbc.read_imeth6_budgets_dense)(
-            cbc_path, header.nlist, dtype, header.pos, size, shape, return_variable
+            cbc_path,
+            header.nlist,
+            dtype,
+            header.pos,
+            size,
+            shape,
+            return_variable,
+            return_id,
         )
         x = dask.array.from_delayed(a, shape=shape, dtype=np.float64)
         dask_list.append(x)
@@ -275,7 +291,7 @@ def open_imeth6_budgets(
     return xu.UgridDataArray(da, grid)
 
 
-@numba.njit
+@numba.njit  # type: ignore[misc]
 def disv_lower_index(
     ia: IntArray,
     ja: IntArray,
@@ -353,7 +369,7 @@ def disv_horizontal_index(
 
 def disv_to_horizontal_lower_indices(
     grb_content: dict,
-) -> Tuple[xr.DataArray, xr.DataArray]:
+) -> Tuple[xr.DataArray, xr.DataArray, xr.DataArray, xr.DataArray]:
     grid = grb_content["grid"]
     horizontal, u, v = disv_horizontal_index(
         ia=grb_content["ia"],
@@ -441,7 +457,7 @@ def disv_extract_horizontal_budget(
 
 def disv_open_face_budgets(
     cbc_path: FilePath, grb_content: dict, header_list: List[cbc.Imeth1Header]
-) -> Tuple[xu.UgridDataArray]:
+) -> Tuple[xu.UgridDataArray, xu.UgridDataArray, xu.UgridDataArray, xu.UgridDataArray]:
     horizontal_index, u, v, lower_index = disv_to_horizontal_lower_indices(grb_content)
     budgets = cbc.open_imeth1_budgets(cbc_path, header_list)
     horizontal = disv_extract_horizontal_budget(budgets, horizontal_index)
@@ -465,36 +481,63 @@ def open_cbc(
     time_unit: Optional[str] = "d",
 ) -> Dict[str, xu.UgridDataArray]:
     headers = cbc.read_cbc_headers(cbc_path)
+    indices = None
+    header_advanced_package = get_first_header_advanced_package(headers)
+    if header_advanced_package is not None:
+        # For advanced packages the id2 column of variable gwf contains the MF6 id's.
+        # Get id's eager from first stress period.
+        dtype = np.dtype(
+            [("id1", np.int32), ("id2", np.int32), ("budget", np.float64)]
+            + [(name, np.float64) for name in header_advanced_package.auxtxt]
+        )
+        table = cbc.read_imeth6_budgets(
+            cbc_path, header_advanced_package.nlist, dtype, header_advanced_package.pos
+        )
+        indices = table["id2"] - 1  # Convert to 0 based index
     cbc_content = {}
     for key, header_list in headers.items():
-        if key == "flow-ja-face":
+        if key == "flow-ja-face" and isinstance(header_list[0], cbc.Imeth1Header):
             if flowja:
-                flowja, ij = cbc.open_face_budgets_as_flowja(
-                    cbc_path, header_list, grb_content
+                assert all(isinstance(x, cbc.Imeth1Header) for x in header_list)
+                flowjaface, ij = cbc.open_face_budgets_as_flowja(
+                    cbc_path, cast(List[cbc.Imeth1Header], header_list), grb_content
                 )
-                cbc_content["flow-ja-face"] = flowja
+                cbc_content["flow-ja-face"] = flowjaface
                 cbc_content["connectivity"] = ij
             else:
+                assert all(isinstance(x, cbc.Imeth1Header) for x in header_list)
                 flow_xy, flow_x, flow_y, lower = disv_open_face_budgets(
-                    cbc_path, grb_content, header_list
+                    cbc_path, grb_content, cast(List[cbc.Imeth1Header], header_list)
                 )
                 cbc_content["flow-horizontal-face"] = flow_xy
                 cbc_content["flow-horizontal-face-x"] = flow_x
                 cbc_content["flow-horizontal-face-y"] = flow_y
                 cbc_content["flow-lower-face"] = lower
         elif isinstance(header_list[0], cbc.Imeth1Header):
-            cbc_content[key] = open_imeth1_budgets(cbc_path, grb_content, header_list)
+            assert all(isinstance(x, cbc.Imeth1Header) for x in header_list)
+            cbc_content[key] = open_imeth1_budgets(
+                cbc_path, grb_content, cast(List[cbc.Imeth1Header], header_list)
+            )
         elif isinstance(header_list[0], cbc.Imeth6Header):
+            assert all(isinstance(x, cbc.Imeth6Header) for x in header_list)
             # for non cell flow budget terms, use auxiliary variables as return value
             if header_list[0].text.startswith("data-"):
                 for return_variable in header_list[0].auxtxt:
                     key_aux = header_list[0].txt2id1 + "-" + return_variable
+
                     cbc_content[key_aux] = open_imeth6_budgets(
-                        cbc_path, grb_content, header_list, return_variable
+                        cbc_path,
+                        grb_content,
+                        cast(List[cbc.Imeth6Header], header_list),
+                        return_variable,
+                        return_id=indices,
                     )
             else:
                 cbc_content[key] = open_imeth6_budgets(
-                    cbc_path, grb_content, header_list
+                    cbc_path,
+                    grb_content,
+                    cast(List[cbc.Imeth6Header], header_list),
+                    return_id=indices,
                 )
 
     if simulation_start_time is not None:

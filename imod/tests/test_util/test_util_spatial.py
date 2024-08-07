@@ -92,6 +92,9 @@ def test_is_divisor():
     assert not imod.util.spatial.is_divisor(-a, b)
     assert not imod.util.spatial.is_divisor(a, -b)
     assert not imod.util.spatial.is_divisor(-a, -b)
+    a = 3
+    b = 1.5
+    assert imod.util.spatial.is_divisor(-a, -b)
 
 
 def test_empty():
@@ -104,6 +107,13 @@ def test_empty():
     da = imod.util.spatial.empty_2d(-1.0, 0.0, 2.0, 1.0, 10.0, 12.0)
     assert np.allclose(da["x"], [0.5, 1.5])
     assert np.allclose(da["y"], [11.5, 10.5])
+
+    # array-like dx and dy
+    da_irregular = imod.util.spatial.empty_2d(
+        np.array([1, 2]), 0.0, 2.0, np.array([1, 2]), 10.0, 12.0
+    )
+    assert np.allclose(da_irregular["x"], [0.5, 2.0])
+    assert np.allclose(da_irregular["y"], [11.5, 10.0])
 
     with pytest.raises(ValueError, match="layer must be 1d"):
         imod.util.spatial.empty_3d(1.0, 0.0, 2.0, -1.0, 10.0, 12.0, [[1, 2]])
@@ -273,3 +283,100 @@ def test_to_ugrid2d(write=False):
 
     if write:
         uds.to_netcdf("ugrid-a3dt.nc")
+
+
+def test_gdal_compliant_grid():
+    # Arrange
+    data = np.ones((2, 3))
+    # explicit dx dy, equidistant
+    coords = {
+        "x": [0.5, 1.5, 2.5],
+        "y": [1.5, 0.5],
+        "dx": ("x", [1.0, 1.0, 1.0]),
+        "dy": ("y", [-1.0, -1.0]),
+    }
+    dims = ("y", "x")
+    da = xr.DataArray(data, coords, dims)
+
+    # Act
+    da_compliant = imod.util.spatial.gdal_compliant_grid(da)
+
+    # Assert
+    # Test if original dataarray not altered
+    assert da.coords["x"].attrs == {}
+    assert da.coords["y"].attrs == {}
+    # Test if coordinates got correct attributes
+    assert da_compliant.coords["x"].attrs["axis"] == "X"
+    assert da_compliant.coords["x"].attrs["long_name"] == "x coordinate of projection"
+    assert da_compliant.coords["x"].attrs["standard_name"] == "projection_x_coordinate"
+    assert da_compliant.coords["y"].attrs["axis"] == "Y"
+    assert da_compliant.coords["y"].attrs["long_name"] == "y coordinate of projection"
+    assert da_compliant.coords["y"].attrs["standard_name"] == "projection_y_coordinate"
+
+
+def test_gdal_compliant_grid_crs(tmpdir):
+    import rioxarray
+
+    # Arrange
+    data = np.ones((2, 3))
+    # explicit dx dy, equidistant
+    coords = {
+        "x": [0.5, 1.5, 2.5],
+        "y": [1.5, 0.5],
+        "dx": ("x", [1.0, 1.0, 1.0]),
+        "dy": ("y", [-1.0, -1.0]),
+    }
+    dims = ("y", "x")
+    da = xr.DataArray(data, coords, dims)
+
+    # Act
+    da_compliant = imod.util.spatial.gdal_compliant_grid(da, crs="EPSG:28992")
+
+    # Assert
+    assert "spatial_ref" in da_compliant.coords
+
+    # Test saving to netcdf, reading with rasterio again to test if crs
+    # understood.
+    da_compliant.to_netcdf(tmpdir / "gdal_accepted_grid.nc")
+    da_compliant.close()
+
+    da_read = rioxarray.open_rasterio(str(tmpdir / "gdal_accepted_grid.nc"))
+    assert da_read.rio.crs == "EPSG:28992"
+
+
+def test_gdal_compliant_grid_error_dims():
+    # Arrange
+    data = np.ones((2,))
+    # explicit dx dy, equidistant
+    coords = {
+        "y": [1.5, 0.5],
+        "dy": ("y", [-1.0, -1.0]),
+    }
+    dims = ("y",)
+    da = xr.DataArray(data, coords, dims)
+
+    # Act
+    with pytest.raises(ValueError, match="Missing dimensions: {'x'}"):
+        imod.util.spatial.gdal_compliant_grid(da)
+
+
+def test_gdal_compliant_grid_error_crs_existing():
+    # Arrange
+    data = np.ones((2, 3))
+    # explicit dx dy, equidistant
+    coords = {
+        "x": [0.5, 1.5, 2.5],
+        "y": [1.5, 0.5],
+        "dx": ("x", [1.0, 1.0, 1.0]),
+        "dy": ("y", [-1.0, -1.0]),
+    }
+    dims = ("y", "x")
+    da = xr.DataArray(data, coords, dims)
+
+    da_crs = da.rio.write_crs("EPSG:28992")
+
+    # Test if fails for
+    with pytest.raises(
+        ValueError, match="Grid already has CRS different then provided CRS."
+    ):
+        imod.util.spatial.gdal_compliant_grid(da_crs, crs="EPSG:4326")

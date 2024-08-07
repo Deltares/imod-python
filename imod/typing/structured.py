@@ -2,7 +2,7 @@
 
 import itertools
 from collections import defaultdict
-from typing import Any, DefaultDict, Dict, List, Set, Tuple
+from typing import DefaultDict, List, Set, Tuple
 
 import dask
 import numpy as np
@@ -13,7 +13,7 @@ import xarray as xr
 
 def check_dtypes(das: List[xr.DataArray]) -> None:
     """Check whether the dtypes of all arrays are the same."""
-    dtypes = set(da.dtype for da in das)
+    dtypes = {da.dtype for da in das}
     if len(dtypes) != 1:
         raise TypeError(f"DataArrays do not match in dtype: {dtypes}")
     return
@@ -38,7 +38,7 @@ def check_sizes(sizes: DefaultDict[str, Set[int]], attribute: str) -> None:
 
 
 def check_dims(das: List[xr.DataArray]) -> None:
-    all_dims = set(da.dims for da in das)
+    all_dims = {da.dims for da in das}
     if len(all_dims) != 1:
         raise ValueError(
             f"All DataArrays should have exactly the same dimensions. Found: {all_dims}"
@@ -55,12 +55,12 @@ def check_dim_sizes(das: List[xr.DataArray]) -> None:
     for da in das:
         for key, value in da.sizes.items():
             sizes[key].add(value)
-    check_sizes(sizes, "size")
+    check_sizes(sizes, "size")  # type: ignore
     return
 
 
 def check_coords(das: List[xr.DataArray]):
-    def drop_xy(coords) -> Dict[str, Any]:
+    def drop_xy(coords) -> xr.Coordinates:
         coords = dict(coords)
         coords.pop("y")
         coords.pop("x")
@@ -91,9 +91,9 @@ def check_chunk_sizes(das: List[xr.DataArray]) -> None:
 
     sizes = defaultdict(set)
     for da in das:
-        for key, value in zip(da.dims, da.chunks):
+        for key, value in zip(da.dims, da.chunks):  # type: ignore
             sizes[key].add(value)
-    check_sizes(sizes, "chunks")
+    check_sizes(sizes, "chunks")  # type: ignore
     return
 
 
@@ -241,15 +241,15 @@ def merge_partitions(
 ) -> xr.Dataset:
     first_item = das[0]
     if isinstance(first_item, xr.Dataset):
-        unique_keys = set([key for da in das for key in da.keys()])
+        unique_keys = {key for da in das for key in da.keys()}
         merged_ls = []
         for key in unique_keys:
-            merged_ls.append(_merge_partitions([da[key] for da in das]).rename(key))
+            merged_ls.append(_merge_partitions([da[key] for da in das]).rename(key))  # type: ignore
         return xr.merge(merged_ls)
     elif isinstance(first_item, xr.DataArray):
         # Store name to rename after concatenation
         name = first_item.name
-        return _merge_partitions(das).to_dataset(name=name)
+        return _merge_partitions(das).to_dataset(name=name)  # type: ignore
     else:
         raise TypeError(
             f"Expected type: xr.DataArray or xr.Dataset, got {type(first_item)}"

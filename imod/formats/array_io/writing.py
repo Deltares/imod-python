@@ -120,7 +120,7 @@ def _save(path, a, nodata, pattern, dtype, write):
     # in this case we do want _l1 in the IDF file name
     check_coords = ["layer", "time"]
     for coord in check_coords:
-        if (coord in a.coords) and not (coord in a.dims):
+        if (coord in a.coords) and coord not in a.dims:
             if coord == "time":
                 # .item() gives an integer for datetime64[ns], so convert first.
                 val = a.coords[coord].values

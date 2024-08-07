@@ -12,7 +12,7 @@ from imod.mf6.interfaces.ipackagebase import IPackageBase
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.utilities.grid import get_active_domain_slice
 from imod.typing import GridDataArray
-from imod.typing.grid import bounding_polygon, is_spatial_2D
+from imod.typing.grid import bounding_polygon, is_spatial_grid
 from imod.util.imports import MissingOptionalModule
 
 try:
@@ -28,8 +28,8 @@ def clip_by_grid(_: object, grid: object) -> None:
     )
 
 
-@typedispatch
-def clip_by_grid(package: IPackageBase, active: xr.DataArray) -> IPackageBase:
+@typedispatch  # type: ignore[no-redef]
+def clip_by_grid(package: IPackageBase, active: xr.DataArray) -> IPackageBase:  # noqa: F811
     domain_slice = get_active_domain_slice(active)
     x_min, x_max = domain_slice["x"].start, domain_slice["x"].stop
     y_min, y_max = domain_slice["y"].stop, domain_slice["y"].start
@@ -43,8 +43,8 @@ def clip_by_grid(package: IPackageBase, active: xr.DataArray) -> IPackageBase:
     return clipped_package
 
 
-@typedispatch
-def clip_by_grid(package: IPackageBase, active: xu.UgridDataArray) -> IPackageBase:
+@typedispatch  # type: ignore[no-redef]
+def clip_by_grid(package: IPackageBase, active: xu.UgridDataArray) -> IPackageBase:  # noqa: F811
     domain_slice = get_active_domain_slice(active)
 
     clipped_dataset = package.dataset.isel(domain_slice, missing_dims="ignore")
@@ -55,8 +55,8 @@ def clip_by_grid(package: IPackageBase, active: xu.UgridDataArray) -> IPackageBa
     return new
 
 
-@typedispatch
-def clip_by_grid(
+@typedispatch  # type: ignore[no-redef]
+def clip_by_grid(  # noqa: F811
     package: IPointDataPackage, active: xu.UgridDataArray
 ) -> IPointDataPackage:
     """Clip PointDataPackage outside unstructured grid."""
@@ -82,18 +82,20 @@ def _filter_inactive_cells(package, active):
     package_vars = package.dataset.data_vars
     for var in package_vars:
         if package_vars[var].shape != ():
-            if is_spatial_2D(package.dataset[var]):
-                if np.issubdtype(package.dataset[var].dtype, np.integer):
-                    other = 0
-                else:
-                    other = np.nan
+            if is_spatial_grid(package.dataset[var]):
+                other = (
+                    0
+                    if np.issubdtype(package.dataset[var].dtype, np.integer)
+                    else np.nan
+                )
+
                 package.dataset[var] = package.dataset[var].where(
                     active > 0, other=other
                 )
 
 
-@typedispatch
-def clip_by_grid(package: ILineDataPackage, active: GridDataArray) -> ILineDataPackage:
+@typedispatch  # type: ignore[no-redef, misc]
+def clip_by_grid(package: ILineDataPackage, active: GridDataArray) -> ILineDataPackage:  # noqa: F811
     """Clip LineDataPackage outside unstructured/structured grid."""
 
     # Clip line with polygon

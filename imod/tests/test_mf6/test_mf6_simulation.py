@@ -11,6 +11,7 @@ from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
+import rasterio
 import xarray as xr
 import xugrid as xu
 
@@ -51,6 +52,40 @@ def test_twri_disv_roundtrip(twri_disv_model, tmpdir_factory):
 @pytest.mark.usefixtures("circle_model")
 def test_circle_roundtrip(circle_model, tmpdir_factory):
     roundtrip(circle_model, tmpdir_factory, "circle")
+
+
+@pytest.mark.usefixtures("twri_model")
+def test_twri_gdal(twri_model, tmpdir_factory):
+    """
+    Test of dumping a structured model with a CRS results in the necessary
+    attributes for GDAL and a parsable CRS.
+    """
+    tmp_path = tmpdir_factory.mktemp("twri")
+    twri_model.dump(tmp_path, crs="EPSG:28992")
+    ds = xr.open_dataset(tmp_path / "GWF_1" / "dis.nc")
+    assert ds.coords["x"].attrs["axis"] == "X"
+    assert ds.coords["y"].attrs["axis"] == "Y"
+    # Convert long string with full description to EPSG code
+    crs = rasterio.CRS.from_string(ds["spatial_ref"].attrs["spatial_ref"])
+    assert crs == "EPSG:28992"
+
+
+@pytest.mark.usefixtures("twri_disv_model")
+def test_twri_disv_mdal_compliant_semi_roundtrip(twri_disv_model, tmpdir_factory):
+    """
+    Test if dumping an unstructured model with mdal_compliant=True also results
+    in a package written with a crs and unstacked layers, which can be stacked.
+    """
+    tmp_path = tmpdir_factory.mktemp("twri")
+    twri_disv_model.dump(tmp_path, crs="EPSG:28992", mdal_compliant=True)
+    ds = xu.open_dataset(tmp_path / "GWF_1" / "dis.nc")
+    assert len(ds.data_vars) == 7
+    # Convert long string with full description to EPSG code
+    crs = rasterio.CRS.from_string(ds.coords["spatial_ref"].attrs["spatial_ref"])
+    assert crs == "EPSG:28992"
+    # Test if running from_mdal_compliant stacks variables properly again.
+    ds = imod.util.spatial.from_mdal_compliant_ugrid2d(ds)
+    assert len(ds.data_vars) == 3
 
 
 @pytest.mark.usefixtures("circle_model")
@@ -120,13 +155,13 @@ def test_simulation_open_flow_budget(circle_model, tmp_path):
 
     assert isinstance(budget, xu.UgridDataset)
     assert sorted(budget.keys()) == [
-        "chd",
+        "chd_chd",
         "flow-horizontal-face",
         "flow-horizontal-face-x",
         "flow-horizontal-face-y",
         "flow-lower-face",
     ]
-    assert isinstance(budget["chd"], xu.UgridDataArray)
+    assert isinstance(budget["chd_chd"], xu.UgridDataArray)
 
 
 def test_write_circle_model_twice(circle_model, tmp_path):

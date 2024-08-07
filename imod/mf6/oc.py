@@ -1,7 +1,7 @@
-import collections
 import os
+from collections import defaultdict
 from pathlib import Path
-from typing import Optional, Tuple, Union
+from typing import Any, Dict, Union
 
 import numpy as np
 
@@ -9,7 +9,6 @@ from imod.logging import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
 from imod.mf6.utilities.dataset import is_dataarray_none
-from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.write_context import WriteContext
 from imod.schemata import DTypeSchema
 
@@ -82,7 +81,6 @@ class OutputControl(Package, IRegridPackage):
     }
 
     _write_schemata = {}
-    _regrid_method: dict[str, Tuple[RegridderType, str]] = {}
 
     @init_log_decorator()
     def __init__(
@@ -156,7 +154,7 @@ class OutputControl(Package, IRegridPackage):
         return path
 
     def render(self, directory, pkgname, globaltimes, binary):
-        d = {}
+        d: dict[str, Any] = {}
 
         for output_variable in OUTPUT_EXT_MAPPING.keys():
             save = self.dataset[f"save_{output_variable}"].values[()]
@@ -165,7 +163,7 @@ class OutputControl(Package, IRegridPackage):
                 output_path = self._get_output_filepath(directory, output_variable)
                 d[varname] = output_path.as_posix()
 
-        periods = collections.defaultdict(dict)
+        periods: defaultdict[int, Dict[str, str]] = defaultdict(dict)
         for datavar in ("save_head", "save_concentration", "save_budget"):
             if self.dataset[datavar].values[()] is None:
                 continue
@@ -209,6 +207,3 @@ class OutputControl(Package, IRegridPackage):
     @property
     def is_budget_output(self) -> bool:
         return self.dataset["save_budget"].values[()] is not None
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method

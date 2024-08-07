@@ -9,7 +9,7 @@ from imod.mf6.auxiliary_variables import (
 )
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.hfb import HorizontalFlowBarrierBase
-from imod.mf6.model import Modflow6Model
+from imod.mf6.interfaces.imodel import IModel
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.grid import get_active_domain_slice
 from imod.mf6.wel import Well
@@ -64,14 +64,14 @@ def _validate_submodel_label_array(submodel_labels: GridDataArray) -> None:
         )
 
 
-def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6Model:
+def slice_model(partition_info: PartitionInfo, model: IModel) -> IModel:
     """
     This function slices a Modflow6Model. A sliced model is a model that consists of packages of the original model
     that are sliced using the domain_slice. A domain_slice can be created using the
     :func:`imod.mf6.modelsplitter.create_domain_slices` function.
     """
     modelclass = type(model)
-    new_model = modelclass(**model._options)
+    new_model = modelclass(**model.options)
     domain_slice2d = get_active_domain_slice(partition_info.active_domain)
     if is_unstructured(model.domain):
         new_idomain = model.domain.sel(domain_slice2d)

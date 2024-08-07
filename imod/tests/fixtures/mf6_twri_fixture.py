@@ -191,8 +191,6 @@ def make_twri_model():
     simulation["solver"] = imod.mf6.Solution(
         modelnames=["GWF_1"],
         print_option="summary",
-        csv_output=False,
-        no_ptc=True,
         outer_dvclose=1.0e-4,
         outer_maximum=500,
         under_relaxation=None,

@@ -20,7 +20,6 @@ from imod.msw.landuse import LanduseOptions
 from imod.msw.meteo_grid import MeteoGrid
 from imod.msw.meteo_mapping import EvapotranspirationMapping, PrecipitationMapping
 from imod.msw.output_control import TimeOutputControl
-from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.timeutil import to_metaswap_timeformat
 from imod.msw.vegetation import AnnualCropFactors
 
@@ -44,27 +43,27 @@ INITIAL_CONDITIONS_PACKAGES = (
     InitialConditionsSavedState,
 )
 
-DEFAULT_SETTINGS = dict(
-    vegetation_mdl=1,
-    evapotranspiration_mdl=1,
-    saltstress_mdl=0,
-    surfacewater_mdl=0,
-    infilimsat_opt=0,
-    netcdf_per=0,
-    postmsw_opt=0,
-    dtgw=1.0,
-    dtsw=1.0,
-    ipstep=2,
-    nxlvage_dim=366,
-    co2=404.32,
-    fact_beta2=1.0,
-    rcsoil=0.15,
-    iterur1=3,
-    iterur2=5,
-    tdbgsm=91.0,
-    tdedsm=270.0,
-    clocktime=0,
-)
+DEFAULT_SETTINGS = {
+    "vegetation_mdl": 1,
+    "evapotranspiration_mdl": 1,
+    "saltstress_mdl": 0,
+    "surfacewater_mdl": 0,
+    "infilimsat_opt": 0,
+    "netcdf_per": 0,
+    "postmsw_opt": 0,
+    "dtgw": 1.0,
+    "dtsw": 1.0,
+    "ipstep": 2,
+    "nxlvage_dim": 366,
+    "co2": 404.32,
+    "fact_beta2": 1.0,
+    "rcsoil": 0.15,
+    "iterur1": 3,
+    "iterur2": 5,
+    "tdbgsm": 91.0,
+    "tdedsm": 270.0,
+    "clocktime": 0,
+}
 
 
 class Model(collections.UserDict):
@@ -194,7 +193,7 @@ class MetaSwapModel(Model):
 
         return year, time_since_start_year
 
-    def _get_pkg_key(self, pkg_type: MetaSwapPackage, optional_package: bool = False):
+    def _get_pkg_key(self, pkg_type: type, optional_package: bool = False):
         for pkg_key, pkg in self.items():
             if isinstance(pkg, pkg_type):
                 return pkg_key

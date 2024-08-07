@@ -22,6 +22,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: Implementation :: CPython",
     "Topic :: Scientific/Engineering"
 ]
@@ -37,6 +38,7 @@ dependencies = [
     "numpy",
     "pandas",
     "pooch",
+    "pydantic",
     "scipy",
     "tomli >= 1.1.0",
     "tomli_w",
@@ -72,36 +74,16 @@ exclude_lines = [
 ]
 
 [tool.ruff.lint]
-select = ["C4", "E", "F", "I"]
+select = ["C4", "E", "F", "I", "PD"]
 ignore = [
-    "C401",
-    "C402",
-    "C403",
-    "C404",
-    "C405",
-    "C408",
-    "C416",
-    "C417",
-    "C419",
-    "D202",
-    "D205",
-    "D206",
-    "D400",
-    "D404",
-    "E402",
-    "E501",
-    "E703",
-    "E713",
-    "E721",
-    "E731",
-    "E741",
-    "F811",
-    "PD002",
+    "E501", # line-too-long. This rule can't be fullfilled by the ruff formatter. The same behavior as black.
     "PD003",
     "PD004",
     "PD901",
+    "PD011",
+    "PD013",
+    "PD015",
 ]
-ignore-init-module-imports = true
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
@@ -111,18 +93,39 @@ convention = "numpy"
 "__init__.py" = ["F401"]
 "conftest.py" = ["F401"]
 "test_examples.py" = ["F401"]
+"examples/*" = ["E402"]
 
 [tool.mypy]
 files = [
-    "imod/mf6/**.py",
-    "imod/logging/**.py",
+    "imod/logging/**/**.py",
+    "imod/mf6/**/**.py",
+    "imod/msw/**/**.py",
+    "imod/prepare/**/**.py",
+    "imod/select/**/**.py",
+    "imod/typing/**/**.py",
+    "imod/util/**/**.py",
 ]
-follow_imports = "silent"
-warn_unused_configs = true
+follow_imports = "normal"
+strict = true
+
+# These shouldn't be too much additional work, but may be tricky to
+# get passing if you use a lot of untyped libraries
+disallow_any_generics = false
+
+# These next few are various gradations of forcing use of type annotations
+disallow_untyped_calls = false
+disallow_incomplete_defs = false
+disallow_untyped_defs = false
+
+# This one isn't too hard to get passing, but return on investment is lower
+no_implicit_reexport = false
+
+# This one can be tricky to get passing if you use a lot of untyped libraries
+warn_return_any = false
 
 [[tool.mypy.overrides]]
-module = ['mf6', 'logging']
-follow_imports = "normal"
+module = ["imod.msw.*"]
+check_untyped_defs = false
 
 [[tool.mypy.overrides]]
 module = [

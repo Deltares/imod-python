@@ -1,11 +1,9 @@
-from typing import Optional, Tuple
-
 import numpy as np
 
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.utilities.regrid import RegridderType
+from imod.mf6.regrid.regrid_schemes import RechargeRegridMethod
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -68,6 +66,9 @@ class Recharge(BoundaryCondition, IRegridPackage):
         value is the "value". For the "key" datetime, the data of the "value"
         datetime will be used. Can also be set with a dictionary using the
         ``set_repeat_stress`` method.
+    fixed_cell: ({True, False}, optional)
+        indicates that recharge will not be reassigned to a cell underlying the
+        cell specified in the list if the specified cell is inactive.
     """
 
     _pkg_id = "rch"
@@ -106,11 +107,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
 
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
-
-    _regrid_method = {
-        "rate": (RegridderType.OVERLAP, "mean"),
-        "concentration": (RegridderType.OVERLAP, "mean"),
-    }
+    _regrid_method = RechargeRegridMethod()
 
     @init_log_decorator()
     def __init__(
@@ -124,6 +121,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
         observations=None,
         validate: bool = True,
         repeat_stress=None,
+        fixed_cell: bool = False,
     ):
         dict_dataset = {
             "rate": rate,
@@ -134,6 +132,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
             "save_flows": save_flows,
             "observations": observations,
             "repeat_stress": repeat_stress,
+            "fixed_cell": fixed_cell,
         }
         super().__init__(dict_dataset)
         self._validate_init_schemata(validate)
@@ -144,6 +143,3 @@ class Recharge(BoundaryCondition, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method

@@ -4,6 +4,7 @@ import xarray as xr
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import AdvancedBoundaryCondition, BoundaryCondition
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
+from imod.prepare.layer import get_upper_active_grid_cells
 from imod.schemata import (
     AllInsideNoDataSchema,
     AllNoDataSchema,
@@ -92,6 +93,10 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         keyword to indicate that UZF flow terms will be written to the file specified with "BUDGET
         FILEOUT" in Output Control.
         Default is False.
+    budget_fileout: ({"str"}, optional)
+        path to output cbc-file for UZF budgets
+    budgetcsv_fileout: ({"str"}, optional)
+        path to output csv-file for summed budgets
     observations: [Not yet supported.]
         Default is None.
     water_mover: [Not yet supported.]
@@ -183,12 +188,12 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         "theta_sat": [IdentityNoDataSchema("kv_sat"), AllValueSchema(">=", 0.0)],
         "theta_init": [IdentityNoDataSchema("kv_sat"), AllValueSchema(">=", 0.0)],
         "epsilon": [IdentityNoDataSchema("kv_sat")],
-        "infiltration_rate": [IdentityNoDataSchema("kv_sat")],
-        "et_pot": [IdentityNoDataSchema("kv_sat")],
-        "extinction_depth": [IdentityNoDataSchema("kv_sat")],
-        "extinction_theta": [IdentityNoDataSchema("kv_sat")],
-        "root_potential": [IdentityNoDataSchema("kv_sat")],
-        "root_activity": [IdentityNoDataSchema("kv_sat")],
+        "infiltration_rate": [IdentityNoDataSchema("stress_period_active")],
+        "et_pot": [IdentityNoDataSchema("stress_period_active")],
+        "extinction_depth": [IdentityNoDataSchema("stress_period_active")],
+        "extinction_theta": [IdentityNoDataSchema("stress_period_active")],
+        "root_potential": [IdentityNoDataSchema("stress_period_active")],
+        "root_activity": [IdentityNoDataSchema("stress_period_active")],
     }
 
     _package_data = (
@@ -226,6 +231,8 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         print_input=False,
         print_flows=False,
         save_flows=False,
+        budget_fileout=None,
+        budgetcsv_fileout=None,
         observations=None,
         water_mover=None,
         timeseries=None,
@@ -234,6 +241,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         landflag = self._determine_landflag(kv_sat)
         iuzno = self._create_uzf_numbers(landflag)
         ivertcon = self._determine_vertical_connection(iuzno)
+        stress_period_active = landflag.where(landflag == 1)
 
         dict_dataset = {
             # Package data
@@ -244,6 +252,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
             "theta_init": theta_init,
             "epsilon": epsilon,
             # Stress period data
+            "stress_period_active": stress_period_active,
             "infiltration_rate": infiltration_rate,
             "et_pot": et_pot,
             "extinction_depth": extinction_depth,
@@ -260,6 +269,8 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
             "print_input": print_input,
             "print_flows": print_flows,
             "save_flows": save_flows,
+            "budget_fileout": budget_fileout,
+            "budgetcsv_fileout": budgetcsv_fileout,
             "observations": observations,
             "water_mover": water_mover,
             "timeseries": timeseries,
@@ -343,16 +354,19 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
 
     def _create_uzf_numbers(self, landflag):
         """Create unique UZF ID's. Inactive cells equal 0"""
-        return np.cumsum(np.ravel(landflag)).reshape(landflag.shape) * landflag
+        active_nodes = landflag.notnull().astype(np.int8)
+        return np.nancumsum(active_nodes).reshape(landflag.shape) * active_nodes
 
     def _determine_landflag(self, kv_sat):
-        return (np.isfinite(kv_sat)).astype(np.int32)
+        """returns the landflag for uzf-model. Landflag == 1 for top active UZF-nodes"""
+        land_nodes = get_upper_active_grid_cells(kv_sat).astype(np.int32)
+        return land_nodes.where(kv_sat.notnull())
 
     def _determine_vertical_connection(self, uzf_number):
         return uzf_number.shift(layer=-1, fill_value=0)
 
     def _package_data_to_sparse(self):
-        notnull = self.dataset["landflag"].values == 1
+        notnull = self.dataset["landflag"].notnull().to_numpy()
         iuzno = self.dataset["iuzno"].values[notnull]
         landflag = self.dataset["landflag"].values[notnull]
         ivertcon = self.dataset["ivertcon"].values[notnull]
@@ -392,7 +406,8 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         d = self._get_options(d, not_options=not_options)
         path = directory / pkgname / f"{self._pkg_id}-pkgdata.dat"
         d["packagedata"] = path.as_posix()
-        d["nuzfcells"] = self._max_active_n()
+        # max uzf-cells for which time period data will be supplied
+        d["nuzfcells"] = np.count_nonzero(np.isfinite(d["landflag"]))
         return self._template.render(d)
 
     def _to_struct_array(self, arrdict, layer):
@@ -422,6 +437,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
     def _validate(self, schemata, **kwargs):
         # Insert additional kwargs
         kwargs["kv_sat"] = self["kv_sat"]
+        kwargs["stress_period_active"] = self["stress_period_active"]
         errors = super()._validate(schemata, **kwargs)
 
         return errors

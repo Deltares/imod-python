@@ -26,6 +26,7 @@ The single aggregated value is then filled into the destination array (dst).
 """
 
 from collections import namedtuple
+from typing import List, Sequence
 
 import dask
 import numba
@@ -35,8 +36,8 @@ import xarray as xr
 from imod.prepare import common, interpolate
 
 _RegridInfo = namedtuple(
-    typename="_RegridInfo",
-    field_names=[
+    "_RegridInfo",
+    [
         "matching_dims",
         "regrid_dims",
         "add_dims",
@@ -490,7 +491,7 @@ class Regridder(object):
         if len(info.add_dims) == 0:
             return self._chunked_regrid(src, like, fill_value)
 
-        src_dim_slices = []
+        src_dim_slices: List[Sequence] = []
         shape_chunks = []
         for dim, chunksize in zip(src.dims, src.chunks):
             if dim in info.add_dims:

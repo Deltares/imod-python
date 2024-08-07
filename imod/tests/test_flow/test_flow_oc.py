@@ -4,17 +4,17 @@ from imod.flow import OutputControl
 
 
 def oc_configuration_template():
-    return dict(
-        saveshd=0,
-        saveflx=0,
-        saveghb=0,
-        savedrn=0,
-        savewel=0,
-        saveriv=0,
-        saverch=0,
-        saveevt=0,
-        savehfb=0,
-    )
+    return {
+        "saveshd": 0,
+        "saveflx": 0,
+        "saveghb": 0,
+        "savedrn": 0,
+        "savewel": 0,
+        "saveriv": 0,
+        "saverch": 0,
+        "saveevt": 0,
+        "savehfb": 0,
+    }
 
 
 def test_compose_oc_configuration_no_layers():

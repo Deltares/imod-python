@@ -34,7 +34,7 @@ validation xarray library becomes.
 import abc
 import operator
 from functools import partial
-from typing import Any, Callable, Dict, Optional, Tuple, TypeAlias, Union
+from typing import Any, Callable, Dict, Optional, Sequence, Tuple, TypeAlias, Union
 
 import numpy as np
 import scipy
@@ -87,7 +87,7 @@ def align_other_obj_with_coords(
 
     """
     for coordname in obj.coords.keys():
-        if (coordname in other_obj.dims) and not (coordname in obj.dims):
+        if (coordname in other_obj.dims) and coordname not in obj.dims:
             obj = obj.expand_dims(coordname)
     # Note:
     # xr.align forces xu.UgridDataArray to xr.DataArray. Keep that in mind
@@ -127,7 +127,7 @@ class SchemaUnion:
     """
 
     def __init__(self, *args):
-        ntypes = len(set(type(arg) for arg in args))
+        ntypes = len({type(arg) for arg in args})
         if ntypes > 1:
             raise TypeError("schemata in a union should have the same type")
         self.schemata = tuple(args)
@@ -146,6 +146,30 @@ class SchemaUnion:
 
     def __or__(self, other):
         return SchemaUnion(*self.schemata, other)
+
+
+class OptionSchema(BaseSchema):
+    """
+    Check whether the value is one of given valid options.
+    """
+
+    def __init__(self, options: Sequence[Any]):
+        self.options = options
+
+    def validate(self, obj: ScalarAsDataArray, **kwargs) -> None:
+        if scalar_None(obj):
+            return
+
+        # MODFLOW 6 is not case sensitive for string options.
+        value = obj.item()
+        if isinstance(value, str):
+            value = value.lower()
+
+        if value not in self.options:
+            valid_values = ", ".join(map(str, self.options))
+            raise ValidationError(
+                f"Invalid option: {value}. Valid options are: {valid_values}"
+            )
 
 
 class DTypeSchema(BaseSchema):

@@ -24,6 +24,7 @@ class MetaSwapPackage(abc.ABC):
     """
 
     __slots__ = "_pkg_id"
+    _file_name = "filename_not_set"
 
     def __init__(self):
         self.dataset = xr.Dataset()

@@ -155,7 +155,7 @@ class ExchangeCreator(abc.ABC):
                     GWFGWF(
                         f"{model_name}_{model_id1}",
                         f"{model_name}_{model_id2}",
-                        **connected_cells_dataset,
+                        **connected_cells_dataset,  # type: ignore[misc]
                     )
                 )
 
@@ -232,7 +232,7 @@ class ExchangeCreator(abc.ABC):
                         f"{transport_model_name}_{model_id2}",
                         f"{flow_model_name}_{model_id1}",
                         f"{flow_model_name}_{model_id2}",
-                        **connected_cells_dataset,
+                        **connected_cells_dataset,  # type: ignore[misc]
                     )
                 )
 

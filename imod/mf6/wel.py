@@ -21,7 +21,6 @@ from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
 from imod.mf6.utilities.dataset import remove_inactive
-from imod.mf6.utilities.regrid import RegridderType
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
@@ -34,7 +33,7 @@ from imod.schemata import (
 )
 from imod.select.points import points_indices, points_values
 from imod.typing import GridDataArray
-from imod.typing.grid import is_spatial_2D, ones_like
+from imod.typing.grid import is_spatial_grid, ones_like
 from imod.util.structured import values_within_range
 
 
@@ -185,8 +184,6 @@ class Well(BoundaryCondition, IPointDataPackage):
         "concentration": [AnyNoDataSchema(), EmptyIndexesSchema()],
     }
 
-    _regrid_method: dict[str, Tuple[RegridderType, str]] = {}
-
     @init_log_decorator()
     def __init__(
         self,
@@ -335,7 +332,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         value = None if layer is None else grid.isel(layer=layer)
 
         # if value is a grid select the values at the well locations and drop the dimensions
-        if (value is not None) and is_spatial_2D(value):
+        if (value is not None) and is_spatial_grid(value):
             value = imod.select.points_values(
                 value,
                 x=well_dataset["x"].values,
@@ -475,7 +472,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         # Find indices belonging to x, y coordinates
         indices_cell2d = points_indices(dst_grid, out_of_bounds="ignore", x=x, y=y)
         # Convert cell2d indices from 0-based to 1-based.
-        indices_cell2d = dict((dim, index + 1) for dim, index in indices_cell2d.items())
+        indices_cell2d = {dim: index + 1 for dim, index in indices_cell2d.items()}
         # Prepare layer indices, for later concatenation
 
         if isinstance(dst_grid, xu.UgridDataArray):
@@ -611,9 +608,6 @@ class Well(BoundaryCondition, IPointDataPackage):
             "layer", errors="ignore"
         )
         return mask_2D(self, domain_2d)
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method
 
 
 class WellDisStructured(DisStructuredBoundaryCondition):

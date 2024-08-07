@@ -7,7 +7,7 @@ used internally, but are not private since they may be useful to users as well.
 
 import collections
 import re
-from typing import TYPE_CHECKING, Any, Dict, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence, Tuple, Union
 
 import affine
 import numpy as np
@@ -18,7 +18,7 @@ import xugrid as xu
 from imod.typing import FloatArray, GridDataset, IntArray
 from imod.util.imports import MissingOptionalModule
 
-# since rasterio, shapely, and geopandas are a big dependencies that are
+# since rasterio, shapely, rioxarray, and geopandas are a big dependencies that are
 # sometimes hard to install and not always required, we made this an optional
 # dependency
 try:
@@ -39,19 +39,24 @@ else:
     except ImportError:
         gpd = MissingOptionalModule("geopandas")
 
+try:
+    import rioxarray
+except ImportError:
+    rasterio = MissingOptionalModule("rioxarray")
+
 
 def _xycoords(bounds, cellsizes) -> Dict[str, Any]:
     """Based on bounds and cellsizes, construct coords with spatial information"""
     # unpack tuples
     xmin, xmax, ymin, ymax = bounds
     dx, dy = cellsizes
-    coords = collections.OrderedDict()
+    coords: collections.OrderedDict[str, Any] = collections.OrderedDict()
     # from cell size to x and y coordinates
-    if isinstance(dx, (int, float)):  # equidistant
+    if isinstance(dx, (int, float, np.int_)):  # equidistant
         coords["x"] = np.arange(xmin + dx / 2.0, xmax, dx)
         coords["y"] = np.arange(ymax + dy / 2.0, ymin, dy)
-        coords["dx"] = float(dx)
-        coords["dy"] = float(dy)
+        coords["dx"] = np.array(float(dx))
+        coords["dy"] = np.array(float(dy))
     else:  # nonequidistant
         # even though IDF may store them as float32, we always convert them to float64
         dx = dx.astype(np.float64)
@@ -59,8 +64,8 @@ def _xycoords(bounds, cellsizes) -> Dict[str, Any]:
         coords["x"] = xmin + np.cumsum(dx) - 0.5 * dx
         coords["y"] = ymax + np.cumsum(dy) - 0.5 * dy
         if np.allclose(dx, dx[0]) and np.allclose(dy, dy[0]):
-            coords["dx"] = float(dx[0])
-            coords["dy"] = float(dy[0])
+            coords["dx"] = np.array(float(dx[0]))
+            coords["dy"] = np.array(float(dy[0]))
         else:
             coords["dx"] = ("x", dx)
             coords["dy"] = ("y", dy)
@@ -230,7 +235,7 @@ def unstack_dim_into_variable(dataset: GridDataset, dim: str) -> GridDataset:
 
     for variable in variables_containing_dim:
         stacked = unstacked[variable]
-        unstacked = unstacked.drop_vars(variable)
+        unstacked = unstacked.drop_vars(variable)  # type: ignore
         for index in stacked[dim].values:
             unstacked[f"{variable}_{dim}_{index}"] = stacked.sel(
                 indexers={dim: index}, drop=True
@@ -240,7 +245,9 @@ def unstack_dim_into_variable(dataset: GridDataset, dim: str) -> GridDataset:
     return unstacked
 
 
-def mdal_compliant_ugrid2d(dataset: xr.Dataset) -> xr.Dataset:
+def mdal_compliant_ugrid2d(
+    dataset: xr.Dataset, crs: Optional[Any] = None
+) -> xr.Dataset:
     """
     Ensures the xarray Dataset will be written to a UGRID netCDF that will be
     accepted by MDAL.
@@ -252,6 +259,10 @@ def mdal_compliant_ugrid2d(dataset: xr.Dataset) -> xr.Dataset:
     Parameters
     ----------
     dataset: xarray.Dataset
+        Dataset to make compliant with MDAL
+    crs: Any, Optional
+        Anything accepted by rasterio.crs.CRS.from_user_input
+        Requires ``rioxarray`` installed.
 
     Returns
     -------
@@ -300,6 +311,11 @@ def mdal_compliant_ugrid2d(dataset: xr.Dataset) -> xr.Dataset:
             if edge_nodes and edge_nodes not in ds:
                 attrs.pop("edge_node_connectivity")
 
+    if crs is not None:
+        if isinstance(rioxarray, MissingOptionalModule):
+            raise ModuleNotFoundError("rioxarray is required for this functionality")
+        ds.rio.write_crs(crs, inplace=True)
+
     # Make sure time is encoded as a float for MDAL
     # TODO: MDAL requires all data variables to be float (this excludes the UGRID topology data)
     for var in ds.coords:
@@ -309,7 +325,7 @@ def mdal_compliant_ugrid2d(dataset: xr.Dataset) -> xr.Dataset:
     return ds
 
 
-def from_mdal_compliant_ugrid2d(dataset: xu.UgridDataset):
+def from_mdal_compliant_ugrid2d(dataset: xu.UgridDataset) -> xu.UgridDataset:
     """
     Undo some of the changes of ``mdal_compliant_ugrid2d``: re-stack the
     layers.
@@ -337,12 +353,12 @@ def from_mdal_compliant_ugrid2d(dataset: xu.UgridDataset):
     # Next group by name, which will be the output dataset variable name.
     grouped = collections.defaultdict(list)
     for variable, match in matches:
-        name, layer = match.groups()
+        name, layer = match.groups()  # type: ignore
         da = ds[variable]
         grouped[name].append(da.assign_coords(layer=int(layer)))
 
     # Concatenate, and make sure the dimension order is natural.
-    ugrid_dims = set([dim for grid in dataset.ugrid.grids for dim in grid.dimensions])
+    ugrid_dims = {dim for grid in dataset.ugrid.grids for dim in grid.dimensions}
     for variable, das in grouped.items():
         da = xr.concat(sorted(das, key=lambda da: da["layer"]), dim="layer")
         newdims = list(da.dims)
@@ -401,6 +417,64 @@ def to_ugrid2d(data: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
     return mdal_compliant_ugrid2d(ds)
 
 
+def gdal_compliant_grid(
+    data: Union[xr.DataArray, xr.Dataset],
+    crs: Optional[Any] = None,
+) -> Union[xr.DataArray, xr.Dataset]:
+    """
+    Assign attributes to x,y coordinates to make data accepted by GDAL.
+
+    Parameters
+    ----------
+    data: xr.DataArray | xr.Dataset
+        Structured data with a x and y coordinate.
+    crs: Any, Optional
+        Anything accepted by rasterio.crs.CRS.from_user_input
+        Requires ``rioxarray`` installed.
+
+    Returns
+    -------
+    data with attributes to be accepted by GDAL.
+    """
+    x_attrs = {
+        "axis": "X",
+        "long_name": "x coordinate of projection",
+        "standard_name": "projection_x_coordinate",
+    }
+    y_attrs = {
+        "axis": "Y",
+        "long_name": "y coordinate of projection",
+        "standard_name": "projection_y_coordinate",
+    }
+
+    # Use of ``dims`` in xarray currently inconsistent between DataArray and
+    # Dataset, therefore use .sizes.keys() to force getting the same thing.
+    # FUTURE: change this to set(data.dims) when made consistent.
+    dims = {str(k) for k in data.sizes.keys()}
+    missing_dims = {"x", "y"} - dims
+
+    if len(missing_dims) > 0:
+        raise ValueError(f"Missing dimensions: {missing_dims}")
+
+    x_coord_attrs = data.coords["x"].assign_attrs(x_attrs)
+    y_coord_attrs = data.coords["y"].assign_attrs(y_attrs)
+
+    data_gdal = data.assign_coords(x=x_coord_attrs, y=y_coord_attrs)
+
+    if crs is not None:
+        if isinstance(rioxarray, MissingOptionalModule):
+            raise ModuleNotFoundError("rioxarray is required for this functionality")
+        elif (data_gdal.rio.crs is not None) and (data_gdal.rio.crs != crs):
+            raise ValueError(
+                "Grid already has CRS different then provided CRS. "
+                f"Grid has {data_gdal.rio.crs}, got {crs}."
+            )
+
+        data_gdal.rio.write_crs(crs, inplace=True)
+
+    return data_gdal
+
+
 def empty_2d(
     dx: Union[float, FloatArray],
     xmin: float,
@@ -437,7 +511,7 @@ def empty_2d(
         Filled with NaN.
     """
     bounds = (xmin, xmax, ymin, ymax)
-    cellsizes = (abs(dx), -abs(dy))
+    cellsizes = (np.abs(dx), -np.abs(dy))
     coords = _xycoords(bounds, cellsizes)
     nrow = coords["y"].size
     ncol = coords["x"].size
@@ -484,7 +558,7 @@ def empty_3d(
         Filled with NaN.
     """
     bounds = (xmin, xmax, ymin, ymax)
-    cellsizes = (abs(dx), -abs(dy))
+    cellsizes = (np.abs(dx), -np.abs(dy))
     coords = _xycoords(bounds, cellsizes)
     nrow = coords["y"].size
     ncol = coords["x"].size
@@ -537,7 +611,7 @@ def empty_2d_transient(
         Filled with NaN.
     """
     bounds = (xmin, xmax, ymin, ymax)
-    cellsizes = (abs(dx), -abs(dy))
+    cellsizes = (np.abs(dx), -np.abs(dy))
     coords = _xycoords(bounds, cellsizes)
     nrow = coords["y"].size
     ncol = coords["x"].size
@@ -591,7 +665,7 @@ def empty_3d_transient(
         Filled with NaN.
     """
     bounds = (xmin, xmax, ymin, ymax)
-    cellsizes = (abs(dx), -abs(dy))
+    cellsizes = (np.abs(dx), -np.abs(dy))
     coords = _xycoords(bounds, cellsizes)
     nrow = coords["y"].size
     ncol = coords["x"].size
@@ -620,20 +694,20 @@ def _time(time: Any) -> Any:
     return pd.to_datetime(time)
 
 
-def is_divisor(numerator: FloatArray, denominator: float) -> bool:
+def is_divisor(numerator: Union[float, FloatArray], denominator: float) -> bool:
     """
     Parameters
     ----------
-    numerator: np.array of floats
+    numerator: np.array of floats or float
     denominator: float
 
     Returns
     -------
     is_divisor: bool
     """
-    denominator = abs(denominator)
+    denominator = np.abs(denominator)
     remainder = np.abs(numerator) % denominator
-    return (np.isclose(remainder, 0.0) | np.isclose(remainder, denominator)).all()
+    return bool(np.all(np.isclose(remainder, 0.0) | np.isclose(remainder, denominator)))
 
 
 def _polygonize(da: xr.DataArray) -> "gpd.GeoDataFrame":

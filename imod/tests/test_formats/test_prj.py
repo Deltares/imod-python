@@ -68,7 +68,7 @@ class TestLineIterator:
         assert self.lines.count == -1
 
     def test_iter(self):
-        lines = [line for line in self.lines]
+        lines = list(self.lines)
         assert lines == [
             ["This", "is", "the", "first", "line"],
             ["this", "is", "the", "second"],
@@ -532,7 +532,55 @@ class TestProjectFile:
         assert isinstance(content["hfb-1"]["geodataframe"], gpd.GeoDataFrame)
         assert isinstance(content["hfb-2"]["geodataframe"], gpd.GeoDataFrame)
         assert isinstance(content["pcg"], dict)
-        assert set(repeats["rch"]) == set([datetime(1899, 4, 1), datetime(1899, 10, 1)])
+        assert set(repeats["rch"]) == {datetime(1899, 4, 1), datetime(1899, 10, 1)}
+
+    def test_open_projectfile_data__faulty_well(self):
+        basepath = self.prj_path.parent
+        # Setup faulty well
+        wellpath = basepath / "wells_l2.ipf"
+        wellpath_backup = basepath / "wells_l2.backup"
+        wellpath.rename(wellpath_backup)
+        with open(wellpath, mode="w") as f:
+            f.write("!@#$(!())\n#*@*!(!())")
+
+        with pytest.raises(ValueError, match="wells_l2.ipf"):
+            imod.prj.open_projectfile_data(self.prj_path)
+
+        # Teardown
+        wellpath.unlink()
+        wellpath_backup.rename(wellpath)
+
+    def test_open_projectfile_data__faulty_grid(self):
+        basepath = self.prj_path.parent
+        # Setup faulty grid
+        gridpath = basepath / "a.idf"
+        gridpath_backup = basepath / "a.backup"
+        gridpath.rename(gridpath_backup)
+        with open(gridpath, mode="w") as f:
+            f.write("!@#$(!())\n#*@*!(!())")
+
+        with pytest.raises(ValueError, match="a.idf"):
+            imod.prj.open_projectfile_data(self.prj_path)
+
+        # Teardown
+        gridpath.unlink()
+        gridpath_backup.rename(gridpath)
+
+    def test_open_projectfile_data__faulty_gen(self):
+        basepath = self.prj_path.parent
+        # Setup faulty gen
+        genpath = basepath / "first.gen"
+        genpath_backup = basepath / "first.backup"
+        genpath.rename(genpath_backup)
+        with open(genpath, mode="w") as f:
+            f.write("!@#$(!())\n#*@*!(!())")
+
+        with pytest.raises(IndexError, match="first.gen"):
+            imod.prj.open_projectfile_data(self.prj_path)
+
+        # Teardown
+        genpath.unlink()
+        genpath_backup.rename(genpath)
 
 
 def test_read_timfile(tmp_path):

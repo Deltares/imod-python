@@ -1,13 +1,14 @@
 import pathlib
-from typing import Optional, Tuple
+from typing import Any, List
 
 import numpy as np
 
 import imod
 from imod.logging import init_log_decorator
+from imod.mf6.interfaces.imaskingsettings import IMaskingSettings
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
-from imod.mf6.utilities.regrid import RegridderType
+from imod.mf6.regrid.regrid_schemes import DiscretizationRegridMethod
 from imod.mf6.validation import DisBottomSchema
 from imod.schemata import (
     ActiveCellsConnectedSchema,
@@ -20,7 +21,7 @@ from imod.schemata import (
 )
 
 
-class StructuredDiscretization(Package, IRegridPackage):
+class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
     """
     Discretization information for structered grids is specified using the file.
     (DIS6) Only one discretization input file (DISU6, DISV6 or DIS6) can be
@@ -84,14 +85,11 @@ class StructuredDiscretization(Package, IRegridPackage):
     _grid_data = {"top": np.float64, "bottom": np.float64, "idomain": np.int32}
     _keyword_map = {"bottom": "botm"}
     _template = Package._initialize_template(_pkg_id)
+    _regrid_method = DiscretizationRegridMethod()
 
-    _regrid_method = {
-        "top": (RegridderType.OVERLAP, "mean"),
-        "bottom": (RegridderType.OVERLAP, "mean"),
-        "idomain": (RegridderType.OVERLAP, "mode"),
-    }
-
-    _skip_mask_arrays = ["bottom"]
+    @property
+    def skip_variables(self) -> List[str]:
+        return ["bottom"]
 
     @init_log_decorator()
     def __init__(self, top, bottom, idomain, validate: bool = True):
@@ -117,7 +115,7 @@ class StructuredDiscretization(Package, IRegridPackage):
 
     def render(self, directory, pkgname, globaltimes, binary):
         disdirectory = pathlib.Path(directory) / pkgname
-        d = {}
+        d: dict[str, Any] = {}
         x = self.dataset["idomain"].coords["x"]
         y = self.dataset["idomain"].coords["y"]
         dx, xmin, _ = imod.util.spatial.coord_reference(x)
@@ -148,6 +146,3 @@ class StructuredDiscretization(Package, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method

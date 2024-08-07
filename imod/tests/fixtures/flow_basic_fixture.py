@@ -174,12 +174,12 @@ def get_render_dict():
             system_index=system_index,
         )
 
-        return dict(
-            pkg_id=package._pkg_id,
-            name=package.__class__.__name__,
-            variable_order=package._variable_order,
-            package_data=composition[package._pkg_id],
-        )
+        return {
+            "pkg_id": package._pkg_id,
+            "name": package.__class__.__name__,
+            "variable_order": package._variable_order,
+            "package_data": composition[package._pkg_id],
+        }
 
     return _get_render_dict
 
@@ -247,7 +247,8 @@ def horizontal_flow_barrier_gdf(basic_dis):
     id_name = ["left_upper", "right_upper", "left_lower", "right_lower"]
 
     hfb_gdf = gpd.GeoDataFrame(
-        geometry=lines, data=dict(layer=hfb_layers, resistance=100.0, id_name=id_name)
+        geometry=lines,
+        data={"layer": hfb_layers, "resistance": 100.0, "id_name": id_name},
     )
 
     return hfb_gdf

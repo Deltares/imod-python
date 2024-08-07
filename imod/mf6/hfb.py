@@ -18,7 +18,6 @@ from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
 from imod.mf6.utilities.grid import broadcast_to_full_domain
-from imod.mf6.utilities.regrid import RegridderType
 from imod.schemata import EmptyIndexesSchema
 from imod.typing import GridDataArray
 from imod.util.imports import MissingOptionalModule
@@ -37,7 +36,7 @@ except ImportError:
     shapely = MissingOptionalModule("shapely")
 
 
-@typedispatch  # type: ignore[no-redef]
+@typedispatch
 def _derive_connected_cell_ids(
     idomain: xr.DataArray, grid: xu.Ugrid2d, edge_index: np.ndarray
 ):
@@ -286,8 +285,6 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
     _init_schemata = {}
     _write_schemata = {"geometry": [EmptyIndexesSchema()]}
 
-    _regrid_method: dict[str, Tuple[RegridderType, str]] = {}
-
     def __init__(
         self,
         geometry: "gpd.GeoDataFrame",
@@ -295,11 +292,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
     ) -> None:
         dict_dataset = {"print_input": print_input}
         super().__init__(dict_dataset)
-
         self.line_data = geometry
-
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method
 
     def _get_variable_names_for_gdf(self) -> list[str]:
         return [
@@ -408,18 +401,15 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
                 )
             )
 
-        barrier_dataset = typing.cast(
-            xr.Dataset,
-            to_connected_cells_dataset(
-                idomain,
-                unstructured_grid.ugrid.grid,
-                edge_index,
-                {
-                    "hydraulic_characteristic": self.__to_hydraulic_characteristic(
-                        barrier_values
-                    )
-                },
-            ),
+        barrier_dataset = to_connected_cells_dataset(
+            idomain,
+            unstructured_grid.ugrid.grid,
+            edge_index,
+            {
+                "hydraulic_characteristic": self.__to_hydraulic_characteristic(
+                    barrier_values
+                )
+            },
         )
 
         barrier_dataset["print_input"] = self.dataset["print_input"]
@@ -431,7 +421,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             return True
 
         linestrings = self.dataset["geometry"]
-        only_empty_lines = all([ls.is_empty for ls in linestrings.values])
+        only_empty_lines = all(ls.is_empty for ls in linestrings.values)
         return only_empty_lines
 
     def _resistance_layer(
@@ -505,9 +495,9 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
     def __to_resistance(self, value: xu.UgridDataArray) -> xu.UgridDataArray:
         match self._get_barrier_type():
             case BarrierType.HydraulicCharacteristic:
-                return 1.0 / value  # type: ignore
+                return 1.0 / value
             case BarrierType.Multiplier:
-                return -1.0 / value  # type: ignore
+                return -1.0 / value
             case BarrierType.Resistance:
                 return value
 
@@ -592,6 +582,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         cls = type(self)
         new = cls.__new__(cls)
         new.dataset = copy.deepcopy(self.dataset)
+        new.line_data = self.line_data
         return new
 
     def mask(self, _) -> Package:
