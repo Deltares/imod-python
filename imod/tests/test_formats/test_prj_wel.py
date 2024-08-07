@@ -10,6 +10,7 @@ from pytest_cases import (
 )
 
 from imod.formats.prj import open_projectfile_data
+from imod.mf6 import LayeredWell, Well
 
 
 class WellPrjCases:
@@ -341,3 +342,27 @@ def test_open_projectfile_data_wells(
         for field in fields:
             assert field in actual
             assert actual[field] == wel_expected[field]
+
+
+@parametrize("wel_case, expected", argvalues=list(zip(PRJ_ARGS, READ_ARGS)))
+def test_from_imod5_data_wells(
+    wel_case, expected, well_mixed_ipfs, tmp_path, request
+):
+    # Arrange
+    case_name = request.node.callspec.id
+    wel_file = tmp_path / f"{case_name}.prj"
+
+    with open(wel_file, "w") as f:
+        f.write(wel_case)
+
+    ipf_dir = tmp_path / "ipf"
+    ipf_dir.mkdir(exist_ok=True)
+
+    # copy files to test folder
+    for p in well_mixed_ipfs:
+        copyfile(p, ipf_dir / p.name)
+
+    # Act
+    data, _ = open_projectfile_data(wel_file)
+    times = [datetime(2000, 1, 1, 0, 0), datetime(2001, 1, 1, 0, 0)]
+    well = LayeredWell.from_imod5_data("wel-simple1", data, times=times)

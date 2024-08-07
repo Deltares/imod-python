@@ -95,6 +95,49 @@ def _prepare_well_rates_from_groups(
     return xr.concat(da_groups, dim="index")
 
 
+def _unpack_package_data(pkg_data, times) -> pd.DataFrame:
+    """Unpack package data to dataframe"""
+    simulation_times = times[:-1]  # Simulation times, without endtime
+
+    has_associated = pkg_data["has_associated"]
+    if has_associated:
+        # Validate if associated wells are assigned multiple layers, factors,
+        # and additions.
+        for entry in ["layer", "factor", "addition"]:
+            uniques = set(pkg_data[entry])
+            if len(uniques) > 1:
+                raise ValueError(f"IPF with associated textfiles assigned multiple {entry}s: {uniques}")
+        # Validate if associated wells are defined only on first timestep or all
+        # timesteps
+        is_defined_all = len(set(times) - set(pkg_data["time"])) == 0
+        is_defined_first = (len(pkg_data["time"]) == 1) & (pkg_data["time"][0] != times[0])
+        if not is_defined_all and not is_defined_first:
+            raise ValueError(
+                "IPF with associated textfiles assigned to wrong times. "
+                "Should be assigned to all times or only first time. "
+                f"PRJ times: {pkg_data["time"]}, simulation times: {simulation_times}"
+            )
+        df = pkg_data["dataframe"][0]
+        # CALL RESAMPLING OF WELLS HERE
+    else:
+        # Concatenate dataframes, assign layer and times
+        iter_dfs_dims = zip(pkg_data["dataframe"], pkg_data["time"], pkg_data["layer"])
+        df = pd.concat([df.assign(time=t, layer=lay) for df, t, lay in iter_dfs_dims])
+        # Prepare out dataframe, taking the outer product to to get all possible
+        # combinations between time and rows.
+        df_multi = df.set_index(["time", df.index])
+        multi_index = pd.MultiIndex.from_product([simulation_times, df.index], names = ["time", "ipf_row"])
+        df_out = df_multi.reindex(multi_index)
+        # Forward fill NaN for well locations, convert to xarray and back to
+        # deal with forward filling across a specific dimension
+        cols_ffill = ["x", "y", "layer"]
+        df_out.loc[:, cols_ffill] = df_out.loc[:, cols_ffill].to_xarray().ffill("time").to_dataframe()
+        # Fill rate NaNs with 0.0
+        df_out.loc[:, "rate"] = df_out.loc[:, "rate"].fillna(0.0)
+        return df_out.reset_index().drop(columns = "ipf_row")
+
+
+
 class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
     """
     Abstract base class for grid agnostic wells
@@ -700,7 +743,10 @@ class Well(GridAgnosticWell):
         minimum_thickness: float = 1.0,
     ) -> "Well":
         pkg_data = imod5_data[key]
-        if "layer" in pkg_data.keys() and (pkg_data["layer"] != 0):
+
+        df = _unpack_package_data(pkg_data, times)
+
+        if "layer" in pkg_data.keys() and (np.any(pkg_data["layer"] != 0)):
             log_msg = textwrap.dedent(
                 f"""
                 In well {key} a layer was assigned, but this is not supported.
@@ -710,8 +756,6 @@ class Well(GridAgnosticWell):
                 """
             )
             logger.log(loglevel=LogLevel.WARNING, message=log_msg, additional_depth=2)
-
-        df: pd.DataFrame = pkg_data["dataframe"]
 
         if "filt_top" not in df.columns or "filt_bot" not in df.columns:
             log_msg = textwrap.dedent(
@@ -980,16 +1024,13 @@ class LayeredWell(GridAgnosticWell):
     ) -> "LayeredWell":
         pkg_data = imod5_data[key]
 
-        if ("layer" not in pkg_data.keys()) or (pkg_data["layer"] == 0):
+        df = _unpack_package_data(pkg_data, times)
+
+        if ("layer" not in pkg_data.keys()) or (np.any(pkg_data["layer"] == 0)):
             log_msg = textwrap.dedent(
                 f"""In well {key} no layer was assigned, but this is required."""
             )
             logger.log(loglevel=LogLevel.ERROR, message=log_msg, additional_depth=2)
-
-        df: pd.DataFrame = pkg_data["dataframe"]
-
-        # Add layer to dataframe.
-        df["layer"] = pkg_data["layer"]
 
         # Groupby unique wells, to get dataframes per time.
         colnames_group = ["x", "y", "layer", "id"]
