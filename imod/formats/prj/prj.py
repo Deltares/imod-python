@@ -786,6 +786,7 @@ def _read_package_gen(
 
 @dataclass
 class IpfResult:
+    has_associated: bool = data_field(default_factory=bool)
     dataframe: list[pd.DataFrame] = data_field(default_factory=list)
     layer: list[int] = data_field(default_factory=list)
     time: list[str] = data_field(default_factory=list)
@@ -833,6 +834,7 @@ def _read_package_ipf(
         ipf_df, indexcol, ext = _try_read_with_func(imod.ipf._read_ipf, path)
         if indexcol == 0:
             # No associated files
+            has_associated=False
             columns = ("x", "y", "rate")
             if layer <= 0:
                 df = ipf_df.iloc[:, :5]
@@ -841,6 +843,7 @@ def _read_package_ipf(
                 df = ipf_df.iloc[:, :3]
             df.columns = columns
         else:
+            has_associated=True
             dfs = []
             for row in ipf_df.itertuples():
                 filename = row[indexcol]
@@ -886,6 +889,7 @@ def _read_package_ipf(
             df = pd.concat(dfs, ignore_index=True, sort=False)
         df["rate"] = df["rate"] * factor + addition
 
+        out[path.stem].has_associated = has_associated
         out[path.stem].append(df, layer, time, factor, addition)
 
     out_dict_ls: list[dict] = {key: asdict(o) for key, o in out.items()}

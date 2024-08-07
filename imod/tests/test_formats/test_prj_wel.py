@@ -143,6 +143,7 @@ class WellReadCases:
     def case_simple__first(self):
         return {
             "wel-simple1": {
+                "has_associated": False,
                 "time": [datetime(2000, 1, 1)],
                 "layer": [1],
                 "factor": [1.0],
@@ -153,18 +154,21 @@ class WellReadCases:
     def case_simple__all(self):
         return {
             "wel-simple1": {
+                "has_associated": False,
                 "time": [datetime(2000, 1, 1), datetime(2000, 1, 2)],
                 "layer": [1, 1],
                 "factor": [1.0, 1.0],
                 "addition": [0.0, 0.0],
             },
             "wel-simple2": {
+                "has_associated": False,
                 "time": [datetime(2000, 1, 2)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
             },
             "wel-simple3": {
+                "has_associated": False,
                 "time": [datetime(2000, 1, 3)],
                 "layer": [1],
                 "factor": [1.0],
@@ -175,6 +179,7 @@ class WellReadCases:
     def case_associated__first(self):
         return {
             "wel-associated": {
+                "has_associated": True,
                 "time": [datetime(2000, 1, 1)],
                 "layer": [1],
                 "factor": [1.0],
@@ -185,6 +190,7 @@ class WellReadCases:
     def case_associated__all(self):
         return {
             "wel-associated": {
+                "has_associated": True,
                 "time": [
                     datetime(2000, 1, 1),
                     datetime(2000, 1, 2),
@@ -199,6 +205,7 @@ class WellReadCases:
     def case_associated__all_varying_factors(self):
         return {
             "wel-associated": {
+                "has_associated": True,
                 "time": [
                     datetime(2000, 1, 1),
                     datetime(2000, 1, 2),
@@ -213,6 +220,7 @@ class WellReadCases:
     def case_associated__multiple_layers_different_factors(self):
         return {
             "wel-associated": {
+                "has_associated": True,
                 "time": [
                     datetime(2000, 1, 1),
                     datetime(2000, 1, 1),
@@ -226,12 +234,14 @@ class WellReadCases:
     def case_mixed__first(self):
         return {
             "wel-simple1": {
+                "has_associated": False,
                 "time": [datetime(2000, 1, 1)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
             },
             "wel-associated": {
+                "has_associated": True,
                 "time": [datetime(2000, 1, 1)],
                 "layer": [1],
                 "factor": [1.0],
@@ -242,6 +252,7 @@ class WellReadCases:
     def case_mixed__all(self):
         return {
             "wel-associated": {
+                "has_associated": True,
                 "time": [
                     datetime(2000, 1, 1),
                     datetime(2000, 1, 2),
@@ -252,6 +263,7 @@ class WellReadCases:
                 "addition": [0.0, 0.0, 0.0],
             },
             "wel-simple1": {
+                "has_associated": False,
                 "time": [datetime(2000, 1, 2)],
                 "layer": [1],
                 "factor": [1.0],
@@ -262,12 +274,14 @@ class WellReadCases:
     def case_mixed__associated_second(self):
         return {
             "wel-associated": {
+                "has_associated": True,
                 "time": [datetime(2000, 1, 2)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
             },
             "wel-simple1": {
+                "has_associated": False,
                 "time": [datetime(2000, 1, 1)],
                 "layer": [1],
                 "factor": [1.0],
@@ -321,10 +335,9 @@ def test_open_projectfile_data_wells(
     # Act
     data, _ = open_projectfile_data(wel_file)
     assert len(set(expected.keys()) ^ set(data.keys())) == 0
-    for key, wel_expected in expected.items():
-        assert "time" in data[key]
-        actual = data[key]
-        assert actual["time"] == wel_expected["time"]
-        assert actual["layer"] == wel_expected["layer"]
-        assert actual["addition"] == wel_expected["addition"]
-        assert actual["factor"] == wel_expected["factor"]
+    fields = ["time", "layer", "addition", "factor", "has_associated"]
+    for wel_name, wel_expected in expected.items():
+        actual = data[wel_name]
+        for field in fields:
+            assert field in actual
+            assert actual[field] == wel_expected[field]
