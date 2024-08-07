@@ -27,15 +27,13 @@ def _relpath(path, to):
 # This class allows only imod packages as values
 class Model(collections.UserDict):
     def __setitem__(self, key, value):
-        # TODO: raise ValueError on setting certain duplicates
-        # e.g. two solvers
-        if self.check == "eager":
-            value._pkgcheck()
-        super().__setitem__(key, value)
-
-    def update(self, *args, **kwargs):
-        for k, v in dict(*args, **kwargs).items():
-            self[k] = v
+        # TODO: raise      # ani and hfb packages
+        content.append(
+            self._render_anihfb(
+                modelname=self.modelname, directory=directory, nlayer=nlayer
+        for key in ("ani", "hfb6"):
+            content.append(
+                self._render_anihfb(
 
     def visualize(
         self,
