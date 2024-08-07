@@ -21,7 +21,7 @@ def _relpath(path, to):
         return pathlib.Path(os.path.relpath(path, to))
     except ValueError:
         # Fails to switch between drives e.g.
-        return pathlib.Path(os.path.abspath(path))
+        return pathlib.Path(os.path.absp
 
 
 # This class allows only imod packages as values
