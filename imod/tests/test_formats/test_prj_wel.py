@@ -20,7 +20,7 @@ class WellPrjCases:
         return dedent(
             """
             0001,(WEL),1
-            2000-01-01
+            1981-12-01
             001,001
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
             """
@@ -30,14 +30,14 @@ class WellPrjCases:
         return dedent(
             """
             0003,(WEL),1
-            2000-01-01
+            1981-12-01
             001,001
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
-            2000-01-02
+            1982-01-01
             001,002
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple2.ipf"
-            2000-01-03
+            1982-02-01
             001,001
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple3.ipf"
             """
@@ -47,7 +47,7 @@ class WellPrjCases:
         return dedent(
             """
             0001,(WEL),1
-            2000-01-01
+            1981-12-01
             001,001
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
             """
@@ -57,13 +57,13 @@ class WellPrjCases:
         return dedent(
             """
             0003,(WEL),1
-            2000-01-01
+            1981-12-01
             001,001
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
-            2000-01-02
+            1982-01-01
             001,001
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
-            2000-01-03
+            1982-02-01
             001,001
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
             """
@@ -73,13 +73,13 @@ class WellPrjCases:
         return dedent(
             """
             0003,(WEL),1
-            2000-01-01
+            1981-12-01
             001,001
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
-            2000-01-02
+            1982-01-01
             001,001
             1,2, 001, 0.5, 0.0, -999.9900 ,"ipf/associated.ipf"
-            2000-01-03
+            1982-02-01
             001,001
             1,2, 001, 0.2, 0.0, -999.9900 ,"ipf/associated.ipf"
             """
@@ -89,7 +89,7 @@ class WellPrjCases:
         return dedent(
             """
             0001,(WEL),1
-            2000-01-01
+            1981-12-01
             001,002
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
             1,2, 002, 0.75, 0.0, -999.9900 ,"ipf/associated.ipf"
@@ -100,7 +100,7 @@ class WellPrjCases:
         return dedent(
             """
             0001,(WEL),1
-            2000-01-01
+            1981-12-01
             001,002
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
@@ -111,14 +111,14 @@ class WellPrjCases:
         return dedent(
             """
             0003,(WEL),1
-            2000-01-01
+            1981-12-01
             001,001
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
-            2000-01-02
+            1982-01-01
             001,002
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
-            2000-01-03
+            1982-02-01
             001,001
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
             """
@@ -128,10 +128,10 @@ class WellPrjCases:
         return dedent(
             """
             0002,(WEL),1
-            2000-01-01
+            1981-12-01
             001,001
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
-            2000-01-02
+            1982-01-01
             001,001
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
             """
@@ -145,7 +145,7 @@ class WellReadCases:
         return {
             "wel-simple1": {
                 "has_associated": False,
-                "time": [datetime(2000, 1, 1)],
+                "time": [datetime(1981,12, 1)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
@@ -156,21 +156,21 @@ class WellReadCases:
         return {
             "wel-simple1": {
                 "has_associated": False,
-                "time": [datetime(2000, 1, 1), datetime(2000, 1, 2)],
+                "time": [datetime(1981,12, 1), datetime(1982, 1, 1)],
                 "layer": [1, 1],
                 "factor": [1.0, 1.0],
                 "addition": [0.0, 0.0],
             },
             "wel-simple2": {
                 "has_associated": False,
-                "time": [datetime(2000, 1, 2)],
+                "time": [datetime(1982, 1, 1)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
             },
             "wel-simple3": {
                 "has_associated": False,
-                "time": [datetime(2000, 1, 3)],
+                "time": [datetime(1982, 3, 3)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
@@ -181,7 +181,7 @@ class WellReadCases:
         return {
             "wel-associated": {
                 "has_associated": True,
-                "time": [datetime(2000, 1, 1)],
+                "time": [datetime(1981,12, 1)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
@@ -193,9 +193,9 @@ class WellReadCases:
             "wel-associated": {
                 "has_associated": True,
                 "time": [
-                    datetime(2000, 1, 1),
-                    datetime(2000, 1, 2),
-                    datetime(2000, 1, 3),
+                    datetime(1981,12, 1),
+                    datetime(1982, 1, 1),
+                    datetime(1982, 3, 3),
                 ],
                 "layer": [1, 1, 1],
                 "factor": [1.0, 1.0, 1.0],
@@ -208,9 +208,9 @@ class WellReadCases:
             "wel-associated": {
                 "has_associated": True,
                 "time": [
-                    datetime(2000, 1, 1),
-                    datetime(2000, 1, 2),
-                    datetime(2000, 1, 3),
+                    datetime(1981,12, 1),
+                    datetime(1982, 1, 1),
+                    datetime(1982, 3, 3),
                 ],
                 "layer": [1, 1, 1],
                 "factor": [1.0, 0.5, 0.2],
@@ -223,8 +223,8 @@ class WellReadCases:
             "wel-associated": {
                 "has_associated": True,
                 "time": [
-                    datetime(2000, 1, 1),
-                    datetime(2000, 1, 1),
+                    datetime(1981,12, 1),
+                    datetime(1981,12, 1),
                 ],
                 "layer": [1, 2],
                 "factor": [1.0, 0.75],
@@ -236,14 +236,14 @@ class WellReadCases:
         return {
             "wel-simple1": {
                 "has_associated": False,
-                "time": [datetime(2000, 1, 1)],
+                "time": [datetime(1981,12, 1)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
             },
             "wel-associated": {
                 "has_associated": True,
-                "time": [datetime(2000, 1, 1)],
+                "time": [datetime(1981,12, 1)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
@@ -255,9 +255,9 @@ class WellReadCases:
             "wel-associated": {
                 "has_associated": True,
                 "time": [
-                    datetime(2000, 1, 1),
-                    datetime(2000, 1, 2),
-                    datetime(2000, 1, 3),
+                    datetime(1981,12, 1),
+                    datetime(1982, 1, 1),
+                    datetime(1982, 3, 3),
                 ],
                 "layer": [1, 1, 1],
                 "factor": [1.0, 1.0, 1.0],
@@ -265,7 +265,7 @@ class WellReadCases:
             },
             "wel-simple1": {
                 "has_associated": False,
-                "time": [datetime(2000, 1, 2)],
+                "time": [datetime(1982, 1, 1)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
@@ -276,14 +276,14 @@ class WellReadCases:
         return {
             "wel-associated": {
                 "has_associated": True,
-                "time": [datetime(2000, 1, 2)],
+                "time": [datetime(1982, 1, 1)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
             },
             "wel-simple1": {
                 "has_associated": False,
-                "time": [datetime(2000, 1, 1)],
+                "time": [datetime(1981,12, 1)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
@@ -299,7 +299,6 @@ class WellReadCases:
 # zip(input_args,expected).
 def case_args_to_parametrize(cases, prefix):
     """Manually retrieve all case args of a set in cases."""
-
     # Decorate some dummy function to be able to call ``get_all_cases``. For some
     # reason, pytest_cases requires a decorated function (despite telling us
     # differently in the docs.)
@@ -359,7 +358,7 @@ def test_from_imod5_data_wells(wel_case, expected, well_mixed_ipfs, tmp_path, re
 
     # Act
     data, _ = open_projectfile_data(wel_file)
-    times = [datetime(2000, 1, i + 1, 0, 0) for i in range(4)]
+    times = [datetime(1981, 12, 1)] + [datetime(1982, i + 1, 1) for i in range(3)]
     for wellname in data.keys():
         well = LayeredWell.from_imod5_data(wellname, data, times=times)
         pass
