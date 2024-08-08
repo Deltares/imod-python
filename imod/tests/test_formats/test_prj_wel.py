@@ -2,6 +2,8 @@ from datetime import datetime
 from shutil import copyfile
 from textwrap import dedent
 
+import numpy as np
+import pytest
 from pytest_cases import (
     get_all_cases,
     get_parametrize_args,
@@ -296,29 +298,54 @@ class WellPackageCases:
     Expected cases as loaded with from_imod5_data.
     Returns a tuple  with as first element a bool whether the import is expected to fail
     The second element specifies in which timesteps the rates are set to zero.
-    
+
     Returns
     -------
     fails, {wellname: datetime_set_to_zero}
     """
 
     def case_simple__first(self):
-        return False, {
-            "wel-simple1": [datetime(1982, 2, 1), datetime(1982, 3, 1)],
+        return {
+            "wel-simple1": (False, [datetime(1982, 2, 1), datetime(1982, 3, 1)]),
         }
+
     def case_simple__all(self):
-        return False, {
-            "wel-simple1": [datetime(1982, 2, 1)],
-            "wel-simple2": [datetime(1982, 1, 1), datetime(1982, 3, 1)],
-            "wel-simple3": [datetime(1982, 1, 1), datetime(1982, 2, 1)],
+        return {
+            "wel-simple1": (False, [datetime(1982, 2, 1)]),
+            "wel-simple2": (False, [datetime(1982, 1, 1), datetime(1982, 3, 1)]),
+            "wel-simple3": (False, [datetime(1982, 1, 1), datetime(1982, 2, 1)]),
         }
+
     def case_associated__first(self):
+        return {"wel-associated": (False, [])}
+
     def case_associated__all(self):
+        return {"wel-associated": (False, [])}
+
     def case_associated__all_varying_factors(self):
+        return {"wel-associated": (True, [])}
+
     def case_associated__multiple_layers_different_factors(self):
+        return {"wel-associated": (True, [])}
+
     def case_mixed__first(self):
+        return {
+            "wel-simple1": (False, [datetime(1982, 2, 1), datetime(1982, 3, 1)]),
+            "wel-associated": (False, []),
+        }
+
     def case_mixed__all(self):
-    def case_mixed__associated_second(self):    
+        return {
+            "wel-simple1": (False, [datetime(1982, 1, 1), datetime(1982, 3, 1)]),
+            "wel-associated": (False, []),
+        }
+
+    def case_mixed__associated_second(self):
+        return {
+            "wel-simple1": (False, [datetime(1982, 1, 1), datetime(1982, 3, 1)]),
+            "wel-associated": (True, []),
+            }
+
 
 # pytest_cases doesn't support any "zipped test cases", instead it takes the
 # outer product of cases, when providing multiple case sets.
@@ -328,6 +355,7 @@ class WellPackageCases:
 # zip(input_args,expected).
 def case_args_to_parametrize(cases, prefix):
     """Manually retrieve all case args of a set in cases."""
+
     # Decorate some dummy function to be able to call ``get_all_cases``. For some
     # reason, pytest_cases requires a decorated function (despite telling us
     # differently in the docs.)
@@ -341,7 +369,7 @@ def case_args_to_parametrize(cases, prefix):
 
 PRJ_ARGS = case_args_to_parametrize(WellPrjCases, "case_")
 READ_ARGS = case_args_to_parametrize(WellReadCases, "case_")
-
+PKG_ARGS = case_args_to_parametrize(WellPackageCases, "case_")
 
 def setup_test_files(wel_case, wel_file, well_mixed_ipfs, tmp_path):
     """
@@ -378,16 +406,28 @@ def test_open_projectfile_data_wells(
             assert actual[field] == wel_expected[field]
 
 
-@parametrize("wel_case, expected", argvalues=list(zip(PRJ_ARGS, READ_ARGS)))
-def test_from_imod5_data_wells(wel_case, expected, well_mixed_ipfs, tmp_path, request):
+@parametrize("wel_case, expected_dict", argvalues=list(zip(PRJ_ARGS, PKG_ARGS)))
+def test_from_imod5_data_wells(wel_case, expected_dict, well_mixed_ipfs, tmp_path, request):
     # Arrange
     case_name = request.node.callspec.id
     wel_file = tmp_path / f"{case_name}.prj"
     setup_test_files(wel_case, wel_file, well_mixed_ipfs, tmp_path)
+    
+    times = [datetime(1982, i + 1, 1) for i in range(4)]
 
     # Act
     data, _ = open_projectfile_data(wel_file)
-    times = [datetime(1982, i + 1, 1) for i in range(4)]
     for wellname in data.keys():
-        well = LayeredWell.from_imod5_data(wellname, data, times=times)
-        pass
+        assert wellname in expected_dict.keys()
+        fails, expected_set_to_zero = expected_dict[wellname]
+        if fails:
+            with pytest.raises(ValueError):
+                LayeredWell.from_imod5_data(wellname, data, times=times)
+        else:
+            well = LayeredWell.from_imod5_data(wellname, data, times=times)
+            rate = well.dataset["rate"]
+            actual_set_to_zero = [t.values for t in rate.coords["time"] if (rate.sel(time=t) == 0.0).all()]
+            expected_set_to_zero = [np.datetime64(t, "ns") for t in expected_set_to_zero]
+            diff = set(actual_set_to_zero) ^ set(expected_set_to_zero)
+            assert len(diff) == 0
+
