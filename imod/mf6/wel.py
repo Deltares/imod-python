@@ -94,47 +94,54 @@ def _prepare_well_rates_from_groups(
     # Concatenate datarrays along index dimension
     return xr.concat(da_groups, dim="index")
 
+def _prepare_df_ipf_associated(pkg_data: dict, start_times: list[datetime]) -> pd.DataFrame:
+    """Prepare dataframe for an ipf with associated timeseries in a textfile."""
+    # Validate if associated wells are assigned multiple layers, factors,
+    # and additions.
+    for entry in ["layer", "factor", "addition"]:
+        uniques = set(pkg_data[entry])
+        if len(uniques) > 1:
+            raise ValueError(f"IPF with associated textfiles assigned multiple {entry}s: {uniques}")
+    # Validate if associated wells are defined only on first timestep or all
+    # timesteps
+    is_defined_all = len(set(start_times) - set(pkg_data["time"])) == 0
+    is_defined_first = (len(pkg_data["time"]) == 1) & (pkg_data["time"][0] != start_times[0])
+    if not is_defined_all and not is_defined_first:
+        raise ValueError(
+            "IPF with associated textfiles assigned to wrong times. "
+            "Should be assigned to all times or only first time. "
+            f"PRJ times: {pkg_data["time"]}, simulation times: {start_times}"
+        )
+    df = pkg_data["dataframe"][0]
+    # CALL RESAMPLING OF WELLS HERE
+    return df
 
-def _unpack_package_data(pkg_data, times) -> pd.DataFrame:
+def _prepare_df_ipf_unassociated(pkg_data: dict, start_times: list[datetime])-> pd.DataFrame:
+    """Prepare dataframe for an ipf with no associated timeseries."""
+    # Concatenate dataframes, assign layer and times
+    iter_dfs_dims = zip(pkg_data["dataframe"], pkg_data["time"], pkg_data["layer"])
+    df = pd.concat([df.assign(time=t, layer=lay) for df, t, lay in iter_dfs_dims])
+    # Prepare out dataframe, taking the outer product to to get all possible
+    # combinations between time and rows.
+    df_multi = df.set_index(["time", df.index])
+    multi_index = pd.MultiIndex.from_product([start_times, df.index], names = ["time", "ipf_row"])
+    df_out = df_multi.reindex(multi_index)
+    # Forward fill NaN for well locations, convert to xarray and back to
+    # deal with forward filling across a specific dimension
+    cols_ffill = ["x", "y", "layer"]
+    df_out.loc[:, cols_ffill] = df_out.loc[:, cols_ffill].to_xarray().ffill("time").to_dataframe()
+    # Fill rate NaNs with 0.0
+    df_out.loc[:, "rate"] = df_out.loc[:, "rate"].fillna(0.0)
+    return df_out.reset_index().drop(columns = "ipf_row")
+
+def _unpack_package_data(pkg_data: dict, times: list[datetime]) -> pd.DataFrame:
     """Unpack package data to dataframe"""
-    simulation_times = times[:-1]  # Simulation times, without endtime
-
+    start_times = times[:-1]  # Starts stress periods.
     has_associated = pkg_data["has_associated"]
     if has_associated:
-        # Validate if associated wells are assigned multiple layers, factors,
-        # and additions.
-        for entry in ["layer", "factor", "addition"]:
-            uniques = set(pkg_data[entry])
-            if len(uniques) > 1:
-                raise ValueError(f"IPF with associated textfiles assigned multiple {entry}s: {uniques}")
-        # Validate if associated wells are defined only on first timestep or all
-        # timesteps
-        is_defined_all = len(set(times) - set(pkg_data["time"])) == 0
-        is_defined_first = (len(pkg_data["time"]) == 1) & (pkg_data["time"][0] != times[0])
-        if not is_defined_all and not is_defined_first:
-            raise ValueError(
-                "IPF with associated textfiles assigned to wrong times. "
-                "Should be assigned to all times or only first time. "
-                f"PRJ times: {pkg_data["time"]}, simulation times: {simulation_times}"
-            )
-        df = pkg_data["dataframe"][0]
-        # CALL RESAMPLING OF WELLS HERE
+        return _prepare_df_ipf_associated(pkg_data, start_times)
     else:
-        # Concatenate dataframes, assign layer and times
-        iter_dfs_dims = zip(pkg_data["dataframe"], pkg_data["time"], pkg_data["layer"])
-        df = pd.concat([df.assign(time=t, layer=lay) for df, t, lay in iter_dfs_dims])
-        # Prepare out dataframe, taking the outer product to to get all possible
-        # combinations between time and rows.
-        df_multi = df.set_index(["time", df.index])
-        multi_index = pd.MultiIndex.from_product([simulation_times, df.index], names = ["time", "ipf_row"])
-        df_out = df_multi.reindex(multi_index)
-        # Forward fill NaN for well locations, convert to xarray and back to
-        # deal with forward filling across a specific dimension
-        cols_ffill = ["x", "y", "layer"]
-        df_out.loc[:, cols_ffill] = df_out.loc[:, cols_ffill].to_xarray().ffill("time").to_dataframe()
-        # Fill rate NaNs with 0.0
-        df_out.loc[:, "rate"] = df_out.loc[:, "rate"].fillna(0.0)
-        return df_out.reset_index().drop(columns = "ipf_row")
+        return _prepare_df_ipf_unassociated(pkg_data, start_times)
 
 
 
@@ -142,6 +149,9 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
     """
     Abstract base class for grid agnostic wells
     """
+
+    _imod5_depth_colnames = []
+    _depth_colnames = []
 
     @property
     def x(self) -> npt.NDArray[np.float64]:
@@ -415,6 +425,37 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
     ) -> pd.DataFrame:
         raise NotImplementedError("Method in abstract base class called")
 
+    @classmethod
+    def _validate_imod5_depth_information(cls, key: str, pkg_data: dict, df: pd.DataFrame) -> None:
+        raise NotImplementedError("Method in abstract base class called")
+
+    @classmethod
+    def from_imod5_data(
+        cls,
+        key: str,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        times: list[datetime],
+        minimum_k: float = 0.1,
+        minimum_thickness: float = 1.0,
+    ) -> "GridAgnosticWell":
+        pkg_data = imod5_data[key]
+
+        df = _unpack_package_data(pkg_data, times)
+        cls._validate_imod5_depth_information(cls, key, pkg_data, df)
+
+        # Groupby unique wells, to get dataframes per time.
+        colnames_group = ["x", "y"] + cls._imod5_depth_colnames #, "id"]
+        wel_index, unique_well_groups = zip(*df.groupby(colnames_group))
+
+        # Unpack wel indices by zipping
+        varnames = ["x", "y"] + cls._depth_colnames
+        index_values = zip(*wel_index)
+        cls_input = {var: np.array(value, dtype=float) for var, value in zip(varnames, index_values)}
+        cls_input["rate"] = _prepare_well_rates_from_groups(unique_well_groups, times)
+        cls_input["minimum_k"] = minimum_k
+        cls_input["minimum_thickness"] = minimum_thickness
+
+        return cls(**cls_input)
 
 class Well(GridAgnosticWell):
     """
@@ -529,6 +570,9 @@ class Well(GridAgnosticWell):
         "rate": [AnyNoDataSchema(), EmptyIndexesSchema()],
         "concentration": [AnyNoDataSchema(), EmptyIndexesSchema()],
     }
+
+    _imod5_depth_colnames = ["filt_top", "filt_bot"]
+    _depth_colnames = ["screen_top", "screen_bottom"]
 
     @init_log_decorator()
     def __init__(
@@ -734,25 +778,15 @@ class Well(GridAgnosticWell):
         return wells_assigned
 
     @classmethod
-    def from_imod5_data(
-        cls,
-        key: str,
-        imod5_data: dict[str, dict[str, GridDataArray]],
-        times: list[datetime],
-        minimum_k: float = 0.1,
-        minimum_thickness: float = 1.0,
-    ) -> "Well":
-        pkg_data = imod5_data[key]
-
-        df = _unpack_package_data(pkg_data, times)
-
+    def _validate_imod5_depth_information(cls, key: str, pkg_data: dict, df: pd.DataFrame) -> None:
         if "layer" in pkg_data.keys() and (np.any(pkg_data["layer"] != 0)):
             log_msg = textwrap.dedent(
                 f"""
-                In well {key} a layer was assigned, but this is not supported.
-                Assignment will be done based on filter_top and filter_bottom,
-                and the chosen layer ({pkg_data["layer"]}) will be ignored. To
-                specify by layer, use imod.mf6.LayeredWell.
+                In well {key} a layer was assigned, but this is not
+                supported for imod.mf6.Well. Assignment will be done based on
+                filter_top and filter_bottom, and the chosen layer
+                ({pkg_data["layer"]}) will be ignored. To specify by layer, use
+                imod.mf6.LayeredWell.
                 """
             )
             logger.log(loglevel=LogLevel.WARNING, message=log_msg, additional_depth=2)
@@ -760,31 +794,13 @@ class Well(GridAgnosticWell):
         if "filt_top" not in df.columns or "filt_bot" not in df.columns:
             log_msg = textwrap.dedent(
                 f"""
-                In well {key} the filt_top and filt_bot columns were not both
-                found; this is not supported for import. To specify by layer,
-                use imod.mf6.LayeredWell.
+                In well {key} the 'filt_top' and 'filt_bot' columns were
+                not both found; this is not supported for import. To specify by
+                layer, use imod.mf6.LayeredWell.
                 """
             )
             logger.log(loglevel=LogLevel.ERROR, message=log_msg, additional_depth=2)
             raise ValueError(log_msg)
-
-        # Groupby unique wells, to get dataframes per time.
-        colnames_group = ["x", "y", "filt_top", "filt_bot", "id"]
-        wel_index, unique_well_groups = zip(*df.groupby(colnames_group))
-
-        # Unpack wel indices by zipping
-        x, y, filt_top, filt_bot, id = zip(*wel_index)
-        well_rate = _prepare_well_rates_from_groups(unique_well_groups, times)
-
-        return cls(
-            x=np.array(x, dtype=float),
-            y=np.array(y, dtype=float),
-            screen_top=np.array(filt_top, dtype=float),
-            screen_bottom=np.array(filt_bot, dtype=float),
-            rate=well_rate,
-            minimum_k=minimum_k,
-            minimum_thickness=minimum_thickness,
-        )
 
 
 class LayeredWell(GridAgnosticWell):
@@ -892,6 +908,8 @@ class LayeredWell(GridAgnosticWell):
         "rate": [AnyNoDataSchema(), EmptyIndexesSchema()],
         "concentration": [AnyNoDataSchema(), EmptyIndexesSchema()],
     }
+    _imod5_depth_colnames = ["layer"]
+    _depth_colnames = ["layer"]
 
     @init_log_decorator()
     def __init__(
@@ -1014,40 +1032,14 @@ class LayeredWell(GridAgnosticWell):
         return wells_df
 
     @classmethod
-    def from_imod5_data(
-        cls,
-        key: str,
-        imod5_data: dict[str, dict[str, GridDataArray]],
-        times: list[datetime],
-        minimum_k: float = 0.1,
-        minimum_thickness: float = 1.0,
-    ) -> "LayeredWell":
-        pkg_data = imod5_data[key]
-
-        df = _unpack_package_data(pkg_data, times)
-
+    def _validate_imod5_depth_information(cls, key: str, pkg_data: dict, df: pd.DataFrame) -> None:
         if ("layer" not in pkg_data.keys()) or (np.any(pkg_data["layer"] == 0)):
             log_msg = textwrap.dedent(
                 f"""In well {key} no layer was assigned, but this is required."""
             )
             logger.log(loglevel=LogLevel.ERROR, message=log_msg, additional_depth=2)
+            raise ValueError(log_msg)
 
-        # Groupby unique wells, to get dataframes per time.
-        colnames_group = ["x", "y", "layer", "id"]
-        wel_index, unique_well_groups = zip(*df.groupby(colnames_group))
-
-        # Unpack wel indices by zipping
-        x, y, layer, id = zip(*wel_index)
-        well_rate = _prepare_well_rates_from_groups(unique_well_groups, times)
-
-        return cls(
-            x=np.array(x, dtype=float),
-            y=np.array(y, dtype=float),
-            layer=np.array(layer, dtype=int),
-            rate=well_rate,
-            minimum_k=minimum_k,
-            minimum_thickness=minimum_thickness,
-        )
 
 
 class WellDisStructured(DisStructuredBoundaryCondition):
