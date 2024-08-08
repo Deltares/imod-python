@@ -41,8 +41,8 @@ def setup_cropfactors():
 
 
 def get_new_grid():
-    x = list( range(100))
-    y = list( range(100, 0, -1))
+    x = list(range(100))
+    y = list(range(100, 0, -1))
     subunit = [0, 1]
     dx = 0.5
     dy = 0.5

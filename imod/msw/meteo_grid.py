@@ -7,11 +7,13 @@ import pandas as pd
 import xarray as xr
 
 import imod
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
+from imod.mf6.utilities.regridding_types import RegridderType
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.timeutil import to_metaswap_timeformat
 
 
-class MeteoGrid(MetaSwapPackage):
+class MeteoGrid(MetaSwapPackage, IRegridPackage):
     """
     This contains the meteorological grid data. Grids are written to ESRI ASCII
     files. The meteorological data requires a time coordinate. Next to a
@@ -32,6 +34,11 @@ class MeteoGrid(MetaSwapPackage):
 
     _file_name = "mete_grid.inp"
     _meteo_dirname = "meteo_grids"
+
+    _regrid_method = {
+        "precipitation": (RegridderType.OVERLAP, "mean"),
+        "evapotranspiration": (RegridderType.OVERLAP, "mean"),
+    }
 
     def __init__(self, precipitation: xr.DataArray, evapotranspiration: xr.DataArray):
         super().__init__()
