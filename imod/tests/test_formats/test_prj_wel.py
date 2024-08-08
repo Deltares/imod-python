@@ -329,6 +329,7 @@ def setup_test_files(wel_case, wel_file, well_mixed_ipfs, tmp_path):
     for p in well_mixed_ipfs:
         copyfile(p, ipf_dir / p.name)
 
+
 @parametrize("wel_case, expected", argvalues=list(zip(PRJ_ARGS, READ_ARGS)))
 def test_open_projectfile_data_wells(
     wel_case, expected, well_mixed_ipfs, tmp_path, request
@@ -358,7 +359,7 @@ def test_from_imod5_data_wells(wel_case, expected, well_mixed_ipfs, tmp_path, re
 
     # Act
     data, _ = open_projectfile_data(wel_file)
-    times = [datetime(2000, 1, i+1, 0, 0) for i in range(4)]
+    times = [datetime(2000, 1, i + 1, 0, 0) for i in range(4)]
     for wellname in data.keys():
         well = LayeredWell.from_imod5_data(wellname, data, times=times)
         pass
