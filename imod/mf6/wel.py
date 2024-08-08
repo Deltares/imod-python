@@ -144,8 +144,10 @@ def _prepare_df_ipf_unassociated(
     # Prepare out dataframe, taking the outer product to to get all possible
     # combinations between time and rows.
     df_multi = df.set_index(["time", df.index])
+    # Produce multi indices.
+    ipf_row_index = pkg_data["dataframe"][0].index
     multi_index = pd.MultiIndex.from_product(
-        [start_times, df.index], names=["time", "ipf_row"]
+        [start_times, ipf_row_index], names=["time", "ipf_row"]
     )
     df_out = df_multi.reindex(multi_index)
     # Forward fill NaN for well locations, convert to xarray and back to
@@ -474,11 +476,11 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         wel_index, unique_well_groups = zip(*df.groupby(colnames_group))
 
         # Unpack wel indices by zipping
-        varnames = ["x", "y"] + cls._depth_colnames
+        varnames = [("x", float), ("y", float)] + cls._depth_colnames
         index_values = zip(*wel_index)
         cls_input = {
-            var: np.array(value, dtype=float)
-            for var, value in zip(varnames, index_values)
+            var: np.array(value, dtype=dtype)
+            for (var, dtype), value in zip(varnames, index_values)
         }
         cls_input["rate"] = _prepare_well_rates_from_groups(
             pkg_data, unique_well_groups, times
@@ -604,7 +606,7 @@ class Well(GridAgnosticWell):
     }
 
     _imod5_depth_colnames = ["filt_top", "filt_bot"]
-    _depth_colnames = ["screen_top", "screen_bottom"]
+    _depth_colnames = [("screen_top", float), ("screen_bottom", float)]
 
     @init_log_decorator()
     def __init__(
@@ -943,7 +945,7 @@ class LayeredWell(GridAgnosticWell):
         "concentration": [AnyNoDataSchema(), EmptyIndexesSchema()],
     }
     _imod5_depth_colnames = ["layer"]
-    _depth_colnames = ["layer"]
+    _depth_colnames = [("layer", int)]
 
     @init_log_decorator()
     def __init__(
