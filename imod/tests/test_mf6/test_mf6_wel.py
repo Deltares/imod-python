@@ -1014,7 +1014,7 @@ def test_logmessage_for_layer_assignment_import_imod5(
         log = log_file.read()
         message_required = layer != 0
         message_present = (
-            "In well wel-1 a layer was assigned, but this is not\nsupported" in log
+            "In well wel-1 a layer was assigned, but this is not supported" in log
         )
         assert message_required == message_present
 
@@ -1059,7 +1059,7 @@ def test_logmessage_for_missing_filter_settings(
         log = log_file.read()
         message_required = remove is not None
         message_present = (
-            "In well wel-1 the filt_top and filt_bot columns were not both found;"
+            "In well wel-1 the filt_top and filt_bot columns were not both\nfound;"
             in log
         )
         assert message_required == message_present
