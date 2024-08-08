@@ -524,7 +524,26 @@ def _try_read_with_func(func, path, *args, **kwargs):
 
 def _get_array_transformation_parameters(
     headers: List[Dict[str, Any]], key: str, dim: str
-) -> xr.DataArray:
+) -> Union[xr.DataArray | float]:
+    """
+    In imod5 prj files one can add linear transformation parameters to transform
+    the data read from an idf file: we can specify a multiplication factor and a
+    constant that will be added to the values. The factor and addition
+    parameters can be can be scalar (if applied to 1 idf), or they can be
+    xr.DataArrays if the factor and addition are for example layer- or
+    time-dependent  (if both we apply the transformations one at a time)
+
+    Parameters
+    ----------
+    headers: List[Dict[str, Any]]
+        prj-file lines which we want to import, serialized as a dictionary.
+    key: str
+        specifies the name of the transformation parameter in the idf file.
+        Usually "factor" or "addition"
+    dim: str
+        the name of the dimension over which transformation parameters are
+        expected to differ for the current import. Usually "time"or "layer"
+    """
     if dim in headers[0].keys():
         return xr.DataArray(
             data=[header[key] for header in headers],
@@ -548,7 +567,7 @@ def _create_dataarray_from_paths(
         headers=headers,
     )
 
-    # remove coordinates in factor and addition but not in da
+    # Ensure factor and addition do not have more dimensions than da
     if isinstance(factor, xr.DataArray):
         missing_dims = set(factor.dims) - set(da.dims)
         if missing_dims:
