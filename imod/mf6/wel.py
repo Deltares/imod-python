@@ -122,7 +122,7 @@ def _prepare_df_ipf_associated(
     # timesteps
     is_defined_all = len(set(start_times) - set(pkg_data["time"])) == 0
     is_defined_first = (len(pkg_data["time"]) == 1) & (
-        pkg_data["time"][0] != start_times[0]
+        pkg_data["time"][0] == start_times[0]
     )
     if not is_defined_all and not is_defined_first:
         raise ValueError(
@@ -131,6 +131,7 @@ def _prepare_df_ipf_associated(
             f"PRJ times: {pkg_data['time']}, simulation times: {start_times}"
         )
     df = pkg_data["dataframe"][0]
+    df["layer"] = pkg_data["layer"][0]
     return df
 
 
@@ -1071,9 +1072,22 @@ class LayeredWell(GridAgnosticWell):
     def _validate_imod5_depth_information(
         cls, key: str, pkg_data: dict, df: pd.DataFrame
     ) -> None:
-        if ("layer" not in pkg_data.keys()) or (np.any(pkg_data["layer"] == 0)):
+        if (np.any(pkg_data["layer"] == 0)):
             log_msg = textwrap.dedent(
-                f"""In well {key} no layer was assigned, but this is required."""
+                f"""
+                Well {key} in projectfile is assigned to layer 0, but should be >
+                0 for LayeredWell             
+                """
+            )
+            logger.log(loglevel=LogLevel.ERROR, message=log_msg, additional_depth=2)
+            raise ValueError(log_msg)
+
+        if "layer" not in df.columns:
+            log_msg = textwrap.dedent(
+                f"""
+                IPF file {key} has no layer assigned, but this is required
+                for LayeredWell.
+                """
             )
             logger.log(loglevel=LogLevel.ERROR, message=log_msg, additional_depth=2)
             raise ValueError(log_msg)
