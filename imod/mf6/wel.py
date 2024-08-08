@@ -72,7 +72,7 @@ def mask_2D(package: GridAgnosticWell, domain_2d: GridDataArray) -> GridAgnostic
 
 
 def _df_groups_to_da_rates(
-    unique_well_groups: pd.api.typing.DataFrameGroupBy
+    unique_well_groups: pd.api.typing.DataFrameGroupBy,
 ) -> xr.DataArray:
     # Convert dataframes all groups to DataArrays
     da_groups = [
@@ -102,7 +102,8 @@ def _prepare_well_rates_from_groups(
     if has_associated:
         # Resample times per group
         unique_well_groups = [
-            resample_timeseries(df_group, start_times) for df_group in unique_well_groups
+            resample_timeseries(df_group, start_times)
+            for df_group in unique_well_groups
         ]
     return _df_groups_to_da_rates(unique_well_groups)
 
