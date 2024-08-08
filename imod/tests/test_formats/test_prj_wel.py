@@ -145,7 +145,7 @@ class WellReadCases:
         return {
             "wel-simple1": {
                 "has_associated": False,
-                "time": [datetime(1981,12, 1)],
+                "time": [datetime(1982, 1, 1)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
@@ -156,21 +156,21 @@ class WellReadCases:
         return {
             "wel-simple1": {
                 "has_associated": False,
-                "time": [datetime(1981,12, 1), datetime(1982, 1, 1)],
+                "time": [datetime(1982, 1, 1), datetime(1982, 2, 1)],
                 "layer": [1, 1],
                 "factor": [1.0, 1.0],
                 "addition": [0.0, 0.0],
             },
             "wel-simple2": {
                 "has_associated": False,
-                "time": [datetime(1982, 1, 1)],
+                "time": [datetime(1982, 2, 1)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
             },
             "wel-simple3": {
                 "has_associated": False,
-                "time": [datetime(1982, 3, 3)],
+                "time": [datetime(1982, 3, 1)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
@@ -181,7 +181,7 @@ class WellReadCases:
         return {
             "wel-associated": {
                 "has_associated": True,
-                "time": [datetime(1981,12, 1)],
+                "time": [datetime(1982, 1, 1)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
@@ -193,9 +193,9 @@ class WellReadCases:
             "wel-associated": {
                 "has_associated": True,
                 "time": [
-                    datetime(1981,12, 1),
                     datetime(1982, 1, 1),
-                    datetime(1982, 3, 3),
+                    datetime(1982, 2, 1),
+                    datetime(1982, 3, 1),
                 ],
                 "layer": [1, 1, 1],
                 "factor": [1.0, 1.0, 1.0],
@@ -208,9 +208,9 @@ class WellReadCases:
             "wel-associated": {
                 "has_associated": True,
                 "time": [
-                    datetime(1981,12, 1),
                     datetime(1982, 1, 1),
-                    datetime(1982, 3, 3),
+                    datetime(1982, 2, 1),
+                    datetime(1982, 3, 1),
                 ],
                 "layer": [1, 1, 1],
                 "factor": [1.0, 0.5, 0.2],
@@ -223,8 +223,8 @@ class WellReadCases:
             "wel-associated": {
                 "has_associated": True,
                 "time": [
-                    datetime(1981,12, 1),
-                    datetime(1981,12, 1),
+                    datetime(1982, 1, 1),
+                    datetime(1982, 1, 1),
                 ],
                 "layer": [1, 2],
                 "factor": [1.0, 0.75],
@@ -236,14 +236,14 @@ class WellReadCases:
         return {
             "wel-simple1": {
                 "has_associated": False,
-                "time": [datetime(1981,12, 1)],
+                "time": [datetime(1982, 1, 1)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
             },
             "wel-associated": {
                 "has_associated": True,
-                "time": [datetime(1981,12, 1)],
+                "time": [datetime(1982, 1, 1)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
@@ -255,9 +255,9 @@ class WellReadCases:
             "wel-associated": {
                 "has_associated": True,
                 "time": [
-                    datetime(1981,12, 1),
                     datetime(1982, 1, 1),
-                    datetime(1982, 3, 3),
+                    datetime(1982, 2, 1),
+                    datetime(1982, 3, 1),
                 ],
                 "layer": [1, 1, 1],
                 "factor": [1.0, 1.0, 1.0],
@@ -265,7 +265,7 @@ class WellReadCases:
             },
             "wel-simple1": {
                 "has_associated": False,
-                "time": [datetime(1982, 1, 1)],
+                "time": [datetime(1982, 2, 1)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
@@ -276,20 +276,49 @@ class WellReadCases:
         return {
             "wel-associated": {
                 "has_associated": True,
-                "time": [datetime(1982, 1, 1)],
+                "time": [datetime(1982, 2, 1)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
             },
             "wel-simple1": {
                 "has_associated": False,
-                "time": [datetime(1981,12, 1)],
+                "time": [datetime(1982, 1, 1)],
                 "layer": [1],
                 "factor": [1.0],
                 "addition": [0.0],
             },
         }
 
+
+class WellPackageCases:
+    """
+    Expected cases as loaded with from_imod5_data.
+    Returns a tuple  with as first element a bool whether the import is expected to fail
+    The second element specifies in which timesteps the rates are set to zero.
+    
+    Returns
+    -------
+    fails, {wellname: datetime_set_to_zero}
+    """
+
+    def case_simple__first(self):
+        return False, {
+            "wel-simple1": [datetime(1982, 2, 1), datetime(1982, 3, 1)],
+        }
+    def case_simple__all(self):
+        return False, {
+            "wel-simple1": [datetime(1982, 2, 1)],
+            "wel-simple2": [datetime(1982, 1, 1), datetime(1982, 3, 1)],
+            "wel-simple3": [datetime(1982, 1, 1), datetime(1982, 2, 1)],
+        }
+    def case_associated__first(self):
+    def case_associated__all(self):
+    def case_associated__all_varying_factors(self):
+    def case_associated__multiple_layers_different_factors(self):
+    def case_mixed__first(self):
+    def case_mixed__all(self):
+    def case_mixed__associated_second(self):    
 
 # pytest_cases doesn't support any "zipped test cases", instead it takes the
 # outer product of cases, when providing multiple case sets.
@@ -358,7 +387,7 @@ def test_from_imod5_data_wells(wel_case, expected, well_mixed_ipfs, tmp_path, re
 
     # Act
     data, _ = open_projectfile_data(wel_file)
-    times = [datetime(1981, 12, 1)] + [datetime(1982, i + 1, 1) for i in range(3)]
+    times = [datetime(1982, i + 1, 1) for i in range(4)]
     for wellname in data.keys():
         well = LayeredWell.from_imod5_data(wellname, data, times=times)
         pass
