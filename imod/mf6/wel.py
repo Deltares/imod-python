@@ -131,7 +131,6 @@ def _prepare_df_ipf_associated(
             f"PRJ times: {pkg_data['time']}, simulation times: {start_times}"
         )
     df = pkg_data["dataframe"][0]
-    # CALL RESAMPLING OF WELLS HERE
     return df
 
 
