@@ -71,20 +71,13 @@ def mask_2D(package: GridAgnosticWell, domain_2d: GridDataArray) -> GridAgnostic
     return cls._from_dataset(selection)
 
 
-def _prepare_well_rates_from_groups(
+def _df_groups_to_da_rates(
     unique_well_groups: pd.api.typing.DataFrameGroupBy, times: list[datetime]
 ) -> xr.DataArray:
-    """
-    Prepare well rates from dataframe groups, grouped by unique well locations.
-    """
-    # Resample times per group
-    df_resampled_groups = [
-        resample_timeseries(df_group, times) for df_group in unique_well_groups
-    ]
     # Convert dataframes all groups to DataArrays
     da_groups = [
         xr.DataArray(df_group["rate"], dims=("time"), coords={"time": df_group["time"]})
-        for df_group in df_resampled_groups
+        for df_group in unique_well_groups
     ]
     # Assign index coordinates
     da_groups = [
@@ -93,6 +86,24 @@ def _prepare_well_rates_from_groups(
     ]
     # Concatenate datarrays along index dimension
     return xr.concat(da_groups, dim="index")
+
+
+def _prepare_well_rates_from_groups(
+    pkg_data: dict,
+    unique_well_groups: pd.api.typing.DataFrameGroupBy,
+    times: list[datetime],
+) -> pd.DataFrame:
+    """
+    Prepare well rates from dataframe groups, grouped by unique well locations.
+    Resample timeseries if ipf with associated text files.
+    """
+    has_associated = pkg_data["has_associated"]
+    if has_associated:
+        # Resample times per group
+        unique_well_groups = [
+            resample_timeseries(df_group, times) for df_group in unique_well_groups
+        ]
+    return _df_groups_to_da_rates(unique_well_groups, times)
 
 
 def _prepare_df_ipf_associated(
@@ -117,7 +128,7 @@ def _prepare_df_ipf_associated(
         raise ValueError(
             "IPF with associated textfiles assigned to wrong times. "
             "Should be assigned to all times or only first time. "
-            f"PRJ times: {pkg_data["time"]}, simulation times: {start_times}"
+            f"PRJ times: {pkg_data['time']}, simulation times: {start_times}"
         )
     df = pkg_data["dataframe"][0]
     # CALL RESAMPLING OF WELLS HERE
@@ -457,7 +468,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         pkg_data = imod5_data[key]
 
         df = _unpack_package_data(pkg_data, times)
-        cls._validate_imod5_depth_information(cls, key, pkg_data, df)
+        cls._validate_imod5_depth_information(key, pkg_data, df)
 
         # Groupby unique wells, to get dataframes per time.
         colnames_group = ["x", "y"] + cls._imod5_depth_colnames  # , "id"]
@@ -470,7 +481,9 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             var: np.array(value, dtype=float)
             for var, value in zip(varnames, index_values)
         }
-        cls_input["rate"] = _prepare_well_rates_from_groups(unique_well_groups, times)
+        cls_input["rate"] = _prepare_well_rates_from_groups(
+            pkg_data, unique_well_groups, times
+        )
         cls_input["minimum_k"] = minimum_k
         cls_input["minimum_thickness"] = minimum_thickness
 
