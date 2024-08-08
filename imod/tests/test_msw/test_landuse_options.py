@@ -49,21 +49,6 @@ def create_landuse_dict():
     return options
 
 
-def get_new_grid():
-    x = [1.0, 1.5, 2.0, 2.5, 3.0]
-    y = [3.0, 2.5, 2.0, 1.5, 1.0]
-    subunit = [0, 1]
-    dx = 0.5
-    dy = 0.5
-    # fmt: off
-    new_grid = xr.DataArray(
-        dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
-    )
-    new_grid.values[:,:,:] = 1
-    return new_grid
-
-
 def test_landuse_options(fixed_format_parser):
     options = create_landuse_dict()
     lu_options = LanduseOptions(**options)
@@ -91,8 +76,8 @@ def test_landuse_options(fixed_format_parser):
             assert_equal(results[option], value.values)
 
 
-def test_landuse_options_regrid():
-    new_grid = get_new_grid()
+def test_landuse_options_regrid(simple_2d_grid_with_subunits):
+    new_grid = simple_2d_grid_with_subunits
     options = create_landuse_dict()
     lu_options = LanduseOptions(**options)
 

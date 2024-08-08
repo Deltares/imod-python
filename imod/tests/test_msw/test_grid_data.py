@@ -9,6 +9,7 @@ from hypothesis.strategies import floats
 from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
 
+from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.msw import GridData
 from imod.msw.fixed_format import format_fixed_width
 
@@ -233,9 +234,8 @@ def test_generate_index_array():
     assert_equal(index, np.array(index_expected))
     assert_equal(svat.values, svat_expected.values)
 
-
-def test_simple_model(fixed_format_parser):
-    x = [1.0, 2.0, 3.0]
+def simple_model():
+   x = [1.0, 2.0, 3.0]
     y = [1.0, 2.0, 3.0]
     subunit = [0, 1]
     dx = 1.0
@@ -323,6 +323,12 @@ def test_simple_model(fixed_format_parser):
         soil_physical_unit,
         active,
     )
+   
+   return grid_data
+
+def test_simple_model(fixed_format_parser):
+ 
+    grid_data = simple_model()
 
     index, svat = grid_data.generate_index_array()
 
@@ -340,6 +346,18 @@ def test_simple_model(fixed_format_parser):
     assert_equal(results["soil_physical_unit"], np.array([2, 8, 2, 5]))
     assert_equal(results["landuse"], np.array([1, 1, 2, 2]))
     assert_almost_equal(results["rootzone_depth"], np.array([1.0, 1.0, 1.0, 1.0]))
+
+
+def test_simple_model_regrid(fixed_format_parser):
+ 
+    grid_data = simple_model()
+    new_grid = get_new_grid()  
+
+    index, svat = grid_data.generate_index_array()
+    
+    regrid_context = RegridderWeightsCache()
+
+    grid_data.regrid_like(new_grid, regrid_context)
 
 
 def test_simple_model_1_subunit(fixed_format_parser):

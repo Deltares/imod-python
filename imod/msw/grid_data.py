@@ -1,12 +1,13 @@
 import numpy as np
 import xarray as xr
 
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.util.spatial import spatial_reference
 
 
-class GridData(MetaSwapPackage):
+class GridData(MetaSwapPackage, IRegridPackage):
     """
     This contains the grid data of MetaSWAP.
 

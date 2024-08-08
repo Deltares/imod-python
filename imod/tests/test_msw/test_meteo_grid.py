@@ -52,21 +52,6 @@ def setup_meteo_grid():
     return meteo_grid
 
 
-def get_new_grid():
-    x = [1.0, 1.5, 2.0, 2.5, 3.0]
-    y = [3.0, 2.5, 2.0, 1.5, 1.0]
-    subunit = [0, 1]
-    dx = 0.5
-    dy = 0.5
-    # fmt: off
-    new_grid = xr.DataArray(
-        dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
-    )
-    new_grid.values[:,:,:] = 1
-    return new_grid
-
-
 def test_meteo_grid():
     meteo_grid = setup_meteo_grid()
 
@@ -128,9 +113,9 @@ def test_meteo_no_time_grid():
         MeteoGrid(precipitation, evapotranspiration)
 
 
-def test_regrid_meteo():
+def test_regrid_meteo(simple_2d_grid_with_subunits):
     meteo = setup_meteo_grid()
-    new_grid = get_new_grid()
+    new_grid = simple_2d_grid_with_subunits
 
     regrid_context = RegridderWeightsCache()
 
