@@ -94,18 +94,25 @@ def _prepare_well_rates_from_groups(
     # Concatenate datarrays along index dimension
     return xr.concat(da_groups, dim="index")
 
-def _prepare_df_ipf_associated(pkg_data: dict, start_times: list[datetime]) -> pd.DataFrame:
+
+def _prepare_df_ipf_associated(
+    pkg_data: dict, start_times: list[datetime]
+) -> pd.DataFrame:
     """Prepare dataframe for an ipf with associated timeseries in a textfile."""
     # Validate if associated wells are assigned multiple layers, factors,
     # and additions.
     for entry in ["layer", "factor", "addition"]:
         uniques = set(pkg_data[entry])
         if len(uniques) > 1:
-            raise ValueError(f"IPF with associated textfiles assigned multiple {entry}s: {uniques}")
+            raise ValueError(
+                f"IPF with associated textfiles assigned multiple {entry}s: {uniques}"
+            )
     # Validate if associated wells are defined only on first timestep or all
     # timesteps
     is_defined_all = len(set(start_times) - set(pkg_data["time"])) == 0
-    is_defined_first = (len(pkg_data["time"]) == 1) & (pkg_data["time"][0] != start_times[0])
+    is_defined_first = (len(pkg_data["time"]) == 1) & (
+        pkg_data["time"][0] != start_times[0]
+    )
     if not is_defined_all and not is_defined_first:
         raise ValueError(
             "IPF with associated textfiles assigned to wrong times. "
@@ -116,7 +123,10 @@ def _prepare_df_ipf_associated(pkg_data: dict, start_times: list[datetime]) -> p
     # CALL RESAMPLING OF WELLS HERE
     return df
 
-def _prepare_df_ipf_unassociated(pkg_data: dict, start_times: list[datetime])-> pd.DataFrame:
+
+def _prepare_df_ipf_unassociated(
+    pkg_data: dict, start_times: list[datetime]
+) -> pd.DataFrame:
     """Prepare dataframe for an ipf with no associated timeseries."""
     # Concatenate dataframes, assign layer and times
     iter_dfs_dims = zip(pkg_data["dataframe"], pkg_data["time"], pkg_data["layer"])
@@ -124,15 +134,20 @@ def _prepare_df_ipf_unassociated(pkg_data: dict, start_times: list[datetime])-> 
     # Prepare out dataframe, taking the outer product to to get all possible
     # combinations between time and rows.
     df_multi = df.set_index(["time", df.index])
-    multi_index = pd.MultiIndex.from_product([start_times, df.index], names = ["time", "ipf_row"])
+    multi_index = pd.MultiIndex.from_product(
+        [start_times, df.index], names=["time", "ipf_row"]
+    )
     df_out = df_multi.reindex(multi_index)
     # Forward fill NaN for well locations, convert to xarray and back to
     # deal with forward filling across a specific dimension
     cols_ffill = ["x", "y", "layer"]
-    df_out.loc[:, cols_ffill] = df_out.loc[:, cols_ffill].to_xarray().ffill("time").to_dataframe()
+    df_out.loc[:, cols_ffill] = (
+        df_out.loc[:, cols_ffill].to_xarray().ffill("time").to_dataframe()
+    )
     # Fill rate NaNs with 0.0
     df_out.loc[:, "rate"] = df_out.loc[:, "rate"].fillna(0.0)
-    return df_out.reset_index().drop(columns = "ipf_row")
+    return df_out.reset_index().drop(columns="ipf_row")
+
 
 def _unpack_package_data(pkg_data: dict, times: list[datetime]) -> pd.DataFrame:
     """Unpack package data to dataframe"""
@@ -142,7 +157,6 @@ def _unpack_package_data(pkg_data: dict, times: list[datetime]) -> pd.DataFrame:
         return _prepare_df_ipf_associated(pkg_data, start_times)
     else:
         return _prepare_df_ipf_unassociated(pkg_data, start_times)
-
 
 
 class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
@@ -426,7 +440,9 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         raise NotImplementedError("Method in abstract base class called")
 
     @classmethod
-    def _validate_imod5_depth_information(cls, key: str, pkg_data: dict, df: pd.DataFrame) -> None:
+    def _validate_imod5_depth_information(
+        cls, key: str, pkg_data: dict, df: pd.DataFrame
+    ) -> None:
         raise NotImplementedError("Method in abstract base class called")
 
     @classmethod
@@ -444,18 +460,22 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         cls._validate_imod5_depth_information(cls, key, pkg_data, df)
 
         # Groupby unique wells, to get dataframes per time.
-        colnames_group = ["x", "y"] + cls._imod5_depth_colnames #, "id"]
+        colnames_group = ["x", "y"] + cls._imod5_depth_colnames  # , "id"]
         wel_index, unique_well_groups = zip(*df.groupby(colnames_group))
 
         # Unpack wel indices by zipping
         varnames = ["x", "y"] + cls._depth_colnames
         index_values = zip(*wel_index)
-        cls_input = {var: np.array(value, dtype=float) for var, value in zip(varnames, index_values)}
+        cls_input = {
+            var: np.array(value, dtype=float)
+            for var, value in zip(varnames, index_values)
+        }
         cls_input["rate"] = _prepare_well_rates_from_groups(unique_well_groups, times)
         cls_input["minimum_k"] = minimum_k
         cls_input["minimum_thickness"] = minimum_thickness
 
         return cls(**cls_input)
+
 
 class Well(GridAgnosticWell):
     """
@@ -778,7 +798,9 @@ class Well(GridAgnosticWell):
         return wells_assigned
 
     @classmethod
-    def _validate_imod5_depth_information(cls, key: str, pkg_data: dict, df: pd.DataFrame) -> None:
+    def _validate_imod5_depth_information(
+        cls, key: str, pkg_data: dict, df: pd.DataFrame
+    ) -> None:
         if "layer" in pkg_data.keys() and (np.any(pkg_data["layer"] != 0)):
             log_msg = textwrap.dedent(
                 f"""
@@ -1032,14 +1054,15 @@ class LayeredWell(GridAgnosticWell):
         return wells_df
 
     @classmethod
-    def _validate_imod5_depth_information(cls, key: str, pkg_data: dict, df: pd.DataFrame) -> None:
+    def _validate_imod5_depth_information(
+        cls, key: str, pkg_data: dict, df: pd.DataFrame
+    ) -> None:
         if ("layer" not in pkg_data.keys()) or (np.any(pkg_data["layer"] == 0)):
             log_msg = textwrap.dedent(
                 f"""In well {key} no layer was assigned, but this is required."""
             )
             logger.log(loglevel=LogLevel.ERROR, message=log_msg, additional_depth=2)
             raise ValueError(log_msg)
-
 
 
 class WellDisStructured(DisStructuredBoundaryCondition):

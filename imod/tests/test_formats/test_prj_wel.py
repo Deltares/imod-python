@@ -10,7 +10,7 @@ from pytest_cases import (
 )
 
 from imod.formats.prj import open_projectfile_data
-from imod.mf6 import LayeredWell, Well
+from imod.mf6 import LayeredWell
 
 
 class WellPrjCases:
@@ -345,9 +345,7 @@ def test_open_projectfile_data_wells(
 
 
 @parametrize("wel_case, expected", argvalues=list(zip(PRJ_ARGS, READ_ARGS)))
-def test_from_imod5_data_wells(
-    wel_case, expected, well_mixed_ipfs, tmp_path, request
-):
+def test_from_imod5_data_wells(wel_case, expected, well_mixed_ipfs, tmp_path, request):
     # Arrange
     case_name = request.node.callspec.id
     wel_file = tmp_path / f"{case_name}.prj"
