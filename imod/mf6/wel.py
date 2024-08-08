@@ -1072,7 +1072,7 @@ class LayeredWell(GridAgnosticWell):
     def _validate_imod5_depth_information(
         cls, key: str, pkg_data: dict, df: pd.DataFrame
     ) -> None:
-        if (np.any(pkg_data["layer"] == 0)):
+        if np.any(pkg_data["layer"] == 0):
             log_msg = textwrap.dedent(
                 f"""
                 Well {key} in projectfile is assigned to layer 0, but should be >
