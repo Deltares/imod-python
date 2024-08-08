@@ -315,14 +315,10 @@ PRJ_ARGS = case_args_to_parametrize(WellPrjCases, "case_")
 READ_ARGS = case_args_to_parametrize(WellReadCases, "case_")
 
 
-@parametrize("wel_case, expected", argvalues=list(zip(PRJ_ARGS, READ_ARGS)))
-def test_open_projectfile_data_wells(
-    wel_case, expected, well_mixed_ipfs, tmp_path, request
-):
-    # Arrange
-    case_name = request.node.callspec.id
-    wel_file = tmp_path / f"{case_name}.prj"
-
+def setup_test_files(wel_case, wel_file, well_mixed_ipfs, tmp_path):
+    """
+    Write string to projectfile, and copy ipf files to directory.
+    """
     with open(wel_file, "w") as f:
         f.write(wel_case)
 
@@ -332,6 +328,15 @@ def test_open_projectfile_data_wells(
     # copy files to test folder
     for p in well_mixed_ipfs:
         copyfile(p, ipf_dir / p.name)
+
+@parametrize("wel_case, expected", argvalues=list(zip(PRJ_ARGS, READ_ARGS)))
+def test_open_projectfile_data_wells(
+    wel_case, expected, well_mixed_ipfs, tmp_path, request
+):
+    # Arrange
+    case_name = request.node.callspec.id
+    wel_file = tmp_path / f"{case_name}.prj"
+    setup_test_files(wel_case, wel_file, well_mixed_ipfs, tmp_path)
 
     # Act
     data, _ = open_projectfile_data(wel_file)
@@ -349,18 +354,11 @@ def test_from_imod5_data_wells(wel_case, expected, well_mixed_ipfs, tmp_path, re
     # Arrange
     case_name = request.node.callspec.id
     wel_file = tmp_path / f"{case_name}.prj"
-
-    with open(wel_file, "w") as f:
-        f.write(wel_case)
-
-    ipf_dir = tmp_path / "ipf"
-    ipf_dir.mkdir(exist_ok=True)
-
-    # copy files to test folder
-    for p in well_mixed_ipfs:
-        copyfile(p, ipf_dir / p.name)
+    setup_test_files(wel_case, wel_file, well_mixed_ipfs, tmp_path)
 
     # Act
     data, _ = open_projectfile_data(wel_file)
-    times = [datetime(2000, 1, 1, 0, 0), datetime(2001, 1, 1, 0, 0)]
-    well = LayeredWell.from_imod5_data("wel-simple1", data, times=times)
+    times = [datetime(2000, 1, i+1, 0, 0) for i in range(4)]
+    for wellname in data.keys():
+        well = LayeredWell.from_imod5_data(wellname, data, times=times)
+        pass
