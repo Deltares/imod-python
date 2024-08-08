@@ -72,7 +72,7 @@ def mask_2D(package: GridAgnosticWell, domain_2d: GridDataArray) -> GridAgnostic
 
 
 def _df_groups_to_da_rates(
-    unique_well_groups: pd.api.typing.DataFrameGroupBy, times: list[datetime]
+    unique_well_groups: pd.api.typing.DataFrameGroupBy
 ) -> xr.DataArray:
     # Convert dataframes all groups to DataArrays
     da_groups = [
@@ -98,12 +98,13 @@ def _prepare_well_rates_from_groups(
     Resample timeseries if ipf with associated text files.
     """
     has_associated = pkg_data["has_associated"]
+    start_times = times[:-1]  # Starts stress periods.
     if has_associated:
         # Resample times per group
         unique_well_groups = [
-            resample_timeseries(df_group, times) for df_group in unique_well_groups
+            resample_timeseries(df_group, start_times) for df_group in unique_well_groups
         ]
-    return _df_groups_to_da_rates(unique_well_groups, times)
+    return _df_groups_to_da_rates(unique_well_groups)
 
 
 def _prepare_df_ipf_associated(
