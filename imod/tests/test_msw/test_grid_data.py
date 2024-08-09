@@ -234,9 +234,10 @@ def test_generate_index_array():
     assert_equal(index, np.array(index_expected))
     assert_equal(svat.values, svat_expected.values)
 
+
 def simple_model():
-   x = [1.0, 2.0, 3.0]
-    y = [1.0, 2.0, 3.0]
+    x = [1.0, 2.0, 3.0]
+    y = [3.0, 2.0, 1.0]
     subunit = [0, 1]
     dx = 1.0
     dy = 1.0
@@ -323,11 +324,11 @@ def simple_model():
         soil_physical_unit,
         active,
     )
-   
-   return grid_data
+
+    return grid_data
+
 
 def test_simple_model(fixed_format_parser):
- 
     grid_data = simple_model()
 
     index, svat = grid_data.generate_index_array()
@@ -348,13 +349,12 @@ def test_simple_model(fixed_format_parser):
     assert_almost_equal(results["rootzone_depth"], np.array([1.0, 1.0, 1.0, 1.0]))
 
 
-def test_simple_model_regrid(fixed_format_parser):
- 
+def test_simple_model_regrid(fixed_format_parser, simple_2d_grid_with_subunits):
     grid_data = simple_model()
-    new_grid = get_new_grid()  
+    new_grid = simple_2d_grid_with_subunits
 
     index, svat = grid_data.generate_index_array()
-    
+
     regrid_context = RegridderWeightsCache()
 
     grid_data.regrid_like(new_grid, regrid_context)

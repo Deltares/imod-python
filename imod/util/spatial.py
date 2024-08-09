@@ -736,3 +736,25 @@ def _polygonize(da: xr.DataArray) -> "gpd.GeoDataFrame":
     gdf = gpd.GeoDataFrame({"value": colvalues, "geometry": geometries})
     gdf.crs = da.attrs.get("crs")
     return gdf
+
+def get_cell_area(array):
+    x = array.coords["x"]
+    y = array.coords["y"]
+    dx, _, _ = coord_reference(x)
+    dy, _, _ = coord_reference(y)
+
+    area = xr.ones_like(array)                
+
+    if isinstance(dx, float):
+        area = area * abs(dx)
+    elif isinstance(dx, np.ndarray):
+        dx_xarray = xr.DataArray(dx, coords={"x": x})
+        area = area* dx_xarray
+
+
+    if isinstance(dy, float):
+        area = area * abs(dy )
+    elif isinstance(dy, np.ndarray):            
+        dy_xarray = xr.DataArray(dy, coords={"y": y})
+        area = area* dy_xarray
+    return area   

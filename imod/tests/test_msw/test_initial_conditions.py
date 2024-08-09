@@ -2,7 +2,6 @@ import tempfile
 from pathlib import Path
 
 import pytest
-import xarray as xr
 
 from imod.mf6.utilities.regrid import (
     RegridderWeightsCache,
@@ -36,7 +35,7 @@ def test_initial_conditions_equilibrium_regrid(simple_2d_grid_with_subunits):
     new_grid = simple_2d_grid_with_subunits
 
     regrid_context = RegridderWeightsCache()
-    regridded = ic.regrid_like(new_grid, regrid_context )
+    regridded = ic.regrid_like(new_grid, regrid_context)
 
     assert is_empty(regridded.dataset)
 

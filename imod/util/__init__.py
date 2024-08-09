@@ -21,6 +21,7 @@ from imod.util.spatial import (
     to_ugrid2d,
     transform,
     ugrid2d_data,
+    get_cell_area
 )
 from imod.util.structured import replace, values_within_range, where
 from imod.util.time import to_datetime

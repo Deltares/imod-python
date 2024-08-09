@@ -1,10 +1,14 @@
+from typing import Optional, Tuple
 import numpy as np
 import xarray as xr
 
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
+from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_like
+from imod.mf6.utilities.regridding_types import RegridderType
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
-from imod.util.spatial import spatial_reference
+from imod.typing import GridDataArray
+from imod.util.spatial import get_cell_area, spatial_reference
 
 
 class GridData(MetaSwapPackage, IRegridPackage):
@@ -50,6 +54,15 @@ class GridData(MetaSwapPackage, IRegridPackage):
     _with_subunit = ("area", "landuse", "rootzone_depth")
     _without_subunit = ("surface_elevation", "soil_physical_unit")
     _to_fill = ("soil_physical_unit_string", "temp")
+
+    _regrid_method = {
+        "area": (RegridderType.OVERLAP, "mean"),
+        "landuse": (RegridderType.OVERLAP, "mean"),
+        "rootzone_depth": ( RegridderType.OVERLAP, "mean" ),
+        "surface_elevation" : ( RegridderType.OVERLAP, "mean" ),
+        "soil_physical_unit" : ( RegridderType.OVERLAP, "mean" ),
+        "active" : ( RegridderType.OVERLAP, "mean" ),
+    }  
 
     def __init__(
         self,
@@ -103,7 +116,38 @@ class GridData(MetaSwapPackage, IRegridPackage):
         # smaller than cell area, to allow surface waters as workaround.
         unequal_area = (total_area > cell_area).values[active.values]
 
-        if np.any(unequal_area):
-            raise ValueError(
-                "Provided area grid with total areas larger than cell area"
-            )
+        
+    def regrid_like(
+        self,
+        target_grid: GridDataArray,
+        regrid_context: RegridderWeightsCache,
+        regridder_types: Optional[dict[str, Tuple[RegridderType, str]]] = None,
+    ) -> "MetaSwapPackage":
+        user_input_area = self.dataset["area"]
+
+        filtered_area = xr.where(np.isnan(user_input_area), 0, user_input_area)
+        total_area = np.sum(filtered_area.values)
+
+        actual_area = get_cell_area( user_input_area)
+        fractional_area = user_input_area / actual_area
+
+        self.dataset["area"] = fractional_area
+
+
+        try:
+            result = MetaSwapPackage.regrid_like(self, target_grid, regrid_context, regridder_types)
+        except ValueError as e:
+            raise e
+        except Exception as e:
+            raise ValueError(f"package could not be regridded:{e}")
+        
+        regridded_fractional_area = result.dataset["area"]
+        regridded_actual_area =  get_cell_area( regridded_fractional_area)
+
+
+        result.dataset["area"] = regridded_fractional_area * regridded_actual_area
+        
+        regridded_filtered_area = xr.where(np.isnan(result.dataset["area"]), 0, result.dataset["area"])
+        total_regridded_area = np.sum(filtered_area.values)
+
+        return result

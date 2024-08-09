@@ -4,8 +4,8 @@ import pandas as pd
 import pytest
 import xarray as xr
 import xugrid as xu
-
 import imod
+from imod.util.spatial import get_cell_area
 
 
 @pytest.fixture(scope="function")
@@ -380,3 +380,34 @@ def test_gdal_compliant_grid_error_crs_existing():
         ValueError, match="Grid already has CRS different then provided CRS."
     ):
         imod.util.spatial.gdal_compliant_grid(da_crs, crs="EPSG:4326")
+
+
+
+def test_get_area_equidistant():
+    
+    a2d = imod.util.spatial.empty_2d(
+        dx=2.0,
+        xmin=0.0,
+        xmax=4.0,
+        dy=3.0,
+        ymin=0.0,
+        ymax=9.0,
+    )
+    cell_area = get_cell_area( a2d)
+    assert  np.all((cell_area == 6.0).values)
+
+def test_get_area_nonequidistant( tmp_path):
+    a2d = imod.util.spatial.empty_2d(
+        dx=[1.0, 0.5, 0.5],
+        xmin=0.0,
+        xmax=2.0,
+        dy=[1.0, 0.5, 0.5],
+        ymin=0.0,
+        ymax=2.0,
+    )
+
+    cell_area = get_cell_area(a2d)
+    assert np.all(cell_area.values == np.array([[-1.  , -0.5 , -0.5 ],
+                    [-0.5 , -0.25, -0.25],
+                    [-0.5 , -0.25, -0.25]]))
+
