@@ -28,7 +28,39 @@ class WellPrjCases:
             """
         )
 
-    def case_simple__all(self):
+    def case_simple__all_same(self):
+        return dedent(
+            """
+            0003,(WEL),1
+            1982-01-01
+            001,001
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
+            1982-02-01
+            001,001
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
+            1982-03-01
+            001,001
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
+            """
+        )
+
+    def case_simple__all_different1(self):
+        return dedent(
+            """
+            0003,(WEL),1
+            1982-01-01
+            001,001
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
+            1982-02-01
+            001,001
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple2.ipf"
+            1982-03-01
+            001,001
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple3.ipf"
+            """
+        )
+
+    def case_simple__all_different2(self):
         return dedent(
             """
             0003,(WEL),1
@@ -41,6 +73,23 @@ class WellPrjCases:
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple2.ipf"
             1982-03-01
             001,001
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple3.ipf"
+            """
+        )
+
+    def case_simple__all_different3(self):
+        return dedent(
+            """
+            0003,(WEL),1
+            1982-01-01
+            001,001
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
+            1982-02-01
+            001,001
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple2.ipf"
+            1982-03-01
+            001,002
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
             1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple3.ipf"
             """
         )
@@ -154,7 +203,43 @@ class WellReadCases:
             },
         }
 
-    def case_simple__all(self):
+    def case_simple__all_same(self):
+        return {
+            "wel-simple1": {
+                "has_associated": False,
+                "time": [datetime(1982, 1, 1), datetime(1982, 2, 1), datetime(1983, 1, 1)],
+                "layer": [1, 1, 1],
+                "factor": [1.0, 1.0, 1.0],
+                "addition": [0.0, 0.0, 0.0],
+            },
+        }
+
+    def case_simple__all_different1(self):
+        return {
+            "wel-simple1": {
+                "has_associated": False,
+                "time": [datetime(1982, 1, 1)],
+                "layer": [1],
+                "factor": [1.0],
+                "addition": [0.0],
+            },
+            "wel-simple2": {
+                "has_associated": False,
+                "time": [datetime(1982, 2, 1)],
+                "layer": [1],
+                "factor": [1.0],
+                "addition": [0.0],
+            },
+            "wel-simple3": {
+                "has_associated": False,
+                "time": [datetime(1982, 3, 1)],
+                "layer": [1],
+                "factor": [1.0],
+                "addition": [0.0],
+            },
+        }
+
+    def case_simple__all_different2(self):
         return {
             "wel-simple1": {
                 "has_associated": False,
@@ -178,6 +263,33 @@ class WellReadCases:
                 "addition": [0.0],
             },
         }
+
+
+    def case_simple__all_different3(self):
+        return {
+            "wel-simple1": {
+                "has_associated": False,
+                "time": [datetime(1982, 1, 1), datetime(1982, 3, 1)],
+                "layer": [1, 1],
+                "factor": [1.0, 1.0],
+                "addition": [0.0, 0.0],
+            },
+            "wel-simple2": {
+                "has_associated": False,
+                "time": [datetime(1982, 2, 1)],
+                "layer": [1],
+                "factor": [1.0],
+                "addition": [0.0],
+            },
+            "wel-simple3": {
+                "has_associated": False,
+                "time": [datetime(1982, 3, 1)],
+                "layer": [1],
+                "factor": [1.0],
+                "addition": [0.0],
+            },
+        }
+
 
     def case_associated__first(self):
         return {
@@ -309,11 +421,30 @@ class WellPackageCases:
             "wel-simple1": (False, [datetime(1982, 2, 1), datetime(1982, 3, 1)]),
         }
 
-    def case_simple__all(self):
+    def case_simple__all_same(self):
+        return {
+            "wel-simple1": (False, []),
+        }
+
+    def case_simple__all_different1(self):
+        return {
+            "wel-simple1": (False, [datetime(1982, 2, 1), datetime(1982, 3, 1)]),
+            "wel-simple2": (False, [datetime(1982, 3, 1)]),
+            "wel-simple3": (False, []),
+        }
+
+    def case_simple__all_different2(self):
+        return {
+            "wel-simple1": (False, [datetime(1982, 3, 1)]),
+            "wel-simple2": (False, [datetime(1982, 3, 1)]),
+            "wel-simple3": (False, []),
+        }
+
+    def case_simple__all_different3(self):
         return {
             "wel-simple1": (False, [datetime(1982, 2, 1)]),
-            "wel-simple2": (False, [datetime(1982, 1, 1), datetime(1982, 3, 1)]),
-            "wel-simple3": (False, [datetime(1982, 1, 1), datetime(1982, 2, 1)]),
+            "wel-simple2": (False, [datetime(1982, 3, 1)]),
+            "wel-simple3": (False, []),
         }
 
     def case_associated__first(self):
@@ -386,13 +517,23 @@ def setup_test_files(wel_case, wel_file, well_mixed_ipfs, tmp_path):
         copyfile(p, ipf_dir / p.name)
 
 
+def get_case_name(request):
+    id_name = request.node.callspec.id
+    # Verify right cases are matched. This can go wrong when case names are not
+    # inserted in the right order in Case class.
+    cases = id_name.split("-")
+    assert cases[0] == cases[-1]
+
+    return cases[0]
+
+
 @parametrize("wel_case, expected", argvalues=list(zip(PRJ_ARGS, READ_ARGS)))
 def test_open_projectfile_data_wells(
     wel_case, expected, well_mixed_ipfs, tmp_path, request
 ):
     # Arrange
-    case_name = request.node.callspec.id
-    wel_file = tmp_path / f"{case_name}.prj"
+    case_name = get_case_name(request)
+    wel_file = tmp_path / f"{case_name]}.prj"
     setup_test_files(wel_case, wel_file, well_mixed_ipfs, tmp_path)
 
     # Act
@@ -409,7 +550,7 @@ def test_open_projectfile_data_wells(
 @parametrize("wel_case, expected_dict", argvalues=list(zip(PRJ_ARGS, PKG_ARGS)))
 def test_from_imod5_data_wells(wel_case, expected_dict, well_mixed_ipfs, tmp_path, request):
     # Arrange
-    case_name = request.node.callspec.id
+    case_name = get_case_name(request)
     wel_file = tmp_path / f"{case_name}.prj"
     setup_test_files(wel_case, wel_file, well_mixed_ipfs, tmp_path)
     
