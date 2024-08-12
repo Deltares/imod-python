@@ -153,7 +153,10 @@ def _prepare_df_ipf_unassociated(
     # multi-dimensional ffilling, instead pandas' ffilling the last value in a
     # column of the flattened table.
     ipf_row_index = pkg_data["dataframe"][0].index
-    cols_ffill = ["x", "y", "layer"]
+    # Forward fill location columns, only reindex layer, filt_top and filt_bot
+    # if present.
+    cols_ffill = ["x", "y", "layer", "filt_top", "filt_bot"]
+    cols_ffill = set(cols_ffill) & set(df.columns)
     da_multi = df_multi.to_xarray()
     indexers = {"time": start_times, "ipf_row": ipf_row_index}
     # Multi-dimensional reindex, forward fill well locations, fill well rates
@@ -166,7 +169,9 @@ def _prepare_df_ipf_unassociated(
     return df_out.reset_index().drop(columns="ipf_row")
 
 
-def _unpack_package_data(pkg_data: dict, times: list[datetime], all_well_times: list[datetime]) -> pd.DataFrame:
+def _unpack_package_data(
+    pkg_data: dict, times: list[datetime], all_well_times: list[datetime]
+) -> pd.DataFrame:
     """Unpack package data to dataframe"""
     start_times = times[:-1]  # Starts stress periods.
     has_associated = pkg_data["has_associated"]
@@ -185,7 +190,7 @@ def get_all_imod5_prj_well_times(imod5_data: dict) -> list[datetime]:
     # Get unique times by converting to set and sorting. ``sorted`` also
     # transforms set to a list again.
     return sorted(set(wel_times_flat))
-        
+
 
 class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
     """
