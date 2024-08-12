@@ -631,7 +631,10 @@ class Well(GridAgnosticWell):
     }
 
     _imod5_depth_colnames: list[str] = ["filt_top", "filt_bot"]
-    _depth_colnames: list[tuple[str, type]] = [("screen_top", float), ("screen_bottom", float)]
+    _depth_colnames: list[tuple[str, type]] = [
+        ("screen_top", float),
+        ("screen_bottom", float),
+    ]
 
     @init_log_decorator()
     def __init__(
