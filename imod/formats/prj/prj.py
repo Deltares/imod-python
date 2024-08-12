@@ -810,7 +810,7 @@ class IpfResult:
 
 def _read_package_ipf(
     block_content: Dict[str, Any], periods: Dict[str, datetime]
-) -> Tuple[List[Dict[str, Any]], List[datetime]]:
+) -> Tuple[Dict[str, Dict], List[datetime]]:
     out = defaultdict(IpfResult)
     repeats = []
 
