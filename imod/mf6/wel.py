@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import abc
+import itertools
 import textwrap
 import warnings
 from datetime import datetime
@@ -109,7 +110,7 @@ def _prepare_well_rates_from_groups(
 
 
 def _prepare_df_ipf_associated(
-    pkg_data: dict, start_times: list[datetime]
+    pkg_data: dict, start_times: list[datetime], all_well_times: list[datetime]
 ) -> pd.DataFrame:
     """Prepare dataframe for an ipf with associated timeseries in a textfile."""
     # Validate if associated wells are assigned multiple layers, factors,
@@ -122,15 +123,15 @@ def _prepare_df_ipf_associated(
             )
     # Validate if associated wells are defined only on first timestep or all
     # timesteps
-    is_defined_all = len(set(start_times) - set(pkg_data["time"])) == 0
+    is_defined_all = len(set(all_well_times) - set(pkg_data["time"])) == 0
     is_defined_first = (len(pkg_data["time"]) == 1) & (
-        pkg_data["time"][0] == start_times[0]
+        pkg_data["time"][0] == all_well_times[0]
     )
     if not is_defined_all and not is_defined_first:
         raise ValueError(
             "IPF with associated textfiles assigned to wrong times. "
             "Should be assigned to all times or only first time. "
-            f"PRJ times: {pkg_data['time']}, simulation times: {start_times}"
+            f"PRJ times: {all_well_times}, package times: {pkg_data['time']}"
         )
     df = pkg_data["dataframe"][0]
     df["layer"] = pkg_data["layer"][0]
@@ -165,15 +166,26 @@ def _prepare_df_ipf_unassociated(
     return df_out.reset_index().drop(columns="ipf_row")
 
 
-def _unpack_package_data(pkg_data: dict, times: list[datetime]) -> pd.DataFrame:
+def _unpack_package_data(pkg_data: dict, times: list[datetime], all_well_times: list[datetime]) -> pd.DataFrame:
     """Unpack package data to dataframe"""
     start_times = times[:-1]  # Starts stress periods.
     has_associated = pkg_data["has_associated"]
     if has_associated:
-        return _prepare_df_ipf_associated(pkg_data, start_times)
+        return _prepare_df_ipf_associated(pkg_data, start_times, all_well_times)
     else:
         return _prepare_df_ipf_unassociated(pkg_data, start_times)
 
+
+def get_all_imod5_prj_well_times(imod5_data: dict) -> list[datetime]:
+    """Get all times a well data is defined on in a prj file"""
+    wel_keys = [key for key in imod5_data.keys() if key.startswith("wel")]
+    wel_times_per_pkg = [imod5_data[wel_key]["time"] for wel_key in wel_keys]
+    # Flatten list
+    wel_times_flat = itertools.chain.from_iterable(wel_times_per_pkg)
+    # Get unique times by converting to set and sorting. ``sorted`` also
+    # transforms set to a list again.
+    return sorted(set(wel_times_flat))
+        
 
 class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
     """
@@ -471,8 +483,9 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         minimum_thickness: float = 1.0,
     ) -> "GridAgnosticWell":
         pkg_data = imod5_data[key]
+        all_well_times = get_all_imod5_prj_well_times(imod5_data)
 
-        df = _unpack_package_data(pkg_data, times)
+        df = _unpack_package_data(pkg_data, times, all_well_times)
         cls._validate_imod5_depth_information(key, pkg_data, df)
 
         # Groupby unique wells, to get dataframes per time.
