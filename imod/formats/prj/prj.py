@@ -892,7 +892,7 @@ def _read_package_ipf(
         out[path.stem].has_associated = has_associated
         out[path.stem].append(df, layer, time, factor, addition)
 
-    out_dict_ls: list[dict] = {key: asdict(o) for key, o in out.items()}
+    out_dict_ls: dict[str, dict] = {key: asdict(o) for key, o in out.items()}
     repeats = sorted(repeats)
     return out_dict_ls, repeats
 
