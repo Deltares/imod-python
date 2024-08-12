@@ -467,13 +467,13 @@ class WellPackageCases:
 
     def case_mixed__all(self):
         return {
-            "wel-simple1": (False, [datetime(1982, 1, 1), datetime(1982, 3, 1)]),
+            "wel-simple1": (False, [datetime(1982, 3, 1)]),
             "wel-associated": (False, []),
         }
 
     def case_mixed__associated_second(self):
         return {
-            "wel-simple1": (False, [datetime(1982, 1, 1), datetime(1982, 3, 1)]),
+            "wel-simple1": (False, [datetime(1982, 2, 1), datetime(1982, 3, 1)]),
             "wel-associated": (True, []),
             }
 
@@ -533,7 +533,7 @@ def test_open_projectfile_data_wells(
 ):
     # Arrange
     case_name = get_case_name(request)
-    wel_file = tmp_path / f"{case_name]}.prj"
+    wel_file = tmp_path / f"{case_name}.prj"
     setup_test_files(wel_case, wel_file, well_mixed_ipfs, tmp_path)
 
     # Act
@@ -572,3 +572,32 @@ def test_from_imod5_data_wells(wel_case, expected_dict, well_mixed_ipfs, tmp_pat
             diff = set(actual_set_to_zero) ^ set(expected_set_to_zero)
             assert len(diff) == 0
 
+
+@parametrize("wel_case, expected_dict", argvalues=list(zip(PRJ_ARGS, PKG_ARGS)))
+def test_from_imod5_data_wells__outside_range(wel_case, expected_dict, well_mixed_ipfs, tmp_path, request):
+    """
+    Test where values are retrieved outside time domain of wells, should be all
+    set to zero.
+    """
+    # Arrange
+    case_name = get_case_name(request)
+    wel_file = tmp_path / f"{case_name}.prj"
+    setup_test_files(wel_case, wel_file, well_mixed_ipfs, tmp_path)
+    
+    times = [datetime(1985, i + 1, 1) for i in range(4)]
+
+    # Act
+    data, _ = open_projectfile_data(wel_file)
+    for wellname in data.keys():
+        assert wellname in expected_dict.keys()
+        fails, _ = expected_dict[wellname]
+        if fails:
+            with pytest.raises(ValueError):
+                LayeredWell.from_imod5_data(wellname, data, times=times)
+        else:
+            well = LayeredWell.from_imod5_data(wellname, data, times=times)
+            rate = well.dataset["rate"]
+            actual_set_to_zero = [t.values for t in rate.coords["time"] if (rate.sel(time=t) == 0.0).all()]
+            expected_set_to_zero = [np.datetime64(t, "ns") for t in times[:-1]]
+            diff = set(actual_set_to_zero) ^ set(expected_set_to_zero)
+            assert len(diff) == 0
