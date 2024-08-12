@@ -914,7 +914,7 @@ def test_import_and_convert_to_mf6(imod5_dataset, tmp_path, wel_class):
     wel = wel_class.from_imod5_data("wel-WELLS_L3", data, times)
     assert wel.dataset["x"].values[0] == 197910.0
     assert wel.dataset["y"].values[0] == 362860.0
-    assert np.mean(wel.dataset["rate"].values) == -317.1681465863781
+    assert np.mean(wel.dataset["rate"].values) == -317.2059091946156
     # convert to a gridded well
     top = target_dis.dataset["top"]
     bottom = target_dis.dataset["bottom"]
@@ -926,7 +926,7 @@ def test_import_and_convert_to_mf6(imod5_dataset, tmp_path, wel_class):
     assert len(mf6_well.dataset["x"].values) == 1
     assert mf6_well.dataset["x"].values[0] == 197910.0
     assert mf6_well.dataset["y"].values[0] == 362860.0
-    assert np.mean(mf6_well.dataset["rate"].values) == -317.1681465863781
+    assert np.mean(mf6_well.dataset["rate"].values) == -317.2059091946156
 
     # write the package for validation
     write_context = WriteContext(simulation_directory=tmp_path)
@@ -947,13 +947,13 @@ def test_import_multiple_wells(well_regular_import_prj, wel_class):
     ]
 
     # import grid-agnostic well from imod5 data (it contains 2 packages with 3 wells each)
-    wel1 = wel_class.from_imod5_data("wel-WELLS_L3", imod5dict[0], times)
-    wel2 = wel_class.from_imod5_data("wel-WELLS_L4", imod5dict[0], times)
+    wel1 = wel_class.from_imod5_data("wel-ipf1", imod5dict[0], times)
+    wel2 = wel_class.from_imod5_data("wel-ipf2", imod5dict[0], times)
 
     assert np.all(wel1.x == np.array([191112.11, 191171.96, 191231.52]))
     assert np.all(wel2.x == np.array([191112.11, 191171.96, 191231.52]))
-    assert wel1.dataset["rate"].shape == (6, 3)
-    assert wel2.dataset["rate"].shape == (6, 3)
+    assert wel1.dataset["rate"].shape == (5, 3)
+    assert wel2.dataset["rate"].shape == (5, 3)
 
 
 @parametrize("wel_class", [Well, LayeredWell])
@@ -969,13 +969,13 @@ def test_import_from_imod5_with_duplication(well_duplication_import_prj, wel_cla
         datetime(1982, 4, 30),
     ]
     # import grid-agnostic well from imod5 data (it contains 2 packages with 3 wells each)
-    wel1 = wel_class.from_imod5_data("wel-WELLS_L3", imod5dict[0], times)
-    wel2 = wel_class.from_imod5_data("wel-WELLS_L4", imod5dict[0], times)
+    wel1 = wel_class.from_imod5_data("wel-ipf1", imod5dict[0], times)
+    wel2 = wel_class.from_imod5_data("wel-ipf2", imod5dict[0], times)
 
     assert np.all(wel1.x == np.array([191171.96, 191231.52, 191231.52]))
     assert np.all(wel2.x == np.array([191112.11, 191171.96, 191231.52]))
-    assert wel1.dataset["rate"].shape == (6, 3)
-    assert wel2.dataset["rate"].shape == (6, 3)
+    assert wel1.dataset["rate"].shape == (5, 3)
+    assert wel2.dataset["rate"].shape == (5, 3)
 
 
 @pytest.mark.parametrize("layer", [0, 1])
@@ -986,7 +986,7 @@ def test_logmessage_for_layer_assignment_import_imod5(
     imod5dict = open_projectfile_data(well_regular_import_prj)
 
     logfile_path = tmp_path / "logfile.txt"
-    imod5dict[0]["wel-WELLS_L3"]["layer"] = layer
+    imod5dict[0]["wel-ipf1"]["layer"] = [layer] * len(imod5dict[0]["wel-ipf1"]["layer"])
 
     try:
         with open(logfile_path, "w") as sys.stdout:
@@ -998,7 +998,7 @@ def test_logmessage_for_layer_assignment_import_imod5(
                 add_default_stream_handler=True,
             )
 
-            _ = imod.mf6.Well.from_imod5_data("wel-WELLS_L3", imod5dict[0], times)
+            _ = imod.mf6.Well.from_imod5_data("wel-ipf1", imod5dict[0], times)
 
     finally:
         # turn the logger off again
@@ -1014,7 +1014,7 @@ def test_logmessage_for_layer_assignment_import_imod5(
         log = log_file.read()
         message_required = layer != 0
         message_present = (
-            "In well wel-1 a layer was assigned, but this is not\nsupported" in log
+            "In well wel-ipf1 a layer was assigned, but this is not\nsupported" in log
         )
         assert message_required == message_present
 
@@ -1027,7 +1027,7 @@ def test_logmessage_for_missing_filter_settings(
     imod5dict = open_projectfile_data(well_regular_import_prj)
     logfile_path = tmp_path / "logfile.txt"
     if remove is not None:
-        imod5dict[0]["wel-WELLS_L3"]["dataframe"] = imod5dict[0]["wel-WELLS_L3"]["dataframe"].drop(
+        imod5dict[0]["wel-ipf1"]["dataframe"][0] = imod5dict[0]["wel-ipf1"]["dataframe"][0].drop(
             remove, axis=1
         )
 
@@ -1041,7 +1041,7 @@ def test_logmessage_for_missing_filter_settings(
                 add_default_stream_handler=True,
             )
 
-            _ = imod.mf6.Well.from_imod5_data("wel-WELLS_L3", imod5dict[0], times)
+            _ = imod.mf6.Well.from_imod5_data("wel-ipf1", imod5dict[0], times)
     except Exception:
         assert remove is not None
 
@@ -1059,7 +1059,7 @@ def test_logmessage_for_missing_filter_settings(
         log = log_file.read()
         message_required = remove is not None
         message_present = (
-            "In well wel-1 the filt_top and filt_bot columns were not both found;"
+            "In well wel-ipf1 the 'filt_top' and 'filt_bot' columns were\nnot both found;"
             in log
         )
         assert message_required == message_present
