@@ -494,7 +494,10 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         cls._validate_imod5_depth_information(key, pkg_data, df)
 
         # Groupby unique wells, to get dataframes per time.
-        colnames_group = ["x", "y"] + cls._imod5_depth_colnames  # , "id"]
+        colnames_group = ["x", "y"] + cls._imod5_depth_colnames
+        # Associated wells need additional grouping by id
+        if pkg_data["has_associated"]:
+            colnames_group.append("id")
         wel_index, unique_well_groups = zip(*df.groupby(colnames_group))
 
         # Unpack wel indices by zipping
@@ -837,7 +840,7 @@ class Well(GridAgnosticWell):
     def _validate_imod5_depth_information(
         cls, key: str, pkg_data: dict, df: pd.DataFrame
     ) -> None:
-        if "layer" in pkg_data.keys() and (np.any(pkg_data["layer"] != 0)):
+        if "layer" in pkg_data.keys() and (np.any(np.array(pkg_data["layer"]) != 0)):
             log_msg = textwrap.dedent(
                 f"""
                 In well {key} a layer was assigned, but this is not
