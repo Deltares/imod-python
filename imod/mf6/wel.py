@@ -93,7 +93,7 @@ def _prepare_well_rates_from_groups(
     pkg_data: dict,
     unique_well_groups: pd.api.typing.DataFrameGroupBy,
     times: list[datetime],
-) -> pd.DataFrame:
+) -> xr.DataArray:
     """
     Prepare well rates from dataframe groups, grouped by unique well locations.
     Resample timeseries if ipf with associated text files.
@@ -155,8 +155,8 @@ def _prepare_df_ipf_unassociated(
     ipf_row_index = pkg_data["dataframe"][0].index
     # Forward fill location columns, only reindex layer, filt_top and filt_bot
     # if present.
-    cols_ffill = ["x", "y", "layer", "filt_top", "filt_bot"]
-    cols_ffill = set(cols_ffill) & set(df.columns)
+    cols_ffill_if_present = {"x", "y", "layer", "filt_top", "filt_bot"}
+    cols_ffill = cols_ffill_if_present & set(df.columns)
     da_multi = df_multi.to_xarray()
     indexers = {"time": start_times, "ipf_row": ipf_row_index}
     # Multi-dimensional reindex, forward fill well locations, fill well rates
@@ -197,8 +197,8 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
     Abstract base class for grid agnostic wells
     """
 
-    _imod5_depth_colnames = []
-    _depth_colnames = []
+    _imod5_depth_colnames: list[str] = []
+    _depth_colnames: list[tuple[str, type]] = []
 
     @property
     def x(self) -> npt.NDArray[np.float64]:
@@ -503,7 +503,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         # Unpack wel indices by zipping
         varnames = [("x", float), ("y", float)] + cls._depth_colnames
         index_values = zip(*wel_index)
-        cls_input = {
+        cls_input: dict[str, Any] = {
             var: np.array(value, dtype=dtype)
             for (var, dtype), value in zip(varnames, index_values)
         }
@@ -630,8 +630,8 @@ class Well(GridAgnosticWell):
         "concentration": [AnyNoDataSchema(), EmptyIndexesSchema()],
     }
 
-    _imod5_depth_colnames = ["filt_top", "filt_bot"]
-    _depth_colnames = [("screen_top", float), ("screen_bottom", float)]
+    _imod5_depth_colnames: list[str] = ["filt_top", "filt_bot"]
+    _depth_colnames: list[tuple[str, type]] = [("screen_top", float), ("screen_bottom", float)]
 
     @init_log_decorator()
     def __init__(
@@ -969,8 +969,8 @@ class LayeredWell(GridAgnosticWell):
         "rate": [AnyNoDataSchema(), EmptyIndexesSchema()],
         "concentration": [AnyNoDataSchema(), EmptyIndexesSchema()],
     }
-    _imod5_depth_colnames = ["layer"]
-    _depth_colnames = [("layer", int)]
+    _imod5_depth_colnames: list[str] = ["layer"]
+    _depth_colnames: list[tuple[str, type]] = [("layer", int)]
 
     @init_log_decorator()
     def __init__(
