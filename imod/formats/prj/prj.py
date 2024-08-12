@@ -838,7 +838,7 @@ def _read_package_ipf(
             columns = ("x", "y", "rate")
             if layer <= 0:
                 df = ipf_df.iloc[:, :5]
-                columns = columns + ("top", "bottom")
+                columns = columns + ("filt_top", "filt_bot")
             else:
                 df = ipf_df.iloc[:, :3]
             df.columns = columns
