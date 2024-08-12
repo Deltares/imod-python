@@ -144,23 +144,24 @@ def _prepare_df_ipf_unassociated(
     # Concatenate dataframes, assign layer and times
     iter_dfs_dims = zip(pkg_data["dataframe"], pkg_data["time"], pkg_data["layer"])
     df = pd.concat([df.assign(time=t, layer=lay) for df, t, lay in iter_dfs_dims])
-    # Prepare out dataframe, taking the outer product to to get all possible
-    # combinations between time and rows.
+    # Prepare multi-index dataframe to convert to a multi-dimensional DataArray
+    # later.
     df_multi = df.set_index(["time", df.index])
-    # Produce multi indices.
+    df_multi.index = df_multi.index.set_names(["time", "ipf_row"])
+    # Temporarily convert to DataArray with 2 dimensions, as it allows for
+    # multi-dimensional ffilling, instead pandas' ffilling the last value in a
+    # column of the flattened table.
     ipf_row_index = pkg_data["dataframe"][0].index
-    multi_index = pd.MultiIndex.from_product(
-        [start_times, ipf_row_index], names=["time", "ipf_row"]
-    )
-    df_out = df_multi.reindex(multi_index)
-    # Forward fill NaN for well locations, convert to xarray and back to
-    # deal with forward filling across a specific dimension
     cols_ffill = ["x", "y", "layer"]
-    df_out.loc[:, cols_ffill] = (
-        df_out.loc[:, cols_ffill].to_xarray().ffill("time").to_dataframe()
-    )
-    # Fill rate NaNs with 0.0
-    df_out.loc[:, "rate"] = df_out.loc[:, "rate"].fillna(0.0)
+    da_multi = df_multi.to_xarray()
+    indexers = {"time": start_times, "ipf_row": ipf_row_index}
+    # Multi-dimensional reindex, forward fill well locations, fill well rates
+    # with 0.0.
+    df_ffilled = da_multi[cols_ffill].reindex(indexers, method="ffill").to_dataframe()
+    df_fill_zero = da_multi["rate"].reindex(indexers, fill_value=0.0).to_dataframe()
+    # Combine columns and reset dataframe back into a simple long table with
+    # single index.
+    df_out = pd.concat([df_ffilled, df_fill_zero], axis="columns")
     return df_out.reset_index().drop(columns="ipf_row")
 
 
