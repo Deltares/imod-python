@@ -911,7 +911,7 @@ def test_import_and_convert_to_mf6(imod5_dataset, tmp_path, wel_class):
     times = list(pd.date_range(datetime(1989, 1, 1), datetime(2013, 1, 1), 8400))
 
     # import grid-agnostic well from imod5 data (it contains 1 well)
-    wel = wel_class.from_imod5_data("wel-1", data, times)
+    wel = wel_class.from_imod5_data("wel-WELLS_L3", data, times)
     assert wel.dataset["x"].values[0] == 197910.0
     assert wel.dataset["y"].values[0] == 362860.0
     assert np.mean(wel.dataset["rate"].values) == -317.1681465863781
@@ -947,8 +947,8 @@ def test_import_multiple_wells(well_regular_import_prj, wel_class):
     ]
 
     # import grid-agnostic well from imod5 data (it contains 2 packages with 3 wells each)
-    wel1 = wel_class.from_imod5_data("wel-1", imod5dict[0], times)
-    wel2 = wel_class.from_imod5_data("wel-2", imod5dict[0], times)
+    wel1 = wel_class.from_imod5_data("wel-WELLS_L3", imod5dict[0], times)
+    wel2 = wel_class.from_imod5_data("wel-WELLS_L4", imod5dict[0], times)
 
     assert np.all(wel1.x == np.array([191112.11, 191171.96, 191231.52]))
     assert np.all(wel2.x == np.array([191112.11, 191171.96, 191231.52]))
@@ -969,8 +969,8 @@ def test_import_from_imod5_with_duplication(well_duplication_import_prj, wel_cla
         datetime(1982, 4, 30),
     ]
     # import grid-agnostic well from imod5 data (it contains 2 packages with 3 wells each)
-    wel1 = wel_class.from_imod5_data("wel-1", imod5dict[0], times)
-    wel2 = wel_class.from_imod5_data("wel-2", imod5dict[0], times)
+    wel1 = wel_class.from_imod5_data("wel-WELLS_L3", imod5dict[0], times)
+    wel2 = wel_class.from_imod5_data("wel-WELLS_L4", imod5dict[0], times)
 
     assert np.all(wel1.x == np.array([191171.96, 191231.52, 191231.52]))
     assert np.all(wel2.x == np.array([191112.11, 191171.96, 191231.52]))
@@ -986,7 +986,7 @@ def test_logmessage_for_layer_assignment_import_imod5(
     imod5dict = open_projectfile_data(well_regular_import_prj)
 
     logfile_path = tmp_path / "logfile.txt"
-    imod5dict[0]["wel-1"]["layer"] = layer
+    imod5dict[0]["wel-WELLS_L3"]["layer"] = layer
 
     try:
         with open(logfile_path, "w") as sys.stdout:
@@ -998,7 +998,7 @@ def test_logmessage_for_layer_assignment_import_imod5(
                 add_default_stream_handler=True,
             )
 
-            _ = imod.mf6.Well.from_imod5_data("wel-1", imod5dict[0], times)
+            _ = imod.mf6.Well.from_imod5_data("wel-WELLS_L3", imod5dict[0], times)
 
     finally:
         # turn the logger off again
@@ -1027,7 +1027,7 @@ def test_logmessage_for_missing_filter_settings(
     imod5dict = open_projectfile_data(well_regular_import_prj)
     logfile_path = tmp_path / "logfile.txt"
     if remove is not None:
-        imod5dict[0]["wel-1"]["dataframe"] = imod5dict[0]["wel-1"]["dataframe"].drop(
+        imod5dict[0]["wel-WELLS_L3"]["dataframe"] = imod5dict[0]["wel-WELLS_L3"]["dataframe"].drop(
             remove, axis=1
         )
 
@@ -1041,7 +1041,7 @@ def test_logmessage_for_missing_filter_settings(
                 add_default_stream_handler=True,
             )
 
-            _ = imod.mf6.Well.from_imod5_data("wel-1", imod5dict[0], times)
+            _ = imod.mf6.Well.from_imod5_data("wel-WELLS_L3", imod5dict[0], times)
     except Exception:
         assert remove is not None
 
