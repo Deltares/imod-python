@@ -5,6 +5,8 @@ Utilities for parsing a project file.
 import shlex
 import textwrap
 from collections import defaultdict
+from dataclasses import asdict, dataclass
+from dataclasses import field as data_field
 from datetime import datetime
 from itertools import chain
 from os import PathLike
@@ -782,10 +784,34 @@ def _read_package_gen(
     return out
 
 
+@dataclass
+class IpfResult:
+    has_associated: bool = data_field(default_factory=bool)
+    dataframe: list[pd.DataFrame] = data_field(default_factory=list)
+    layer: list[int] = data_field(default_factory=list)
+    time: list[str] = data_field(default_factory=list)
+    factor: list[float] = data_field(default_factory=list)
+    addition: list[float] = data_field(default_factory=list)
+
+    def append(
+        self,
+        dataframe: pd.DataFrame,
+        layer: int,
+        time: str,
+        factor: float,
+        addition: float,
+    ):
+        self.dataframe.append(dataframe)
+        self.layer.append(layer)
+        self.time.append(time)
+        self.factor.append(factor)
+        self.addition.append(addition)
+
+
 def _read_package_ipf(
     block_content: Dict[str, Any], periods: Dict[str, datetime]
-) -> Tuple[List[Dict[str, Any]], List[datetime]]:
-    out = []
+) -> Tuple[Dict[str, Dict], List[datetime]]:
+    out = defaultdict(IpfResult)
     repeats = []
 
     # we will store in this set the tuples of (x, y, id, well_top, well_bot)
@@ -808,6 +834,7 @@ def _read_package_ipf(
         ipf_df, indexcol, ext = _try_read_with_func(imod.ipf._read_ipf, path)
         if indexcol == 0:
             # No associated files
+            has_associated = False
             columns = ("x", "y", "rate")
             if layer <= 0:
                 df = ipf_df.iloc[:, :5]
@@ -816,6 +843,7 @@ def _read_package_ipf(
                 df = ipf_df.iloc[:, :3]
             df.columns = columns
         else:
+            has_associated = True
             dfs = []
             for row in ipf_df.itertuples():
                 filename = row[indexcol]
@@ -861,14 +889,12 @@ def _read_package_ipf(
             df = pd.concat(dfs, ignore_index=True, sort=False)
         df["rate"] = df["rate"] * factor + addition
 
-        d = {
-            "dataframe": df,
-            "layer": layer,
-            "time": time,
-        }
-        out.append(d)
+        out[path.stem].has_associated = has_associated
+        out[path.stem].append(df, layer, time, factor, addition)
+
+    out_dict_ls: dict[str, dict] = {key: asdict(o) for key, o in out.items()}
     repeats = sorted(repeats)
-    return out, repeats
+    return out_dict_ls, repeats
 
 
 def read_projectfile(path: FilePath) -> Dict[str, Any]:
@@ -1021,7 +1047,12 @@ def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
             raise type(e)(f"{e}. Errored while opening/reading data entries for: {key}")
 
         strippedkey = key.strip("(").strip(")")
-        if len(data) > 1:
+        if strippedkey == "wel":
+            for key, d in data.items():
+                named_key = f"{strippedkey}-{key}"
+                prj_data[named_key] = d
+                repeat_stress[named_key] = repeats
+        elif len(data) > 1:
             for i, da in enumerate(data):
                 numbered_key = f"{strippedkey}-{i + 1}"
                 prj_data[numbered_key] = da
