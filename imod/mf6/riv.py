@@ -335,9 +335,14 @@ class River(BoundaryCondition, IRegridPackage):
         optional_river_package: Optional[River] = None
         optional_drainage_package: Optional[Drainage] = None
         # create a drainage package with the conductance we computed from the infiltration factor
+        drainage_arrays = {
+            "stage": regridded_package_data["stage"],
+            "conductance": drain_conductance,
+        }
+
         drainage_package = cls.create_infiltration_factor_drain(
-            regridded_package_data["stage"],
-            drain_conductance,
+            drainage_arrays["stage"],
+            drainage_arrays["conductance"],
         )
         # remove River package if its mask is False everywhere
         mask = ~np.isnan(river_conductance)

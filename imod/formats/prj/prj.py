@@ -810,7 +810,7 @@ class IpfResult:
 
 def _read_package_ipf(
     block_content: Dict[str, Any], periods: Dict[str, datetime]
-) -> Tuple[List[Dict[str, Any]], List[datetime]]:
+) -> Tuple[Dict[str, Dict], List[datetime]]:
     out = defaultdict(IpfResult)
     repeats = []
 
@@ -892,7 +892,7 @@ def _read_package_ipf(
         out[path.stem].has_associated = has_associated
         out[path.stem].append(df, layer, time, factor, addition)
 
-    out_dict_ls: list[dict] = {key: asdict(o) for key, o in out.items()}
+    out_dict_ls: dict[str, dict] = {key: asdict(o) for key, o in out.items()}
     repeats = sorted(repeats)
     return out_dict_ls, repeats
 
