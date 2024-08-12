@@ -1027,9 +1027,9 @@ def test_logmessage_for_missing_filter_settings(
     imod5dict = open_projectfile_data(well_regular_import_prj)
     logfile_path = tmp_path / "logfile.txt"
     if remove is not None:
-        imod5dict[0]["wel-ipf1"]["dataframe"][0] = imod5dict[0]["wel-ipf1"]["dataframe"][0].drop(
-            remove, axis=1
-        )
+        imod5dict[0]["wel-ipf1"]["dataframe"][0] = imod5dict[0]["wel-ipf1"][
+            "dataframe"
+        ][0].drop(remove, axis=1)
 
     try:
         with open(logfile_path, "w") as sys.stdout:

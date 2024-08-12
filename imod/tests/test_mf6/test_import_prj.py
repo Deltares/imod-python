@@ -196,12 +196,24 @@ def test_import_ipf(tmp_path):
         result_snippet_1[0]["wel-WELLS_L5"]["dataframe"][0]["rate"]
         == 2 * result_snippet_0[0]["wel-WELLS_L4"]["dataframe"][0]["rate"] + 1.3
     )
-    assert np.all(result_snippet_1[0]["wel-WELLS_L3"]["dataframe"][0]["filt_top"] == 11.0)
-    assert np.all(result_snippet_1[0]["wel-WELLS_L3"]["dataframe"][0]["filt_bot"] == 6.0)
-    assert np.all(result_snippet_1[0]["wel-WELLS_L4"]["dataframe"][0]["filt_top"] == 11.0)
-    assert np.all(result_snippet_1[0]["wel-WELLS_L4"]["dataframe"][0]["filt_bot"] == 6.0)
-    assert np.all(result_snippet_1[0]["wel-WELLS_L5"]["dataframe"][0]["filt_top"] == 11.0)
-    assert np.all(result_snippet_1[0]["wel-WELLS_L5"]["dataframe"][0]["filt_bot"] == 6.0)
+    assert np.all(
+        result_snippet_1[0]["wel-WELLS_L3"]["dataframe"][0]["filt_top"] == 11.0
+    )
+    assert np.all(
+        result_snippet_1[0]["wel-WELLS_L3"]["dataframe"][0]["filt_bot"] == 6.0
+    )
+    assert np.all(
+        result_snippet_1[0]["wel-WELLS_L4"]["dataframe"][0]["filt_top"] == 11.0
+    )
+    assert np.all(
+        result_snippet_1[0]["wel-WELLS_L4"]["dataframe"][0]["filt_bot"] == 6.0
+    )
+    assert np.all(
+        result_snippet_1[0]["wel-WELLS_L5"]["dataframe"][0]["filt_top"] == 11.0
+    )
+    assert np.all(
+        result_snippet_1[0]["wel-WELLS_L5"]["dataframe"][0]["filt_bot"] == 6.0
+    )
 
 
 def test_import_ipf_unique_id_and_logging(tmp_path):
@@ -242,9 +254,15 @@ def test_import_ipf_unique_id_and_logging(tmp_path):
 
     # test that id's were made unique
     # Assert
-    assert np.all(result_snippet_1[0]["wel-WELLS_L3"]["dataframe"][0]["id"] == "extractions")
-    assert np.all(result_snippet_1[0]["wel-WELLS_L4"]["dataframe"][0]["id"] == "extractions_1")
-    assert np.all(result_snippet_1[0]["wel-WELLS_L5"]["dataframe"][0]["id"] == "extractions_2")
+    assert np.all(
+        result_snippet_1[0]["wel-WELLS_L3"]["dataframe"][0]["id"] == "extractions"
+    )
+    assert np.all(
+        result_snippet_1[0]["wel-WELLS_L4"]["dataframe"][0]["id"] == "extractions_1"
+    )
+    assert np.all(
+        result_snippet_1[0]["wel-WELLS_L5"]["dataframe"][0]["id"] == "extractions_2"
+    )
 
     with open(logfile_path, "r") as log_file:
         log = log_file.read()
