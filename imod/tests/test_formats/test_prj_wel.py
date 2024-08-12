@@ -1,6 +1,7 @@
 from datetime import datetime
 from shutil import copyfile
 from textwrap import dedent
+from typing import Union
 
 import numpy as np
 import pytest
@@ -12,7 +13,7 @@ from pytest_cases import (
 )
 
 from imod.formats.prj import open_projectfile_data
-from imod.mf6 import LayeredWell
+from imod.mf6 import LayeredWell, Well
 
 
 class WellPrjCases:
@@ -522,9 +523,10 @@ def get_case_name(request):
     # Verify right cases are matched. This can go wrong when case names are not
     # inserted in the right order in Case class.
     cases = id_name.split("-")
-    assert cases[0] == cases[-1]
+    # First entry refers to wel obj, we can skip this.
+    assert cases[1] == cases[-1]
 
-    return cases[0]
+    return cases[1]
 
 
 @parametrize("wel_case, expected", argvalues=list(zip(PRJ_ARGS, READ_ARGS)))
@@ -548,7 +550,8 @@ def test_open_projectfile_data_wells(
 
 
 @parametrize("wel_case, expected_dict", argvalues=list(zip(PRJ_ARGS, PKG_ARGS)))
-def test_from_imod5_data_wells(wel_case, expected_dict, well_mixed_ipfs, tmp_path, request):
+@parametrize("wel_cls", argvalues=[LayeredWell, Well])
+def test_from_imod5_data_wells(wel_cls: Union[LayeredWell, Well], wel_case, expected_dict, well_mixed_ipfs, tmp_path, request):
     # Arrange
     case_name = get_case_name(request)
     wel_file = tmp_path / f"{case_name}.prj"
@@ -563,9 +566,9 @@ def test_from_imod5_data_wells(wel_case, expected_dict, well_mixed_ipfs, tmp_pat
         fails, expected_set_to_zero = expected_dict[wellname]
         if fails:
             with pytest.raises(ValueError):
-                LayeredWell.from_imod5_data(wellname, data, times=times)
+                wel_cls.from_imod5_data(wellname, data, times=times)
         else:
-            well = LayeredWell.from_imod5_data(wellname, data, times=times)
+            well = wel_cls.from_imod5_data(wellname, data, times=times)
             rate = well.dataset["rate"]
             actual_set_to_zero = [t.values for t in rate.coords["time"] if (rate.sel(time=t) == 0.0).all()]
             expected_set_to_zero = [np.datetime64(t, "ns") for t in expected_set_to_zero]
@@ -574,10 +577,12 @@ def test_from_imod5_data_wells(wel_case, expected_dict, well_mixed_ipfs, tmp_pat
 
 
 @parametrize("wel_case, expected_dict", argvalues=list(zip(PRJ_ARGS, PKG_ARGS)))
-def test_from_imod5_data_wells__outside_range(wel_case, expected_dict, well_mixed_ipfs, tmp_path, request):
+@parametrize("wel_cls", argvalues=[LayeredWell, Well])
+def test_from_imod5_data_wells__outside_range(wel_cls: Union[LayeredWell, Well], wel_case, expected_dict, well_mixed_ipfs, tmp_path, request):
     """
-    Test where values are retrieved outside time domain of wells, should be all
-    set to zero.
+    Test when values are retrieved outside time domain of wells, should be all
+    set to zero for unassociated ipfs, and be forward filled with the last entry
+    for associated ipfs.
     """
     # Arrange
     case_name = get_case_name(request)
@@ -593,11 +598,14 @@ def test_from_imod5_data_wells__outside_range(wel_case, expected_dict, well_mixe
         fails, _ = expected_dict[wellname]
         if fails:
             with pytest.raises(ValueError):
-                LayeredWell.from_imod5_data(wellname, data, times=times)
+                wel_cls.from_imod5_data(wellname, data, times=times)
         else:
-            well = LayeredWell.from_imod5_data(wellname, data, times=times)
+            well = wel_cls.from_imod5_data(wellname, data, times=times)
             rate = well.dataset["rate"]
             actual_set_to_zero = [t.values for t in rate.coords["time"] if (rate.sel(time=t) == 0.0).all()]
-            expected_set_to_zero = [np.datetime64(t, "ns") for t in times[:-1]]
+            if data[wellname]["has_associated"]:
+                expected_set_to_zero = []
+            else:
+                expected_set_to_zero = [np.datetime64(t, "ns") for t in times[:-1]]
             diff = set(actual_set_to_zero) ^ set(expected_set_to_zero)
             assert len(diff) == 0
