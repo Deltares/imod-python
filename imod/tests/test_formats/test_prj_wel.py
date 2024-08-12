@@ -208,7 +208,11 @@ class WellReadCases:
         return {
             "wel-simple1": {
                 "has_associated": False,
-                "time": [datetime(1982, 1, 1), datetime(1982, 2, 1), datetime(1983, 1, 1)],
+                "time": [
+                    datetime(1982, 1, 1),
+                    datetime(1982, 2, 1),
+                    datetime(1982, 3, 1),
+                ],
                 "layer": [1, 1, 1],
                 "factor": [1.0, 1.0, 1.0],
                 "addition": [0.0, 0.0, 0.0],
@@ -265,7 +269,6 @@ class WellReadCases:
             },
         }
 
-
     def case_simple__all_different3(self):
         return {
             "wel-simple1": {
@@ -290,7 +293,6 @@ class WellReadCases:
                 "addition": [0.0],
             },
         }
-
 
     def case_associated__first(self):
         return {
@@ -476,7 +478,7 @@ class WellPackageCases:
         return {
             "wel-simple1": (False, [datetime(1982, 2, 1), datetime(1982, 3, 1)]),
             "wel-associated": (True, []),
-            }
+        }
 
 
 # pytest_cases doesn't support any "zipped test cases", instead it takes the
@@ -502,6 +504,7 @@ def case_args_to_parametrize(cases, prefix):
 PRJ_ARGS = case_args_to_parametrize(WellPrjCases, "case_")
 READ_ARGS = case_args_to_parametrize(WellReadCases, "case_")
 PKG_ARGS = case_args_to_parametrize(WellPackageCases, "case_")
+
 
 def setup_test_files(wel_case, wel_file, well_mixed_ipfs, tmp_path):
     """
@@ -551,12 +554,23 @@ def test_open_projectfile_data_wells(
 
 @parametrize("wel_case, expected_dict", argvalues=list(zip(PRJ_ARGS, PKG_ARGS)))
 @parametrize("wel_cls", argvalues=[LayeredWell, Well])
-def test_from_imod5_data_wells(wel_cls: Union[LayeredWell, Well], wel_case, expected_dict, well_mixed_ipfs, tmp_path, request):
+def test_from_imod5_data_wells(
+    wel_cls: Union[LayeredWell, Well],
+    wel_case,
+    expected_dict,
+    well_mixed_ipfs,
+    tmp_path,
+    request,
+):
     # Arrange
+    # Replace layer number to zero if non-layered well.
+    if wel_cls == Well:
+        wel_case = wel_case.replace("1,2, 001", "1,2, 000")
+    # Write prj and copy ipfs to right folder.
     case_name = get_case_name(request)
     wel_file = tmp_path / f"{case_name}.prj"
     setup_test_files(wel_case, wel_file, well_mixed_ipfs, tmp_path)
-    
+
     times = [datetime(1982, i + 1, 1) for i in range(4)]
 
     # Act
@@ -570,25 +584,40 @@ def test_from_imod5_data_wells(wel_cls: Union[LayeredWell, Well], wel_case, expe
         else:
             well = wel_cls.from_imod5_data(wellname, data, times=times)
             rate = well.dataset["rate"]
-            actual_set_to_zero = [t.values for t in rate.coords["time"] if (rate.sel(time=t) == 0.0).all()]
-            expected_set_to_zero = [np.datetime64(t, "ns") for t in expected_set_to_zero]
+            actual_set_to_zero = [
+                t.values for t in rate.coords["time"] if (rate.sel(time=t) == 0.0).all()
+            ]
+            expected_set_to_zero = [
+                np.datetime64(t, "ns") for t in expected_set_to_zero
+            ]
             diff = set(actual_set_to_zero) ^ set(expected_set_to_zero)
             assert len(diff) == 0
 
 
 @parametrize("wel_case, expected_dict", argvalues=list(zip(PRJ_ARGS, PKG_ARGS)))
 @parametrize("wel_cls", argvalues=[LayeredWell, Well])
-def test_from_imod5_data_wells__outside_range(wel_cls: Union[LayeredWell, Well], wel_case, expected_dict, well_mixed_ipfs, tmp_path, request):
+def test_from_imod5_data_wells__outside_range(
+    wel_cls: Union[LayeredWell, Well],
+    wel_case,
+    expected_dict,
+    well_mixed_ipfs,
+    tmp_path,
+    request,
+):
     """
     Test when values are retrieved outside time domain of wells, should be all
     set to zero for unassociated ipfs, and be forward filled with the last entry
     for associated ipfs.
     """
     # Arrange
+    # Replace layer number to zero if non-layered well.
+    if wel_cls == Well:
+        wel_case = wel_case.replace("1,2, 001", "1,2, 000")
+    # Write prj and copy ipfs to right folder.
     case_name = get_case_name(request)
     wel_file = tmp_path / f"{case_name}.prj"
     setup_test_files(wel_case, wel_file, well_mixed_ipfs, tmp_path)
-    
+
     times = [datetime(1985, i + 1, 1) for i in range(4)]
 
     # Act
@@ -602,7 +631,9 @@ def test_from_imod5_data_wells__outside_range(wel_cls: Union[LayeredWell, Well],
         else:
             well = wel_cls.from_imod5_data(wellname, data, times=times)
             rate = well.dataset["rate"]
-            actual_set_to_zero = [t.values for t in rate.coords["time"] if (rate.sel(time=t) == 0.0).all()]
+            actual_set_to_zero = [
+                t.values for t in rate.coords["time"] if (rate.sel(time=t) == 0.0).all()
+            ]
             if data[wellname]["has_associated"]:
                 expected_set_to_zero = []
             else:
