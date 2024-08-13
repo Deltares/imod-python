@@ -349,15 +349,20 @@ def test_simple_model(fixed_format_parser):
     assert_almost_equal(results["rootzone_depth"], np.array([1.0, 1.0, 1.0, 1.0]))
 
 
-def test_simple_model_regrid(fixed_format_parser, simple_2d_grid_with_subunits):
+def test_simple_model_regrid(simple_2d_grid_with_subunits):
     grid_data = simple_model()
     new_grid = simple_2d_grid_with_subunits
 
-    index, svat = grid_data.generate_index_array()
-
     regrid_context = RegridderWeightsCache()
 
-    grid_data.regrid_like(new_grid, regrid_context)
+    regridded_griddata = grid_data.regrid_like(new_grid, regrid_context)
+
+    regridded_area = regridded_griddata.dataset["area"].sum(dim="subunit")
+
+    original_area  =grid_data.dataset["area"].sum(dim="subunit")
+    pass
+    
+
 
 
 def test_simple_model_1_subunit(fixed_format_parser):

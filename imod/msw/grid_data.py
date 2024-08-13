@@ -56,7 +56,7 @@ class GridData(MetaSwapPackage, IRegridPackage):
     _to_fill = ("soil_physical_unit_string", "temp")
 
     _regrid_method = {
-        "area": (RegridderType.OVERLAP, "mean"),
+        "area":(RegridderType.RELATIVEOVERLAP, "conductance"),
         "landuse": (RegridderType.OVERLAP, "mean"),
         "rootzone_depth": ( RegridderType.OVERLAP, "mean" ),
         "surface_elevation" : ( RegridderType.OVERLAP, "mean" ),
@@ -72,14 +72,20 @@ class GridData(MetaSwapPackage, IRegridPackage):
         surface_elevation: xr.DataArray,
         soil_physical_unit: xr.DataArray,
         active: xr.DataArray,
+        area_is_fractional = False
     ):
         super().__init__()
-        self.dataset["area"] = area
+        if area_is_fractional:
+            self.dataset["area"] = area * get_cell_area(area)
+        else:
+            self.dataset["area"] = area
+        self.dataset["area_is_fractional"] = False            
         self.dataset["landuse"] = landuse
         self.dataset["rootzone_depth"] = rootzone_depth
         self.dataset["surface_elevation"] = surface_elevation
         self.dataset["soil_physical_unit"] = soil_physical_unit
         self.dataset["active"] = active
+
 
         self._pkgcheck()
 
@@ -109,13 +115,18 @@ class GridData(MetaSwapPackage, IRegridPackage):
 
         active = self.dataset["active"]
 
-        cell_area = active.astype(float) * dx * abs(dy)
+        cell_area = get_cell_area(active)
         total_area = self.dataset["area"].sum(dim="subunit")
 
         # Apparently all regional models intentionally provided area grids
         # smaller than cell area, to allow surface waters as workaround.
         unequal_area = (total_area > cell_area).values[active.values]
 
+        if not self.dataset["area_is_fractional"].values[()]:
+            if np.any(unequal_area):
+                raise ValueError(
+                    "Provided area grid with total areas larger than cell area"
+                )
         
     def regrid_like(
         self,
@@ -126,13 +137,12 @@ class GridData(MetaSwapPackage, IRegridPackage):
         user_input_area = self.dataset["area"]
 
         filtered_area = xr.where(np.isnan(user_input_area), 0, user_input_area)
-        total_area = np.sum(filtered_area.values)
 
         actual_area = get_cell_area( user_input_area)
         fractional_area = user_input_area / actual_area
 
         self.dataset["area"] = fractional_area
-
+        self.dataset["area_is_fractional"] = True
 
         try:
             result = MetaSwapPackage.regrid_like(self, target_grid, regrid_context, regridder_types)
@@ -141,13 +151,8 @@ class GridData(MetaSwapPackage, IRegridPackage):
         except Exception as e:
             raise ValueError(f"package could not be regridded:{e}")
         
-        regridded_fractional_area = result.dataset["area"]
-        regridded_actual_area =  get_cell_area( regridded_fractional_area)
-
-
-        result.dataset["area"] = regridded_fractional_area * regridded_actual_area
-        
-        regridded_filtered_area = xr.where(np.isnan(result.dataset["area"]), 0, result.dataset["area"])
-        total_regridded_area = np.sum(filtered_area.values)
+        # Undo the changes to the input object
+        self.dataset["area"] = user_input_area
+        self.dataset["area_is_fractional"] = False
 
         return result
