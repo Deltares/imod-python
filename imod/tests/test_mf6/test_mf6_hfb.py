@@ -697,6 +697,40 @@ def test_hfb_from_imod5(imod5_dataset, tmp_path):
     assert list(np.unique(hfb_package["layer"].values)) == [7]
 
 
+
+
+@pytest.mark.usefixtures("structured_flow_model")
+def test_combine_linestrings(structured_flow_model):
+    dis = structured_flow_model["dis"]
+    top, bottom, idomain = dis["top"], dis["bottom"], dis["idomain"],
+    k = xr.ones_like(idomain)
+
+    barrier_y = [11.0, 5.0, -1.0]
+    barrier_x = [5.0, 5.0, 5.0]
+    line = linestrings(barrier_x, barrier_y)
+
+    geometry_single = gpd.GeoDataFrame(
+        geometry=[line],
+        data={
+            "resistance": [1200.0],
+            "layer": [1],
+        },
+    )
+    geometry_triple = gpd.GeoDataFrame(
+        geometry=[line, line, line],
+        data={
+            "resistance": [400.0, 400.0, 400.0],
+            "layer": [1, 1, 1],
+        },
+    )
+    hfb_single = SingleLayerHorizontalFlowBarrierResistance(geometry_single)
+    hfb_triple = SingleLayerHorizontalFlowBarrierResistance(geometry_triple)
+    mf6_hfb_single = hfb_single.to_mf6_pkg(idomain, top, bottom, k)
+    mf6_hfb_triple = hfb_triple.to_mf6_pkg(idomain, top, bottom, k)
+
+    xr.testing.equals(mf6_hfb_single.dataset, mf6_hfb_triple.dataset)
+
+
 @pytest.mark.usefixtures("structured_flow_model")
 def test_run_multiple_hfbs(tmp_path, structured_flow_model):
     # Single layered model
