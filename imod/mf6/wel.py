@@ -487,6 +487,84 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         minimum_k: float = 0.1,
         minimum_thickness: float = 1.0,
     ) -> "GridAgnosticWell":
+        """
+        Convert wells to imod5 data, loaded with
+        :func:`imod.formats.prj.open_projectfile_data`, to a Well object. As
+        iMOD5 handles wells differently than iMOD Python normally does, some
+        data transformations are made, which are outlined further. 
+        
+        iMOD5 stores well information in IPF files and it supports two ways to
+        specify injection/extraction rates:
+        
+            1. A timeseries of well rates, in an associated text file. We will
+               call these "associated wells" further in this text.
+            2. Constant rates in an IPF file, without an associated text file.
+               We will call these "unassociated wells" further in this text.
+
+        Depending on this, iMOD5 does different things, which we need to mimic
+        in this method. 
+        
+        *Associated wells* 
+        
+        Wells with timeseries in an associated textfile are processed as
+        follows:
+        
+        - Wells are validated if the following requirements are met
+            * Associated well entries in projectfile are defined on either all
+              timestamps or just the first
+            * Multiplication and addition factors need to remain constant through time
+            * Same associated well cannot be assigned to multiple layers
+        - The dataframe of the first projectfile timestamp is selected
+        - Rate timeseries are resampled with a time weighted mean to the
+          simulation times.
+        - When simulation times fall outside well timeseries range, the last
+          rate is forward filled.
+
+        *Unassociated wells*
+
+        Wells without associated textfiles are processed as follows:
+        
+        - When a unassociated well disappears from the next time entry in the
+          projectfile, the well is deactivated by ratting its rate to 0.0. This
+          is to prevent the well being activated again in case of any potential
+          forward filling at a later stage by
+          :meth:`imod.mf6.Modflow6Simulation.create_time_discretization`
+
+        .. note::
+            In case you are wondering why is this so complicated? There are two
+            main reasons:
+
+            - iMOD5 is inconsistent in how it treats timeseries for grid data,
+              compared to point data. Whereas grids are forward filled when
+              there is no entry specified for a time entry, unassociated wells
+              are deactivated. Associated wells, however, are forward filled.
+            - Normally there are two levels in which times are defined: The
+              simulation times, which are the requested times for the
+              simulation, and projectfile times, on which data is defined. With
+              associated ipfs, times are defined in three
+              levels: There are simulation times (in iMOD5 in the ini
+              file), there are projectfile times, and there are times
+              defined in the associated textfiles on which data is defined.
+        
+        Parameters
+        ----------
+
+        key: str
+            Name of the well system in the imod5 data
+        imod5_data: dict
+            iMOD5 data loaded from a projectfile with
+            :func:`imod.formats.prj.open_projectfile_data`
+        times: list
+            Simulation times
+        minimum_k: float, optional
+            On creating point wells, no point wells will be placed in cells with
+            a lower horizontal conductivity than this. Wells are placed when
+            ``to_mf6_pkg`` is called.
+        minimum_thickness: float, optional
+            On creating point wells, no point wells will be placed in cells with
+            a lower thickness than this. Wells are placed when ``to_mf6_pkg`` is
+            called.
+        """
         pkg_data = imod5_data[key]
         all_well_times = get_all_imod5_prj_well_times(imod5_data)
 
