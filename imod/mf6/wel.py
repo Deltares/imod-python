@@ -491,24 +491,24 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         Convert wells to imod5 data, loaded with
         :func:`imod.formats.prj.open_projectfile_data`, to a Well object. As
         iMOD5 handles wells differently than iMOD Python normally does, some
-        data transformations are made, which are outlined further. 
-        
+        data transformations are made, which are outlined further.
+
         iMOD5 stores well information in IPF files and it supports two ways to
         specify injection/extraction rates:
-        
+
             1. A timeseries of well rates, in an associated text file. We will
                call these "associated wells" further in this text.
             2. Constant rates in an IPF file, without an associated text file.
                We will call these "unassociated wells" further in this text.
 
         Depending on this, iMOD5 does different things, which we need to mimic
-        in this method. 
-        
-        *Associated wells* 
-        
+        in this method.
+
+        *Associated wells*
+
         Wells with timeseries in an associated textfile are processed as
         follows:
-        
+
         - Wells are validated if the following requirements are met
             * Associated well entries in projectfile are defined on either all
               timestamps or just the first
@@ -523,7 +523,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         *Unassociated wells*
 
         Wells without associated textfiles are processed as follows:
-        
+
         - When a unassociated well disappears from the next time entry in the
           projectfile, the well is deactivated by ratting its rate to 0.0. This
           is to prevent the well being activated again in case of any potential
@@ -545,7 +545,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
               levels: There are simulation times (in iMOD5 in the ini
               file), there are projectfile times, and there are times
               defined in the associated textfiles on which data is defined.
-        
+
         Parameters
         ----------
 
