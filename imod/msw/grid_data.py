@@ -56,7 +56,7 @@ class GridData(MetaSwapPackage, IRegridPackage):
     _to_fill = ("soil_physical_unit_string", "temp")
 
     _regrid_method = {
-        "area":(RegridderType.RELATIVEOVERLAP, "conductance"),
+        "area": (RegridderType.OVERLAP, "mean"),
         "landuse": (RegridderType.OVERLAP, "mean"),
         "rootzone_depth": ( RegridderType.OVERLAP, "mean" ),
         "surface_elevation" : ( RegridderType.OVERLAP, "mean" ),
