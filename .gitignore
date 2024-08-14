@@ -140,3 +140,4 @@ examples/data
 # pixi environments
 .pixi
 
+/imod/tests/unittest_report.xml
