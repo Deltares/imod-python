@@ -728,7 +728,7 @@ def test_combine_linestrings(structured_flow_model):
     mf6_hfb_single = hfb_single.to_mf6_pkg(idomain, top, bottom, k)
     mf6_hfb_triple = hfb_triple.to_mf6_pkg(idomain, top, bottom, k)
 
-    xr.testing.equals(mf6_hfb_single.dataset, mf6_hfb_triple.dataset)
+    xr.testing.assert_equal(mf6_hfb_single.dataset, mf6_hfb_triple.dataset)
 
 
 @pytest.mark.usefixtures("structured_flow_model")
