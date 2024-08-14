@@ -752,43 +752,46 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
     def _snap_to_grid(
         self, idomain: GridDataArray
     ) -> Tuple[xu.UgridDataset, np.ndarray]:
-        if "layer" in self._get_vertical_variables():
-            variable_names = [self._get_variable_name(), "geometry", "layer"]
+        variable_name = self._get_variable_name()
+        has_layer = "layer" in self._get_vertical_variables()
+        # Create geodataframe with barriers
+        if has_layer:
+            varnames_for_df = [variable_name, "geometry", "layer"]
         else:
-            variable_names = [self._get_variable_name(), "geometry"]
+            varnames_for_df = [variable_name, "geometry"]
         barrier_dataframe = gpd.GeoDataFrame(
-            self.dataset[variable_names].to_dataframe()
+            self.dataset[varnames_for_df].to_dataframe()
         )
-
-        if "layer" not in self._get_vertical_variables():
+        # Convert vertical polygon to linestring
+        if not has_layer:
             lower, _ = _extract_hfb_bounds_from_zpolygons(barrier_dataframe)
             linestring = _create_zlinestring_from_bound_df(lower)
             barrier_dataframe["geometry"] = linestring["geometry"]
-
+        # Clip barriers outside domain
         barrier_dataframe = clip_line_gdf_by_grid(
             barrier_dataframe, idomain.sel(layer=1)
         )
-
-        # Work around issue where xu.snap_to_grid cannot handle snapping a
-        # dataset with multiple lines appropriately. This can be later replaced
-        # to a single call to xu.snap_to_grid if this bug is fixed:
-        # <link_to_github_issue_here>
-        snapped_dataset_rows: List[xr.Dataset] = []
-        for index in barrier_dataframe.index:
-            # Index with list to return pd.DataFrame instead of pd.Series for
-            # xu.snap_to_grid.
-            row_df = barrier_dataframe.loc[[index]]
-            snapped_dataset_row, _ = typing.cast(
-                xu.UgridDataset,
-                xu.snap_to_grid(row_df, grid=idomain, max_snap_distance=0.5),
-            )
-            snapped_dataset_row["line_index"] += index[0]  # Set to original line index.
-            snapped_dataset_rows.append(snapped_dataset_row)
-        snapped_dataset = xu.merge(snapped_dataset_rows)
-
-        edge_index = np.argwhere(
-            snapped_dataset[self._get_variable_name()].notnull().values
-        ).ravel()
+        # Prepare variable names and methods for aggregation
+        varnames_agg = ["line_index", variable_name]
+        methods_agg = ["first", "sum"]
+        if has_layer:
+            varnames_agg.append("layer")
+            methods_agg.append("first")
+        # Snap line to edges, groupby edge index
+        grid2d = xu.UgridDataArray.from_structured(idomain.sel(layer=1)).grid
+        snapping_df = xu.create_snap_to_grid_dataframe(barrier_dataframe, grid2d, max_snap_distance=0.5)
+        for varname in varnames_agg[1:]:
+            line_index = snapping_df["line_index"]
+            snapping_df[varname] = barrier_dataframe[varname].iloc[line_index].to_numpy()
+        gb_edge = snapping_df.groupby("edge_index")
+        # Initialize dataset and dataarray with the right shape and dims
+        snapped_dataset = xu.UgridDataset(grids=[grid2d])
+        new = xr.DataArray(np.full(grid2d.n_edge, np.nan), dims=[grid2d.edge_dimension])
+        edge_index = np.array(list(gb_edge.indices.keys()))
+        # Aggregate with different methods per variable
+        for varname, method in zip(varnames_agg, methods_agg):
+            snapped_dataset[varname] = new.copy()
+            snapped_dataset[varname].data[edge_index] = gb_edge[varname].aggregate(method)
 
         return snapped_dataset, edge_index
 
