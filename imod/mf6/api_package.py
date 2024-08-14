@@ -5,10 +5,6 @@ from imod.schemata import (
     DTypeSchema,
 )
 
-_init_schemata = {
-    "maxbound": [DTypeSchema(np.integer)],
-}
-
 
 class ApiPackage(Package):
     """
@@ -46,6 +42,9 @@ class ApiPackage(Package):
 
     _pkg_id = "api"
     _template = Package._initialize_template(_pkg_id)
+    _init_schemata = {
+        "maxbound": [DTypeSchema(np.integer)],
+    }
 
     def __init__(
         self,
