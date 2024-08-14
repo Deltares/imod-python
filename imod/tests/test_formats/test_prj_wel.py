@@ -105,7 +105,6 @@ class WellPrjCases:
             """
         )
 
-
     def case_simple__all_different1(self):
         return dedent(
             """
@@ -562,7 +561,7 @@ class WellPackageCases:
         return {
             "wel-simple1": (False, []),
         }
-    
+
     def case_simple__all_same_multi_layer2(self):
         return {
             "wel-simple1": (True, []),
