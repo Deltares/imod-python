@@ -147,15 +147,15 @@ def _prepare_df_ipf_unassociated(
     df = pd.concat([df.assign(time=t, layer=lay) for df, t, lay in iter_dfs_dims])
     # Prepare multi-index dataframe to convert to a multi-dimensional DataArray
     # later.
-    df_multi = df.set_index(["time", df.index])
-    df_multi.index = df_multi.index.set_names(["time", "ipf_row"])
+    df_multi = df.set_index(["time", "layer", df.index])
+    df_multi.index = df_multi.index.set_names(["time", "layer", "ipf_row"])
     # Temporarily convert to DataArray with 2 dimensions, as it allows for
     # multi-dimensional ffilling, instead pandas' ffilling the last value in a
     # column of the flattened table.
     ipf_row_index = pkg_data["dataframe"][0].index
     # Forward fill location columns, only reindex layer, filt_top and filt_bot
     # if present.
-    cols_ffill_if_present = {"x", "y", "layer", "filt_top", "filt_bot"}
+    cols_ffill_if_present = {"x", "y", "filt_top", "filt_bot"}
     cols_ffill = cols_ffill_if_present & set(df.columns)
     da_multi = df_multi.to_xarray()
     indexers = {"time": start_times, "ipf_row": ipf_row_index}
