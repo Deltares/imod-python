@@ -16,12 +16,12 @@ from imod.util.spatial import (
     empty_3d,
     empty_3d_transient,
     from_mdal_compliant_ugrid2d,
+    get_cell_area,
     mdal_compliant_ugrid2d,
     spatial_reference,
     to_ugrid2d,
     transform,
     ugrid2d_data,
-    get_cell_area
 )
 from imod.util.structured import replace, values_within_range, where
 from imod.util.time import to_datetime

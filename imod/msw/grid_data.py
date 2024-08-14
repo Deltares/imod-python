@@ -1,13 +1,10 @@
-from typing import Optional, Tuple
 import numpy as np
 import xarray as xr
 
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_like
 from imod.mf6.utilities.regridding_types import RegridderType
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
-from imod.typing import GridDataArray
 from imod.util.spatial import get_cell_area, spatial_reference
 
 
@@ -56,13 +53,13 @@ class GridData(MetaSwapPackage, IRegridPackage):
     _to_fill = ("soil_physical_unit_string", "temp")
 
     _regrid_method = {
-        "area": (RegridderType.OVERLAP, "mean"),
+        "area": (RegridderType.RELATIVEOVERLAP, "conductance"),
         "landuse": (RegridderType.OVERLAP, "mean"),
-        "rootzone_depth": ( RegridderType.OVERLAP, "mean" ),
-        "surface_elevation" : ( RegridderType.OVERLAP, "mean" ),
-        "soil_physical_unit" : ( RegridderType.OVERLAP, "mean" ),
-        "active" : ( RegridderType.OVERLAP, "mean" ),
-    }  
+        "rootzone_depth": (RegridderType.OVERLAP, "mean"),
+        "surface_elevation": (RegridderType.OVERLAP, "mean"),
+        "soil_physical_unit": (RegridderType.OVERLAP, "mean"),
+        "active": (RegridderType.OVERLAP, "mean"),
+    }
 
     def __init__(
         self,
@@ -72,20 +69,15 @@ class GridData(MetaSwapPackage, IRegridPackage):
         surface_elevation: xr.DataArray,
         soil_physical_unit: xr.DataArray,
         active: xr.DataArray,
-        area_is_fractional = False
     ):
         super().__init__()
-        if area_is_fractional:
-            self.dataset["area"] = area * get_cell_area(area)
-        else:
-            self.dataset["area"] = area
-        self.dataset["area_is_fractional"] = False            
+
+        self.dataset["area"] = area
         self.dataset["landuse"] = landuse
         self.dataset["rootzone_depth"] = rootzone_depth
         self.dataset["surface_elevation"] = surface_elevation
         self.dataset["soil_physical_unit"] = soil_physical_unit
         self.dataset["active"] = active
-
 
         self._pkgcheck()
 
@@ -122,37 +114,7 @@ class GridData(MetaSwapPackage, IRegridPackage):
         # smaller than cell area, to allow surface waters as workaround.
         unequal_area = (total_area > cell_area).values[active.values]
 
-        if not self.dataset["area_is_fractional"].values[()]:
-            if np.any(unequal_area):
-                raise ValueError(
-                    "Provided area grid with total areas larger than cell area"
-                )
-        
-    def regrid_like(
-        self,
-        target_grid: GridDataArray,
-        regrid_context: RegridderWeightsCache,
-        regridder_types: Optional[dict[str, Tuple[RegridderType, str]]] = None,
-    ) -> "MetaSwapPackage":
-        user_input_area = self.dataset["area"]
-
-        filtered_area = xr.where(np.isnan(user_input_area), 0, user_input_area)
-
-        actual_area = get_cell_area( user_input_area)
-        fractional_area = user_input_area / actual_area
-
-        self.dataset["area"] = fractional_area
-        self.dataset["area_is_fractional"] = True
-
-        try:
-            result = MetaSwapPackage.regrid_like(self, target_grid, regrid_context, regridder_types)
-        except ValueError as e:
-            raise e
-        except Exception as e:
-            raise ValueError(f"package could not be regridded:{e}")
-        
-        # Undo the changes to the input object
-        self.dataset["area"] = user_input_area
-        self.dataset["area_is_fractional"] = False
-
-        return result
+        if np.any(unequal_area):
+            raise ValueError(
+                "Provided area grid with total areas larger than cell area"
+            )

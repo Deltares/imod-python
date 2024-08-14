@@ -12,6 +12,7 @@ from numpy.testing import assert_almost_equal, assert_equal
 from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.msw import GridData
 from imod.msw.fixed_format import format_fixed_width
+from imod.util.spatial import get_grid_area
 
 
 @given(
@@ -358,11 +359,8 @@ def test_simple_model_regrid(simple_2d_grid_with_subunits):
     regridded_griddata = grid_data.regrid_like(new_grid, regrid_context)
 
     regridded_area = regridded_griddata.dataset["area"].sum(dim="subunit")
-
-    original_area  =grid_data.dataset["area"].sum(dim="subunit")
-    pass
-    
-
+    regridded_total_area = get_grid_area(new_grid.sel({"subunit": 0}, drop=True))
+    assert np.sum(regridded_area.values) == regridded_total_area
 
 
 def test_simple_model_1_subunit(fixed_format_parser):
@@ -466,7 +464,7 @@ def test_area_grid_exceeds_cell_area():
     """
     Test where provided area grid exceeds total cell area, should throw error.
     """
-    x = [1.0, 2.0, 3.0]
+    x = [1.0, 3.0, 5.0]
     y = [1.0, 2.0, 3.0]
     subunit = [0, 1]
     dx = 1.0

@@ -1,6 +1,6 @@
 import pathlib
 from typing import Any, List
-import xarray as xr
+
 import numpy as np
 
 import imod
@@ -19,7 +19,6 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
 )
-from imod.typing.grid import ones_like
 
 
 class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
@@ -140,7 +139,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         )
 
         return self._template.render(d)
-    
+
     def _validate(self, schemata, **kwargs):
         # Insert additional kwargs
         kwargs["bottom"] = self["bottom"]
