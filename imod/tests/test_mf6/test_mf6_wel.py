@@ -936,7 +936,7 @@ def test_import_and_convert_to_mf6(imod5_dataset, tmp_path, wel_class):
 @parametrize("wel_class", [Well, LayeredWell])
 @pytest.mark.usefixtures("well_regular_import_prj")
 def test_import_multiple_wells(well_regular_import_prj, wel_class):
-    imod5dict = open_projectfile_data(well_regular_import_prj)
+    imod5dict, _ = open_projectfile_data(well_regular_import_prj)
     times = [
         datetime(1981, 11, 30),
         datetime(1981, 12, 31),
@@ -945,10 +945,13 @@ def test_import_multiple_wells(well_regular_import_prj, wel_class):
         datetime(1982, 3, 31),
         datetime(1982, 4, 30),
     ]
-
+    # Set layer to 1, to avoid validation error.
+    if wel_class is LayeredWell:
+        imod5dict["wel-ipf1"]["layer"] = [1]
+        imod5dict["wel-ipf2"]["layer"] = [1]
     # import grid-agnostic well from imod5 data (it contains 2 packages with 3 wells each)
-    wel1 = wel_class.from_imod5_data("wel-ipf1", imod5dict[0], times)
-    wel2 = wel_class.from_imod5_data("wel-ipf2", imod5dict[0], times)
+    wel1 = wel_class.from_imod5_data("wel-ipf1", imod5dict, times)
+    wel2 = wel_class.from_imod5_data("wel-ipf2", imod5dict, times)
 
     assert np.all(wel1.x == np.array([191112.11, 191171.96, 191231.52]))
     assert np.all(wel2.x == np.array([191112.11, 191171.96, 191231.52]))
@@ -959,7 +962,7 @@ def test_import_multiple_wells(well_regular_import_prj, wel_class):
 @parametrize("wel_class", [Well, LayeredWell])
 @pytest.mark.usefixtures("well_duplication_import_prj")
 def test_import_from_imod5_with_duplication(well_duplication_import_prj, wel_class):
-    imod5dict = open_projectfile_data(well_duplication_import_prj)
+    imod5dict, _ = open_projectfile_data(well_duplication_import_prj)
     times = [
         datetime(1981, 11, 30),
         datetime(1981, 12, 31),
@@ -968,9 +971,13 @@ def test_import_from_imod5_with_duplication(well_duplication_import_prj, wel_cla
         datetime(1982, 3, 31),
         datetime(1982, 4, 30),
     ]
+    # Set layer to 1, to avoid validation error.
+    if wel_class is LayeredWell:
+        imod5dict["wel-ipf1"]["layer"] = [1]
+        imod5dict["wel-ipf2"]["layer"] = [1]
     # import grid-agnostic well from imod5 data (it contains 2 packages with 3 wells each)
-    wel1 = wel_class.from_imod5_data("wel-ipf1", imod5dict[0], times)
-    wel2 = wel_class.from_imod5_data("wel-ipf2", imod5dict[0], times)
+    wel1 = wel_class.from_imod5_data("wel-ipf1", imod5dict, times)
+    wel2 = wel_class.from_imod5_data("wel-ipf2", imod5dict, times)
 
     assert np.all(wel1.x == np.array([191171.96, 191231.52, 191231.52]))
     assert np.all(wel2.x == np.array([191112.11, 191171.96, 191231.52]))
