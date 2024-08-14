@@ -396,7 +396,7 @@ def preserve_gridtype(func: Callable[P, T]) -> Callable[P, T]:
     return decorator
 
 
-@typedispatch  # type: ignore[no-redef]
+@typedispatch
 def is_empty(object: xr.Dataset) -> bool:
     return len(object.keys()) == 0
 

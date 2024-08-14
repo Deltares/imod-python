@@ -265,11 +265,7 @@ def _regrid_like(
         remove_expanded_auxiliary_variables_from_dataset(package)
 
     if regridder_types is None:
-        regridder_types = package.get_regrid_methods()
-        if isinstance(regridder_types, dict):
-            regridder_settings = regridder_types
-        else:
-            regridder_settings = asdict(regridder_types, dict_factory=dict)
+        regridder_settings = asdict(package.get_regrid_methods(), dict_factory=dict)
     else:
         regridder_settings = asdict(regridder_types, dict_factory=dict)
 

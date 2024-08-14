@@ -2,6 +2,7 @@ import numpy as np
 import xarray as xr
 
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
+from imod.mf6.regrid.regrid_schemes import EmptyRegridMethod, RegridMethodType
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 
@@ -53,7 +54,7 @@ class AnnualCropFactors(MetaSwapPackage, IRegridPackage):
         "ponding_factor": VariableMetaData(8, 0.01, 10.0, float),
     }
 
-    _regrid_method = {}
+    _regrid_method: RegridMethodType = EmptyRegridMethod()
 
     def __init__(
         self,

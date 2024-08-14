@@ -1,9 +1,7 @@
 import pandas as pd
 
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.utilities.regrid import (
-    RegridderType,
-)
+from imod.mf6.regrid.regrid_schemes import PondingRegridMethod
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 
@@ -43,14 +41,7 @@ class Ponding(MetaSwapPackage, IRegridPackage):
     _without_subunit = ()
     _to_fill = ()
 
-    _regrid_method = {
-        "ponding_depth": (RegridderType.OVERLAP, "mean"),
-        "runon_resistance": (RegridderType.OVERLAP, "mean"),
-        "runoff_resistance": (
-            RegridderType.OVERLAP,
-            "mean",
-        ),
-    }
+    _regrid_method = PondingRegridMethod()
 
     def __init__(self, ponding_depth, runon_resistance, runoff_resistance) -> None:
         super().__init__()

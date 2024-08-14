@@ -1,4 +1,5 @@
 import abc
+from copy import deepcopy
 from pathlib import Path
 from typing import Any, Optional, Tuple, Union
 
@@ -6,6 +7,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from imod.mf6.regrid.regrid_schemes import EmptyRegridMethod, RegridMethodType
 from imod.mf6.utilities.regrid import (
     RegridderType,
     RegridderWeightsCache,
@@ -25,6 +27,7 @@ class MetaSwapPackage(abc.ABC):
 
     __slots__ = "_pkg_id"
     _file_name = "filename_not_set"
+    _regrid_method: RegridMethodType = EmptyRegridMethod()
 
     def __init__(self):
         self.dataset = xr.Dataset()
@@ -174,7 +177,7 @@ class MetaSwapPackage(abc.ABC):
         return {}
 
     def is_regridding_supported(self) -> bool:
-        return
+        return True
 
     def regrid_like(
         self,
@@ -190,5 +193,5 @@ class MetaSwapPackage(abc.ABC):
             raise ValueError(f"package could not be regridded:{e}")
         return result
 
-    def get_regrid_methods(self) -> Optional[dict[str, Tuple[RegridderType, str]]]:
-        return self._regrid_method
+    def get_regrid_methods(self) -> RegridMethodType:
+        return deepcopy(self._regrid_method)
