@@ -212,8 +212,9 @@ Added
 ~~~~~
 - Developer environment: Added pixi environment ``interactive`` to interactively
   run code. Can be useful to plot data.
-- An API package was added. It can be added to both flow and transport models, and its 
-  presence allows users to interact with libMF6.dll through its API.
+- :class:`imod.mf6.ApiPackage` was added. It can be added to both flow and
+  transport models, and its presence allows users to interact with libMF6.dll
+  through its API.
 - Developer environment: Empty python 3.10, 3.11, 3.12 environments where pip
   install and import imod can be tested.
 
