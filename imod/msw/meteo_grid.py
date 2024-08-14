@@ -35,6 +35,7 @@ class MeteoGrid(MetaSwapPackage):
     _meteo_dirname = "meteo_grids"
 
     _regrid_method = MeteoGridRegridMethod()
+
     def __init__(self, precipitation: xr.DataArray, evapotranspiration: xr.DataArray):
         super().__init__()
 

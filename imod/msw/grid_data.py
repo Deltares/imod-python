@@ -52,6 +52,7 @@ class GridData(MetaSwapPackage):
     _to_fill = ("soil_physical_unit_string", "temp")
 
     _regrid_method = GridDataRegridMethod()
+
     def __init__(
         self,
         area: xr.DataArray,
