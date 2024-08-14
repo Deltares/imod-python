@@ -514,8 +514,8 @@ def test_import_from_imod5__correct_well_type(imod5_dataset):
     period_data = imod5_dataset[1]
     # Temporarily change layer number to 0, to force Well object instead of
     # LayeredWell
-    original_wel_layer = imod5_data["wel-1"]["layer"]
-    imod5_data["wel-1"]["layer"] = 0
+    original_wel_layer = imod5_data["wel-WELLS_L3"]["layer"]
+    imod5_data["wel-WELLS_L3"]["layer"] = [0] * len(original_wel_layer)
     # Other arrangement
     default_simulation_allocation_options = SimulationAllocationOptions
     default_simulation_distributing_options = SimulationDistributingOptions
@@ -530,11 +530,11 @@ def test_import_from_imod5__correct_well_type(imod5_dataset):
         datelist,
     )
     # Set layer back to right value (before AssertionError might be thrown)
-    imod5_data["wel-1"]["layer"] = original_wel_layer
+    imod5_data["wel-WELLS_L3"]["layer"] = original_wel_layer
     # Assert
-    assert isinstance(simulation["imported_model"]["wel-1"], Well)
-    assert isinstance(simulation["imported_model"]["wel-2"], LayeredWell)
-    assert isinstance(simulation["imported_model"]["wel-3"], LayeredWell)
+    assert isinstance(simulation["imported_model"]["wel-WELLS_L3"], Well)
+    assert isinstance(simulation["imported_model"]["wel-WELLS_L4"], LayeredWell)
+    assert isinstance(simulation["imported_model"]["wel-WELLS_L5"], LayeredWell)
 
 
 @pytest.mark.usefixtures("imod5_dataset")

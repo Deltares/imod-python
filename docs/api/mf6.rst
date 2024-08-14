@@ -74,6 +74,11 @@ Flow Packages
     HorizontalFlowBarrierHydraulicCharacteristic
     HorizontalFlowBarrierMultiplier
     HorizontalFlowBarrierResistance
+    LayeredWell
+    LayeredWell.from_imod5_data
+    LayeredWell.mask
+    LayeredWell.regrid_like
+    LayeredWell.to_mf6_pkg
     InitialConditions
     NodePropertyFlow
     Recharge
@@ -82,6 +87,10 @@ Flow Packages
     StorageCoefficient
     UnsaturatedZoneFlow
     Well
+    Well.from_imod5_data
+    Well.mask
+    Well.regrid_like
+    Well.to_mf6_pkg
     WellDisStructured
     WellDisVertices
 
