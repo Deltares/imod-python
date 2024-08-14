@@ -67,6 +67,45 @@ class WellPrjCases:
             """
         )
 
+    def case_simple__all_same_multi_layer1(self):
+        return dedent(
+            """
+            0003,(WEL),1
+            1982-01-01
+            001,002
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
+            1,2, 002, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
+            1982-02-01
+            001,002
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
+            1,2, 002, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
+            1982-03-01
+            001,002
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
+            1,2, 002, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
+            """
+        )
+
+    def case_simple__all_same_multi_layer2(self):
+        return dedent(
+            """
+            0003,(WEL),1
+            1982-01-01
+            001,002
+            1,2, 000, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
+            1982-02-01
+            001,002
+            1,2, 000, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
+            1982-03-01
+            001,002
+            1,2, 000, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
+            """
+        )
+
+
     def case_simple__all_different1(self):
         return dedent(
             """
@@ -260,6 +299,42 @@ class WellReadCases:
                 "layer": [1, 1, 1],
                 "factor": [1.0, 1.0, 1.0],
                 "addition": [0.0, 0.0, 0.0],
+            },
+        }
+
+    def case_simple__all_same_multi_layer1(self):
+        return {
+            "wel-simple1": {
+                "has_associated": False,
+                "time": [
+                    datetime(1982, 1, 1),
+                    datetime(1982, 1, 1),
+                    datetime(1982, 2, 1),
+                    datetime(1982, 2, 1),
+                    datetime(1982, 3, 1),
+                    datetime(1982, 3, 1),
+                ],
+                "layer": [1, 2, 1, 2, 1, 2],
+                "factor": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                "addition": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            },
+        }
+
+    def case_simple__all_same_multi_layer2(self):
+        return {
+            "wel-simple1": {
+                "has_associated": False,
+                "time": [
+                    datetime(1982, 1, 1),
+                    datetime(1982, 1, 1),
+                    datetime(1982, 2, 1),
+                    datetime(1982, 2, 1),
+                    datetime(1982, 3, 1),
+                    datetime(1982, 3, 1),
+                ],
+                "layer": [0, 1, 0, 1, 0, 1],
+                "factor": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                "addition": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
             },
         }
 
@@ -481,6 +556,16 @@ class WellPackageCases:
     def case_simple__all_same(self):
         return {
             "wel-simple1": (False, []),
+        }
+
+    def case_simple__all_same_multi_layer1(self):
+        return {
+            "wel-simple1": (False, []),
+        }
+    
+    def case_simple__all_same_multi_layer2(self):
+        return {
+            "wel-simple1": (True, []),
         }
 
     def case_simple__all_different1(self):
