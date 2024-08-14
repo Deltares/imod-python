@@ -66,6 +66,7 @@ Flow Packages
 .. autosummary::
     :toctree: generated/mf6
 
+    ApiPackage
     Buoyancy
     ConstantHead
     Drainage
@@ -91,6 +92,7 @@ Transport Packages
 .. autosummary::
     :toctree: generated/mf6
 
+    ApiPackage
     AdvectionCentral
     AdvectionTVD
     AdvectionUpstream
