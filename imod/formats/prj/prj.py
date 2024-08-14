@@ -524,7 +524,43 @@ def _try_read_with_func(func, path, *args, **kwargs):
         raise type(e)(f"{e}. Error thrown while opening file: {path}")
 
 
-def _create_datarray_from_paths(paths: List[str], headers: List[Dict[str, Any]]):
+def _get_array_transformation_parameters(
+    headers: List[Dict[str, Any]], key: str, dim: str
+) -> Union[xr.DataArray | float]:
+    """
+    In imod5 prj files one can add linear transformation parameters to transform
+    the data read from an idf file: we can specify a multiplication factor and a
+    constant that will be added to the values. The factor and addition
+    parameters can be can be scalar (if applied to 1 idf), or they can be
+    xr.DataArrays if the factor and addition are for example layer- or
+    time-dependent  (if both we apply the transformations one at a time)
+
+    Parameters
+    ----------
+    headers: List[Dict[str, Any]]
+        prj-file lines which we want to import, serialized as a dictionary.
+    key: str
+        specifies the name of the transformation parameter in the idf file.
+        Usually "factor" or "addition"
+    dim: str
+        the name of the dimension over which transformation parameters are
+        expected to differ for the current import. Usually "time"or "layer"
+    """
+    if dim in headers[0].keys():
+        return xr.DataArray(
+            data=[header[key] for header in headers],
+            dims=(dim,),
+            coords={dim: [header[dim] for header in headers]},
+        )
+    else:
+        return headers[0][key]
+
+
+def _create_dataarray_from_paths(
+    paths: List[str], headers: List[Dict[str, Any]], dim: str
+) -> xr.DataArray:
+    factor = _get_array_transformation_parameters(headers, "factor", dim)
+    addition = _get_array_transformation_parameters(headers, "addition", dim)
     da = _try_read_with_func(
         imod.formats.array_io.reading._load,
         paths,
@@ -532,22 +568,38 @@ def _create_datarray_from_paths(paths: List[str], headers: List[Dict[str, Any]])
         _read=imod.idf._read,
         headers=headers,
     )
-    return da
+
+    # Ensure factor and addition do not have more dimensions than da
+    if isinstance(factor, xr.DataArray):
+        missing_dims = set(factor.dims) - set(da.dims)
+        if missing_dims:
+            factor = factor.isel({d: 0 for d in missing_dims}, drop=True)
+            addition = addition.isel({d: 0 for d in missing_dims}, drop=True)
+
+    return da * factor + addition
 
 
-def _create_dataarray_from_values(values: List[float], headers: List[Dict[str, Any]]):
+def _create_dataarray_from_values(
+    values: List[float], headers: List[Dict[str, Any]], dim: str
+):
+    factor = _get_array_transformation_parameters(headers, "factor", dim)
+    addition = _get_array_transformation_parameters(headers, "addition", dim)
     coords = _merge_coords(headers)
     firstdims = headers[0]["dims"]
     shape = [len(coord) for coord in coords.values()]
     da = xr.DataArray(np.reshape(values, shape), dims=firstdims, coords=coords)
-    return da
+    return da * factor + addition
 
 
 def _create_dataarray(
-    paths: List[str], headers: List[Dict[str, Any]], values: List[float]
+    paths: List[str], headers: List[Dict[str, Any]], values: List[float], dim: str
 ) -> xr.DataArray:
     """
     Create a DataArray from a list of IDF paths, or from constant values.
+
+    There are mixed cases possible, where some of the layers or stress periods
+    contain only a single constant value, and the others are specified as IDFs.
+    In that case, we cannot do a straightforward concatenation.
     """
     values_valid = []
     paths_valid = []
@@ -562,54 +614,19 @@ def _create_dataarray(
             paths_valid.append(path)
 
     if paths_valid and values_valid:
-        dap = _create_datarray_from_paths(paths_valid, headers_paths)
-        dav = _create_dataarray_from_values(values_valid, headers_values)
+        # Both lists contain entries: mixed case.
+        dap = _create_dataarray_from_paths(paths_valid, headers_paths, dim=dim)
+        dav = _create_dataarray_from_values(values_valid, headers_values, dim=dim)
         dap.name = "tmp"
         dav.name = "tmp"
         da = xr.merge((dap, dav), join="outer")["tmp"]
     elif paths_valid:
-        da = _create_datarray_from_paths(paths_valid, headers_paths)
+        # Only paths provided
+        da = _create_dataarray_from_paths(paths_valid, headers_paths, dim=dim)
     elif values_valid:
-        da = _create_dataarray_from_values(values_valid, headers_values)
+        # Only scalar values provided
+        da = _create_dataarray_from_values(values_valid, headers_values, dim=dim)
 
-    da = apply_factor_and_addition(headers, da)
-    return da
-
-
-def apply_factor_and_addition(headers, da):
-    if not ("layer" in da.coords or "time" in da.dims):
-        factor = headers[0]["factor"]
-        addition = headers[0]["addition"]
-        da = da * factor + addition
-    elif "layer" in da.coords and "time" not in da.dims:
-        da = apply_factor_and_addition_per_layer(headers, da)
-    else:
-        header_per_time = defaultdict(list)
-        for time in da.coords["time"].values:
-            for header in headers:
-                if np.datetime64(header["time"]) == time:
-                    header_per_time[time].append(header)
-
-        for time in da.coords["time"]:
-            da.loc[{"time": time}] = apply_factor_and_addition(
-                header_per_time[np.datetime64(time.values)],
-                da.sel(time=time, drop=True),
-            )
-    return da
-
-
-def apply_factor_and_addition_per_layer(headers, da):
-    layer = da.coords["layer"].values
-    header_per_layer = {}
-    for header in headers:
-        if header["layer"] in header_per_layer.keys():
-            raise ValueError("error in project file: layer repetition")
-        header_per_layer[header["layer"]] = header
-    addition_values = [header_per_layer[lay]["addition"] for lay in layer]
-    factor_values = [header_per_layer[lay]["factor"] for lay in layer]
-    addition = xr.DataArray(addition_values, coords={"layer": layer}, dims=("layer"))
-    factor = xr.DataArray(factor_values, coords={"layer": layer}, dims=("layer",))
-    da = da * factor + addition
     return da
 
 
@@ -633,7 +650,7 @@ def _open_package_idf(
             headers.append(header)
             values.append(value)
 
-        das[variable] = _create_dataarray(paths, headers, values)
+        das[variable] = _create_dataarray(paths, headers, values, dim="layer")
 
     return [das]
 
@@ -760,7 +777,7 @@ def _open_boundary_condition_idf(
         for i, (paths, headers, values) in enumerate(
             zip(system_paths.values(), system_headers.values(), system_values.values())
         ):
-            das[i][variable] = _create_dataarray(paths, headers, values)
+            das[i][variable] = _create_dataarray(paths, headers, values, dim="time")
 
     repeats = sorted(all_repeats)
     return das, repeats
