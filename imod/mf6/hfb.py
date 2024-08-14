@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 
 import cftime
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
 import xarray as xr
 import xugrid as xu
@@ -372,6 +373,45 @@ def _prepare_barrier_dataset_for_mf6_adapter(dataset: xr.Dataset) -> xr.Dataset:
     # Attach layer again
     dataset["layer"] = ("cell_id", layer)
     return dataset
+
+
+def _snap_to_grid_and_aggregate(
+    barrier_dataframe: gpd.GeoDataFrame, grid2d: xu.Ugrid2d, vardict_agg: dict[str, str]
+) -> tuple[xu.UgridDataset, npt.NDArray]:
+    """
+    Snap barrier dataframe to grid and aggregate multiple lines with a list of
+    methods per variable.
+
+    Parameters
+    ----------
+    barrier_dataframe: geopandas.GeoDataFrame
+        GeoDataFrame with barriers, should have variable "line_index".
+    grid2d: xugrid.Ugrid2d
+        Grid to snap lines to
+    vardict_agg: dict
+        Mapping of variable name to aggregation method
+    """
+    snapping_df = xu.create_snap_to_grid_dataframe(
+        barrier_dataframe, grid2d, max_snap_distance=0.5
+    )
+    # Map other variables to snapping_df with line indices
+    line_index = snapping_df["line_index"]
+    vars_to_snap = list(vardict_agg.keys())
+    vars_to_snap.remove("line_index")  # snapping_df already has line_index
+    for varname in vars_to_snap:
+        snapping_df[varname] = barrier_dataframe[varname].iloc[line_index].to_numpy()
+    # Aggregate to grid edges
+    gb_edge = snapping_df.groupby("edge_index")
+    # Initialize dataset and dataarray with the right shape and dims
+    snapped_dataset = xu.UgridDataset(grids=[grid2d])
+    new = xr.DataArray(np.full(grid2d.n_edge, np.nan), dims=[grid2d.edge_dimension])
+    edge_index = np.array(list(gb_edge.indices.keys()))
+    # Aggregate with different methods per variable
+    for varname, method in vardict_agg.items():
+        snapped_dataset[varname] = new.copy()
+        snapped_dataset[varname].data[edge_index] = gb_edge[varname].aggregate(method)
+
+    return snapped_dataset, edge_index
 
 
 class BarrierType(Enum):
@@ -772,28 +812,13 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             barrier_dataframe, idomain.sel(layer=1)
         )
         # Prepare variable names and methods for aggregation
-        varnames_agg = ["line_index", variable_name]
-        methods_agg = ["first", "sum"]
+        vardict_agg = {"line_index": "first", variable_name: "sum"}
         if has_layer:
-            varnames_agg.append("layer")
-            methods_agg.append("first")
-        # Snap line to edges, groupby edge index
+            vardict_agg["layer"] = "first"
+        # Create grid from structured
         grid2d = xu.UgridDataArray.from_structured(idomain.sel(layer=1)).grid
-        snapping_df = xu.create_snap_to_grid_dataframe(barrier_dataframe, grid2d, max_snap_distance=0.5)
-        for varname in varnames_agg[1:]:
-            line_index = snapping_df["line_index"]
-            snapping_df[varname] = barrier_dataframe[varname].iloc[line_index].to_numpy()
-        gb_edge = snapping_df.groupby("edge_index")
-        # Initialize dataset and dataarray with the right shape and dims
-        snapped_dataset = xu.UgridDataset(grids=[grid2d])
-        new = xr.DataArray(np.full(grid2d.n_edge, np.nan), dims=[grid2d.edge_dimension])
-        edge_index = np.array(list(gb_edge.indices.keys()))
-        # Aggregate with different methods per variable
-        for varname, method in zip(varnames_agg, methods_agg):
-            snapped_dataset[varname] = new.copy()
-            snapped_dataset[varname].data[edge_index] = gb_edge[varname].aggregate(method)
 
-        return snapped_dataset, edge_index
+        return _snap_to_grid_and_aggregate(barrier_dataframe, grid2d, vardict_agg)
 
     @staticmethod
     def __remove_invalid_edges(
