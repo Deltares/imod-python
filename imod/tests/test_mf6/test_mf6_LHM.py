@@ -14,13 +14,14 @@ from imod.mf6.regrid.regrid_schemes import (
     StorageCoefficientRegridMethod,
 )
 from imod.mf6.simulation import Modflow6Simulation
-from imod.mf6.utilities.mask import mask_arrays
 from imod.prepare.topsystem.default_allocation_methods import (
     SimulationAllocationOptions,
     SimulationDistributingOptions,
 )
 
-LHM_DIR = Path(r"c:\Users\engelen\projects_wdir\imod-python\imod5_converter\MODFLOW6_MODEL")
+LHM_DIR = Path(
+    r"c:\Users\engelen\projects_wdir\imod-python\imod5_converter\MODFLOW6_MODEL"
+)
 
 
 def test_mf6_LHM(tmp_path):
@@ -61,4 +62,3 @@ def test_mf6_LHM(tmp_path):
             package.dataset.load()
         simulation.write(tmp_path, binary=False, validate=True)
     pass
-

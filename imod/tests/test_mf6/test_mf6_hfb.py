@@ -697,12 +697,14 @@ def test_hfb_from_imod5(imod5_dataset, tmp_path):
     assert list(np.unique(hfb_package["layer"].values)) == [7]
 
 
-
-
 @pytest.mark.usefixtures("structured_flow_model")
 def test_combine_linestrings(structured_flow_model):
     dis = structured_flow_model["dis"]
-    top, bottom, idomain = dis["top"], dis["bottom"], dis["idomain"],
+    top, bottom, idomain = (
+        dis["top"],
+        dis["bottom"],
+        dis["idomain"],
+    )
     k = xr.ones_like(idomain)
 
     barrier_y = [11.0, 5.0, -1.0]
