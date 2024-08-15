@@ -431,3 +431,17 @@ def is_transient_data_grid(
         if len(grid["time"]) > 1:
             return True
     return False
+
+
+@typedispatch
+def enforce_ugrid(grid: xr.DataArray) -> xu.UgridDataArray:
+    return xu.UgridDataArray.from_structured(grid)
+
+@typedispatch  # type: ignore[no-redef]
+def enforce_ugrid(grid: xu.UgridDataArray | xu.UgridDataset) -> xu.UgridDataArray:
+    return grid
+
+@typedispatch  # type: ignore[no-redef]
+def enforce_ugrid(grid: object) -> xu.UgridDataArray:
+    raise TypeError(f"function doesn't support type {type(grid)}")
+
