@@ -28,6 +28,7 @@ from imod.mf6.utilities.hfb import (
 )
 from imod.schemata import EmptyIndexesSchema, MaxNUniqueValuesSchema
 from imod.typing import GeoDataFrameType, GridDataArray, LineStringType
+from imod.typing.grid import enforce_uda
 from imod.util.imports import MissingOptionalModule
 
 if TYPE_CHECKING:
@@ -504,11 +505,8 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         """
         top, bottom = broadcast_to_full_domain(idomain, top, bottom)
         k = idomain * k
-        unstructured_grid, top, bottom, k = (
-            self.__to_unstructured(idomain, top, bottom, k)
-            if isinstance(idomain, xr.DataArray)
-            else [idomain, top, bottom, k]
-        )
+        # Enforce unstructured
+        unstructured_grid, top, bottom, k = (enforce_uda(grid) for grid in [idomain, top, bottom, k])
         snapped_dataset, edge_index = self._snap_to_grid(idomain)
         edge_index = self.__remove_invalid_edges(unstructured_grid, edge_index)
 
@@ -776,19 +774,6 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         """
         return deepcopy(self)
 
-    @staticmethod
-    def __to_unstructured(
-        idomain: xr.DataArray, top: xr.DataArray, bottom: xr.DataArray, k: xr.DataArray
-    ) -> Tuple[
-        xu.UgridDataArray, xu.UgridDataArray, xu.UgridDataArray, xu.UgridDataArray
-    ]:
-        unstruct = xu.UgridDataArray.from_structured(idomain)
-        top = xu.UgridDataArray.from_structured(top)
-        bottom = xu.UgridDataArray.from_structured(bottom)
-        k = xu.UgridDataArray.from_structured(k)
-
-        return unstruct, top, bottom, k
-
     def _snap_to_grid(
         self, idomain: GridDataArray
     ) -> Tuple[xu.UgridDataset, np.ndarray]:
@@ -816,7 +801,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         if has_layer:
             vardict_agg["layer"] = "first"
         # Create grid from structured
-        grid2d = xu.UgridDataArray.from_structured(idomain.sel(layer=1)).grid
+        grid2d = enforce_uda(idomain.sel(layer=1)).grid
 
         return _snap_to_grid_and_aggregate(barrier_dataframe, grid2d, vardict_agg)
 
