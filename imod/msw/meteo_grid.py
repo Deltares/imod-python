@@ -8,7 +8,7 @@ import xarray as xr
 
 import imod
 from imod.msw.pkgbase import MetaSwapPackage
-from imod.msw.regrid_schemes import MeteoGridRegridMethod
+from imod.msw.regrid.regrid_schemes import MeteoGridRegridMethod
 from imod.msw.timeutil import to_metaswap_timeformat
 
 

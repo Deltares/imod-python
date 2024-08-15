@@ -3,7 +3,7 @@ import xarray as xr
 
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
-from imod.msw.regrid_schemes import GridDataRegridMethod
+from imod.msw.regrid.regrid_schemes import GridDataRegridMethod
 from imod.util.spatial import spatial_reference
 
 
