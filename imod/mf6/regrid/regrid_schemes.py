@@ -2,8 +2,7 @@ from typing import Tuple, TypeAlias
 
 from pydantic.dataclasses import dataclass
 
-from imod.mf6.utilities.regridding_types import RegridderType
-from imod.util.regrid_method_type import _CONFIG, RegridMethodType
+from imod.util.regrid_method_type import _CONFIG, RegridderType, RegridMethodType
 
 _RegridVarType: TypeAlias = Tuple[RegridderType, str] | Tuple[RegridderType]
 

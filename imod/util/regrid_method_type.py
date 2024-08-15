@@ -1,9 +1,28 @@
-from typing import ClassVar, Protocol
+from enum import Enum
+from typing import ClassVar, Protocol, Tuple, TypeAlias
 
+import xugrid as xu
 from pydantic import ConfigDict
 from pydantic.dataclasses import dataclass
 
 _CONFIG = ConfigDict(extra="forbid")
+
+
+class RegridderType(Enum):
+    """
+    Enumerator referring to regridder types in ``xugrid``.
+    These can be used safely in scripts, remaining backwards compatible for
+    when it is decided to rename regridders in ``xugrid``. For an explanation
+    what each regridder type does, we refer to the `xugrid documentation <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_
+    """
+
+    CENTROIDLOCATOR = xu.CentroidLocatorRegridder
+    BARYCENTRIC = xu.BarycentricInterpolator
+    OVERLAP = xu.OverlapRegridder
+    RELATIVEOVERLAP = xu.RelativeOverlapRegridder
+
+
+_RegridVarType: TypeAlias = Tuple[RegridderType, str] | Tuple[RegridderType]
 
 
 class RegridMethodType(Protocol):

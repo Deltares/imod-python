@@ -21,10 +21,13 @@ from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.interfaces.isimulation import ISimulation
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.utilities.clip import clip_by_grid
-from imod.mf6.utilities.regridding_types import RegridderType
 from imod.schemata import ValidationError
 from imod.typing.grid import GridDataArray, get_grid_geometry_hash, ones_like
-from imod.util.regrid_method_type import EmptyRegridMethod, RegridMethodType
+from imod.util.regrid_method_type import (
+    EmptyRegridMethod,
+    RegridderType,
+    RegridMethodType,
+)
 
 HashRegridderMapping = Tuple[int, int, BaseRegridder]
 
