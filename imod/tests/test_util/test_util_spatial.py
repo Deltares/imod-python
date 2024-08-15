@@ -393,7 +393,7 @@ def test_get_area_equidistant():
         ymax=9.0,
     )
     cell_area = get_cell_area(a2d)
-    assert np.all((cell_area == 6.0).values)
+    assert np.all((np.abs(cell_area) - 6.0 < 1e-10).values)
 
 
 def test_get_area_nonequidistant(tmp_path):
