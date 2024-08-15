@@ -771,13 +771,13 @@ def get_cell_area(array: xr.DataArray) -> xr.DataArray:
     if isinstance(dx, float):
         area = area * abs(dx)
     elif isinstance(dx, np.ndarray):
-        dx_xarray = xr.DataArray(dx, coords={"x": x})
+        dx_xarray = xr.DataArray(np.abs(dx), coords={"x": x})
         area = area * dx_xarray
 
     if isinstance(dy, float):
         area = area * abs(dy)
     elif isinstance(dy, np.ndarray):
-        dy_xarray = xr.DataArray(dy, coords={"y": y})
+        dy_xarray = xr.DataArray(np.abs(dy), coords={"y": y})
         area = area * dy_xarray
 
     return area

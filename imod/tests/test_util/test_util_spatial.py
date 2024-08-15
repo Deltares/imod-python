@@ -409,5 +409,5 @@ def test_get_area_nonequidistant(tmp_path):
     cell_area = get_cell_area(a2d)
     assert np.all(
         cell_area.values
-        == np.array([[-1.0, -0.5, -0.5], [-0.5, -0.25, -0.25], [-0.5, -0.25, -0.25]])
+        == np.array([[1.0, 0.5, 0.5], [0.5, 0.25, 0.25], [0.5, 0.25, 0.25]])
     )
