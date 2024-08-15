@@ -54,6 +54,8 @@ class GridData(MetaSwapPackage, IRegridPackage):
 
     _regrid_method = GridDataRegridMethod()
 
+    _regrid_method = GridDataRegridMethod()
+
     def __init__(
         self,
         area: xr.DataArray,

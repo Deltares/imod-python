@@ -1,9 +1,9 @@
 import pandas as pd
 
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.regrid.regrid_schemes import PondingRegridMethod
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
+from imod.msw.regrid.regrid_schemes import PondingRegridMethod
 
 
 class Ponding(MetaSwapPackage, IRegridPackage):
