@@ -365,9 +365,11 @@ def enforce_dim_order(grid: xu.UgridDataArray) -> xu.UgridDataArray:  # noqa: F8
     )
 
 
-def _enforce_unstructured(obj: GridDataArray, ugrid2d: xu.Ugrid2d) -> xu.UgridDataArray:
-    """Force obj to unstructured"""
-    return xu.UgridDataArray(xr.DataArray(obj), ugrid2d)
+def _enforce_uda_with_topology(
+    obj: GridDataArray, topology: xu.Ugrid2d
+) -> xu.UgridDataArray:
+    """Force obj and topology to ugrid dataarray"""
+    return xu.UgridDataArray(xr.DataArray(obj), topology)
 
 
 def preserve_gridtype(func: Callable[P, T]) -> Callable[P, T]:
@@ -399,8 +401,8 @@ def preserve_gridtype(func: Callable[P, T]) -> Callable[P, T]:
         if unstructured:
             # Multiple grids returned
             if isinstance(x, tuple):
-                return tuple(_enforce_unstructured(i, grid) for i in x)
-            return _enforce_unstructured(x, grid)
+                return tuple(_enforce_uda_with_topology(i, grid) for i in x)
+            return _enforce_uda_with_topology(x, grid)
         return x
 
     return decorator
@@ -434,16 +436,17 @@ def is_transient_data_grid(
 
 
 @typedispatch
-def enforce_ugrid_da(grid: xr.DataArray) -> xu.UgridDataArray:
+def enforce_uda(grid: xr.DataArray) -> xu.UgridDataArray:
+    """Enforce GridDataArray to UgridDataArray"""
     return xu.UgridDataArray.from_structured(grid)
 
 
 @typedispatch  # type: ignore[no-redef]
-def enforce_ugrid_da(grid: xu.UgridDataArray | xu.UgridDataset) -> xu.UgridDataArray:
+def enforce_uda(grid: xu.UgridDataArray) -> xu.UgridDataArray:  # noqa: F811
+    """Enforce GridDataArray to UgridDataArray"""
     return grid
 
 
 @typedispatch  # type: ignore[no-redef]
-def enforce_ugrid_da(grid: object) -> xu.UgridDataArray:
-    raise TypeError(f"function doesn't support type {type(grid)}")
-
+def enforce_uda(grid: object) -> xu.UgridDataArray:  # noqa: F811
+    raise TypeError(f"Function doesn't support type {type(grid)}")
