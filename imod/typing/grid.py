@@ -365,7 +365,7 @@ def enforce_dim_order(grid: xu.UgridDataArray) -> xu.UgridDataArray:  # noqa: F8
     )
 
 
-def _enforce_unstructured(obj: GridDataArray, ugrid2d=xu.Ugrid2d) -> xu.UgridDataArray:
+def _enforce_unstructured(obj: GridDataArray, ugrid2d: xu.Ugrid2d) -> xu.UgridDataArray:
     """Force obj to unstructured"""
     return xu.UgridDataArray(xr.DataArray(obj), ugrid2d)
 
@@ -434,14 +434,16 @@ def is_transient_data_grid(
 
 
 @typedispatch
-def enforce_ugrid(grid: xr.DataArray) -> xu.UgridDataArray:
+def enforce_ugrid_da(grid: xr.DataArray) -> xu.UgridDataArray:
     return xu.UgridDataArray.from_structured(grid)
 
-@typedispatch  # type: ignore[no-redef]
-def enforce_ugrid(grid: xu.UgridDataArray | xu.UgridDataset) -> xu.UgridDataArray:
-    return grid
 
 @typedispatch  # type: ignore[no-redef]
-def enforce_ugrid(grid: object) -> xu.UgridDataArray:
+def enforce_ugrid_da(grid: xu.UgridDataArray | xu.UgridDataset) -> xu.UgridDataArray:
+    return grid
+
+
+@typedispatch  # type: ignore[no-redef]
+def enforce_ugrid_da(grid: object) -> xu.UgridDataArray:
     raise TypeError(f"function doesn't support type {type(grid)}")
 
