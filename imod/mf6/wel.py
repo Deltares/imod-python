@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import abc
+import itertools
 import textwrap
 import warnings
 from datetime import datetime
@@ -71,20 +72,13 @@ def mask_2D(package: GridAgnosticWell, domain_2d: GridDataArray) -> GridAgnostic
     return cls._from_dataset(selection)
 
 
-def _prepare_well_rates_from_groups(
-    unique_well_groups: pd.api.typing.DataFrameGroupBy, times: list[datetime]
+def _df_groups_to_da_rates(
+    unique_well_groups: pd.api.typing.DataFrameGroupBy,
 ) -> xr.DataArray:
-    """
-    Prepare well rates from dataframe groups, grouped by unique well locations.
-    """
-    # Resample times per group
-    df_resampled_groups = [
-        resample_timeseries(df_group, times) for df_group in unique_well_groups
-    ]
     # Convert dataframes all groups to DataArrays
     da_groups = [
         xr.DataArray(df_group["rate"], dims=("time"), coords={"time": df_group["time"]})
-        for df_group in df_resampled_groups
+        for df_group in unique_well_groups
     ]
     # Assign index coordinates
     da_groups = [
@@ -95,10 +89,116 @@ def _prepare_well_rates_from_groups(
     return xr.concat(da_groups, dim="index")
 
 
+def _prepare_well_rates_from_groups(
+    pkg_data: dict,
+    unique_well_groups: pd.api.typing.DataFrameGroupBy,
+    times: list[datetime],
+) -> xr.DataArray:
+    """
+    Prepare well rates from dataframe groups, grouped by unique well locations.
+    Resample timeseries if ipf with associated text files.
+    """
+    has_associated = pkg_data["has_associated"]
+    start_times = times[:-1]  # Starts stress periods.
+    if has_associated:
+        # Resample times per group
+        unique_well_groups = [
+            resample_timeseries(df_group, start_times)
+            for df_group in unique_well_groups
+        ]
+    return _df_groups_to_da_rates(unique_well_groups)
+
+
+def _prepare_df_ipf_associated(
+    pkg_data: dict, start_times: list[datetime], all_well_times: list[datetime]
+) -> pd.DataFrame:
+    """Prepare dataframe for an ipf with associated timeseries in a textfile."""
+    # Validate if associated wells are assigned multiple layers, factors,
+    # and additions.
+    for entry in ["layer", "factor", "addition"]:
+        uniques = set(pkg_data[entry])
+        if len(uniques) > 1:
+            raise ValueError(
+                f"IPF with associated textfiles assigned multiple {entry}s: {uniques}"
+            )
+    # Validate if associated wells are defined only on first timestep or all
+    # timesteps
+    is_defined_all = len(set(all_well_times) - set(pkg_data["time"])) == 0
+    is_defined_first = (len(pkg_data["time"]) == 1) & (
+        pkg_data["time"][0] == all_well_times[0]
+    )
+    if not is_defined_all and not is_defined_first:
+        raise ValueError(
+            "IPF with associated textfiles assigned to wrong times. "
+            "Should be assigned to all times or only first time. "
+            f"PRJ times: {all_well_times}, package times: {pkg_data['time']}"
+        )
+    df = pkg_data["dataframe"][0]
+    df["layer"] = pkg_data["layer"][0]
+    return df
+
+
+def _prepare_df_ipf_unassociated(
+    pkg_data: dict, start_times: list[datetime]
+) -> pd.DataFrame:
+    """Prepare dataframe for an ipf with no associated timeseries."""
+    # Concatenate dataframes, assign layer and times
+    iter_dfs_dims = zip(pkg_data["dataframe"], pkg_data["time"], pkg_data["layer"])
+    df = pd.concat([df.assign(time=t, layer=lay) for df, t, lay in iter_dfs_dims])
+    # Prepare multi-index dataframe to convert to a multi-dimensional DataArray
+    # later.
+    df_multi = df.set_index(["time", "layer", df.index])
+    df_multi.index = df_multi.index.set_names(["time", "layer", "ipf_row"])
+    # Temporarily convert to DataArray with 2 dimensions, as it allows for
+    # multi-dimensional ffilling, instead pandas' ffilling the last value in a
+    # column of the flattened table.
+    ipf_row_index = pkg_data["dataframe"][0].index
+    # Forward fill location columns, only reindex layer, filt_top and filt_bot
+    # if present.
+    cols_ffill_if_present = {"x", "y", "filt_top", "filt_bot"}
+    cols_ffill = cols_ffill_if_present & set(df.columns)
+    da_multi = df_multi.to_xarray()
+    indexers = {"time": start_times, "ipf_row": ipf_row_index}
+    # Multi-dimensional reindex, forward fill well locations, fill well rates
+    # with 0.0.
+    df_ffilled = da_multi[cols_ffill].reindex(indexers, method="ffill").to_dataframe()
+    df_fill_zero = da_multi["rate"].reindex(indexers, fill_value=0.0).to_dataframe()
+    # Combine columns and reset dataframe back into a simple long table with
+    # single index.
+    df_out = pd.concat([df_ffilled, df_fill_zero], axis="columns")
+    return df_out.reset_index().drop(columns="ipf_row")
+
+
+def _unpack_package_data(
+    pkg_data: dict, times: list[datetime], all_well_times: list[datetime]
+) -> pd.DataFrame:
+    """Unpack package data to dataframe"""
+    start_times = times[:-1]  # Starts stress periods.
+    has_associated = pkg_data["has_associated"]
+    if has_associated:
+        return _prepare_df_ipf_associated(pkg_data, start_times, all_well_times)
+    else:
+        return _prepare_df_ipf_unassociated(pkg_data, start_times)
+
+
+def get_all_imod5_prj_well_times(imod5_data: dict) -> list[datetime]:
+    """Get all times a well data is defined on in a prj file"""
+    wel_keys = [key for key in imod5_data.keys() if key.startswith("wel")]
+    wel_times_per_pkg = [imod5_data[wel_key]["time"] for wel_key in wel_keys]
+    # Flatten list
+    wel_times_flat = itertools.chain.from_iterable(wel_times_per_pkg)
+    # Get unique times by converting to set and sorting. ``sorted`` also
+    # transforms set to a list again.
+    return sorted(set(wel_times_flat))
+
+
 class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
     """
     Abstract base class for grid agnostic wells
     """
+
+    _imod5_depth_colnames: list[str] = []
+    _depth_colnames: list[tuple[str, type]] = []
 
     @property
     def x(self) -> npt.NDArray[np.float64]:
@@ -372,6 +472,127 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
     ) -> pd.DataFrame:
         raise NotImplementedError("Method in abstract base class called")
 
+    @classmethod
+    def _validate_imod5_depth_information(
+        cls, key: str, pkg_data: dict, df: pd.DataFrame
+    ) -> None:
+        raise NotImplementedError("Method in abstract base class called")
+
+    @classmethod
+    def from_imod5_data(
+        cls,
+        key: str,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        times: list[datetime],
+        minimum_k: float = 0.1,
+        minimum_thickness: float = 1.0,
+    ) -> "GridAgnosticWell":
+        """
+        Convert wells to imod5 data, loaded with
+        :func:`imod.formats.prj.open_projectfile_data`, to a Well object. As
+        iMOD5 handles wells differently than iMOD Python normally does, some
+        data transformations are made, which are outlined further.
+
+        iMOD5 stores well information in IPF files and it supports two ways to
+        specify injection/extraction rates:
+
+            1. A timeseries of well rates, in an associated text file. We will
+               call these "associated wells" further in this text.
+            2. Constant rates in an IPF file, without an associated text file.
+               We will call these "unassociated wells" further in this text.
+
+        Depending on this, iMOD5 does different things, which we need to mimic
+        in this method.
+
+        *Associated wells*
+
+        Wells with timeseries in an associated textfile are processed as
+        follows:
+
+        - Wells are validated if the following requirements are met
+            * Associated well entries in projectfile are defined on either all
+              timestamps or just the first
+            * Multiplication and addition factors need to remain constant through time
+            * Same associated well cannot be assigned to multiple layers
+        - The dataframe of the first projectfile timestamp is selected
+        - Rate timeseries are resampled with a time weighted mean to the
+          simulation times.
+        - When simulation times fall outside well timeseries range, the last
+          rate is forward filled.
+
+        *Unassociated wells*
+
+        Wells without associated textfiles are processed as follows:
+
+        - When a unassociated well disappears from the next time entry in the
+          projectfile, the well is deactivated by ratting its rate to 0.0. This
+          is to prevent the well being activated again in case of any potential
+          forward filling at a later stage by
+          :meth:`imod.mf6.Modflow6Simulation.create_time_discretization`
+
+        .. note::
+            In case you are wondering why is this so complicated? There are two
+            main reasons:
+
+            - iMOD5 is inconsistent in how it treats timeseries for grid data,
+              compared to point data. Whereas grids are forward filled when
+              there is no entry specified for a time entry, unassociated wells
+              are deactivated. Associated wells, however, are forward filled.
+            - Normally there are two levels in which times are defined: The
+              simulation times, which are the requested times for the
+              simulation, and projectfile times, on which data is defined. With
+              associated ipfs, times are defined in three
+              levels: There are simulation times (in iMOD5 in the ini
+              file), there are projectfile times, and there are times
+              defined in the associated textfiles on which data is defined.
+
+        Parameters
+        ----------
+
+        key: str
+            Name of the well system in the imod5 data
+        imod5_data: dict
+            iMOD5 data loaded from a projectfile with
+            :func:`imod.formats.prj.open_projectfile_data`
+        times: list
+            Simulation times
+        minimum_k: float, optional
+            On creating point wells, no point wells will be placed in cells with
+            a lower horizontal conductivity than this. Wells are placed when
+            ``to_mf6_pkg`` is called.
+        minimum_thickness: float, optional
+            On creating point wells, no point wells will be placed in cells with
+            a lower thickness than this. Wells are placed when ``to_mf6_pkg`` is
+            called.
+        """
+        pkg_data = imod5_data[key]
+        all_well_times = get_all_imod5_prj_well_times(imod5_data)
+
+        df = _unpack_package_data(pkg_data, times, all_well_times)
+        cls._validate_imod5_depth_information(key, pkg_data, df)
+
+        # Groupby unique wells, to get dataframes per time.
+        colnames_group = ["x", "y"] + cls._imod5_depth_colnames
+        # Associated wells need additional grouping by id
+        if pkg_data["has_associated"]:
+            colnames_group.append("id")
+        wel_index, unique_well_groups = zip(*df.groupby(colnames_group))
+
+        # Unpack wel indices by zipping
+        varnames = [("x", float), ("y", float)] + cls._depth_colnames
+        index_values = zip(*wel_index)
+        cls_input: dict[str, Any] = {
+            var: np.array(value, dtype=dtype)
+            for (var, dtype), value in zip(varnames, index_values)
+        }
+        cls_input["rate"] = _prepare_well_rates_from_groups(
+            pkg_data, unique_well_groups, times
+        )
+        cls_input["minimum_k"] = minimum_k
+        cls_input["minimum_thickness"] = minimum_thickness
+
+        return cls(**cls_input)
+
 
 class Well(GridAgnosticWell):
     """
@@ -486,6 +707,12 @@ class Well(GridAgnosticWell):
         "rate": [AnyNoDataSchema(), EmptyIndexesSchema()],
         "concentration": [AnyNoDataSchema(), EmptyIndexesSchema()],
     }
+
+    _imod5_depth_colnames: list[str] = ["filt_top", "filt_bot"]
+    _depth_colnames: list[tuple[str, type]] = [
+        ("screen_top", float),
+        ("screen_bottom", float),
+    ]
 
     @init_log_decorator()
     def __init__(
@@ -691,56 +918,31 @@ class Well(GridAgnosticWell):
         return wells_assigned
 
     @classmethod
-    def from_imod5_data(
-        cls,
-        key: str,
-        imod5_data: dict[str, dict[str, GridDataArray]],
-        times: list[datetime],
-        minimum_k: float = 0.1,
-        minimum_thickness: float = 1.0,
-    ) -> "Well":
-        pkg_data = imod5_data[key]
-        if "layer" in pkg_data.keys() and (pkg_data["layer"] != 0):
+    def _validate_imod5_depth_information(
+        cls, key: str, pkg_data: dict, df: pd.DataFrame
+    ) -> None:
+        if "layer" in pkg_data.keys() and (np.any(np.array(pkg_data["layer"]) != 0)):
             log_msg = textwrap.dedent(
                 f"""
-                In well {key} a layer was assigned, but this is not supported.
-                Assignment will be done based on filter_top and filter_bottom,
-                and the chosen layer ({pkg_data["layer"]}) will be ignored. To
-                specify by layer, use imod.mf6.LayeredWell.
+                In well {key} a layer was assigned, but this is not
+                supported for imod.mf6.Well. Assignment will be done based on
+                filter_top and filter_bottom, and the chosen layer
+                ({pkg_data["layer"]}) will be ignored. To specify by layer, use
+                imod.mf6.LayeredWell.
                 """
             )
             logger.log(loglevel=LogLevel.WARNING, message=log_msg, additional_depth=2)
 
-        df: pd.DataFrame = pkg_data["dataframe"]
-
         if "filt_top" not in df.columns or "filt_bot" not in df.columns:
             log_msg = textwrap.dedent(
                 f"""
-                In well {key} the filt_top and filt_bot columns were not both
-                found; this is not supported for import. To specify by layer,
-                use imod.mf6.LayeredWell.
+                In well {key} the 'filt_top' and 'filt_bot' columns were
+                not both found; this is not supported for import. To specify by
+                layer, use imod.mf6.LayeredWell.
                 """
             )
             logger.log(loglevel=LogLevel.ERROR, message=log_msg, additional_depth=2)
             raise ValueError(log_msg)
-
-        # Groupby unique wells, to get dataframes per time.
-        colnames_group = ["x", "y", "filt_top", "filt_bot", "id"]
-        wel_index, unique_well_groups = zip(*df.groupby(colnames_group))
-
-        # Unpack wel indices by zipping
-        x, y, filt_top, filt_bot, id = zip(*wel_index)
-        well_rate = _prepare_well_rates_from_groups(unique_well_groups, times)
-
-        return cls(
-            x=np.array(x, dtype=float),
-            y=np.array(y, dtype=float),
-            screen_top=np.array(filt_top, dtype=float),
-            screen_bottom=np.array(filt_bot, dtype=float),
-            rate=well_rate,
-            minimum_k=minimum_k,
-            minimum_thickness=minimum_thickness,
-        )
 
 
 class LayeredWell(GridAgnosticWell):
@@ -848,6 +1050,8 @@ class LayeredWell(GridAgnosticWell):
         "rate": [AnyNoDataSchema(), EmptyIndexesSchema()],
         "concentration": [AnyNoDataSchema(), EmptyIndexesSchema()],
     }
+    _imod5_depth_colnames: list[str] = ["layer"]
+    _depth_colnames: list[tuple[str, type]] = [("layer", int)]
 
     @init_log_decorator()
     def __init__(
@@ -970,43 +1174,28 @@ class LayeredWell(GridAgnosticWell):
         return wells_df
 
     @classmethod
-    def from_imod5_data(
-        cls,
-        key: str,
-        imod5_data: dict[str, dict[str, GridDataArray]],
-        times: list[datetime],
-        minimum_k: float = 0.1,
-        minimum_thickness: float = 1.0,
-    ) -> "LayeredWell":
-        pkg_data = imod5_data[key]
-
-        if ("layer" not in pkg_data.keys()) or (pkg_data["layer"] == 0):
+    def _validate_imod5_depth_information(
+        cls, key: str, pkg_data: dict, df: pd.DataFrame
+    ) -> None:
+        if np.any(np.array(pkg_data["layer"]) == 0):
             log_msg = textwrap.dedent(
-                f"""In well {key} no layer was assigned, but this is required."""
+                f"""
+                Well {key} in projectfile is assigned to layer 0, but should be >
+                0 for LayeredWell             
+                """
             )
             logger.log(loglevel=LogLevel.ERROR, message=log_msg, additional_depth=2)
+            raise ValueError(log_msg)
 
-        df: pd.DataFrame = pkg_data["dataframe"]
-
-        # Add layer to dataframe.
-        df["layer"] = pkg_data["layer"]
-
-        # Groupby unique wells, to get dataframes per time.
-        colnames_group = ["x", "y", "layer", "id"]
-        wel_index, unique_well_groups = zip(*df.groupby(colnames_group))
-
-        # Unpack wel indices by zipping
-        x, y, layer, id = zip(*wel_index)
-        well_rate = _prepare_well_rates_from_groups(unique_well_groups, times)
-
-        return cls(
-            x=np.array(x, dtype=float),
-            y=np.array(y, dtype=float),
-            layer=np.array(layer, dtype=int),
-            rate=well_rate,
-            minimum_k=minimum_k,
-            minimum_thickness=minimum_thickness,
-        )
+        if "layer" not in df.columns:
+            log_msg = textwrap.dedent(
+                f"""
+                IPF file {key} has no layer assigned, but this is required
+                for LayeredWell.
+                """
+            )
+            logger.log(loglevel=LogLevel.ERROR, message=log_msg, additional_depth=2)
+            raise ValueError(log_msg)
 
 
 class WellDisStructured(DisStructuredBoundaryCondition):
