@@ -3,6 +3,7 @@ import xarray as xr
 
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
+from imod.msw.regrid.regrid_schemes import GridDataRegridMethod
 from imod.util.spatial import spatial_reference
 
 
@@ -49,6 +50,8 @@ class GridData(MetaSwapPackage):
     _with_subunit = ("area", "landuse", "rootzone_depth")
     _without_subunit = ("surface_elevation", "soil_physical_unit")
     _to_fill = ("soil_physical_unit_string", "temp")
+
+    _regrid_method = GridDataRegridMethod()
 
     def __init__(
         self,

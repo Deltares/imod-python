@@ -1,6 +1,8 @@
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
+from imod.msw.regrid.regrid_schemes import RegridMethodType
+from imod.util.regrid_method_type import EmptyRegridMethod
 
 
 class LanduseOptions(MetaSwapPackage, IRegridPackage):
@@ -123,7 +125,7 @@ class LanduseOptions(MetaSwapPackage, IRegridPackage):
 
     _file_name = "luse_svat.inp"
 
-    _regrid_method = {}
+    _regrid_method: RegridMethodType = EmptyRegridMethod()
 
     def __init__(
         self,

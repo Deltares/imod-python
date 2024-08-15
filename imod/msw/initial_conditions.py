@@ -4,6 +4,7 @@ import shutil
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
+from imod.util.regrid_method_type import EmptyRegridMethod, RegridMethodType
 
 
 class InitialConditionsEquilibrium(MetaSwapPackage, IRegridPackage):
@@ -13,7 +14,7 @@ class InitialConditionsEquilibrium(MetaSwapPackage, IRegridPackage):
     This class is responsible for the file `init_svat.inp`
     """
 
-    _regrid_method = {}
+    _regrid_method: RegridMethodType = EmptyRegridMethod()
 
     _file_name = "init_svat.inp"
     _option = "Equilibrium"
@@ -43,7 +44,7 @@ class InitialConditionsRootzonePressureHead(MetaSwapPackage, IRegridPackage):
     _metadata_dict = {
         "initial_pF": VariableMetaData(6, 0.0, 6.0, float),
     }
-    _regrid_method = {}
+    _regrid_method: RegridMethodType = EmptyRegridMethod()
 
     def __init__(self, initial_pF=2.2):
         super().__init__()
@@ -72,7 +73,7 @@ class InitialConditionsPercolation(MetaSwapPackage, IRegridPackage):
     _file_name = "init_svat.inp"
     _option = "MeteoInputP"
     _metadata_dict: dict = {}
-    _regrid_method = {}
+    _regrid_method: RegridMethodType = EmptyRegridMethod()
 
     def __init__(self):
         super().__init__()
@@ -108,3 +109,6 @@ class InitialConditionsSavedState(MetaSwapPackage):
         filename = directory / self._file_name
 
         shutil.copyfile(self.saved_state, filename)
+
+    def is_regridding_supported(self) -> bool:
+        return False
