@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from imod.mf6.regrid.regrid_schemes import EmptyRegridMethod, RegridMethodType
 from imod.mf6.utilities.regrid import (
     RegridderType,
     RegridderWeightsCache,
@@ -15,6 +14,7 @@ from imod.mf6.utilities.regrid import (
 )
 from imod.msw.fixed_format import format_fixed_width
 from imod.typing.grid import GridDataArray, GridDataset
+from imod.util.regrid_method_type import EmptyRegridMethod, RegridMethodType
 
 
 class MetaSwapPackage(abc.ABC):

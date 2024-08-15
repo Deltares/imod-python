@@ -1,9 +1,9 @@
 import numpy as np
 import xarray as xr
 
-from imod.mf6.regrid.regrid_schemes import GridDataRegridMethod
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
+from imod.msw.regrid_schemes import GridDataRegridMethod
 from imod.util.spatial import spatial_reference
 
 

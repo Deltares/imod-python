@@ -1,7 +1,7 @@
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.regrid.regrid_schemes import ScalingRegridMethod
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
+from imod.msw.regrid_schemes import ScalingRegridMethod
 
 
 class ScalingFactors(MetaSwapPackage, IRegridPackage):

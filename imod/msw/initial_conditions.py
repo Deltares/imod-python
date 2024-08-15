@@ -2,9 +2,9 @@ import pathlib
 import shutil
 
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.regrid.regrid_schemes import EmptyRegridMethod, RegridMethodType
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
+from imod.util.regrid_method_type import EmptyRegridMethod, RegridMethodType
 
 
 class InitialConditionsEquilibrium(MetaSwapPackage, IRegridPackage):
