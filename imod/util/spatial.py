@@ -738,7 +738,7 @@ def _polygonize(da: xr.DataArray) -> "gpd.GeoDataFrame":
     return gdf
 
 
-def get_grid_area(array: xr.DataArray) -> float:
+def get_total_grid_area(array: xr.DataArray) -> float:
     """
     Returns the total area of all cells summed together in a 2d grid with x and
     y coordinates
