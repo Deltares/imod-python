@@ -435,10 +435,40 @@ def is_transient_data_grid(
     return False
 
 
+class GridCache:
+    """
+    Cache grids in this object for a specific function, lookup grids based on
+    unique geometry hash.
+    """
+    def __init__(self, func: Callable, max_cache_size=5):
+        self.max_cache_size = max_cache_size
+        self.grid_cache: dict[int, GridDataArray] = {}
+        self.func = func
+
+    def get_grid(self, grid: GridDataArray):
+        hash = get_grid_geometry_hash(grid)
+        if hash not in self.grid_cache.keys():
+            if len(self.grid_cache.keys()) > self.max_cache_size:
+                self.remove_first()
+            self.grid_cache[hash] = self.func(grid)
+        return self.grid_cache[hash]
+
+    def remove_first(self):
+        keys = list(self.grid_cache.keys())
+        self.grid_cache.pop(keys[0])
+
+
+UGRID_FROM_STRUCTURED_CACHE = GridCache(xu.UgridDataArray.from_structured)
+
+
 @typedispatch
 def enforce_uda(grid: xr.DataArray) -> xu.UgridDataArray:
-    """Enforce GridDataArray to UgridDataArray"""
-    return xu.UgridDataArray.from_structured(grid)
+    """
+    Enforce GridDataArray to UgridDataArray, calls
+    xu.UgridDataArray.from_structured, which is a costly operation. Therefore
+    cache results.
+    """
+    return UGRID_FROM_STRUCTURED_CACHE.get_grid(grid)
 
 
 @typedispatch  # type: ignore[no-redef]
