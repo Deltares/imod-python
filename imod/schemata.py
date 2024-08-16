@@ -74,7 +74,7 @@ def scalar_None(obj):
     if not isinstance(obj, (xr.DataArray, xu.UgridDataArray)):
         return False
     else:
-        return (len(obj.shape) == 0) & (~obj.notnull()).all()
+        return (len(obj.shape) == 0) and (obj.isnull()).all()
 
 
 def align_other_obj_with_coords(
