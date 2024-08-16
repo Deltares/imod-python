@@ -391,6 +391,13 @@ def _snap_to_grid_and_aggregate(
         Grid to snap lines to
     vardict_agg: dict
         Mapping of variable name to aggregation method
+    
+    Returns
+    -------
+    snapping_dataset: xugrid.UgridDataset
+        Dataset with all variables snapped and aggregated to cell edges
+    edge_index: numpy.array
+        1D array with indices of cell edges that lines were snapped to
     """
     snapping_df = xu.create_snap_to_grid_dataframe(
         barrier_dataframe, grid2d, max_snap_distance=0.5
