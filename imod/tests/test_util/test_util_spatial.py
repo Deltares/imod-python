@@ -6,7 +6,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-from imod.util.spatial import get_cell_area
+from imod.util.spatial import get_cell_area, get_total_grid_area
 
 
 @pytest.fixture(scope="function")
@@ -410,4 +410,33 @@ def test_get_area_nonequidistant(tmp_path):
     assert np.all(
         cell_area.values
         == np.array([[1.0, 0.5, 0.5], [0.5, 0.25, 0.25], [0.5, 0.25, 0.25]])
+    )
+
+
+def test_get_total_area_equidistant():
+    a2d = imod.util.spatial.empty_2d(
+        dx=2.0,
+        xmin=0.0,
+        xmax=4.0,
+        dy=3.0,
+        ymin=0.0,
+        ymax=9.0,
+    )
+    total_grid_area_area = get_total_grid_area(a2d)
+    assert total_grid_area_area - 36 < 1e-10
+
+
+def test_get_total_area_nonequidistant(tmp_path):
+    a2d = imod.util.spatial.empty_2d(
+        dx=[1.0, 0.5, 0.5],
+        xmin=0.0,
+        xmax=2.0,
+        dy=[1.0, 0.5, 0.5],
+        ymin=0.0,
+        ymax=2.0,
+    )
+
+    total_grid_area = get_total_grid_area(a2d)
+    assert total_grid_area == np.sum(
+        np.array([[1.0, 0.5, 0.5], [0.5, 0.25, 0.25], [0.5, 0.25, 0.25]])
     )
