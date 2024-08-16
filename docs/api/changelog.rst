@@ -17,6 +17,8 @@ Fixed
   flow barrier for MODFLOW 6
 - Bug where error would be thrown when barriers in a ``HorizontalFlowBarrier``
   would be snapped to the same cell edge. These are now summed.
+- Improve performance validation upon Package initialization
+- Improve performance writing ``HorizontalFlowBarrier`` objects
 
 Changed
 ~~~~~~~
