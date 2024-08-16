@@ -1,7 +1,16 @@
+"""
+LHM tests, these are pytest marked with 'lhm'.
+
+These require the LHM model to be available on the local drive. The tests looks
+for the path to the projectfile needs to be included in a .env file, with the
+environmental variable "LHM_PRJ" with the path to the projectfile.
+"""
+
+import os
 import sys
-from pathlib import Path
 
 import pandas as pd
+import pytest
 
 import imod
 from imod.formats.prj.prj import open_projectfile_data
@@ -21,13 +30,11 @@ from imod.prepare.topsystem.default_allocation_methods import (
     SimulationDistributingOptions,
 )
 
-LHM_DIR = Path(
-    r"c:\Users\engelen\projects_wdir\imod-python\imod5_converter\MODFLOW6_MODEL"
-)
 
-# @pytest.fixture(scope="module")
+# In function, not a fixture, to allow logging of the import.
 def LHM_imod5_data():
-    data = open_projectfile_data(LHM_DIR / "LHM4.3_test.prj")
+    lhm_prjfile = os.environ["LHM_PRJ"]
+    data = open_projectfile_data(lhm_prjfile)
 
     imod5_data = data[0]
     period_data = data[1]
@@ -54,22 +61,7 @@ def LHM_imod5_data():
     return simulation
 
 
-def test_mf6_LHM(tmp_path):
-    logfile_path = tmp_path / "logfile.txt"
-    with open(logfile_path, "w") as sys.stdout:
-        imod.logging.configure(
-            LoggerType.PYTHON,
-            log_level=LogLevel.DEBUG,
-            add_default_file_handler=False,
-            add_default_stream_handler=True,
-        )
-        simulation = LHM_imod5_data()
-
-        for k, package in simulation["imported_model"].items():
-            package.dataset.load()
-        simulation.write(tmp_path, binary=False, validate=True)
-
-
+@pytest.mark.lhm
 def test_mf6_LHM_write_HFB(tmp_path):
     logfile_path = tmp_path / "logfile.txt"
     with open(logfile_path, "w") as sys.stdout:
@@ -100,5 +92,3 @@ def test_mf6_LHM_write_HFB(tmp_path):
         write_context = WriteContext(out_dir, use_binary=True, use_absolute_paths=False)
 
         mf6_hfb.write("hfb", times, write_context)
-
-

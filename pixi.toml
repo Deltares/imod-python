@@ -23,7 +23,7 @@ unittests = { cmd = [
     "NUMBA_DISABLE_JIT=1",
     "pytest",
     "-n", "auto",
-    "-m", "not example",
+    "-m", "not example and not lhm",
     "--cache-clear",
     "--verbose",
     "--junitxml=unittest_report.xml",
@@ -40,6 +40,13 @@ examples = { cmd = [
     "--cache-clear",
     "--verbose",
     "--junitxml=examples_report.xml",
+], depends_on = ["install"], cwd = "imod/tests" }
+user_acceptance = { cmd = [
+    "pytest",
+    "-m", "lhm",
+    "--cache-clear",
+    "--verbose",
+    "--junitxml=user_acceptance_report.xml",
 ], depends_on = ["install"], cwd = "imod/tests" }
 test_import = { cmd = [
     "python",
@@ -87,6 +94,7 @@ pytest = "<8"   # Newer version incompatible with pytest-cases
 pytest-benchmark = "*"
 pytest-cases = "*"
 pytest-cov = "*"
+pytest-dotenv = "*"
 pytest-xdist = "*"
 python = "3.11"
 python-graphviz = "*"

@@ -157,6 +157,7 @@ ignore_missing_imports = true
 [tool.pytest.ini_options]
 markers = [
     "example: marks test as example (deselect with '-m \"not example\"')",
+    "lhm: marks lhm tests (deselect with '-m \"not example\"')",
 ]
 
 [tool.hatch.version]
