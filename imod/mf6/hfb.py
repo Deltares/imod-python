@@ -391,7 +391,7 @@ def _snap_to_grid_and_aggregate(
         Grid to snap lines to
     vardict_agg: dict
         Mapping of variable name to aggregation method
-    
+
     Returns
     -------
     snapping_dataset: xugrid.UgridDataset
@@ -405,7 +405,8 @@ def _snap_to_grid_and_aggregate(
     # Map other variables to snapping_df with line indices
     line_index = snapping_df["line_index"]
     vars_to_snap = list(vardict_agg.keys())
-    vars_to_snap.remove("line_index")  # snapping_df already has line_index
+    if "line_index" in vars_to_snap:
+        vars_to_snap.remove("line_index")  # snapping_df already has line_index
     for varname in vars_to_snap:
         snapping_df[varname] = barrier_dataframe[varname].iloc[line_index].to_numpy()
     # Aggregate to grid edges
