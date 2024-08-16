@@ -28,7 +28,7 @@ from imod.mf6.utilities.hfb import (
 )
 from imod.schemata import EmptyIndexesSchema, MaxNUniqueValuesSchema
 from imod.typing import GeoDataFrameType, GridDataArray, LineStringType
-from imod.typing.grid import enforce_uda
+from imod.typing.grid import as_ugrid_dataarray
 from imod.util.imports import MissingOptionalModule
 
 if TYPE_CHECKING:
@@ -514,7 +514,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         k = idomain * k
         # Enforce unstructured
         unstructured_grid, top, bottom, k = (
-            enforce_uda(grid) for grid in [idomain, top, bottom, k]
+            as_ugrid_dataarray(grid) for grid in [idomain, top, bottom, k]
         )
         snapped_dataset, edge_index = self._snap_to_grid(idomain)
         edge_index = self.__remove_invalid_edges(unstructured_grid, edge_index)
@@ -810,7 +810,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         if has_layer:
             vardict_agg["layer"] = "first"
         # Create grid from structured
-        grid2d = enforce_uda(idomain.sel(layer=1)).grid
+        grid2d = as_ugrid_dataarray(idomain.sel(layer=1)).grid
 
         return _snap_to_grid_and_aggregate(barrier_dataframe, grid2d, vardict_agg)
 
