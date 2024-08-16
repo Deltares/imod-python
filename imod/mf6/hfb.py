@@ -506,7 +506,9 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         top, bottom = broadcast_to_full_domain(idomain, top, bottom)
         k = idomain * k
         # Enforce unstructured
-        unstructured_grid, top, bottom, k = (enforce_uda(grid) for grid in [idomain, top, bottom, k])
+        unstructured_grid, top, bottom, k = (
+            enforce_uda(grid) for grid in [idomain, top, bottom, k]
+        )
         snapped_dataset, edge_index = self._snap_to_grid(idomain)
         edge_index = self.__remove_invalid_edges(unstructured_grid, edge_index)
 
