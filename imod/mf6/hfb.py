@@ -377,7 +377,7 @@ def _prepare_barrier_dataset_for_mf6_adapter(dataset: xr.Dataset) -> xr.Dataset:
 
 
 def _snap_to_grid_and_aggregate(
-    barrier_dataframe: gpd.GeoDataFrame, grid2d: xu.Ugrid2d, vardict_agg: dict[str, str]
+    barrier_dataframe: GeoDataFrameType, grid2d: xu.Ugrid2d, vardict_agg: dict[str, str]
 ) -> tuple[xu.UgridDataset, npt.NDArray]:
     """
     Snap barrier dataframe to grid and aggregate multiple lines with a list of
