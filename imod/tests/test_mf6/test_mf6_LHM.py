@@ -1,5 +1,5 @@
 """
-LHM tests, these are pytest marked with 'lhm'.
+LHM tests, these are pytest-marked with 'user_acceptance'.
 
 These require the LHM model to be available on the local drive. The tests looks
 for the path to the projectfile needs to be included in a .env file, with the
@@ -61,7 +61,7 @@ def LHM_imod5_data():
     return simulation
 
 
-@pytest.mark.lhm
+@pytest.mark.user_acceptance
 def test_mf6_LHM_write_HFB(tmp_path):
     logfile_path = tmp_path / "logfile.txt"
     with open(logfile_path, "w") as sys.stdout:

@@ -23,7 +23,7 @@ unittests = { cmd = [
     "NUMBA_DISABLE_JIT=1",
     "pytest",
     "-n", "auto",
-    "-m", "not example and not lhm",
+    "-m", "not example and not user_acceptance",
     "--cache-clear",
     "--verbose",
     "--junitxml=unittest_report.xml",
@@ -41,9 +41,11 @@ examples = { cmd = [
     "--verbose",
     "--junitxml=examples_report.xml",
 ], depends_on = ["install"], cwd = "imod/tests" }
+# User acceptance tests, only works when paths to models are located on local
+# drive and are specified in a .env file.
 user_acceptance = { cmd = [
     "pytest",
-    "-m", "lhm",
+    "-m", "user_acceptance",
     "--cache-clear",
     "--verbose",
     "--junitxml=user_acceptance_report.xml",
