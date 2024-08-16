@@ -73,21 +73,6 @@ def setup_scaling_factor():
     return scaling_factors, index, svat
 
 
-def get_new_grid():
-    x = [1.0, 1.5, 2.0, 2.5, 3.0]
-    y = [3.0, 2.5, 2.0, 1.5, 1.0]
-    subunit = [0, 1]
-    dx = 0.5
-    dy = 0.5
-    # fmt: off
-    new_grid = xr.DataArray(
-        dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
-    )
-    new_grid.values[:,:,:] = 1
-    return new_grid
-
-
 def test_simple_model(fixed_format_parser):
     scaling_factors, index, svat = setup_scaling_factor()
 
@@ -110,9 +95,9 @@ def test_simple_model(fixed_format_parser):
     )
 
 
-def test_regrid_scaling_factor(fixed_format_parser):
-    scaling_factors, index, svat = setup_scaling_factor()
-    new_grid = get_new_grid()
+def test_regrid_scaling_factor(fixed_format_parser, simple_2d_grid_with_subunits):
+    scaling_factors, _, _ = setup_scaling_factor()
+    new_grid = simple_2d_grid_with_subunits
 
     regrid_context = RegridderWeightsCache()
 

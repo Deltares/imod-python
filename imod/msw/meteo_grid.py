@@ -7,12 +7,13 @@ import pandas as pd
 import xarray as xr
 
 import imod
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import MeteoGridRegridMethod
 from imod.msw.timeutil import to_metaswap_timeformat
 
 
-class MeteoGrid(MetaSwapPackage):
+class MeteoGrid(MetaSwapPackage, IRegridPackage):
     """
     This contains the meteorological grid data. Grids are written to ESRI ASCII
     files. The meteorological data requires a time coordinate. Next to a

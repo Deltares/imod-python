@@ -40,24 +40,9 @@ def setup_cropfactors():
     return cropfactors
 
 
-def get_new_grid():
-    x = list(range(100))
-    y = list(range(100, 0, -1))
-    subunit = [0, 1]
-    dx = 0.5
-    dy = 0.5
-    # fmt: off
-    new_grid = xr.DataArray(
-        dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
-    )
-    new_grid.values[:,:,:] = 1
-    return new_grid
-
-
-def test_cropfactor_regrid():
+def test_cropfactor_regrid(simple_2d_grid_with_subunits):
     crop_factors = setup_cropfactors()
-    new_grid = get_new_grid()
+    new_grid = simple_2d_grid_with_subunits
 
     regrid_context = RegridderWeightsCache()
     regridded = crop_factors.regrid_like(new_grid, regrid_context)
