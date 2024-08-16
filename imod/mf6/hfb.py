@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 
 import cftime
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
 import xarray as xr
 import xugrid as xu
@@ -27,6 +28,7 @@ from imod.mf6.utilities.hfb import (
 )
 from imod.schemata import EmptyIndexesSchema, MaxNUniqueValuesSchema
 from imod.typing import GeoDataFrameType, GridDataArray, LineStringType
+from imod.typing.grid import as_ugrid_dataarray
 from imod.util.imports import MissingOptionalModule
 
 if TYPE_CHECKING:
@@ -374,6 +376,53 @@ def _prepare_barrier_dataset_for_mf6_adapter(dataset: xr.Dataset) -> xr.Dataset:
     return dataset
 
 
+def _snap_to_grid_and_aggregate(
+    barrier_dataframe: GeoDataFrameType, grid2d: xu.Ugrid2d, vardict_agg: dict[str, str]
+) -> tuple[xu.UgridDataset, npt.NDArray]:
+    """
+    Snap barrier dataframe to grid and aggregate multiple lines with a list of
+    methods per variable.
+
+    Parameters
+    ----------
+    barrier_dataframe: geopandas.GeoDataFrame
+        GeoDataFrame with barriers, should have variable "line_index".
+    grid2d: xugrid.Ugrid2d
+        Grid to snap lines to
+    vardict_agg: dict
+        Mapping of variable name to aggregation method
+
+    Returns
+    -------
+    snapping_dataset: xugrid.UgridDataset
+        Dataset with all variables snapped and aggregated to cell edges
+    edge_index: numpy.array
+        1D array with indices of cell edges that lines were snapped to
+    """
+    snapping_df = xu.create_snap_to_grid_dataframe(
+        barrier_dataframe, grid2d, max_snap_distance=0.5
+    )
+    # Map other variables to snapping_df with line indices
+    line_index = snapping_df["line_index"]
+    vars_to_snap = list(vardict_agg.keys())
+    if "line_index" in vars_to_snap:
+        vars_to_snap.remove("line_index")  # snapping_df already has line_index
+    for varname in vars_to_snap:
+        snapping_df[varname] = barrier_dataframe[varname].iloc[line_index].to_numpy()
+    # Aggregate to grid edges
+    gb_edge = snapping_df.groupby("edge_index")
+    # Initialize dataset and dataarray with the right shape and dims
+    snapped_dataset = xu.UgridDataset(grids=[grid2d])
+    new = xr.DataArray(np.full(grid2d.n_edge, np.nan), dims=[grid2d.edge_dimension])
+    edge_index = np.array(list(gb_edge.indices.keys()))
+    # Aggregate with different methods per variable
+    for varname, method in vardict_agg.items():
+        snapped_dataset[varname] = new.copy()
+        snapped_dataset[varname].data[edge_index] = gb_edge[varname].aggregate(method)
+
+    return snapped_dataset, edge_index
+
+
 class BarrierType(Enum):
     HydraulicCharacteristic = 0
     Multiplier = 1
@@ -464,10 +513,9 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         """
         top, bottom = broadcast_to_full_domain(idomain, top, bottom)
         k = idomain * k
+        # Enforce unstructured
         unstructured_grid, top, bottom, k = (
-            self.__to_unstructured(idomain, top, bottom, k)
-            if isinstance(idomain, xr.DataArray)
-            else [idomain, top, bottom, k]
+            as_ugrid_dataarray(grid) for grid in [idomain, top, bottom, k]
         )
         snapped_dataset, edge_index = self._snap_to_grid(idomain)
         edge_index = self.__remove_invalid_edges(unstructured_grid, edge_index)
@@ -736,61 +784,36 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         """
         return deepcopy(self)
 
-    @staticmethod
-    def __to_unstructured(
-        idomain: xr.DataArray, top: xr.DataArray, bottom: xr.DataArray, k: xr.DataArray
-    ) -> Tuple[
-        xu.UgridDataArray, xu.UgridDataArray, xu.UgridDataArray, xu.UgridDataArray
-    ]:
-        unstruct = xu.UgridDataArray.from_structured(idomain)
-        top = xu.UgridDataArray.from_structured(top)
-        bottom = xu.UgridDataArray.from_structured(bottom)
-        k = xu.UgridDataArray.from_structured(k)
-
-        return unstruct, top, bottom, k
-
     def _snap_to_grid(
         self, idomain: GridDataArray
     ) -> Tuple[xu.UgridDataset, np.ndarray]:
-        if "layer" in self._get_vertical_variables():
-            variable_names = [self._get_variable_name(), "geometry", "layer"]
+        variable_name = self._get_variable_name()
+        has_layer = "layer" in self._get_vertical_variables()
+        # Create geodataframe with barriers
+        if has_layer:
+            varnames_for_df = [variable_name, "geometry", "layer"]
         else:
-            variable_names = [self._get_variable_name(), "geometry"]
+            varnames_for_df = [variable_name, "geometry"]
         barrier_dataframe = gpd.GeoDataFrame(
-            self.dataset[variable_names].to_dataframe()
+            self.dataset[varnames_for_df].to_dataframe()
         )
-
-        if "layer" not in self._get_vertical_variables():
+        # Convert vertical polygon to linestring
+        if not has_layer:
             lower, _ = _extract_hfb_bounds_from_zpolygons(barrier_dataframe)
             linestring = _create_zlinestring_from_bound_df(lower)
             barrier_dataframe["geometry"] = linestring["geometry"]
-
+        # Clip barriers outside domain
         barrier_dataframe = clip_line_gdf_by_grid(
             barrier_dataframe, idomain.sel(layer=1)
         )
+        # Prepare variable names and methods for aggregation
+        vardict_agg = {"line_index": "first", variable_name: "sum"}
+        if has_layer:
+            vardict_agg["layer"] = "first"
+        # Create grid from structured
+        grid2d = as_ugrid_dataarray(idomain.sel(layer=1)).grid
 
-        # Work around issue where xu.snap_to_grid cannot handle snapping a
-        # dataset with multiple lines appropriately. This can be later replaced
-        # to a single call to xu.snap_to_grid if this bug is fixed:
-        # <link_to_github_issue_here>
-        snapped_dataset_rows: List[xr.Dataset] = []
-        for index in barrier_dataframe.index:
-            # Index with list to return pd.DataFrame instead of pd.Series for
-            # xu.snap_to_grid.
-            row_df = barrier_dataframe.loc[[index]]
-            snapped_dataset_row, _ = typing.cast(
-                xu.UgridDataset,
-                xu.snap_to_grid(row_df, grid=idomain, max_snap_distance=0.5),
-            )
-            snapped_dataset_row["line_index"] += index[0]  # Set to original line index.
-            snapped_dataset_rows.append(snapped_dataset_row)
-        snapped_dataset = xu.merge(snapped_dataset_rows)
-
-        edge_index = np.argwhere(
-            snapped_dataset[self._get_variable_name()].notnull().values
-        ).ravel()
-
-        return snapped_dataset, edge_index
+        return _snap_to_grid_and_aggregate(barrier_dataframe, grid2d, vardict_agg)
 
     @staticmethod
     def __remove_invalid_edges(

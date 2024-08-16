@@ -15,7 +15,8 @@ Fixed
 - Multiple ``HorizontalFlowBarrier`` objects attached to
   :class:`imod.mf6.GroundwaterFlowModel` are merged into a single horizontal
   flow barrier for MODFLOW 6
-
+- Bug where error would be thrown when barriers in a ``HorizontalFlowBarrier``
+  would be snapped to the same cell edge. These are now summed.
 
 Changed
 ~~~~~~~

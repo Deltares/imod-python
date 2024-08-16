@@ -23,7 +23,7 @@ unittests = { cmd = [
     "NUMBA_DISABLE_JIT=1",
     "pytest",
     "-n", "auto",
-    "-m", "not example",
+    "-m", "not example and not user_acceptance",
     "--cache-clear",
     "--verbose",
     "--junitxml=unittest_report.xml",
@@ -40,6 +40,15 @@ examples = { cmd = [
     "--cache-clear",
     "--verbose",
     "--junitxml=examples_report.xml",
+], depends_on = ["install"], cwd = "imod/tests" }
+# User acceptance tests, only works when paths to models are located on local
+# drive and are specified in a .env file.
+user_acceptance = { cmd = [
+    "pytest",
+    "-m", "user_acceptance",
+    "--cache-clear",
+    "--verbose",
+    "--junitxml=user_acceptance_report.xml",
 ], depends_on = ["install"], cwd = "imod/tests" }
 test_import = { cmd = [
     "python",
@@ -87,6 +96,7 @@ pytest = "<8"   # Newer version incompatible with pytest-cases
 pytest-benchmark = "*"
 pytest-cases = "*"
 pytest-cov = "*"
+pytest-dotenv = "*"
 pytest-xdist = "*"
 python = "3.11"
 python-graphviz = "*"
@@ -107,7 +117,7 @@ tqdm = "*"
 twine = "*"
 vtk = { version = ">=9.0", build = "*qt*", channel = "conda-forge" }
 xarray = ">=2023.08.0"
-xugrid = ">=0.10.0"
+xugrid = ">=0.11.0"
 zarr = "*"
 build = "*"
 

@@ -22,6 +22,7 @@ from imod.mf6.hfb import (
     _extract_mean_hfb_bounds_from_dataframe,
     _make_linestring_from_polygon,
     _prepare_barrier_dataset_for_mf6_adapter,
+    _snap_to_grid_and_aggregate,
     to_connected_cells_dataset,
 )
 from imod.mf6.ims import SolutionPresetSimple
@@ -695,6 +696,77 @@ def test_hfb_from_imod5(imod5_dataset, tmp_path):
         target_dis["idomain"], target_dis["top"], target_dis["bottom"], target_npf["k"]
     )
     assert list(np.unique(hfb_package["layer"].values)) == [7]
+
+
+@pytest.mark.usefixtures("structured_flow_model")
+def test_snap_to_grid_and_aggregate(structured_flow_model):
+    idomain = structured_flow_model["dis"]["idomain"]
+    grid2d = xu.Ugrid2d.from_structured(idomain)
+
+    barrier_y = [11.0, 5.0, -1.0]
+    barrier_x = [5.0, 5.0, 5.0]
+    line = linestrings(barrier_x, barrier_y)
+    layer = [1, 1, 1]
+
+    geometry_triple = gpd.GeoDataFrame(
+        geometry=[line, line, line],
+        data={
+            "resistance": [400.0, 400.0, 400.0],
+            "layer": layer,
+            "line_index": [0, 1, 2],
+        },
+    )
+    geometry_triple = geometry_triple.set_index("line_index")
+
+    vardict_agg = {"resistance": "sum", "layer": "first"}
+
+    snapped_dataset, edge_index = _snap_to_grid_and_aggregate(
+        geometry_triple, grid2d, vardict_agg
+    )
+
+    argwhere_summed_expected = np.array([7, 20, 33, 46, 59, 72], dtype=np.int64)
+    argwhere_summed_actual = np.nonzero((snapped_dataset["resistance"] == 1200).values)[
+        0
+    ]
+
+    np.testing.assert_array_equal(argwhere_summed_actual, argwhere_summed_expected)
+    np.testing.assert_array_equal(edge_index, argwhere_summed_expected)
+
+
+@pytest.mark.usefixtures("structured_flow_model")
+def test_combine_linestrings(structured_flow_model):
+    dis = structured_flow_model["dis"]
+    top, bottom, idomain = (
+        dis["top"],
+        dis["bottom"],
+        dis["idomain"],
+    )
+    k = xr.ones_like(idomain)
+
+    barrier_y = [11.0, 5.0, -1.0]
+    barrier_x = [5.0, 5.0, 5.0]
+    line = linestrings(barrier_x, barrier_y)
+
+    geometry_single = gpd.GeoDataFrame(
+        geometry=[line],
+        data={
+            "resistance": [1200.0],
+            "layer": [1],
+        },
+    )
+    geometry_triple = gpd.GeoDataFrame(
+        geometry=[line, line, line],
+        data={
+            "resistance": [400.0, 400.0, 400.0],
+            "layer": [1, 1, 1],
+        },
+    )
+    hfb_single = SingleLayerHorizontalFlowBarrierResistance(geometry_single)
+    hfb_triple = SingleLayerHorizontalFlowBarrierResistance(geometry_triple)
+    mf6_hfb_single = hfb_single.to_mf6_pkg(idomain, top, bottom, k)
+    mf6_hfb_triple = hfb_triple.to_mf6_pkg(idomain, top, bottom, k)
+
+    xr.testing.assert_equal(mf6_hfb_single.dataset, mf6_hfb_triple.dataset)
 
 
 @pytest.mark.usefixtures("structured_flow_model")
