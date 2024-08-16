@@ -440,6 +440,7 @@ class GridCache:
     Cache grids in this object for a specific function, lookup grids based on
     unique geometry hash.
     """
+
     def __init__(self, func: Callable, max_cache_size=5):
         self.max_cache_size = max_cache_size
         self.grid_cache: dict[int, GridDataArray] = {}
