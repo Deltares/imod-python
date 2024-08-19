@@ -365,7 +365,7 @@ def enforce_dim_order(grid: xu.UgridDataArray) -> xu.UgridDataArray:  # noqa: F8
     )
 
 
-def _enforce_uda_with_topology(
+def _as_ugrid_dataarray_with_topology(
     obj: GridDataArray, topology: xu.Ugrid2d
 ) -> xu.UgridDataArray:
     """Force obj and topology to ugrid dataarray"""
@@ -401,8 +401,8 @@ def preserve_gridtype(func: Callable[P, T]) -> Callable[P, T]:
         if unstructured:
             # Multiple grids returned
             if isinstance(x, tuple):
-                return tuple(_enforce_uda_with_topology(i, grid) for i in x)
-            return _enforce_uda_with_topology(x, grid)
+                return tuple(_as_ugrid_dataarray_with_topology(i, grid) for i in x)
+            return _as_ugrid_dataarray_with_topology(x, grid)
         return x
 
     return decorator
@@ -463,7 +463,7 @@ UGRID_FROM_STRUCTURED_CACHE = GridCache(xu.UgridDataArray.from_structured)
 
 
 @typedispatch
-def enforce_uda(grid: xr.DataArray) -> xu.UgridDataArray:
+def as_ugrid_dataarray(grid: xr.DataArray) -> xu.UgridDataArray:
     """
     Enforce GridDataArray to UgridDataArray, calls
     xu.UgridDataArray.from_structured, which is a costly operation. Therefore
@@ -473,11 +473,11 @@ def enforce_uda(grid: xr.DataArray) -> xu.UgridDataArray:
 
 
 @typedispatch  # type: ignore[no-redef]
-def enforce_uda(grid: xu.UgridDataArray) -> xu.UgridDataArray:  # noqa: F811
+def as_ugrid_dataarray(grid: xu.UgridDataArray) -> xu.UgridDataArray:  # noqa: F811
     """Enforce GridDataArray to UgridDataArray"""
     return grid
 
 
 @typedispatch  # type: ignore[no-redef]
-def enforce_uda(grid: object) -> xu.UgridDataArray:  # noqa: F811
+def as_ugrid_dataarray(grid: object) -> xu.UgridDataArray:  # noqa: F811
     raise TypeError(f"Function doesn't support type {type(grid)}")

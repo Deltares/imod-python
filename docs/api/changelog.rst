@@ -22,7 +22,8 @@ Fixed
 
 Changed
 ~~~~~~~
-- :class:`imod.mf6.Well` now also validates that well filter top is above well filter bottom
+- :class:`imod.mf6.Well` now also validates that well filter top is above well
+  filter bottom
 - :func:`open_projectfile_data` now also imports well filter top and bottom.
 - :class:`imod.mf6.Well` now logs a warning if any wells are removed during writing.
 - :class:`imod.mf6.HorizontalFlowBarrierResistance`,
@@ -33,19 +34,31 @@ Changed
   :func:`imod.prepare.linestring_to_square_zpolygons` and
   :func:`imod.prepare.linestring_to_trapezoid_zpolygons` to generate these
   polygons.
+- :func:`open_projectfile_data` now returns well data grouped by ipf name,
+  instead of generic, separate number per entry.
 
 Added
 ~~~~~
 
+- :meth:`imod.mf6.Modflow6Simulation.from_imod5_data` to import imod5 data
+  loaded with :func:`imod.formats.prj.open_projectfile_data` as a MODFLOW 6
+  simulation.
 - :func:`imod.prepare.linestring_to_square_zpolygons` and
-  :func:`imod.prepare.linestring_to_trapezoid_zpolygons` to generate
-  vertical polygons that can be used to specify horizontal flow barriers, specifically:
+  :func:`imod.prepare.linestring_to_trapezoid_zpolygons` to generate vertical
+  polygons that can be used to specify horizontal flow barriers, specifically:
   :class:`imod.mf6.HorizontalFlowBarrierResistance`,
   :class:`imod.mf6.HorizontalFlowBarrierMultiplier`,
   :class:`imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic`.
 - :class:`imod.mf6.LayeredWell` to specify wells directly to layers instead
   assigning them with filter depths.
 
+Removed
+~~~~~~~
+
+- :func:`imod.formats.prj.convert_to_disv` has been removed. This functionality
+  has been replaced by :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`. To
+  convert a structured simulation to an unstructured simulation, call:
+  :meth:`imod.mf6.Modflow6Simulation.regrid_like`
 
 [Unreleased]
 ------------

@@ -6,7 +6,7 @@ import pytest
 
 import imod
 
-ipf_header = textwrap.dedent(
+ipf_associated_header = textwrap.dedent(
     """\
     3
     18
@@ -31,6 +31,23 @@ ipf_header = textwrap.dedent(
     3,txt """
 )
 
+ipf_simple_header = textwrap.dedent(
+    """\
+    13
+    9
+    xcoord
+    ycoord
+    q_assigned
+    top
+    bot
+    col
+    row
+    lay
+    whichmodel
+    0,txt
+    """
+)
+
 
 def projectfile_string(tmp_path):
     return textwrap.dedent(
@@ -47,7 +64,7 @@ def projectfile_string(tmp_path):
 def ipf1_string_no_duplication():
     return textwrap.dedent(
         f"""\
-    {ipf_header}
+    {ipf_associated_header}
     191231.52,406381.47,timeseries_wel1,4.11,-1.69,01-PP001,0,B46D0517,"30-11-1981 00:00",13.41,13.41,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
     191171.96,406420.89,timeseries_wel1,3.78,-2.02,01-PP002,0,B46D0518,"30-11-1981 00:00",13.18,13.18,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
     191112.11,406460.02,timeseries_wel1,3.81,-1.99,01-PP003,0,B46D0519,"30-11-1981 00:00",13.21,13.21,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
@@ -58,7 +75,7 @@ def ipf1_string_no_duplication():
 def ipf1_string_duplication():
     return textwrap.dedent(
         f"""\
-    {ipf_header}
+    {ipf_associated_header}
     191231.52,406381.47,timeseries_wel1,4.11,-1.69,01-PP001,0,B46D0517,"30-11-1981 00:00",13.41,13.41,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
     191171.96,406420.89,timeseries_wel1,3.78,-2.02,01-PP002,0,B46D0518,"30-11-1981 00:00",13.18,13.18,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
     191231.52,406381.47,other_timeseries_wel1,4.11,-1.69,01-PP001,0,B46D0517,"30-11-1981 00:00",13.41,13.41,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
@@ -69,7 +86,7 @@ def ipf1_string_duplication():
 def ipf2_string():
     return textwrap.dedent(
         f"""\
-    {ipf_header}
+    {ipf_associated_header}
     191231.52,406381.47,timeseries_wel1,4.11,-1.69,01-PP001,0,B46D0517,"30-11-1981 00:00",13.41,13.41,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
     191171.96,406420.89,timeseries_wel1,3.78,-2.02,01-PP002,0,B46D0518,"30-11-1981 00:00",13.18,13.18,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
     191112.11,406460.02,timeseries_wel1,3.81,-1.99,01-PP003,0,B46D0519,"30-11-1981 00:00",13.21,13.21,nan,Inactive,Vertical,"Oxmeer","User1 - Zeeland Water","Oxmeer","Zeeland Water"
@@ -77,10 +94,32 @@ def ipf2_string():
     )
 
 
+def ipf_simple_string():
+    return textwrap.dedent(
+        f"""\
+    {ipf_simple_header}
+    276875.0,584375.0,-0.2,1.7,1.7,1107,162,1,4.0
+    276875.0,584125.0,-0.1,4.7,4.7,1107,163,1,4.0
+    276625.0,583875.0,-0.0,0.07,0.07,1106,164,1,4.0
+    276875.0,583625.0,-0.1,-0.26,-0.26,1107,165,1,4.0
+    276875.0,583375.0,-0.4,-2.65,-2.65,1107,166,1,4.0
+    276875.0,583125.0,-0.1,3.1,3.1,1107,167,1,4.0
+    277125.0,582875.0,-0.9,-0.45,-0.45,1108,168,1,4.0
+    277125.0,582625.0,-0.6,-2.65,-2.65,1108,169,1,4.0
+    277125.0,582375.0,-0.3,-2.65,-2.65,1108,170,1,4.0
+    277125.0,582125.0,-0.2,-2.65,-2.65,1108,171,1,4.0
+    277125.0,581875.0,-0.2,-2.65,-2.65,1108,172,1,4.0
+    277125.0,581625.0,-0.3,2.54,2.54,1108,173,1,4.0
+    277125.0,581375.0,0.2,1.6,1.6,1108,174,1,4.0
+    277125.0,581125.0,0.5,0.6,0.6,1108,175,1,4.0
+    """
+    )
+
+
 def timeseries_string():
     return textwrap.dedent(
         """\
-    374
+    6
     2
     DATE,-9999.0
     MEASUREMENT,-9999.0
@@ -97,7 +136,7 @@ def timeseries_string():
 def other_timeseries_string():
     return textwrap.dedent(
         """\
-    374
+    6
     2
     DATE,-9999.0
     MEASUREMENT,-9999.0
@@ -111,7 +150,7 @@ def other_timeseries_string():
     )
 
 
-def write_files(
+def write_ipf_assoc_files(
     projectfile_str,
     ipf1_str,
     ipf2_str,
@@ -138,6 +177,28 @@ def write_files(
     return Path(tmp_path) / "projectfile.prj"
 
 
+def write_ipf_mixed_files(
+    ipf_assoc_str, ipf_simple_str, timeseries_wel1_str, other_timeseries_str, tmp_path
+):
+    file_dict = {
+        "associated.ipf": ipf_assoc_str,
+        "simple1.ipf": ipf_simple_str,
+        "simple2.ipf": ipf_simple_str,
+        "simple3.ipf": ipf_simple_str,
+        "timeseries_wel1.txt": timeseries_wel1_str,
+        "other_timeseries_wel1.txt": other_timeseries_str,
+    }
+
+    paths = []
+    for file, string in file_dict.items():
+        path = Path(tmp_path) / file
+        paths.append(path)
+        with open(path, "w") as f:
+            f.write(string)
+
+    return paths
+
+
 @pytest.fixture(scope="session")
 def well_regular_import_prj():
     tmp_path = imod.util.temporary_directory()
@@ -148,7 +209,7 @@ def well_regular_import_prj():
     ipf2_str = ipf2_string()
     timeseries_well_str = timeseries_string()
 
-    return write_files(
+    return write_ipf_assoc_files(
         projectfile_str, ipf1_str, ipf2_str, timeseries_well_str, tmp_path
     )
 
@@ -163,11 +224,30 @@ def well_duplication_import_prj():
     ipf2_str = ipf2_string()
     timeseries_well_str = timeseries_string()
     other_timeseries_well_str = other_timeseries_string()
-    return write_files(
+    return write_ipf_assoc_files(
         projectfile_str,
         ipf1_str,
         ipf2_str,
         timeseries_well_str,
         tmp_path,
         other_timeseries_well_str,
+    )
+
+
+@pytest.fixture(scope="session")
+def well_mixed_ipfs():
+    tmp_path = imod.util.temporary_directory()
+    os.makedirs(tmp_path)
+
+    ipf_assoc_str = ipf1_string_duplication()
+    ipf_simple_str = ipf_simple_string()
+    timeseries_well_str = timeseries_string()
+    other_timeseries_well_str = other_timeseries_string()
+
+    return write_ipf_mixed_files(
+        ipf_assoc_str,
+        ipf_simple_str,
+        timeseries_well_str,
+        other_timeseries_well_str,
+        tmp_path,
     )

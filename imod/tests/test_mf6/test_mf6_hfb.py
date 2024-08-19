@@ -22,6 +22,7 @@ from imod.mf6.hfb import (
     _extract_mean_hfb_bounds_from_dataframe,
     _make_linestring_from_polygon,
     _prepare_barrier_dataset_for_mf6_adapter,
+    _snap_to_grid_and_aggregate,
     to_connected_cells_dataset,
 )
 from imod.mf6.ims import SolutionPresetSimple
