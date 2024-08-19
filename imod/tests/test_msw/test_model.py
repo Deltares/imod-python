@@ -4,7 +4,8 @@ import pytest
 from numpy.testing import assert_almost_equal, assert_equal
 
 from imod import msw
-
+import xarray as xr 
+from imod.mf6.utilities.regrid import RegridderWeightsCache
 
 def test_msw_model_write(msw_model, tmp_path):
     output_dir = tmp_path / "metaswap"
@@ -78,3 +79,20 @@ def test_render_unsat_database_path(msw_model, tmp_path):
     assert abs_path[-1] == '"'
 
     assert Path(abs_path.replace('"', "")).is_absolute()
+
+
+def test_model_regrid(msw_model):
+    x = [1.0, 1.5, 2.0, 2.5, 3.0]
+    y = [3.0, 2.5, 2.0, 1.5, 1.0]
+    subunit = [0, 1]
+    dx = 0.5
+    dy = 0.5
+    # fmt: off
+    new_grid = xr.DataArray(
+        dims=("subunit", "y", "x"),
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
+    )
+
+    regrid_context = RegridderWeightsCache()
+
+    msw_model.regrid_like(new_grid,  True, regrid_context)

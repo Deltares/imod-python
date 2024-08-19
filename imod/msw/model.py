@@ -1,8 +1,11 @@
 import collections
 from copy import copy
 from pathlib import Path
-from typing import Union
+from typing import Optional, Tuple, Union
 
+from imod.mf6.utilities.regrid import RegridderWeightsCache
+from imod.typing import GridDataArray
+from imod.util.regrid_method_type import RegridderType
 import jinja2
 import numpy as np
 
@@ -242,3 +245,30 @@ class MetaSwapModel(Model):
         # write package contents
         for pkgname in self:
             self[pkgname].write(directory, index, svat)
+
+
+    def regrid_like(
+        self,
+        target_grid: GridDataArray,
+        validate: bool = True,
+        regrid_context: Optional[RegridderWeightsCache] = None,
+        regridder_types: Optional[dict[str, Tuple[RegridderType, str]]] = None,
+    ) -> "MetaSwapModel":            
+        
+        unsat_database = self.simulation_settings["unsa_svat_path"]
+        regridded_model = MetaSwapModel(unsat_database)
+
+        for pkgname in self:
+            msw_package = self[pkgname]
+            if msw_package.is_regridding_supported():
+                regridded_package = msw_package.regrid_like(target_grid, regrid_context, regridder_types)
+            else:
+                # create new instance'
+                pass
+            regridded_model[pkgname] =msw_package
+
+        if validate:
+            for pkgname in self:
+                msw_package = self[pkgname]
+                msw_package.validate()
+
