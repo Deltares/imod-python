@@ -495,14 +495,15 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
     simulation["imported_model"]["oc"] = OutputControl(
         save_head="last", save_budget="last"
     )
-
     simulation.create_time_discretization(["01-01-2003", "02-01-2003"])
-
+    # Cleanup
     # Remove HFB packages outside domain
     # TODO: Build in support for hfb packages outside domain
     for hfb_outside in ["hfb-24", "hfb-26"]:
         simulation["imported_model"].pop(hfb_outside)
-
+    # Align NoData to domain
+    idomain = simulation["imported_model"].domain
+    simulation.mask_all_models(idomain)
     # write and validate the simulation.
     simulation.write(tmp_path, binary=False, validate=True)
 
@@ -558,18 +559,18 @@ def test_import_from_imod5__nonstandard_regridding(imod5_dataset, tmp_path):
         times,
         regridding_option,
     )
-
     simulation["imported_model"]["oc"] = OutputControl(
         save_head="last", save_budget="last"
     )
-
     simulation.create_time_discretization(["01-01-2003", "02-01-2003"])
-
+    # Cleanup
     # Remove HFB packages outside domain
     # TODO: Build in support for hfb packages outside domain
     for hfb_outside in ["hfb-24", "hfb-26"]:
         simulation["imported_model"].pop(hfb_outside)
-
+    # Align NoData to domain
+    idomain = simulation["imported_model"].domain
+    simulation.mask_all_models(idomain)
     # write and validate the simulation.
     simulation.write(tmp_path, binary=False, validate=True)
 
@@ -594,23 +595,22 @@ def test_import_from_imod5_no_storage_no_recharge(imod5_dataset, tmp_path):
         default_simulation_distributing_options,
         times,
     )
-
     simulation["imported_model"]["oc"] = OutputControl(
         save_head="last", save_budget="last"
     )
-
     simulation.create_time_discretization(["01-01-2003", "02-01-2003"])
-
+    # Cleanup
     # Remove HFB packages outside domain
     # TODO: Build in support for hfb packages outside domain
     for hfb_outside in ["hfb-24", "hfb-26"]:
         simulation["imported_model"].pop(hfb_outside)
-
     # check storage is present and rch is absent
     assert not simulation["imported_model"]["sto"].dataset["transient"].values[()]
     package_keys = simulation["imported_model"].keys()
     for key in package_keys:
         assert key[0:3] != "rch"
-
+    # Align NoData to domain
+    idomain = simulation["imported_model"].domain
+    simulation.mask_all_models(idomain)
     # write and validate the simulation.
     simulation.write(tmp_path, binary=False, validate=True)
