@@ -476,6 +476,7 @@ def compare_submodel_partition_info(first: PartitionInfo, second: PartitionInfo)
     )
 
 
+@pytest.mark.unittest_jit
 @pytest.mark.usefixtures("imod5_dataset")
 def test_import_from_imod5(imod5_dataset, tmp_path):
     imod5_data = imod5_dataset[0]
@@ -508,6 +509,7 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
     simulation.write(tmp_path, binary=False, validate=True)
 
 
+@pytest.mark.unittest_jit
 @pytest.mark.usefixtures("imod5_dataset")
 def test_import_from_imod5__correct_well_type(imod5_dataset):
     # Unpack
@@ -538,6 +540,7 @@ def test_import_from_imod5__correct_well_type(imod5_dataset):
     assert isinstance(simulation["imported_model"]["wel-WELLS_L5"], LayeredWell)
 
 
+@pytest.mark.unittest_jit
 @pytest.mark.usefixtures("imod5_dataset")
 def test_import_from_imod5__nonstandard_regridding(imod5_dataset, tmp_path):
     imod5_data = imod5_dataset[0]
@@ -575,6 +578,7 @@ def test_import_from_imod5__nonstandard_regridding(imod5_dataset, tmp_path):
     simulation.write(tmp_path, binary=False, validate=True)
 
 
+@pytest.mark.unittest_jit
 @pytest.mark.usefixtures("imod5_dataset")
 def test_import_from_imod5_no_storage_no_recharge(imod5_dataset, tmp_path):
     # this test imports an imod5 simulation, but it has no recharge and no storage package.

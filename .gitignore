@@ -141,5 +141,4 @@ examples/data
 .pixi
 
 /imod/tests/mydask.png
-/imod/tests/unittest_report.xml
-/imod/tests/examples_report.xml
+/imod/tests/*_report.xml

@@ -238,6 +238,7 @@ def test_from_imod5_shd(imod5_dataset, tmp_path):
     chd_shd.write("chd_shd", [1], write_context)
 
 
+@pytest.mark.unittest_jit
 @pytest.mark.parametrize("remove_merged_packages", [True, False])
 @pytest.mark.usefixtures("imod5_dataset")
 def test_concatenate_chd(imod5_dataset, tmp_path, remove_merged_packages):
