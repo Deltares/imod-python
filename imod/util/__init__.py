@@ -16,6 +16,7 @@ from imod.util.spatial import (
     empty_3d,
     empty_3d_transient,
     from_mdal_compliant_ugrid2d,
+    get_cell_area,
     mdal_compliant_ugrid2d,
     spatial_reference,
     to_ugrid2d,
