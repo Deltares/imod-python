@@ -459,7 +459,7 @@ class GridCache:
         self.grid_cache.pop(keys[0])
 
 
-UGRID_FROM_STRUCTURED_CACHE = GridCache(xu.UgridDataArray.from_structured)
+UGRID2D_FROM_STRUCTURED_CACHE = GridCache(xu.Ugrid2d.from_structured)
 
 
 @typedispatch
@@ -469,7 +469,21 @@ def as_ugrid_dataarray(grid: xr.DataArray) -> xu.UgridDataArray:
     xu.UgridDataArray.from_structured, which is a costly operation. Therefore
     cache results.
     """
-    return UGRID_FROM_STRUCTURED_CACHE.get_grid(grid)
+
+    topology = UGRID2D_FROM_STRUCTURED_CACHE.get_grid(grid)
+
+    # Copied from:
+    # https://github.com/Deltares/xugrid/blob/3dee693763da1c4c0859a4f53ac38d4b99613a33/xugrid/core/wrap.py#L236
+    # Note that "da" is renamed to "grid" and "grid" to "topology"
+    dims = grid.dims[:-2]
+    coords = {k: grid.coords[k] for k in dims}
+    face_da = xr.DataArray(
+        grid.data.reshape(*grid.shape[:-2], -1),
+        coords=coords,
+        dims=[*dims, topology.face_dimension],
+        name=grid.name,
+    )
+    return xu.UgridDataArray(face_da, topology)
 
 
 @typedispatch  # type: ignore[no-redef]
