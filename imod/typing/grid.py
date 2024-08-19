@@ -457,7 +457,7 @@ class GridCache:
     def remove_first(self):
         keys = list(self.grid_cache.keys())
         self.grid_cache.pop(keys[0])
-    
+
     def clear(self):
         self.grid_cache: dict[int, GridDataArray] = {}
 
