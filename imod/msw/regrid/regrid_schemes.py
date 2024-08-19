@@ -173,3 +173,13 @@ class ScalingRegridMethod(RegridMethodType):
     scale_hydraulic_conductivity: _RegridVarType = (RegridderType.OVERLAP, "mean")
     scale_pressure_head: _RegridVarType = (RegridderType.OVERLAP, "mean")
     depth_perched_water_table: _RegridVarType = (RegridderType.OVERLAP, "mean")
+
+
+@dataclass(config=_CONFIG)
+class IdfMappingRegridMethod(RegridMethodType):
+    """
+    Object containing regridder methods for the
+    :class:`imod.msw.IdfMapping` package. This can be provided to the
+    ``regrid_like`` method to regrid with custom settings.
+    """
+    area: _RegridVarType = (RegridderType.RELATIVEOVERLAP, "conductance")    

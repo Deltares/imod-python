@@ -265,10 +265,6 @@ class MetaSwapModel(Model):
             else:
                 # create new instance'
                 pass
-            regridded_model[pkgname] =msw_package
-
-        if validate:
-            for pkgname in self:
-                msw_package = self[pkgname]
-                msw_package.validate()
+            regridded_model[pkgname] =regridded_package
+        return regridded_model
 

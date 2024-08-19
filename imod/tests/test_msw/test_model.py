@@ -94,5 +94,6 @@ def test_model_regrid(msw_model):
     )
 
     regrid_context = RegridderWeightsCache()
-
+    msw_model.pop("sprinkling")
+    msw_model.pop("mod2svat")
     msw_model.regrid_like(new_grid,  True, regrid_context)
