@@ -449,7 +449,7 @@ class GridCache:
     def get_grid(self, grid: GridDataArray):
         hash = get_grid_geometry_hash(grid)
         if hash not in self.grid_cache.keys():
-            if len(self.grid_cache.keys()) > self.max_cache_size:
+            if len(self.grid_cache.keys()) >= self.max_cache_size:
                 self.remove_first()
             self.grid_cache[hash] = self.func(grid)
         return self.grid_cache[hash]
@@ -457,6 +457,9 @@ class GridCache:
     def remove_first(self):
         keys = list(self.grid_cache.keys())
         self.grid_cache.pop(keys[0])
+    
+    def clear(self):
+        self.grid_cache: dict[int, GridDataArray] = {}
 
 
 UGRID2D_FROM_STRUCTURED_CACHE = GridCache(xu.Ugrid2d.from_structured)
