@@ -447,12 +447,12 @@ class GridCache:
         self.func = func
 
     def get_grid(self, grid: GridDataArray):
-        hash = get_grid_geometry_hash(grid)
-        if hash not in self.grid_cache.keys():
+        geom_hash = get_grid_geometry_hash(grid)
+        if geom_hash not in self.grid_cache.keys():
             if len(self.grid_cache.keys()) >= self.max_cache_size:
                 self.remove_first()
-            self.grid_cache[hash] = self.func(grid)
-        return self.grid_cache[hash]
+            self.grid_cache[geom_hash] = self.func(grid)
+        return self.grid_cache[geom_hash]
 
     def remove_first(self):
         keys = list(self.grid_cache.keys())

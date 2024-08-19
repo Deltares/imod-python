@@ -154,14 +154,14 @@ def test_merge_dictionary__unstructured(basic_unstructured_dis):
 def test_as_ugrid_dataarray__structured(basic_dis):
     # Arrange
     ibound, top, bottom = basic_dis
-    top_3D = top * ibound
-    bottom_3D = bottom * ibound
+    top_3d = top * ibound
+    bottom_3d = bottom * ibound
     # Clear cache
     UGRID2D_FROM_STRUCTURED_CACHE.clear()
     # Act
     ibound_disv = as_ugrid_dataarray(ibound)
-    top_disv = as_ugrid_dataarray(top_3D)
-    bottom_disv = as_ugrid_dataarray(bottom_3D)
+    top_disv = as_ugrid_dataarray(top_3d)
+    bottom_disv = as_ugrid_dataarray(bottom_3d)
     # Assert
     # Test types
     assert isinstance(ibound_disv, xu.UgridDataArray)
@@ -180,14 +180,14 @@ def test_as_ugrid_dataarray__structured(basic_dis):
 def test_as_ugrid_dataarray__unstructured(basic_unstructured_dis):
     # Arrange
     ibound, top, bottom = basic_unstructured_dis
-    top_3D = enforce_dim_order(ibound * top)
-    bottom_3D = enforce_dim_order(ibound * bottom)
+    top_3d = enforce_dim_order(ibound * top)
+    bottom_3d = enforce_dim_order(ibound * bottom)
     # Clear cache
     UGRID2D_FROM_STRUCTURED_CACHE.clear()
     # Act
     ibound_disv = as_ugrid_dataarray(ibound)
-    top_disv = as_ugrid_dataarray(top_3D)
-    bottom_disv = as_ugrid_dataarray(bottom_3D)
+    top_disv = as_ugrid_dataarray(top_3d)
+    bottom_disv = as_ugrid_dataarray(bottom_3d)
     # Assert
     # Test types
     assert isinstance(ibound_disv, xu.UgridDataArray)
