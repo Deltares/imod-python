@@ -3,12 +3,11 @@ from copy import copy
 from pathlib import Path
 from typing import Optional, Tuple, Union
 
-from imod.mf6.utilities.regrid import RegridderWeightsCache
-from imod.typing import GridDataArray
-from imod.util.regrid_method_type import RegridderType
 import jinja2
 import numpy as np
 
+from imod import mf6
+from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.msw.coupler_mapping import CouplerMapping
 from imod.msw.grid_data import GridData
 from imod.msw.idf_mapping import IdfMapping
@@ -25,6 +24,7 @@ from imod.msw.meteo_mapping import EvapotranspirationMapping, PrecipitationMappi
 from imod.msw.output_control import TimeOutputControl
 from imod.msw.timeutil import to_metaswap_timeformat
 from imod.msw.vegetation import AnnualCropFactors
+from imod.util.regrid_method_type import RegridderType
 
 REQUIRED_PACKAGES = (
     GridData,
@@ -246,25 +246,34 @@ class MetaSwapModel(Model):
         for pkgname in self:
             self[pkgname].write(directory, index, svat)
 
-
     def regrid_like(
         self,
-        target_grid: GridDataArray,
+        mf6_regridded_dis: mf6.StructuredDiscretization,
         validate: bool = True,
         regrid_context: Optional[RegridderWeightsCache] = None,
         regridder_types: Optional[dict[str, Tuple[RegridderType, str]]] = None,
-    ) -> "MetaSwapModel":            
-        
+    ) -> "MetaSwapModel":
         unsat_database = self.simulation_settings["unsa_svat_path"]
         regridded_model = MetaSwapModel(unsat_database)
+
+        target_grid = mf6_regridded_dis["idomain"]
+
+        mod2svat = self.pop("mod2svat", None)
+        grid = self.pop("grid", None)
+        new_grid = grid.regrid_like(target_grid, regrid_context, regridder_types)
 
         for pkgname in self:
             msw_package = self[pkgname]
             if msw_package.is_regridding_supported():
-                regridded_package = msw_package.regrid_like(target_grid, regrid_context, regridder_types)
+                regridded_package = msw_package.regrid_like(
+                    target_grid, regrid_context, regridder_types
+                )
+
             else:
                 # create new instance'
                 pass
-            regridded_model[pkgname] =regridded_package
+            regridded_model[pkgname] = regridded_package
+        if mod2svat is not None:
+            regridded_model["mod2svat"] = CouplerMapping(mf6_regridded_dis.dataset)
+        regridded_model["grid"] = new_grid
         return regridded_model
-

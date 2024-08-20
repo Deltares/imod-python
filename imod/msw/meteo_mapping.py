@@ -1,5 +1,6 @@
 from copy import deepcopy
-from typing import Optional, Tuple
+from typing import Optional
+
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -9,7 +10,7 @@ from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.prepare import common
 from imod.typing import GridDataArray
-from imod.util.regrid_method_type import RegridderType
+from imod.util.regrid_method_type import RegridMethodType
 
 
 class MeteoMapping(MetaSwapPackage):
@@ -75,14 +76,13 @@ class MeteoMapping(MetaSwapPackage):
         n_subunit = svat["subunit"].size
 
         return np.tile(row, n_subunit), np.tile(column, n_subunit)
-    
+
     def regrid_like(
         self,
         target_grid: GridDataArray,
         regrid_context: RegridderWeightsCache,
-        regridder_types: Optional[dict[str, Tuple[RegridderType, str]]] = None,
-    ) :
-
+        regridder_types: Optional[RegridMethodType] = None,
+    ):
         return deepcopy(self)
 
 

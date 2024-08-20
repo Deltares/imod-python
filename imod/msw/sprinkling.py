@@ -94,3 +94,6 @@ class Sprinkling(MetaSwapPackage):
         self._check_range(dataframe)
 
         return self.write_dataframe_fixed_width(file, dataframe)
+
+    def is_regridding_supported(self) -> bool:
+        return False

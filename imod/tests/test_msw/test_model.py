@@ -1,11 +1,12 @@
 from pathlib import Path
 
 import pytest
+import xarray as xr
 from numpy.testing import assert_almost_equal, assert_equal
 
-from imod import msw
-import xarray as xr 
+from imod import mf6, msw
 from imod.mf6.utilities.regrid import RegridderWeightsCache
+
 
 def test_msw_model_write(msw_model, tmp_path):
     output_dir = tmp_path / "metaswap"
@@ -81,19 +82,32 @@ def test_render_unsat_database_path(msw_model, tmp_path):
     assert Path(abs_path.replace('"', "")).is_absolute()
 
 
-def test_model_regrid(msw_model):
+def get_target_mf6_discretization():
     x = [1.0, 1.5, 2.0, 2.5, 3.0]
     y = [3.0, 2.5, 2.0, 1.5, 1.0]
-    subunit = [0, 1]
     dx = 0.5
-    dy = 0.5
-    # fmt: off
-    new_grid = xr.DataArray(
-        dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
+    dy = -0.5
+    layer = [1, 2, 3]
+
+    idomain = xr.DataArray(
+        1,
+        dims=("layer", "y", "x"),
+        coords={"layer": layer, "y": y, "x": x, "dx": dx, "dy": dy},
     )
 
-    regrid_context = RegridderWeightsCache()
+    top = 0.0
+    bottom = xr.DataArray([-1.0, -21.0, -321.0], coords={"layer": layer}, dims="layer")
+
+    dis = mf6.StructuredDiscretization(top=top, bottom=bottom, idomain=idomain)
+    return dis
+
+
+def test_model_regrid(msw_model, tmp_path):
+    # sprinkling not supported yet for regridding
     msw_model.pop("sprinkling")
-    msw_model.pop("mod2svat")
-    msw_model.regrid_like(new_grid,  True, regrid_context)
+
+    mf6_discretization = get_target_mf6_discretization()
+
+    regrid_context = RegridderWeightsCache()
+    regridded_model = msw_model.regrid_like(mf6_discretization, True, regrid_context)
+    regridded_model.write(tmp_path)

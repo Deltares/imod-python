@@ -182,4 +182,5 @@ class IdfMappingRegridMethod(RegridMethodType):
     :class:`imod.msw.IdfMapping` package. This can be provided to the
     ``regrid_like`` method to regrid with custom settings.
     """
-    area: _RegridVarType = (RegridderType.RELATIVEOVERLAP, "conductance")    
+
+    area: _RegridVarType = (RegridderType.RELATIVEOVERLAP, "conductance")
