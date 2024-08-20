@@ -459,7 +459,7 @@ class GridCache:
         self.grid_cache.pop(keys[0])
 
     def clear(self):
-        self.grid_cache: dict[int, GridDataArray] = {}
+        self.grid_cache = {}
 
 
 UGRID2D_FROM_STRUCTURED_CACHE = GridCache(xu.Ugrid2d.from_structured)
