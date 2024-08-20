@@ -95,10 +95,14 @@ class IdfMapping(MetaSwapPackage, IRegridPackage):
         regrid_context: RegridderWeightsCache,
         regridder_types: Optional[RegridMethodType] = None,
     ) -> "MetaSwapPackage":
+
         if regridder_types is None:
             regridder_types = self._regrid_method
 
         assert regridder_types is not None
+        assert isinstance(regridder_types, IdfMappingRegridMethod)
+        assert len( regridder_types.area) > 1
+
 
         nodata = self.dataset["nodata"].values[()]
         regridded_area = _regrid_array(

@@ -141,7 +141,7 @@ def _regrid_array(
     package: IRegridPackage,
     varname: str,
     regridder_collection: RegridderWeightsCache,
-    regridder_name: str,
+    regridder_name: RegridderType,
     regridder_function: str,
     target_grid: GridDataArray,
 ) -> Optional[GridDataArray]:

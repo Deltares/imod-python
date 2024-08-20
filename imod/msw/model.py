@@ -274,6 +274,6 @@ class MetaSwapModel(Model):
                 pass
             regridded_model[pkgname] = regridded_package
         if mod2svat is not None:
-            regridded_model["mod2svat"] = CouplerMapping(mf6_regridded_dis.dataset)
+            regridded_model["mod2svat"] = CouplerMapping(mf6_regridded_dis)
         regridded_model["grid"] = new_grid
         return regridded_model
