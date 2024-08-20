@@ -304,9 +304,6 @@ def _handle_dtype(dtype, nodata):
             str_dtype, ", ".join(str_dtypes)
         )
 
-    if dtype is np.dtype(np.int64):
-        dtype = np.int32
-
     str_dtype = str(np.dtype(dtype))
     if str_dtype not in dtype_mapping.keys():
         raise ValueError(format_invalid(str_dtype))
