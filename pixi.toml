@@ -63,6 +63,7 @@ contextily = ">=1"
 cytoolz = "*"
 dask = "<2024.1.0" # Newer version incompatible with rasterio
 fastcore = "*"
+filelock = "*"
 flopy = "*"
 geopandas = "*"
 gh = "*"

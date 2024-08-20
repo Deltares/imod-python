@@ -12,6 +12,7 @@ import pandas as pd
 import pooch
 import xarray as xr
 import xugrid as xu
+from filelock import FileLock
 
 from imod.formats.prj import open_projectfile_data
 from imod.mf6 import Modflow6Simulation
@@ -56,8 +57,10 @@ def hondsrug_initial() -> xr.Dataset:
 
 
 def hondsrug_layermodel() -> xr.Dataset:
-    fname = REGISTRY.fetch("hondsrug-layermodel.nc")
-    return xr.open_dataset(fname)
+    lock = FileLock(REGISTRY.path / "hondsrug-layermodel.nc.lock")
+    with lock:
+        fname = REGISTRY.fetch("hondsrug-layermodel.nc")
+        return xr.open_dataset(fname)
 
 
 def hondsrug_meteorology() -> xr.Dataset:
@@ -150,8 +153,7 @@ def hondsrug_layermodel_topsystem() -> xr.Dataset:
     taken and subdivided into n_new layers. This makes for more layers around
     the topsystem.
     """
-    fname = REGISTRY.fetch("hondsrug-layermodel.nc")
-    layer_model = xr.open_dataset(fname)
+    layer_model = hondsrug_layermodel()
     # Make layer model more interesting for this example by subdividing layers
     # into n_new layers.
     n_new = 4
@@ -192,11 +194,11 @@ def hondsrug_planar_river() -> xr.Dataset:
        most of the time laying at bottom elevation, making for boring examples.
 
     """
-    fname = REGISTRY.fetch("hondsrug-river.nc")
-    planar_river = xr.open_dataset(fname).max(dim="layer")
+    river = hondsrug_river()
+    planar_river = river.max(dim="layer")
 
-    fname = REGISTRY.fetch("hondsrug-layermodel.nc")
-    top = xr.open_dataset(fname)["top"].sel(layer=1)
+    layer_model = hondsrug_layermodel()
+    top = layer_model["top"].sel(layer=1)
 
     planar_river["stage"] = (top - planar_river["stage"]) / 2 + planar_river["stage"]
 
