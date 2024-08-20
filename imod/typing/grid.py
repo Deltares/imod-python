@@ -435,10 +435,58 @@ def is_transient_data_grid(
     return False
 
 
+class GridCache:
+    """
+    Cache grids in this object for a specific function, lookup grids based on
+    unique geometry hash.
+    """
+
+    def __init__(self, func: Callable, max_cache_size=5):
+        self.max_cache_size = max_cache_size
+        self.grid_cache: dict[int, GridDataArray] = {}
+        self.func = func
+
+    def get_grid(self, grid: GridDataArray):
+        geom_hash = get_grid_geometry_hash(grid)
+        if geom_hash not in self.grid_cache.keys():
+            if len(self.grid_cache.keys()) >= self.max_cache_size:
+                self.remove_first()
+            self.grid_cache[geom_hash] = self.func(grid)
+        return self.grid_cache[geom_hash]
+
+    def remove_first(self):
+        keys = list(self.grid_cache.keys())
+        self.grid_cache.pop(keys[0])
+
+    def clear(self):
+        self.grid_cache = {}
+
+
+UGRID2D_FROM_STRUCTURED_CACHE = GridCache(xu.Ugrid2d.from_structured)
+
+
 @typedispatch
 def as_ugrid_dataarray(grid: xr.DataArray) -> xu.UgridDataArray:
-    """Enforce GridDataArray to UgridDataArray"""
-    return xu.UgridDataArray.from_structured(grid)
+    """
+    Enforce GridDataArray to UgridDataArray, calls
+    xu.UgridDataArray.from_structured, which is a costly operation. Therefore
+    cache results.
+    """
+
+    topology = UGRID2D_FROM_STRUCTURED_CACHE.get_grid(grid)
+
+    # Copied from:
+    # https://github.com/Deltares/xugrid/blob/3dee693763da1c4c0859a4f53ac38d4b99613a33/xugrid/core/wrap.py#L236
+    # Note that "da" is renamed to "grid" and "grid" to "topology"
+    dims = grid.dims[:-2]
+    coords = {k: grid.coords[k] for k in dims}
+    face_da = xr.DataArray(
+        grid.data.reshape(*grid.shape[:-2], -1),
+        coords=coords,
+        dims=[*dims, topology.face_dimension],
+        name=grid.name,
+    )
+    return xu.UgridDataArray(face_da, topology)
 
 
 @typedispatch  # type: ignore[no-redef]

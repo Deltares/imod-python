@@ -19,11 +19,12 @@ install_with_deps = "python -m pip install --editable ."
 format = "ruff check --fix .; ruff format ."
 lint = "ruff check . ; ruff format --check ."
 tests = { depends_on = ["unittests", "examples"] }
-unittests = { cmd = [
+unittests = { depends_on = ["unittests_njit", "unittests_jit"] }
+unittests_njit = { cmd = [
     "NUMBA_DISABLE_JIT=1",
     "pytest",
     "-n", "auto",
-    "-m", "not example and not user_acceptance",
+    "-m", "not example and not user_acceptance and not unittest_jit",
     "--cache-clear",
     "--verbose",
     "--junitxml=unittest_report.xml",
@@ -31,6 +32,14 @@ unittests = { cmd = [
     "--cov-report=term",
     "--cov-report=html:coverage",
     "--cov-config=.coveragerc"
+], depends_on = ["install"], cwd = "imod/tests" }
+unittests_jit = { cmd = [
+    "pytest",
+    "-n", "auto",
+    "-m", "unittest_jit",
+    "--cache-clear",
+    "--verbose",
+    "--junitxml=unittest_jit_report.xml",
 ], depends_on = ["install"], cwd = "imod/tests" }
 examples = { cmd = [
     "NUMBA_DISABLE_JIT=1",

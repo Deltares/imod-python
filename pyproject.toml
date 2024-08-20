@@ -158,6 +158,7 @@ ignore_missing_imports = true
 markers = [
     "example: marks test as example (deselect with '-m \"not example\"')",
     "user_acceptance: marks user acceptance tests (deselect with '-m \"not user_acceptance\"')",
+    "unittest_jit: marks unit tests that should be jitted (deselect with '-m \"not unittest_jit\"')"
 ]
 
 [tool.hatch.version]
