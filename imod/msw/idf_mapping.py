@@ -1,3 +1,4 @@
+from dataclasses import asdict
 from typing import Optional
 
 import numpy as np
@@ -95,22 +96,18 @@ class IdfMapping(MetaSwapPackage, IRegridPackage):
         regrid_context: RegridderWeightsCache,
         regridder_types: Optional[RegridMethodType] = None,
     ) -> "MetaSwapPackage":
-
         if regridder_types is None:
-            regridder_types = self._regrid_method
-
-        assert regridder_types is not None
-        assert isinstance(regridder_types, IdfMappingRegridMethod)
-        assert len( regridder_types.area) > 1
-
+            regridder_settings = asdict(self.get_regrid_methods(), dict_factory=dict)
+        else:
+            regridder_settings = asdict(regridder_types, dict_factory=dict)
 
         nodata = self.dataset["nodata"].values[()]
         regridded_area = _regrid_array(
             self,
             "area",
             regrid_context,
-            regridder_types.area[0],
-            regridder_types.area[1],
+            regridder_settings["area"][0],
+            regridder_settings["area"][1],
             target_grid,
         )
 
