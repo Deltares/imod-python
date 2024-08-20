@@ -143,7 +143,10 @@ def test_handle_dtype():
     assert imod.prepare.spatial._handle_dtype(np.float32, None) == (6, np.nan)
     assert imod.prepare.spatial._handle_dtype(np.float64, None) == (7, np.nan)
     assert imod.prepare.spatial._handle_dtype(np.uint64, None) == (12, 0)
-    assert imod.prepare.spatial._handle_dtype(np.int64, None) == (13, -9223372036854775808)
+    assert imod.prepare.spatial._handle_dtype(np.int64, None) == (
+        13,
+        -9223372036854775808,
+    )
 
     with pytest.raises(ValueError):  # out of bounds
         imod.prepare.spatial._handle_dtype(np.uint32, -1)

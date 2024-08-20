@@ -237,7 +237,9 @@ def split_transient_twri_model(transient_twri_model):
     active = transient_twri_model["GWF_1"].domain.sel(layer=1)
 
     number_partitions = 3
-    split_location = np.linspace(active.y.min().item(), active.y.max().item(), number_partitions + 1)
+    split_location = np.linspace(
+        active.y.min().item(), active.y.max().item(), number_partitions + 1
+    )
 
     coords = active.coords
     submodel_labels = zeros_like(active)
