@@ -40,7 +40,7 @@ examples = { cmd = [
     "--cache-clear",
     "--verbose",
     "--junitxml=examples_report.xml",
-], depends_on = ["install"], cwd = "imod/tests" }
+], depends_on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
 test_import = { cmd = [
     "python",
     "-c",
@@ -75,7 +75,7 @@ matplotlib = "*"
 mypy = "*"
 netcdf4 = "*"
 numba = ">=0.50"
-numpy = "<2"
+numpy = "<2"    # TODO https://github.com/Deltares/imod-python/issues/1107: Upgrade to version 2.0 
 pandamesh = "*"
 pandas = "*"
 pip = "*"
