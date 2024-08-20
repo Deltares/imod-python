@@ -40,8 +40,8 @@ def create_package_instances(is_structured: bool) -> List[Package]:
             k22=3.0,
         ),
         imod.mf6.SpecificStorage(
-            specific_storage=grid_data_function(np.float_, 1.0e-4, 5.0),
-            specific_yield=grid_data_function(np.float_, 0.15, 5.0),
+            specific_storage=grid_data_function(np.float64, 1.0e-4, 5.0),
+            specific_yield=grid_data_function(np.float64, 0.15, 5.0),
             convertible=0,
             transient=False,
         ),
@@ -62,27 +62,27 @@ def create_package_instances(is_structured: bool) -> List[Package]:
             transient=False,
         ),
         imod.mf6.StorageCoefficient(
-            storage_coefficient=grid_data_function(np.float_, 1.0e-4, 5.0),
-            specific_yield=grid_data_function(np.float_, 0.15, 5.0),
+            storage_coefficient=grid_data_function(np.float64, 1.0e-4, 5.0),
+            specific_yield=grid_data_function(np.float64, 0.15, 5.0),
             convertible=grid_data_function(np.int32, 0, 5.0),
             transient=True,
         ),
         imod.mf6.Drainage(
-            elevation=grid_data_function(np.float_, 1.0e-4, 5.0),
-            conductance=grid_data_function(np.float_, 1.0e-4, 5.0),
+            elevation=grid_data_function(np.float64, 1.0e-4, 5.0),
+            conductance=grid_data_function(np.float64, 1.0e-4, 5.0),
             print_input=True,
             print_flows=True,
             save_flows=True,
         ),
         imod.mf6.ConstantHead(
-            grid_data_function(np.float_, 1.0e-4, 5.0),
+            grid_data_function(np.float64, 1.0e-4, 5.0),
             print_input=True,
             print_flows=True,
             save_flows=True,
         ),
         imod.mf6.GeneralHeadBoundary(
-            head=grid_data_function(np.float_, 1.0e-4, 5.0),
-            conductance=grid_data_function(np.float_, 1.0e-4, 5.0),
+            head=grid_data_function(np.float64, 1.0e-4, 5.0),
+            conductance=grid_data_function(np.float64, 1.0e-4, 5.0),
         ),
         imod.mf6.OutputControl(save_head="all", save_budget="all"),
         imod.mf6.Recharge(grid_data_function(np.float64, 0.002, 5.0).sel(layer=[1])),
@@ -94,7 +94,7 @@ def create_package_instances(is_structured: bool) -> List[Package]:
         packages.append(
             imod.mf6.StructuredDiscretization(
                 top=20.0,
-                bottom=grid_data_function_layered(np.float_, -1, 5.0),
+                bottom=grid_data_function_layered(np.float64, -1, 5.0),
                 idomain=grid_data_function(np.int_, 1, 5.0),
             )
         )
@@ -102,7 +102,7 @@ def create_package_instances(is_structured: bool) -> List[Package]:
         packages.append(
             imod.mf6.VerticesDiscretization(
                 top=20.0,
-                bottom=grid_data_function_layered(np.float_, -1, 5.0),
+                bottom=grid_data_function_layered(np.float64, -1, 5.0),
                 idomain=grid_data_function(np.int_, 1, 5.0),
             )
         )
