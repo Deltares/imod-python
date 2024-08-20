@@ -60,7 +60,8 @@ def hondsrug_layermodel() -> xr.Dataset:
     lock = FileLock(REGISTRY.path / "hondsrug-layermodel.nc.lock")
     with lock:
         fname = REGISTRY.fetch("hondsrug-layermodel.nc")
-        return xr.open_dataset(fname)
+
+    return xr.open_dataset(fname)
 
 
 def hondsrug_meteorology() -> xr.Dataset:
@@ -105,8 +106,13 @@ def lakes_shp(path: Union[str, Path]) -> "geopandas.GeoDataFrame":  # type: igno
 
 
 def circle() -> xu.Ugrid2d:
-    fname_nodes = REGISTRY.fetch("circle-nodes.txt")
-    fname_triangles = REGISTRY.fetch("circle-triangles.txt")
+    nodes_lock = FileLock(REGISTRY.path / "circle-nodes.txt.lock")
+    with nodes_lock:
+        fname_nodes = REGISTRY.fetch("circle-nodes.txt")
+
+    triangles_lock = FileLock(REGISTRY.path / "circle-triangles.txt.lock")
+    with triangles_lock:
+        fname_triangles = REGISTRY.fetch("circle-triangles.txt")
 
     nodes = np.loadtxt(fname_nodes)
     triangles = np.loadtxt(fname_triangles).astype(np.int32)
