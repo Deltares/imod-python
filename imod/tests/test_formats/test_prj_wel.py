@@ -19,6 +19,37 @@ from imod.mf6 import LayeredWell, Well
 class WellPrjCases:
     """Cases for projectfile well records"""
 
+    def case_simple__steady_state(self):
+        return dedent(
+            """
+            0001,(WEL),1
+            steady-state
+            001,001
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
+            """
+        )
+
+    def case_associated__steady_state(self):
+        return dedent(
+            """
+            0001,(WEL),1
+            steady-state
+            001,001
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
+            """
+        )
+
+    def case_mixed__steady_state(self):
+        return dedent(
+            """
+            0001,(WEL),1
+            steady-state
+            001,002
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/associated.ipf"
+            1,2, 001, 1.0, 0.0, -999.9900 ,"ipf/simple1.ipf"
+            """
+        )
+
     def case_simple__first(self):
         return dedent(
             """
@@ -252,6 +283,46 @@ class WellPrjCases:
 
 class WellReadCases:
     """Expected cases as interpreted by ``imod.formats.prj.open_projectfile_data``"""
+
+    def case_simple__steady_state(self):
+        return {
+            "wel-simple1": {
+                "has_associated": False,
+                "time": [None],
+                "layer": [1],
+                "factor": [1.0],
+                "addition": [0.0],
+            },
+        }
+
+    def case_associated__steady_state(self):
+        return {
+            "wel-associated": {
+                "has_associated": True,
+                "time": [None],
+                "layer": [1],
+                "factor": [1.0],
+                "addition": [0.0],
+            },
+        }
+
+    def case_mixed__steady_state(self):
+        return {
+            "wel-simple1": {
+                "has_associated": False,
+                "time": [None],
+                "layer": [1],
+                "factor": [1.0],
+                "addition": [0.0],
+            },
+            "wel-associated": {
+                "has_associated": True,
+                "time": [None],
+                "layer": [1],
+                "factor": [1.0],
+                "addition": [0.0],
+            },
+        }
 
     def case_simple__first(self):
         return {
@@ -534,88 +605,104 @@ class WellPackageCases:
 
     Returns
     -------
-    fails, {wellname: datetime_set_to_zero}
+    {wellname: (fails, has_time, datetimes_set_to_zero)}
     """
+
+    def case_simple__steady_state(self):
+        return {
+            "wel-simple1": (False, False, []),
+        }
+
+    def case_associated__steady_state(self):
+        return {
+            "wel-associated": (False, True, []),
+        }
+
+    def case_mixed__steady_state(self):
+        return {
+            "wel-associated": (False, True, []),
+            "wel-simple1": (False, False, []),
+        }
 
     def case_simple__first(self):
         return {
-            "wel-simple1": (False, [datetime(1982, 2, 1), datetime(1982, 3, 1)]),
+            "wel-simple1": (False, True, [datetime(1982, 2, 1), datetime(1982, 3, 1)]),
         }
 
     def case_simple__first_multi_layer1(self):
         return {
-            "wel-simple1": (False, [datetime(1982, 2, 1), datetime(1982, 3, 1)]),
+            "wel-simple1": (False, True, [datetime(1982, 2, 1), datetime(1982, 3, 1)]),
         }
 
     def case_simple__first_multi_layer2(self):
         return {
-            "wel-simple1": (True, []),
+            "wel-simple1": (True, False, []),
         }
 
     def case_simple__all_same(self):
         return {
-            "wel-simple1": (False, []),
+            "wel-simple1": (False, True, []),
         }
 
     def case_simple__all_same_multi_layer1(self):
         return {
-            "wel-simple1": (False, []),
+            "wel-simple1": (False, True, []),
         }
 
     def case_simple__all_same_multi_layer2(self):
         return {
-            "wel-simple1": (True, []),
+            "wel-simple1": (True, False, []),
         }
 
     def case_simple__all_different1(self):
         return {
-            "wel-simple1": (False, [datetime(1982, 2, 1), datetime(1982, 3, 1)]),
-            "wel-simple2": (False, [datetime(1982, 3, 1)]),
-            "wel-simple3": (False, []),
+            "wel-simple1": (False, True, [datetime(1982, 2, 1), datetime(1982, 3, 1)]),
+            "wel-simple2": (False, True, [datetime(1982, 3, 1)]),
+            "wel-simple3": (False, True, []),
         }
 
     def case_simple__all_different2(self):
         return {
-            "wel-simple1": (False, [datetime(1982, 3, 1)]),
-            "wel-simple2": (False, [datetime(1982, 3, 1)]),
-            "wel-simple3": (False, []),
+            "wel-simple1": (False, True, [datetime(1982, 3, 1)]),
+            "wel-simple2": (False, True, [datetime(1982, 3, 1)]),
+            "wel-simple3": (False, True, []),
         }
 
     def case_simple__all_different3(self):
         return {
-            "wel-simple1": (False, [datetime(1982, 2, 1)]),
-            "wel-simple2": (False, [datetime(1982, 3, 1)]),
-            "wel-simple3": (False, []),
+            "wel-simple1": (False, True, [datetime(1982, 2, 1)]),
+            "wel-simple2": (False, True, [datetime(1982, 3, 1)]),
+            "wel-simple3": (False, True, []),
         }
 
     def case_associated__first(self):
-        return {"wel-associated": (False, [])}
+        return {"wel-associated": (False, True, [])}
 
     def case_associated__all(self):
-        return {"wel-associated": (False, [])}
+        return {"wel-associated": (False, True, [])}
 
     def case_associated__all_varying_factors(self):
-        return {"wel-associated": (True, [])}
+        return {"wel-associated": (True, False, [])}
 
     def case_associated__multiple_layers_different_factors(self):
-        return {"wel-associated": (True, [])}
+        return {"wel-associated": (True, False, [])}
 
     def case_mixed__first(self):
         return {
-            "wel-simple1": (False, [datetime(1982, 2, 1), datetime(1982, 3, 1)]),
-            "wel-associated": (False, []),
+            "wel-simple1": (False, True, [datetime(1982, 2, 1), datetime(1982, 3, 1)]),
+            "wel-associated": (False, True, []),
         }
 
     def case_mixed__all(self):
         return {
-            "wel-simple1": (False, [datetime(1982, 3, 1)]),
-            "wel-associated": (False, []),
+            "wel-simple1": (False, True, [datetime(1982, 3, 1)]),
+            "wel-associated": (False, True, []),
         }
 
     def case_mixed__associated_second(self):
         return {
-            "wel-simple1": (False, [datetime(1982, 2, 1), datetime(1982, 3, 1)]),
-            "wel-associated": (True, []),
+            "wel-simple1": (False, True, [datetime(1982, 2, 1), datetime(1982, 3, 1)]),
+            "wel-associated": (True, False, []),
         }
 
 
@@ -715,21 +802,27 @@ def test_from_imod5_data_wells(
     data, _ = open_projectfile_data(wel_file)
     for wellname in data.keys():
         assert wellname in expected_dict.keys()
-        fails, expected_set_to_zero = expected_dict[wellname]
+        fails, has_time, expected_set_to_zero = expected_dict[wellname]
         if fails:
             with pytest.raises(ValueError):
                 wel_cls.from_imod5_data(wellname, data, times=times)
         else:
             well = wel_cls.from_imod5_data(wellname, data, times=times)
             rate = well.dataset["rate"]
-            actual_set_to_zero = [
-                t.values for t in rate.coords["time"] if (rate.sel(time=t) == 0.0).all()
-            ]
-            expected_set_to_zero = [
-                np.datetime64(t, "ns") for t in expected_set_to_zero
-            ]
-            diff = set(actual_set_to_zero) ^ set(expected_set_to_zero)
-            assert len(diff) == 0
+            if has_time:
+                actual_set_to_zero = [
+                    t.values
+                    for t in rate.coords["time"]
+                    if (rate.sel(time=t) == 0.0).all()
+                ]
+                expected_set_to_zero = [
+                    np.datetime64(t, "ns") for t in expected_set_to_zero
+                ]
+                diff = set(actual_set_to_zero) ^ set(expected_set_to_zero)
+                assert len(diff) == 0
+            else:
+                assert "time" not in rate.dims
+                assert "time" not in rate.coords
 
 
 @parametrize("wel_case, expected_dict", argvalues=list(zip(PRJ_ARGS, PKG_ARGS)))
@@ -762,19 +855,25 @@ def test_from_imod5_data_wells__outside_range(
     data, _ = open_projectfile_data(wel_file)
     for wellname in data.keys():
         assert wellname in expected_dict.keys()
-        fails, _ = expected_dict[wellname]
+        fails, has_time, _ = expected_dict[wellname]
         if fails:
             with pytest.raises(ValueError):
                 wel_cls.from_imod5_data(wellname, data, times=times)
         else:
             well = wel_cls.from_imod5_data(wellname, data, times=times)
             rate = well.dataset["rate"]
-            actual_set_to_zero = [
-                t.values for t in rate.coords["time"] if (rate.sel(time=t) == 0.0).all()
-            ]
-            if data[wellname]["has_associated"]:
-                expected_set_to_zero = []
+            if has_time:
+                actual_set_to_zero = [
+                    t.values
+                    for t in rate.coords["time"]
+                    if (rate.sel(time=t) == 0.0).all()
+                ]
+                if data[wellname]["has_associated"]:
+                    expected_set_to_zero = []
+                else:
+                    expected_set_to_zero = [np.datetime64(t, "ns") for t in times[:-1]]
+                diff = set(actual_set_to_zero) ^ set(expected_set_to_zero)
+                assert len(diff) == 0
             else:
-                expected_set_to_zero = [np.datetime64(t, "ns") for t in times[:-1]]
-            diff = set(actual_set_to_zero) ^ set(expected_set_to_zero)
-            assert len(diff) == 0
+                assert "time" not in rate.dims
+                assert "time" not in rate.coords
