@@ -25,6 +25,7 @@ from .fixtures.flow_transport_simulation_fixture import flow_transport_simulatio
 from .fixtures.imod5_well_data import (
     well_duplication_import_prj,
     well_mixed_ipfs,
+    well_out_of_bounds_ipfs,
     well_regular_import_prj,
 )
 from .fixtures.mf6_circle_fixture import (

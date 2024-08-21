@@ -4,6 +4,7 @@ from textwrap import dedent
 from typing import Union
 
 import numpy as np
+import pandas as pd
 import pytest
 from pytest_cases import (
     get_all_cases,
@@ -777,6 +778,30 @@ def test_open_projectfile_data_wells(
             assert actual[field] == wel_expected[field]
 
 
+@parametrize("wel_case, expected", argvalues=list(zip(PRJ_ARGS, READ_ARGS)))
+def test_open_projectfile_data_out_of_bounds_wells(
+    wel_case, expected, well_out_of_bounds_ipfs, tmp_path, request
+):
+    # Arrange
+    case_name = get_case_name(request)
+    wel_file = tmp_path / f"{case_name}.prj"
+    setup_test_files(wel_case, wel_file, well_out_of_bounds_ipfs, tmp_path)
+
+    # Act
+    data, _ = open_projectfile_data(wel_file)
+    assert len(set(expected.keys()) ^ set(data.keys())) == 0
+    fields = ["time", "layer", "addition", "factor", "has_associated"]
+    for wel_name, wel_expected in expected.items():
+        actual = data[wel_name]
+        for field in fields:
+            assert field in actual
+            assert actual[field] == wel_expected[field]
+        if actual["has_associated"]:
+            timeseries = data["wel-associated"]["dataframe"][0]["time"]
+            # Test if last element NaT
+            assert timeseries.iloc[-1] is pd.NaT
+
+
 @parametrize("wel_case, expected_dict", argvalues=list(zip(PRJ_ARGS, PKG_ARGS)))
 @parametrize("wel_cls", argvalues=[LayeredWell, Well])
 def test_from_imod5_data_wells(
@@ -877,3 +902,42 @@ def test_from_imod5_data_wells__outside_range(
             else:
                 assert "time" not in rate.dims
                 assert "time" not in rate.coords
+
+@parametrize("wel_case, expected_dict", argvalues=list(zip(PRJ_ARGS, PKG_ARGS)))
+@parametrize("wel_cls", argvalues=[LayeredWell, Well])
+def test_from_imod5_data_wells__wells_out_of_bounds(
+    wel_cls: Union[LayeredWell, Well],
+    wel_case,
+    expected_dict,
+    well_out_of_bounds_ipfs,
+    tmp_path,
+    request,
+):
+    # Arrange
+    # Replace layer number to zero if non-layered well.
+    if wel_cls == Well:
+        wel_case = wel_case.replace("1,2, 001", "1,2, 000")
+    # Write prj and copy ipfs to right folder.
+    case_name = get_case_name(request)
+    wel_file = tmp_path / f"{case_name}.prj"
+    setup_test_files(wel_case, wel_file, well_out_of_bounds_ipfs, tmp_path)
+
+    times = [datetime(1982, i + 3, 1) for i in range(4)]
+
+    # Act
+    data, _ = open_projectfile_data(wel_file)
+    for wellname in data.keys():
+        assert wellname in expected_dict.keys()
+        fails, has_time, _ = expected_dict[wellname]
+        if fails:
+            with pytest.raises(ValueError):
+                wel_cls.from_imod5_data(wellname, data, times=times)
+        else:
+            well = wel_cls.from_imod5_data(wellname, data, times=times)
+            if data[wellname]["has_associated"]:
+                # Last value in dataframe returned by open_projectfile is time
+                # NaT (out of bounds), so expect second last rate in dataframe
+                # as final rate in well package.
+                expected_last_rate = data[wellname]["dataframe"][0]["rate"].iloc[-2]
+                actual_last_rate = well.dataset["rate"].isel(index=1, time=-1).item()
+                assert actual_last_rate == expected_last_rate
