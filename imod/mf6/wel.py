@@ -76,10 +76,18 @@ def _df_groups_to_da_rates(
     unique_well_groups: pd.api.typing.DataFrameGroupBy,
 ) -> xr.DataArray:
     # Convert dataframes all groups to DataArrays
-    da_groups = [
-        xr.DataArray(df_group["rate"], dims=("time"), coords={"time": df_group["time"]})
-        for df_group in unique_well_groups
-    ]
+    is_steady_state = "time" not in unique_well_groups[0].columns
+    if is_steady_state:
+        da_groups = [
+            xr.DataArray(df_group["rate"].iloc[0]) for df_group in unique_well_groups
+        ]
+    else:
+        da_groups = [
+            xr.DataArray(
+                df_group["rate"], dims=("time"), coords={"time": df_group["time"]}
+            )
+            for df_group in unique_well_groups
+        ]
     # Assign index coordinates
     da_groups = [
         da_group.expand_dims(dim="index").assign_coords(index=[i])
@@ -142,13 +150,22 @@ def _prepare_df_ipf_unassociated(
     pkg_data: dict, start_times: list[datetime]
 ) -> pd.DataFrame:
     """Prepare dataframe for an ipf with no associated timeseries."""
+    is_steady_state = any(t is None for t in pkg_data["time"])
+    if is_steady_state:
+        index_dicts = [{"layer": lay} for lay in pkg_data["layer"]]
+    else:
+        index_dicts = [
+            {"time": t, "layer": lay}
+            for t, lay in zip(pkg_data["time"], pkg_data["layer"])
+        ]
     # Concatenate dataframes, assign layer and times
-    iter_dfs_dims = zip(pkg_data["dataframe"], pkg_data["time"], pkg_data["layer"])
-    df = pd.concat([df.assign(time=t, layer=lay) for df, t, lay in iter_dfs_dims])
+    iter_dfs_dims = zip(pkg_data["dataframe"], index_dicts)
+    df = pd.concat([df.assign(**index_dict) for df, index_dict in iter_dfs_dims])
     # Prepare multi-index dataframe to convert to a multi-dimensional DataArray
     # later.
-    df_multi = df.set_index(["time", "layer", df.index])
-    df_multi.index = df_multi.index.set_names(["time", "layer", "ipf_row"])
+    dimnames = list(index_dicts[0].keys())
+    df_multi = df.set_index(dimnames + [df.index])
+    df_multi.index = df_multi.index.set_names(dimnames + ["ipf_row"])
     # Temporarily convert to DataArray with 2 dimensions, as it allows for
     # multi-dimensional ffilling, instead pandas' ffilling the last value in a
     # column of the flattened table.
@@ -158,7 +175,9 @@ def _prepare_df_ipf_unassociated(
     cols_ffill_if_present = {"x", "y", "filt_top", "filt_bot"}
     cols_ffill = cols_ffill_if_present & set(df.columns)
     da_multi = df_multi.to_xarray()
-    indexers = {"time": start_times, "ipf_row": ipf_row_index}
+    indexers = {"ipf_row": ipf_row_index}
+    if not is_steady_state:
+        indexers["time"] = start_times
     # Multi-dimensional reindex, forward fill well locations, fill well rates
     # with 0.0.
     df_ffilled = da_multi[cols_ffill].reindex(indexers, method="ffill").to_dataframe()
