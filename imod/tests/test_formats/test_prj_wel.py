@@ -903,6 +903,7 @@ def test_from_imod5_data_wells__outside_range(
                 assert "time" not in rate.dims
                 assert "time" not in rate.coords
 
+
 @parametrize("wel_case, expected_dict", argvalues=list(zip(PRJ_ARGS, PKG_ARGS)))
 @parametrize("wel_cls", argvalues=[LayeredWell, Well])
 def test_from_imod5_data_wells__wells_out_of_bounds(

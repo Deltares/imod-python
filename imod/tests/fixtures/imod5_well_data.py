@@ -269,6 +269,7 @@ def well_mixed_ipfs():
         tmp_path,
     )
 
+
 @pytest.fixture(scope="session")
 def well_out_of_bounds_ipfs():
     tmp_path = imod.util.temporary_directory()
