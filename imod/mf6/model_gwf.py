@@ -291,11 +291,14 @@ class GroundwaterFlowModel(Modflow6Model):
         imod5_keys = list(imod5_data.keys())
         wel_keys = [key for key in imod5_keys if key[0:3] == "wel"]
         for wel_key in wel_keys:
+            wel_key_truncated = wel_key[:16]
             layer = np.array(imod5_data[wel_key]["layer"])
             if np.any(layer == 0):
-                result[wel_key] = Well.from_imod5_data(wel_key, imod5_data, times)
+                result[wel_key_truncated] = Well.from_imod5_data(
+                    wel_key, imod5_data, times
+                )
             else:
-                result[wel_key] = LayeredWell.from_imod5_data(
+                result[wel_key_truncated] = LayeredWell.from_imod5_data(
                     wel_key, imod5_data, times
                 )
 
