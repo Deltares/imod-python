@@ -15,6 +15,17 @@ DATETIME_FORMATS = {
 }
 
 
+def to_pandas_datetime_series(series: pd.Series):
+    """
+    Try pd.to_datetime first with format, which tries converting to pandas
+    datetime with nanosecond as base. This only supports going up to 2261. If
+    this fails, manually convert with seconds as base.
+    """
+    len_date = len(series.iloc[0])
+    format = DATETIME_FORMATS[len_date]
+    return pd.to_datetime(series, format=format, errors="coerce")
+
+
 def to_datetime(s: str) -> datetime.datetime:
     """
     Convert string to datetime. Part of the public API for backwards
