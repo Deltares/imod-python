@@ -40,7 +40,7 @@ examples = { cmd = [
     "--cache-clear",
     "--verbose",
     "--junitxml=examples_report.xml",
-], depends_on = ["install"], cwd = "imod/tests" }
+], depends_on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
 test_import = { cmd = [
     "python",
     "-c",
@@ -63,6 +63,7 @@ contextily = ">=1"
 cytoolz = "*"
 dask = "<2024.1.0" # Newer version incompatible with rasterio
 fastcore = "*"
+filelock = "*"
 flopy = "*"
 geopandas = "*"
 gh = "*"
@@ -75,9 +76,10 @@ matplotlib = "*"
 mypy = "*"
 netcdf4 = "*"
 numba = ">=0.50"
-numpy = "*"
+numpy = "<2"    # TODO https://github.com/Deltares/imod-python/issues/1107: Upgrade to version 2.0 
 pandamesh = "*"
 pandas = "*"
+pip = "*"
 pooch = "*"
 pydantic = "*"
 pydata-sphinx-theme = "*"

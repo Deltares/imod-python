@@ -270,11 +270,16 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             f.write(mfsim_content)
 
         # Write time discretization file
-        self["time_discretization"].write(directory, "time_discretization")
+        globaltimes = self["time_discretization"]["time"].values
+        self["time_discretization"].write(
+            pkgname="time_discretization",
+            globaltimes=globaltimes,
+            write_context=write_context,
+        )
 
         # Write individual models
         status_info = NestedStatusInfo("Simulation validation status")
-        globaltimes = self["time_discretization"]["time"].values
+
         for key, value in self.items():
             model_write_context = write_context.copy_with_new_write_directory(
                 write_context.simulation_directory
