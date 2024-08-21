@@ -538,6 +538,9 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
           simulation times.
         - When simulation times fall outside well timeseries range, the last
           rate is forward filled.
+        - Projectfile timestamps itsself are not used. Even if assigned to a
+          "steady-state" timestamp, the resulting dataset still uses simulation
+          times.
 
         *Unassociated wells*
 
@@ -548,6 +551,8 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
           is to prevent the well being activated again in case of any potential
           forward filling at a later stage by
           :meth:`imod.mf6.Modflow6Simulation.create_time_discretization`
+        - Wells assigned to a "steady-state" entry in the projectfile will have
+          no "time" dimension in the resulting dataset.
 
         .. note::
             In case you are wondering why is this so complicated? There are two
