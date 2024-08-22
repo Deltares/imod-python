@@ -14,6 +14,7 @@ from imod.mf6.regrid.regrid_schemes import (
 )
 from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
+from imod.prepare.cleanup import cleanup_ghb
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_ghb_cells
 from imod.prepare.topsystem.conductance import (
     DISTRIBUTING_OPTION,
@@ -164,6 +165,10 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
+
+    def cleanup(self) -> None:
+        cleaned_dict = self._call_func_on_grids(cleanup_ghb)
+        super().__init__(cleaned_dict)
 
     @classmethod
     def from_imod5_data(

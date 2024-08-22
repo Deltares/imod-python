@@ -30,3 +30,7 @@ class IPackage(IPackageBase, metaclass=abc.ABCMeta):
     @abstractmethod
     def is_regridding_supported(self) -> bool:
         raise NotImplementedError
+
+    @abstractmethod
+    def cleanup(self):
+        raise NotImplementedError

@@ -18,6 +18,7 @@ from imod.mf6.utilities.regrid import (
     _regrid_package_data,
 )
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
+from imod.prepare.cleanup import cleanup_riv
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_riv_cells
 from imod.prepare.topsystem.conductance import (
     DISTRIBUTING_OPTION,
@@ -183,6 +184,10 @@ class River(BoundaryCondition, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
+
+    def cleanup(self) -> None:
+        cleaned_dict = self._call_func_on_grids(cleanup_riv)
+        super().__init__(cleaned_dict)
 
     @classmethod
     def from_imod5_data(
