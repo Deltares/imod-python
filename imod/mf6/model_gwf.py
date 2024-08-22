@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import textwrap
 from datetime import datetime
 from typing import Optional, cast
 
@@ -292,6 +293,15 @@ class GroundwaterFlowModel(Modflow6Model):
         wel_keys = [key for key in imod5_keys if key[0:3] == "wel"]
         for wel_key in wel_keys:
             wel_key_truncated = wel_key[:16]
+            if wel_key_truncated in result.keys():
+                msg = textwrap.dedent(
+                    f"""Truncated key: '{wel_key_truncated}' already assigned to
+                    imported model, please rename wells so that unique names are
+                    formed after they are truncated to 16 characters for MODFLOW
+                    6.
+                    """
+                )
+                raise KeyError(msg)
             layer = np.array(imod5_data[wel_key]["layer"])
             if np.any(layer == 0):
                 result[wel_key_truncated] = Well.from_imod5_data(
