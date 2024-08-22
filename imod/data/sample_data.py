@@ -130,15 +130,17 @@ def imod5_projectfile_data(path: Union[str, Path]) -> dict:
 
 
 def hondsrug_simulation(path: Union[str, Path]) -> Modflow6Simulation:
-    fname_simulation = REGISTRY.fetch("hondsrug-simulation.zip")
+    lock = FileLock(REGISTRY.path / "hondsrug-simulation.zip.lock")
+    with lock:
+        fname_simulation = REGISTRY.fetch("hondsrug-simulation.zip")
 
-    with ZipFile(fname_simulation) as archive:
-        archive.extractall(path)
+        with ZipFile(fname_simulation) as archive:
+            archive.extractall(path)
 
-    simulation = Modflow6Simulation.from_file(Path(path) / "mf6-hondsrug-example.toml")
-    # The model was written before the xt3d_option and rhs_option arguments were
-    # added to iMOD Python. Set missing options to False.
-    simulation["GWF"]["npf"].set_xt3d_option(is_xt3d_used=False, is_rhs=False)
+        simulation = Modflow6Simulation.from_file(Path(path) / "mf6-hondsrug-example.toml")
+        # The model was written before the xt3d_option and rhs_option arguments were
+        # added to iMOD Python. Set missing options to False.
+        simulation["GWF"]["npf"].set_xt3d_option(is_xt3d_used=False, is_rhs=False)
 
     return simulation
 
