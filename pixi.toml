@@ -52,9 +52,6 @@ mypy_lint = { cmd ="mypy", depends_on = ["install"]}
 mypy_report = { cmd ="mypy | mypy2junit > mypy-report.xml", depends_on = ["install"]}
 
 [dependencies]
-# Keep empty or undefined to create an empty default environment.
-
-[feature.base.dependencies]
 affine = "*"
 black = "*"
 bottleneck = "*"
@@ -113,7 +110,7 @@ xugrid = ">=0.10.0"
 zarr = "*"
 python-build = "*"
 
-[feature.base.pypi-dependencies]
+[pypi-dependencies]
 mypy2junit = "*"
 
 [feature.interactive.dependencies]
@@ -134,8 +131,8 @@ python = "3.12"
 pip = "*"
 
 [environments]
-default = {features = ["base"], solve-group = "conda-deps"}
-interactive = {features = ["interactive", "base"], solve-group = "conda-deps"}
-py310 = {features = ["py310"], solve-group = "py310"}
-py311 = {features = ["py311"], solve-group = "py311"}
-py312 = {features = ["py312"], solve-group = "py312"}
+default = {features = [], solve-group = "conda-deps"}
+interactive = {features = ["interactive"], solve-group = "conda-deps"}
+py310 = {features = ["py310"], no-default-feature = true}
+py311 = {features = ["py311"], no-default-feature = true}
+py312 = {features = ["py312"], no-default-feature = true}
