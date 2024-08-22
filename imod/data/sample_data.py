@@ -137,7 +137,9 @@ def hondsrug_simulation(path: Union[str, Path]) -> Modflow6Simulation:
         with ZipFile(fname_simulation) as archive:
             archive.extractall(path)
 
-        simulation = Modflow6Simulation.from_file(Path(path) / "mf6-hondsrug-example.toml")
+        simulation = Modflow6Simulation.from_file(
+            Path(path) / "mf6-hondsrug-example.toml"
+        )
         # The model was written before the xt3d_option and rhs_option arguments were
         # added to iMOD Python. Set missing options to False.
         simulation["GWF"]["npf"].set_xt3d_option(is_xt3d_used=False, is_rhs=False)
