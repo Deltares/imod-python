@@ -270,8 +270,7 @@ class MetaSwapModel(Model):
                 )
 
             else:
-                # create new instance'
-                pass
+                raise ValueError(f"package {pkgname} cannot be  regridded")
             regridded_model[pkgname] = regridded_package
         if mod2svat is not None:
             regridded_model["mod2svat"] = CouplerMapping(mf6_regridded_dis)
