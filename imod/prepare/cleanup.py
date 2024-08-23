@@ -7,7 +7,7 @@ import xarray as xr
 
 from imod.mf6.utilities.mask import mask_arrays
 from imod.schemata import scalar_None
-from imod.typing import GridDataArray
+from imod.typing import GridDataArray, GridDataset
 
 
 class AlignLevelsMode(Enum):
@@ -35,7 +35,7 @@ def align_interface_levels(
 
 
 def _cleanup_robin_boundary(grids=dict[str, GridDataArray]) -> dict[str, GridDataArray]:
-    """Cleanup robin boundary condition, with conductance"""
+    """Cleanup robin boundary condition (i.e. bc with conductance)"""
     conductance = grids["conductance"]
     concentration = grids["concentration"]
     # Make conductance cells with erronous values inactive
@@ -127,3 +127,10 @@ def cleanup_ghb(
         "concentration": concentration,
     }
     return _cleanup_robin_boundary(output_dict)
+
+
+def cleanup_wel(
+        wel_ds: GridDataset
+):
+    deactivate = wel_ds["screen_top"] < wel_ds["screen_bottom"]
+    return wel_ds.where(~deactivate, drop=True)

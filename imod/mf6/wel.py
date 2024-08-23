@@ -30,6 +30,7 @@ from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
+from imod.prepare.cleanup import cleanup_wel
 from imod.prepare.layer import create_layered_top
 from imod.schemata import (
     AllValueSchema,
@@ -943,6 +944,9 @@ class Well(GridAgnosticWell):
             )
             logger.log(loglevel=LogLevel.ERROR, message=log_msg, additional_depth=2)
             raise ValueError(log_msg)
+
+    def cleanup(self):
+        self.dataset = cleanup_wel(self.dataset)
 
 
 class LayeredWell(GridAgnosticWell):
