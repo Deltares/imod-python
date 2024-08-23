@@ -96,4 +96,6 @@ class Sprinkling(MetaSwapPackage):
         return self.write_dataframe_fixed_width(file, dataframe)
 
     def is_regridding_supported(self) -> bool:
+        # regridding for the sprikling package is currently not supported, but
+        # this will be fixed in issue #728
         return False
