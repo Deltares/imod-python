@@ -146,7 +146,7 @@ def make_msw_model():
              [False, True, False],
              [False, True, False]]),
         dims=("y", "x"),
-        coords={"y": y, "x": x}
+        coords={"y": y, "x": x, "dx": dx, "dy": dy}
     )
     # fmt: on
     msw_grid = xr.ones_like(active, dtype=float)

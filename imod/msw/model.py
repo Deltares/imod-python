@@ -1,11 +1,13 @@
 import collections
 from copy import copy
 from pathlib import Path
-from typing import Union
+from typing import Optional, Tuple, Union
 
 import jinja2
 import numpy as np
 
+from imod import mf6
+from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.msw.coupler_mapping import CouplerMapping
 from imod.msw.grid_data import GridData
 from imod.msw.idf_mapping import IdfMapping
@@ -22,6 +24,7 @@ from imod.msw.meteo_mapping import EvapotranspirationMapping, PrecipitationMappi
 from imod.msw.output_control import TimeOutputControl
 from imod.msw.timeutil import to_metaswap_timeformat
 from imod.msw.vegetation import AnnualCropFactors
+from imod.util.regrid_method_type import RegridderType
 
 REQUIRED_PACKAGES = (
     GridData,
@@ -242,3 +245,35 @@ class MetaSwapModel(Model):
         # write package contents
         for pkgname in self:
             self[pkgname].write(directory, index, svat)
+
+    def regrid_like(
+        self,
+        mf6_regridded_dis: mf6.StructuredDiscretization,
+        validate: bool = True,
+        regrid_context: Optional[RegridderWeightsCache] = None,
+        regridder_types: Optional[dict[str, Tuple[RegridderType, str]]] = None,
+    ) -> "MetaSwapModel":
+        unsat_database = self.simulation_settings["unsa_svat_path"]
+        regridded_model = MetaSwapModel(unsat_database)
+
+        target_grid = mf6_regridded_dis["idomain"]
+
+        mod2svat_name = None
+
+        for pkgname in self:
+            msw_package = self[pkgname]
+            if isinstance(msw_package, CouplerMapping):
+                # there can be only one couplermapping
+                mod2svat_name = pkgname
+            elif msw_package.is_regridding_supported():
+                regridded_package = msw_package.regrid_like(
+                    target_grid, regrid_context, regridder_types
+                )
+
+            else:
+                raise ValueError(f"package {pkgname} cannot be  regridded")
+            regridded_model[pkgname] = regridded_package
+        if mod2svat_name is not None:
+            regridded_model[mod2svat_name] = CouplerMapping(mf6_regridded_dis)
+
+        return regridded_model

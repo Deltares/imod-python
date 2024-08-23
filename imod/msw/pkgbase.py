@@ -1,14 +1,13 @@
 import abc
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Optional, Union
 
 import numpy as np
 import pandas as pd
 import xarray as xr
 
 from imod.mf6.utilities.regrid import (
-    RegridderType,
     RegridderWeightsCache,
     _regrid_like,
 )
@@ -183,7 +182,7 @@ class MetaSwapPackage(abc.ABC):
         self,
         target_grid: GridDataArray,
         regrid_context: RegridderWeightsCache,
-        regridder_types: Optional[dict[str, Tuple[RegridderType, str]]] = None,
+        regridder_types: Optional[RegridMethodType] = None,
     ) -> "MetaSwapPackage":
         try:
             result = _regrid_like(self, target_grid, regrid_context, regridder_types)
