@@ -258,13 +258,14 @@ class MetaSwapModel(Model):
 
         target_grid = mf6_regridded_dis["idomain"]
 
-        mod2svat = self.pop("mod2svat", None)
-        grid = self.pop("grid", None)
-        new_grid = grid.regrid_like(target_grid, regrid_context, regridder_types)
+        mod2svat_name = None
 
         for pkgname in self:
             msw_package = self[pkgname]
-            if msw_package.is_regridding_supported():
+            if isinstance(msw_package, CouplerMapping):
+                # there can be only one couplermapping
+                mod2svat_name = pkgname
+            elif msw_package.is_regridding_supported():
                 regridded_package = msw_package.regrid_like(
                     target_grid, regrid_context, regridder_types
                 )
@@ -272,7 +273,7 @@ class MetaSwapModel(Model):
             else:
                 raise ValueError(f"package {pkgname} cannot be  regridded")
             regridded_model[pkgname] = regridded_package
-        if mod2svat is not None:
-            regridded_model["mod2svat"] = CouplerMapping(mf6_regridded_dis)
-        regridded_model["grid"] = new_grid
+        if mod2svat_name is not None:
+            regridded_model[mod2svat_name] = CouplerMapping(mf6_regridded_dis)
+
         return regridded_model
