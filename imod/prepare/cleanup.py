@@ -39,10 +39,10 @@ def _cleanup_robin_boundary(grids=dict[str, GridDataArray]) -> dict[str, GridDat
     conductance = grids["conductance"]
     concentration = grids["concentration"]
     # Make conductance cells with erronous values inactive
-    grids["conductance"] = conductance.where(conductance <= 0.0)
+    grids["conductance"] = conductance.where(conductance > 0.0)
     # Make concentration cells with erronous values inactive
     if (concentration is not None) or not scalar_None(concentration):
-        grids["concentration"] = concentration.where(concentration < 0.0)
+        grids["concentration"] = concentration.where(concentration >= 0.0)
     else:
         grids.pop("concentration")
 
@@ -56,6 +56,18 @@ def cleanup_riv(
     bottom_elevation: GridDataArray,
     concentration: Optional[GridDataArray] = None,
 ) -> dict[str, GridDataArray]:
+    """
+    Clean up river data, fixes some common mistakes causing ValidationErrors by
+    doing the following:
+
+    - Cells where conductance <= 0 are deactivated.
+    - Cells where concentration < 0 are deactivated.
+    - Align NoData: If one variable has an inactive cell in one cell, ensure
+      this cell is deactivated for all variables.
+    - River bottom elevations which exceed river stage are lowered to river
+      stage.
+
+    """
     # Output dict
     output_dict = {
         "stage": stage,
@@ -76,6 +88,15 @@ def cleanup_drn(
     conductance: GridDataArray,
     concentration: Optional[GridDataArray] = None,
 ) -> dict[str, GridDataArray]:
+    """
+    Clean up drain data, fixes some common mistakes causing ValidationErrors by
+    doing the following:
+
+    - Cells where conductance <= 0 are deactivated.
+    - Cells where concentration < 0 are deactivated.
+    - Align NoData: If one variable has an inactive cell in one cell, ensure
+      this cell is deactivated for all variables.
+    """
     # Output dict
     output_dict = {
         "elevation": elevation,
@@ -90,6 +111,15 @@ def cleanup_ghb(
     conductance: GridDataArray,
     concentration: Optional[GridDataArray] = None,
 ) -> dict[str, GridDataArray]:
+    """
+    Clean up general head boundary data, fixes some common mistakes causing
+    ValidationErrors by doing the following:
+
+    - Cells where conductance <= 0 are deactivated.
+    - Cells where concentration < 0 are deactivated.
+    - Align NoData: If one variable has an inactive cell in one cell, ensure
+      this cell is deactivated for all variables.
+    """
     # Output dict
     output_dict = {
         "head": head,
