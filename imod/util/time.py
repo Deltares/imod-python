@@ -17,9 +17,10 @@ DATETIME_FORMATS = {
 
 def to_pandas_datetime_series(series: pd.Series):
     """
-    Try pd.to_datetime first with format, which tries converting to pandas
-    datetime with nanosecond as base. This only supports going up to 2261. If
-    this fails, manually convert with seconds as base.
+    Convert series to pandas datetime, uses length of first string to find the
+    appropriate format. This takes nanosecond as base. This only supports going
+    up to the year 2261; the function sets dates beyond this year silently to
+    pd.NaT.
     """
     len_date = len(series.iloc[0])
     format = DATETIME_FORMATS[len_date]
