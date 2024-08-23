@@ -56,12 +56,14 @@ def resample_timeseries(well_rate: pd.DataFrame, times: list[datetime]) -> pd.Da
     well_rate:  pd.DataFrame
         input timeseries for well
     times: datetime
-        list of times on which the output datarame should have entries.
+        list of times on which the output dataframe should have entries.
 
     returns:
     --------
     a new dataframe containing a timeseries defined on the times in "times".
     """
+    is_steady_state = len(times) == 0
+
     output_frame = pd.DataFrame(times)
     output_frame = output_frame.rename(columns={0: "time"})
     intermediate_df = pd.merge(
@@ -106,6 +108,20 @@ def resample_timeseries(well_rate: pd.DataFrame, times: list[datetime]) -> pd.Da
     if np.isnan(output_frame["rate"].values[-1]):
         output_frame["rate"].values[-1] = well_rate["rate"].values[-1]
 
-    columns_to_merge = ["time"] + location_columns
-
-    return pd.merge(output_frame, intermediate_df[columns_to_merge], on="time")
+    if is_steady_state:
+        # Take first element, the slice is to force pandas to return it as
+        # dataframe instead of series.
+        location_dataframe = intermediate_df[location_columns].iloc[slice(0, 1), :]
+        # Concat along columns and drop time column
+        return pd.concat([output_frame, location_dataframe], axis=1).drop(
+            columns="time"
+        )
+    else:
+        columns_to_merge = ["time"] + location_columns
+        return pd.merge(
+            output_frame,
+            intermediate_df[columns_to_merge],
+            on="time",
+            how="left",
+            validate="1:m",
+        )

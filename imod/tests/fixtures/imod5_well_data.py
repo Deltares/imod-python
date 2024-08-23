@@ -150,6 +150,23 @@ def other_timeseries_string():
     )
 
 
+def out_of_bounds_timeseries_string():
+    return textwrap.dedent(
+        """\
+    6
+    2
+    DATE,-9999.0
+    MEASUREMENT,-9999.0
+    19811130,-174.1507971461288
+    19811231,-166.7777419354838
+    19820131,-147.6367741935485
+    19820228,-127.3857142857142
+    19820331,-159.2109677419355
+    29991112,-182.7713333333334
+    """
+    )
+
+
 def write_ipf_assoc_files(
     projectfile_str,
     ipf1_str,
@@ -243,6 +260,25 @@ def well_mixed_ipfs():
     ipf_simple_str = ipf_simple_string()
     timeseries_well_str = timeseries_string()
     other_timeseries_well_str = other_timeseries_string()
+
+    return write_ipf_mixed_files(
+        ipf_assoc_str,
+        ipf_simple_str,
+        timeseries_well_str,
+        other_timeseries_well_str,
+        tmp_path,
+    )
+
+
+@pytest.fixture(scope="session")
+def well_out_of_bounds_ipfs():
+    tmp_path = imod.util.temporary_directory()
+    os.makedirs(tmp_path)
+
+    ipf_assoc_str = ipf1_string_duplication()
+    ipf_simple_str = ipf_simple_string()
+    timeseries_well_str = timeseries_string()
+    other_timeseries_well_str = out_of_bounds_timeseries_string()
 
     return write_ipf_mixed_files(
         ipf_assoc_str,
