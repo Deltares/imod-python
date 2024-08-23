@@ -81,6 +81,11 @@ class Package(PackageBase, IPackage, abc.ABC):
             f"{type(self).__name__}(**{self._pkg_id}.dataset.sel(**selection))"
         )
 
+    def cleanup(self):
+        raise NotImplementedError(
+            "Method not implemented for this package."
+        )
+
     @staticmethod
     def _valid(value: Any) -> bool:
         return _is_valid(value)
