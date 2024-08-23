@@ -538,7 +538,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
           simulation times.
         - When simulation times fall outside well timeseries range, the last
           rate is forward filled.
-        - Projectfile timestamps itsself are not used. Even if assigned to a
+        - Projectfile timestamps are not used. Even if assigned to a
           "steady-state" timestamp, the resulting dataset still uses simulation
           times.
 
