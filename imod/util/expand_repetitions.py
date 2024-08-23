@@ -108,8 +108,6 @@ def resample_timeseries(well_rate: pd.DataFrame, times: list[datetime]) -> pd.Da
     if np.isnan(output_frame["rate"].values[-1]):
         output_frame["rate"].values[-1] = well_rate["rate"].values[-1]
 
-    columns_to_merge = ["time"] + location_columns
-
     if is_steady_state:
         # Take first element, the slice is to force pandas to return it as
         # dataframe instead of series.
@@ -119,6 +117,11 @@ def resample_timeseries(well_rate: pd.DataFrame, times: list[datetime]) -> pd.Da
             columns="time"
         )
     else:
+        columns_to_merge = ["time"] + location_columns
         return pd.merge(
-            output_frame, intermediate_df[columns_to_merge], on="time", how="left"
+            output_frame,
+            intermediate_df[columns_to_merge],
+            on="time",
+            how="left",
+            validate="1:m",
         )

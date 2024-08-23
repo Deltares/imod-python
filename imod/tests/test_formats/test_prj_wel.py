@@ -929,7 +929,7 @@ def test_from_imod5_data_wells__wells_out_of_bounds(
     data, _ = open_projectfile_data(wel_file)
     for wellname in data.keys():
         assert wellname in expected_dict.keys()
-        fails, has_time, _ = expected_dict[wellname]
+        fails, _, _ = expected_dict[wellname]
         if fails:
             with pytest.raises(ValueError):
                 wel_cls.from_imod5_data(wellname, data, times=times)

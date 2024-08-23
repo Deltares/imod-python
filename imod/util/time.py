@@ -23,8 +23,8 @@ def to_pandas_datetime_series(series: pd.Series):
     pd.NaT.
     """
     len_date = len(series.iloc[0])
-    format = DATETIME_FORMATS[len_date]
-    return pd.to_datetime(series, format=format, errors="coerce")
+    dt_format = DATETIME_FORMATS[len_date]
+    return pd.to_datetime(series, format=dt_format, errors="coerce")
 
 
 def to_datetime(s: str) -> datetime.datetime:
