@@ -294,6 +294,8 @@ class GroundwaterFlowModel(Modflow6Model):
         for wel_key in wel_keys:
             wel_key_truncated = wel_key[:16]
             if wel_key_truncated in result.keys():
+                # Remove this when https://github.com/Deltares/imod-python/issues/1167
+                # is resolved
                 msg = textwrap.dedent(
                     f"""Truncated key: '{wel_key_truncated}' already assigned to
                     imported model, please rename wells so that unique names are
