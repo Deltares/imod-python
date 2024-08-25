@@ -5,7 +5,6 @@ Functions to load sample data.
 import importlib
 from pathlib import Path
 from typing import Union
-from zipfile import ZipFile
 
 import numpy as np
 import pandas as pd
@@ -13,6 +12,7 @@ import pooch
 import xarray as xr
 import xugrid as xu
 from filelock import FileLock
+from pooch import Unzip
 
 from imod.formats.prj import open_projectfile_data
 from imod.mf6 import Modflow6Simulation
@@ -46,9 +46,7 @@ REGISTRY = load_pooch_registry(REGISTRY)
 
 
 def twri_output(path: Union[str, Path]) -> None:
-    fname_twri = REGISTRY.fetch("ex01-twri-output.zip")
-    with ZipFile(fname_twri) as archive:
-        archive.extractall(path)
+    _ = REGISTRY.fetch("ex01-twri-output.zip", processor=Unzip(extract_dir=path))
 
 
 def hondsrug_initial() -> xr.Dataset:
@@ -99,32 +97,39 @@ def ahn() -> xr.Dataset:
 
 
 def lakes_shp(path: Union[str, Path]) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
-    fname_lakes_shp = REGISTRY.fetch("lakes_shp.zip")
-    with ZipFile(fname_lakes_shp) as archive:
-        archive.extractall(path)
+    lock = FileLock(REGISTRY.path / "lakes_shp.zip.lock")
+    with lock:
+        _ = REGISTRY.fetch("lakes_shp.zip", processor=Unzip(extract_dir=path))
     return gpd.read_file(Path(path) / "lakes.shp")
 
 
-def circle() -> xu.Ugrid2d:
-    nodes_lock = FileLock(REGISTRY.path / "circle-nodes.txt.lock")
-    with nodes_lock:
+def _circle_nodes():
+    lock = FileLock(REGISTRY.path / "circle-nodes.txt.lock")
+    with lock:
         fname_nodes = REGISTRY.fetch("circle-nodes.txt")
+        nodes = np.loadtxt(fname_nodes)
 
-    triangles_lock = FileLock(REGISTRY.path / "circle-triangles.txt.lock")
-    with triangles_lock:
+    return nodes
+
+
+def _circle_triangles():
+    lock = FileLock(REGISTRY.path / "circle-triangles.txt.lock")
+    with lock:
         fname_triangles = REGISTRY.fetch("circle-triangles.txt")
+        triangles = np.loadtxt(fname_triangles).astype(np.int32)
 
-    nodes = np.loadtxt(fname_nodes)
-    triangles = np.loadtxt(fname_triangles).astype(np.int32)
+    return triangles
+
+
+def circle() -> xu.Ugrid2d:
+    nodes = _circle_nodes()
+    triangles = _circle_triangles()
 
     return xu.Ugrid2d(*nodes.T, -1, triangles)
 
 
 def imod5_projectfile_data(path: Union[str, Path]) -> dict:
-    fname_model = REGISTRY.fetch("iMOD5_model.zip")
-
-    with ZipFile(fname_model) as archive:
-        archive.extractall(path)
+    _ = REGISTRY.fetch("iMOD5_model.zip", processor=Unzip(extract_dir=path))
 
     return open_projectfile_data(Path(path) / "iMOD5_model_pooch" / "iMOD5_model.prj")
 
@@ -132,10 +137,7 @@ def imod5_projectfile_data(path: Union[str, Path]) -> dict:
 def hondsrug_simulation(path: Union[str, Path]) -> Modflow6Simulation:
     lock = FileLock(REGISTRY.path / "hondsrug-simulation.zip.lock")
     with lock:
-        fname_simulation = REGISTRY.fetch("hondsrug-simulation.zip")
-
-        with ZipFile(fname_simulation) as archive:
-            archive.extractall(path)
+        _ = REGISTRY.fetch("hondsrug-simulation.zip", processor=Unzip(extract_dir=path))
 
         simulation = Modflow6Simulation.from_file(
             Path(path) / "mf6-hondsrug-example.toml"
@@ -148,10 +150,7 @@ def hondsrug_simulation(path: Union[str, Path]) -> Modflow6Simulation:
 
 
 def hondsrug_crosssection(path: Union[str, Path]) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
-    fname_simulation = REGISTRY.fetch("hondsrug-crosssection.zip")
-
-    with ZipFile(fname_simulation) as archive:
-        archive.extractall(path)
+    _ = REGISTRY.fetch("hondsrug-crosssection.zip", processor=Unzip(extract_dir=path))
 
     return gpd.read_file(Path(path) / "crosssection.shp")
 
