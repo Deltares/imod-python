@@ -35,9 +35,14 @@ def align_interface_levels(
             raise TypeError(f"Unmatched case for method, got {method}")
 
 
-def _cleanup_robin_boundary(grids=dict[str, GridDataArray]) -> dict[str, GridDataArray]:
+def _cleanup_robin_boundary(
+    idomain: GridDataArray, grids: dict[str, GridDataArray]
+) -> dict[str, GridDataArray]:
     """Cleanup robin boundary condition (i.e. bc with conductance)"""
-    conductance = grids["conductance"]
+    active = idomain == 1
+    # Deactivate conductance cells outside active domain; this nodata
+    # inconsistency will be aligned in the final call to align_nodata
+    conductance = grids["conductance"].where(active)
     concentration = grids["concentration"]
     # Make conductance cells with erronous values inactive
     grids["conductance"] = conductance.where(conductance > 0.0)
@@ -52,6 +57,8 @@ def _cleanup_robin_boundary(grids=dict[str, GridDataArray]) -> dict[str, GridDat
 
 
 def cleanup_riv(
+    idomain: GridDataArray,
+    bottom: GridDataArray,
     stage: GridDataArray,
     conductance: GridDataArray,
     bottom_elevation: GridDataArray,
@@ -63,8 +70,11 @@ def cleanup_riv(
 
     - Cells where conductance <= 0 are deactivated.
     - Cells where concentration < 0 are set to 0.0.
+    - Cells outside active domain (idomain==1) are removed.
     - Align NoData: If one variable has an inactive cell in one cell, ensure
       this cell is deactivated for all variables.
+    - River bottom elevations below model bottom of a layer are set to model
+      bottom of that layer.
     - River bottom elevations which exceed river stage are lowered to river
       stage.
 
@@ -76,7 +86,19 @@ def cleanup_riv(
         "bottom_elevation": bottom_elevation,
         "concentration": concentration,
     }
-    output_dict = _cleanup_robin_boundary(output_dict)
+    output_dict = _cleanup_robin_boundary(idomain, output_dict)
+    if (output_dict["stage"] < bottom).any():
+        raise ValueError(
+            "River stage below bottom of model layer, cannot fix this. "
+            "Probably rivers are assigned to the wrong layer, you can allocate "
+            "to model layers with "
+            "river data to with: "
+            "``imod.prepare.topsystem.allocate_riv_cells``."
+        )
+    # Ensure bottom elevation above model bottom
+    output_dict["bottom_elevation"], _ = align_interface_levels(
+        output_dict["bottom_elevation"], bottom, AlignLevelsMode.BOTTOMUP
+    )
     # Ensure stage above bottom_elevation
     output_dict["stage"], output_dict["bottom_elevation"] = align_interface_levels(
         output_dict["stage"], output_dict["bottom_elevation"], AlignLevelsMode.TOPDOWN
@@ -85,6 +107,7 @@ def cleanup_riv(
 
 
 def cleanup_drn(
+    idomain: GridDataArray,
     elevation: GridDataArray,
     conductance: GridDataArray,
     concentration: Optional[GridDataArray] = None,
@@ -95,6 +118,7 @@ def cleanup_drn(
 
     - Cells where conductance <= 0 are deactivated.
     - Cells where concentration < 0 are set to 0.0.
+    - Cells outside active domain (idomain==1) are removed.
     - Align NoData: If one variable has an inactive cell in one cell, ensure
       this cell is deactivated for all variables.
     """
@@ -104,10 +128,11 @@ def cleanup_drn(
         "conductance": conductance,
         "concentration": concentration,
     }
-    return _cleanup_robin_boundary(output_dict)
+    return _cleanup_robin_boundary(idomain, output_dict)
 
 
 def cleanup_ghb(
+    idomain: GridDataArray,
     head: GridDataArray,
     conductance: GridDataArray,
     concentration: Optional[GridDataArray] = None,
@@ -118,6 +143,7 @@ def cleanup_ghb(
 
     - Cells where conductance <= 0 are deactivated.
     - Cells where concentration < 0 are set to 0.0.
+    - Cells outside active domain (idomain==1) are removed.
     - Align NoData: If one variable has an inactive cell in one cell, ensure
       this cell is deactivated for all variables.
     """
@@ -127,9 +153,10 @@ def cleanup_ghb(
         "conductance": conductance,
         "concentration": concentration,
     }
-    return _cleanup_robin_boundary(output_dict)
+    return _cleanup_robin_boundary(idomain, output_dict)
 
 
 def cleanup_wel(wel_ds: GridDataset):
+    """ """
     deactivate = wel_ds["screen_top"] < wel_ds["screen_bottom"]
     return wel_ds.where(~deactivate, drop=True)

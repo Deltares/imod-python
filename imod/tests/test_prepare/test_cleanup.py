@@ -5,7 +5,7 @@ import xugrid as xu
 from pytest_cases import parametrize, parametrize_with_cases
 
 from imod.prepare.cleanup import cleanup_drn, cleanup_ghb, cleanup_riv
-from imod.tests.test_mf6.test_mf6_riv import RivCases
+from imod.tests.test_mf6.test_mf6_riv import RivDisCases
 from imod.typing import GridDataArray
 
 
@@ -33,16 +33,29 @@ def _rename_data_dict(data: dict, func: Callable):
     return renamed
 
 
+def _prepare_dis_dict(dis_dict: dict, func: Callable):
+    """Keep required dis args for specific cleanup functions"""
+    keep_vars = _KEEP_FROM_DIS_DICT[func]
+    return {var: dis_dict[var] for var in keep_vars}
+
+
 _RENAME_DICT = {
     cleanup_riv: {},
     cleanup_drn: {"stage": "elevation", "bottom_elevation": None},
     cleanup_ghb: {"stage": "head", "bottom_elevation": None},
 }
 
+_KEEP_FROM_DIS_DICT = {
+    cleanup_riv: ["idomain", "bottom"],
+    cleanup_drn: ["idomain"],
+    cleanup_ghb: ["idomain"],
+}
 
-@parametrize_with_cases("riv_data", cases=RivCases)
+
+@parametrize_with_cases("riv_data, dis_data", cases=RivDisCases)
 @parametrize("cleanup_func", [cleanup_drn, cleanup_ghb, cleanup_riv])
-def test_cleanup__align_nodata(riv_data: dict, cleanup_func: Callable):
+def test_cleanup__align_nodata(riv_data: dict, dis_data: dict, cleanup_func: Callable):
+    dis_dict = _prepare_dis_dict(dis_data, cleanup_func)
     data_dict = _rename_data_dict(riv_data, cleanup_func)
     # Assure conductance not modified by previous tests.
     np.testing.assert_equal(_first(data_dict["conductance"]), 1.0)
@@ -51,15 +64,18 @@ def test_cleanup__align_nodata(riv_data: dict, cleanup_func: Callable):
     first_key = next(iter(data_dict.keys()))
     data_dict[first_key][idx] = np.nan
     # Act
-    data_cleaned = cleanup_func(**data_dict)
+    data_cleaned = cleanup_func(**dis_dict, **data_dict)
     # Assert
     for key in data_cleaned.keys():
         np.testing.assert_equal(_first(data_cleaned[key][idx]), np.nan)
 
 
-@parametrize_with_cases("riv_data", cases=RivCases)
+@parametrize_with_cases("riv_data, dis_data", cases=RivDisCases)
 @parametrize("cleanup_func", [cleanup_drn, cleanup_ghb, cleanup_riv])
-def test_cleanup__zero_conductance(riv_data: dict, cleanup_func: Callable):
+def test_cleanup__zero_conductance(
+    riv_data: dict, dis_data: dict, cleanup_func: Callable
+):
+    dis_dict = _prepare_dis_dict(dis_data, cleanup_func)
     data_dict = _rename_data_dict(riv_data, cleanup_func)
     # Assure conductance not modified by previous tests.
     np.testing.assert_equal(_first(data_dict["conductance"]), 1.0)
@@ -67,15 +83,18 @@ def test_cleanup__zero_conductance(riv_data: dict, cleanup_func: Callable):
     # Arrange: Deactivate one cell
     data_dict["conductance"][idx] = 0.0
     # Act
-    data_cleaned = cleanup_func(**data_dict)
+    data_cleaned = cleanup_func(**dis_dict, **data_dict)
     # Assert
     for key in data_cleaned.keys():
         np.testing.assert_equal(_first(data_cleaned[key][idx]), np.nan)
 
 
-@parametrize_with_cases("riv_data", cases=RivCases)
+@parametrize_with_cases("riv_data, dis_data", cases=RivDisCases)
 @parametrize("cleanup_func", [cleanup_drn, cleanup_ghb, cleanup_riv])
-def test_cleanup__negative_concentration(riv_data: dict, cleanup_func: Callable):
+def test_cleanup__negative_concentration(
+    riv_data: dict, dis_data: dict, cleanup_func: Callable
+):
+    dis_dict = _prepare_dis_dict(dis_data, cleanup_func)
     data_dict = _rename_data_dict(riv_data, cleanup_func)
     first_key = next(iter(data_dict.keys()))
     # Create concentration data
@@ -86,19 +105,58 @@ def test_cleanup__negative_concentration(riv_data: dict, cleanup_func: Callable)
     # Arrange: Deactivate one cell
     data_dict["concentration"][idx] = -10.0
     # Act
-    data_cleaned = cleanup_func(**data_dict)
+    data_cleaned = cleanup_func(**dis_dict, **data_dict)
     # Assert
     np.testing.assert_equal(_first(data_cleaned["concentration"]), 0.0)
 
 
-@parametrize_with_cases("riv_data", cases=RivCases)
-def test_cleanup_riv__fix_bottom_elevation(riv_data):
+@parametrize_with_cases("riv_data, dis_data", cases=RivDisCases)
+@parametrize("cleanup_func", [cleanup_drn, cleanup_ghb, cleanup_riv])
+def test_cleanup__outside_active_domain(
+    riv_data: dict, dis_data: dict, cleanup_func: Callable
+):
+    dis_dict = _prepare_dis_dict(dis_data, cleanup_func)
+    data_dict = _rename_data_dict(riv_data, cleanup_func)
+    # Assure conductance not modified by previous tests.
+    np.testing.assert_equal(_first(data_dict["conductance"]), 1.0)
+    idx = _first_index(data_dict["conductance"])
+    # Arrange: Deactivate one cell
+    dis_dict["idomain"][idx] = 0.0
+    # Act
+    data_cleaned = cleanup_func(**dis_dict, **data_dict)
+    # Assert
+    for key in data_cleaned.keys():
+        np.testing.assert_equal(_first(data_cleaned[key][idx]), np.nan)
+
+
+@parametrize_with_cases("riv_data, dis_data", cases=RivDisCases)
+def test_cleanup_riv__fix_bottom_elevation_to_bottom(riv_data: dict, dis_data: dict):
+    dis_dict = _prepare_dis_dict(dis_data, cleanup_riv)
+    # Arrange: Set bottom elevation model layer bottom
+    riv_data["bottom_elevation"] -= 3.0
+    # Assure conductance not modified by previous tests.
+    np.testing.assert_equal(_first(riv_data["conductance"]), 1.0)
+    # Act
+    riv_data_cleaned = cleanup_riv(**dis_dict, **riv_data)
+    # Assert
+    # Account for cells inactive river cells.
+    riv_active = riv_data_cleaned["stage"].notnull()
+    expected = dis_dict["bottom"].where(riv_active)
+
+    np.testing.assert_equal(
+        riv_data_cleaned["bottom_elevation"].values, expected.values
+    )
+
+
+@parametrize_with_cases("riv_data, dis_data", cases=RivDisCases)
+def test_cleanup_riv__fix_bottom_elevation_to_stage(riv_data: dict, dis_data: dict):
+    dis_dict = _prepare_dis_dict(dis_data, cleanup_riv)
     # Arrange: Set bottom elevation above stage
     riv_data["bottom_elevation"] += 3.0
     # Assure conductance not modified by previous tests.
     np.testing.assert_equal(_first(riv_data["conductance"]), 1.0)
     # Act
-    riv_data_cleaned = cleanup_riv(**riv_data)
+    riv_data_cleaned = cleanup_riv(**dis_dict, **riv_data)
     # Assert
     np.testing.assert_equal(
         riv_data_cleaned["bottom_elevation"].values, riv_data_cleaned["stage"].values

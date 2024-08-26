@@ -81,7 +81,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             f"{type(self).__name__}(**{self._pkg_id}.dataset.sel(**selection))"
         )
 
-    def cleanup(self):
+    def cleanup(self, dis: Any):
         raise NotImplementedError("Method not implemented for this package.")
 
     @staticmethod
@@ -633,7 +633,9 @@ class Package(PackageBase, IPackage, abc.ABC):
                 result[name] = self.dataset[name].values[()]
         return result
 
-    def _call_func_on_grids(self, func: Callable) -> dict[str, GridDataArray]:
+    def _call_func_on_grids(
+        self, func: Callable, dis: dict
+    ) -> dict[str, GridDataArray]:
         """
         Call function on dictionary of grids and merge settings back into
         dictionary.
@@ -649,7 +651,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             for varname in grid_varnames
             if varname in self.dataset.keys()
         }
-        cleaned_grids = func(**grids)
+        cleaned_grids = func(**dis, **grids)
         settings = self.get_non_grid_data(grid_varnames)
         return cleaned_grids | settings
 

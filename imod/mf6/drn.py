@@ -1,12 +1,13 @@
 from copy import deepcopy
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Union
 
 import numpy as np
 
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.regrid.regrid_schemes import DrainageRegridMethod
@@ -164,8 +165,11 @@ class Drainage(BoundaryCondition, IRegridPackage):
 
         return errors
 
-    def cleanup(self) -> None:
-        cleaned_dict = self._call_func_on_grids(cleanup_drn)
+    def cleanup(
+        self, dis: Union[StructuredDiscretization, VerticesDiscretization]
+    ) -> None:
+        dis_dict = {var: dis.dataset[var] for var in ["idomain"]}
+        cleaned_dict = self._call_func_on_grids(cleanup_drn, dis_dict)
         super().__init__(cleaned_dict)
 
     @classmethod

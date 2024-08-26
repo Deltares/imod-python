@@ -12,11 +12,17 @@ from pytest_cases import parametrize_with_cases
 
 import imod
 from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.write_context import WriteContext
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION
 from imod.prepare.topsystem.conductance import DISTRIBUTING_OPTION
 from imod.schemata import ValidationError
 from imod.typing.grid import ones_like, zeros_like
+
+TYPE_DIS_PKG = {
+    xu.UgridDataArray: VerticesDiscretization,
+    xr.DataArray: StructuredDiscretization,
+}
 
 
 def make_da():
@@ -134,8 +140,10 @@ def test_validate_inconsistent_nan(riv_data, dis_data):
 def test_cleanup_inconsistent_nan(riv_data, dis_data):
     riv_data["stage"][..., 2] = np.nan
     river = imod.mf6.River(**riv_data)
+    type_grid = type(riv_data["stage"])
+    dis_pkg = TYPE_DIS_PKG[type_grid](**dis_data)
 
-    river.cleanup()
+    river.cleanup(dis_pkg)
     errors = river._validate(river._write_schemata, **dis_data)
 
     assert len(errors) == 0
@@ -239,9 +247,11 @@ def test_cleanup_zero_conductance(riv_data, dis_data):
     Cleanup zero conductance
     """
     riv_data["conductance"][..., 2] = 0.0
+    type_grid = type(riv_data["stage"])
+    dis_pkg = TYPE_DIS_PKG[type_grid](**dis_data)
 
     river = imod.mf6.River(**riv_data)
-    river.cleanup()
+    river.cleanup(dis_pkg)
 
     errors = river._validate(river._write_schemata, **dis_data)
     assert len(errors) == 0
@@ -270,9 +280,11 @@ def test_cleanup_bottom_above_stage(riv_data, dis_data):
     """
 
     riv_data["bottom_elevation"] = riv_data["bottom_elevation"] + 10.0
+    type_grid = type(riv_data["stage"])
+    dis_pkg = TYPE_DIS_PKG[type_grid](**dis_data)
 
     river = imod.mf6.River(**riv_data)
-    river.cleanup()
+    river.cleanup(dis_pkg)
 
     errors = river._validate(river._write_schemata, **dis_data)
 

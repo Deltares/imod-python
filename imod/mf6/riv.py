@@ -1,6 +1,6 @@
 from copy import deepcopy
 from datetime import datetime
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 import numpy as np
 import xarray as xr
@@ -10,6 +10,7 @@ from imod.logging import init_log_decorator
 from imod.logging.loglevel import LogLevel
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.drn import Drainage
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.regrid.regrid_schemes import RiverRegridMethod
@@ -185,8 +186,11 @@ class River(BoundaryCondition, IRegridPackage):
 
         return errors
 
-    def cleanup(self) -> None:
-        cleaned_dict = self._call_func_on_grids(cleanup_riv)
+    def cleanup(
+        self, dis: Union[StructuredDiscretization, VerticesDiscretization]
+    ) -> None:
+        dis_dict = {var: dis.dataset[var] for var in ["idomain", "bottom"]}
+        cleaned_dict = self._call_func_on_grids(cleanup_riv, dis_dict)
         super().__init__(cleaned_dict)
 
     @classmethod
