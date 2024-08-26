@@ -26,12 +26,13 @@ def align_interface_levels(
 ) -> tuple[GridDataArray, GridDataArray]:
     to_align = top < bottom
 
-    if method == AlignLevelsMode.BOTTOMUP:
-        return top.where(~to_align, bottom), bottom
-    elif method == AlignLevelsMode.TOPDOWN:
-        return top, bottom.where(~to_align, top)
-    else:
-        raise TypeError("")
+    match method:
+        case AlignLevelsMode.BOTTOMUP:
+            return top.where(~to_align, bottom), bottom
+        case AlignLevelsMode.TOPDOWN:
+            return top, bottom.where(~to_align, top)
+        case _:
+            raise TypeError(f"Unmatched case for method, got {method}")
 
 
 def _cleanup_robin_boundary(grids=dict[str, GridDataArray]) -> dict[str, GridDataArray]:
@@ -41,7 +42,7 @@ def _cleanup_robin_boundary(grids=dict[str, GridDataArray]) -> dict[str, GridDat
     # Make conductance cells with erronous values inactive
     grids["conductance"] = conductance.where(conductance > 0.0)
     # Make concentration cells with erronous values inactive
-    if (concentration is not None) or not scalar_None(concentration):
+    if (concentration is not None) and not scalar_None(concentration):
         grids["concentration"] = concentration.where(concentration >= 0.0)
     else:
         grids.pop("concentration")
