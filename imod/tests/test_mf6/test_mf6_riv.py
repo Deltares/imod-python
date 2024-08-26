@@ -115,19 +115,30 @@ def test_all_nan(riv_data, dis_data):
     errors = river._validate(river._write_schemata, **dis_data)
 
     assert len(errors) == 1
-
-    for var, var_errors in errors.items():
-        assert var == "stage"
+    assert "stage" in errors.keys()
 
 
 @parametrize_with_cases("riv_data,dis_data", cases=RivDisCases)
-def test_inconsistent_nan(riv_data, dis_data):
+def test_validate_inconsistent_nan(riv_data, dis_data):
     riv_data["stage"][..., 2] = np.nan
     river = imod.mf6.River(**riv_data)
 
     errors = river._validate(river._write_schemata, **dis_data)
 
-    assert len(errors) == 1
+    assert len(errors) == 2
+    assert "bottom_elevation" in errors.keys()
+    assert "conductance" in errors.keys()
+
+
+@parametrize_with_cases("riv_data,dis_data", cases=RivDisCases)
+def test_cleanup_inconsistent_nan(riv_data, dis_data):
+    riv_data["stage"][..., 2] = np.nan
+    river = imod.mf6.River(**riv_data)
+
+    river.cleanup()
+    errors = river._validate(river._write_schemata, **dis_data)
+
+    assert len(errors) == 0
 
 
 @parametrize_with_cases("riv_data,dis_data", cases=RivDisCases)
@@ -207,11 +218,11 @@ def test_check_dimsize_zero():
 
 
 @parametrize_with_cases("riv_data,dis_data", cases=RivDisCases)
-def test_check_zero_conductance(riv_data, dis_data):
+def test_validate_zero_conductance(riv_data, dis_data):
     """
-    Test for zero conductance
+    Test for validation zero conductance
     """
-    riv_data["conductance"] = riv_data["conductance"] * 0.0
+    riv_data["conductance"][..., 2] = 0.0
 
     river = imod.mf6.River(**riv_data)
 
@@ -223,9 +234,23 @@ def test_check_zero_conductance(riv_data, dis_data):
 
 
 @parametrize_with_cases("riv_data,dis_data", cases=RivDisCases)
-def test_check_bottom_above_stage(riv_data, dis_data):
+def test_cleanup_zero_conductance(riv_data, dis_data):
     """
-    Check that river bottom is not above stage.
+    Cleanup zero conductance
+    """
+    riv_data["conductance"][..., 2] = 0.0
+
+    river = imod.mf6.River(**riv_data)
+    river.cleanup()
+
+    errors = river._validate(river._write_schemata, **dis_data)
+    assert len(errors) == 0
+
+
+@parametrize_with_cases("riv_data,dis_data", cases=RivDisCases)
+def test_validate_bottom_above_stage(riv_data, dis_data):
+    """
+    Validate that river bottom is not above stage.
     """
 
     riv_data["bottom_elevation"] = riv_data["bottom_elevation"] + 10.0
@@ -235,8 +260,24 @@ def test_check_bottom_above_stage(riv_data, dis_data):
     errors = river._validate(river._write_schemata, **dis_data)
 
     assert len(errors) == 1
-    for var, var_errors in errors.items():
-        assert var == "stage"
+    assert "stage" in errors.keys()
+
+
+@parametrize_with_cases("riv_data,dis_data", cases=RivDisCases)
+def test_cleanup_bottom_above_stage(riv_data, dis_data):
+    """
+    Cleanup river bottom above stage.
+    """
+
+    riv_data["bottom_elevation"] = riv_data["bottom_elevation"] + 10.0
+
+    river = imod.mf6.River(**riv_data)
+    river.cleanup()
+
+    errors = river._validate(river._write_schemata, **dis_data)
+
+    assert len(errors) == 0
+    assert river.dataset["bottom_elevation"].equals(river.dataset["stage"])
 
 
 @parametrize_with_cases("riv_data,dis_data", cases=RivDisCases)
@@ -277,12 +318,12 @@ def test_check_boundary_outside_active_domain(riv_data, dis_data):
     assert len(errors) == 1
 
 
-def test_check_dim_monotonicity(riv_dict):
+def test_check_dim_monotonicity():
     """
     Test if dimensions are monotonically increasing or, in case of the y coord,
     decreasing
     """
-    riv_ds = xr.merge([riv_dict])
+    riv_ds = xr.merge([riv_dict()])
 
     message = textwrap.dedent(
         """
@@ -324,19 +365,19 @@ def test_check_dim_monotonicity(riv_dict):
         imod.mf6.River(**riv_ds.sel(layer=slice(None, None, -1)))
 
 
-def test_validate_false(riv_dict):
+def test_validate_false():
     """
     Test turning off validation
     """
 
-    riv_ds = xr.merge([riv_dict])
+    riv_ds = xr.merge([riv_dict()])
 
     imod.mf6.River(validate=False, **riv_ds.sel(layer=slice(None, None, -1)))
 
 
 @pytest.mark.usefixtures("concentration_fc")
-def test_render_concentration(riv_dict, concentration_fc):
-    riv_ds = xr.merge([riv_dict])
+def test_render_concentration(concentration_fc):
+    riv_ds = xr.merge([riv_dict()])
 
     concentration = concentration_fc.sel(
         layer=[2, 3], time=np.datetime64("2000-01-01"), drop=True
