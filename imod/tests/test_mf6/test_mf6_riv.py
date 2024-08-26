@@ -19,7 +19,6 @@ from imod.schemata import ValidationError
 from imod.typing.grid import ones_like, zeros_like
 
 
-@pytest.fixture(scope="function")
 def make_da():
     x = [5.0, 15.0, 25.0]
     y = [25.0, 15.0, 5.0]
@@ -34,9 +33,8 @@ def make_da():
     )
 
 
-@pytest.fixture(scope="function")
-def dis_dict(make_da):
-    da = make_da
+def dis_dict():
+    da = make_da()
     bottom = da - xr.DataArray(
         data=[1.5, 2.5], dims=("layer",), coords={"layer": [2, 3]}
     )
@@ -44,16 +42,15 @@ def dis_dict(make_da):
     return {"idomain": da.astype(int), "top": da.sel(layer=2), "bottom": bottom}
 
 
-@pytest.fixture(scope="function")
-def riv_dict(make_da):
-    da = make_da
+def riv_dict():
+    da = make_da()
     da[:, 1, 1] = np.nan
 
     bottom = da - xr.DataArray(
         data=[1.0, 2.0], dims=("layer",), coords={"layer": [2, 3]}
     )
 
-    return {"stage": da, "conductance": da, "bottom_elevation": bottom}
+    return {"stage": da, "conductance": da.copy(), "bottom_elevation": bottom}
 
 
 def make_dict_unstructured(d):
@@ -61,19 +58,19 @@ def make_dict_unstructured(d):
 
 
 class RivCases:
-    def case_structured(self, riv_dict):
-        return riv_dict
+    def case_structured(self):
+        return riv_dict()
 
-    def case_unstructured(self, riv_dict):
-        return make_dict_unstructured(riv_dict)
+    def case_unstructured(self):
+        return make_dict_unstructured(riv_dict())
 
 
 class RivDisCases:
-    def case_structured(self, riv_dict, dis_dict):
-        return riv_dict, dis_dict
+    def case_structured(self):
+        return riv_dict(), dis_dict()
 
-    def case_unstructured(self, riv_dict, dis_dict):
-        return make_dict_unstructured(riv_dict), make_dict_unstructured(dis_dict)
+    def case_unstructured(self):
+        return make_dict_unstructured(riv_dict()), make_dict_unstructured(dis_dict())
 
 
 @parametrize_with_cases("riv_data", cases=RivCases)
