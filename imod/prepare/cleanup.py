@@ -41,9 +41,9 @@ def _cleanup_robin_boundary(grids=dict[str, GridDataArray]) -> dict[str, GridDat
     concentration = grids["concentration"]
     # Make conductance cells with erronous values inactive
     grids["conductance"] = conductance.where(conductance > 0.0)
-    # Make concentration cells with erronous values inactive
+    # Clip negative concentration cells to 0.0
     if (concentration is not None) and not scalar_None(concentration):
-        grids["concentration"] = concentration.where(concentration >= 0.0)
+        grids["concentration"] = concentration.clip(min=0.0)
     else:
         grids.pop("concentration")
 
@@ -62,7 +62,7 @@ def cleanup_riv(
     doing the following:
 
     - Cells where conductance <= 0 are deactivated.
-    - Cells where concentration < 0 are deactivated.
+    - Cells where concentration < 0 are set to 0.0.
     - Align NoData: If one variable has an inactive cell in one cell, ensure
       this cell is deactivated for all variables.
     - River bottom elevations which exceed river stage are lowered to river
@@ -94,7 +94,7 @@ def cleanup_drn(
     doing the following:
 
     - Cells where conductance <= 0 are deactivated.
-    - Cells where concentration < 0 are deactivated.
+    - Cells where concentration < 0 are set to 0.0.
     - Align NoData: If one variable has an inactive cell in one cell, ensure
       this cell is deactivated for all variables.
     """
@@ -117,7 +117,7 @@ def cleanup_ghb(
     ValidationErrors by doing the following:
 
     - Cells where conductance <= 0 are deactivated.
-    - Cells where concentration < 0 are deactivated.
+    - Cells where concentration < 0 are set to 0.0.
     - Align NoData: If one variable has an inactive cell in one cell, ensure
       this cell is deactivated for all variables.
     """
