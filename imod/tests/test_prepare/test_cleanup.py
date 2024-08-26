@@ -74,6 +74,24 @@ def test_cleanup__zero_conductance(riv_data: dict, cleanup_func: Callable):
 
 
 @parametrize_with_cases("riv_data", cases=RivCases)
+@parametrize("cleanup_func", [cleanup_drn, cleanup_ghb, cleanup_riv])
+def test_cleanup__negative_concentration(riv_data: dict, cleanup_func: Callable):
+    data_dict = _rename_data_dict(riv_data, cleanup_func)
+    first_key = next(iter(data_dict.keys()))
+    # Create concentration data
+    data_dict["concentration"] = data_dict[first_key].copy()
+    # Assure conductance not modified by previous tests.
+    np.testing.assert_equal(_first(data_dict["conductance"]), 1.0)
+    idx = _first_index(data_dict["conductance"])
+    # Arrange: Deactivate one cell
+    data_dict["concentration"][idx] = -10.0
+    # Act
+    data_cleaned = cleanup_func(**data_dict)
+    # Assert
+    np.testing.assert_equal(_first(data_cleaned["concentration"]), 0.0)
+
+
+@parametrize_with_cases("riv_data", cases=RivCases)
 def test_cleanup_riv__fix_bottom_elevation(riv_data):
     # Arrange: Set bottom elevation above stage
     riv_data["bottom_elevation"] += 3.0
