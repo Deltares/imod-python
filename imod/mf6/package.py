@@ -82,9 +82,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         )
 
     def cleanup(self):
-        raise NotImplementedError(
-            "Method not implemented for this package."
-        )
+        raise NotImplementedError("Method not implemented for this package.")
 
     @staticmethod
     def _valid(value: Any) -> bool:
@@ -646,7 +644,11 @@ class Package(PackageBase, IPackage, abc.ABC):
             Function to call on all grids
         """
         grid_varnames = list(self._write_schemata.keys())
-        grids = {varname: self.dataset[varname] for varname in grid_varnames}
+        grids = {
+            varname: self.dataset[varname]
+            for varname in grid_varnames
+            if varname in self.dataset.keys()
+        }
         cleaned_grids = func(**grids)
         settings = self.get_non_grid_data(grid_varnames)
         return cleaned_grids | settings

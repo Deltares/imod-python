@@ -130,8 +130,6 @@ def cleanup_ghb(
     return _cleanup_robin_boundary(output_dict)
 
 
-def cleanup_wel(
-        wel_ds: GridDataset
-):
+def cleanup_wel(wel_ds: GridDataset):
     deactivate = wel_ds["screen_top"] < wel_ds["screen_bottom"]
     return wel_ds.where(~deactivate, drop=True)
