@@ -47,3 +47,7 @@ Prepare model input
     distribute_drn_conductance
     distribute_ghb_conductance
     distribute_riv_conductance
+
+    cleanup_drn
+    cleanup_ghb
+    cleanup_riv

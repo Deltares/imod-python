@@ -69,8 +69,14 @@ Flow Packages
     Buoyancy
     ConstantHead
     Drainage
+    Drainage.mask
+    Drainage.regrid_like
+    Drainage.cleanup
     Evapotranspiration
     GeneralHeadBoundary
+    GeneralHeadBoundary.mask
+    GeneralHeadBoundary.regrid_like
+    GeneralHeadBoundary.cleanup
     HorizontalFlowBarrierHydraulicCharacteristic
     HorizontalFlowBarrierMultiplier
     HorizontalFlowBarrierResistance
@@ -83,6 +89,9 @@ Flow Packages
     NodePropertyFlow
     Recharge
     River
+    River.mask
+    River.regrid_like
+    River.cleanup
     SpecificStorage
     StorageCoefficient
     UnsaturatedZoneFlow
