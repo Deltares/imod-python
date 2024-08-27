@@ -168,6 +168,14 @@ class Drainage(BoundaryCondition, IRegridPackage):
     def cleanup(
         self, dis: Union[StructuredDiscretization, VerticesDiscretization]
     ) -> None:
+        """
+        Clean up package inplace. This method calls
+        :func:`imod.prepare.cleanup.cleanup_drn`, see documentation of that
+        function for details on cleanup.
+
+        dis: imod.mf6.StructuredDiscretization | imod.mf6.VerticesDiscretization
+            Model discretization package.
+        """
         dis_dict = {var: dis.dataset[var] for var in ["idomain"]}
         cleaned_dict = self._call_func_on_grids(cleanup_drn, dis_dict)
         super().__init__(cleaned_dict)

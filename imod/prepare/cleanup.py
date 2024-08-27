@@ -78,6 +78,26 @@ def cleanup_riv(
     - River bottom elevations which exceed river stage are lowered to river
       stage.
 
+    Parameters
+    ----------
+    idomain: xarray.DataArray | xugrid.UgridDataArray
+        MODFLOW 6 model domain. idomain==1 is considered active domain.
+    bottom: xarray.DataArray | xugrid.UgridDataArray
+        Grid with`model bottoms
+    stage: xarray.DataArray | xugrid.UgridDataArray
+        Grid with river stages
+    conductance: xarray.DataArray | xugrid.UgridDataArray
+        Grid with conductances
+    bottom_elevation: xarray.DataArray | xugrid.UgridDataArray
+        Grid with river bottom elevations
+    concentration: xarray.DataArray | xugrid.UgridDataArray, optional
+        Optional grid with concentrations
+    
+    Returns
+    -------
+    dict[str, xarray.DataArray | xugrid.UgridDataArray]
+        Dict of cleaned up grids. Has keys: "stage", "conductance",
+        "bottom_elevation", "concentration".
     """
     # Output dict
     output_dict = {
@@ -90,9 +110,8 @@ def cleanup_riv(
     if (output_dict["stage"] < bottom).any():
         raise ValueError(
             "River stage below bottom of model layer, cannot fix this. "
-            "Probably rivers are assigned to the wrong layer, you can allocate "
-            "to model layers with "
-            "river data to with: "
+            "Probably rivers are assigned to the wrong layer, you can reallocate "
+            "river data to model layers with: "
             "``imod.prepare.topsystem.allocate_riv_cells``."
         )
     # Ensure bottom elevation above model bottom
@@ -121,6 +140,23 @@ def cleanup_drn(
     - Cells outside active domain (idomain==1) are removed.
     - Align NoData: If one variable has an inactive cell in one cell, ensure
       this cell is deactivated for all variables.
+
+    Parameters
+    ----------
+    idomain: xarray.DataArray | xugrid.UgridDataArray
+        MODFLOW 6 model domain. idomain==1 is considered active domain.
+    elevation: xarray.DataArray | xugrid.UgridDataArray
+        Grid with drain elevations
+    conductance: xarray.DataArray | xugrid.UgridDataArray
+        Grid with conductances
+    concentration: xarray.DataArray | xugrid.UgridDataArray, optional
+        Optional grid with concentrations
+    
+    Returns
+    -------
+    dict[str, xarray.DataArray | xugrid.UgridDataArray]
+        Dict of cleaned up grids. Has keys: "elevation", "conductance",
+        "concentration".      
     """
     # Output dict
     output_dict = {
@@ -146,6 +182,23 @@ def cleanup_ghb(
     - Cells outside active domain (idomain==1) are removed.
     - Align NoData: If one variable has an inactive cell in one cell, ensure
       this cell is deactivated for all variables.
+
+    Parameters
+    ----------
+    idomain: xarray.DataArray | xugrid.UgridDataArray
+        MODFLOW 6 model domain. idomain==1 is considered active domain.
+    head: xarray.DataArray | xugrid.UgridDataArray
+        Grid with heads
+    conductance: xarray.DataArray | xugrid.UgridDataArray
+        Grid with conductances
+    concentration: xarray.DataArray | xugrid.UgridDataArray, optional
+        Optional grid with concentrations
+    
+    Returns
+    -------
+    dict[str, xarray.DataArray | xugrid.UgridDataArray]
+        Dict of cleaned up grids. Has keys: "head", "conductance",
+        "concentration".  
     """
     # Output dict
     output_dict = {
@@ -157,6 +210,10 @@ def cleanup_ghb(
 
 
 def cleanup_wel(wel_ds: GridDataset):
-    """ """
+    """
+    Clean up wells
+    
+    - Removes wells where the screen bottom elevation exceeds screen top.
+    """
     deactivate = wel_ds["screen_top"] < wel_ds["screen_bottom"]
     return wel_ds.where(~deactivate, drop=True)
