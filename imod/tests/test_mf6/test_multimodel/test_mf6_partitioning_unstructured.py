@@ -5,12 +5,13 @@ import geopandas as gpd
 import numpy as np
 import pytest
 import shapely
+import xarray as xr
 import xugrid as xu
 from pytest_cases import parametrize_with_cases
 
 import imod
 from imod.mf6 import Modflow6Simulation
-from imod.typing.grid import zeros_like
+from imod.typing.grid import ones_like, zeros_like
 
 
 @pytest.mark.usefixtures("circle_model")
@@ -241,6 +242,63 @@ def test_partitioning_unstructured_with_inactive_cells(
     actual_head = split_simulation.open_head()
     actual_head = actual_head.ugrid.reindex_like(expected_head)
     # _ = split_simulation.open_flow_budget()
+
+    # Compare the head result of the original simulation with the result of the partitioned simulation
+    np.testing.assert_allclose(
+        actual_head["head"].values, expected_head.values, rtol=1e-5, atol=1e-3
+    )
+
+
+@pytest.mark.usefixtures("circle_model")
+def test_partitioning_unstructured_voronoi_conversion(
+    tmp_path: Path,
+    circle_model: Modflow6Simulation,
+):
+    # get original domain
+    grid_triangles = circle_model["GWF_1"].domain
+
+    # get voronoi grid
+    voronoi_grid = grid_triangles.ugrid.grid.tesselate_centroidal_voronoi()
+    nface = voronoi_grid.n_face
+    nlayer = len(grid_triangles["layer"])
+
+    layer = np.arange(nlayer, dtype=int) + 1
+
+    voronoi_idomain = xu.UgridDataArray(
+        xr.DataArray(
+            np.ones((nlayer, nface), dtype=np.int32),
+            coords={"layer": layer},
+            dims=["layer", voronoi_grid.face_dimension],
+            name="idomain",
+        ),
+        grid=voronoi_grid,
+    )
+
+    # get voronoi partition array
+    voronoi_partition_array = ones_like(voronoi_idomain.isel({"layer": 0}))
+    voronoi_partition_array.values[:50] = 0
+    voronoi_partition_array.name = "idomain"
+
+    # regrid original model to voronoi grid
+    voronoi_simulation = circle_model.regrid_like("regridded", voronoi_idomain, True)
+
+    # Run the original example, so without partitioning, and save the simulation
+    # results
+    original_dir = tmp_path / "original"
+    voronoi_simulation.write(original_dir, binary=False)
+
+    voronoi_simulation.run()
+
+    expected_head = voronoi_simulation.open_head()
+
+    # split the voronoi grid simulation into partitions.
+    split_simulation = voronoi_simulation.split(voronoi_partition_array)
+
+    split_simulation.write(tmp_path, binary=False)
+    split_simulation.run()
+
+    actual_head = split_simulation.open_head()
+    actual_head = actual_head.ugrid.reindex_like(expected_head)
 
     # Compare the head result of the original simulation with the result of the partitioned simulation
     np.testing.assert_allclose(
