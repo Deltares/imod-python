@@ -92,7 +92,7 @@ def cleanup_riv(
         Grid with river bottom elevations
     concentration: xarray.DataArray | xugrid.UgridDataArray, optional
         Optional grid with concentrations
-    
+
     Returns
     -------
     dict[str, xarray.DataArray | xugrid.UgridDataArray]
@@ -151,12 +151,12 @@ def cleanup_drn(
         Grid with conductances
     concentration: xarray.DataArray | xugrid.UgridDataArray, optional
         Optional grid with concentrations
-    
+
     Returns
     -------
     dict[str, xarray.DataArray | xugrid.UgridDataArray]
         Dict of cleaned up grids. Has keys: "elevation", "conductance",
-        "concentration".      
+        "concentration".
     """
     # Output dict
     output_dict = {
@@ -193,12 +193,12 @@ def cleanup_ghb(
         Grid with conductances
     concentration: xarray.DataArray | xugrid.UgridDataArray, optional
         Optional grid with concentrations
-    
+
     Returns
     -------
     dict[str, xarray.DataArray | xugrid.UgridDataArray]
         Dict of cleaned up grids. Has keys: "head", "conductance",
-        "concentration".  
+        "concentration".
     """
     # Output dict
     output_dict = {
@@ -212,7 +212,7 @@ def cleanup_ghb(
 def cleanup_wel(wel_ds: GridDataset):
     """
     Clean up wells
-    
+
     - Removes wells where the screen bottom elevation exceeds screen top.
     """
     deactivate = wel_ds["screen_top"] < wel_ds["screen_bottom"]
