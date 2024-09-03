@@ -4,7 +4,7 @@ from typing import Optional
 
 import numpy as np
 
-from imod.logging import init_log_decorator
+from imod.logging import init_log_decorator, standard_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
@@ -168,6 +168,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
 
         return errors
 
+    @standard_log_decorator()
     def cleanup(self, dis: StructuredDiscretization | VerticesDiscretization) -> None:
         """
         Clean up package inplace. This method calls

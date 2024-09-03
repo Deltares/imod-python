@@ -6,7 +6,7 @@ import numpy as np
 import xarray as xr
 
 from imod import logging
-from imod.logging import init_log_decorator
+from imod.logging import init_log_decorator, standard_log_decorator
 from imod.logging.loglevel import LogLevel
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
@@ -186,6 +186,7 @@ class River(BoundaryCondition, IRegridPackage):
 
         return errors
 
+    @standard_log_decorator()
     def cleanup(self, dis: StructuredDiscretization | VerticesDiscretization) -> None:
         """
         Clean up package inplace. This method calls
