@@ -89,6 +89,32 @@ class GridAgnosticWellCases:
         rate_expected = np.array([0.25] * 4 + [0.75] * 4 + [1.0] * 4)
         return obj, dims_expected, cellid_expected, rate_expected
 
+    def case_well_point_filter(self, well_high_lvl_test_data_stationary):
+        x, y, screen_top, _, rate_wel, concentration = (
+            well_high_lvl_test_data_stationary
+        )
+        obj = imod.mf6.Well(x, y, screen_top, screen_top, rate_wel, concentration)
+        dims_expected = {
+            "ncellid": 8,
+            "nmax_cellid": 3,
+            "species": 2,
+        }
+        cellid_expected = np.array(
+            [
+                [1, 1, 9],
+                [1, 2, 9],
+                [1, 1, 8],
+                [1, 2, 8],
+                [2, 3, 7],
+                [2, 4, 7],
+                [2, 3, 6],
+                [2, 4, 6],
+            ],
+            dtype=np.int64,
+        )
+        rate_expected = np.array(np.ones((8,), dtype=np.float32))
+        return obj, dims_expected, cellid_expected, rate_expected
+
     def case_well_transient(self, well_high_lvl_test_data_transient):
         obj = imod.mf6.Well(*well_high_lvl_test_data_transient)
         dims_expected = {
@@ -221,7 +247,7 @@ def test_to_mf6_pkg__validate_filter_top(well_high_lvl_test_data_stationary):
     assert len(errors) == 1
     assert (
         str(errors["screen_bottom"][0])
-        == "not all values comply with criterion: < screen_top"
+        == "not all values comply with criterion: <= screen_top"
     )
 
 
