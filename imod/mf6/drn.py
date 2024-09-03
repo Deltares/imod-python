@@ -4,9 +4,10 @@ from typing import Optional
 
 import numpy as np
 
-from imod.logging import init_log_decorator
+from imod.logging import init_log_decorator, standard_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.regrid.regrid_schemes import DrainageRegridMethod
@@ -15,6 +16,7 @@ from imod.mf6.utilities.regrid import (
     _regrid_package_data,
 )
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
+from imod.prepare.cleanup import cleanup_drn
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_drn_cells
 from imod.prepare.topsystem.conductance import (
     DISTRIBUTING_OPTION,
@@ -162,6 +164,20 @@ class Drainage(BoundaryCondition, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
+
+    @standard_log_decorator()
+    def cleanup(self, dis: StructuredDiscretization | VerticesDiscretization) -> None:
+        """
+        Clean up package inplace. This method calls
+        :func:`imod.prepare.cleanup.cleanup_drn`, see documentation of that
+        function for details on cleanup.
+
+        dis: imod.mf6.StructuredDiscretization | imod.mf6.VerticesDiscretization
+            Model discretization package.
+        """
+        dis_dict = {"idomain": dis.dataset["idomain"]}
+        cleaned_dict = self._call_func_on_grids(cleanup_drn, dis_dict)
+        super().__init__(cleaned_dict)
 
     @classmethod
     def from_imod5_data(

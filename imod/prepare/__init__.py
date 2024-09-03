@@ -14,6 +14,7 @@ speed by making use of the Numba compiler, to be able to regrid large datasets.
 """
 
 from imod.prepare import hfb, spatial, subsoil, surface_water
+from imod.prepare.cleanup import cleanup_drn, cleanup_ghb, cleanup_riv
 from imod.prepare.hfb import (
     linestring_to_square_zpolygons,
     linestring_to_trapezoid_zpolygons,

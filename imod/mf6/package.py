@@ -4,7 +4,7 @@ import abc
 import pathlib
 from collections import defaultdict
 from copy import deepcopy
-from typing import Any, Dict, List, Mapping, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
 
 import cftime
 import jinja2
@@ -80,6 +80,9 @@ class Package(PackageBase, IPackage, abc.ABC):
             "You can create a new package with a selection by calling "
             f"{type(self).__name__}(**{self._pkg_id}.dataset.sel(**selection))"
         )
+
+    def cleanup(self, dis: Any):
+        raise NotImplementedError("Method not implemented for this package.")
 
     @staticmethod
     def _valid(value: Any) -> bool:
@@ -629,6 +632,28 @@ class Package(PackageBase, IPackage, abc.ABC):
             else:
                 result[name] = self.dataset[name].values[()]
         return result
+
+    def _call_func_on_grids(
+        self, func: Callable, dis: dict
+    ) -> dict[str, GridDataArray]:
+        """
+        Call function on dictionary of grids and merge settings back into
+        dictionary.
+
+        Parameters
+        ----------
+        func: Callable
+            Function to call on all grids
+        """
+        grid_varnames = list(self._write_schemata.keys())
+        grids = {
+            varname: self.dataset[varname]
+            for varname in grid_varnames
+            if varname in self.dataset.keys()
+        }
+        cleaned_grids = func(**dis, **grids)
+        settings = self.get_non_grid_data(grid_varnames)
+        return cleaned_grids | settings
 
     def is_splitting_supported(self) -> bool:
         return True
