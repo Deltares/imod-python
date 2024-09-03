@@ -12,7 +12,7 @@ import xugrid as xu
 import imod
 
 
-def vectorized_overlap(bounds_a, bounds_b):
+def compute_vectorized_overlap(bounds_a, bounds_b):
     """
     Vectorized overlap computation.
     Compare with:
@@ -25,22 +25,38 @@ def vectorized_overlap(bounds_a, bounds_b):
     )
 
 
+def compute_point_filter_overlap(bounds_wells, bounds_layers):
+    """
+    Special case for filters with zero filter length, these are set to layer
+    thickness.
+    """
+    zero_filter_length = bounds_wells[:, 1] == bounds_wells[:, 0]
+    layer_thickness = bounds_layers[:, 1] - bounds_layers[:, 0]
+    return zero_filter_length.astype(float) * layer_thickness
+
+
 def compute_overlap(wells, top, bottom):
     # layer bounds shape of (n_well, n_layer, 2)
-    layer_bounds = np.stack((bottom, top), axis=-1)
+    layer_bounds = np.stack((bottom, top), axis=-1).reshape(-1, 2)
     well_bounds = np.broadcast_to(
         np.stack(
             (wells["bottom"].to_numpy(), wells["top"].to_numpy()),
             axis=-1,
         )[np.newaxis, :, :],
         layer_bounds.shape,
-    )
-    overlap = vectorized_overlap(
-        well_bounds.reshape((-1, 2)),
-        layer_bounds.reshape((-1, 2)),
-    )
-    return overlap
+    ).reshape(-1, 2)
 
+    # Deal with filters with a nonzero length
+    interval_filter_overlap = compute_vectorized_overlap(
+        well_bounds,
+        layer_bounds,
+    )
+    # Deal with filters with zero length
+    point_filter_overlap = compute_point_filter_overlap(
+        well_bounds,
+        layer_bounds,
+    )
+    return np.maximum(interval_filter_overlap, point_filter_overlap)
 
 def locate_wells(
     wells: pd.DataFrame,
@@ -101,7 +117,9 @@ def assign_wells(
     thickness and minimum k should be set to avoid placing wells in clay
     layers.
 
-    Wells located outside of the grid are removed.
+    Wells where well screen_top equals screen_bottom are assigned to the layer
+    they are located in, without any subdivision. Wells located outside of the
+    grid are removed.
 
     Parameters
     ----------
