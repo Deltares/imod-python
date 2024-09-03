@@ -175,7 +175,7 @@ def assign_wells(
 
     # Distribute rate according to transmissivity.
     n_layer, n_well = xy_top.shape
-    df = pd.DataFrame(
+    df_factor = pd.DataFrame(
         index=pd.Index(np.tile(first.index, n_layer), name="id"),
         data={
             "layer": np.repeat(top["layer"], n_well),
@@ -187,17 +187,21 @@ def assign_wells(
     # remove entries
     #   -in very thin layers or when the wellbore penetrates the layer very little
     #   -in low conductivity layers
-    df = df.loc[(df["overlap"] >= minimum_thickness) & (df["k"] >= minimum_k)]
-    df["rate"] = df["transmissivity"] / df.groupby("id")["transmissivity"].transform(
-        "sum"
-    )
+    df_factor = df_factor.loc[
+        (df_factor["overlap"] >= minimum_thickness) & (df_factor["k"] >= minimum_k)
+    ]
+    df_factor["rate"] = df_factor["transmissivity"] / df_factor.groupby("id")[
+        "transmissivity"
+    ].transform("sum")
     # Create a unique index for every id-layer combination.
-    df["index"] = np.arange(len(df))
-    df = df.reset_index()
+    df_factor["index"] = np.arange(len(df_factor))
+    df_factor = df_factor.reset_index()
 
     # Get rid of those that are removed because of minimum thickness or
     # transmissivity.
-    wells_in_bounds = wells_in_bounds.loc[wells_in_bounds["id"].isin(df["id"].unique())]
+    wells_in_bounds = wells_in_bounds.loc[
+        wells_in_bounds["id"].isin(df_factor["id"].unique())
+    ]
 
     # Use pandas multi-index broadcasting.
     # Maintain all other columns as-is.
@@ -205,7 +209,7 @@ def assign_wells(
     wells_in_bounds["overlap"] = 1.0
     wells_in_bounds["k"] = 1.0
     wells_in_bounds["transmissivity"] = 1.0
-    columns = list(set(wells_in_bounds.columns).difference(df.columns))
+    columns = list(set(wells_in_bounds.columns).difference(df_factor.columns))
 
     indexes = ["id"]
     for dim in ["species", "time"]:
@@ -213,9 +217,9 @@ def assign_wells(
             indexes.append(dim)
             columns.remove(dim)
 
-    df[columns] = 1  # N.B. integer!
+    df_factor[columns] = 1  # N.B. integer!
 
     assigned = (
-        wells_in_bounds.set_index(indexes) * df.set_index(["id", "layer"])
+        wells_in_bounds.set_index(indexes) * df_factor.set_index(["id", "layer"])
     ).reset_index()
     return assigned
