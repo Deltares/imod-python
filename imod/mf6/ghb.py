@@ -1,6 +1,6 @@
 from copy import deepcopy
 from datetime import datetime
-from typing import Optional, Union
+from typing import Optional
 
 import numpy as np
 
@@ -168,9 +168,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
 
         return errors
 
-    def cleanup(
-        self, dis: Union[StructuredDiscretization, VerticesDiscretization]
-    ) -> None:
+    def cleanup(self, dis: StructuredDiscretization | VerticesDiscretization) -> None:
         """
         Clean up package inplace. This method calls
         :func:`imod.prepare.cleanup.cleanup_ghb`, see documentation of that

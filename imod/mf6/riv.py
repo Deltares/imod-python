@@ -1,6 +1,6 @@
 from copy import deepcopy
 from datetime import datetime
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple
 
 import numpy as np
 import xarray as xr
@@ -186,9 +186,7 @@ class River(BoundaryCondition, IRegridPackage):
 
         return errors
 
-    def cleanup(
-        self, dis: Union[StructuredDiscretization, VerticesDiscretization]
-    ) -> None:
+    def cleanup(self, dis: StructuredDiscretization | VerticesDiscretization) -> None:
         """
         Clean up package inplace. This method calls
         :func:`imod.prepare.cleanup.cleanup_riv`, see documentation of that
