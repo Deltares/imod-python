@@ -5,6 +5,7 @@ from typing import Optional
 
 import xarray as xr
 
+from imod.logging.logging_decorators import standard_log_decorator
 from imod.mf6.utilities.mask import mask_arrays
 from imod.schemata import scalar_None
 from imod.typing import GridDataArray, GridDataset
@@ -56,6 +57,7 @@ def _cleanup_robin_boundary(
     return align_nodata(grids)
 
 
+@standard_log_decorator()
 def cleanup_riv(
     idomain: GridDataArray,
     bottom: GridDataArray,
@@ -125,6 +127,7 @@ def cleanup_riv(
     return output_dict
 
 
+@standard_log_decorator()
 def cleanup_drn(
     idomain: GridDataArray,
     elevation: GridDataArray,
@@ -167,6 +170,7 @@ def cleanup_drn(
     return _cleanup_robin_boundary(idomain, output_dict)
 
 
+@standard_log_decorator()
 def cleanup_ghb(
     idomain: GridDataArray,
     head: GridDataArray,
