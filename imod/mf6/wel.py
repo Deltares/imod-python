@@ -728,7 +728,7 @@ class Well(GridAgnosticWell):
         "screen_bottom": [
             AnyNoDataSchema(),
             EmptyIndexesSchema(),
-            AllValueSchema("<", "screen_top"),
+            AllValueSchema("<=", "screen_top"),
         ],
         "y": [AnyNoDataSchema(), EmptyIndexesSchema()],
         "x": [AnyNoDataSchema(), EmptyIndexesSchema()],
