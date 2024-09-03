@@ -213,6 +213,7 @@ def cleanup_ghb(
     return _cleanup_robin_boundary(idomain, output_dict)
 
 
+@standard_log_decorator()
 def cleanup_wel(wel_ds: GridDataset):
     """
     Clean up wells
