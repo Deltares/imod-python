@@ -37,14 +37,15 @@ def compute_point_filter_overlap(bounds_wells, bounds_layers):
 
 def compute_overlap(wells, top, bottom):
     # layer bounds shape of (n_well, n_layer, 2)
-    layer_bounds = np.stack((bottom, top), axis=-1).reshape(-1, 2)
+    layer_bounds_stack = np.stack((bottom, top), axis=-1)
     well_bounds = np.broadcast_to(
         np.stack(
             (wells["bottom"].to_numpy(), wells["top"].to_numpy()),
             axis=-1,
         )[np.newaxis, :, :],
-        layer_bounds.shape,
+        layer_bounds_stack.shape,
     ).reshape(-1, 2)
+    layer_bounds = layer_bounds_stack.reshape(-1, 2)
 
     # Deal with filters with a nonzero length
     interval_filter_overlap = compute_vectorized_overlap(
