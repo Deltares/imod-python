@@ -177,7 +177,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         dis: imod.mf6.StructuredDiscretization | imod.mf6.VerticesDiscretization
             Model discretization package.
         """
-        dis_dict = {var: dis.dataset[var] for var in ["idomain"]}
+        dis_dict = {"idomain": dis.dataset["idomain"]}
         cleaned_dict = self._call_func_on_grids(cleanup_ghb, dis_dict)
         super().__init__(cleaned_dict)
 

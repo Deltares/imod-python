@@ -195,7 +195,7 @@ class River(BoundaryCondition, IRegridPackage):
         dis: imod.mf6.StructuredDiscretization | imod.mf6.VerticesDiscretization
             Model discretization package.
         """
-        dis_dict = {var: dis.dataset[var] for var in ["idomain", "bottom"]}
+        dis_dict = {"idomain": dis.dataset["idomain"], "bottom": dis.dataset["bottom"]}
         cleaned_dict = self._call_func_on_grids(cleanup_riv, dis_dict)
         super().__init__(cleaned_dict)
 
