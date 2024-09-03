@@ -31,8 +31,11 @@ def compute_point_filter_overlap(bounds_wells, bounds_layers):
     thickness.
     """
     zero_filter_length = bounds_wells[:, 1] == bounds_wells[:, 0]
+    in_layer = (bounds_layers[:, 1] > bounds_wells[:, 1]) & (
+        bounds_layers[:, 0] < bounds_wells[:, 0]
+    )
     layer_thickness = bounds_layers[:, 1] - bounds_layers[:, 0]
-    return zero_filter_length.astype(float) * layer_thickness
+    return zero_filter_length.astype(float) * in_layer.astype(float) * layer_thickness
 
 
 def compute_overlap(wells, top, bottom):
@@ -58,6 +61,7 @@ def compute_overlap(wells, top, bottom):
         layer_bounds,
     )
     return np.maximum(interval_filter_overlap, point_filter_overlap)
+
 
 def locate_wells(
     wells: pd.DataFrame,
