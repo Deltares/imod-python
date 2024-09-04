@@ -36,6 +36,8 @@ Changed
   polygons.
 - :func:`open_projectfile_data` now returns well data grouped by ipf name,
   instead of generic, separate number per entry.
+- :class:`imod.mf6.Well` now supports wells which have a filter with zero
+  length, where ``"screen_top"`` equals ``"screen_bottom"``.
 
 Added
 ~~~~~
