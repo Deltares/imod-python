@@ -90,10 +90,10 @@ class GridAgnosticWellCases:
         return obj, dims_expected, cellid_expected, rate_expected
 
     def case_well_point_filter(self, well_high_lvl_test_data_stationary):
-        x, y, screen_top, _, rate_wel, concentration = (
+        x, y, _, screen_point, rate_wel, concentration = (
             well_high_lvl_test_data_stationary
         )
-        obj = imod.mf6.Well(x, y, screen_top, screen_top, rate_wel, concentration)
+        obj = imod.mf6.Well(x, y, screen_point, screen_point, rate_wel, concentration)
         dims_expected = {
             "ncellid": 8,
             "nmax_cellid": 3,
