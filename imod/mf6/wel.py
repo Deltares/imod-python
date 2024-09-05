@@ -505,7 +505,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         imod5_data: dict[str, dict[str, GridDataArray]],
         times: list[datetime],
         minimum_k: float = 0.1,
-        minimum_thickness: float = 1.0,
+        minimum_thickness: float = 0.05,
     ) -> "GridAgnosticWell":
         """
         Convert wells to imod5 data, loaded with
@@ -754,7 +754,7 @@ class Well(GridAgnosticWell):
         concentration_boundary_type="aux",
         id: Optional[list[Any]] = None,
         minimum_k: float = 0.1,
-        minimum_thickness: float = 1.0,
+        minimum_thickness: float = 0.05,
         print_input: bool = False,
         print_flows: bool = False,
         save_flows: bool = False,
