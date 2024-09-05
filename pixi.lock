@@ -316,7 +316,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/nspr-4.35-h27087fc_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/nss-3.104-hd34e28f_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/numba-0.60.0-py311h4bc866e_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.1.8-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.2.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/numcodecs-0.13.0-py311h044e617_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/numpy-2.0.2-py311h71ddf71_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/occt-7.7.2-novtk_h130ccc2_101.conda
@@ -419,8 +419,8 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/sphinxcontrib-serializinghtml-1.1.10-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/sqlite-3.46.1-h9eae976_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/svt-av1-2.2.1-h5888daf_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/tbb-2021.12.0-h84d6215_4.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/tbb-devel-2021.12.0-h94b29a5_4.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/tbb-2021.13.0-h84d6215_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/tbb-devel-2021.13.0-h94b29a5_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/tblib-3.0.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/threadpoolctl-3.5.0-pyhc1e730c_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/tiledb-2.25.0-h86fa3b2_11.conda
@@ -776,7 +776,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-64/nspr-4.35-hea0b92c_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/nss-3.104-h3135457_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/numba-0.60.0-py311h0e5bd6a_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.1.8-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.2.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/numcodecs-0.13.0-py311hfdcbad3_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/numpy-2.0.2-py311h394b0bb_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/occt-7.7.2-novtk_h0a0d97a_101.conda
@@ -875,8 +875,8 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/sphinxcontrib-serializinghtml-1.1.10-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/sqlite-3.46.1-he26b093_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/svt-av1-2.2.1-hac325c4_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-64/tbb-2021.12.0-h37c8870_4.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-64/tbb-devel-2021.12.0-hf74753b_4.conda
+      - conda: https://conda.anaconda.org/conda-forge/osx-64/tbb-2021.13.0-h37c8870_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/osx-64/tbb-devel-2021.13.0-hf74753b_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/tblib-3.0.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/threadpoolctl-3.5.0-pyhc1e730c_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/tiledb-2.25.0-h313d0e2_11.conda
@@ -1216,7 +1216,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/nspr-4.35-hb7217d7_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/nss-3.104-hd1ce637_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/numba-0.60.0-py311h9506ed5_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.1.8-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.2.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/numcodecs-0.13.0-py311h4b4568b_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/numpy-2.0.2-py311h6de8079_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/occt-7.7.2-novtk_h5f4376a_101.conda
@@ -1315,8 +1315,8 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/sphinxcontrib-serializinghtml-1.1.10-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/sqlite-3.46.1-h3b4c4e4_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/svt-av1-2.2.1-ha39b806_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/tbb-2021.12.0-h7b3277c_4.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/tbb-devel-2021.12.0-h8e01b61_4.conda
+      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/tbb-2021.13.0-h7b3277c_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/tbb-devel-2021.13.0-h8e01b61_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/tblib-3.0.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/threadpoolctl-3.5.0-pyhc1e730c_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/tiledb-2.25.0-h3c94177_11.conda
@@ -1612,7 +1612,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/nh3-0.2.18-py311h9363f20_1.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/nlohmann_json-3.11.3-he0c23c2_1.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/numba-0.60.0-py311h0673bce_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.1.8-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.2.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/numcodecs-0.13.0-py311hcf9f919_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/numpy-2.0.2-py311h35ffc71_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/occt-7.7.2-novtk_hdfb195f_101.conda
@@ -1712,8 +1712,8 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/sphinxcontrib-serializinghtml-1.1.10-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/sqlite-3.46.1-h2466b09_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/svt-av1-2.2.1-he0c23c2_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/tbb-2021.12.0-hc790b64_4.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/tbb-devel-2021.12.0-h053bfa6_4.conda
+      - conda: https://conda.anaconda.org/conda-forge/win-64/tbb-2021.13.0-hc790b64_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/win-64/tbb-devel-2021.13.0-h053bfa6_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/tblib-3.0.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/threadpoolctl-3.5.0-pyhc1e730c_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/tiledb-2.25.0-h98a567f_11.conda
@@ -2139,7 +2139,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/nspr-4.35-h27087fc_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/nss-3.104-hd34e28f_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/numba-0.60.0-py311h4bc866e_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.1.8-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.2.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/numcodecs-0.13.0-py311h044e617_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/numpy-2.0.2-py311h71ddf71_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/occt-7.7.2-novtk_h130ccc2_101.conda
@@ -2263,8 +2263,8 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/sqlite-3.46.1-h9eae976_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/stack_data-0.6.2-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/svt-av1-2.2.1-h5888daf_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/tbb-2021.12.0-h84d6215_4.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/tbb-devel-2021.12.0-h94b29a5_4.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/tbb-2021.13.0-h84d6215_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/tbb-devel-2021.13.0-h94b29a5_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/tblib-3.0.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/terminado-0.18.1-pyh0d859eb_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/threadpoolctl-3.5.0-pyhc1e730c_0.conda
@@ -2683,7 +2683,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-64/nspr-4.35-hea0b92c_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/nss-3.104-h3135457_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/numba-0.60.0-py311h0e5bd6a_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.1.8-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.2.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/numcodecs-0.13.0-py311hfdcbad3_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/numpy-2.0.2-py311h394b0bb_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/occt-7.7.2-novtk_h0a0d97a_101.conda
@@ -2805,8 +2805,8 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-64/sqlite-3.46.1-he26b093_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/stack_data-0.6.2-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/svt-av1-2.2.1-hac325c4_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-64/tbb-2021.12.0-h37c8870_4.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-64/tbb-devel-2021.12.0-hf74753b_4.conda
+      - conda: https://conda.anaconda.org/conda-forge/osx-64/tbb-2021.13.0-h37c8870_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/osx-64/tbb-devel-2021.13.0-hf74753b_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/tblib-3.0.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/terminado-0.18.1-pyh31c8845_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/threadpoolctl-3.5.0-pyhc1e730c_0.conda
@@ -3209,7 +3209,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/nspr-4.35-hb7217d7_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/nss-3.104-hd1ce637_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/numba-0.60.0-py311h9506ed5_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.1.8-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.2.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/numcodecs-0.13.0-py311h4b4568b_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/numpy-2.0.2-py311h6de8079_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/occt-7.7.2-novtk_h5f4376a_101.conda
@@ -3331,8 +3331,8 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/sqlite-3.46.1-h3b4c4e4_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/stack_data-0.6.2-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/svt-av1-2.2.1-ha39b806_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/tbb-2021.12.0-h7b3277c_4.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/tbb-devel-2021.12.0-h8e01b61_4.conda
+      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/tbb-2021.13.0-h7b3277c_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/tbb-devel-2021.13.0-h8e01b61_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/tblib-3.0.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/terminado-0.18.1-pyh31c8845_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/threadpoolctl-3.5.0-pyhc1e730c_0.conda
@@ -3690,7 +3690,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/notebook-7.2.2-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/notebook-shim-0.2.4-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/numba-0.60.0-py311h0673bce_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.1.8-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.2.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/numcodecs-0.13.0-py311hcf9f919_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/numpy-2.0.2-py311h35ffc71_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/occt-7.7.2-novtk_hdfb195f_101.conda
@@ -3811,8 +3811,8 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/sqlite-3.46.1-h2466b09_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/stack_data-0.6.2-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/svt-av1-2.2.1-he0c23c2_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/tbb-2021.12.0-hc790b64_4.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/tbb-devel-2021.12.0-h053bfa6_4.conda
+      - conda: https://conda.anaconda.org/conda-forge/win-64/tbb-2021.13.0-hc790b64_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/win-64/tbb-devel-2021.13.0-h053bfa6_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/tblib-3.0.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/terminado-0.18.1-pyh5737063_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/threadpoolctl-3.5.0-pyhc1e730c_0.conda
@@ -23695,13 +23695,13 @@ packages:
   timestamp: 1718888718616
 - kind: conda
   name: numba_celltree
-  version: 0.1.8
+  version: 0.2.0
   build: pyhd8ed1ab_0
   subdir: noarch
   noarch: python
-  url: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.1.8-pyhd8ed1ab_0.conda
-  sha256: 4b30d964bf034b41ce14842bf8fa3040b21878c0da1bdec15c5523ab785bc311
-  md5: 02b10d14b2e6693519804fe90d41c589
+  url: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.2.0-pyhd8ed1ab_0.conda
+  sha256: 8ef116fc2af9d70afe8123cb4157f5efa55cfd042fd1ef36cad9aab65b36ca5a
+  md5: e2ed9d4ac5f28671045cd33b2269969a
   depends:
   - numba >=0.50
   - numpy
@@ -23710,8 +23710,8 @@ packages:
   license_family: MIT
   purls:
   - pkg:pypi/numba-celltree?source=hash-mapping
-  size: 33524
-  timestamp: 1722763371483
+  size: 33566
+  timestamp: 1724401764094
 - kind: conda
   name: numcodecs
   version: 0.13.0
@@ -29782,148 +29782,132 @@ packages:
   timestamp: 1724459941490
 - kind: conda
   name: tbb
-  version: 2021.12.0
-  build: h37c8870_4
-  build_number: 4
+  version: 2021.13.0
+  build: h37c8870_0
   subdir: osx-64
-  url: https://conda.anaconda.org/conda-forge/osx-64/tbb-2021.12.0-h37c8870_4.conda
-  sha256: e26826f2a677f9efed56b137706b95e77f3f7cd8d7eda70d7f4b9ef897599edb
-  md5: a1391c6e22a72e21c4cb18f574a2105e
+  url: https://conda.anaconda.org/conda-forge/osx-64/tbb-2021.13.0-h37c8870_0.conda
+  sha256: 9a20a60ebf743f99e38a7be049f8ca90f264851c13dc8cb41eb09d854a631e31
+  md5: 89742f5ac7aeb5c44ec2b4c3c6692c3c
   depends:
   - __osx >=10.13
   - libcxx >=17
   - libhwloc >=2.11.1,<2.11.2.0a0
   license: Apache-2.0
-  license_family: APACHE
   purls: []
-  size: 171699
-  timestamp: 1724905633043
+  size: 159453
+  timestamp: 1725532728568
 - kind: conda
   name: tbb
-  version: 2021.12.0
-  build: h7b3277c_4
-  build_number: 4
+  version: 2021.13.0
+  build: h7b3277c_0
   subdir: osx-arm64
-  url: https://conda.anaconda.org/conda-forge/osx-arm64/tbb-2021.12.0-h7b3277c_4.conda
-  sha256: 16fa99fbe3e334000ac19df1a81d86339740b29f99a84608adf1b2fd08771769
-  md5: a8790535719e5f6321d7dcea1e651d93
+  url: https://conda.anaconda.org/conda-forge/osx-arm64/tbb-2021.13.0-h7b3277c_0.conda
+  sha256: 4a16118d5f71da9e8177921be996da87112a55fe53a700ab5dffe14ae2b6ecba
+  md5: a8a0feb11d51d4a0a2e56fbd53c628cf
   depends:
   - __osx >=11.0
   - libcxx >=17
   - libhwloc >=2.11.1,<2.11.2.0a0
   license: Apache-2.0
-  license_family: APACHE
   purls: []
-  size: 128795
-  timestamp: 1724905730211
+  size: 115213
+  timestamp: 1725532720037
 - kind: conda
   name: tbb
-  version: 2021.12.0
-  build: h84d6215_4
-  build_number: 4
+  version: 2021.13.0
+  build: h84d6215_0
   subdir: linux-64
-  url: https://conda.anaconda.org/conda-forge/linux-64/tbb-2021.12.0-h84d6215_4.conda
-  sha256: a079dcf42804a841ac2b63784f42e0d2e93401833d4a7d44ddf05b767794d578
-  md5: 1fa72fdeb88f538018612ce2ed9fc789
+  url: https://conda.anaconda.org/conda-forge/linux-64/tbb-2021.13.0-h84d6215_0.conda
+  sha256: 7d4d3ad608dc6ae5a7e0f431f784985398a18bcde2ba3ce19cc32f61e2defd98
+  md5: ee6f7fd1e76061ef1fa307d41fa86a96
   depends:
   - __glibc >=2.17,<3.0.a0
-  - libgcc
-  - libgcc-ng >=13
+  - libgcc >=13
   - libhwloc >=2.11.1,<2.11.2.0a0
-  - libstdcxx
-  - libstdcxx-ng >=13
+  - libstdcxx >=13
   license: Apache-2.0
-  license_family: APACHE
   purls: []
-  size: 186953
-  timestamp: 1724905442040
+  size: 175779
+  timestamp: 1725532539822
 - kind: conda
   name: tbb
-  version: 2021.12.0
-  build: hc790b64_4
-  build_number: 4
+  version: 2021.13.0
+  build: hc790b64_0
   subdir: win-64
-  url: https://conda.anaconda.org/conda-forge/win-64/tbb-2021.12.0-hc790b64_4.conda
-  sha256: d23e589311be6aeacbfb8371bd65d8637c5acc83a149baccc57d2621644fe158
-  md5: bce92c19a6cb64b47866b7271363f747
+  url: https://conda.anaconda.org/conda-forge/win-64/tbb-2021.13.0-hc790b64_0.conda
+  sha256: 990dbe4fb42f14700c22bd434d8312607bf8d0bd9f922b054e51fda14c41994c
+  md5: 28496a1e6af43c63927da4f80260348d
   depends:
   - libhwloc >=2.11.1,<2.11.2.0a0
   - ucrt >=10.0.20348.0
   - vc >=14.2,<15
   - vc14_runtime >=14.29.30139
   license: Apache-2.0
-  license_family: APACHE
   purls: []
-  size: 161921
-  timestamp: 1724906383699
+  size: 151494
+  timestamp: 1725532984828
 - kind: conda
   name: tbb-devel
-  version: 2021.12.0
-  build: h053bfa6_4
-  build_number: 4
+  version: 2021.13.0
+  build: h053bfa6_0
   subdir: win-64
-  url: https://conda.anaconda.org/conda-forge/win-64/tbb-devel-2021.12.0-h053bfa6_4.conda
-  sha256: 49b8edbfee1363d1dc1b937839f8723ff0c36f900be7194596e00ad9eee1c4d4
-  md5: ab99bb2b57c87fefd2613aa2ac17e4d8
+  url: https://conda.anaconda.org/conda-forge/win-64/tbb-devel-2021.13.0-h053bfa6_0.conda
+  sha256: 5c564de8d3355814ccb6213c3e1eeee473cb7975e82dd9415dfd1766e2f44a2f
+  md5: ae3893a7b463769d7372d2335297abb8
   depends:
-  - tbb 2021.12.0 hc790b64_4
+  - tbb 2021.13.0 hc790b64_0
   - ucrt >=10.0.20348.0
   - vc >=14.2,<15
   - vc14_runtime >=14.29.30139
   purls: []
-  size: 1067302
-  timestamp: 1724906522822
+  size: 1062534
+  timestamp: 1725533022774
 - kind: conda
   name: tbb-devel
-  version: 2021.12.0
-  build: h8e01b61_4
-  build_number: 4
+  version: 2021.13.0
+  build: h8e01b61_0
   subdir: osx-arm64
-  url: https://conda.anaconda.org/conda-forge/osx-arm64/tbb-devel-2021.12.0-h8e01b61_4.conda
-  sha256: 85c4df0c45564d7bad6782b23b577c37663dde40b6b21098748a853e97253591
-  md5: 8d370591b428bafe4c9f067291b20600
+  url: https://conda.anaconda.org/conda-forge/osx-arm64/tbb-devel-2021.13.0-h8e01b61_0.conda
+  sha256: b89cb16d48beff43827a00c08b2a1109e359f0e2ada334e1c7aee0700b1833d0
+  md5: 88aeb528f853519166f2c2859b9f1b47
   depends:
   - __osx >=11.0
   - libcxx >=17
-  - tbb 2021.12.0 h7b3277c_4
+  - tbb 2021.13.0 h7b3277c_0
   purls: []
-  size: 1058759
-  timestamp: 1724905778501
+  size: 1053471
+  timestamp: 1725532740440
 - kind: conda
   name: tbb-devel
-  version: 2021.12.0
-  build: h94b29a5_4
-  build_number: 4
+  version: 2021.13.0
+  build: h94b29a5_0
   subdir: linux-64
-  url: https://conda.anaconda.org/conda-forge/linux-64/tbb-devel-2021.12.0-h94b29a5_4.conda
-  sha256: f27e36a67e55f84f656d3aa12e38abca533b21eafe51ce8cb6d2f62b272ae7f8
-  md5: a4ffa023c8c0ba32ed2be249119d6eaa
+  url: https://conda.anaconda.org/conda-forge/linux-64/tbb-devel-2021.13.0-h94b29a5_0.conda
+  sha256: d5b1aae283133f6f0d5b349de05f8af5f53e5085724a15701a2492cd0a17c7de
+  md5: 4431bd4ace17dd09b97caf68509b016b
   depends:
   - __glibc >=2.17,<3.0.a0
-  - libgcc
-  - libgcc-ng >=13
-  - libstdcxx
-  - libstdcxx-ng >=13
-  - tbb 2021.12.0 h84d6215_4
+  - libgcc >=13
+  - libstdcxx >=13
+  - tbb 2021.13.0 h84d6215_0
   purls: []
-  size: 1056060
-  timestamp: 1724905525428
+  size: 1054129
+  timestamp: 1725532588872
 - kind: conda
   name: tbb-devel
-  version: 2021.12.0
-  build: hf74753b_4
-  build_number: 4
+  version: 2021.13.0
+  build: hf74753b_0
   subdir: osx-64
-  url: https://conda.anaconda.org/conda-forge/osx-64/tbb-devel-2021.12.0-hf74753b_4.conda
-  sha256: 2f6b716641e8e48ca295308f642e5bad91ee3ab2c74b9a823c76ec906eddbbac
-  md5: 3d059de5762c152e2c6f282e07dae3ef
+  url: https://conda.anaconda.org/conda-forge/osx-64/tbb-devel-2021.13.0-hf74753b_0.conda
+  sha256: 87211cb5e0ac89bae332a9d709400adb0a89c2cd0de4832bdac9f5df4e31d411
+  md5: 0b573dab0c70a7db11f734c7a711c126
   depends:
   - __osx >=10.13
   - libcxx >=17
-  - tbb 2021.12.0 h37c8870_4
+  - tbb 2021.13.0 h37c8870_0
   purls: []
-  size: 1057133
-  timestamp: 1724905705058
+  size: 1055091
+  timestamp: 1725532749871
 - kind: conda
   name: tblib
   version: 3.0.0
