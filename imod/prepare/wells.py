@@ -31,7 +31,7 @@ def compute_point_filter_overlap(bounds_wells, bounds_layers):
     thickness.
     """
     zero_filter_length = bounds_wells[:, 1] == bounds_wells[:, 0]
-    in_layer = (bounds_layers[:, 1] > bounds_wells[:, 1]) & (
+    in_layer = (bounds_layers[:, 1] >= bounds_wells[:, 1]) & (
         bounds_layers[:, 0] < bounds_wells[:, 0]
     )
     layer_thickness = bounds_layers[:, 1] - bounds_layers[:, 0]
@@ -39,7 +39,7 @@ def compute_point_filter_overlap(bounds_wells, bounds_layers):
 
 
 def compute_overlap(wells, top, bottom):
-    # layer bounds shape of (n_well, n_layer, 2)
+    # layer bounds stack shape of (n_well, n_layer, 2)
     layer_bounds_stack = np.stack((bottom, top), axis=-1)
     well_bounds = np.broadcast_to(
         np.stack(
