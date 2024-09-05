@@ -47,6 +47,7 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
+imod/tests/.imod_data/
 
 # Translations
 *.mo
@@ -137,6 +138,7 @@ examples/user-guide/*
 examples/visualize/*
 examples/data
 !examples/**/*.py
+
 # pixi environments
 .pixi
 

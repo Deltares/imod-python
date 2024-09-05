@@ -283,6 +283,8 @@ def _handle_dtype(dtype, nodata):
         "int32": 5,  # GDT_Int32
         "float32": 6,  # GDT_Float32
         "float64": 7,  # GDT_Float64
+        "uint64": 12,  # GDT_UInt64
+        "int64": 13,  # GDT_Int64
     }
     dtype_ranges = {
         "uint8": (0, 255),
@@ -292,6 +294,8 @@ def _handle_dtype(dtype, nodata):
         "int32": (-2147483648, 2147483647),
         "float32": (-3.4028235e38, 3.4028235e38),
         "float64": (-1.7976931348623157e308, 1.7976931348623157e308),
+        "uint64": (0, 18446744073709551615),
+        "int64": (-9223372036854775808, 9223372036854775807),
     }
 
     def format_invalid(str_dtype):
@@ -299,9 +303,6 @@ def _handle_dtype(dtype, nodata):
         return "Invalid dtype: {0}, must be one of: {1}".format(
             str_dtype, ", ".join(str_dtypes)
         )
-
-    if dtype is np.dtype(np.int64):
-        dtype = np.int32
 
     str_dtype = str(np.dtype(dtype))
     if str_dtype not in dtype_mapping.keys():

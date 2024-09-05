@@ -123,6 +123,9 @@ object NightlyTests : BuildType({
     }
 
     dependencies {
+        snapshot(NightlyPipPython) {
+            onDependencyFailure = FailureAction.FAIL_TO_START
+        }
         snapshot(NightlyExamples) {
             onDependencyFailure = FailureAction.FAIL_TO_START
         }

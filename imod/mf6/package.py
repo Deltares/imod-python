@@ -366,7 +366,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         indexer["time"] = insert_keys
 
         # Update the key-value pairs. Discard keys that have been "promoted".
-        keep = np.in1d(new_keys, insert_keys, assume_unique=True, invert=True)
+        keep = np.isin(new_keys, insert_keys, assume_unique=True, invert=True)
         new_keys = new_keys[keep]
         new_values = new_values[keep]
         # Set the values to their new source.

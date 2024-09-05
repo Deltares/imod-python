@@ -128,7 +128,10 @@ def _save_subdomains_no_species(subdomains, tmp_path, start_nr=0):
     for i, subdomain in enumerate(subdomains):
         nr = start_nr + i
         for layer, da in subdomain.groupby("layer"):
-            idf.write(tmp_path / f"subdomains_20000101_l{layer}_p00{nr}.idf", da)
+            idf.write(
+                tmp_path / f"subdomains_20000101_l{layer}_p00{nr}.idf",
+                da.squeeze(drop=True),
+            )
 
 
 def _save_subdomains_species(subdomains, tmp_path):
@@ -136,7 +139,8 @@ def _save_subdomains_species(subdomains, tmp_path):
         for species, das in subdomain.groupby("species"):
             for layer, da in das.groupby("layer"):
                 idf.write(
-                    tmp_path / f"subdomains_c{species}_20000101_l{layer}_p00{i}.idf", da
+                    tmp_path / f"subdomains_c{species}_20000101_l{layer}_p00{i}.idf",
+                    da.squeeze(drop=True),
                 )
 
 
