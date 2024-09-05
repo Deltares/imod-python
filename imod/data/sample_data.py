@@ -5,7 +5,6 @@ Functions to load sample data.
 import importlib
 from pathlib import Path
 from typing import Union
-from zipfile import ZipFile
 
 import numpy as np
 import pandas as pd
@@ -13,6 +12,7 @@ import pooch
 import xarray as xr
 import xugrid as xu
 from filelock import FileLock
+from pooch import Unzip
 
 from imod.formats.prj import open_projectfile_data
 from imod.mf6 import Modflow6Simulation
@@ -46,14 +46,17 @@ REGISTRY = load_pooch_registry(REGISTRY)
 
 
 def twri_output(path: Union[str, Path]) -> None:
-    fname_twri = REGISTRY.fetch("ex01-twri-output.zip")
-    with ZipFile(fname_twri) as archive:
-        archive.extractall(path)
+    lock = FileLock(REGISTRY.path / "ex01-twri-output.zip.lock")
+    with lock:
+        _ = REGISTRY.fetch("ex01-twri-output.zip", processor=Unzip(extract_dir=path))
 
 
 def hondsrug_initial() -> xr.Dataset:
-    fname = REGISTRY.fetch("hondsrug-initial.nc")
-    return xr.open_dataset(fname)
+    lock = FileLock(REGISTRY.path / "hondsrug-initial.nc.lock")
+    with lock:
+        fname = REGISTRY.fetch("hondsrug-initial.nc")
+        hondsrug_initial = xr.open_dataset(fname)
+    return hondsrug_initial
 
 
 def hondsrug_layermodel() -> xr.Dataset:
@@ -65,91 +68,127 @@ def hondsrug_layermodel() -> xr.Dataset:
 
 
 def hondsrug_meteorology() -> xr.Dataset:
-    fname = REGISTRY.fetch("hondsrug-meteorology.nc")
-    return xr.open_dataset(fname)
+    lock = FileLock(REGISTRY.path / "hondsrug-meteorology.lock")
+    with lock:
+        fname = REGISTRY.fetch("hondsrug-meteorology.nc")
+        hondsrug_meteorology = xr.open_dataset(fname)
+    return hondsrug_meteorology
 
 
 def hondsrug_river() -> xr.Dataset:
-    fname = REGISTRY.fetch("hondsrug-river.nc")
-    return xr.open_dataset(fname)
+    lock = FileLock(REGISTRY.path / "hondsrug-river.nc.lock")
+    with lock:
+        fname = REGISTRY.fetch("hondsrug-river.nc")
+        hondsrug_river = xr.open_dataset(fname)
+    return hondsrug_river
 
 
 def hondsrug_drainage() -> xr.Dataset:
-    fname = REGISTRY.fetch("hondsrug-drainage.nc")
-    return xr.open_dataset(fname)
+    lock = FileLock(REGISTRY.path / "hondsrug-drainage.nc.lock")
+    with lock:
+        fname = REGISTRY.fetch("hondsrug-drainage.nc")
+        hondsrug_drainage = xr.open_dataset(fname)
+    return hondsrug_drainage
 
 
 def head_observations() -> pd.DataFrame:
-    fname = REGISTRY.fetch("head-observations.csv")
-    df = pd.read_csv(fname)
+    lock = FileLock(REGISTRY.path / "head-observations.csv.lock")
+    with lock:
+        fname = REGISTRY.fetch("head-observations.csv")
+        head_observations = pd.read_csv(fname)
+
     # Manually convert time column to datetime type because pandas >2.0 doesn't
     # do this automatically anymore upon reading.
-    df["time"] = pd.to_datetime(df["time"])
-    return df
+    head_observations["time"] = pd.to_datetime(head_observations["time"])
+    return head_observations
 
 
 def fluxes() -> xr.Dataset:
-    fname = REGISTRY.fetch("fluxes.nc")
-    return xr.open_dataset(fname)
+    lock = FileLock(REGISTRY.path / "fluxes.nc.lock")
+    with lock:
+        fname = REGISTRY.fetch("fluxes.nc")
+        fluxes = xr.open_dataset(fname)
+    return fluxes
 
 
 def ahn() -> xr.Dataset:
-    fname = REGISTRY.fetch("ahn.nc")
-    return xr.open_dataset(fname)
+    lock = FileLock(REGISTRY.path / "ahn.nc.lock")
+    with lock:
+        fname = REGISTRY.fetch("ahn.nc")
+        ahn = xr.open_dataset(fname)
+    return ahn
 
 
 def lakes_shp(path: Union[str, Path]) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
-    fname_lakes_shp = REGISTRY.fetch("lakes_shp.zip")
-    with ZipFile(fname_lakes_shp) as archive:
-        archive.extractall(path)
-    return gpd.read_file(Path(path) / "lakes.shp")
+    lock = FileLock(REGISTRY.path / "lakes_shp.zip.lock")
+    with lock:
+        fnames = REGISTRY.fetch("lakes_shp.zip", processor=Unzip(extract_dir=path))
+        shape_file = next(filter(lambda files: "lakes.shp" in files, fnames))
+        lakes = gpd.read_file(shape_file)
+    return lakes
+
+
+def _circle_nodes():
+    lock = FileLock(REGISTRY.path / "circle-nodes.txt.lock")
+    with lock:
+        fname_nodes = REGISTRY.fetch("circle-nodes.txt")
+        nodes = np.loadtxt(fname_nodes)
+
+    return nodes
+
+
+def _circle_triangles():
+    lock = FileLock(REGISTRY.path / "circle-triangles.txt.lock")
+    with lock:
+        fname_triangles = REGISTRY.fetch("circle-triangles.txt")
+        triangles = np.loadtxt(fname_triangles).astype(np.int32)
+
+    return triangles
 
 
 def circle() -> xu.Ugrid2d:
-    nodes_lock = FileLock(REGISTRY.path / "circle-nodes.txt.lock")
-    with nodes_lock:
-        fname_nodes = REGISTRY.fetch("circle-nodes.txt")
-
-    triangles_lock = FileLock(REGISTRY.path / "circle-triangles.txt.lock")
-    with triangles_lock:
-        fname_triangles = REGISTRY.fetch("circle-triangles.txt")
-
-    nodes = np.loadtxt(fname_nodes)
-    triangles = np.loadtxt(fname_triangles).astype(np.int32)
+    nodes = _circle_nodes()
+    triangles = _circle_triangles()
 
     return xu.Ugrid2d(*nodes.T, -1, triangles)
 
 
 def imod5_projectfile_data(path: Union[str, Path]) -> dict:
-    fname_model = REGISTRY.fetch("iMOD5_model.zip")
+    lock = FileLock(REGISTRY.path / "iMOD5_model.zip.lock")
+    with lock:
+        _ = REGISTRY.fetch("iMOD5_model.zip", processor=Unzip(extract_dir=path))
+        iMOD5_model = open_projectfile_data(
+            Path(path) / "iMOD5_model_pooch" / "iMOD5_model.prj"
+        )
 
-    with ZipFile(fname_model) as archive:
-        archive.extractall(path)
-
-    return open_projectfile_data(Path(path) / "iMOD5_model_pooch" / "iMOD5_model.prj")
+    return iMOD5_model
 
 
 def hondsrug_simulation(path: Union[str, Path]) -> Modflow6Simulation:
-    fname_simulation = REGISTRY.fetch("hondsrug-simulation.zip")
+    lock = FileLock(REGISTRY.path / "hondsrug-simulation.zip.lock")
+    with lock:
+        _ = REGISTRY.fetch("hondsrug-simulation.zip", processor=Unzip(extract_dir=path))
 
-    with ZipFile(fname_simulation) as archive:
-        archive.extractall(path)
-
-    simulation = Modflow6Simulation.from_file(Path(path) / "mf6-hondsrug-example.toml")
-    # The model was written before the xt3d_option and rhs_option arguments were
-    # added to iMOD Python. Set missing options to False.
-    simulation["GWF"]["npf"].set_xt3d_option(is_xt3d_used=False, is_rhs=False)
+        simulation = Modflow6Simulation.from_file(
+            Path(path) / "mf6-hondsrug-example.toml"
+        )
+        # The model was written before the xt3d_option and rhs_option arguments were
+        # added to iMOD Python. Set missing options to False.
+        simulation["GWF"]["npf"].set_xt3d_option(is_xt3d_used=False, is_rhs=False)
 
     return simulation
 
 
 def hondsrug_crosssection(path: Union[str, Path]) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
-    fname_simulation = REGISTRY.fetch("hondsrug-crosssection.zip")
+    lock = FileLock(REGISTRY.path / "hondsrug-crosssection.zip.lock")
+    with lock:
+        fnames = REGISTRY.fetch(
+            "hondsrug-crosssection.zip", processor=Unzip(extract_dir=path)
+        )
+        shape_file = next(filter(lambda files: "crosssection.shp" in files, fnames))
+        crosssection = gpd.read_file(shape_file)
 
-    with ZipFile(fname_simulation) as archive:
-        archive.extractall(path)
-
-    return gpd.read_file(Path(path) / "crosssection.shp")
+    return crosssection
 
 
 def hondsrug_layermodel_topsystem() -> xr.Dataset:

@@ -15,7 +15,6 @@ repository = "https://github.com/Deltares/imod-python.git"
 [tasks]
 docs =  { cmd = "make html", depends_on = ["install"], cwd = "docs" }
 install = "python -m pip install --no-deps --editable ."
-install_with_deps = "python -m pip install --editable ."
 format = "ruff check --fix .; ruff format ."
 lint = "ruff check . ; ruff format --check ."
 tests = { depends_on = ["unittests", "examples"] }
@@ -41,31 +40,24 @@ examples = { cmd = [
     "--verbose",
     "--junitxml=examples_report.xml",
 ], depends_on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
-test_import = { cmd = [
-    "python",
-    "-c",
-    "import imod"
-], depends_on = ["install_with_deps"]}
 pypi-publish = { cmd = "rm --recursive --force dist && python -m build && twine check dist/* && twine upload dist/*" }
 
 mypy_lint = { cmd ="mypy", depends_on = ["install"]}
 mypy_report = { cmd ="mypy | mypy2junit > mypy-report.xml", depends_on = ["install"]}
 
 [dependencies]
-# Keep empty or undefined to create an empty default environment.
-
-[feature.base.dependencies]
 affine = "*"
 black = "*"
 bottleneck = "*"
 cftime = ">=1"
 contextily = ">=1"
 cytoolz = "*"
-dask = "<2024.1.0" # Newer version incompatible with rasterio
+dask = "*"
 fastcore = "*"
 filelock = "*"
 flopy = "*"
 geopandas = "*"
+gdal = ">=3.9.2"
 gh = "*"
 graphviz = "*"
 hatchling = "*"
@@ -76,7 +68,8 @@ matplotlib = "*"
 mypy = "*"
 netcdf4 = "*"
 numba = ">=0.50"
-numpy = "<2"    # TODO https://github.com/Deltares/imod-python/issues/1107: Upgrade to version 2.0 
+numba_celltree = "<0.2" # The 0.2 version breaks the following test: test_in_bounds, test_get_indices__unstructured, test_get_values__unstructured
+numpy = "*"
 pandamesh = "*"
 pandas = "*"
 pip = "*"
@@ -113,7 +106,7 @@ xugrid = ">=0.10.0"
 zarr = "*"
 python-build = "*"
 
-[feature.base.pypi-dependencies]
+[pypi-dependencies]
 mypy2junit = "*"
 
 [feature.interactive.dependencies]
@@ -133,9 +126,17 @@ pip = "*"
 python = "3.12"
 pip = "*"
 
+[feature.py_common.tasks]
+test_import = { cmd = [
+    "python",
+    "-c",
+    "import imod"
+], depends_on = ["install_with_deps"]}
+install_with_deps = "python -m pip install --editable ."
+
 [environments]
-default = {features = ["base"], solve-group = "conda-deps"}
-interactive = {features = ["interactive", "base"], solve-group = "conda-deps"}
-py310 = {features = ["py310"], solve-group = "py310"}
-py311 = {features = ["py311"], solve-group = "py311"}
-py312 = {features = ["py312"], solve-group = "py312"}
+default = {features = [], solve-group = "conda-deps"}
+interactive = {features = ["interactive"], solve-group = "conda-deps"}
+py310 = {features = ["py310", "py_common"], no-default-feature = true}
+py311 = {features = ["py311", "py_common"], no-default-feature = true}
+py312 = {features = ["py312", "py_common"], no-default-feature = true}
