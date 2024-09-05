@@ -104,7 +104,7 @@ def test_hfb_writing_one_layer(barrier, tmp_path):
     hfb = Mf6HorizontalFlowBarrier(**barrier)
     write_context = WriteContext(tmp_path)
 
-    expected_hfb_data = np.row_stack(
+    expected_hfb_data = np.vstack(
         (
             barrier["layer"],
             barrier["cell_id1"],

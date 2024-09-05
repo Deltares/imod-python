@@ -4,7 +4,7 @@ version = "0.17.1"
 description = "Make massive MODFLOW models"
 authors = ["Deltares <huite.bootsma@deltares.nl>", ]
 channels = ["conda-forge", ]
-platforms = ["win-64", "linux-64", "osx-arm64", "osx-64"]
+platforms = ["win-64", "linux-64", "osx-arm64"]
 license = "MIT"
 license-file = "LICENSE"
 readme = "README.rst"
@@ -49,7 +49,7 @@ examples = { cmd = [
     "--cache-clear",
     "--verbose",
     "--junitxml=examples_report.xml",
-], depends_on = ["install"], cwd = "imod/tests" }
+], depends_on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
 # User acceptance tests, only works when paths to models are located on local
 # drive and are specified in a .env file.
 user_acceptance = { cmd = [
@@ -58,7 +58,7 @@ user_acceptance = { cmd = [
     "--cache-clear",
     "--verbose",
     "--junitxml=user_acceptance_report.xml",
-], depends_on = ["install"], cwd = "imod/tests" }
+], depends_on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
 test_import = { cmd = [
     "python",
     "-c",
@@ -70,19 +70,18 @@ mypy_lint = { cmd ="mypy", depends_on = ["install"]}
 mypy_report = { cmd ="mypy | mypy2junit > mypy-report.xml", depends_on = ["install"]}
 
 [dependencies]
-# Keep empty or undefined to create an empty default environment.
-
-[feature.base.dependencies]
 affine = "*"
 black = "*"
 bottleneck = "*"
 cftime = ">=1"
 contextily = ">=1"
 cytoolz = "*"
-dask = "<2024.1.0" # Newer version incompatible with rasterio
+dask = "*"
 fastcore = "*"
+filelock = "*"
 flopy = "*"
 geopandas = "*"
+gdal = ">=3.9.2"
 gh = "*"
 graphviz = "*"
 hatchling = "*"
@@ -93,9 +92,11 @@ matplotlib = "*"
 mypy = "*"
 netcdf4 = "*"
 numba = ">=0.50"
+numba_celltree = "<0.2" # The 0.2 version breaks the following test: test_in_bounds, test_get_indices__unstructured, test_get_values__unstructured
 numpy = "*"
 pandamesh = "*"
 pandas = "*"
+pip = "*"
 pooch = "*"
 pydantic = "*"
 pydata-sphinx-theme = "*"
@@ -107,7 +108,7 @@ pytest-cases = "*"
 pytest-cov = "*"
 pytest-dotenv = "*"
 pytest-xdist = "*"
-python = "3.11"
+python = "3.11.*"
 python-graphviz = "*"
 pyvista = "*"
 rasterio = ">=1.0"
@@ -128,9 +129,9 @@ vtk = { version = ">=9.0", build = "*qt*", channel = "conda-forge" }
 xarray = ">=2023.08.0"
 xugrid = ">=0.11.0"
 zarr = "*"
-build = "*"
+python-build = "*"
 
-[feature.base.pypi-dependencies]
+[pypi-dependencies]
 mypy2junit = "*"
 
 [feature.interactive.dependencies]
@@ -150,9 +151,17 @@ pip = "*"
 python = "3.12"
 pip = "*"
 
+[feature.py_common.tasks]
+test_import = { cmd = [
+    "python",
+    "-c",
+    "import imod"
+], depends_on = ["install_with_deps"]}
+install_with_deps = "python -m pip install --editable ."
+
 [environments]
-default = {features = ["base"], solve-group = "conda-deps"}
-interactive = {features = ["interactive", "base"], solve-group = "conda-deps"}
-py310 = {features = ["py310"], solve-group = "py310"}
-py311 = {features = ["py311"], solve-group = "py311"}
-py312 = {features = ["py312"], solve-group = "py312"}
+default = {features = [], solve-group = "conda-deps"}
+interactive = {features = ["interactive"], solve-group = "conda-deps"}
+py310 = {features = ["py310", "py_common"], no-default-feature = true}
+py311 = {features = ["py311", "py_common"], no-default-feature = true}
+py312 = {features = ["py312", "py_common"], no-default-feature = true}

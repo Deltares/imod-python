@@ -31,6 +31,7 @@ dependencies = [
     "cftime >=1",
     "dask",
     "fastcore",
+    "filelock",
     "Jinja2",
     "loguru",
     "matplotlib",
@@ -74,7 +75,7 @@ exclude_lines = [
 ]
 
 [tool.ruff.lint]
-select = ["C4", "E", "F", "I", "PD"]
+select = ["C4", "E", "F", "I", "NPY201", "PD"]
 ignore = [
     "E501", # line-too-long. This rule can't be fullfilled by the ruff formatter. The same behavior as black.
     "PD003",
