@@ -41,5 +41,6 @@ object ExamplesTemplate : Template({
 
     requirements {
         equals("env.OS", "Windows_NT")
+        doesNotExist("container.engine")
     }
 })
