@@ -3,11 +3,12 @@
 from enum import Enum
 from typing import Optional
 
+import pandas as pd
 import xarray as xr
 
 from imod.mf6.utilities.mask import mask_arrays
 from imod.schemata import scalar_None
-from imod.typing import GridDataArray, GridDataset
+from imod.typing import GridDataArray
 
 
 class AlignLevelsMode(Enum):
@@ -209,11 +210,22 @@ def cleanup_ghb(
     return _cleanup_robin_boundary(idomain, output_dict)
 
 
-def cleanup_wel(wel_ds: GridDataset):
+def cleanup_wel(
+    idomain: GridDataArray,
+    top: GridDataArray,
+    bottom: GridDataArray,
+    wells: pd.DataFrame,
+):
     """
     Clean up wells
 
     - Removes wells where the screen bottom elevation exceeds screen top.
     """
-    deactivate = wel_ds["screen_top"] < wel_ds["screen_bottom"]
-    return wel_ds.where(~deactivate, drop=True)
+    from imod.prepare.wells import locate_wells, validate_well_columnnames
+
+    validate_well_columnnames(wells)
+
+    id_in_bounds, xy_top, xy_bottom = locate_wells(wells, top, bottom)
+
+    deactivate = wells["screen_top"] < wells["screen_bottom"]
+    return wells.where(~deactivate, drop=True)

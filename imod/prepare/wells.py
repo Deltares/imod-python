@@ -86,6 +86,23 @@ def locate_wells(
     return id_in_bounds, xy_top, xy_bottom, xy_k
 
 
+def validate_well_columnnames(wells: pd.DataFrame) -> None:
+    names = {"x", "y", "id", "top", "bottom", "rate"}
+    missing = names.difference(wells.columns)
+    if missing:
+        raise ValueError(f"Columns are missing in wells dataframe: {missing}")
+
+def validate_arg_types_equal(**kwargs):
+    types = [type(arg) for arg in (kwargs.values()) if arg is not None]
+    if len(set(types)) != 1:
+        members = ",".join([t.__name__ for t in types])
+        names = ",".join(kwargs.keys())
+        raise TypeError(
+            f"{names} should be of the same type, "
+            f"received: {members}"
+        )
+
+
 def assign_wells(
     wells: pd.DataFrame,
     top: Union[xr.DataArray, xu.UgridDataArray],
@@ -124,19 +141,8 @@ def assign_wells(
         Wells with rate subdivided per layer. Contains the original columns of
         ``wells``, as well as layer, overlap, transmissivity.
     """
-
-    names = {"x", "y", "id", "top", "bottom", "rate"}
-    missing = names.difference(wells.columns)
-    if missing:
-        raise ValueError(f"Columns are missing in wells dataframe: {missing}")
-
-    types = [type(arg) for arg in (top, bottom, k) if arg is not None]
-    if len(set(types)) != 1:
-        members = ",".join([t.__name__ for t in types])
-        raise TypeError(
-            "top, bottom, and optionally k should be of the same type, "
-            f"received: {members}"
-        )
+    validate_well_columnnames(wells)
+    validate_arg_types_equal(top=top, bottom=bottom, k=k)
 
     id_in_bounds, xy_top, xy_bottom, xy_k = locate_wells(
         wells, top, bottom, k, validate
