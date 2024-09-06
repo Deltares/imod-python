@@ -5,6 +5,7 @@ Assign wells to layers.
 from typing import Optional, Union
 
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
 import xarray as xr
 import xugrid as xu
@@ -12,7 +13,9 @@ import xugrid as xu
 import imod
 
 
-def compute_vectorized_overlap(bounds_a, bounds_b):
+def compute_vectorized_overlap(
+    bounds_a: npt.NDArray[np.float64], bounds_b: npt.NDArray[np.float64]
+) -> npt.NDArray[np.float64]:
     """
     Vectorized overlap computation.
     Compare with:
@@ -25,20 +28,33 @@ def compute_vectorized_overlap(bounds_a, bounds_b):
     )
 
 
-def compute_point_filter_overlap(bounds_wells, bounds_layers):
+def compute_point_filter_overlap(
+    bounds_wells: npt.NDArray[np.float64], bounds_layers: npt.NDArray[np.float64]
+) -> npt.NDArray[np.float64]:
     """
     Special case for filters with zero filter length, these are set to layer
-    thickness.
+    thickness. Filters which are not in a layer or have a nonzero filter length
+    are set to zero overlap.
     """
-    zero_filter_length = bounds_wells[:, 1] == bounds_wells[:, 0]
-    in_layer = (bounds_layers[:, 1] >= bounds_wells[:, 1]) & (
-        bounds_layers[:, 0] < bounds_wells[:, 0]
+    # Unwrap for readability
+    wells_top = bounds_wells[:, 1]
+    wells_bottom = bounds_wells[:, 0]
+    layers_top = bounds_layers[:, 1]
+    layers_bottom = bounds_layers[:, 0]
+
+    has_zero_filter_length = wells_top == wells_bottom
+    in_layer = (layers_top >= wells_top) & (layers_bottom < wells_bottom)
+    layer_thickness = layers_top - layers_bottom
+    # Multiplication to set any elements not meeting the criteria to zero.
+    point_filter_overlap = (
+        has_zero_filter_length.astype(float) * in_layer.astype(float) * layer_thickness
     )
-    layer_thickness = bounds_layers[:, 1] - bounds_layers[:, 0]
-    return zero_filter_length.astype(float) * in_layer.astype(float) * layer_thickness
+    return point_filter_overlap
 
 
-def compute_overlap(wells, top, bottom):
+def compute_overlap(
+    wells: pd.DataFrame, top: npt.NDArray[np.float64], bottom: npt.NDArray[np.float64]
+) -> npt.NDArray[np.float64]:
     # layer bounds stack shape of (n_well, n_layer, 2)
     layer_bounds_stack = np.stack((bottom, top), axis=-1)
     well_bounds = np.broadcast_to(
@@ -69,7 +85,7 @@ def locate_wells(
     bottom: Union[xr.DataArray, xu.UgridDataArray],
     k: Optional[Union[xr.DataArray, xu.UgridDataArray]],
     validate: bool = True,
-):
+) -> tuple[npt.NDArray, xr.Dataset, xr.Dataset, Optional[xr.Dataset]]:
     if not isinstance(top, (xu.UgridDataArray, xr.DataArray)):
         raise TypeError(
             "top and bottom should be DataArray or UgridDataArray, received: "
