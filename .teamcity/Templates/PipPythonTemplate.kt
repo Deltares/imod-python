@@ -2,6 +2,8 @@ package Templates
 
 import jetbrains.buildServer.configs.kotlin.DslContext
 import jetbrains.buildServer.configs.kotlin.Template
+import jetbrains.buildServer.configs.kotlin.buildFeatures.dockerSupport
+import jetbrains.buildServer.configs.kotlin.buildSteps.ScriptBuildStep
 import jetbrains.buildServer.configs.kotlin.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.matrix
 
@@ -25,15 +27,18 @@ object PipPythonTemplate : Template({
                     pixi run --environment %python_env% --frozen test_import
                 """.trimIndent()
             formatStderrAsError = true
+            dockerImage = "containers.deltares.nl/hydrology_product_line_imod/windows-pixi:v0.26.1"
+            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Windows
+            dockerPull = true
         }
     }
 
-    requirements {
-        equals("env.OS", "Windows_NT")
-        doesNotExist("container.engine")
-    }
-
     features {
+        dockerSupport {
+            loginToRegistry = on {
+                dockerRegistryId = "PROJECT_EXT_134"
+            }
+        }
         matrix {
             param(
                 "python_env", listOf(
