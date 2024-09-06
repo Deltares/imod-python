@@ -86,20 +86,20 @@ def locate_wells(
     return id_in_bounds, xy_top, xy_bottom, xy_k
 
 
-def validate_well_columnnames(wells: pd.DataFrame, names: set = {"x", "y", "id", "rate"}) -> None:
+def validate_well_columnnames(
+    wells: pd.DataFrame, names: set = {"x", "y", "id", "rate"}
+) -> None:
     missing = names.difference(wells.columns)
     if missing:
         raise ValueError(f"Columns are missing in wells dataframe: {missing}")
+
 
 def validate_arg_types_equal(**kwargs):
     types = [type(arg) for arg in (kwargs.values()) if arg is not None]
     if len(set(types)) != 1:
         members = ",".join([t.__name__ for t in types])
         names = ",".join(kwargs.keys())
-        raise TypeError(
-            f"{names} should be of the same type, "
-            f"received: {members}"
-        )
+        raise TypeError(f"{names} should be of the same type, " f"received: {members}")
 
 
 def assign_wells(
