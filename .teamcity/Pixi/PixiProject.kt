@@ -38,8 +38,7 @@ object UpdateDependencies : BuildType({
                     git checkout -b pixi_update_%build.counter%
                     
                     echo "Update dependencies" 
-                    del pixi.lock
-                    pixi install
+                    pixi run -e pixi-update update
                     
                     echo "Add any changes" 
                     git add pixi.lock
@@ -48,6 +47,10 @@ object UpdateDependencies : BuildType({
                     {
                       git commit -m "Update pixi.lock"
                       git push -u origin pixi_update_%build.counter%
+
+                      echo Teamcity automatically updated the dependencies defined the pixi.toml file. Please verify that all tests succeed before merging. > body.md
+                      echo. >> body.md
+                      type diff.md >> body.md
                       pixi run --environment default gh pr create --title "[TEAMCITY] Update project dependencies" --body "Teamcity automatically updated the dependencies defined the pixi.toml file. Please verify that all tests succeed before merging" --reviewer JoerivanEngelen,luitjansl
                       echo "Changes pushed and PR created"
                     }
