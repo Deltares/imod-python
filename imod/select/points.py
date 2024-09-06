@@ -1,10 +1,12 @@
 import warnings
 
 import numpy as np
+import numpy.typing as npt
 import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.typing import GridDataArray
 
 
 def get_unstructured_cell2d_from_xy(uda, **points):
@@ -137,7 +139,9 @@ def check_points_in_bounds(da, points, out_of_bounds):
     return points, inside
 
 
-def _get_indices_1d(da, coordname, x):
+def _get_indices_1d(
+    da: xr.DataArray, coordname: str, x: npt.NDArray[np._FloatType]
+) -> npt.NDArray[np.intp]:
     x = np.atleast_1d(x)
     x_decreasing = da.indexes[coordname].is_monotonic_decreasing
     dx, xmin, _ = imod.util.spatial.coord_reference(da.coords[coordname])
@@ -172,7 +176,9 @@ def _get_indices_1d(da, coordname, x):
     return ixs
 
 
-def points_indices(da, out_of_bounds="raise", **points):
+def points_indices(
+    da: GridDataArray, out_of_bounds: str = "raise", **points
+) -> dict[str, xr.DataArray]:
     """
     Get the indices for points as defined by the arrays x and y.
 
@@ -184,7 +190,7 @@ def points_indices(da, out_of_bounds="raise", **points):
 
     Parameters
     ----------
-    da : xr.DataArray
+    da : xarray.DataArray | xu.UgridDataArray
     out_of_bounds : {"raise", "warn", "ignore"}, default: "raise"
         What to do if the points are not located in the bounds of the
         DataArray:
@@ -246,7 +252,7 @@ def points_indices(da, out_of_bounds="raise", **points):
     return indices
 
 
-def points_values(da, out_of_bounds="raise", **points):
+def points_values(da: GridDataArray, out_of_bounds="raise", **points) -> GridDataArray:
     """
     Get values from specified points.
 
@@ -287,7 +293,7 @@ def points_values(da, out_of_bounds="raise", **points):
     indices = imod.select.points.points_indices(
         da, out_of_bounds=out_of_bounds, **iterable_points
     )
-    selection = da.isel(**indices)
+    selection = da.isel(indexers=indices)
 
     return selection
 

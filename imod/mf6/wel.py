@@ -18,6 +18,7 @@ import imod
 from imod.logging import init_log_decorator, logger
 from imod.logging.logging_decorators import standard_log_decorator
 from imod.logging.loglevel import LogLevel
+from imod.mf6 import StructuredDiscretization, VerticesDiscretization
 from imod.mf6.boundary_condition import (
     BoundaryCondition,
     DisStructuredBoundaryCondition,
@@ -339,7 +340,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             "x": ("ncellid", x),
             "y": ("ncellid", y),
         }
-        cellid = cellid.assign_coords(**coords)
+        cellid = cellid.assign_coords(coords=coords)
 
         return cellid
 
@@ -972,7 +973,7 @@ class Well(GridAgnosticWell):
             logger.log(loglevel=LogLevel.ERROR, message=log_msg, additional_depth=2)
             raise ValueError(log_msg)
 
-    def cleanup(self):
+    def cleanup(self, _: StructuredDiscretization | VerticesDiscretization):
         self.dataset = cleanup_wel(self.dataset)
 
 

@@ -2,7 +2,7 @@
 Assign wells to layers.
 """
 
-from typing import Optional, Union
+from typing import Optional
 
 import numpy as np
 import numpy.typing as npt
@@ -11,6 +11,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.typing import GridDataArray
 
 
 def compute_vectorized_overlap(
@@ -53,7 +54,7 @@ def compute_point_filter_overlap(
 
 
 def compute_overlap(
-    wells: pd.DataFrame, top: npt.NDArray[np.float64], bottom: npt.NDArray[np.float64]
+    wells: pd.DataFrame, top: GridDataArray, bottom: GridDataArray
 ) -> npt.NDArray[np.float64]:
     # layer bounds stack shape of (n_well, n_layer, 2)
     layer_bounds_stack = np.stack((bottom, top), axis=-1)
@@ -81,11 +82,13 @@ def compute_overlap(
 
 def locate_wells(
     wells: pd.DataFrame,
-    top: Union[xr.DataArray, xu.UgridDataArray],
-    bottom: Union[xr.DataArray, xu.UgridDataArray],
-    k: Optional[Union[xr.DataArray, xu.UgridDataArray]],
+    top: GridDataArray,
+    bottom: GridDataArray,
+    k: Optional[GridDataArray],
     validate: bool = True,
-) -> tuple[npt.NDArray, xr.Dataset, xr.Dataset, Optional[xr.Dataset]]:
+) -> tuple[
+    npt.NDArray[np.object_], GridDataArray, GridDataArray, float | GridDataArray
+]:
     if not isinstance(top, (xu.UgridDataArray, xr.DataArray)):
         raise TypeError(
             "top and bottom should be DataArray or UgridDataArray, received: "
@@ -93,7 +96,7 @@ def locate_wells(
         )
 
     # Default to a xy_k value of 1.0: weigh every layer equally.
-    xy_k = 1.0
+    xy_k: float | GridDataArray = 1.0
     first = wells.groupby("id").first()
     x = first["x"].to_numpy()
     y = first["y"].to_numpy()
@@ -125,9 +128,9 @@ def locate_wells(
 
 def assign_wells(
     wells: pd.DataFrame,
-    top: Union[xr.DataArray, xu.UgridDataArray],
-    bottom: Union[xr.DataArray, xu.UgridDataArray],
-    k: Optional[Union[xr.DataArray, xu.UgridDataArray]] = None,
+    top: GridDataArray,
+    bottom: GridDataArray,
+    k: Optional[GridDataArray] = None,
     minimum_thickness: Optional[float] = 0.05,
     minimum_k: Optional[float] = 1.0,
     validate: bool = True,
@@ -144,13 +147,13 @@ def assign_wells(
 
     Parameters
     ----------
-    wells: pd.DataFrame
+    wells: pandas.DataFrame
         Should contain columns x, y, id, top, bottom, rate.
-    top: xr.DataArray or xu.UgridDataArray
+    top: xarray.DataArray or xugrid.UgridDataArray
         Top of the model layers.
-    bottom: xr.DataArray or xu.UgridDataArray
+    bottom: xarray.DataArray or xugrid.UgridDataArray
         Bottom of the model layers.
-    k: xr.DataArray or xu.UgridDataArray, optional
+    k: xarray.DataArray or xugrid.UgridDataArray, optional
         Horizontal conductivity of the model layers.
     minimum_thickness: float, optional, default: 0.01
     minimum_k: float, optional, default: 1.0
@@ -184,10 +187,10 @@ def assign_wells(
     first = wells_in_bounds.groupby("id").first()
     overlap = compute_overlap(first, xy_top, xy_bottom)
 
-    if k is None:
-        k = 1.0
+    if isinstance(xy_k, (xr.DataArray, xu.UgridDataArray)):
+        k_for_df = xy_k.values.ravel()
     else:
-        k = xy_k.values.ravel()
+        k_for_df = xy_k
 
     # Distribute rate according to transmissivity.
     n_layer, n_well = xy_top.shape
@@ -196,8 +199,8 @@ def assign_wells(
         data={
             "layer": np.repeat(top["layer"], n_well),
             "overlap": overlap,
-            "k": k,
-            "transmissivity": overlap * k,
+            "k": k_for_df,
+            "transmissivity": overlap * k_for_df,
         },
     )
     # remove entries
