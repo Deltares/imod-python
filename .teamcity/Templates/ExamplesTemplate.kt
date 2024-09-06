@@ -27,7 +27,7 @@ object ExamplesTemplate : Template({
             id = "Run_examples"
             workingDir = "imod-python"
             scriptContent = """
-                set Path=%system.teamcity.build.checkoutDir%\modflow6;"d:\ProgramData\pixi"
+                SET PATH=%%PATH%%;%system.teamcity.build.checkoutDir%\modflow6
                 pixi run --environment default --frozen examples
             """.trimIndent()
             formatStderrAsError = true
