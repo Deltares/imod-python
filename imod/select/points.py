@@ -140,7 +140,7 @@ def check_points_in_bounds(da, points, out_of_bounds):
 
 
 def _get_indices_1d(
-    da: xr.DataArray, coordname: str, x: npt.NDArray[np._FloatType]
+    da: xr.DataArray, coordname: str, x: npt.NDArray[np.floating]
 ) -> npt.NDArray[np.intp]:
     x = np.atleast_1d(x)
     x_decreasing = da.indexes[coordname].is_monotonic_decreasing
