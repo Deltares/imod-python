@@ -74,7 +74,7 @@ class RivCases:
 class DisCases:
     def case_structured(self):
         return dis_dict()
-    
+
     def case_unstructured(self):
         return make_dict_unstructured(dis_dict())
 
