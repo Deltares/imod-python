@@ -222,41 +222,45 @@ def cleanup_wel(
 
     - Removes wells where the screen bottom elevation exceeds screen top.
     """
-    validate_well_columnnames(wells)
+    validate_well_columnnames(
+        wells, names={"x", "y", "id", "screen_top", "screen_bottom"}
+    )
 
     # 1. Locate wells, wells outside grid bounds are dropped
-    id_in_bounds, xy_top, xy_bottom, _ = locate_wells(wells, top, bottom)
+    id_in_bounds, xy_top, xy_bottom, _ = locate_wells(
+        wells, top, bottom, validate=False
+    )
     xy_base_model = xy_bottom.isel(layer=-1, drop=True)
 
     # Assign id as coordinates
     xy_top = xy_top.assign_coords(id=("index", id_in_bounds))
     xy_base_model = xy_base_model.assign_coords(id=("index", id_in_bounds))
     # Create pandas dataframes/series with "id" as index.
-    xy_top_series = xy_top.to_dataframe().set_index("id")["top"]
-    xy_base_series = xy_base_model.to_dataframe().set_index("id")["bottom"]
+    xy_top_series = xy_top.to_dataframe(name="top").set_index("id")["top"]
+    xy_base_series = xy_base_model.to_dataframe(name="bottom").set_index("id")["bottom"]
     wells_in_bounds = wells.set_index("id").loc[id_in_bounds]
 
     # 2. Set screen_top to surface level
     wells_in_bounds["screen_top"] = wells_in_bounds["screen_top"].clip(
-        max=xy_top_series
+        upper=xy_top_series
     )
-    # 3. Convert all filters where screen bottom exceeds screen top to
+    # 3. Drop wells with filters below base
+    is_below_base = wells_in_bounds["screen_top"] >= xy_base_series
+    wells_in_bounds = wells_in_bounds.loc[is_below_base]
+    # 4. Clip screen_bottom to model base
+    wells_in_bounds["screen_bottom"] = wells_in_bounds["screen_bottom"].clip(
+        lower=xy_base_series
+    )
+    # 5. Convert all filters where screen bottom exceeds screen top to
     #    point filters
     wells_in_bounds["screen_bottom"] = wells_in_bounds["screen_bottom"].clip(
-        min=wells_in_bounds["screen_top"]
-    )
-    # 4. Drop wells with filters below base
-    is_below_base = wells_in_bounds["screen_top"] < xy_base_series
-    wells_in_bounds = wells_in_bounds.loc[is_below_base]
-    # 5. Clip screen_bottom to model base
-    wells_in_bounds["screen_bottom"] = wells_in_bounds["screen_bottom"].clip(
-        min=xy_base_series
+        upper=wells_in_bounds["screen_top"]
     )
     # 6. Set filters with ultrathin filters to point filters
-    is_ultrathin_layer = (
+    not_ultrathin_layer = (
         wells_in_bounds["screen_top"] - wells_in_bounds["screen_bottom"]
-    ) <= minimum_thickness
-    wells_in_bounds["screen_bottom"] = wells_in_bounds["screen_top"].loc[
-        is_ultrathin_layer
-    ]
+    ) > minimum_thickness
+    wells_in_bounds["screen_bottom"] = wells_in_bounds["screen_bottom"].where(
+        not_ultrathin_layer, wells_in_bounds["screen_top"]
+    )
     return wells_in_bounds
