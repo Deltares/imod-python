@@ -51,7 +51,7 @@ object UpdateDependencies : BuildType({
                       echo Teamcity automatically updated the dependencies defined the pixi.toml file. Please verify that all tests succeed before merging. > body.md
                       echo. >> body.md
                       type diff.md >> body.md
-                      pixi run --environment default gh pr create --title "[TEAMCITY] Update project dependencies" --body "Teamcity automatically updated the dependencies defined the pixi.toml file. Please verify that all tests succeed before merging" --reviewer JoerivanEngelen,luitjansl
+                      pixi run --environment default gh pr create --title "[TEAMCITY] Update project dependencies" --body-file body.md --reviewer JoerivanEngelen,luitjansl
                       echo "Changes pushed and PR created"
                     }
                     else
