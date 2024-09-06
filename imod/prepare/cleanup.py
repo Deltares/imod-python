@@ -85,7 +85,7 @@ def cleanup_riv(
     idomain: xarray.DataArray | xugrid.UgridDataArray
         MODFLOW 6 model domain. idomain==1 is considered active domain.
     bottom: xarray.DataArray | xugrid.UgridDataArray
-        Grid with`model bottoms
+        Grid with model bottoms
     stage: xarray.DataArray | xugrid.UgridDataArray
         Grid with river stages
     conductance: xarray.DataArray | xugrid.UgridDataArray
@@ -218,9 +218,33 @@ def cleanup_wel(
     minimum_thickness=0.05,
 ):
     """
-    Clean up wells
+    Clean up dataframe with wells, fixes some common mistakes in the following
+    order:
 
-    - Removes wells where the screen bottom elevation exceeds screen top.
+    - Wells outside grid bounds are dropped
+    - Filters above surface level are set to surface level
+    - Drop wells with filters entirely below base
+    - Clip filter screen_bottom to model base
+    - Clip filter screen_bottom to screen_top
+    - Well filters thinner than minimum thickness are made point filters
+
+    Parameters
+    ----------
+    wells: pandas.Dataframe
+        Dataframe with wells to be cleaned up. Requires columns ``"x", "y",
+        "id", "screen_top", "screen_bottom"``
+    top: xarray.DataArray | xugrid.UgridDataArray
+        Grid with model top
+    bottom: xarray.DataArray | xugrid.UgridDataArray
+        Grid with model bottoms
+    minimum_thickness: float
+        Minimum thickness, filter thinner than this thickness are set to point
+        filters
+
+    Returns
+    -------
+    pandas.DataFrame
+        Cleaned well dataframe.
     """
     validate_well_columnnames(
         wells, names={"x", "y", "id", "screen_top", "screen_bottom"}
@@ -240,7 +264,7 @@ def cleanup_wel(
     xy_base_series = xy_base_model.to_dataframe(name="bottom").set_index("id")["bottom"]
     wells_in_bounds = wells.set_index("id").loc[id_in_bounds]
 
-    # 2. Set screen_top to surface level
+    # 2. Clip screen_top to surface level
     wells_in_bounds["screen_top"] = wells_in_bounds["screen_top"].clip(
         upper=xy_top_series
     )
