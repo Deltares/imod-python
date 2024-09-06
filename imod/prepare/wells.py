@@ -46,7 +46,7 @@ def locate_wells(
     wells: pd.DataFrame,
     top: Union[xr.DataArray, xu.UgridDataArray],
     bottom: Union[xr.DataArray, xu.UgridDataArray],
-    k: Optional[Union[xr.DataArray, xu.UgridDataArray]],
+    k: Optional[Union[xr.DataArray, xu.UgridDataArray]] = None,
     validate: bool = True,
 ):
     if not isinstance(top, (xu.UgridDataArray, xr.DataArray)):
@@ -86,8 +86,7 @@ def locate_wells(
     return id_in_bounds, xy_top, xy_bottom, xy_k
 
 
-def validate_well_columnnames(wells: pd.DataFrame) -> None:
-    names = {"x", "y", "id", "top", "bottom", "rate"}
+def validate_well_columnnames(wells: pd.DataFrame, names: set = {"x", "y", "id", "rate"}) -> None:
     missing = names.difference(wells.columns)
     if missing:
         raise ValueError(f"Columns are missing in wells dataframe: {missing}")
@@ -141,7 +140,8 @@ def assign_wells(
         Wells with rate subdivided per layer. Contains the original columns of
         ``wells``, as well as layer, overlap, transmissivity.
     """
-    validate_well_columnnames(wells)
+    columnnames = {"x", "y", "id", "top", "bottom", "rate"}
+    validate_well_columnnames(wells, columnnames)
     validate_arg_types_equal(top=top, bottom=bottom, k=k)
 
     id_in_bounds, xy_top, xy_bottom, xy_k = locate_wells(
