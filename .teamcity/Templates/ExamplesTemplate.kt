@@ -4,7 +4,9 @@ import jetbrains.buildServer.configs.kotlin.AbsoluteId
 import jetbrains.buildServer.configs.kotlin.DslContext
 import jetbrains.buildServer.configs.kotlin.Template
 import jetbrains.buildServer.configs.kotlin.buildFeatures.XmlReport
+import jetbrains.buildServer.configs.kotlin.buildFeatures.dockerSupport
 import jetbrains.buildServer.configs.kotlin.buildFeatures.xmlReport
+import jetbrains.buildServer.configs.kotlin.buildSteps.ScriptBuildStep
 import jetbrains.buildServer.configs.kotlin.buildSteps.script
 
 object ExamplesTemplate : Template({
@@ -29,18 +31,22 @@ object ExamplesTemplate : Template({
                 pixi run --environment default --frozen examples
             """.trimIndent()
             formatStderrAsError = true
+            dockerImage = "containers.deltares.nl/hydrology_product_line_imod/windows-pixi:v0.26.1"
+            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Windows
+            dockerRunParameters = """--cpus="4""""
+            dockerPull = true
         }
     }
 
     features {
+        dockerSupport {
+            loginToRegistry = on {
+                dockerRegistryId = "PROJECT_EXT_134"
+            }
+        }
         xmlReport {
             reportType = XmlReport.XmlReportType.JUNIT
             rules = "imod-python/imod/tests/*report.xml"
         }
-    }
-
-    requirements {
-        equals("env.OS", "Windows_NT")
-        doesNotExist("container.engine")
     }
 })
