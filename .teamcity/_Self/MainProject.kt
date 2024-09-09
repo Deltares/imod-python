@@ -88,12 +88,17 @@ object MyPy : BuildType({
 object UnitTests : BuildType({
     name = "UnitTests"
 
+    params {
+        param("reverse.dep.Modflow_Modflow6Release.MODFLOW6_Version", "6.5.0")
+        param("reverse.dep.Modflow_Modflow6Release.MODFLOW6_Platform", "win64")
+    }
     templates(UnitTestsTemplate, GitHubIntegrationTemplate)
 
     dependencies {
-        dependency(AbsoluteId("MetaSWAP_Modflow_Modflow6Release642")) {
+        dependency(AbsoluteId("Modflow_Modflow6Release")) {
             snapshot {
                 onDependencyFailure = FailureAction.FAIL_TO_START
+
             }
 
             artifacts {
@@ -112,10 +117,15 @@ object UnitTests : BuildType({
 object Examples : BuildType({
     name = "Examples"
 
+    params {
+        param("reverse.dep.Modflow_Modflow6Release.MODFLOW6_Version", "6.5.0")
+        param("reverse.dep.Modflow_Modflow6Release.MODFLOW6_Platform", "win64")
+    }
+
     templates(ExamplesTemplate, GitHubIntegrationTemplate)
 
     dependencies {
-        dependency(AbsoluteId("MetaSWAP_Modflow_Modflow6Release642")) {
+        dependency(AbsoluteId("Modflow_Modflow6Release")) {
             snapshot {
                 onDependencyFailure = FailureAction.FAIL_TO_START
             }
