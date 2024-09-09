@@ -114,6 +114,10 @@ ipykernel = "*"
 ipython = "*"
 jupyter = "*"
 
+[feature.pixi-update.dependencies]
+pip = "*"
+pixi-diff-to-markdown = "*"
+
 [feature.py310.dependencies]
 python = "3.10.12"
 pip = "*"
@@ -125,6 +129,9 @@ pip = "*"
 [feature.py312.dependencies]
 python = "3.12"
 pip = "*"
+
+[feature.pixi-update.tasks]
+update = "pixi update --json | pixi-diff-to-markdown > diff.md"
 
 [feature.py_common.tasks]
 test_import = { cmd = [
@@ -140,3 +147,4 @@ interactive = {features = ["interactive"], solve-group = "conda-deps"}
 py310 = {features = ["py310", "py_common"], no-default-feature = true}
 py311 = {features = ["py311", "py_common"], no-default-feature = true}
 py312 = {features = ["py312", "py_common"], no-default-feature = true}
+pixi-update = {features = ["pixi-update"], no-default-feature = true}
