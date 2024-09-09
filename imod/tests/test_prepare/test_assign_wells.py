@@ -25,30 +25,53 @@ def test_compute_vectorized_overlap():
     assert np.array_equal(actual, np.array([1.0, 1.0]))
 
 
+def test_compute_point_filter_overlap():
+    bounds_well = np.array(
+        [
+            [0.0, 0.0],
+            [0.0, 0.0],
+            [0.0, 1.0],
+            [0.0, 0.0],
+            [0.0, 0.0],
+        ]
+    )
+    bounds_layer = np.array(
+        [
+            [1.0, 2.0],
+            [-1.0, 2.0],
+            [-1.0, 2.0],
+            [0.0, 0.0],
+            [-5.0, -4.0],
+        ]
+    )
+    actual = prepwel.compute_point_filter_overlap(bounds_well, bounds_layer)
+    assert np.array_equal(actual, np.array([0.0, 3.0, 0.0, 0.0, 0.0]))
+
+
 def test_compute_overlap():
     # Three wells
     wells = pd.DataFrame(
         {
-            "top": [5.0, 4.0, 3.0],
-            "bottom": [4.0, 2.0, -1.0],
+            "top": [5.0, 4.0, 3.0, 0.0],
+            "bottom": [4.0, 2.0, -1.0, 0.0],
         }
     )
     top = xr.DataArray(
         data=[
-            [10.0, 10.0, 10.0],
-            [0.0, 0.0, 0.0],
+            [10.0, 10.0, 10.0, 10.0],
+            [0.0, 0.0, 0.0, 0.0],
         ],
         dims=["layer", "index"],
     )
     bottom = xr.DataArray(
         data=[
-            [0.0, 0.0, 0.0],
-            [-10.0, -10.0, -10.0],
+            [0.0, 0.0, 0.0, 0.0],
+            [-10.0, -10.0, -10.0, -10.0],
         ],
         dims=["layer", "index"],
     )
     actual = prepwel.compute_overlap(wells, top, bottom)
-    expected = np.array([1.0, 2.0, 3.0, 0.0, 0.0, 1.0])
+    expected = np.array([1.0, 2.0, 3.0, 0.0, 0.0, 0.0, 1.0, 10.0])
     assert np.allclose(actual, expected)
 
 
