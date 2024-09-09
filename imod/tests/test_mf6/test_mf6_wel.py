@@ -937,7 +937,7 @@ def test_import_and_convert_to_mf6(imod5_dataset, tmp_path, wel_class):
     times = list(pd.date_range(datetime(1989, 1, 1), datetime(2013, 1, 1), 8400))
 
     # import grid-agnostic well from imod5 data (it contains 1 well)
-    wel = wel_class.from_imod5_data("wel-WELLS_L3", data, times)
+    wel = wel_class.from_imod5_data("wel-WELLS_L3", data, times, minimum_thickness=1.0)
     assert wel.dataset["x"].values[0] == 197910.0
     assert wel.dataset["y"].values[0] == 362860.0
     assert np.mean(wel.dataset["rate"].values) == -317.2059091946156
