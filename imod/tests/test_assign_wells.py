@@ -8,7 +8,7 @@ import imod.prepare.wells as prepwel
 from imod.testing import assert_frame_equal
 
 
-def test_vectorized_overlap():
+def test_compute_vectorized_overlap():
     bounds_a = np.array(
         [
             [0.0, 3.0],
@@ -21,7 +21,7 @@ def test_vectorized_overlap():
             [1.0, 2.0],
         ]
     )
-    actual = prepwel.vectorized_overlap(bounds_a, bounds_b)
+    actual = prepwel.compute_vectorized_overlap(bounds_a, bounds_b)
     assert np.array_equal(actual, np.array([1.0, 1.0]))
 
 
