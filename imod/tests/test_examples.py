@@ -22,6 +22,7 @@ def test_example(example):
     result = subprocess.run([sys.executable, example], capture_output=True)
     if result.returncode != 0:
         raise RuntimeError(
-            f"Example failed to run with returncode "
-            f"{result.returncode}, and error message:\n\n{result.stderr.decode()} "
+            f"Example failed to run with returncode: {result.returncode} \n\n"
+            f"stdout: {result.stdout.decode()} \n\n"
+            f"stderr: {result.stderr.decode()} \n\n"
         )
