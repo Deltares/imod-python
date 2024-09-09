@@ -79,7 +79,7 @@ class AssignWellCases:
                 "id": [1, 2, 3, 4],
                 "top": [5.0, 4.0, 3.0, 0.0],
                 "bottom": [4.0, 2.0, -1.0, 0.0],
-                "rate": [1.0, 10.0, 100.0, 0.0],
+                "rate": [1.0, 10.0, 100.0, 0.1],
             }
         )
         return wells, top, bottom, k
@@ -109,7 +109,7 @@ class AssignWellCases:
                 "id": [1, 2, 3, 4],
                 "top": [5.0, 4.0, 3.0, 0.0],
                 "bottom": [4.0, 2.0, -1.0, 0.0],
-                "rate": [1.0, 10.0, 100.0, 0.0],
+                "rate": [1.0, 10.0, 100.0, 0.1],
             }
         )
 
@@ -190,17 +190,17 @@ class TestAssignWell:
         assert isinstance(actual, pd.DataFrame)
         expected = pd.DataFrame(
             {
-                "index": [0, 1, 2, 3],
-                "id": [1, 2, 3, 3],
-                "layer": [1, 1, 1, 2],
-                "bottom": [4.0, 2.0, -1.0, -1.0],
-                "overlap": [1.0, 2.0, 3.0, 1.0],
-                "rate": [1.0, 10.0, 75.0, 25.0],
-                "top": [5.0, 4.0, 3.0, 3.0],
-                "k": [1.0, 1.0, 1.0, 1.0],
-                "transmissivity": [1.0, 2.0, 3.0, 1.0],
-                "x": [0.6, 1.1, 2.3, 2.3],
-                "y": [0.6, 1.1, 2.3, 2.3],
+                "index": [0, 1, 2, 3, 4],
+                "id": [1, 2, 3, 3, 4],
+                "layer": [1, 1, 1, 2, 2],
+                "bottom": [4.0, 2.0, -1.0, -1.0, 0.0],
+                "overlap": [1.0, 2.0, 3.0, 1.0, 10.0],
+                "rate": [1.0, 10.0, 75.0, 25.0, 0.1],
+                "top": [5.0, 4.0, 3.0, 3.0, 0.0],
+                "k": [1.0, 1.0, 1.0, 1.0, 1.0],
+                "transmissivity": [1.0, 2.0, 3.0, 1.0, 10.0],
+                "x": [0.6, 1.1, 2.3, 2.3, 2.6],
+                "y": [0.6, 1.1, 2.3, 2.3, 2.6],
             }
         )
         assert_frame_equal(actual, expected, check_like=True)
@@ -218,17 +218,17 @@ class TestAssignWell:
         assert isinstance(actual, pd.DataFrame)
         expected = pd.DataFrame(
             {
-                "index": [0, 1, 2, 3],
-                "id": [1, 2, 3, 3],
-                "layer": [1, 1, 1, 2],
-                "bottom": [4.0, 2.0, -1.0, -1.0],
-                "overlap": [1.0, 2.0, 3.0, 1.0],
-                "rate": [1.0, 10.0, 60.0, 40.0],
-                "top": [5.0, 4.0, 3.0, 3.0],
-                "k": [10.0, 10.0, 10.0, 20.0],
-                "transmissivity": [10.0, 20.0, 30.0, 20.0],
-                "x": [0.6, 1.1, 2.3, 2.3],
-                "y": [0.6, 1.1, 2.3, 2.3],
+                "index": [0, 1, 2, 3, 4],
+                "id": [1, 2, 3, 3, 4],
+                "layer": [1, 1, 1, 2, 2],
+                "bottom": [4.0, 2.0, -1.0, -1.0, 0.0],
+                "overlap": [1.0, 2.0, 3.0, 1.0, 10.0],
+                "rate": [1.0, 10.0, 60.0, 40.0, 0.1],
+                "top": [5.0, 4.0, 3.0, 3.0, 0.0],
+                "k": [10.0, 10.0, 10.0, 20.0, 20.0],
+                "transmissivity": [10.0, 20.0, 30.0, 20.0, 200.0],
+                "x": [0.6, 1.1, 2.3, 2.3, 2.6],
+                "y": [0.6, 1.1, 2.3, 2.3, 2.6],
             }
         )
         assert_frame_equal(actual, expected, check_like=True)
@@ -247,17 +247,17 @@ class TestAssignWell:
         assert isinstance(actual, pd.DataFrame)
         expected = pd.DataFrame(
             {
-                "index": [0, 1],
-                "id": [2, 3],
-                "layer": [1, 1],
-                "bottom": [2.0, -1.0],
-                "overlap": [2.0, 3.0],
-                "rate": [10.0, 100.0],
-                "top": [4.0, 3.0],
-                "k": [10.0, 10.0],
-                "transmissivity": [20.0, 30.0],
-                "x": [1.1, 2.3],
-                "y": [1.1, 2.3],
+                "index": [0, 1, 2],
+                "id": [2, 3, 4],
+                "layer": [1, 1, 2],
+                "bottom": [2.0, -1.0, 0.0],
+                "overlap": [2.0, 3.0, 10.0],
+                "rate": [10.0, 100.0, 0.1],
+                "top": [4.0, 3.0, 0.0],
+                "k": [10.0, 10.0, 20.0],
+                "transmissivity": [20.0, 30.0, 200.0],
+                "x": [1.1, 2.3, 2.6],
+                "y": [1.1, 2.3, 2.6],
             }
         )
         assert_frame_equal(actual, expected, check_like=True)
@@ -281,7 +281,7 @@ class TestAssignWell:
             bottom=bottom,
             k=k,
         )
-        assert np.array_equal(actual["id"], np.repeat([1, 2, 3, 3], 5))
+        assert np.array_equal(actual["id"], np.repeat([1, 2, 3, 3, 4], 5))
 
         actual = prepwel.assign_wells(
             wells=transient_wells,
@@ -290,7 +290,7 @@ class TestAssignWell:
             k=k,
             minimum_thickness=1.01,
         )
-        assert np.array_equal(actual["id"], np.repeat([2, 3], 5))
+        assert np.array_equal(actual["id"], np.repeat([2, 3, 4], 5))
 
     @parametrize_with_cases(
         "wells, top, bottom, k", cases=AssignWellCases.case_mix_wells
