@@ -15,6 +15,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod
+import imod.mf6.utilities
 from imod.logging import init_log_decorator, logger
 from imod.logging.logging_decorators import standard_log_decorator
 from imod.logging.loglevel import LogLevel
@@ -28,6 +29,7 @@ from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
 from imod.mf6.utilities.dataset import remove_inactive
+from imod.mf6.utilities.grid import broadcast_to_full_domain
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
@@ -973,14 +975,35 @@ class Well(GridAgnosticWell):
             logger.log(loglevel=LogLevel.ERROR, message=log_msg, additional_depth=2)
             raise ValueError(log_msg)
 
+    @standard_log_decorator()
     def cleanup(self, dis: StructuredDiscretization | VerticesDiscretization):
-        dis_dict = {"top": dis.dataset["top"], "bottom": dis.dataset["bottom"]}
-        # call_fun_on_grids is not useful immediately here, as:
-        # - Top and bottom should be forced to grids with a x, y coordinates
-        # - variables from write schemata shouldn't be taken immediately,
-        #   instead the whole dataset needs to be converted to pd.DataFrame
-        # Mainly the separation of settings and adding them again at the end is useful.
-        cleaned_dict = self._call_func_on_grids(cleanup_wel, dis_dict)
+        """
+        Clean up package inplace. This method calls
+        :func:`imod.prepare.cleanup.cleanup_wel`, see documentation of that
+        function for details on cleanup.
+
+        dis: imod.mf6.StructuredDiscretization | imod.mf6.VerticesDiscretization
+            Model discretization package.
+        """
+        # Top and bottom should be forced to grids with a x, y coordinates
+        top, bottom = broadcast_to_full_domain(**dis.dataset)
+        # Collect point variable datanames
+        point_varnames = list(self._write_schemata.keys())
+        if "concentration" not in self.dataset.keys():
+            point_varnames.remove("concentration")
+        point_varnames.append("id")
+
+        point_ds = self.dataset[point_varnames]
+        if "time" in self.dataset.coords:
+            point_ds = point_ds.isel(time=0)
+
+        wells = point_ds.to_dataframe()
+        minimum_thickness = float(self.dataset["minimum_thickness"])
+        cleaned_wells = cleanup_wel(wells, top.isel(layer=0), bottom, minimum_thickness)
+
+        settings = self.get_non_grid_data(point_varnames)
+        cleaned_dict = cleaned_wells | settings
+
         super().__init__(cleaned_dict)
 
 class LayeredWell(GridAgnosticWell):

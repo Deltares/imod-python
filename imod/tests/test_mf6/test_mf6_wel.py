@@ -933,6 +933,20 @@ def test_import_and_convert_to_mf6(imod5_dataset, tmp_path, wel_class):
     mf6_well.write("wel", [], write_context)
 
 
+@parametrize("wel_class", [Well])
+@pytest.mark.usefixtures("imod5_dataset")
+def test_import_and_cleanup(imod5_dataset, wel_class):
+    data = imod5_dataset[0]
+    target_dis = StructuredDiscretization.from_imod5_data(data)
+
+    times = list(pd.date_range(datetime(1989, 1, 1), datetime(2013, 1, 1), 8400))
+
+    # import grid-agnostic well from imod5 data (it contains 1 well)
+    wel = wel_class.from_imod5_data("wel-WELLS_L3", data, times)
+    # cleanup
+    wel.cleanup(target_dis)
+
+
 @parametrize("wel_class", [Well, LayeredWell])
 @pytest.mark.usefixtures("well_regular_import_prj")
 def test_import_multiple_wells(well_regular_import_prj, wel_class):
