@@ -19,4 +19,4 @@ def get_examples():
 @pytest.mark.example
 @pytest.mark.parametrize("example", get_examples())
 def test_example(example):
-    subprocess.run([sys.executable, example], check=True)
+    subprocess.run([sys.executable, example], check=True, capture_output=True)
