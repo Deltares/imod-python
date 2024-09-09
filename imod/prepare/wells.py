@@ -2,17 +2,21 @@
 Assign wells to layers.
 """
 
-from typing import Optional, Union
+from typing import Optional
 
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
 import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.typing import GridDataArray
 
 
-def vectorized_overlap(bounds_a, bounds_b):
+def compute_vectorized_overlap(
+    bounds_a: npt.NDArray[np.float64], bounds_b: npt.NDArray[np.float64]
+) -> npt.NDArray[np.float64]:
     """
     Vectorized overlap computation.
     Compare with:
@@ -25,30 +29,66 @@ def vectorized_overlap(bounds_a, bounds_b):
     )
 
 
-def compute_overlap(wells, top, bottom):
-    # layer bounds shape of (n_well, n_layer, 2)
-    layer_bounds = np.stack((bottom, top), axis=-1)
+def compute_point_filter_overlap(
+    bounds_wells: npt.NDArray[np.float64], bounds_layers: npt.NDArray[np.float64]
+) -> npt.NDArray[np.float64]:
+    """
+    Special case for filters with zero filter length, these are set to layer
+    thickness. Filters which are not in a layer or have a nonzero filter length
+    are set to zero overlap.
+    """
+    # Unwrap for readability
+    wells_top = bounds_wells[:, 1]
+    wells_bottom = bounds_wells[:, 0]
+    layers_top = bounds_layers[:, 1]
+    layers_bottom = bounds_layers[:, 0]
+
+    has_zero_filter_length = wells_top == wells_bottom
+    in_layer = (layers_top >= wells_top) & (layers_bottom < wells_bottom)
+    layer_thickness = layers_top - layers_bottom
+    # Multiplication to set any elements not meeting the criteria to zero.
+    point_filter_overlap = (
+        has_zero_filter_length.astype(float) * in_layer.astype(float) * layer_thickness
+    )
+    return point_filter_overlap
+
+
+def compute_overlap(
+    wells: pd.DataFrame, top: GridDataArray, bottom: GridDataArray
+) -> npt.NDArray[np.float64]:
+    # layer bounds stack shape of (n_well, n_layer, 2)
+    layer_bounds_stack = np.stack((bottom, top), axis=-1)
     well_bounds = np.broadcast_to(
         np.stack(
             (wells["bottom"].to_numpy(), wells["top"].to_numpy()),
             axis=-1,
         )[np.newaxis, :, :],
-        layer_bounds.shape,
+        layer_bounds_stack.shape,
+    ).reshape(-1, 2)
+    layer_bounds = layer_bounds_stack.reshape(-1, 2)
+
+    # Deal with filters with a nonzero length
+    interval_filter_overlap = compute_vectorized_overlap(
+        well_bounds,
+        layer_bounds,
     )
-    overlap = vectorized_overlap(
-        well_bounds.reshape((-1, 2)),
-        layer_bounds.reshape((-1, 2)),
+    # Deal with filters with zero length
+    point_filter_overlap = compute_point_filter_overlap(
+        well_bounds,
+        layer_bounds,
     )
-    return overlap
+    return np.maximum(interval_filter_overlap, point_filter_overlap)
 
 
 def locate_wells(
     wells: pd.DataFrame,
-    top: Union[xr.DataArray, xu.UgridDataArray],
-    bottom: Union[xr.DataArray, xu.UgridDataArray],
-    k: Optional[Union[xr.DataArray, xu.UgridDataArray]],
+    top: GridDataArray,
+    bottom: GridDataArray,
+    k: Optional[GridDataArray],
     validate: bool = True,
-):
+) -> tuple[
+    npt.NDArray[np.object_], GridDataArray, GridDataArray, float | GridDataArray
+]:
     if not isinstance(top, (xu.UgridDataArray, xr.DataArray)):
         raise TypeError(
             "top and bottom should be DataArray or UgridDataArray, received: "
@@ -56,7 +96,7 @@ def locate_wells(
         )
 
     # Default to a xy_k value of 1.0: weigh every layer equally.
-    xy_k = 1.0
+    xy_k: float | GridDataArray = 1.0
     first = wells.groupby("id").first()
     x = first["x"].to_numpy()
     y = first["y"].to_numpy()
@@ -88,9 +128,9 @@ def locate_wells(
 
 def assign_wells(
     wells: pd.DataFrame,
-    top: Union[xr.DataArray, xu.UgridDataArray],
-    bottom: Union[xr.DataArray, xu.UgridDataArray],
-    k: Optional[Union[xr.DataArray, xu.UgridDataArray]] = None,
+    top: GridDataArray,
+    bottom: GridDataArray,
+    k: Optional[GridDataArray] = None,
     minimum_thickness: Optional[float] = 0.05,
     minimum_k: Optional[float] = 1.0,
     validate: bool = True,
@@ -101,17 +141,19 @@ def assign_wells(
     thickness and minimum k should be set to avoid placing wells in clay
     layers.
 
-    Wells located outside of the grid are removed.
+    Wells where well screen_top equals screen_bottom are assigned to the layer
+    they are located in, without any subdivision. Wells located outside of the
+    grid are removed.
 
     Parameters
     ----------
-    wells: pd.DataFrame
+    wells: pandas.DataFrame
         Should contain columns x, y, id, top, bottom, rate.
-    top: xr.DataArray or xu.UgridDataArray
+    top: xarray.DataArray or xugrid.UgridDataArray
         Top of the model layers.
-    bottom: xr.DataArray or xu.UgridDataArray
+    bottom: xarray.DataArray or xugrid.UgridDataArray
         Bottom of the model layers.
-    k: xr.DataArray or xu.UgridDataArray, optional
+    k: xarray.DataArray or xugrid.UgridDataArray, optional
         Horizontal conductivity of the model layers.
     minimum_thickness: float, optional, default: 0.01
     minimum_k: float, optional, default: 1.0
@@ -145,36 +187,40 @@ def assign_wells(
     first = wells_in_bounds.groupby("id").first()
     overlap = compute_overlap(first, xy_top, xy_bottom)
 
-    if k is None:
-        k = 1.0
+    if isinstance(xy_k, (xr.DataArray, xu.UgridDataArray)):
+        k_for_df = xy_k.values.ravel()
     else:
-        k = xy_k.values.ravel()
+        k_for_df = xy_k
 
     # Distribute rate according to transmissivity.
     n_layer, n_well = xy_top.shape
-    df = pd.DataFrame(
+    df_factor = pd.DataFrame(
         index=pd.Index(np.tile(first.index, n_layer), name="id"),
         data={
             "layer": np.repeat(top["layer"], n_well),
             "overlap": overlap,
-            "k": k,
-            "transmissivity": overlap * k,
+            "k": k_for_df,
+            "transmissivity": overlap * k_for_df,
         },
     )
     # remove entries
     #   -in very thin layers or when the wellbore penetrates the layer very little
     #   -in low conductivity layers
-    df = df.loc[(df["overlap"] >= minimum_thickness) & (df["k"] >= minimum_k)]
-    df["rate"] = df["transmissivity"] / df.groupby("id")["transmissivity"].transform(
-        "sum"
-    )
+    df_factor = df_factor.loc[
+        (df_factor["overlap"] >= minimum_thickness) & (df_factor["k"] >= minimum_k)
+    ]
+    df_factor["rate"] = df_factor["transmissivity"] / df_factor.groupby("id")[
+        "transmissivity"
+    ].transform("sum")
     # Create a unique index for every id-layer combination.
-    df["index"] = np.arange(len(df))
-    df = df.reset_index()
+    df_factor["index"] = np.arange(len(df_factor))
+    df_factor = df_factor.reset_index()
 
     # Get rid of those that are removed because of minimum thickness or
     # transmissivity.
-    wells_in_bounds = wells_in_bounds.loc[wells_in_bounds["id"].isin(df["id"].unique())]
+    wells_in_bounds = wells_in_bounds.loc[
+        wells_in_bounds["id"].isin(df_factor["id"].unique())
+    ]
 
     # Use pandas multi-index broadcasting.
     # Maintain all other columns as-is.
@@ -182,7 +228,7 @@ def assign_wells(
     wells_in_bounds["overlap"] = 1.0
     wells_in_bounds["k"] = 1.0
     wells_in_bounds["transmissivity"] = 1.0
-    columns = list(set(wells_in_bounds.columns).difference(df.columns))
+    columns = list(set(wells_in_bounds.columns).difference(df_factor.columns))
 
     indexes = ["id"]
     for dim in ["species", "time"]:
@@ -190,9 +236,9 @@ def assign_wells(
             indexes.append(dim)
             columns.remove(dim)
 
-    df[columns] = 1  # N.B. integer!
+    df_factor[columns] = 1  # N.B. integer!
 
     assigned = (
-        wells_in_bounds.set_index(indexes) * df.set_index(["id", "layer"])
+        wells_in_bounds.set_index(indexes) * df_factor.set_index(["id", "layer"])
     ).reset_index()
     return assigned

@@ -36,6 +36,10 @@ Changed
   polygons.
 - :func:`open_projectfile_data` now returns well data grouped by ipf name,
   instead of generic, separate number per entry.
+- :class:`imod.mf6.Well` now supports wells which have a filter with zero
+  length, where ``"screen_top"`` equals ``"screen_bottom"``.
+- :class:`imod.mf6.Well` shares the same default ``minimum_thickness`` as
+  :func:`imod.prepare.assign_wells`, which is 0.05, before this was 1.0.
 
 Added
 ~~~~~

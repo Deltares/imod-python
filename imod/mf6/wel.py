@@ -18,6 +18,7 @@ import imod
 from imod.logging import init_log_decorator, logger
 from imod.logging.logging_decorators import standard_log_decorator
 from imod.logging.loglevel import LogLevel
+from imod.mf6 import StructuredDiscretization, VerticesDiscretization
 from imod.mf6.boundary_condition import (
     BoundaryCondition,
     DisStructuredBoundaryCondition,
@@ -339,7 +340,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             "x": ("ncellid", x),
             "y": ("ncellid", y),
         }
-        cellid = cellid.assign_coords(**coords)
+        cellid = cellid.assign_coords(coords=coords)
 
         return cellid
 
@@ -505,7 +506,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         imod5_data: dict[str, dict[str, GridDataArray]],
         times: list[datetime],
         minimum_k: float = 0.1,
-        minimum_thickness: float = 1.0,
+        minimum_thickness: float = 0.05,
     ) -> "GridAgnosticWell":
         """
         Convert wells to imod5 data, loaded with
@@ -728,7 +729,7 @@ class Well(GridAgnosticWell):
         "screen_bottom": [
             AnyNoDataSchema(),
             EmptyIndexesSchema(),
-            AllValueSchema("<", "screen_top"),
+            AllValueSchema("<=", "screen_top"),
         ],
         "y": [AnyNoDataSchema(), EmptyIndexesSchema()],
         "x": [AnyNoDataSchema(), EmptyIndexesSchema()],
@@ -754,7 +755,7 @@ class Well(GridAgnosticWell):
         concentration_boundary_type="aux",
         id: Optional[list[Any]] = None,
         minimum_k: float = 0.1,
-        minimum_thickness: float = 1.0,
+        minimum_thickness: float = 0.05,
         print_input: bool = False,
         print_flows: bool = False,
         save_flows: bool = False,
@@ -972,7 +973,7 @@ class Well(GridAgnosticWell):
             logger.log(loglevel=LogLevel.ERROR, message=log_msg, additional_depth=2)
             raise ValueError(log_msg)
 
-    def cleanup(self):
+    def cleanup(self, _: StructuredDiscretization | VerticesDiscretization):
         self.dataset = cleanup_wel(self.dataset)
 
 
