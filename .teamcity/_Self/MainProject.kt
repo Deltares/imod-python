@@ -10,6 +10,7 @@ import jetbrains.buildServer.configs.kotlin.buildFeatures.pullRequests
 import jetbrains.buildServer.configs.kotlin.failureConditions.BuildFailureOnMetric
 import jetbrains.buildServer.configs.kotlin.failureConditions.failOnMetricChange
 import jetbrains.buildServer.configs.kotlin.projectFeatures.ProjectReportTab
+import jetbrains.buildServer.configs.kotlin.projectFeatures.dockerRegistry
 import jetbrains.buildServer.configs.kotlin.projectFeatures.projectReportTab
 import jetbrains.buildServer.configs.kotlin.triggers.vcs
 
@@ -29,6 +30,13 @@ object MainProject : Project({
     template(PipPythonTemplate)
 
     features {
+        dockerRegistry {
+            id = "PROJECT_EXT_134"
+            name = "Hydrology"
+            url = "https://containers.deltares.nl/"
+            userName = "robot${'$'}hydrology_product_line_imod+teamcity"
+            password = "credentialsJSON:7cfeee0c-bc26-4c80-b488-a5d8e00233c3"
+        }
         buildTypeCustomChart {
             id = "PROJECT_EXT_41"
             title = "Build Duration (all stages)"
