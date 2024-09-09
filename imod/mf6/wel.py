@@ -992,19 +992,23 @@ class Well(GridAgnosticWell):
         if "concentration" not in self.dataset.keys():
             point_varnames.remove("concentration")
         point_varnames.append("id")
-
+        # Create dataset with purely point locations
         point_ds = self.dataset[point_varnames]
         if "time" in self.dataset.coords:
-            point_ds = point_ds.isel(time=0)
-
+            point_ds = point_ds.isel(time=0, drop=True)
+        # Cleanup well dataframe
         wells = point_ds.to_dataframe()
         minimum_thickness = float(self.dataset["minimum_thickness"])
         cleaned_wells = cleanup_wel(wells, top.isel(layer=0), bottom, minimum_thickness)
+        # Select on original dataset to drop points outside grid.
+        well_ids = cleaned_wells.index
+        dataset_cleaned = self.dataset.swap_dims({"index": "id"}).sel(id=well_ids)
+        # Assign adjusted screen top and bottom
+        dataset_cleaned["screen_top"] = cleaned_wells["screen_top"]
+        dataset_cleaned["screen_bottom"] = cleaned_wells["screen_bottom"]
+        # Override dataset
+        self.dataset = dataset_cleaned.swap_dims({"id": "index"})
 
-        settings = self.get_non_grid_data(point_varnames)
-        cleaned_dict = cleaned_wells | settings
-
-        super().__init__(cleaned_dict)
 
 class LayeredWell(GridAgnosticWell):
     """
