@@ -19,4 +19,9 @@ def get_examples():
 @pytest.mark.example
 @pytest.mark.parametrize("example", get_examples())
 def test_example(example):
-    subprocess.run([sys.executable, example], check=True, capture_output=True)
+    result = subprocess.run([sys.executable, example], capture_output=True)
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"Example failed to run with returncode "
+            f"{result.returncode}, and error message:\n\n{result.stderr.decode()} "
+        )
