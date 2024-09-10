@@ -139,7 +139,7 @@ def validate_arg_types_equal(**kwargs):
     if len(set(types)) != 1:
         members = ",".join([t.__name__ for t in types])
         names = ",".join(kwargs.keys())
-        raise TypeError(f"{names} should be of the same type, " f"received: {members}")
+        raise TypeError(f"{names} should be of the same type, received: {members}")
 
 
 def assign_wells(

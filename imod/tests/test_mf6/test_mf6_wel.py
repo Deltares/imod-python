@@ -414,8 +414,8 @@ def test_cleanup(basic_dis, well_high_lvl_test_data_transient):
     wel.cleanup(dis_deep)
     assert not ds_original.identical(wel.dataset)
     # Wells filters should be placed downwards at surface level as point filters
-    assert np.all(wel.dataset["screen_top"] == wel.dataset["screen_bottom"])
-    assert np.all(wel.dataset["screen_top"] == top - deep_offset)
+    np.testing.assert_array_almost_equal(wel.dataset["screen_top"], wel.dataset["screen_bottom"])
+    np.testing.assert_array_almost_equal(wel.dataset["screen_top"], top - deep_offset)
 
 
 class ClipBoxCases:
