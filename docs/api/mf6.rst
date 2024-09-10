@@ -97,6 +97,7 @@ Flow Packages
     StorageCoefficient
     UnsaturatedZoneFlow
     Well
+    Well.cleanup
     Well.from_imod5_data
     Well.mask
     Well.regrid_like
