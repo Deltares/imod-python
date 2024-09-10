@@ -414,7 +414,9 @@ def test_cleanup(basic_dis, well_high_lvl_test_data_transient):
     wel.cleanup(dis_deep)
     assert not ds_original.identical(wel.dataset)
     # Wells filters should be placed downwards at surface level as point filters
-    np.testing.assert_array_almost_equal(wel.dataset["screen_top"], wel.dataset["screen_bottom"])
+    np.testing.assert_array_almost_equal(
+        wel.dataset["screen_top"], wel.dataset["screen_bottom"]
+    )
     np.testing.assert_array_almost_equal(wel.dataset["screen_top"], top - deep_offset)
 
 
