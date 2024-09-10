@@ -84,7 +84,7 @@ def locate_wells(
     wells: pd.DataFrame,
     top: GridDataArray,
     bottom: GridDataArray,
-    k: Optional[GridDataArray],
+    k: Optional[GridDataArray] = None,
     validate: bool = True,
 ) -> tuple[
     npt.NDArray[np.object_], GridDataArray, GridDataArray, float | GridDataArray
