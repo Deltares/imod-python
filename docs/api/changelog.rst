@@ -52,12 +52,13 @@ Added
 - :class:`imod.mf6.LayeredWell` to specify wells directly to layers instead
   assigning them with filter depths.
 - :func:`imod.prepare.cleanup_drn`, :func:`imod.prepare.cleanup_ghb`,
-  :func:`imod.prepare.cleanup_riv`. These are utility functions to clean up
-  drainage, general head boundaries, and rivers, respectively.
+  :func:`imod.prepare.cleanup_riv`, :func:`imod.prepare.cleanup_wel`. These are
+  utility functions to clean up drainage, general head boundaries, and rivers,
+  respectively.
 - :meth:`imod.mf6.Drainage.cleanup`,
-  :meth:`imod.mf6.GeneralHeadboundary.cleanup`, :meth:`imod.mf6.River.cleanup`
-  convenience methods to call the corresponding cleanup utility functions with
-  the appropriate arguments.
+  :meth:`imod.mf6.GeneralHeadboundary.cleanup`, :meth:`imod.mf6.River.cleanup`,
+  :meth:`imod.mf6.Well.cleanup` convenience methods to call the corresponding
+  cleanup utility functions with the appropriate arguments.
 
 
 Removed
