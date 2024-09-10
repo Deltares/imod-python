@@ -51,3 +51,4 @@ Prepare model input
     cleanup_drn
     cleanup_ghb
     cleanup_riv
+    cleanup_wel
