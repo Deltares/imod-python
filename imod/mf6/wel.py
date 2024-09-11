@@ -986,7 +986,7 @@ class Well(GridAgnosticWell):
             Model discretization package.
         """
         # Top and bottom should be forced to grids with a x, y coordinates
-        top, bottom = broadcast_to_full_domain(**dis.dataset)
+        top, bottom = broadcast_to_full_domain(**dict(dis.dataset.data_vars))
         # Collect point variable datanames
         point_varnames = list(self._write_schemata.keys())
         if "concentration" not in self.dataset.keys():
