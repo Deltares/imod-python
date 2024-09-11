@@ -314,6 +314,17 @@ def _enforce_layered_top(top: GridDataArray, bottom: GridDataArray):
         return create_layered_top(bottom, top)
 
 
+def _is_above_lower_bound(
+        bottom_elevation: GridDataArray, top_layered: GridDataArray
+    ):
+    top_layer_label = {"layer": min(top_layered.coords["layer"])}
+    above_lower_bound = (bottom_elevation <= top_layered)
+    # Bottom elevation above top surface is allowed, so these are set to True
+    # regardless.
+    above_lower_bound.loc[top_layer_label] = ~bottom_elevation.isnull()
+    return above_lower_bound
+
+
 @enforced_dim_order
 def _allocate_cells__stage_to_riv_bot(
     top: GridDataArray,
@@ -351,7 +362,8 @@ def _allocate_cells__stage_to_riv_bot(
 
     top_layered = _enforce_layered_top(top, bottom)
 
-    riv_cells = (stage > bottom) & (bottom_elevation < top_layered)
+    above_lower_bound = _is_above_lower_bound(bottom_elevation, top_layered)
+    riv_cells = (stage > bottom) & above_lower_bound
 
     return riv_cells, None
 
@@ -394,7 +406,8 @@ def _allocate_cells__first_active_to_elevation(
 
     top_layered = _enforce_layered_top(top, bottom)
 
-    riv_cells = (upper_active_layer <= layer) & (bottom_elevation < top_layered)
+    above_lower_bound = _is_above_lower_bound(bottom_elevation, top_layered)
+    riv_cells = (upper_active_layer <= layer) & above_lower_bound
 
     return riv_cells, None
 
@@ -442,12 +455,12 @@ def _allocate_cells__stage_to_riv_bot_drn_above(
     PLANAR_GRID.validate(bottom_elevation)
 
     top_layered = _enforce_layered_top(top, bottom)
-
+    above_lower_bound = _is_above_lower_bound(bottom_elevation, top_layered)
     upper_active_layer = get_upper_active_layer_number(active)
     layer = active.coords["layer"]
     drn_cells = (upper_active_layer <= layer) & (bottom >= stage)
     riv_cells = (
-        (upper_active_layer <= layer) & (bottom_elevation < top_layered)
+        (upper_active_layer <= layer) & above_lower_bound
     ) != drn_cells
 
     return riv_cells, drn_cells
