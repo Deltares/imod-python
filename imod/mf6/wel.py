@@ -994,7 +994,7 @@ class Well(GridAgnosticWell):
         point_varnames.append("id")
         # Create dataset with purely point locations
         point_ds = self.dataset[point_varnames]
-        # Take first item of irrelevant indices
+        # Take first item of irrelevant dimensions
         point_ds = point_ds.isel(time=0, species=0, drop=True, missing_dims="ignore")
         # Cleanup well dataframe
         wells = point_ds.to_dataframe()
