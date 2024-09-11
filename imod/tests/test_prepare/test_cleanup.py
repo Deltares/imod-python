@@ -1,12 +1,13 @@
 from typing import Callable
 
 import numpy as np
+import pandas as pd
 import pytest
 import xugrid as xu
 from pytest_cases import parametrize, parametrize_with_cases
 
-from imod.prepare.cleanup import cleanup_drn, cleanup_ghb, cleanup_riv
-from imod.tests.test_mf6.test_mf6_riv import RivDisCases
+from imod.prepare.cleanup import cleanup_drn, cleanup_ghb, cleanup_riv, cleanup_wel
+from imod.tests.test_mf6.test_mf6_riv import DisCases, RivDisCases
 from imod.typing import GridDataArray
 
 
@@ -50,6 +51,7 @@ _KEEP_FROM_DIS_DICT = {
     cleanup_riv: ["idomain", "bottom"],
     cleanup_drn: ["idomain"],
     cleanup_ghb: ["idomain"],
+    cleanup_wel: ["top", "bottom"],
 }
 
 
@@ -176,3 +178,71 @@ def test_cleanup_riv__raise_error(riv_data: dict, dis_data: dict):
     # Act
     with pytest.raises(ValueError, match="imod.prepare.topsystem.allocate_riv_cells"):
         cleanup_riv(**dis_dict, **riv_data)
+
+
+@parametrize_with_cases("dis_data", cases=DisCases)
+def test_cleanup_wel(dis_data: dict):
+    """
+    Cleanup wells.
+
+    Cases by id (on purpose not in order, to see if pandas'
+    sorting results in any issues):
+
+    a: filter completely above surface level -> point filter in top layer
+    c: filter partly above surface level -> filter top set to surface level
+    b: filter completely below model base -> well should be removed
+    d: filter partly below model base -> filter bottom set to model base
+    f: well outside grid bounds -> well should be removed
+    e: utrathin filter -> filter should be forced to point filter
+    g: filter screen_bottom above screen_top -> filter should be forced to point filter
+    """
+    # Arrange
+    dis_dict = _prepare_dis_dict(dis_data, cleanup_wel)
+    wel_dict = {
+        "id": ["a", "c", "b", "d", "f", "e", "g"],
+        "x": [17.0, 17.0, 17.0, 17.0, 40.0, 17.0, 17.0],
+        "y": [15.0, 15.0, 15.0, 15.0, 15.0, 15.0, 15.0],
+        "screen_top": [
+            2.0,
+            2.0,
+            -7.0,
+            -1.0,
+            -1.0,
+            1e-3,
+            0.0,
+        ],
+        "screen_bottom": [
+            1.5,
+            0.0,
+            -8.0,
+            -8.0,
+            -1.0,
+            0.0,
+            0.5,
+        ],
+    }
+    well_df = pd.DataFrame(wel_dict)
+    wel_expected = {
+        "id": ["a", "c", "d", "e", "g"],
+        "x": [17.0, 17.0, 17.0, 17.0, 17.0],
+        "y": [15.0, 15.0, 15.0, 15.0, 15.0],
+        "screen_top": [
+            1.0,
+            1.0,
+            -1.0,
+            1e-3,
+            0.0,
+        ],
+        "screen_bottom": [
+            1.0,
+            0.0,
+            -1.5,
+            1e-3,
+            0.0,
+        ],
+    }
+    well_expected_df = pd.DataFrame(wel_expected).set_index("id")
+    # Act
+    well_cleaned = cleanup_wel(well_df, **dis_dict)
+    # Assert
+    pd.testing.assert_frame_equal(well_cleaned, well_expected_df)

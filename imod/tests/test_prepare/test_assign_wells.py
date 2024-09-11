@@ -196,9 +196,9 @@ class TestAssignWell:
         with pytest.raises(ValueError, match="Columns are missing"):
             faulty_wells = pd.DataFrame({"id": [1], "x": [1.0], "y": [1.0]})
             prepwel.assign_wells(faulty_wells, top, bottom, k)
-        with pytest.raises(TypeError, match="top, bottom, and optionally"):
+        with pytest.raises(TypeError, match="top, bottom, "):
             prepwel.assign_wells(wells, top, bottom.values)
-        with pytest.raises(TypeError, match="top, bottom, and optionally"):
+        with pytest.raises(TypeError, match="top, bottom, k"):
             prepwel.assign_wells(wells, top.values, bottom, k)
 
     @parametrize_with_cases(

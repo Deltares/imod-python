@@ -15,6 +15,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod
+import imod.mf6.utilities
 from imod.logging import init_log_decorator, logger
 from imod.logging.logging_decorators import standard_log_decorator
 from imod.logging.loglevel import LogLevel
@@ -28,6 +29,7 @@ from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
 from imod.mf6.utilities.dataset import remove_inactive
+from imod.mf6.utilities.grid import broadcast_to_full_domain
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
@@ -973,8 +975,43 @@ class Well(GridAgnosticWell):
             logger.log(loglevel=LogLevel.ERROR, message=log_msg, additional_depth=2)
             raise ValueError(log_msg)
 
-    def cleanup(self, _: StructuredDiscretization | VerticesDiscretization):
-        self.dataset = cleanup_wel(self.dataset)
+    @standard_log_decorator()
+    def cleanup(self, dis: StructuredDiscretization | VerticesDiscretization):
+        """
+        Clean up package inplace. This method calls
+        :func:`imod.prepare.cleanup.cleanup_wel`, see documentation of that
+        function for details on cleanup.
+
+        dis: imod.mf6.StructuredDiscretization | imod.mf6.VerticesDiscretization
+            Model discretization package.
+        """
+        # Top and bottom should be forced to grids with a x, y coordinates
+        top, bottom = broadcast_to_full_domain(**dict(dis.dataset.data_vars))
+        # Collect point variable datanames
+        point_varnames = list(self._write_schemata.keys())
+        if "concentration" not in self.dataset.keys():
+            point_varnames.remove("concentration")
+        point_varnames.append("id")
+        # Create dataset with purely point locations
+        point_ds = self.dataset[point_varnames]
+        # Take first item of irrelevant dimensions
+        point_ds = point_ds.isel(time=0, species=0, drop=True, missing_dims="ignore")
+        # Cleanup well dataframe
+        wells = point_ds.to_dataframe()
+        minimum_thickness = float(self.dataset["minimum_thickness"])
+        cleaned_wells = cleanup_wel(wells, top.isel(layer=0), bottom, minimum_thickness)
+        # Select with ids in cleaned dataframe to drop points outside grid.
+        well_ids = cleaned_wells.index
+        dataset_cleaned = self.dataset.swap_dims({"index": "id"}).sel(id=well_ids)
+        # Assign adjusted screen top and bottom
+        dataset_cleaned["screen_top"] = cleaned_wells["screen_top"]
+        dataset_cleaned["screen_bottom"] = cleaned_wells["screen_bottom"]
+        # Ensure dtype of id is preserved
+        id_type = self.dataset["id"].dtype
+        dataset_cleaned = dataset_cleaned.swap_dims({"id": "index"}).reset_coords("id")
+        dataset_cleaned["id"] = dataset_cleaned["id"].astype(id_type)
+        # Override dataset
+        self.dataset = dataset_cleaned
 
 
 class LayeredWell(GridAgnosticWell):
