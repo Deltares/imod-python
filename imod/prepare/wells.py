@@ -137,8 +137,8 @@ def validate_well_columnnames(
 def validate_arg_types_equal(**kwargs):
     types = [type(arg) for arg in (kwargs.values()) if arg is not None]
     if len(set(types)) != 1:
-        members = ",".join([t.__name__ for t in types])
-        names = ",".join(kwargs.keys())
+        members = ", ".join([t.__name__ for t in types])
+        names = ", ".join(kwargs.keys())
         raise TypeError(f"{names} should be of the same type, received: {members}")
 
 
