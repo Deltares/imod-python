@@ -314,11 +314,9 @@ def _enforce_layered_top(top: GridDataArray, bottom: GridDataArray):
         return create_layered_top(bottom, top)
 
 
-def _is_above_lower_bound(
-        bottom_elevation: GridDataArray, top_layered: GridDataArray
-    ):
+def _is_above_lower_bound(bottom_elevation: GridDataArray, top_layered: GridDataArray):
     top_layer_label = {"layer": min(top_layered.coords["layer"])}
-    above_lower_bound = (bottom_elevation <= top_layered)
+    above_lower_bound = bottom_elevation <= top_layered
     # Bottom elevation above top surface is allowed, so these are set to True
     # regardless.
     above_lower_bound.loc[top_layer_label] = ~bottom_elevation.isnull()
@@ -459,9 +457,7 @@ def _allocate_cells__stage_to_riv_bot_drn_above(
     upper_active_layer = get_upper_active_layer_number(active)
     layer = active.coords["layer"]
     drn_cells = (upper_active_layer <= layer) & (bottom >= stage)
-    riv_cells = (
-        (upper_active_layer <= layer) & above_lower_bound
-    ) != drn_cells
+    riv_cells = ((upper_active_layer <= layer) & above_lower_bound) != drn_cells
 
     return riv_cells, drn_cells
 
