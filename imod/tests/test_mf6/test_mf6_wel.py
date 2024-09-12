@@ -356,23 +356,23 @@ def test_to_mf6_pkg__logging_without_message(
 
 
 def test_to_mf6_pkg__error_on_all_wells_removed(
-        basic_dis, well_high_lvl_test_data_transient
-    ):
+    basic_dis, well_high_lvl_test_data_transient
+):
     """Drop all wells, then run to_mf6_pkg"""
     idomain, top, bottom = basic_dis
 
     wel = imod.mf6.Well(*well_high_lvl_test_data_transient)
-    wel.dataset = wel.dataset.drop_sel(index = wel.dataset["index"])
+    wel.dataset = wel.dataset.drop_sel(index=wel.dataset["index"])
     active = idomain == 1
     k = xr.ones_like(idomain)
 
-    with pytest.raises(ValidationError, match = "No wells were assigned in package"):
+    with pytest.raises(ValidationError, match="No wells were assigned in package"):
         wel.to_mf6_pkg(active, top, bottom, k)
 
 
 def test_to_mf6_pkg__error_on_well_removal(
-        basic_dis, well_high_lvl_test_data_transient
-    ):
+    basic_dis, well_high_lvl_test_data_transient
+):
     """Set k values at well location x=81 to 1e-3, causing it to be dropped.
     Should throw error if error_on_well_removal = True"""
     idomain, top, bottom = basic_dis
@@ -380,7 +380,7 @@ def test_to_mf6_pkg__error_on_well_removal(
     wel = imod.mf6.Well(minimum_k=1.0, *well_high_lvl_test_data_transient)
     active = idomain == 1
     k = xr.ones_like(idomain)
-    k.loc[{"x":85.0}] = 1e-3
+    k.loc[{"x": 85.0}] = 1e-3
 
     with pytest.raises(ValidationError, match="x = 81"):
         wel.to_mf6_pkg(active, top, bottom, k, error_on_well_removal=True)

@@ -349,10 +349,11 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
     def render(self, directory, pkgname, globaltimes, binary):
         raise NotImplementedError(
             textwrap.dedent(
-            f"""{self.__class__.__name__} is a grid-agnostic package and does not
+                f"""{self.__class__.__name__} is a grid-agnostic package and does not
             have a render method. To render the package, first convert to a
             Modflow6 package by calling pkg.to_mf6_pkg()"""
-        ))
+            )
+        )
 
     def write(
         self,
@@ -466,7 +467,9 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             message_end = self.to_mf6_package_information(
                 filtered_ids_end, reason_text=reason_text
             )
-            logger.log(loglevel=LogLevel.WARNING, message=message_end, additional_depth=2)
+            logger.log(
+                loglevel=LogLevel.WARNING, message=message_end, additional_depth=2
+            )
 
         ds = ds.drop_vars("id")
 
