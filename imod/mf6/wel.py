@@ -348,8 +348,11 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
 
     def render(self, directory, pkgname, globaltimes, binary):
         raise NotImplementedError(
-            f"{self.__class__.__name__} is a grid-agnostic package and does not have a render method. To render the package, first convert to a Modflow6 package by calling pkg.to_mf6_pkg()"
-        )
+            textwrap.dedent(
+            f"""{self.__class__.__name__} is a grid-agnostic package and does not
+            have a render method. To render the package, first convert to a
+            Modflow6 package by calling pkg.to_mf6_pkg()"""
+        ))
 
     def write(
         self,
@@ -384,7 +387,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         bottom: GridDataArray,
         k: GridDataArray,
         validate: bool = False,
-        is_partitioned: bool = False,
+        error_on_well_removal: bool = True,
     ) -> Mf6Wel:
         """
         Write package to Modflow 6 package.
@@ -413,8 +416,9 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             Grid with hydraulic conductivities.
         validate: bool
             Run validation before converting
-        is_partitioned: bool
-            Set to true if model has been partitioned
+        error_on_well_removal: bool
+            Throw error if well is removed entirely during its assignment to
+            layers.
 
         Returns
         -------
@@ -429,19 +433,21 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
 
         wells_df = self._create_wells_df()
         nwells_df = len(wells_df["id"].unique())
-        wells_assigned = self._assign_wells_to_layers(wells_df, active, top, bottom, k)
-
-        nwells_assigned = (
-            0 if wells_assigned.empty else len(wells_assigned["id"].unique())
-        )
-
         if nwells_df == 0:
-            raise ValueError("No wells were assigned in package. None were present.")
-
-        if not is_partitioned and nwells_df != nwells_assigned:
-            raise ValueError(
-                "One or more well(s) are completely invalid due to minimum conductivity and thickness constraints."
+            raise ValidationError(
+                "No wells were assigned in package. None were present."
             )
+
+        wells_assigned = self._assign_wells_to_layers(wells_df, active, top, bottom, k)
+        filtered_ids_in_assign = self.gather_filtered_well_ids(wells_assigned, wells_df)
+        message_assign = self.to_mf6_package_information(
+            filtered_ids_in_assign, reason_text="permeability/thickness constraints"
+        )
+        if error_on_well_removal and len(filtered_ids_in_assign) > 0:
+            logger.log(
+                loglevel=LogLevel.ERROR, message=message_assign, additional_depth=2
+            )
+            raise ValidationError(message_assign)
 
         ds = xr.Dataset()
         ds["cellid"] = self._create_cellid(wells_assigned, active)
@@ -454,21 +460,34 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         ds["print_flows"] = self["print_flows"].values[()]
         ds["print_input"] = self["print_input"].values[()]
 
-        filtered_wells = [
-            id for id in wells_df["id"].unique() if id not in ds["id"].values
-        ]
-        if len(filtered_wells) > 0:
-            message = self.to_mf6_package_information(filtered_wells)
-            logger.log(loglevel=LogLevel.WARNING, message=message, additional_depth=2)
+        filtered_ids_end = self.gather_filtered_well_ids(ds, wells_df)
+        if len(filtered_ids_end) > 0:
+            reason_text = "inactive cells or permeability/thickness constraints"
+            message_end = self.to_mf6_package_information(
+                filtered_ids_end, reason_text=reason_text
+            )
+            logger.log(loglevel=LogLevel.WARNING, message=message_end, additional_depth=2)
 
         ds = ds.drop_vars("id")
 
         return Mf6Wel(**ds.data_vars)
 
-    def to_mf6_package_information(self, filtered_wells: pd.DataFrame) -> str:
+    def gather_filtered_well_ids(
+        self, well_data_filtered: pd.DataFrame | xr.Dataset, well_data: pd.DataFrame
+    ) -> list[str]:
+        filtered_well_ids = [
+            id
+            for id in well_data["id"].unique()
+            if id not in well_data_filtered["id"].values
+        ]
+        return filtered_well_ids
+
+    def to_mf6_package_information(
+        self, filtered_wells: list[str], reason_text: str
+    ) -> str:
         message = textwrap.dedent(
-            """Some wells were not placed in the MF6 well package. This 
-            can be due to inactive cells or permeability/thickness constraints.\n"""
+            f"""Some wells were not placed in the MF6 well package. This can be
+            due to {reason_text}.\n"""
         )
         if len(filtered_wells) < 10:
             message += "The filtered wells are: \n"
