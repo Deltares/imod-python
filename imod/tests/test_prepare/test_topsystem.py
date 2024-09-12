@@ -195,3 +195,105 @@ def test_distribute_ghb_conductance(
     actual = take_nth_layer_column(actual_da, 0)
 
     np.testing.assert_equal(actual, expected)
+
+
+@parametrize_with_cases(
+    argnames="active,top,bottom,stage,bottom_elevation",
+    prefix="riv_",
+)
+@parametrize_with_cases(
+    argnames="option,expected_riv,expected_drn", prefix="allocation_", has_tag="riv"
+)
+def test_riv_allocation__elevation_above_surface_level(
+    active, top, bottom, stage, bottom_elevation, option, expected_riv, expected_drn
+):
+    # Put elevations a lot above surface level. Need to be allocated to first
+    # layer.
+    actual_riv_da, actual_drn_da = allocate_riv_cells(
+        option, active, top, bottom, stage + 100.0, bottom_elevation + 100.0
+    )
+
+    # Override expected values
+    expected_riv = [True, False, False, False]
+    if expected_drn:
+        expected_drn = [False, False, False, False]
+
+    actual_riv = take_nth_layer_column(actual_riv_da, 0)
+    empty_riv = take_nth_layer_column(actual_riv_da, 1)
+
+    if actual_drn_da is None:
+        actual_drn = None
+        empty_drn = None
+    else:
+        actual_drn = take_nth_layer_column(actual_drn_da, 0)
+        empty_drn = take_nth_layer_column(actual_drn_da, 1)
+
+    np.testing.assert_equal(actual_riv, expected_riv)
+    np.testing.assert_equal(actual_drn, expected_drn)
+    assert np.all(~empty_riv)
+    if empty_drn is not None:
+        assert np.all(~empty_drn)
+
+
+@parametrize_with_cases(
+    argnames="active,top,bottom,elevation",
+    prefix="drn_",
+)
+@parametrize_with_cases(
+    argnames="option,expected,_", prefix="allocation_", has_tag="drn"
+)
+def test_drn_allocation__elevation_above_surface_level(
+    active, top, bottom, elevation, option, expected, _
+):
+    # Put elevations a lot above surface level. Need to be allocated to first
+    # layer.
+    actual_da = allocate_drn_cells(
+        option,
+        active,
+        top,
+        bottom,
+        elevation + 100.0,
+    )
+
+    # Override expected
+    expected = [True, False, False, False]
+
+    actual = take_nth_layer_column(actual_da, 0)
+    empty = take_nth_layer_column(actual_da, 1)
+
+    np.testing.assert_equal(actual, expected)
+    assert np.all(~empty)
+    if empty is not None:
+        assert np.all(~empty)
+
+
+@parametrize_with_cases(
+    argnames="active,top,bottom,head",
+    prefix="ghb_",
+)
+@parametrize_with_cases(
+    argnames="option,expected,_", prefix="allocation_", has_tag="ghb"
+)
+def test_ghb_allocation__elevation_above_surface_level(
+    active, top, bottom, head, option, expected, _
+):
+    # Put elevations a lot above surface level. Need to be allocated to first
+    # layer.
+    actual_da = allocate_ghb_cells(
+        option,
+        active,
+        top,
+        bottom,
+        head + 100.0,
+    )
+
+    # Override expected
+    expected = [True, False, False, False]
+
+    actual = take_nth_layer_column(actual_da, 0)
+    empty = take_nth_layer_column(actual_da, 1)
+
+    np.testing.assert_equal(actual, expected)
+    assert np.all(~empty)
+    if empty is not None:
+        assert np.all(~empty)
