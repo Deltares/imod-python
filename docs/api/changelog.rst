@@ -40,6 +40,12 @@ Changed
   length, where ``"screen_top"`` equals ``"screen_bottom"``.
 - :class:`imod.mf6.Well` shares the same default ``minimum_thickness`` as
   :func:`imod.prepare.assign_wells`, which is 0.05, before this was 1.0.
+- :func:`imod.prepare.allocate_drn_cells`,
+  :func:`imod.prepare.allocate_ghb_cells`,
+  :func:`imod.prepare.allocate_riv_cells`, now allocate to the first model layer
+  when elevations are above model top for all methods in
+  :func:`imod.prepare.ALLOCATION_OPTION`.
+
 
 Added
 ~~~~~
