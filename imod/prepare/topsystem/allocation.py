@@ -495,8 +495,8 @@ def _allocate_cells__at_elevation(
     PLANAR_GRID.validate(elevation)
 
     top_layered = _enforce_layered_top(top, bottom)
-
-    riv_cells = (elevation < top_layered) & (elevation >= bottom)
+    above_lower_bound = _is_above_lower_bound(elevation, top_layered)
+    riv_cells = (elevation >= bottom) & above_lower_bound
 
     return riv_cells, None
 
