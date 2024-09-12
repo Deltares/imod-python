@@ -42,7 +42,10 @@ Changed
   :func:`imod.prepare.assign_wells`, which is 0.05, before this was 1.0.
 - :meth:`imod.mf6.Well.to_mf6_pkg` got a new argument:
   ``error_on_well_removal``, which controls the behavior for when wells are
-  removed entirely during their assignment to layers.
+  removed entirely during their assignment to layers. This replaces the
+  ``is_partioned`` argument. Note: if ``is_partioned`` was set to True before,
+  this means you need to set ``error_on_removal`` to False now to get the same
+  behavior.
 
 
 Added
