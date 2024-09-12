@@ -68,7 +68,6 @@ matplotlib = "*"
 mypy = "*"
 netcdf4 = "*"
 numba = ">=0.50"
-numba_celltree = "<0.2" # The 0.2 version breaks the following test: test_in_bounds, test_get_indices__unstructured, test_get_values__unstructured
 numpy = "*"
 pandamesh = "*"
 pandas = "*"

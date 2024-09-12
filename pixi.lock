@@ -316,7 +316,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/nspr-4.35-h27087fc_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/nss-3.104-hd34e28f_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/numba-0.60.0-py311h4bc866e_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.1.8-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.2.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/numcodecs-0.13.0-py311h044e617_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/numpy-2.0.2-py311h71ddf71_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/occt-7.7.2-novtk_h130ccc2_101.conda
@@ -776,7 +776,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-64/nspr-4.35-hea0b92c_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/nss-3.104-h3135457_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/numba-0.60.0-py311h0e5bd6a_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.1.8-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.2.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/numcodecs-0.13.0-py311hfdcbad3_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/numpy-2.0.2-py311h394b0bb_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/occt-7.7.2-novtk_h0a0d97a_101.conda
@@ -1216,7 +1216,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/nspr-4.35-hb7217d7_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/nss-3.104-hd1ce637_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/numba-0.60.0-py311h9506ed5_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.1.8-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.2.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/numcodecs-0.13.0-py311h4b4568b_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/numpy-2.0.2-py311h6de8079_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/occt-7.7.2-novtk_h5f4376a_101.conda
@@ -1612,7 +1612,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/nh3-0.2.18-py311h9363f20_1.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/nlohmann_json-3.11.3-he0c23c2_1.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/numba-0.60.0-py311h0673bce_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.1.8-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.2.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/numcodecs-0.13.0-py311hcf9f919_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/numpy-2.0.2-py311h35ffc71_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/occt-7.7.2-novtk_hdfb195f_101.conda
@@ -2139,7 +2139,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/nspr-4.35-h27087fc_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/nss-3.104-hd34e28f_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/numba-0.60.0-py311h4bc866e_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.1.8-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.2.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/numcodecs-0.13.0-py311h044e617_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/numpy-2.0.2-py311h71ddf71_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/occt-7.7.2-novtk_h130ccc2_101.conda
@@ -2683,7 +2683,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-64/nspr-4.35-hea0b92c_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/nss-3.104-h3135457_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/numba-0.60.0-py311h0e5bd6a_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.1.8-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.2.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/numcodecs-0.13.0-py311hfdcbad3_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/numpy-2.0.2-py311h394b0bb_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/occt-7.7.2-novtk_h0a0d97a_101.conda
@@ -3209,7 +3209,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/nspr-4.35-hb7217d7_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/nss-3.104-hd1ce637_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/numba-0.60.0-py311h9506ed5_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.1.8-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.2.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/numcodecs-0.13.0-py311h4b4568b_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/numpy-2.0.2-py311h6de8079_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/occt-7.7.2-novtk_h5f4376a_101.conda
@@ -3690,7 +3690,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/notebook-7.2.2-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/notebook-shim-0.2.4-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/numba-0.60.0-py311h0673bce_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.1.8-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.2.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/numcodecs-0.13.0-py311hcf9f919_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/numpy-2.0.2-py311h35ffc71_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/occt-7.7.2-novtk_hdfb195f_101.conda
@@ -24000,13 +24000,13 @@ packages:
   timestamp: 1718888718616
 - kind: conda
   name: numba_celltree
-  version: 0.1.8
+  version: 0.2.0
   build: pyhd8ed1ab_0
   subdir: noarch
   noarch: python
-  url: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.1.8-pyhd8ed1ab_0.conda
-  sha256: 4b30d964bf034b41ce14842bf8fa3040b21878c0da1bdec15c5523ab785bc311
-  md5: 02b10d14b2e6693519804fe90d41c589
+  url: https://conda.anaconda.org/conda-forge/noarch/numba_celltree-0.2.0-pyhd8ed1ab_0.conda
+  sha256: 8ef116fc2af9d70afe8123cb4157f5efa55cfd042fd1ef36cad9aab65b36ca5a
+  md5: e2ed9d4ac5f28671045cd33b2269969a
   depends:
   - numba >=0.50
   - numpy
@@ -24015,8 +24015,8 @@ packages:
   license_family: MIT
   purls:
   - pkg:pypi/numba-celltree?source=hash-mapping
-  size: 33524
-  timestamp: 1722763371483
+  size: 33566
+  timestamp: 1724401764094
 - kind: conda
   name: numcodecs
   version: 0.13.0
