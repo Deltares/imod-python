@@ -29,12 +29,12 @@ def convert_ibound_to_idomain(
     # Fill the remaining nans at tops and bottoms with 0
     return idomain_float.fillna(0).astype(int)
 
-def convert_unit_rch_rate(
-        rate: xr.DataArray
-    ) -> xr.DataArray:
+
+def convert_unit_rch_rate(rate: xr.DataArray) -> xr.DataArray:
     """Convert recharge from iMOD5's mm/d to m/d"""
     mm_to_m_conversion = 1e-3
     return rate * mm_to_m_conversion
+
 
 def fill_missing_layers(
     source: xr.DataArray, full: xr.DataArray, fillvalue: Union[float | int]

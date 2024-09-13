@@ -345,9 +345,9 @@ def test_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
 
     # Assert
     np.testing.assert_allclose(
-        data["rch"]["rate"].mean().values / 1e3, 
+        data["rch"]["rate"].mean().values / 1e3,
         rch.dataset["rate"].mean().values,
-        atol=1e-5
+        atol=1e-5,
     )
     assert "maxbound 33856" in rendered_rch
     assert rendered_rch.count("begin period") == 1
@@ -378,9 +378,9 @@ def test_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
 
     # assert
     np.testing.assert_allclose(
-        data["rch"]["rate"].mean().values / 1e3, 
+        data["rch"]["rate"].mean().values / 1e3,
         rch.dataset["rate"].mean().values,
-        atol=1e-5
+        atol=1e-5,
     )
     assert rendered_rch.count("begin period") == 3
     assert "maxbound 33856" in rendered_rch
@@ -413,9 +413,9 @@ def test_non_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
 
     # assert
     np.testing.assert_allclose(
-        data["rch"]["rate"].mean().values / 1e3, 
+        data["rch"]["rate"].mean().values / 1e3,
         rch.dataset["rate"].mean().values,
-        atol=1e-5
+        atol=1e-5,
     )
     assert rendered_rch.count("begin period") == 1
     assert "maxbound 33856" in rendered_rch
@@ -449,9 +449,9 @@ def test_non_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
 
     # assert
     np.testing.assert_allclose(
-        data["rch"]["rate"].mean().values / 1e3, 
+        data["rch"]["rate"].mean().values / 1e3,
         rch.dataset["rate"].mean().values,
-        atol=1e-5
+        atol=1e-5,
     )
     assert rendered_rch.count("begin period") == 3
     assert "maxbound 33856" in rendered_rch
