@@ -117,7 +117,7 @@ html_theme = "pydata_sphinx_theme"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
-html_css_files = ["theme-deltares.css"]
+html_js_files  = ["deltares.js"]
 
 # Set
 html_context = {"default_mode": "light"}
@@ -132,8 +132,8 @@ html_theme_options = {
         {
             "name": "Deltares",
             "url": "https://www.deltares.nl/en/",
-            "icon": "_static/deltares-white.svg",
-            "type": "local",
+            "icon": "fa-custom fa-deltares",
+            "type": "fontawesome",
         },
         {
             "name": "GitHub",
@@ -143,8 +143,8 @@ html_theme_options = {
         },
     ],
     "logo": {
-        "image_light": "imod-python-logo.svg",
-        "image_dark": "imod-python-logo.svg",
+        "image_light": "imod-python-logo-light.svg",
+        "image_dark": "imod-python-logo-dark.svg",
     },
 }
 
