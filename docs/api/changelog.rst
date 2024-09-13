@@ -293,7 +293,7 @@ Added
   set automatically.
 - Added the ``simulation_start_time`` and ``time_unit`` arguments. To the ``Modflow6Simulation.open_`` methods, and ``imod.mf6.out.open_`` functions. This converts the ``"time"`` coordinate to datetimes.
 - added :meth:`imod.mf6.Modflow6Simulation.mask_all_models`  to apply a mask to all models under a simulation,
-provided the simulation is not split and the models use the same discretization. 
+  provided the simulation is not split and the models use the same discretization. 
 
 
 Changed
