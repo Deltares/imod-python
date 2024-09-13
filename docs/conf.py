@@ -158,10 +158,6 @@ html_theme_options = {
 #
 # html_sidebars = {}
 
-# The name of an image file (relative to this directory) to place at the top
-# of the sidebar.
-html_logo = "_static/imod-python-logo.svg"
-
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
