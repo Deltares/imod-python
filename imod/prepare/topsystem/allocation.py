@@ -412,7 +412,7 @@ def _allocate_cells__first_active_to_elevation(
 
     is_above_lower_bound = get_above_lower_bound(bottom_elevation, top_layered)
     is_below_upper_bound = upper_active_layer <= layer
-    riv_cells = is_below_upper_bound & is_above_lower_bound
+    riv_cells = is_below_upper_bound & is_above_lower_bound & active
 
     return riv_cells, None
 
@@ -464,8 +464,9 @@ def _allocate_cells__stage_to_riv_bot_drn_above(
     upper_active_layer = get_upper_active_layer_number(active)
     layer = active.coords["layer"]
     is_below_upper_bound = upper_active_layer <= layer
-    drn_cells = is_below_upper_bound & (bottom >= stage)
-    riv_cells = (is_below_upper_bound & is_above_lower_bound) != drn_cells
+    is_below_upper_bound_and_active = is_below_upper_bound & active
+    drn_cells = is_below_upper_bound_and_active & (bottom >= stage)
+    riv_cells = (is_below_upper_bound_and_active & is_above_lower_bound) != drn_cells
 
     return riv_cells, drn_cells
 
