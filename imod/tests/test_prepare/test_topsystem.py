@@ -297,3 +297,31 @@ def test_ghb_allocation__elevation_above_surface_level(
     assert np.all(~empty)
     if empty is not None:
         assert np.all(~empty)
+
+
+@parametrize_with_cases(
+    argnames="active,top,bottom,elevation",
+    prefix="drn_",
+)
+@parametrize_with_cases(
+    argnames="option,allocated_layer,_", prefix="distribution_", has_tag="drn"
+)
+def test_distribute_drn_conductance__above_surface_level(
+    active, top, bottom, elevation, option, allocated_layer, _
+):
+    allocated_layer.data = np.array([True, False, False, False])
+    expected = [1.0, np.nan, np.nan, np.nan]
+    allocated = enforce_dim_order(active & allocated_layer)
+    k = xr.DataArray(
+        [2.0, 2.0, 1.0, 1.0], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+
+    conductance = zeros_like(elevation) + 1.0
+
+    actual_da = distribute_drn_conductance(
+        option, allocated, conductance, top, bottom, k, elevation + 100.0
+    )
+    actual = take_nth_layer_column(actual_da, 0)
+
+    np.testing.assert_equal(actual, expected)
+
