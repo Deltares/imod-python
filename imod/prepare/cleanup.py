@@ -3,11 +3,13 @@
 from enum import Enum
 from typing import Optional
 
+import pandas as pd
 import xarray as xr
 
 from imod.mf6.utilities.mask import mask_arrays
+from imod.prepare.wells import locate_wells, validate_well_columnnames
 from imod.schemata import scalar_None
-from imod.typing import GridDataArray, GridDataset
+from imod.typing import GridDataArray
 
 
 class AlignLevelsMode(Enum):
@@ -83,7 +85,7 @@ def cleanup_riv(
     idomain: xarray.DataArray | xugrid.UgridDataArray
         MODFLOW 6 model domain. idomain==1 is considered active domain.
     bottom: xarray.DataArray | xugrid.UgridDataArray
-        Grid with`model bottoms
+        Grid with model bottoms
     stage: xarray.DataArray | xugrid.UgridDataArray
         Grid with river stages
     conductance: xarray.DataArray | xugrid.UgridDataArray
@@ -209,11 +211,128 @@ def cleanup_ghb(
     return _cleanup_robin_boundary(idomain, output_dict)
 
 
-def cleanup_wel(wel_ds: GridDataset):
+def _locate_wells_in_bounds(
+    wells: pd.DataFrame, top: GridDataArray, bottom: GridDataArray
+) -> tuple[pd.DataFrame, pd.Series, pd.Series]:
     """
-    Clean up wells
+    Locate wells in model bounds, wells outside bounds are dropped. Returned
+    dataframes and series have well "id" as index.
 
-    - Removes wells where the screen bottom elevation exceeds screen top.
+    Returns
+    -------
+    wells_in_bounds: pd.DataFrame
+        wells in model boundaries. Has "id" as index.
+    xy_top_series: pd.Series
+        model top at well xy location. Has "id" as index.
+    xy_base_series: pd.Series
+        model base at well xy location. Has "id" as index.
     """
-    deactivate = wel_ds["screen_top"] < wel_ds["screen_bottom"]
-    return wel_ds.where(~deactivate, drop=True)
+    id_in_bounds, xy_top, xy_bottom, _ = locate_wells(
+        wells, top, bottom, validate=False
+    )
+    xy_base_model = xy_bottom.isel(layer=-1, drop=True)
+
+    # Assign id as coordinates
+    xy_top = xy_top.assign_coords(id=("index", id_in_bounds))
+    xy_base_model = xy_base_model.assign_coords(id=("index", id_in_bounds))
+    # Create pandas dataframes/series with "id" as index.
+    xy_top_series = xy_top.to_dataframe(name="top").set_index("id")["top"]
+    xy_base_series = xy_base_model.to_dataframe(name="bottom").set_index("id")["bottom"]
+    wells_in_bounds = wells.set_index("id").loc[id_in_bounds]
+    return wells_in_bounds, xy_top_series, xy_base_series
+
+
+def _clip_filter_screen_to_surface_level(
+    cleaned_wells: pd.DataFrame, xy_top_series: pd.Series
+) -> pd.DataFrame:
+    cleaned_wells["screen_top"] = cleaned_wells["screen_top"].clip(upper=xy_top_series)
+    return cleaned_wells
+
+
+def _drop_wells_below_model_base(
+    cleaned_wells: pd.DataFrame, xy_base_series: pd.Series
+) -> pd.DataFrame:
+    is_below_base = cleaned_wells["screen_top"] >= xy_base_series
+    return cleaned_wells.loc[is_below_base]
+
+
+def _clip_filter_bottom_to_model_base(
+    cleaned_wells: pd.DataFrame, xy_base_series: pd.Series
+) -> pd.DataFrame:
+    cleaned_wells["screen_bottom"] = cleaned_wells["screen_bottom"].clip(
+        lower=xy_base_series
+    )
+    return cleaned_wells
+
+
+def _set_inverted_filters_to_point_filters(cleaned_wells: pd.DataFrame) -> pd.DataFrame:
+    # Convert all filters where screen bottom exceeds screen top to
+    # point filters
+    cleaned_wells["screen_bottom"] = cleaned_wells["screen_bottom"].clip(
+        upper=cleaned_wells["screen_top"]
+    )
+    return cleaned_wells
+
+
+def _set_ultrathin_filters_to_point_filters(
+    cleaned_wells: pd.DataFrame, minimum_thickness: float
+) -> pd.DataFrame:
+    not_ultrathin_layer = (
+        cleaned_wells["screen_top"] - cleaned_wells["screen_bottom"]
+    ) > minimum_thickness
+    cleaned_wells["screen_bottom"] = cleaned_wells["screen_bottom"].where(
+        not_ultrathin_layer, cleaned_wells["screen_top"]
+    )
+    return cleaned_wells
+
+
+def cleanup_wel(
+    wells: pd.DataFrame,
+    top: GridDataArray,
+    bottom: GridDataArray,
+    minimum_thickness: float = 0.05,
+) -> pd.DataFrame:
+    """
+    Clean up dataframe with wells, fixes some common mistakes in the following
+    order:
+
+    1. Wells outside grid bounds are dropped
+    2. Filters above surface level are set to surface level
+    3. Drop wells with filters entirely below base
+    4. Clip filter screen_bottom to model base
+    5. Clip filter screen_bottom to screen_top
+    6. Well filters thinner than minimum thickness are made point filters
+
+    Parameters
+    ----------
+    wells: pandas.Dataframe
+        Dataframe with wells to be cleaned up. Requires columns ``"x", "y",
+        "id", "screen_top", "screen_bottom"``
+    top: xarray.DataArray | xugrid.UgridDataArray
+        Grid with model top
+    bottom: xarray.DataArray | xugrid.UgridDataArray
+        Grid with model bottoms
+    minimum_thickness: float
+        Minimum thickness, filter thinner than this thickness are set to point
+        filters
+
+    Returns
+    -------
+    pandas.DataFrame
+        Cleaned well dataframe.
+    """
+    validate_well_columnnames(
+        wells, names={"x", "y", "id", "screen_top", "screen_bottom"}
+    )
+
+    cleaned_wells, xy_top_series, xy_base_series = _locate_wells_in_bounds(
+        wells, top, bottom
+    )
+    cleaned_wells = _clip_filter_screen_to_surface_level(cleaned_wells, xy_top_series)
+    cleaned_wells = _drop_wells_below_model_base(cleaned_wells, xy_base_series)
+    cleaned_wells = _clip_filter_bottom_to_model_base(cleaned_wells, xy_base_series)
+    cleaned_wells = _set_inverted_filters_to_point_filters(cleaned_wells)
+    cleaned_wells = _set_ultrathin_filters_to_point_filters(
+        cleaned_wells, minimum_thickness
+    )
+    return cleaned_wells

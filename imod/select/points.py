@@ -115,7 +115,7 @@ def points_in_bounds(da: GridDataArray, **points) -> npt.NDArray[np.bool]:
         da_x = da.coords[key]
         _, xmin, xmax = imod.util.spatial.coord_reference(da_x)
         # Inplace bitwise operator
-        in_bounds &= (x >= xmin) & (x < xmax)
+        in_bounds &= (x >= xmin) & (x <= xmax)
 
     return in_bounds
 

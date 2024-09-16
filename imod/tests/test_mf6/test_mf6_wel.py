@@ -394,6 +394,32 @@ def test_is_empty(well_high_lvl_test_data_transient):
     assert wel_empty.is_empty()
 
 
+def test_cleanup(basic_dis, well_high_lvl_test_data_transient):
+    # Arrange
+    wel = imod.mf6.Well(*well_high_lvl_test_data_transient)
+    ds_original = wel.dataset.copy()
+    idomain, top, bottom = basic_dis
+    top = top.isel(layer=0, drop=True)
+    deep_offset = 100.0
+    dis_normal = imod.mf6.StructuredDiscretization(top, bottom, idomain)
+    dis_deep = imod.mf6.StructuredDiscretization(
+        top - deep_offset, bottom - deep_offset, idomain
+    )
+
+    # Nothing to be cleaned up with default discretization
+    wel.cleanup(dis_normal)
+    xr.testing.assert_identical(ds_original, wel.dataset)
+
+    # Cleanup
+    wel.cleanup(dis_deep)
+    assert not ds_original.identical(wel.dataset)
+    # Wells filters should be placed downwards at surface level as point filters
+    np.testing.assert_array_almost_equal(
+        wel.dataset["screen_top"], wel.dataset["screen_bottom"]
+    )
+    np.testing.assert_array_almost_equal(wel.dataset["screen_top"], top - deep_offset)
+
+
 class ClipBoxCases:
     @staticmethod
     def case_clip_xy(parameterizable_basic_dis):
@@ -957,6 +983,26 @@ def test_import_and_convert_to_mf6(imod5_dataset, tmp_path, wel_class):
     # write the package for validation
     write_context = WriteContext(simulation_directory=tmp_path)
     mf6_well.write("wel", [], write_context)
+
+
+@parametrize("wel_class", [Well])
+@pytest.mark.usefixtures("imod5_dataset")
+def test_import_and_cleanup(imod5_dataset, wel_class: Well):
+    data = imod5_dataset[0]
+    target_dis = StructuredDiscretization.from_imod5_data(data)
+
+    ntimes = 8399
+    times = list(pd.date_range(datetime(1989, 1, 1), datetime(2013, 1, 1), ntimes + 1))
+
+    # Import grid-agnostic well from imod5 data (it contains 1 well)
+    wel = wel_class.from_imod5_data("wel-WELLS_L3", data, times)
+    assert len(wel.dataset.coords["time"]) == ntimes
+    # Cleanup
+    wel.cleanup(target_dis)
+    # Nothing to be cleaned, single well point is located properly, test that
+    # time coordinate has not been dropped.
+    assert "time" in wel.dataset.coords
+    assert len(wel.dataset.coords["time"]) == ntimes
 
 
 @parametrize("wel_class", [Well, LayeredWell])
