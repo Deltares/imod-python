@@ -360,9 +360,13 @@ def _compute_crosscut_thickness(
         bot_is_above_lower_bound = get_above_lower_bound(bc_bottom, top_layered)
         lower_layer_bc = bot_is_above_lower_bound & (bc_bottom > bottom)
         outside = outside | ~bot_is_above_lower_bound
-        # Clip to zero to ensure no negative thicknesses are computed when
-        # elevation exceeds surface level
-        corrected_thickness = thickness - (bc_bottom - bottom).clip(max=0.0)
+        corrected_thickness = thickness - (bc_bottom - bottom)
+        # Set top layer to 1.0, where top exceeds bc_bottom
+        top_layer_label = {"layer": min(top_layered.coords["layer"])}
+        is_above_surface = top_layered.loc[top_layer_label] < bc_bottom
+        corrected_thickness.loc[top_layer_label] = corrected_thickness.loc[
+            top_layer_label
+        ].where(is_above_surface, 1.0)
         thickness = thickness.where(~lower_layer_bc, corrected_thickness)
 
     thickness = thickness.where(~outside, 0.0)
