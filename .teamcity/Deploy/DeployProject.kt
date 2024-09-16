@@ -46,7 +46,7 @@ object BuildPackage : BuildType({
             formatStderrAsError = true
             dockerImage = "%DockerContainer%:%DockerVersion%"
             dockerImagePlatform = ScriptBuildStep.ImagePlatform.Windows
-            dockerRunParameters = """--cpus=3 --memory=16g"""
+            dockerRunParameters = """--cpus=4 --memory=16g"""
             dockerPull = true
         }
     }
