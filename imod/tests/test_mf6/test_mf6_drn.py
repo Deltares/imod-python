@@ -478,7 +478,7 @@ def test_html_repr(drainage):
     assert html_string.split("</div>")[0] == "<div>Drainage"
 
 
-class AllocationSettings():
+class AllocationSettings:
     def case_default(self):
         return SimulationAllocationOptions.drn, SimulationDistributingOptions.drn
 
@@ -486,8 +486,12 @@ class AllocationSettings():
         return ALLOCATION_OPTION.at_elevation, DISTRIBUTING_OPTION.by_crosscut_thickness
 
 
-@parametrize_with_cases(["allocation_setting", "distribution_setting"], cases=AllocationSettings)
-def test_from_imod5(imod5_dataset_periods, tmp_path, allocation_setting, distribution_setting):
+@parametrize_with_cases(
+    ["allocation_setting", "distribution_setting"], cases=AllocationSettings
+)
+def test_from_imod5(
+    imod5_dataset_periods, tmp_path, allocation_setting, distribution_setting
+):
     period_data = imod5_dataset_periods[1]
     imod5_dataset = imod5_dataset_periods[0]
     target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset, validate=False)
