@@ -325,3 +325,63 @@ def test_distribute_drn_conductance__above_surface_level(
 
     np.testing.assert_equal(actual, expected)
 
+
+@parametrize_with_cases(
+    argnames="active,top,bottom,stage,bottom_elevation",
+    prefix="riv_",
+)
+@parametrize_with_cases(
+    argnames="option,allocated_layer,_", prefix="distribution_", has_tag="riv"
+)
+def test_distribute_riv_conductance__above_surface_level(
+    active, top, bottom, stage, bottom_elevation, option, allocated_layer, _
+):
+    allocated_layer.data = np.array([True, False, False, False])
+    expected = [1.0, np.nan, np.nan, np.nan]
+    allocated = enforce_dim_order(active & allocated_layer)
+    k = xr.DataArray(
+        [2.0, 2.0, 1.0, 1.0], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+
+    conductance = zeros_like(bottom_elevation) + 1.0
+
+    actual_da = distribute_riv_conductance(
+        option,
+        allocated,
+        conductance,
+        top,
+        bottom,
+        k,
+        stage + 100.0,
+        bottom_elevation + 100.0,
+    )
+    actual = take_nth_layer_column(actual_da, 0)
+
+    np.testing.assert_equal(actual, expected)
+
+
+@parametrize_with_cases(
+    argnames="active,top,bottom,elevation",
+    prefix="ghb_",
+)
+@parametrize_with_cases(
+    argnames="option,allocated_layer,_", prefix="distribution_", has_tag="ghb"
+)
+def test_distribute_ghb_conductance__above_surface_level(
+    active, top, bottom, elevation, option, allocated_layer, _
+):
+    allocated_layer.data = np.array([True, False, False, False])
+    expected = [1.0, np.nan, np.nan, np.nan]
+    allocated = enforce_dim_order(active & allocated_layer)
+    k = xr.DataArray(
+        [2.0, 2.0, 1.0, 1.0], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+
+    conductance = zeros_like(elevation) + 1.0
+
+    actual_da = distribute_ghb_conductance(
+        option, allocated, conductance, top, bottom, k
+    )
+    actual = take_nth_layer_column(actual_da, 0)
+
+    np.testing.assert_equal(actual, expected)
