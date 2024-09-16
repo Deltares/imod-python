@@ -3,7 +3,10 @@ from typing import Optional
 
 import numpy as np
 
-from imod.prepare.topsystem.allocation import _enforce_layered_top
+from imod.prepare.topsystem.allocation import (
+    _enforce_layered_top,
+    get_above_lower_bound,
+)
 from imod.schemata import DimsSchema
 from imod.typing import GridDataArray
 from imod.typing.grid import ones_like, preserve_gridtype, zeros_like
@@ -348,14 +351,19 @@ def _compute_crosscut_thickness(
     outside = zeros_like(allocated).astype(bool)
 
     if bc_top is not None:
-        upper_layer_bc = (bc_top < top_layered) & (bc_top > bottom)
+        top_is_above_lower_bound = get_above_lower_bound(bc_top, top_layered)
+        upper_layer_bc = top_is_above_lower_bound & (bc_top > bottom)
         outside = outside | (bc_top < bottom)
         thickness = thickness.where(~upper_layer_bc, thickness - (top_layered - bc_top))
 
     if bc_bottom is not None:
-        lower_layer_bc = (bc_bottom < top_layered) & (bc_bottom > bottom)
-        outside = outside | (bc_bottom > top_layered)
-        thickness = thickness.where(~lower_layer_bc, thickness - (bc_bottom - bottom))
+        bot_is_above_lower_bound = get_above_lower_bound(bc_bottom, top_layered)
+        lower_layer_bc = bot_is_above_lower_bound & (bc_bottom > bottom)
+        outside = outside | ~bot_is_above_lower_bound
+        # Clip to zero to ensure no negative thicknesses are computed when
+        # elevation exceeds surface level
+        corrected_thickness = thickness - (bc_bottom - bottom).clip(max=0.0)
+        thickness = thickness.where(~lower_layer_bc, corrected_thickness)
 
     thickness = thickness.where(~outside, 0.0)
 
@@ -389,19 +397,26 @@ def _distribute_weights__by_corrected_transmissivity(
 
     if bc_top is not None:
         PLANAR_GRID.validate(bc_top)
-        upper_layer_bc = (bc_top < top_layered) & (bc_top > bottom)
+        top_is_above_lower_bound = get_above_lower_bound(bc_top, top_layered)
+        upper_layer_bc = top_is_above_lower_bound & (bc_top > bottom)
         # Computing vertical midpoint of river crosscutting layers.
         Fc = Fc.where(~upper_layer_bc, (bottom + bc_top) / 2)
 
     if bc_bottom is not None:
         PLANAR_GRID.validate(bc_bottom)
-        lower_layer_bc = (bc_bottom < top_layered) & (bc_bottom > bottom)
+        bot_is_above_lower_bound = get_above_lower_bound(bc_bottom, top_layered)
+        lower_layer_bc = bot_is_above_lower_bound & (bc_bottom > bottom)
         # Computing vertical midpoint of river crosscutting layers.
         Fc = Fc.where(~lower_layer_bc, (top_layered + bc_bottom) / 2)
 
     # Correction factor for mismatch between midpoints of crosscut layers and
     # layer midpoints.
     F = 1.0 - np.abs(midpoints - Fc) / (layer_thickness * 0.5)
+    # Negative values can be introduced when elevation above surface level, set
+    # these to 1.0.
+    top_layer_index = {"layer": min(top_layered.coords["layer"])}
+    F_top_layer = F.loc[top_layer_index]
+    F.loc[top_layer_index] = F_top_layer.where(F_top_layer >= 0.0, 1.0)
 
     transmissivity_corrected = transmissivity * F
     return transmissivity_corrected / transmissivity_corrected.sum(dim="layer")
