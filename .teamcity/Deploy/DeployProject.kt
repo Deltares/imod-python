@@ -167,7 +167,7 @@ object CreateGitHubRelease : BuildType({
             }
             param("plugin.docker.imagePlatform", "windows")
             param("plugin.docker.pull.enabled", "true")
-            param("plugin.docker.imageId", "containers.deltares.nl/hydrology_product_line_imod/windows-intelfortran-pixi:19.1")
+            param("plugin.docker.imageId", "containers.deltares.nl/hydrology_product_line_imod/windows-pixi:v0.26.1")
             param("plugin.docker.run.parameters", "--cpus=4 --memory=16g")
         }
     }
