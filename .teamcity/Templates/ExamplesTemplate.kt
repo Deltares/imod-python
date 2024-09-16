@@ -31,7 +31,7 @@ object ExamplesTemplate : Template({
                 pixi run --environment default --frozen examples
             """.trimIndent()
             formatStderrAsError = true
-            dockerImage = "containers.deltares.nl/hydrology_product_line_imod/windows-pixi:v0.26.1"
+            dockerImage = "%DockerContainer%:%DockerVersion%"
             dockerImagePlatform = ScriptBuildStep.ImagePlatform.Windows
             dockerRunParameters = """--cpus=8 --memory=32g"""
             dockerPull = true

@@ -44,7 +44,7 @@ object BuildPackage : BuildType({
                 pixi run --environment default --frozen python -m build
             """.trimIndent()
             formatStderrAsError = true
-            dockerImage = "containers.deltares.nl/hydrology_product_line_imod/windows-pixi:v0.26.1"
+            dockerImage = "%DockerContainer%:%DockerVersion%"
             dockerImagePlatform = ScriptBuildStep.ImagePlatform.Windows
             dockerRunParameters = """--cpus=3 --memory=16g"""
             dockerPull = true
@@ -87,7 +87,7 @@ object BuildPages : BuildType({
                 pixi run --environment default --frozen docs
             """.trimIndent()
             formatStderrAsError = true
-            dockerImage = "containers.deltares.nl/hydrology_product_line_imod/windows-pixi:v0.26.1"
+            dockerImage = "%DockerContainer%:%DockerVersion%"
             dockerImagePlatform = ScriptBuildStep.ImagePlatform.Windows
             dockerRunParameters = """--cpus=8 --memory=32g"""
             dockerPull = true
@@ -167,7 +167,7 @@ object CreateGitHubRelease : BuildType({
             }
             param("plugin.docker.imagePlatform", "windows")
             param("plugin.docker.pull.enabled", "true")
-            param("plugin.docker.imageId", "containers.deltares.nl/hydrology_product_line_imod/windows-pixi:v0.26.1")
+            param("plugin.docker.imageId", "%DockerContainer%:%DockerVersion%")
             param("plugin.docker.run.parameters", "--cpus=4 --memory=16g")
         }
     }
@@ -214,7 +214,7 @@ object DeployPackage : BuildType({
                 pixi run --frozen twine check ../dist/*
                 pixi run --frozen twine upload ../dist/*
             """.trimIndent()
-            dockerImage = "containers.deltares.nl/hydrology_product_line_imod/windows-pixi:v0.26.1"
+            dockerImage = "%DockerContainer%:%DockerVersion%"
             dockerImagePlatform = ScriptBuildStep.ImagePlatform.Windows
             dockerRunParameters = """--cpus=4 --memory=16g"""
             dockerPull = true
@@ -294,7 +294,7 @@ object DeployPages : BuildType({
                 git push origin gh-pages
             """.trimIndent()
             formatStderrAsError = true
-            dockerImage = "containers.deltares.nl/hydrology_product_line_imod/windows-pixi:v0.26.1"
+            dockerImage = "%DockerContainer%:%DockerVersion%"
             dockerImagePlatform = ScriptBuildStep.ImagePlatform.Windows
             dockerRunParameters = """--cpus=4 --memory=16g"""
             dockerPull = true

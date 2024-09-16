@@ -34,7 +34,7 @@ object UnitTestsTemplate : Template({
                 pixi run --environment default --frozen unittests
             """.trimIndent()
             formatStderrAsError = true
-            dockerImage = "containers.deltares.nl/hydrology_product_line_imod/windows-pixi:v0.26.1"
+            dockerImage = "%DockerContainer%:%DockerVersion%"
             dockerImagePlatform = ScriptBuildStep.ImagePlatform.Windows
             dockerRunParameters = """--cpus=8 --memory=32g"""
             dockerPull = true
@@ -58,7 +58,7 @@ object UnitTestsTemplate : Template({
                 """.trimIndent()
             }
             param("plugin.docker.imagePlatform", "windows")
-            param("plugin.docker.imageId", "containers.deltares.nl/hydrology_product_line_imod/windows-pixi:v0.26.1")
+            param("plugin.docker.imageId", "%DockerContainer%:%DockerVersion%")
             param("plugin.docker.pull.enabled", "true")
         }
     }
