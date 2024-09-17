@@ -98,6 +98,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         self.name = name
         self.directory = None
         self._initialize_template()
+        self._is_from_imod5 = False
 
     def __setitem__(self, key, value):
         super().__setitem__(key, value)
@@ -257,6 +258,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         validation_context = ValidationContext(validate)
         if self.is_split():
             validation_context.relax_well_validation = True
+        if self._is_from_imod5:
+            write_context.is_from_imod5 = True
 
         # Check models for required content
         for key, model in self.items():
@@ -1366,6 +1369,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         -------
         """
         simulation = Modflow6Simulation("imported_simulation")
+        simulation._is_from_imod5 = True
 
         # import GWF model,
         groundwaterFlowModel = GroundwaterFlowModel.from_imod5_data(

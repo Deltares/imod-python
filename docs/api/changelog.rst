@@ -45,6 +45,12 @@ Changed
   :func:`imod.prepare.allocate_riv_cells`, now allocate to the first model layer
   when elevations are above model top for all methods in
   :func:`imod.prepare.ALLOCATION_OPTION`.
+- :meth:`imod.mf6.Well.to_mf6_pkg` got a new argument:
+  ``error_on_well_removal``, which controls the behavior for when wells are
+  removed entirely during their assignment to layers. This replaces the
+  ``is_partioned`` argument. Note: if ``is_partioned`` was set to True before,
+  this means you need to set ``error_on_removal`` to False now to get the same
+  behavior.
 
 
 Added
