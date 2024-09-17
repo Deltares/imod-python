@@ -8,6 +8,7 @@ from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.regrid.regrid_schemes import RechargeRegridMethod
+from imod.mf6.utilities.imod5_converter import convert_unit_rch_rate
 from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_rch_cells
@@ -193,7 +194,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
         """
         new_idomain = dis_pkg.dataset["idomain"]
         data = {
-            "rate": imod5_data["rch"]["rate"],
+            "rate": convert_unit_rch_rate(imod5_data["rch"]["rate"]),
         }
         new_package_data = {}
 

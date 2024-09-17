@@ -27,7 +27,7 @@ object PipPythonTemplate : Template({
                     pixi run --environment %python_env% --frozen test_import
                 """.trimIndent()
             formatStderrAsError = true
-            dockerImage = "containers.deltares.nl/hydrology_product_line_imod/windows-pixi:v0.26.1"
+            dockerImage = "%DockerContainer%:%DockerVersion%"
             dockerImagePlatform = ScriptBuildStep.ImagePlatform.Windows
             dockerRunParameters = """--cpus=4 --memory=16g"""
             dockerPull = true

@@ -1,6 +1,6 @@
 [project]
 name = "imod-python"
-version = "0.17.1"
+version = "0.17.2"
 description = "Make massive MODFLOW models"
 authors = ["Deltares <huite.bootsma@deltares.nl>", ]
 channels = ["conda-forge", ]
@@ -92,7 +92,6 @@ matplotlib = "*"
 mypy = "*"
 netcdf4 = "*"
 numba = ">=0.50"
-numba_celltree = "<0.2" # The 0.2 version breaks the following test: test_in_bounds, test_get_indices__unstructured, test_get_values__unstructured
 numpy = "*"
 pandamesh = "*"
 pandas = "*"
@@ -118,7 +117,7 @@ scipy = "*"
 scooby = "*"
 setuptools_scm = "*"
 shapely = ">=2.0"
-sphinx = "5"
+sphinx = "*"
 sphinx-gallery = "*"
 tomli = ">=1.1.0"
 tomli-w = "*"

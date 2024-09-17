@@ -40,6 +40,11 @@ Changed
   length, where ``"screen_top"`` equals ``"screen_bottom"``.
 - :class:`imod.mf6.Well` shares the same default ``minimum_thickness`` as
   :func:`imod.prepare.assign_wells`, which is 0.05, before this was 1.0.
+- :func:`imod.prepare.allocate_drn_cells`,
+  :func:`imod.prepare.allocate_ghb_cells`,
+  :func:`imod.prepare.allocate_riv_cells`, now allocate to the first model layer
+  when elevations are above model top for all methods in
+  :func:`imod.prepare.ALLOCATION_OPTION`.
 - :meth:`imod.mf6.Well.to_mf6_pkg` got a new argument:
   ``error_on_well_removal``, which controls the behavior for when wells are
   removed entirely during their assignment to layers. This replaces the
@@ -80,8 +85,15 @@ Removed
   convert a structured simulation to an unstructured simulation, call:
   :meth:`imod.mf6.Modflow6Simulation.regrid_like`
 
-[Unreleased]
-------------
+
+[0.17.2] - 2024-09-17
+---------------------
+
+Fixed
+~~~~~
+- :func:`imod.formats.prj.open_projectfile_data` now reports the path to a
+  faulty IPF or IDF file in the error message.
+- Support for Numpy 2.0
 
 Added
 ~~~~~
