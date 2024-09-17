@@ -43,6 +43,7 @@ from imod.mf6.ssm import SourceSinkMixing
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.utilities.mask import _mask_all_models
 from imod.mf6.utilities.regrid import _regrid_like
+from imod.mf6.validation_context import ValidationContext
 from imod.mf6.write_context import WriteContext
 from imod.prepare.topsystem.default_allocation_methods import (
     SimulationAllocationOptions,
@@ -253,8 +254,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         """
         # create write context
         write_context = WriteContext(directory, binary, use_absolute_paths)
+        validation_context = ValidationContext(validate)
         if self.is_split():
-            write_context.is_partitioned = True
+            validation_context.relax_well_validation = True
 
         # Check models for required content
         for key, model in self.items():
