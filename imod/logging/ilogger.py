@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from typing import Optional
 
 from imod.logging.loglevel import LogLevel
 
@@ -9,7 +10,7 @@ class ILogger:
     """
 
     @abstractmethod
-    def debug(self, message: str, additional_depth: int) -> None:
+    def debug(self, message: str, additional_depth: int = 0) -> None:
         """
         Log message with severity ':attr:`~imod.logging.loglevel.LogLevel.DEBUG`'.
 
@@ -24,7 +25,7 @@ class ILogger:
         raise NotImplementedError
 
     @abstractmethod
-    def info(self, message: str, additional_depth: int) -> None:
+    def info(self, message: str, additional_depth: int = 0) -> None:
         """
         Log message with severity ':attr:`~imod.logging.loglevel.LogLevel.INFO`'.
 
@@ -39,7 +40,7 @@ class ILogger:
         raise NotImplementedError
 
     @abstractmethod
-    def warning(self, message: str, additional_depth: int) -> None:
+    def warning(self, message: str, additional_depth: int = 0) -> None:
         """
         Log message with severity ':attr:`~imod.logging.loglevel.LogLevel.WARNING`'.
 
@@ -54,7 +55,7 @@ class ILogger:
         raise NotImplementedError
 
     @abstractmethod
-    def error(self, message: str, additional_depth: int) -> None:
+    def error(self, message: str, additional_depth: int = 0) -> None:
         """
         Log message with severity ':attr:`~imod.logging.loglevel.LogLevel.ERROR`'.
 
@@ -69,7 +70,7 @@ class ILogger:
         raise NotImplementedError
 
     @abstractmethod
-    def critical(self, message: str, additional_depth: int) -> None:
+    def critical(self, message: str, additional_depth: int = 0) -> None:
         """
         Log message with severity ':attr:`~imod.logging.loglevel.LogLevel.CRITICAL`'.
 
@@ -83,7 +84,7 @@ class ILogger:
         """
         raise NotImplementedError
 
-    def log(self, loglevel: LogLevel, message: str, additional_depth: int) -> None:
+    def log(self, loglevel: LogLevel, message: str, additional_depth: int = 0) -> None:
         """
         logs a message with the specified urgency level.
         """
