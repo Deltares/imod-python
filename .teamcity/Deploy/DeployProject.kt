@@ -63,6 +63,12 @@ object BuildPackage : BuildType({
 object BuildPages : BuildType({
     name = "Build Pages"
 
+    params {
+        param("env.TEMP", "%system.teamcity.build.checkoutDir%\tmpdir")
+        param("env.TMPDIR", "%system.teamcity.build.checkoutDir%\tmpdir")
+        param("env.TMP", "%system.teamcity.build.checkoutDir%\tmpdir")
+    }
+
     artifactRules = """imod-python\docs\_build\html => documentation.zip"""
 
     vcs {
@@ -273,6 +279,10 @@ object DeployPages : BuildType({
             workingDir = "imod-python"
             scriptContent = """
                 echo on
+                echo "Setup git"
+                git config --global user.email "%env.USERNAME%@%env.USERDNSDOMAIN%"
+                git config --global user.name "%env.USERNAME%"
+
                 echo "Checkout imod-python-pages"
                 git remote set-url origin https://%GH_USER%:%env.GH_TOKEN%@github.com/Deltares/imod-python.git
                 git fetch origin gh-pages
