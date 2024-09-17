@@ -447,9 +447,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             filterd_assigned_well_ids, reason_text="permeability/thickness constraints"
         )
         if error_on_well_removal and len(filterd_assigned_well_ids) > 0:
-            logger.log(
-                loglevel=LogLevel.ERROR, message=message_assign
-            )
+            logger.log(loglevel=LogLevel.ERROR, message=message_assign)
             raise ValidationError(message_assign)
 
         ds = xr.Dataset()

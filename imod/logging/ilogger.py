@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from typing import Optional
 
 from imod.logging.loglevel import LogLevel
 
