@@ -236,32 +236,32 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         return True
 
     def _create_cellid(
-        self, wells_assigned: pd.DataFrame, active: xr.DataArray
+        self, assigned_wells: pd.DataFrame, active: xr.DataArray
     ) -> GridDataArray:
         like = ones_like(active)
 
         # Groupby index and select first, to unset any duplicate records
         # introduced by the multi-indexed "time" dimension.
-        df_for_cellid = wells_assigned.groupby("index").first()
+        df_for_cellid = assigned_wells.groupby("index").first()
         d_for_cellid = df_for_cellid[["x", "y", "layer"]].to_dict("list")
 
         return self._derive_cellid_from_points(like, **d_for_cellid)
 
     def _create_dataset_vars(
-        self, wells_assigned: pd.DataFrame, cellid: xr.DataArray
+        self, assigned_wells: pd.DataFrame, cellid: xr.DataArray
     ) -> xr.Dataset:
         """
         Create dataset with all variables (rate, concentration), with a similar shape as the cellids.
         """
         data_vars = ["id", "rate"]
-        if "concentration" in wells_assigned.columns:
+        if "concentration" in assigned_wells.columns:
             data_vars.append("concentration")
 
-        ds_vars = wells_assigned[data_vars].to_xarray()
+        ds_vars = assigned_wells[data_vars].to_xarray()
         # "rate" variable in conversion from multi-indexed DataFrame to xarray
         # DataArray results in duplicated values for "rate" along dimension
         # "species". Select first species to reduce this again.
-        index_names = wells_assigned.index.names
+        index_names = assigned_wells.index.names
         if "species" in index_names:
             ds_vars["rate"] = ds_vars["rate"].isel(species=0)
 
@@ -439,21 +439,21 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
                 "No wells were assigned in package. None were present."
             )
 
-        wells_assigned = self._assign_wells_to_layers(wells_df, active, top, bottom, k)
-        filtered_ids_in_assign = self.gather_filtered_well_ids(wells_assigned, wells_df)
+        assigned_wells = self._assign_wells_to_layers(wells_df, active, top, bottom, k)
+        filterd_assigned_well_ids = self.gather_filtered_well_ids(assigned_wells, wells_df)
         message_assign = self.to_mf6_package_information(
-            filtered_ids_in_assign, reason_text="permeability/thickness constraints"
+            filterd_assigned_well_ids, reason_text="permeability/thickness constraints"
         )
-        if error_on_well_removal and len(filtered_ids_in_assign) > 0:
+        if error_on_well_removal and len(filterd_assigned_well_ids) > 0:
             logger.log(
                 loglevel=LogLevel.ERROR, message=message_assign, additional_depth=2
             )
             raise ValidationError(message_assign)
 
         ds = xr.Dataset()
-        ds["cellid"] = self._create_cellid(wells_assigned, active)
+        ds["cellid"] = self._create_cellid(assigned_wells, active)
 
-        ds_vars = self._create_dataset_vars(wells_assigned, ds["cellid"])
+        ds_vars = self._create_dataset_vars(assigned_wells, ds["cellid"])
         ds = ds.assign(**ds_vars.data_vars)
 
         ds = remove_inactive(ds, active)
@@ -461,14 +461,14 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         ds["print_flows"] = self["print_flows"].values[()]
         ds["print_input"] = self["print_input"].values[()]
 
-        filtered_ids_end = self.gather_filtered_well_ids(ds, wells_df)
-        if len(filtered_ids_end) > 0:
+        filtered_final_well_ids = self.gather_filtered_well_ids(ds, wells_df)
+        if len(filtered_final_well_ids) > 0:
             reason_text = "inactive cells or permeability/thickness constraints"
             message_end = self.to_mf6_package_information(
-                filtered_ids_end, reason_text=reason_text
+                filtered_final_well_ids, reason_text=reason_text
             )
             logger.log(
-                loglevel=LogLevel.WARNING, message=message_end, additional_depth=2
+                loglevel=LogLevel.WARNING, message=message_end
             )
 
         ds = ds.drop_vars("id")
@@ -962,13 +962,13 @@ class Well(GridAgnosticWell):
         # case of a "time" and "species" coordinate.
         wells_df = wells_df.reset_index()
 
-        wells_assigned = assign_wells(
+        assigned_wells = assign_wells(
             wells_df, top_3d, bottom, k, minimum_thickness, minimum_k, True
         )
         # Set multi-index again
-        wells_assigned = wells_assigned.set_index(index_names).sort_index()
+        assigned_wells = assigned_wells.set_index(index_names).sort_index()
 
-        return wells_assigned
+        return assigned_wells
 
     @classmethod
     def _validate_imod5_depth_information(
