@@ -31,6 +31,7 @@ from imod.mf6.package import Package
 from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.utilities.grid import broadcast_to_full_domain
 from imod.mf6.validation import validation_pkg_error_message
+from imod.mf6.validation_context import ValidationContext
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
 from imod.prepare.cleanup import cleanup_wel
@@ -388,7 +389,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         bottom: GridDataArray,
         k: GridDataArray,
         validate: bool = False,
-        error_on_well_removal: bool = True,
+        strict_well_validation: bool = True,
     ) -> Mf6Wel:
         """
         Write package to Modflow 6 package.
@@ -415,9 +416,10 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             Grid with bottom of model layers.
         k: {xarry.DataArray, xugrid.UgridDataArray}
             Grid with hydraulic conductivities.
-        validate: bool
+        validate: bool, default True
             Run validation before converting
-        error_on_well_removal: bool
+        strict_well_validation: bool, default False
+            Set well validation strict:
             Throw error if well is removed entirely during its assignment to
             layers.
 
@@ -426,7 +428,19 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         Mf6Wel
             Object with wells as list based input.
         """
-        if validate:
+        validation_context = ValidationContext(validate=validate, strict_well_validation=strict_well_validation)
+        return self._to_mf6_pkg(active, top, bottom, k, validation_context)
+
+    def _to_mf6_pkg(
+        self,
+        active: GridDataArray,
+        top: GridDataArray,
+        bottom: GridDataArray,
+        k: GridDataArray,
+        validation_context: ValidationContext,
+    ) -> Mf6Wel:
+
+        if validation_context.validate:
             errors = self._validate(self._write_schemata)
             if len(errors) > 0:
                 message = validation_pkg_error_message(errors)
@@ -446,6 +460,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         message_assign = self.to_mf6_package_information(
             filtered_assigned_well_ids, reason_text="permeability/thickness constraints"
         )
+        error_on_well_removal = validation_context.strict_well_validation
         if error_on_well_removal and len(filtered_assigned_well_ids) > 0:
             logger.log(loglevel=LogLevel.ERROR, message=message_assign)
             raise ValidationError(message_assign)
