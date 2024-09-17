@@ -40,6 +40,10 @@ object BuildPackage : BuildType({
             id = "Create_package"
             workingDir = "imod-python"
             scriptContent = """
+                SET TEMP=%system.teamcity.build.checkoutDir%\tmpdir
+                SET TMPDIR=%system.teamcity.build.checkoutDir%\tmpdir
+                SET TMP=%system.teamcity.build.checkoutDir%\tmpdir
+
                 pixi run --environment default --frozen rm --recursive --force dist
                 pixi run --environment default --frozen python -m build
             """.trimIndent()
@@ -273,6 +277,10 @@ object DeployPages : BuildType({
             workingDir = "imod-python"
             scriptContent = """
                 echo on
+                echo "Setup git"
+                git config --global user.email "svc-teamcity-ansible@DIRECTORY.INTRA"
+                git config --global user.name "SVC TeamCity Ansible"
+
                 echo "Checkout imod-python-pages"
                 git remote set-url origin https://%GH_USER%:%env.GH_TOKEN%@github.com/Deltares/imod-python.git
                 git fetch origin gh-pages
