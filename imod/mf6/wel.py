@@ -428,7 +428,9 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         Mf6Wel
             Object with wells as list based input.
         """
-        validation_context = ValidationContext(validate=validate, strict_well_validation=strict_well_validation)
+        validation_context = ValidationContext(
+            validate=validate, strict_well_validation=strict_well_validation
+        )
         return self._to_mf6_pkg(active, top, bottom, k, validation_context)
 
     def _to_mf6_pkg(
@@ -439,7 +441,6 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         k: GridDataArray,
         validation_context: ValidationContext,
     ) -> Mf6Wel:
-
         if validation_context.validate:
             errors = self._validate(self._write_schemata)
             if len(errors) > 0:

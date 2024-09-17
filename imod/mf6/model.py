@@ -241,7 +241,11 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
     @standard_log_decorator()
     def write(
-        self, modelname, globaltimes, write_context: WriteContext, validate_context: ValidationContext,
+        self,
+        modelname,
+        globaltimes,
+        write_context: WriteContext,
+        validate_context: ValidationContext,
     ) -> StatusInfoBase:
         """
         Write model namefile

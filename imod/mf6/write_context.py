@@ -28,7 +28,7 @@ class WriteContext:
          it will be set to the simulation_directrory.
     """
 
-    simulation_directory: Path = Path("."),
+    simulation_directory: Path = Path(".")
     use_binary: bool = False
     use_absolute_paths: bool = False
     write_directory: Optional[Union[str, Path]] = None
