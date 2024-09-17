@@ -25,6 +25,7 @@ import numpy as np
 import xarray as xr
 from example_models import create_twri_simulation
 
+from imod.mf6.regrid import NodePropertyFlowRegridMethod
 from imod.mf6.utilities.regrid import RegridderType, RegridderWeightsCache
 
 # %%
@@ -98,7 +99,7 @@ regridded_k_2.sel(layer=1).plot(y="y", yincrease=False, ax=ax)
 # a performance increase if that package uses the same regridding method,
 # because initializing a regridder is costly.
 
-regridder_types = {"k": (RegridderType.CENTROIDLOCATOR, None)}
+regridder_types = NodePropertyFlowRegridMethod(k=(RegridderType.CENTROIDLOCATOR,))
 regrid_context = RegridderWeightsCache()
 npf_regridded = model["npf"].regrid_like(
     target_grid=target_grid,

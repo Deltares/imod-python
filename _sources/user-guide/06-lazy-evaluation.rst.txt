@@ -502,7 +502,7 @@ outside of VSCode.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.612 seconds)
+   **Total running time of the script:** (0 minutes 3.076 seconds)
 
 
 .. _sphx_glr_download_user-guide_06-lazy-evaluation.py:
@@ -518,6 +518,10 @@ outside of VSCode.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: 06-lazy-evaluation.py <06-lazy-evaluation.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: 06-lazy-evaluation.zip <06-lazy-evaluation.zip>`
 
 
 .. only:: html

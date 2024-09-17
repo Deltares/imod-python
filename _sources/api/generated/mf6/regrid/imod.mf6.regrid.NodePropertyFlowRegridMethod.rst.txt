@@ -1,0 +1,35 @@
+﻿imod.mf6.regrid.NodePropertyFlowRegridMethod
+============================================
+
+.. currentmodule:: imod.mf6.regrid
+
+.. autoclass:: NodePropertyFlowRegridMethod
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~NodePropertyFlowRegridMethod.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~NodePropertyFlowRegridMethod.angle1
+      ~NodePropertyFlowRegridMethod.angle2
+      ~NodePropertyFlowRegridMethod.angle3
+      ~NodePropertyFlowRegridMethod.icelltype
+      ~NodePropertyFlowRegridMethod.k
+      ~NodePropertyFlowRegridMethod.k22
+      ~NodePropertyFlowRegridMethod.k33
+      ~NodePropertyFlowRegridMethod.rewet_layer
+   
+   

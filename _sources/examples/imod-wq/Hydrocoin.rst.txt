@@ -173,7 +173,7 @@ Set inactive cells by specifying ``bnd[index] = 0.0``
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x00000204A35B0310>
+    <matplotlib.collections.QuadMesh object at 0x00000204CEAEE910>
 
 
 
@@ -211,7 +211,7 @@ that is: ``bnd[index] = -1``
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x00000204A38F7110>
+    <matplotlib.collections.QuadMesh object at 0x00000204D7B0FD90>
 
 
 
@@ -281,7 +281,7 @@ And, on both sides, the outer 15 cells of the top row are inactive in the transp
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x00000204A360AA10>
+    <matplotlib.collections.QuadMesh object at 0x00000204D97B8710>
 
 
 
@@ -329,7 +329,7 @@ Define the starting concentrations
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x00000204A4212890>
+    <matplotlib.collections.QuadMesh object at 0x00000204CDCD6B10>
 
 
 
@@ -421,7 +421,7 @@ Define starting heads, these will be inserted in the Basic Flow (BAS) package
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x00000204AE961D50>
+    <matplotlib.collections.QuadMesh object at 0x00000204CE64D250>
 
 
 
@@ -468,7 +468,7 @@ Define horizontal hydraulic conductivity
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x00000204A3B22A10>
+    <matplotlib.collections.QuadMesh object at 0x00000204D9249F50>
 
 
 
@@ -534,23 +534,6 @@ Now we write the model, including runfile:
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\formats\array_io\writing.py:37: UserWarning: The `squeeze` kwarg to GroupBy is being removed.Pass .groupby(..., squeeze=False) to disable squeezing, which is the new default, and to silence this warning.
-      for coordvals, a_yx in list(stacked.groupby("idf")):
-    D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\formats\array_io\writing.py:37: UserWarning: The `squeeze` kwarg to GroupBy is being removed.Pass .groupby(..., squeeze=False) to disable squeezing, which is the new default, and to silence this warning.
-      for coordvals, a_yx in list(stacked.groupby("idf")):
-    D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\formats\array_io\writing.py:37: UserWarning: The `squeeze` kwarg to GroupBy is being removed.Pass .groupby(..., squeeze=False) to disable squeezing, which is the new default, and to silence this warning.
-      for coordvals, a_yx in list(stacked.groupby("idf")):
-    D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\formats\array_io\writing.py:37: UserWarning: The `squeeze` kwarg to GroupBy is being removed.Pass .groupby(..., squeeze=False) to disable squeezing, which is the new default, and to silence this warning.
-      for coordvals, a_yx in list(stacked.groupby("idf")):
-    D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\formats\array_io\writing.py:37: UserWarning: The `squeeze` kwarg to GroupBy is being removed.Pass .groupby(..., squeeze=False) to disable squeezing, which is the new default, and to silence this warning.
-      for coordvals, a_yx in list(stacked.groupby("idf")):
-    D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\formats\array_io\writing.py:37: UserWarning: The `squeeze` kwarg to GroupBy is being removed.Pass .groupby(..., squeeze=False) to disable squeezing, which is the new default, and to silence this warning.
-      for coordvals, a_yx in list(stacked.groupby("idf")):
-
 
 
 
@@ -597,7 +580,7 @@ plot results as follows:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 2.103 seconds)
+   **Total running time of the script:** (0 minutes 2.984 seconds)
 
 
 .. _sphx_glr_download_examples_imod-wq_Hydrocoin.py:
@@ -613,6 +596,10 @@ plot results as follows:
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: Hydrocoin.py <Hydrocoin.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: Hydrocoin.zip <Hydrocoin.zip>`
 
 
 .. only:: html

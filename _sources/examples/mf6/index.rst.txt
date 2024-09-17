@@ -39,7 +39,7 @@ These examples demonstrate how to use imod to build MODFLOW6 models.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates how to setup a variable density groundwater flow and transport model u...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates how to setup a variable density groundwater flow and transport model using the imod package and associated packages.">
 
 .. only:: html
 
@@ -56,7 +56,7 @@ These examples demonstrate how to use imod to build MODFLOW6 models.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates how to setup a very simple unstructured groundwater model using the im...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates how to setup a very simple unstructured groundwater model using the imod package and associated packages.">
 
 .. only:: html
 
@@ -73,7 +73,7 @@ These examples demonstrate how to use imod to build MODFLOW6 models.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates a circular model that is split into 3 submodels. The split method retu...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates a circular model that is split into 3 submodels. The split method returns a simulation object that can be run as is. In this case the 3 submodels are roughly equal sized partitions that have the shape of pie pieces.">
 
 .. only:: html
 
@@ -90,7 +90,7 @@ These examples demonstrate how to use imod to build MODFLOW6 models.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates how to setup a very simple unstructured groundwater transport model us...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates how to setup a very simple unstructured groundwater transport model using the imod package and associated packages.">
 
 .. only:: html
 
@@ -107,7 +107,7 @@ These examples demonstrate how to use imod to build MODFLOW6 models.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example focuses on regridding. It uses the TWRI model from modflow6 (`Harbaugh, 2005`). Mo...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example focuses on regridding. It uses the TWRI model from modflow6 (`Harbaugh, 2005`). More information about this model can be found in an example dedicated to building this model ( ex01_twri.py)">
 
 .. only:: html
 
@@ -124,7 +124,7 @@ These examples demonstrate how to use imod to build MODFLOW6 models.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example has been converted from the `MODFLOW6 Example problems`_.  See the `description`_ ...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example has been converted from the `MODFLOW6 Example problems`_.  See the `description`_ and the `notebook`_ which uses `FloPy`_ to setup the model.">
 
 .. only:: html
 
@@ -158,7 +158,7 @@ These examples demonstrate how to use imod to build MODFLOW6 models.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This source file contains functions that create a simulation that can be used in examples that ...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This source file contains functions that create a simulation that can be used in examples that are not focused on building a simulation, but on doing something with it (such as regridding).">
 
 .. only:: html
 
@@ -175,7 +175,7 @@ These examples demonstrate how to use imod to build MODFLOW6 models.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example shows a simplified script for building a groundwater model in the northeast of the...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows a simplified script for building a groundwater model in the northeast of the Netherlands. A primary feature of this area is an ice-pushed ridge called the Hondsrug. This examples demonstrates modifying external data for use in a MODFLOW6 model.">
 
 .. only:: html
 
@@ -192,7 +192,7 @@ These examples demonstrate how to use imod to build MODFLOW6 models.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how a model can be partitioned into submodels. This will allow parallelizati...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how a model can be partitioned into submodels. This will allow parallelization when solving the model. The example used is the Hondsrug model. It is partitioned into 3 rectangular parts. In the example we first run the original, unpartitioned model. Then we partition the model and run the resulting simulation. Finally we merge the head output of the submodels into a head array for the whole grid. we print both the heads obtained without partitioning, and the merged heads of the partitioned simulation, &#x27; for comparison.">
 
 .. only:: html
 
@@ -209,7 +209,7 @@ These examples demonstrate how to use imod to build MODFLOW6 models.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This is a synthetic example (using invented, not necesarily physical data) of how to use the la...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This is a synthetic example (using invented, not necesarily physical data) of how to use the lake package api to generate models with lakes.">
 
 .. only:: html
 
@@ -226,7 +226,7 @@ These examples demonstrate how to use imod to build MODFLOW6 models.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="The simulation shown here comes from the  1999 MT3DMS report, p 138: Two-Dimensional Transport ...">
+    <div class="sphx-glr-thumbcontainer" tooltip="The simulation shown here comes from the  1999 MT3DMS report, p 138: Two-Dimensional Transport in a Uniform Flow of solute injected continuously from a point source in a steady-state uniform flow field.">
 
 .. only:: html
 

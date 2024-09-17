@@ -110,7 +110,7 @@ Our raster looks like this:
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x00000204A3E61D90>
+    <matplotlib.collections.QuadMesh object at 0x00000204CF2DFDD0>
 
 
 
@@ -160,27 +160,27 @@ Polygonize the lakes
         <tr>
           <th>0</th>
           <td>1.0</td>
-          <td>POLYGON ((94950.000 467550.000, 94950.000 4671...</td>
+          <td>POLYGON ((94950 467550, 94950 467150, 95350 46...</td>
         </tr>
         <tr>
           <th>1</th>
           <td>1.0</td>
-          <td>POLYGON ((95150.000 466950.000, 95150.000 4667...</td>
+          <td>POLYGON ((95150 466950, 95150 466750, 95350 46...</td>
         </tr>
         <tr>
           <th>2</th>
           <td>1.0</td>
-          <td>POLYGON ((103150.000 467550.000, 103150.000 46...</td>
+          <td>POLYGON ((103150 467550, 103150 466950, 103350...</td>
         </tr>
         <tr>
           <th>3</th>
           <td>1.0</td>
-          <td>POLYGON ((109150.000 467550.000, 109150.000 46...</td>
+          <td>POLYGON ((109150 467550, 109150 467350, 108750...</td>
         </tr>
         <tr>
           <th>4</th>
           <td>1.0</td>
-          <td>POLYGON ((102550.000 465950.000, 102550.000 46...</td>
+          <td>POLYGON ((102550 465950, 102550 465750, 102150...</td>
         </tr>
       </tbody>
     </table>
@@ -237,27 +237,27 @@ regular pandas functionality
         <tr>
           <th>0</th>
           <td>1.0</td>
-          <td>POLYGON ((94950.000 467550.000, 94950.000 4671...</td>
+          <td>POLYGON ((94950 467550, 94950 467150, 95350 46...</td>
         </tr>
         <tr>
           <th>1</th>
           <td>1.0</td>
-          <td>POLYGON ((95150.000 466950.000, 95150.000 4667...</td>
+          <td>POLYGON ((95150 466950, 95150 466750, 95350 46...</td>
         </tr>
         <tr>
           <th>2</th>
           <td>1.0</td>
-          <td>POLYGON ((103150.000 467550.000, 103150.000 46...</td>
+          <td>POLYGON ((103150 467550, 103150 466950, 103350...</td>
         </tr>
         <tr>
           <th>3</th>
           <td>1.0</td>
-          <td>POLYGON ((109150.000 467550.000, 109150.000 46...</td>
+          <td>POLYGON ((109150 467550, 109150 467350, 108750...</td>
         </tr>
         <tr>
           <th>4</th>
           <td>1.0</td>
-          <td>POLYGON ((102550.000 465950.000, 102550.000 46...</td>
+          <td>POLYGON ((102550 465950, 102550 465750, 102150...</td>
         </tr>
       </tbody>
     </table>
@@ -331,7 +331,7 @@ the centroids and plotting them as points.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.899 seconds)
+   **Total running time of the script:** (0 minutes 0.844 seconds)
 
 
 .. _sphx_glr_download_examples_prepare_polygonize_raster.py:
@@ -347,6 +347,10 @@ the centroids and plotting them as points.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: polygonize_raster.py <polygonize_raster.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: polygonize_raster.zip <polygonize_raster.zip>`
 
 
 .. only:: html

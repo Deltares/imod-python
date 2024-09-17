@@ -41,6 +41,10 @@ cells is not constant; for structured grids, every cell has 4 neighbors (in
 
       :download:`Download Python source code: 05-unstructured-grids.py <05-unstructured-grids.py>`
 
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: 05-unstructured-grids.zip <05-unstructured-grids.zip>`
+
 
 .. only:: html
 

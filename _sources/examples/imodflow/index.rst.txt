@@ -14,7 +14,7 @@ These examples demonstrate how to use imod to build iMODFLOW models.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="There are two surface water systems: the outer two edges of the grid feature ditches with a ris...">
+    <div class="sphx-glr-thumbcontainer" tooltip="There are two surface water systems: the outer two edges of the grid feature ditches with a rising stage, whereas the central ditch has a periodic boundary conditions with a summer and winter stage.">
 
 .. only:: html
 

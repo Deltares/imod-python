@@ -19,6 +19,7 @@
       ~MassSourceLoading.from_file
       ~MassSourceLoading.get_non_grid_data
       ~MassSourceLoading.get_period_varnames
+      ~MassSourceLoading.get_regrid_methods
       ~MassSourceLoading.is_clipping_supported
       ~MassSourceLoading.is_empty
       ~MassSourceLoading.is_grid_agnostic_package

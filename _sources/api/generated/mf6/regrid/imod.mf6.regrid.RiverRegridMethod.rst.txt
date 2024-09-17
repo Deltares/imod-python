@@ -1,0 +1,31 @@
+﻿imod.mf6.regrid.RiverRegridMethod
+=================================
+
+.. currentmodule:: imod.mf6.regrid
+
+.. autoclass:: RiverRegridMethod
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~RiverRegridMethod.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~RiverRegridMethod.bottom_elevation
+      ~RiverRegridMethod.concentration
+      ~RiverRegridMethod.conductance
+      ~RiverRegridMethod.stage
+   
+   

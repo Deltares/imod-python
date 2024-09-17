@@ -18,6 +18,7 @@
       ~Buoyancy.copy
       ~Buoyancy.from_file
       ~Buoyancy.get_non_grid_data
+      ~Buoyancy.get_regrid_methods
       ~Buoyancy.get_transport_model_names
       ~Buoyancy.is_clipping_supported
       ~Buoyancy.is_empty

@@ -1,0 +1,30 @@
+﻿imod.mf6.regrid.DiscretizationRegridMethod
+==========================================
+
+.. currentmodule:: imod.mf6.regrid
+
+.. autoclass:: DiscretizationRegridMethod
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DiscretizationRegridMethod.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DiscretizationRegridMethod.bottom
+      ~DiscretizationRegridMethod.idomain
+      ~DiscretizationRegridMethod.top
+   
+   

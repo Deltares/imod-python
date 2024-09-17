@@ -15,7 +15,7 @@ These examples demonstrate how to prepare you data with the iMOD Python
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="The starting heads to be used for a model could be based on the interpolation of x-y head measu...">
+    <div class="sphx-glr-thumbcontainer" tooltip="The starting heads to be used for a model could be based on the interpolation of x-y head measurements.">
 
 .. only:: html
 

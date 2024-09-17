@@ -15,7 +15,7 @@ These examples demonstrate how to use imod to build iMOD-WQ models.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="The classic 2D Elder problem demonstrates free convection. Traditionally this was created for h...">
+    <div class="sphx-glr-thumbcontainer" tooltip="The classic 2D Elder problem demonstrates free convection. Traditionally this was created for heat transport, but we use a modified version for salt transport. The conceptual model can be seen as a 2D sand box, with on top a salt lake in the center and fresh lakes on both the outer edges of the top row.">
 
 .. only:: html
 
@@ -32,7 +32,7 @@ These examples demonstrate how to use imod to build iMOD-WQ models.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This 2D examples illustrates the growth of a fresh water lens in an initially fully saline doma...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This 2D examples illustrates the growth of a fresh water lens in an initially fully saline domain.">
 
 .. only:: html
 
@@ -83,7 +83,7 @@ These examples demonstrate how to use imod to build iMOD-WQ models.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This 2D example demonstrates the development of a saltwater pocket in a fresh groundwater envir...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This 2D example demonstrates the development of a saltwater pocket in a fresh groundwater environment.">
 
 .. only:: html
 
@@ -100,7 +100,7 @@ These examples demonstrate how to use imod to build iMOD-WQ models.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This 2D examples demonstrates the rotation of an initially vertical interface between fresh and...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This 2D examples demonstrates the rotation of an initially vertical interface between fresh and salt water.">
 
 .. only:: html
 

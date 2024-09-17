@@ -1,0 +1,30 @@
+﻿imod.mf6.regrid.SpecificStorageRegridMethod
+===========================================
+
+.. currentmodule:: imod.mf6.regrid
+
+.. autoclass:: SpecificStorageRegridMethod
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SpecificStorageRegridMethod.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~SpecificStorageRegridMethod.convertible
+      ~SpecificStorageRegridMethod.specific_storage
+      ~SpecificStorageRegridMethod.specific_yield
+   
+   

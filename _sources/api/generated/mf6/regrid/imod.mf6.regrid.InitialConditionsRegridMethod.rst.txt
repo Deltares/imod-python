@@ -1,0 +1,28 @@
+﻿imod.mf6.regrid.InitialConditionsRegridMethod
+=============================================
+
+.. currentmodule:: imod.mf6.regrid
+
+.. autoclass:: InitialConditionsRegridMethod
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~InitialConditionsRegridMethod.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~InitialConditionsRegridMethod.start
+   
+   

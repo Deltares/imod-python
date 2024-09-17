@@ -20,6 +20,7 @@
       ~Solution.from_file
       ~Solution.get_models_in_solution
       ~Solution.get_non_grid_data
+      ~Solution.get_regrid_methods
       ~Solution.is_clipping_supported
       ~Solution.is_empty
       ~Solution.is_grid_agnostic_package

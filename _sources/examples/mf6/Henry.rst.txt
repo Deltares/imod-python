@@ -217,24 +217,29 @@ Now let's make the constant head boundary condition.
 
 ... and the constant flux condition.
 
-.. GENERATED FROM PYTHON SOURCE LINES 136-152
+.. GENERATED FROM PYTHON SOURCE LINES 136-157
 
 .. code-block:: Python
 
+    from imod.prepare.layer import create_layered_top
+
+    screen_top = create_layered_top(bottom, top)
 
     flux_concentration = xr.DataArray(
         data=np.full((1, nlay), min_concentration),
-        dims=["species", "cell"],
-        coords={"species": ["salinity"], "cell": layer},
+        dims=["species", "index"],
+        coords={"species": ["salinity"], "index": layer},
     )
 
-    gwf_model["left_boundary"] = imod.mf6.WellDisStructured(
-        layer=layer,
-        row=np.full_like(layer, 1, dtype=int),
-        column=np.full_like(layer, 1, dtype=int),
+    gwf_model["left_boundary"] = imod.mf6.Well(
+        x=np.full_like(layer, xmin, dtype=float),
+        y=np.full_like(layer, y[0], dtype=float),
+        screen_top=screen_top.values,
+        screen_bottom=bottom.values,
         rate=np.full_like(layer, 0.5 * (total_flux / nlay), dtype=float),
         concentration=flux_concentration,
         concentration_boundary_type="AUX",
+        minimum_thickness=0.002,
     )
 
 
@@ -244,13 +249,13 @@ Now let's make the constant head boundary condition.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 153-156
+.. GENERATED FROM PYTHON SOURCE LINES 158-161
 
 Since we are solving a variable density problem, we need to add the buoyancy
 package. It will use the species "salinity" that we are simulating with a
 transport model defined below.
 
-.. GENERATED FROM PYTHON SOURCE LINES 156-166
+.. GENERATED FROM PYTHON SOURCE LINES 161-171
 
 .. code-block:: Python
 
@@ -271,14 +276,14 @@ transport model defined below.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 167-171
+.. GENERATED FROM PYTHON SOURCE LINES 172-176
 
 Now let's make the transport model. It contains the standard packages of
 storage, dispersion and advection as well as initial condiations and output
 control. Sinks and sources are automatically determined based on packages
 provided in the flow model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 171-190
+.. GENERATED FROM PYTHON SOURCE LINES 176-195
 
 .. code-block:: Python
 
@@ -308,11 +313,11 @@ provided in the flow model.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 191-192
+.. GENERATED FROM PYTHON SOURCE LINES 196-197
 
 now let's define a simulation using the flow and transport models.
 
-.. GENERATED FROM PYTHON SOURCE LINES 192-199
+.. GENERATED FROM PYTHON SOURCE LINES 197-204
 
 .. code-block:: Python
 
@@ -330,14 +335,14 @@ now let's define a simulation using the flow and transport models.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 200-204
+.. GENERATED FROM PYTHON SOURCE LINES 205-209
 
 Define solver settings. We need to define separate solutions for the flow and
 transport models. In this case, we'll use the same settings, but generally
 convergence settings should differ: the transport model has very different
 units from the flow model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 204-237
+.. GENERATED FROM PYTHON SOURCE LINES 209-242
 
 .. code-block:: Python
 
@@ -381,11 +386,11 @@ units from the flow model.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 238-239
+.. GENERATED FROM PYTHON SOURCE LINES 243-244
 
 Increase the number of time steps for the single stress period:
 
-.. GENERATED FROM PYTHON SOURCE LINES 239-241
+.. GENERATED FROM PYTHON SOURCE LINES 244-246
 
 .. code-block:: Python
 
@@ -398,11 +403,11 @@ Increase the number of time steps for the single stress period:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 242-243
+.. GENERATED FROM PYTHON SOURCE LINES 247-248
 
 We'll create a new directory in which we will write and run the model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 243-246
+.. GENERATED FROM PYTHON SOURCE LINES 248-251
 
 .. code-block:: Python
 
@@ -416,7 +421,7 @@ We'll create a new directory in which we will write and run the model.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 247-257
+.. GENERATED FROM PYTHON SOURCE LINES 252-262
 
 Run the model
 -------------
@@ -429,7 +434,7 @@ This takes about 20 seconds.
   :ref:`The Modflow 6 examples introduction <mf6-introduction>` shortly
   describes how to add it to yours.
 
-.. GENERATED FROM PYTHON SOURCE LINES 257-260
+.. GENERATED FROM PYTHON SOURCE LINES 262-265
 
 .. code-block:: Python
 
@@ -443,14 +448,14 @@ This takes about 20 seconds.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 261-265
+.. GENERATED FROM PYTHON SOURCE LINES 266-270
 
 Open the results
 ----------------
 
 We'll open the head and concentration files.
 
-.. GENERATED FROM PYTHON SOURCE LINES 265-270
+.. GENERATED FROM PYTHON SOURCE LINES 270-275
 
 .. code-block:: Python
 
@@ -466,12 +471,12 @@ We'll open the head and concentration files.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 271-273
+.. GENERATED FROM PYTHON SOURCE LINES 276-278
 
 Visualize the results
 ---------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 273-276
+.. GENERATED FROM PYTHON SOURCE LINES 278-281
 
 .. code-block:: Python
 
@@ -492,16 +497,16 @@ Visualize the results
  .. code-block:: none
 
 
-    <matplotlib.contour.QuadContourSet object at 0x00000204A247C290>
+    <matplotlib.contour.QuadContourSet object at 0x00000204D972FC50>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 277-279
+.. GENERATED FROM PYTHON SOURCE LINES 282-284
 
 We can check the concentration to see that a fresh-saline interface has been
 formed:
 
-.. GENERATED FROM PYTHON SOURCE LINES 279-282
+.. GENERATED FROM PYTHON SOURCE LINES 284-287
 
 .. code-block:: Python
 
@@ -522,14 +527,14 @@ formed:
  .. code-block:: none
 
 
-    <matplotlib.contour.QuadContourSet object at 0x00000204A9950290>
+    <matplotlib.contour.QuadContourSet object at 0x00000204D900C710>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 58.355 seconds)
+   **Total running time of the script:** (1 minutes 0.689 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_Henry.py:
@@ -545,6 +550,10 @@ formed:
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: Henry.py <Henry.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: Henry.zip <Henry.zip>`
 
 
 .. only:: html

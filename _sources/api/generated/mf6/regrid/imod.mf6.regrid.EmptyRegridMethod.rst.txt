@@ -1,0 +1,22 @@
+﻿imod.mf6.regrid.EmptyRegridMethod
+=================================
+
+.. currentmodule:: imod.mf6.regrid
+
+.. autoclass:: EmptyRegridMethod
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~EmptyRegridMethod.__init__
+   
+   
+
+   
+   
+   

@@ -1,0 +1,49 @@
+﻿imod.mf6.ApiPackage
+===================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: ApiPackage
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ApiPackage.__init__
+      ~ApiPackage.clip_box
+      ~ApiPackage.copy
+      ~ApiPackage.from_file
+      ~ApiPackage.get_non_grid_data
+      ~ApiPackage.get_regrid_methods
+      ~ApiPackage.is_clipping_supported
+      ~ApiPackage.is_empty
+      ~ApiPackage.is_grid_agnostic_package
+      ~ApiPackage.is_regridding_supported
+      ~ApiPackage.is_splitting_supported
+      ~ApiPackage.isel
+      ~ApiPackage.mask
+      ~ApiPackage.regrid_like
+      ~ApiPackage.render
+      ~ApiPackage.sel
+      ~ApiPackage.to_netcdf
+      ~ApiPackage.write
+      ~ApiPackage.write_binary_griddata
+      ~ApiPackage.write_blockfile
+      ~ApiPackage.write_text_griddata
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ApiPackage.auxiliary_data_fields
+      ~ApiPackage.dataset
+   
+   

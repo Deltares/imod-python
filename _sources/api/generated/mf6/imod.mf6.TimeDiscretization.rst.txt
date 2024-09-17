@@ -18,6 +18,7 @@
       ~TimeDiscretization.copy
       ~TimeDiscretization.from_file
       ~TimeDiscretization.get_non_grid_data
+      ~TimeDiscretization.get_regrid_methods
       ~TimeDiscretization.is_clipping_supported
       ~TimeDiscretization.is_empty
       ~TimeDiscretization.is_grid_agnostic_package

@@ -1,0 +1,30 @@
+﻿imod.mf6.regrid.DrainageRegridMethod
+====================================
+
+.. currentmodule:: imod.mf6.regrid
+
+.. autoclass:: DrainageRegridMethod
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DrainageRegridMethod.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DrainageRegridMethod.concentration
+      ~DrainageRegridMethod.conductance
+      ~DrainageRegridMethod.elevation
+   
+   

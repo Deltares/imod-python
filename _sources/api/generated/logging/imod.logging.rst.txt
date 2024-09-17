@@ -28,11 +28,11 @@
    :template: custom-module-template.rst
    :recursive:
 
-   imod.logging.config
-   imod.logging.ilogger
-   imod.logging.logging_decorators
-   imod.logging.loglevel
-   imod.logging.logurulogger
-   imod.logging.nulllogger
-   imod.logging.pythonlogger
+   config
+   ilogger
+   logging_decorators
+   loglevel
+   logurulogger
+   nulllogger
+   pythonlogger
 

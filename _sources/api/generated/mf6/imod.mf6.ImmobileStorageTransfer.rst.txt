@@ -18,6 +18,7 @@
       ~ImmobileStorageTransfer.copy
       ~ImmobileStorageTransfer.from_file
       ~ImmobileStorageTransfer.get_non_grid_data
+      ~ImmobileStorageTransfer.get_regrid_methods
       ~ImmobileStorageTransfer.is_clipping_supported
       ~ImmobileStorageTransfer.is_empty
       ~ImmobileStorageTransfer.is_grid_agnostic_package

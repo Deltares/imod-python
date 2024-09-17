@@ -1,0 +1,33 @@
+﻿imod.mf6.regrid.MobileStorageTransferRegridMethod
+=================================================
+
+.. currentmodule:: imod.mf6.regrid
+
+.. autoclass:: MobileStorageTransferRegridMethod
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MobileStorageTransferRegridMethod.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~MobileStorageTransferRegridMethod.bulk_density
+      ~MobileStorageTransferRegridMethod.decay
+      ~MobileStorageTransferRegridMethod.decay_sorbed
+      ~MobileStorageTransferRegridMethod.distcoef
+      ~MobileStorageTransferRegridMethod.porosity
+      ~MobileStorageTransferRegridMethod.sp2
+   
+   

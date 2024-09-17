@@ -38,7 +38,7 @@ regridding method for the horizontal conductivity field
 We'll start with the usual imports. As this is an simple (synthetic)
 structured model, we can make due with few packages.
 
-.. GENERATED FROM PYTHON SOURCE LINES 22-30
+.. GENERATED FROM PYTHON SOURCE LINES 22-31
 
 .. code-block:: Python
 
@@ -48,6 +48,7 @@ structured model, we can make due with few packages.
     import xarray as xr
     from example_models import create_twri_simulation
 
+    from imod.mf6.regrid import NodePropertyFlowRegridMethod
     from imod.mf6.utilities.regrid import RegridderType, RegridderWeightsCache
 
 
@@ -57,12 +58,12 @@ structured model, we can make due with few packages.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 31-33
+.. GENERATED FROM PYTHON SOURCE LINES 32-34
 
 Now we create the twri simulation itself. It yields a simulation of a flow problem, with a grid of 3 layers and 15 cells in both x and y directions.
 To better illustrate the regridding, we replace the K field with a lognormal random K field. The original k-field is a constant per layer.
 
-.. GENERATED FROM PYTHON SOURCE LINES 33-40
+.. GENERATED FROM PYTHON SOURCE LINES 34-41
 
 .. code-block:: Python
 
@@ -77,21 +78,14 @@ To better illustrate the regridding, we replace the K field with a lognormal ran
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\wel.py:236: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
-      index_coord = np.arange(self.dataset.dims["index"])
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 41-42
+.. GENERATED FROM PYTHON SOURCE LINES 42-43
 
 Let's plot the k-field. This is going to be the input for the regridder, and the regridded output should somewhat resemble it.
 
-.. GENERATED FROM PYTHON SOURCE LINES 42-45
+.. GENERATED FROM PYTHON SOURCE LINES 43-46
 
 .. code-block:: Python
 
@@ -112,17 +106,17 @@ Let's plot the k-field. This is going to be the input for the regridder, and the
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x00000204AF2524D0>
+    <matplotlib.collections.QuadMesh object at 0x00000204CDD83190>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 46-49
+.. GENERATED FROM PYTHON SOURCE LINES 47-50
 
 Now we create a new grid for this simulation. It has 3 layers,  45 rows and 20 columns.
 The length of the domain is slightly different from the input grid. That had a coordinate difference between the first and last cellcentre on the
 x axis and y axis of  15*5000 = 75000 on both axes, but the new grid that is  75020 on the x axis and  75015 on the y axis
 
-.. GENERATED FROM PYTHON SOURCE LINES 49-69
+.. GENERATED FROM PYTHON SOURCE LINES 50-70
 
 .. code-block:: Python
 
@@ -153,14 +147,14 @@ x axis and y axis of  15*5000 = 75000 on both axes, but the new grid that is  75
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-74
+.. GENERATED FROM PYTHON SOURCE LINES 71-75
 
 A first way to regrid the twri model is to regrid the whole simulation object. This is the most straightforward method,
 and it uses default regridding methods for each input field. To see which ones are used, look at the _regrid_method
 class attribute of the relevant package. For example the _regrid_method attribute  of the NodePropertyFlow package
 specifies that field "k" uses an OVERLAP regridder in combination with the averaging function "geometric_mean".
 
-.. GENERATED FROM PYTHON SOURCE LINES 74-76
+.. GENERATED FROM PYTHON SOURCE LINES 75-77
 
 .. code-block:: Python
 
@@ -170,21 +164,14 @@ specifies that field "k" uses an OVERLAP regridder in combination with the avera
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\wel.py:318: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
-      in_bounds = np.full(ds.dims["index"], True)
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 77-78
+.. GENERATED FROM PYTHON SOURCE LINES 78-79
 
 Let's plot the k-field. This is the regridded output, and it should should somewhat resemble the original k-field plotted earlier.
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-81
+.. GENERATED FROM PYTHON SOURCE LINES 79-82
 
 .. code-block:: Python
 
@@ -205,15 +192,15 @@ Let's plot the k-field. This is the regridded output, and it should should somew
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x00000204AF3BC710>
+    <matplotlib.collections.QuadMesh object at 0x00000204D1107950>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-83
+.. GENERATED FROM PYTHON SOURCE LINES 83-84
 
 A second way to regrid  twri  is to regrid the groundwater flow model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-92
+.. GENERATED FROM PYTHON SOURCE LINES 84-93
 
 .. code-block:: Python
 
@@ -239,14 +226,12 @@ A second way to regrid  twri  is to regrid the groundwater flow model.
 
  .. code-block:: none
 
-    D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\mf6\wel.py:318: FutureWarning: The return type of `Dataset.dims` will be changed to return a set of dimension names in future, in order to be more consistent with `DataArray.dims`. To access a mapping from dimension names to lengths, please use `Dataset.sizes`.
-      in_bounds = np.full(ds.dims["index"], True)
 
-    <matplotlib.collections.QuadMesh object at 0x00000204ADF95BD0>
+    <matplotlib.collections.QuadMesh object at 0x00000204CF387B90>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 93-100
+.. GENERATED FROM PYTHON SOURCE LINES 94-101
 
 regridding method as well. in this example we'll regrid the npf package
 manually and the rest of the packages using default methods.
@@ -256,12 +241,12 @@ of the regridder. Using the same cache to regrid another package will lead to
 a performance increase if that package uses the same regridding method,
 because initializing a regridder is costly.
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-114
+.. GENERATED FROM PYTHON SOURCE LINES 101-115
 
 .. code-block:: Python
 
 
-    regridder_types = {"k": (RegridderType.CENTROIDLOCATOR, None)}
+    regridder_types = NodePropertyFlowRegridMethod(k=(RegridderType.CENTROIDLOCATOR,))
     regrid_context = RegridderWeightsCache()
     npf_regridded = model["npf"].regrid_like(
         target_grid=target_grid,
@@ -288,14 +273,14 @@ because initializing a regridder is costly.
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x00000204A3EEA310>
+    <matplotlib.collections.QuadMesh object at 0x00000204CF02D0D0>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.731 seconds)
+   **Total running time of the script:** (0 minutes 17.641 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_different_ways_to_regrid_models.py:
@@ -311,6 +296,10 @@ because initializing a regridder is costly.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: different_ways_to_regrid_models.py <different_ways_to_regrid_models.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: different_ways_to_regrid_models.zip <different_ways_to_regrid_models.zip>`
 
 
 .. only:: html

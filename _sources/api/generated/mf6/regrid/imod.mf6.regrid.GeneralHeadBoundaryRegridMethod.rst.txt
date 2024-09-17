@@ -1,0 +1,30 @@
+﻿imod.mf6.regrid.GeneralHeadBoundaryRegridMethod
+===============================================
+
+.. currentmodule:: imod.mf6.regrid
+
+.. autoclass:: GeneralHeadBoundaryRegridMethod
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~GeneralHeadBoundaryRegridMethod.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~GeneralHeadBoundaryRegridMethod.concentration
+      ~GeneralHeadBoundaryRegridMethod.conductance
+      ~GeneralHeadBoundaryRegridMethod.head
+   
+   

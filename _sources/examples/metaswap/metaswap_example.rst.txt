@@ -39,6 +39,10 @@ The functionality to generate coupled models has been moved to the ``primod`` pa
 
       :download:`Download Python source code: metaswap_example.py <metaswap_example.py>`
 
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: metaswap_example.zip <metaswap_example.zip>`
+
 
 .. only:: html
 

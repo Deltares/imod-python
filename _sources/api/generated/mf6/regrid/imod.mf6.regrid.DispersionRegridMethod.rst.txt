@@ -1,0 +1,33 @@
+﻿imod.mf6.regrid.DispersionRegridMethod
+======================================
+
+.. currentmodule:: imod.mf6.regrid
+
+.. autoclass:: DispersionRegridMethod
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DispersionRegridMethod.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DispersionRegridMethod.diffusion_coefficient
+      ~DispersionRegridMethod.longitudinal_horizontal
+      ~DispersionRegridMethod.longitudinal_vertical
+      ~DispersionRegridMethod.transversal_horizontal1
+      ~DispersionRegridMethod.transversal_horizontal2
+      ~DispersionRegridMethod.transversal_vertical
+   
+   

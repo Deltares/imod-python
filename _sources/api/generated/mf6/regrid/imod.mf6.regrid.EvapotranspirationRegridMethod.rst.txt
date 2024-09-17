@@ -1,0 +1,32 @@
+﻿imod.mf6.regrid.EvapotranspirationRegridMethod
+==============================================
+
+.. currentmodule:: imod.mf6.regrid
+
+.. autoclass:: EvapotranspirationRegridMethod
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~EvapotranspirationRegridMethod.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~EvapotranspirationRegridMethod.depth
+      ~EvapotranspirationRegridMethod.proportion_depth
+      ~EvapotranspirationRegridMethod.proportion_rate
+      ~EvapotranspirationRegridMethod.rate
+      ~EvapotranspirationRegridMethod.surface
+   
+   

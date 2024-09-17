@@ -90,6 +90,10 @@ row.
 
       :download:`Download Python source code: 03-timeseries-data.py <03-timeseries-data.py>`
 
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: 03-timeseries-data.zip <03-timeseries-data.zip>`
+
 
 .. only:: html
 

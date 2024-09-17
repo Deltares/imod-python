@@ -198,13 +198,6 @@ Finally, we build the model.
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    D:\buildAgent\work\4b9080cbb3354582\imod-python\examples\imod-wq\Henry-wq.py:105: FutureWarning: 'M' is deprecated and will be removed in a future version, please use 'ME' instead.
-      additional_times=pd.date_range("2000-01-01", "2001-01-01", freq="M")
-
 
 
 
@@ -223,15 +216,6 @@ Now we write the model
 
 
 
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\formats\array_io\writing.py:37: UserWarning: The `squeeze` kwarg to GroupBy is being removed.Pass .groupby(..., squeeze=False) to disable squeezing, which is the new default, and to silence this warning.
-      for coordvals, a_yx in list(stacked.groupby("idf")):
-    D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\formats\array_io\writing.py:37: UserWarning: The `squeeze` kwarg to GroupBy is being removed.Pass .groupby(..., squeeze=False) to disable squeezing, which is the new default, and to silence this warning.
-      for coordvals, a_yx in list(stacked.groupby("idf")):
 
 
 
@@ -279,7 +263,7 @@ plot results as follows:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.346 seconds)
+   **Total running time of the script:** (0 minutes 0.500 seconds)
 
 
 .. _sphx_glr_download_examples_imod-wq_Henry-wq.py:
@@ -295,6 +279,10 @@ plot results as follows:
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: Henry-wq.py <Henry-wq.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: Henry-wq.zip <Henry-wq.zip>`
 
 
 .. only:: html

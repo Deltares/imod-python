@@ -1,0 +1,29 @@
+﻿imod.mf6.regrid.ConstantHeadRegridMethod
+========================================
+
+.. currentmodule:: imod.mf6.regrid
+
+.. autoclass:: ConstantHeadRegridMethod
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ConstantHeadRegridMethod.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ConstantHeadRegridMethod.concentration
+      ~ConstantHeadRegridMethod.head
+   
+   

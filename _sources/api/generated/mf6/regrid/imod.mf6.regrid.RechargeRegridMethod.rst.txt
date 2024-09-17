@@ -1,0 +1,29 @@
+﻿imod.mf6.regrid.RechargeRegridMethod
+====================================
+
+.. currentmodule:: imod.mf6.regrid
+
+.. autoclass:: RechargeRegridMethod
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~RechargeRegridMethod.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~RechargeRegridMethod.concentration
+      ~RechargeRegridMethod.rate
+   
+   

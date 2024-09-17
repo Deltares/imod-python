@@ -6,6 +6,54 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+0.17.2
+------
+
+Fixed
+~~~~~
+- :func:`imod.formats.prj.open_projectfile_data` now reports the path to a
+  faulty IPF or IDF file in the error message.
+- Support for Numpy 2.0
+
+Added
+~~~~~
+- Added objects with regrid settings. These can be used to provide custom
+  settings: :class:`imod.mf6.regrid.ConstantHeadRegridMethod`,
+  :class:`imod.mf6.regrid.DiscretizationRegridMethod`,
+  :class:`imod.mf6.regrid.DispersionRegridMethod`,
+  :class:`imod.mf6.regrid.DrainageRegridMethod`,
+  :class:`imod.mf6.regrid.EmptyRegridMethod`,
+  :class:`imod.mf6.regrid.EvapotranspirationRegridMethod`,
+  :class:`imod.mf6.regrid.GeneralHeadBoundaryRegridMethod`,
+  :class:`imod.mf6.regrid.InitialConditionsRegridMethod`,
+  :class:`imod.mf6.regrid.MobileStorageTransferRegridMethod`,
+  :class:`imod.mf6.regrid.NodePropertyFlowRegridMethod`,
+  :class:`imod.mf6.regrid.RechargeRegridMethod`,
+  :class:`imod.mf6.regrid.RiverRegridMethod`,
+  :class:`imod.mf6.regrid.SpecificStorageRegridMethod`,
+  :class:`imod.mf6.regrid.StorageCoefficientRegridMethod`.
+
+Changed
+~~~~~~~
+- Instead of providing a dictionary with settings to ``Package.regrid_like``,
+  provide one of the following ``RegridMethod`` objects: 
+  :class:`imod.mf6.regrid.ConstantHeadRegridMethod`,
+  :class:`imod.mf6.regrid.DiscretizationRegridMethod`,
+  :class:`imod.mf6.regrid.DispersionRegridMethod`,
+  :class:`imod.mf6.regrid.DrainageRegridMethod`,
+  :class:`imod.mf6.regrid.EmptyRegridMethod`,
+  :class:`imod.mf6.regrid.EvapotranspirationRegridMethod`,
+  :class:`imod.mf6.regrid.GeneralHeadBoundaryRegridMethod`,
+  :class:`imod.mf6.regrid.InitialConditionsRegridMethod`,
+  :class:`imod.mf6.regrid.MobileStorageTransferRegridMethod`,
+  :class:`imod.mf6.regrid.NodePropertyFlowRegridMethod`,
+  :class:`imod.mf6.regrid.RechargeRegridMethod`,
+  :class:`imod.mf6.regrid.RiverRegridMethod`,
+  :class:`imod.mf6.regrid.SpecificStorageRegridMethod`,
+  :class:`imod.mf6.regrid.StorageCoefficientRegridMethod`.
+
+
+
 [0.17.1] - 2024-05-16
 ---------------------
 
@@ -165,8 +213,9 @@ Added
 ~~~~~
 - Developer environment: Added pixi environment ``interactive`` to interactively
   run code. Can be useful to plot data.
-- An API package was added. It can be added to both flow and transport models, and its 
-  presence allows users to interact with libMF6.dll through its API.
+- :class:`imod.mf6.ApiPackage` was added. It can be added to both flow and
+  transport models, and its presence allows users to interact with libMF6.dll
+  through its API.
 - Developer environment: Empty python 3.10, 3.11, 3.12 environments where pip
   install and import imod can be tested.
 
@@ -245,7 +294,7 @@ Added
   set automatically.
 - Added the ``simulation_start_time`` and ``time_unit`` arguments. To the ``Modflow6Simulation.open_`` methods, and ``imod.mf6.out.open_`` functions. This converts the ``"time"`` coordinate to datetimes.
 - added :meth:`imod.mf6.Modflow6Simulation.mask_all_models`  to apply a mask to all models under a simulation,
-provided the simulation is not split and the models use the same discretization. 
+  provided the simulation is not split and the models use the same discretization. 
 
 
 Changed

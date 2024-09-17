@@ -138,7 +138,7 @@ Set up ibound, which sets where active cells are `(ibound = 1.0)`
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x00000204AF32CAD0>
+    <matplotlib.collections.QuadMesh object at 0x00000204CF37BE10>
 
 
 
@@ -204,7 +204,7 @@ Define the starting concentration
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x00000204A3B2AA10>
+    <matplotlib.collections.QuadMesh object at 0x00000204D6C7EFD0>
 
 
 
@@ -268,17 +268,6 @@ Now we write the model, including runfile:
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\formats\array_io\writing.py:37: UserWarning: The `squeeze` kwarg to GroupBy is being removed.Pass .groupby(..., squeeze=False) to disable squeezing, which is the new default, and to silence this warning.
-      for coordvals, a_yx in list(stacked.groupby("idf")):
-    D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\formats\array_io\writing.py:37: UserWarning: The `squeeze` kwarg to GroupBy is being removed.Pass .groupby(..., squeeze=False) to disable squeezing, which is the new default, and to silence this warning.
-      for coordvals, a_yx in list(stacked.groupby("idf")):
-    D:\buildAgent\work\4b9080cbb3354582\imod-python\imod\formats\array_io\writing.py:37: UserWarning: The `squeeze` kwarg to GroupBy is being removed.Pass .groupby(..., squeeze=False) to disable squeezing, which is the new default, and to silence this warning.
-      for coordvals, a_yx in list(stacked.groupby("idf")):
-
 
 
 
@@ -328,7 +317,7 @@ plot results as follows:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.687 seconds)
+   **Total running time of the script:** (0 minutes 0.953 seconds)
 
 
 .. _sphx_glr_download_examples_imod-wq_SaltwaterPocket.py:
@@ -344,6 +333,10 @@ plot results as follows:
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: SaltwaterPocket.py <SaltwaterPocket.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: SaltwaterPocket.zip <SaltwaterPocket.zip>`
 
 
 .. only:: html

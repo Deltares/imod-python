@@ -52,7 +52,7 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Geospatial data primarily comes in two forms: raster data and vector data. This guide focuses o...">
+    <div class="sphx-glr-thumbcontainer" tooltip="Geospatial data primarily comes in two forms: raster data and vector data. This guide focuses on the first.">
 
 .. only:: html
 
@@ -69,7 +69,7 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Geospatial data primarily comes in two forms: raster data and vector data. This guide focuses o...">
+    <div class="sphx-glr-thumbcontainer" tooltip="Geospatial data primarily comes in two forms: raster data and vector data. This guide focuses on the latter.">
 
 .. only:: html
 
@@ -86,7 +86,7 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Handling time series is major part of geohydrology and groundwater modeling. Time series data c...">
+    <div class="sphx-glr-thumbcontainer" tooltip="Handling time series is major part of geohydrology and groundwater modeling. Time series data come in more than one form:">
 
 .. only:: html
 
@@ -103,7 +103,7 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="MODFLOW6 supports unstructured grids. Unlike raster data, the connectivity of unstructured grid...">
+    <div class="sphx-glr-thumbcontainer" tooltip="MODFLOW6 supports unstructured grids. Unlike raster data, the connectivity of unstructured grids is irregular. This means that the number of neighboring cells is not constant; for structured grids, every cell has 4 neighbors (in 2D), or 6 neighbors (in 3D).">
 
 .. only:: html
 
@@ -120,7 +120,7 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="A powerful feature of xarray is `lazy evaluation`_. Lazy evaluation means that expressions are ...">
+    <div class="sphx-glr-thumbcontainer" tooltip="A powerful feature of xarray is `lazy evaluation`_. Lazy evaluation means that expressions are delayed until the results are needed. In a nutshell, lazy evaluation has the following advantages for us:">
 
 .. only:: html
 
@@ -137,7 +137,7 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="iMOD Python provides nice functionality to discretize your models into stress periods, dependin...">
+    <div class="sphx-glr-thumbcontainer" tooltip="iMOD Python provides nice functionality to discretize your models into stress periods, depending on the timesteps you assigned your boundary conditions. This functionality is activated with the create_time_discretization() method.">
 
 .. only:: html
 
@@ -154,7 +154,7 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Most MF6 packages have spatial data arrays as input. These arrays are discrete: they are define...">
+    <div class="sphx-glr-thumbcontainer" tooltip="Most MF6 packages have spatial data arrays as input. These arrays are discrete: they are defined over the simulation grid and contain values associated to each cell.">
 
 .. only:: html
 
@@ -171,7 +171,7 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="iMOD Python has multiple features to help you define the topsystem of the groundwater system. W...">
+    <div class="sphx-glr-thumbcontainer" tooltip="iMOD Python has multiple features to help you define the topsystem of the groundwater system. With &quot;topsystem&quot; we mean all forcings which act on the top of the groundwater system. These are usually either meteorological (precipitation &amp; evapotranspiration) or hydrological (rivers, ditches, lakes, sea) in nature. In MODFLOW6 these are usually simulated with the DRN, RIV, GHB, and RCH package. This data is usually provided as planar grids (x, y) without any vertical dimension. This user guide will show you how to allocate these forcings across model layers to grid cells and how to distribute conductances for Robin-like boundary conditions (RIV, DRN, GHB) over model layers. We will demonstrate this with the RIV package, as this package supports all options for allocating cells and distributing conductances. A subset of options are available for the DRN, GHB, and RCH packages.">
 
 .. only:: html
 

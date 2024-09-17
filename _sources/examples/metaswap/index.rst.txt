@@ -15,7 +15,7 @@ Modflow 6 models.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="The functionality to generate coupled models has been moved to the primod package. You can find...">
+    <div class="sphx-glr-thumbcontainer" tooltip="The functionality to generate coupled models has been moved to the primod package. You can find the example here">
 
 .. only:: html
 
@@ -32,7 +32,7 @@ Modflow 6 models.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="iMOD Python currently has no support for reading entire MetaSWAP models, however reading indivi...">
+    <div class="sphx-glr-thumbcontainer" tooltip="iMOD Python currently has no support for reading entire MetaSWAP models, however reading individual .inp files into a pandas DataFrame is possible.">
 
 .. only:: html
 

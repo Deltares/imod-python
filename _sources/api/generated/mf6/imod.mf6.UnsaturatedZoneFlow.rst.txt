@@ -20,6 +20,7 @@
       ~UnsaturatedZoneFlow.from_file
       ~UnsaturatedZoneFlow.get_non_grid_data
       ~UnsaturatedZoneFlow.get_period_varnames
+      ~UnsaturatedZoneFlow.get_regrid_methods
       ~UnsaturatedZoneFlow.is_clipping_supported
       ~UnsaturatedZoneFlow.is_empty
       ~UnsaturatedZoneFlow.is_grid_agnostic_package

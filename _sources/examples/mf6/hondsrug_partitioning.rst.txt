@@ -239,7 +239,7 @@ Load and plot the simulation results. Also plot the differences with the origina
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (3 minutes 55.337 seconds)
+   **Total running time of the script:** (4 minutes 2.369 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_hondsrug_partitioning.py:
@@ -255,6 +255,10 @@ Load and plot the simulation results. Also plot the differences with the origina
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: hondsrug_partitioning.py <hondsrug_partitioning.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: hondsrug_partitioning.zip <hondsrug_partitioning.zip>`
 
 
 .. only:: html

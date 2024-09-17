@@ -1,0 +1,30 @@
+﻿imod.mf6.regrid.StorageCoefficientRegridMethod
+==============================================
+
+.. currentmodule:: imod.mf6.regrid
+
+.. autoclass:: StorageCoefficientRegridMethod
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~StorageCoefficientRegridMethod.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~StorageCoefficientRegridMethod.convertible
+      ~StorageCoefficientRegridMethod.specific_yield
+      ~StorageCoefficientRegridMethod.storage_coefficient
+   
+   
