@@ -6,13 +6,14 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
-[Unreleased]
-------------
+0.17.2
+------
 
 Fixed
 ~~~~~
 - :func:`imod.formats.prj.open_projectfile_data` now reports the path to a
   faulty IPF or IDF file in the error message.
+- Support for Numpy 2.0
 
 Added
 ~~~~~
