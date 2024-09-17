@@ -79,8 +79,15 @@ Removed
   convert a structured simulation to an unstructured simulation, call:
   :meth:`imod.mf6.Modflow6Simulation.regrid_like`
 
-[Unreleased]
-------------
+
+[0.17.2] - 2024-09-17
+---------------------
+
+Fixed
+~~~~~
+- :func:`imod.formats.prj.open_projectfile_data` now reports the path to a
+  faulty IPF or IDF file in the error message.
+- Support for Numpy 2.0
 
 Added
 ~~~~~
