@@ -271,13 +271,16 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 if issubclass(type(pkg), GridAgnosticWell):
                     top, bottom, idomain = self.__get_domain_geometry()
                     k = self.__get_k()
+                    error_on_well_removal = (not pkg_write_context.is_partitioned) & (
+                        not pkg_write_context.is_from_imod5
+                    )
                     mf6_well_pkg = pkg.to_mf6_pkg(
                         idomain,
                         top,
                         bottom,
                         k,
                         validate,
-                        pkg_write_context.is_partitioned,
+                        error_on_well_removal,
                     )
                     mf6_well_pkg.write(
                         pkgname=pkg_name,

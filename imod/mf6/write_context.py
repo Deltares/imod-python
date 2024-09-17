@@ -44,6 +44,7 @@ class WriteContext:
             else self.__simulation_directory
         )
         self.__is_partitioned = False
+        self.__is_from_imod5 = False
 
     def get_formatted_write_directory(self) -> Path:
         """
@@ -98,3 +99,11 @@ class WriteContext:
     @is_partitioned.setter
     def is_partitioned(self, value: bool) -> None:
         self.__is_partitioned = value
+
+    @property
+    def is_from_imod5(self) -> bool:
+        return self.__is_from_imod5
+
+    @is_from_imod5.setter
+    def is_from_imod5(self, value: bool) -> None:
+        self.__is_from_imod5 = value
