@@ -341,9 +341,14 @@ def test_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
 
     # Act
     rch = imod.mf6.Recharge.from_imod5_data(data, target_discretization)
+    rendered_rch = rch.render(tmp_path, "rch", None, None)
 
     # Assert
-    rendered_rch = rch.render(tmp_path, "rch", None, None)
+    np.testing.assert_allclose(
+        data["rch"]["rate"].mean().values / 1e3,
+        rch.dataset["rate"].mean().values,
+        atol=1e-5,
+    )
     assert "maxbound 33856" in rendered_rch
     assert rendered_rch.count("begin period") == 1
     # teardown
@@ -369,9 +374,14 @@ def test_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
 
     # act
     rch = imod.mf6.Recharge.from_imod5_data(data, target_discretization)
+    rendered_rch = rch.render(tmp_path, "rch", [0, 1, 2], None)
 
     # assert
-    rendered_rch = rch.render(tmp_path, "rch", [0, 1, 2], None)
+    np.testing.assert_allclose(
+        data["rch"]["rate"].mean().values / 1e3,
+        rch.dataset["rate"].mean().values,
+        atol=1e-5,
+    )
     assert rendered_rch.count("begin period") == 3
     assert "maxbound 33856" in rendered_rch
 
@@ -399,9 +409,14 @@ def test_non_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
 
     # act
     rch = imod.mf6.Recharge.from_imod5_data(data, target_discretization)
+    rendered_rch = rch.render(tmp_path, "rch", None, None)
 
     # assert
-    rendered_rch = rch.render(tmp_path, "rch", None, None)
+    np.testing.assert_allclose(
+        data["rch"]["rate"].mean().values / 1e3,
+        rch.dataset["rate"].mean().values,
+        atol=1e-5,
+    )
     assert rendered_rch.count("begin period") == 1
     assert "maxbound 33856" in rendered_rch
 
@@ -430,8 +445,13 @@ def test_non_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
 
     # act
     rch = imod.mf6.Recharge.from_imod5_data(data, target_discretization)
+    rendered_rch = rch.render(tmp_path, "rch", [0, 1, 2], None)
 
     # assert
-    rendered_rch = rch.render(tmp_path, "rch", [0, 1, 2], None)
+    np.testing.assert_allclose(
+        data["rch"]["rate"].mean().values / 1e3,
+        rch.dataset["rate"].mean().values,
+        atol=1e-5,
+    )
     assert rendered_rch.count("begin period") == 3
     assert "maxbound 33856" in rendered_rch
