@@ -440,13 +440,13 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             )
 
         assigned_wells = self._assign_wells_to_layers(wells_df, active, top, bottom, k)
-        filterd_assigned_well_ids = self.gather_filtered_well_ids(
+        filtered_assigned_well_ids = self.gather_filtered_well_ids(
             assigned_wells, wells_df
         )
         message_assign = self.to_mf6_package_information(
-            filterd_assigned_well_ids, reason_text="permeability/thickness constraints"
+            filtered_assigned_well_ids, reason_text="permeability/thickness constraints"
         )
-        if error_on_well_removal and len(filterd_assigned_well_ids) > 0:
+        if error_on_well_removal and len(filtered_assigned_well_ids) > 0:
             logger.log(loglevel=LogLevel.ERROR, message=message_assign)
             raise ValidationError(message_assign)
 
