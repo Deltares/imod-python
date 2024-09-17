@@ -448,7 +448,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         )
         if error_on_well_removal and len(filterd_assigned_well_ids) > 0:
             logger.log(
-                loglevel=LogLevel.ERROR, message=message_assign, additional_depth=2
+                loglevel=LogLevel.ERROR, message=message_assign
             )
             raise ValidationError(message_assign)
 
