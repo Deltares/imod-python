@@ -43,7 +43,7 @@ Changed
 - :func:`imod.prepare.allocate_drn_cells`,
   :func:`imod.prepare.allocate_ghb_cells`,
   :func:`imod.prepare.allocate_riv_cells`, now allocate to the first model layer
-  when elevations are above model top for all methods in
+  when elevations are above or equal to model top for all methods in
   :func:`imod.prepare.ALLOCATION_OPTION`.
 - :meth:`imod.mf6.Well.to_mf6_pkg` got a new argument:
   ``strict_well_validation``, which controls the behavior for when wells are
