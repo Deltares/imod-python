@@ -31,7 +31,7 @@ class WriteContext:
     simulation_directory: Path = Path(".")
     use_binary: bool = False
     use_absolute_paths: bool = False
-    write_directory: Optional[Union[str, Path]] = None
+    write_directory: Path = None  # type: ignore
 
     def __post_init__(self):
         self.simulation_directory = Path(self.simulation_directory)
