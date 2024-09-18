@@ -42,7 +42,6 @@ unittests_jit = { cmd = [
     "--junitxml=unittest_jit_report.xml",
 ], depends_on = ["install"], cwd = "imod/tests" }
 examples = { cmd = [
-    "NUMBA_DISABLE_JIT=1",
     "pytest",
     "-n", "auto",
     "-m", "example",
