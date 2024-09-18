@@ -511,12 +511,12 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
     simulation.write(tmp_path, binary=False, validate=True)
 
     # Test if simulation attribute appropiately set
-    assert simulation._is_from_imod5 is True
+    assert simulation._validation_context.strict_well_validation is False
 
 
 @pytest.mark.unittest_jit
 @pytest.mark.usefixtures("imod5_dataset")
-def test_is_from_imod5_attribute(imod5_dataset):
+def test_from_imod5__strict_well_validation_set(imod5_dataset):
     imod5_data = imod5_dataset[0]
     period_data = imod5_dataset[1]
     default_simulation_allocation_options = SimulationAllocationOptions
@@ -531,8 +531,10 @@ def test_is_from_imod5_attribute(imod5_dataset):
         default_simulation_distributing_options,
         datelist,
     )
-    assert simulation._is_from_imod5 is True
-    assert Modflow6Simulation("test")._is_from_imod5 is False
+    assert simulation._validation_context.strict_well_validation is False
+    assert (
+        Modflow6Simulation("test")._validation_context.strict_well_validation is True
+    )
 
 
 @pytest.mark.unittest_jit
