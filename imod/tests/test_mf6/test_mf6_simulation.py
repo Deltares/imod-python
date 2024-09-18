@@ -532,9 +532,7 @@ def test_from_imod5__strict_well_validation_set(imod5_dataset):
         datelist,
     )
     assert simulation._validation_context.strict_well_validation is False
-    assert (
-        Modflow6Simulation("test")._validation_context.strict_well_validation is True
-    )
+    assert Modflow6Simulation("test")._validation_context.strict_well_validation is True
 
 
 @pytest.mark.unittest_jit
