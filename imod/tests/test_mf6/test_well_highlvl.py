@@ -12,6 +12,7 @@ import imod.tests
 import imod.tests.fixtures
 import imod.tests.fixtures.mf6_circle_fixture
 import imod.tests.fixtures.mf6_twri_fixture
+from imod.mf6.validation_context import ValidationContext
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.tests.fixtures.mf6_small_models_fixture import (
@@ -80,9 +81,10 @@ def test_write_well(tmp_path: Path, grid_data, grid_data_layered, reference_outp
     k = 100.0
     top = ones_like(active.sel(layer=1), dtype=np.float64)
     bottom = grid_data_layered(np.float64, -2.0, 10)
+    validation_context = ValidationContext(False)
     write_context = WriteContext(tmp_path)
-    mf6_pkg = well.to_mf6_pkg(
-        active, top, bottom, k, False, write_context.is_partitioned
+    mf6_pkg = well._to_mf6_pkg(
+        active, top, bottom, k, write_context, validation_context
     )
     mf6_pkg.write("packagename", globaltimes, write_context)
     assert pathlib.Path.exists(tmp_path / "packagename.wel")
