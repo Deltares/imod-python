@@ -345,10 +345,10 @@ class GroundwaterFlowModel(Modflow6Model):
                 period_data,
                 dis_pkg,
                 npf_pkg,
+                times[0],
+                times[-1],
                 allocation_options.drn,
                 distributing_option=distributing_options.drn,
-                time_min=times[0],
-                time_max=times[-1],
                 regridder_types=cast(
                     DrainageRegridMethod, regridder_types.get(drn_key)
                 ),
@@ -364,6 +364,7 @@ class GroundwaterFlowModel(Modflow6Model):
                 imod5_data,
                 period_data,
                 dis_pkg,
+                npf_pkg,
                 times[0],
                 times[-1],
                 allocation_options.riv,
