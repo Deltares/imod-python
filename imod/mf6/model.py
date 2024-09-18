@@ -27,6 +27,7 @@ from imod.mf6.utilities.mask import _mask_all_packages
 from imod.mf6.utilities.mf6hfb import merge_hfb_packages
 from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_like
 from imod.mf6.validation import pkg_errors_to_status_info
+from imod.mf6.validation_context import ValidationContext
 from imod.mf6.wel import GridAgnosticWell
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
@@ -240,7 +241,11 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
     @standard_log_decorator()
     def write(
-        self, modelname, globaltimes, validate: bool, write_context: WriteContext
+        self,
+        modelname,
+        globaltimes,
+        write_context: WriteContext,
+        validate_context: ValidationContext,
     ) -> StatusInfoBase:
         """
         Write model namefile
@@ -250,7 +255,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         workdir = write_context.simulation_directory
         modeldirectory = workdir / modelname
         Path(modeldirectory).mkdir(exist_ok=True, parents=True)
-        if validate:
+        if validate_context.validate:
             model_status_info = self.validate(modelname)
             if model_status_info.has_errors():
                 return model_status_info
@@ -271,16 +276,12 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 if issubclass(type(pkg), GridAgnosticWell):
                     top, bottom, idomain = self.__get_domain_geometry()
                     k = self.__get_k()
-                    error_on_well_removal = (not pkg_write_context.is_partitioned) & (
-                        not pkg_write_context.is_from_imod5
-                    )
-                    mf6_well_pkg = pkg.to_mf6_pkg(
+                    mf6_well_pkg = pkg._to_mf6_pkg(
                         idomain,
                         top,
                         bottom,
                         k,
-                        validate,
-                        error_on_well_removal,
+                        validate_context,
                     )
                     mf6_well_pkg.write(
                         pkgname=pkg_name,

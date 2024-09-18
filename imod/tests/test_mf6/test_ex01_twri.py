@@ -8,6 +8,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.mf6.validation_context import ValidationContext
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing.grid import ones_like
@@ -351,6 +352,7 @@ def test_gwfmodel_render(twri_model, tmp_path):
     globaltimes = simulation["time_discretization"]["time"].values
     gwfmodel = simulation["GWF_1"]
     path = Path(tmp_path.stem).as_posix()
+    validation_context = ValidationContext(tmp_path)
     write_context = WriteContext(tmp_path)
     actual = gwfmodel.render(path, write_context)
     expected = textwrap.dedent(
@@ -373,7 +375,7 @@ def test_gwfmodel_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    gwfmodel.write("GWF_1", globaltimes, True, write_context)
+    gwfmodel.write("GWF_1", globaltimes, write_context, validation_context)
     assert (tmp_path / "GWF_1" / "GWF_1.nam").is_file()
     assert (tmp_path / "GWF_1").is_dir()
 
