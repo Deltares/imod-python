@@ -13,6 +13,7 @@ from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.drn import Drainage
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
+from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.regrid.regrid_schemes import RiverRegridMethod
 from imod.mf6.utilities.regrid import (
     RegridderWeightsCache,
@@ -207,6 +208,7 @@ class River(BoundaryCondition, IRegridPackage):
         imod5_data: dict[str, dict[str, GridDataArray]],
         period_data: dict[str, list[datetime]],
         target_discretization: StructuredDiscretization,
+        target_npf: NodePropertyFlow,
         time_min: datetime,
         time_max: datetime,
         allocation_option_riv: ALLOCATION_OPTION,
@@ -264,6 +266,7 @@ class River(BoundaryCondition, IRegridPackage):
         target_top = target_discretization.dataset["top"]
         target_bottom = target_discretization.dataset["bottom"]
         target_idomain = target_discretization.dataset["idomain"]
+        target_k = target_npf.dataset["k"]
 
         # gather input data
         data = {
@@ -303,7 +306,7 @@ class River(BoundaryCondition, IRegridPackage):
                 conductance,
                 target_top,
                 target_bottom,
-                conductance,
+                target_k,
                 regridded_package_data["stage"],
                 regridded_package_data["bottom_elevation"],
             )
