@@ -276,7 +276,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 if issubclass(type(pkg), GridAgnosticWell):
                     top, bottom, idomain = self.__get_domain_geometry()
                     k = self.__get_k()
-                    mf6_well_pkg = pkg.to_mf6_pkg(
+                    mf6_well_pkg = pkg._to_mf6_pkg(
                         idomain,
                         top,
                         bottom,
