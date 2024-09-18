@@ -83,9 +83,7 @@ def test_write_well(tmp_path: Path, grid_data, grid_data_layered, reference_outp
     bottom = grid_data_layered(np.float64, -2.0, 10)
     validation_context = ValidationContext(False)
     write_context = WriteContext(tmp_path)
-    mf6_pkg = well._to_mf6_pkg(
-        active, top, bottom, k, validation_context
-    )
+    mf6_pkg = well._to_mf6_pkg(active, top, bottom, k, validation_context)
     mf6_pkg.write("packagename", globaltimes, write_context)
     assert pathlib.Path.exists(tmp_path / "packagename.wel")
     assert pathlib.Path.exists(tmp_path / "packagename" / "wel.dat")
