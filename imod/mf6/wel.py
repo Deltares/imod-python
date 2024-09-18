@@ -418,7 +418,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             Grid with hydraulic conductivities.
         validate: bool, default True
             Run validation before converting
-        strict_well_validation: bool, default False
+        strict_well_validation: bool, default True
             Set well validation strict:
             Throw error if well is removed entirely during its assignment to
             layers.
