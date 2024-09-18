@@ -48,7 +48,7 @@ Changed
 - :meth:`imod.mf6.Well.to_mf6_pkg` got a new argument:
   ``strict_well_validation``, which controls the behavior for when wells are
   removed entirely during their assignment to layers. This replaces the
-  ``is_partioned`` argument.
+  ``is_partitioned`` argument.
 
 Added
 ~~~~~
