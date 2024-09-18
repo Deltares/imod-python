@@ -363,10 +363,10 @@ def _compute_crosscut_thickness(
         corrected_thickness = thickness - (bc_bottom - bottom)
         # Set top layer to 1.0, where top exceeds bc_bottom
         top_layer_label = {"layer": min(top_layered.coords["layer"])}
-        is_above_surface = top_layered.loc[top_layer_label] < bc_bottom
+        is_below_surface = top_layered.loc[top_layer_label] > bc_bottom
         corrected_thickness.loc[top_layer_label] = corrected_thickness.loc[
             top_layer_label
-        ].where(is_above_surface, 1.0)
+        ].where(is_below_surface, 1.0)
         thickness = thickness.where(~lower_layer_bc, corrected_thickness)
 
     thickness = thickness.where(~outside, 0.0)
@@ -420,7 +420,7 @@ def _distribute_weights__by_corrected_transmissivity(
     # these to 1.0.
     top_layer_index = {"layer": min(top_layered.coords["layer"])}
     F_top_layer = F.loc[top_layer_index]
-    F.loc[top_layer_index] = F_top_layer.where(F_top_layer >= 0.0, 1.0)
+    F.loc[top_layer_index] = F_top_layer.where(F_top_layer > 0.0, 1.0)
 
     transmissivity_corrected = transmissivity * F
     return transmissivity_corrected / transmissivity_corrected.sum(dim="layer")
