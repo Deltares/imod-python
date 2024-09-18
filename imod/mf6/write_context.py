@@ -4,7 +4,6 @@ from copy import deepcopy
 from dataclasses import dataclass
 from os.path import relpath
 from pathlib import Path
-from typing import Optional, Union
 
 
 @dataclass
