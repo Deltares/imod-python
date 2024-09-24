@@ -1047,7 +1047,15 @@ def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
                 data, repeats = _read_package_ipf(block_content, periods)
             elif key == "(cap)":
                 variables = set(METASWAP_VARS).intersection(block_content.keys())
+                # check for optional ipf input 
+                read_ipf = False
+                if 'path' in block_content['artifical_recharge_layer'][0]:
+                    if 'ipf' in block_content['artifical_recharge_layer'][0]['path'].suffix.lower():
+                        variables.remove('artifical_recharge_layer')
+                        read_ipf = True
                 data = _open_package_idf(block_content, variables)
+                if read_ipf:
+                    data[0]['artifical_recharge_dataframe'] = imod.ipf.read(block_content['artifical_recharge_layer'][0]['path'])
             elif key in ("extra", "(pcg)"):
                 data = [block_content]
             elif key in KEYS:

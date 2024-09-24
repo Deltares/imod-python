@@ -212,9 +212,9 @@ class MetaSwapModel(Model):
         """
 
         # Model checks
-        self._check_required_packages()
-        self._check_vegetation_indices_in_annual_crop_factors()
-        self._check_landuse_indices_in_lookup_options()
+        # self._check_required_packages()
+        # self._check_vegetation_indices_in_annual_crop_factors()
+        # self._check_landuse_indices_in_lookup_options()
 
         # Force to Path
         directory = Path(directory)

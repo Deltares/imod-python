@@ -9,7 +9,6 @@ from imod.mf6.wel import WellDisStructured
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 
-
 class CouplerMapping(MetaSwapPackage):
     """
     This contains the data to connect MODFLOW 6 cells to MetaSWAP svats.
@@ -108,10 +107,9 @@ class CouplerMapping(MetaSwapPackage):
         well_column = self.well["column"] - 1
         well_layer = self.well["layer"] - 1
 
-        n_mod = self.idomain_active.sum()
-        mod_id = xr.full_like(self.idomain_active, 0, dtype=np.int64)
-        mod_id.values[self.idomain_active.values] = np.arange(1, n_mod + 1)
-
+        n_mod = self.idomain_active.sum().compute()
+        mod_id = xr.full_like(self.idomain_active, 0, dtype=np.int64).compute()
+        mod_id.values[self.idomain_active.values] = np.arange(1, n_mod + 1)   
         well_mod_id = mod_id[well_layer, well_row, well_column]
         well_mod_id = np.tile(well_mod_id, (n_subunit, 1))
 
