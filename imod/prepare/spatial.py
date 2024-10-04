@@ -48,15 +48,22 @@ def round_z(z_extent, dz):
 
 
 def _fill_np(data, invalid):
-    """Basic nearest neighbour interpolation"""
+    if invalid is None or np.isnan(invalid):
+        nodata = np.isnan(data)
+    else:
+        nodata = data == invalid
+    if not nodata.any():
+        return data.copy()
     # see: https://stackoverflow.com/questions/5551286/filling-gaps-in-a-numpy-array
-    ind = scipy.ndimage.distance_transform_edt(
-        invalid, return_distances=False, return_indices=True
+    indices = scipy.ndimage.distance_transform_edt(
+        input=nodata,
+        return_distances=False,
+        return_indices=True,
     )
-    return data[tuple(ind)]
+    return data[tuple(indices)]
 
 
-def fill(da, invalid=None, by=None):
+def fill(da, dims=("y", "x"), invalid=None):
     """
     Replace the value of invalid ``da`` cells (indicated by ``invalid``)
     using basic nearest neighbour interpolation.
@@ -65,14 +72,14 @@ def fill(da, invalid=None, by=None):
     ----------
     da: xr.DataArray with gaps
         array containing missing value
-    by: str, optional
-        dimension over which the array will be filled, one by one.
-        See the examples.
-
+    dims: sequence of str, optional, default is ("y", "x").
+        Dimensions along which to search for nearest neighbors. For example,
+        ("y", "x") will perform 2D interpolation in the horizontal plane, while
+        ("layer", "y", "x") will perform 3D interpolation including the
+        vertical dimension.
     invalid: xr.DataArray
-        a binary array of same shape as ``da``.
-        data value are replaced where invalid is True
-        If None (default), uses: `invalid = np.isnan(data)`
+        Which values to fill.
+        If None (default), uses: ``nodata = np.isnan(data)``
 
     Returns
     -------
@@ -91,24 +98,28 @@ def fill(da, invalid=None, by=None):
     neighbor in the last dimension is chosen (for rasters, that's generally x).
 
     A typical use case is filling a 3D array (layer, y, x), but only in the
-    horizontal dimensions. The ``by`` keyword can be used to do this:
+    horizontal dimensions. The ``dims`` keyword can be used to do control this:
 
-    >>> filled = imod.prepare.fill(da, by="layer")
+    >>> filled = imod.prepare.fill(da, dims=("y", "x"))
 
     In this case, the array is filled by one layer at a time.
+
+    To also incorporate nearest values across the layer dimension:
+
+    >>> filled = imod.prepare.fill(da, dims=("layer", "y", "x"))
     """
 
-    out = xr.full_like(da, np.nan)
-    if invalid is None:
-        invalid = np.isnan(da)
-    if by:
-        for coordvalue in da[by]:
-            d = {by: coordvalue}
-            out.sel(d)[...] = _fill_np(da.sel(d).values, invalid.sel(d).values)
-    else:
-        out.values = _fill_np(da.values, invalid.values)
-
-    return out
+    return xr.apply_ufunc(
+        _fill_np,
+        da,
+        input_core_dims=[dims],
+        output_core_dims=[dims],
+        output_dtypes=[da.dtype],
+        dask="parallelized",
+        vectorize=True,
+        keep_attrs=True,
+        kwargs={"invalid": invalid},
+    ).transpose(*da.dims)
 
 
 def laplace_interpolate(
