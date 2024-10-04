@@ -10,7 +10,7 @@ import xarray as xr
 from numpy.typing import DTypeLike
 
 import imod
-from imod.prepare import common, pcg
+from imod.prepare import common, laplace
 from imod.util.imports import MissingOptionalModule
 from imod.util.spatial import _polygonize
 
@@ -112,100 +112,75 @@ def fill(da, invalid=None, by=None):
 
 
 def laplace_interpolate(
-    source, ibound=None, close=0.01, mxiter=5, iter1=50, relax=0.98
+    source,
+    dims=("y", "x"),
+    direct=False,
+    delta=0.0,
+    relax=0.97,
+    atol=0.0,
+    rtol=1.0e-5,
+    maxiter=500,
 ):
     """
-    Fills gaps in `source` by interpolating from existing values using Laplace
-    interpolation.
+    Fills gaps in ``source`` (NaN values) by interpolating from existing values
+    using Laplace interpolation.
 
     Parameters
     ----------
-    source : xr.DataArray of floats with dims (y, x)
+    source : xr.DataArray of floats
         Data values to interpolate.
-    ibound : xr.DataArray of bool with dims (y, x)
-        Precomputed array which marks where to interpolate.
-    close : float
-        Closure criteration of iterative solver. Should be one to two orders
-        of magnitude smaller than desired accuracy.
-    mxiter : int
-        Outer iterations of iterative solver.
-    iter1 : int
-        Inner iterations of iterative solver. Should not exceed 50.
-    relax : float
-        Iterative solver relaxation parameter. Should be between 0 and 1.
+    dims: sequence of str, default is ``("y", "x")``.
+        Dimensions along which to search for nearest neighbors. For example,
+        ("y", "x") will perform 2D interpolation in the horizontal plane, while
+        ("layer", "y", "x") will perform 3D interpolation including the
+        vertical dimension.
+    direct: bool, optional, default ``False``
+        Whether to use a direct or an iterative solver or a conjugate gradient
+        solver. Direct method provides an exact answer, but are unsuitable
+        for large problems (> 10 000 unknowns).
+    delta: float, default 0.0.
+        ILU0 preconditioner non-diagonally dominant correction.
+    relax: float, default 0.97.
+        Modified ILU0 preconditioner relaxation factor.
+    rtol: float, optional, default 1.0e-5.
+        Convergence tolerance for ``scipy.sparse.linalg.cg``.
+    atol: float, optional, default 0.0.
+        Convergence tolerance for ``scipy.sparse.linalg.cg``.
+    maxiter: int, default 500.
+        Maximum number of iterations for ``scipy.sparse.linalg.cg``.
 
     Returns
     -------
-    interpolated : xr.DataArray with dims (y, x)
-        source, with interpolated values where ibound equals 1
+    interpolated : xr.DataArray
+        source, with interpolated values.
     """
-    solver = pcg.PreconditionedConjugateGradientSolver(
-        close, close * 1.0e6, mxiter, iter1, relax
-    )
-
-    if not source.dims == ("y", "x"):
-        raise ValueError('source dims must be ("y", "x")')
-
-    # expand dims to make 3d
-    source3d = source.expand_dims("layer")
-    if ibound is None:
-        iboundv = xr.full_like(source3d, 1, dtype=np.int32).values
-    else:
-        if not ibound.dims == ("y", "x"):
-            raise ValueError('ibound dims must be ("y", "x")')
-        if not ibound.shape == source.shape:
-            raise ValueError("ibound and source must have the same shape")
-        iboundv = ibound.expand_dims("layer").astype(np.int32).values
-
-    has_data = source3d.notnull().values
-    iboundv[has_data] = -1
-    hnew = source3d.fillna(0.0).values.astype(
-        np.float64
-    )  # Set start interpolated estimate to 0.0
-
-    shape = iboundv.shape
-    nlay, nrow, ncol = shape
-    nodes = nlay * nrow * ncol
-    # Allocate work arrays
-    # Not really used now, but might come in handy to implements weights
-    cc = np.ones(shape)
-    cr = np.ones(shape)
-    cv = np.ones(shape)
-    rhs = np.zeros(shape)
-    hcof = np.zeros(shape)
-    # Solver work arrays
-    res = np.zeros(nodes)
-    cd = np.zeros(nodes)
-    v = np.zeros(nodes)
-    ss = np.zeros(nodes)
-    p = np.zeros(nodes)
-
-    # Picard iteration
-    converged = False
-    outer_iteration = 0
-    while not converged and outer_iteration < mxiter:
-        # Mutates hnew
-        converged = solver.solve(
-            hnew=hnew,
-            cc=cc,
-            cr=cr,
-            cv=cv,
-            ibound=iboundv,
-            rhs=rhs,
-            hcof=hcof,
-            res=res,
-            cd=cd,
-            v=v,
-            ss=ss,
-            p=p,
-        )
-        outer_iteration += 1
-    else:
-        if not converged:
-            raise RuntimeError("Failed to converge")
-
-    hnew[iboundv == 0] = np.nan
-    return source.copy(data=hnew[0])
+    missing_dims = set(dims) - set(source.dims)
+    if missing_dims:
+        raise ValueError(f"Dimensions not in source: {missing_dims}")
+    # Ensure order matches the order in source.
+    dims = [dim for dim in source.dims if dim in dims]
+    shape = tuple(source.sizes[d] for d in dims)
+    connectivity = laplace._build_connectivity(shape)
+    arr = xr.apply_ufunc(
+        laplace._interpolate,
+        source,
+        input_core_dims=[dims],
+        output_core_dims=[dims],
+        output_dtypes=[source.dtype],
+        dask="parallelized",
+        vectorize=True,
+        keep_attrs=True,
+        kwargs={
+            "connectivity": connectivity,
+            "direct": direct,
+            "delta": delta,
+            "relax": relax,
+            "atol": atol,
+            "rtol": rtol,
+            "maxiter": maxiter,
+        },
+    ).transpose(*source.dims)
+    return arr
 
 
 def rasterize(geodataframe, like, column=None, fill=np.nan, **kwargs):
