@@ -97,6 +97,8 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         path to output cbc-file for UZF budgets
     budgetcsv_fileout: ({"str"}, optional)
         path to output csv-file for summed budgets
+    water_content_file: ({"str"}, optional)
+        path to output file for unsaturated zone water content
     observations: [Not yet supported.]
         Default is None.
     water_mover: [Not yet supported.]
@@ -233,6 +235,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         save_flows=False,
         budget_fileout=None,
         budgetcsv_fileout=None,
+        water_content_file=None,
         observations=None,
         water_mover=None,
         timeseries=None,
@@ -271,6 +274,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
             "save_flows": save_flows,
             "budget_fileout": budget_fileout,
             "budgetcsv_fileout": budgetcsv_fileout,
+            "water_content_file": water_content_file,
             "observations": observations,
             "water_mover": water_mover,
             "timeseries": timeseries,

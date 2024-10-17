@@ -6,6 +6,7 @@ import pytest
 import xarray as xr
 
 import imod
+import matplotlib.pyplot as plt
 
 
 @pytest.fixture(scope="module")
@@ -120,6 +121,7 @@ def uzf_model():
     uds["simulate_groundwater_seepage"] = True
     uds["save_flows"] = True
     uds["budget_fileout"] = "GWF_1/uzf.cbc"
+    uds["water_content_file"] = "GWF_1/uzf.wc"
 
     gwf_model["uzf"] = imod.mf6.UnsaturatedZoneFlow(**uds)
 
@@ -162,3 +164,16 @@ def test_simulation_write(uzf_model, tmp_path):
         assert np.allclose(
             budget_mf6["uzf-gwrch_uzf"], -budgets_uzf["gwf_gwf_1"], equal_nan=True
         )
+
+        kv_sat = simulation["GWF_1"]["uzf"]["kv_sat"]
+        nlay, nrow, ncol = kv_sat.shape
+        indices = np.arange(nlay * nrow * ncol)[kv_sat.notnull().to_numpy().flatten()]
+        water_content = imod.mf6.open_dvs("GWF_1/uzf.wc", "GWF_1/dis.dis.grb", indices)
+        not_active = xr.where(kv_sat.notnull(), False, True)
+        # should increase with constant recharge
+        assert (
+            water_content.fillna(0.0)[-1, :, 5, 5]
+            >= water_content.fillna(0.0)[0, :, 5, 5]
+        ).all()
+        # should be nan if no uzf-package is defined
+        assert water_content.where(not_active).isnull().all()

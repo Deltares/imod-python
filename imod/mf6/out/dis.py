@@ -128,7 +128,7 @@ def read_name_dvs(path: FilePath) -> str:
     with open(path, "rb") as f:
         f.seek(24)
         name = struct.unpack("16s", f.read(16))[0]
-    return name
+    return name.decode().strip()
 
 
 def read_hds_timestep(
