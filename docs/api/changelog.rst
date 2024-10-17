@@ -6,6 +6,15 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+Unreleased
+------
+
+Added
+~~~~~
+- Added function :func:`imod.mf6.open_dvs` to read depended varibale output files like the water content file of `imod.mf6.uzf`
+
+
+
 0.17.2
 ------
 
