@@ -101,9 +101,7 @@ def read_times(
     return times
 
 
-def read_times_dvs(
-    path: FilePath, ntime: int, indices: np.ndarray
-) -> FloatArray:
+def read_times_dvs(path: FilePath, ntime: int, indices: np.ndarray) -> FloatArray:
     """
     Reads all total simulation times.
     """
@@ -113,11 +111,7 @@ def read_times_dvs(
     start_of_header = 16
     rest_of_header = 28
     data_single_layer = indices.size * 8
-    nskip = (
-        rest_of_header
-        + data_single_layer
-        + start_of_header
-    )
+    nskip = rest_of_header + data_single_layer + start_of_header
 
     with open(path, "rb") as f:
         f.seek(start_of_header)
@@ -127,9 +121,7 @@ def read_times_dvs(
     return times
 
 
-def read_name_dvs(
-    path: FilePath
-) -> str:
+def read_name_dvs(path: FilePath) -> str:
     """
     Reads variable name from first header in file.
     """
@@ -169,9 +161,7 @@ def read_dvs_timestep(
         f.seek(pos)
         a1d = np.full(nlayer * nrow * ncol, dtype=np.float64, fill_value=np.nan)
         f.seek(52, 1)  # skip kstp, kper, pertime
-        a1d[indices] = np.fromfile(
-            f, np.float64, indices.size
-        )        
+        a1d[indices] = np.fromfile(f, np.float64, indices.size)
     return a1d.reshape((nlayer, nrow, ncol))
 
 
@@ -221,7 +211,7 @@ def open_dvs(
     ntime = filesize // (52 + (indices.size * 8))
     times = read_times_dvs(path, ntime, indices)
     dv_name = read_name_dvs(path)
-    
+
     coords = grid_info["coords"]
     coords["time"] = times
 
