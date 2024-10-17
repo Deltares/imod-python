@@ -144,9 +144,9 @@ def test_dis_indices__single_column():
     # +---+
     # | 4 |
     # +---+
-    
     ia = np.array([1, 2, 4, 6, 7])
     ja = np.array([2, 1, 3, 2, 4, 3])
+    # nja index      0  1  2  3  4  5
     ncells = 4
     nlayer = 1
     nrow = 4
@@ -156,22 +156,25 @@ def test_dis_indices__single_column():
     )
     assert right.shape == front.shape == lower.shape == (nlayer, nrow, ncol)
     assert (lower == -1).all()  # No lower connections
-    right_expected = np.array(
-        [
-            [-1, -1, -1, -1],
-        ]
-    )
-    assert (right == -1).all()
+    assert (right == -1).all()  # No right connections
     front_expected = np.array(
         [
-            [2,],
-            [3,],
-            [4,],
-            [-1,],
+            [
+                0,
+            ],
+            [
+                2,
+            ],
+            [
+                4,
+            ],
+            [
+                -1,
+            ],
         ]
     )
     assert np.allclose(front[0], front_expected)
-    
+
 
 def test_dis_indices__idomain():
     # Note: ia and ja use 1-based indexing as produced by modflow6!
