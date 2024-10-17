@@ -209,15 +209,15 @@ def test_dis_indices__idomain():
     right, front, lower = imod.mf6.out.dis.dis_indices(
         ia, ja, ncells, nlayer, nrow, ncol
     )
-    assert (front == -1).all()  # No front connections
-    right_expected = np.array(
+    assert (right == -1).all()  # No right connection
+    front_expected = np.array(
         [
             [0, 3, -1],
             [-1, -1, -1],
             [9, 12, -1],
         ]
     )
-    assert np.allclose(right.reshape(nlayer, nrow), right_expected)
+    assert np.allclose(front.reshape(nlayer, nrow), front_expected)
     lower_expected = np.array(
         [
             [1, 4, -1],
