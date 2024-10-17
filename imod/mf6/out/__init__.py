@@ -69,6 +69,10 @@ _OPEN_CBC: Dict[str, Callable] = {
     "disu": disu.open_cbc,
 }
 
+_OPEN_DVS = {
+    "dis": dis.open_dvs,
+}
+
 
 def _get_function(d: Dict[str, Callable], key: str) -> Callable:
     try:
@@ -151,6 +155,55 @@ def open_hds(
     distype = grb_content["distype"]
     _open = _get_function(_OPEN_HDS, distype)
     return _open(hds_path, grb_content, dry_nan, simulation_start_time, time_unit)
+
+
+def open_dvs(
+    dvs_path: FilePath,
+    grb_path: FilePath,
+    indices: np.ndarray,
+    simulation_start_time: Optional[np.datetime64] = None,
+    time_unit: Optional[str] = "d",
+) -> GridDataArray:
+    """
+    Open modflow6 dependent variable output for complex packages (like the watercontent file for the UZF-package).
+
+    The data is lazily read per timestep and automatically converted into
+    (dense) xr.DataArrays or xu.UgridDataArrays, for DIS and DISV respectively.
+    The conversion is done via the information stored in the Binary Grid file
+    (GRB).
+
+
+    Parameters
+    ----------
+    dsv_path: Union[str, pathlib.Path]
+    grb_path: Union[str, pathlib.Path]
+    indices: np.ndarray
+        The indices to map dvs variable to model nodes
+    simulation_start_time : Optional datetime
+        The time and date correpsonding to the beginning of the simulation.
+        Use this to convert the time coordinates of the output array to
+        calendar time/dates. time_unit must also be present if this argument is present.
+    time_unit: Optional str
+        The time unit MF6 is working in, in string representation.
+        Only used if simulation_start_time was provided.
+        Admissible values are:
+        ns -> nanosecond
+        ms -> microsecond
+        s -> second
+        m -> minute
+        h -> hour
+        d -> day
+        w -> week
+        Units "month" or "year" are not supported, as they do not represent unambiguous timedelta values durations.
+
+    Returns
+    -------
+    dvs : Union[xr.DataArray, xu.UgridDataArray]
+    """
+    grb_content = read_grb(grb_path)
+    distype = grb_content["distype"]
+    _open = _get_function(_OPEN_DVS, distype)
+    return _open(dvs_path, grb_content, indices, simulation_start_time, time_unit)
 
 
 def open_conc(

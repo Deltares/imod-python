@@ -101,6 +101,44 @@ def read_times(
     return times
 
 
+def read_times_dvs(
+    path: FilePath, ntime: int, indices: np.ndarray
+) -> FloatArray:
+    """
+    Reads all total simulation times.
+    """
+    times = np.empty(ntime, dtype=np.float64)
+
+    # Compute how much to skip to the next timestamp
+    start_of_header = 16
+    rest_of_header = 28
+    data_single_layer = indices.size * 8
+    nskip = (
+        rest_of_header
+        + data_single_layer
+        + start_of_header
+    )
+
+    with open(path, "rb") as f:
+        f.seek(start_of_header)
+        for i in range(ntime):
+            times[i] = struct.unpack("d", f.read(8))[0]  # total simulation time
+            f.seek(nskip, 1)
+    return times
+
+
+def read_name_dvs(
+    path: FilePath
+) -> str:
+    """
+    Reads variable name from first header in file.
+    """
+    with open(path, "rb") as f:
+        f.seek(24)
+        name = struct.unpack("16s", f.read(16))[0]
+    return name
+
+
 def read_hds_timestep(
     path: FilePath, nlayer: int, nrow: int, ncol: int, dry_nan: bool, pos: int
 ) -> FloatArray:
@@ -119,6 +157,22 @@ def read_hds_timestep(
 
     a3d = a1d.reshape((nlayer, nrow, ncol))
     return _to_nan(a3d, dry_nan)
+
+
+def read_dvs_timestep(
+    path: FilePath, nlayer: int, nrow: int, ncol: int, pos: int, indices: np.ndarray
+) -> FloatArray:
+    """
+    Reads all values of one timestep.
+    """
+    with open(path, "rb") as f:
+        f.seek(pos)
+        a1d = np.full(nlayer * nrow * ncol, dtype=np.float64, fill_value=np.nan)
+        f.seek(52, 1)  # skip kstp, kper, pertime
+        a1d[indices] = np.fromfile(
+            f, np.float64, indices.size
+        )        
+    return a1d.reshape((nlayer, nrow, ncol))
 
 
 def open_hds(
@@ -147,6 +201,42 @@ def open_hds(
     daskarr = dask.array.stack(dask_list, axis=0)
     data_array = xr.DataArray(
         daskarr, coords, ("time", "layer", "y", "x"), name=grid_info["name"]
+    )
+    if simulation_start_time is not None:
+        data_array = assign_datetime_coords(
+            data_array, simulation_start_time, time_unit
+        )
+    return data_array
+
+
+def open_dvs(
+    path: FilePath,
+    grid_info: Dict[str, Any],
+    indices: np.ndarray,
+    simulation_start_time: Optional[np.datetime64] = None,
+    time_unit: Optional[str] = "d",
+) -> xr.DataArray:
+    nlayer, nrow, ncol = grid_info["nlayer"], grid_info["nrow"], grid_info["ncol"]
+    filesize = os.path.getsize(path)
+    ntime = filesize // (52 + (indices.size * 8))
+    times = read_times_dvs(path, ntime, indices)
+    dv_name = read_name_dvs(path)
+    
+    coords = grid_info["coords"]
+    coords["time"] = times
+
+    dask_list = []
+    # loop over times and add delayed arrays
+    for i in range(ntime):
+        # TODO verify dimension order
+        pos = i * (52 + indices.size * 8)
+        a = dask.delayed(read_dvs_timestep)(path, nlayer, nrow, ncol, pos, indices)
+        x = dask.array.from_delayed(a, shape=(nlayer, nrow, ncol), dtype=np.float64)
+        dask_list.append(x)
+
+    daskarr = dask.array.stack(dask_list, axis=0)
+    data_array = xr.DataArray(
+        daskarr, coords, ("time", "layer", "y", "x"), name=dv_name
     )
     if simulation_start_time is not None:
         data_array = assign_datetime_coords(
