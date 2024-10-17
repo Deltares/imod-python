@@ -233,7 +233,7 @@ def rasterize(geodataframe, like, column=None, fill=np.nan, **kwargs):
     """
 
     if column is not None:
-        shapes = list(zip(geodataframe.geometry, geodataframe[column]))
+        shapes = list(zip(geodataframe.geometry, geodataframe[column].astype(dtype=np.float64)))
     else:
         shapes = list(geodataframe.geometry)
 

@@ -187,10 +187,10 @@ class Drainage(BoundaryCondition, IRegridPackage):
         period_data: dict[str, list[datetime]],
         target_discretization: StructuredDiscretization,
         target_npf: NodePropertyFlow,
-        allocation_option: ALLOCATION_OPTION,
-        distributing_option: DISTRIBUTING_OPTION,
         time_min: datetime,
         time_max: datetime,
+        allocation_option: ALLOCATION_OPTION,
+        distributing_option: DISTRIBUTING_OPTION,
         regridder_types: Optional[DrainageRegridMethod] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "Drainage":

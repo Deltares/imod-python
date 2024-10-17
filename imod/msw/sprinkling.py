@@ -22,8 +22,11 @@ class Sprinkling(MetaSwapPackage):
     max_abstraction_surfacewater: array of floats (xr.DataArray)
         Describes the maximum abstraction of surfacewater to SVAT units in m3
         per day. This array must not have a subunit coordinate.
+    well_id: array of int (xr.DataArray) 
+        Describes per svat the corresponing id of the well package
+        from which water is extracted.
     well: WellDisStructured
-        Describes the sprinkling of SVAT units coming groundwater.
+        Describes the source location for groundwater intake.
     """
 
     _file_name = "scap_svat.inp"
@@ -33,21 +36,19 @@ class Sprinkling(MetaSwapPackage):
         "max_abstraction_surfacewater_mm_d": VariableMetaData(8, None, None, str),
         "max_abstraction_groundwater_m3_d": VariableMetaData(8, 0.0, 1e9, float),
         "max_abstraction_surfacewater_m3_d": VariableMetaData(8, 0.0, 1e9, float),
-        "svat_groundwater": VariableMetaData(10, None, None, str),
+        "svat_groundwater": VariableMetaData(10, 1, 99999999, int),
         "layer": VariableMetaData(6, 1, 9999, int),
         "trajectory": VariableMetaData(10, None, None, str),
     }
 
-    _with_subunit = ()
-    _without_subunit = (
+    _with_subunit = (        
         "max_abstraction_groundwater_m3_d",
-        "max_abstraction_surfacewater_m3_d",
-    )
+        "max_abstraction_surfacewater_m3_d",)
+    _without_subunit = ()
 
     _to_fill = (
         "max_abstraction_groundwater_mm_d",
         "max_abstraction_surfacewater_mm_d",
-        "svat_groundwater",
         "trajectory",
     )
 
@@ -62,27 +63,74 @@ class Sprinkling(MetaSwapPackage):
         self.dataset["max_abstraction_surfacewater_m3_d"] = max_abstraction_surfacewater
         self.well = well
 
-        self._pkgcheck()
+        self._pkgcheck()    
+
 
     def _render(self, file, index, svat):
         well_row = self.well["row"] - 1
+        layer = self.well["layer"]
+        max_rate = self.dataset["max_abstraction_groundwater_m3_d"]
+        
+        svat_source_target = svat.where(max_rate > 0).to_numpy()
+        svat_source_target = svat_source_target[np.isfinite(svat_source_target)].astype(dtype=np.int32)
+
+        if svat_source_target.size != well_row.size:
+            raise ValueError('Provided well-pacakge does not correspond with the abstraction rate')
+
+        data_dict = {"svat": svat_source_target, "layer": layer, "svat_groundwater": svat_source_target}
+
+        for var in self._with_subunit:
+            array = self.dataset[var].where(max_rate > 0).to_numpy()
+            array = array[np.isfinite(array)]
+            data_dict[var] = array
+
+        for var in self._to_fill:
+            data_dict[var] = ""
+
+        dataframe = pd.DataFrame(
+            data=data_dict, columns=list(self._metadata_dict.keys())
+        )
+        
+        self._check_range(dataframe)
+
+        return self.write_dataframe_fixed_width(file, dataframe)
+
+
+class SprinklingMultipleSources(Sprinkling):
+    
+    def __init__(
+        self,
+        max_abstraction_groundwater: xr.DataArray,
+        max_abstraction_surfacewater: xr.DataArray,
+        well: WellDisStructured,
+        well_id: xr.DataArray
+    ):
+        super().__init__(max_abstraction_groundwater, max_abstraction_surfacewater, well)
+        self.well_id = well_id
+        
+        
+    def _render(self, file, index, svat):
+        well_row = self.well["row"] - 1
         well_column = self.well["column"] - 1
-        well_layer = self.well["layer"]
+        layer_source = self.well["layer"]
+        max_rate = self.dataset["max_abstraction_groundwater_m3_d"]
+        
+        svat_target = svat.where(max_rate > 0).to_numpy()
+        svat_target = svat_target[np.isfinite(svat_target)].astype(dtype=np.int32)
+        
+        well_id = self.well_id.where(max_rate > 0).to_numpy()
+        well_id = well_id[np.isfinite(well_id)].astype(dtype=np.int32)
+        
+        # always use the first svat as source
+        svat_source = svat.to_numpy()[0, well_row[well_id], well_column[well_id]]
+        layer_source = layer_source[well_id]
 
-        n_subunit = svat["subunit"].size
+        data_dict = {"svat": svat_target, "layer": layer_source, "svat_groundwater": svat_source}
 
-        well_svat = svat.values[:, well_row, well_column]
-        well_active = well_svat != 0
-
-        # Tile well_layers for each subunit
-        layer = np.tile(well_layer, (n_subunit, 1))
-
-        data_dict = {"svat": well_svat[well_active], "layer": layer[well_active]}
-
-        for var in self._without_subunit:
-            well_arr = self.dataset[var].values[well_row, well_column]
-            well_arr = np.tile(well_arr, (n_subunit, 1))
-            data_dict[var] = well_arr[well_active]
+        for var in self._with_subunit:
+            array = self.dataset[var].where(max_rate > 0).to_numpy()
+            array = array[np.isfinite(array)]
+            data_dict[var] = array
 
         for var in self._to_fill:
             data_dict[var] = ""
