@@ -307,7 +307,7 @@ def dis_indices(
             d = j - i
             if d <= 0:  # left, back, upper
                 continue
-            elif d == 1:  # right neighbor
+            elif d == 1 and ncol > 1:  # right neighbor
                 right[i] = nzi
             elif d == ncol:  # front neighbor
                 front[i] = nzi
