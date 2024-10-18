@@ -215,12 +215,16 @@ def test_simulation_write_disv(uzf_model, tmp_path):
     simulation.write(modeldir, validate=True, binary=False)
     with imod.util.cd(modeldir):
         simulation.run()
-        budget_mf6 = imod.mf6.open_cbc("GWF_1/GWF_1.cbc", "GWF_1/disv.disv.grb", flowja=True)
+        budget_mf6 = imod.mf6.open_cbc(
+            "GWF_1/GWF_1.cbc", "GWF_1/disv.disv.grb", flowja=True
+        )
         budgets_uzf = imod.mf6.open_cbc("GWF_1/uzf.cbc", "GWF_1/disv.disv.grb")
         assert ("time", "layer", "mesh2d_nFaces") == budgets_uzf["gwf_gwf_1"].dims
         assert (47, 7, 81) == budgets_uzf["gwf_gwf_1"].shape
         assert np.allclose(
-            budget_mf6["uzf-gwrch_uzf"].obj, -budgets_uzf["gwf_gwf_1"].obj, equal_nan=True
+            budget_mf6["uzf-gwrch_uzf"].obj,
+            -budgets_uzf["gwf_gwf_1"].obj,
+            equal_nan=True,
         )
         kv_sat = simulation["GWF_1"]["uzf"]["kv_sat"]
         nlay, nnodes = kv_sat.shape
