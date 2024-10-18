@@ -11,9 +11,7 @@ Unreleased
 
 Added
 ~~~~~
-- Added function :func:`imod.mf6.open_dvs` to read depended varibale output files like the water content file of `imod.mf6.uzf`
-
-
+- Added function :func:`imod.mf6.open_dvs` to read dependent variable output files like the water content file of :class:`imod.mf6.UnsaturatedZoneFlow`
 
 0.17.2
 ------

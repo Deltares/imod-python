@@ -172,7 +172,6 @@ def open_dvs(
     The conversion is done via the information stored in the Binary Grid file
     (GRB).
 
-
     Parameters
     ----------
     dsv_path: Union[str, pathlib.Path]
