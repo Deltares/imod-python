@@ -4,9 +4,12 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+import xugrid as xu
 
 import imod
 import matplotlib.pyplot as plt
+
+import imod.mf6.simulation
 
 
 @pytest.fixture(scope="module")
@@ -146,6 +149,91 @@ def uzf_model():
     return simulation
 
 
+def uzf_model_disv(uzf_model) -> imod.mf6.Modflow6Simulation:
+    def toface(da):
+        return imod.util.spatial.ugrid2d_data(da, grid.face_dimension)
+
+    simulation = uzf_model
+    idomain = simulation["GWF_1"]["dis"]["idomain"]
+    bottom = simulation["GWF_1"]["dis"]["bottom"]
+    top = simulation["GWF_1"]["dis"]["top"]
+
+    icelltype = simulation["GWF_1"]["npf"]["icelltype"]
+    k = simulation["GWF_1"]["npf"]["k"]
+    k33 = simulation["GWF_1"]["npf"]["k33"]
+
+    chd = simulation["GWF_1"]["chd"]["head"]
+
+    grid = xu.Ugrid2d.from_structured(idomain)
+    idomain = xu.UgridDataArray(toface(idomain), grid)
+    icelltype = xu.UgridDataArray(toface(icelltype), grid)
+    chd = xu.UgridDataArray(toface(chd), grid)
+
+    simulation["GWF_1"].pop("dis")
+    simulation["GWF_1"]["disv"] = imod.mf6.VerticesDiscretization(top, bottom, idomain)
+
+    simulation["GWF_1"]["chd"] = imod.mf6.ConstantHead(
+        chd, print_input=True, print_flows=True, save_flows=True
+    )
+    simulation["GWF_1"]["npf"] = imod.mf6.NodePropertyFlow(
+        icelltype=icelltype,
+        k=k,
+        k33=k33,
+        variable_vertical_conductance=False,
+        dewatered=False,
+        perched=False,
+        save_flows=True,
+    )
+
+    uds = {}
+    UZF_GRID_VARS = [
+        "kv_sat",
+        "theta_sat",
+        "theta_res",
+        "theta_init",
+        "epsilon",
+        "surface_depression_depth",
+        "infiltration_rate",
+        "et_pot",
+        "extinction_depth",
+    ]
+    for var_name in UZF_GRID_VARS:
+        sda = simulation["GWF_1"]["uzf"][var_name]
+        uda = xu.UgridDataArray(toface(sda), grid)
+        uds[var_name] = uda
+    uds["save_flows"] = True
+    uds["budget_fileout"] = "GWF_1/uzf.cbc"
+    uds["water_content_file"] = "GWF_1/uzf.wc"
+    simulation["GWF_1"].pop("uzf")
+    simulation["GWF_1"]["uzf"] = imod.mf6.UnsaturatedZoneFlow(**uds)
+    return simulation
+
+
+def test_simulation_write_disv(uzf_model, tmp_path):
+    simulation = uzf_model_disv(uzf_model)
+    modeldir = tmp_path / "uzf_model"
+    simulation.write(modeldir, validate=True, binary=False)
+    with imod.util.cd(modeldir):
+        simulation.run()
+        budgets_uzf = imod.mf6.open_cbc("GWF_1/uzf.cbc", "GWF_1/disv.disv.grb")
+        assert ("time", "layer", "mesh2d_nFaces") == budgets_uzf["gwf_gwf_1"].dims
+        assert (47, 7, 81) == budgets_uzf["gwf_gwf_1"].shape
+        kv_sat = simulation["GWF_1"]["uzf"]["kv_sat"]
+        nlay, nnodes = kv_sat.shape
+        indices = np.arange(nlay * nnodes)[kv_sat.notnull().to_numpy().flatten()]
+        water_content = imod.mf6.open_dvs(
+            "GWF_1/uzf.wc", "GWF_1/disv.disv.grb", indices
+        )
+        not_active = xr.where(kv_sat.obj.notnull(), False, True)
+        # should increase with constant recharge
+        assert (
+            water_content.fillna(0.0)[-1, :, 5 * 5]
+            >= water_content.fillna(0.0)[0, :, 5 * 5]
+        ).all()
+        # should be nan if no uzf-package is defined
+        assert water_content.obj.where(not_active).isnull().all()
+
+
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_write(uzf_model, tmp_path):
     simulation = uzf_model
@@ -159,7 +247,7 @@ def test_simulation_write(uzf_model, tmp_path):
         meanhead = head.mean().values
         mean_answer = -1.54998241
         assert np.allclose(meanhead, mean_answer)
-        budget_mf6 = head = imod.mf6.open_cbc("GWF_1/GWF_1.cbc", "GWF_1/dis.dis.grb")
+        budget_mf6 = imod.mf6.open_cbc("GWF_1/GWF_1.cbc", "GWF_1/dis.dis.grb")
         budgets_uzf = imod.mf6.open_cbc("GWF_1/uzf.cbc", "GWF_1/dis.dis.grb")
         assert np.allclose(
             budget_mf6["uzf-gwrch_uzf"], -budgets_uzf["gwf_gwf_1"], equal_nan=True

@@ -1,5 +1,6 @@
 import numpy as np
 import xarray as xr
+import xugrid as xu
 
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import AdvancedBoundaryCondition, BoundaryCondition
@@ -305,7 +306,10 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         for var in self._period_data:
             if self.dataset[var].size == 1:  # Prevent loading large arrays in memory
                 if self.dataset[var].values[()] is None:
-                    self.dataset[var] = xr.full_like(self["infiltration_rate"], 0.0)
+                    if isinstance(self["infiltration_rate"], xu.UgridDataArray):
+                        self.dataset[var] = xu.full_like(self["infiltration_rate"], 0)
+                    else:
+                        self.dataset[var] = xr.full_like(self["infiltration_rate"], 0.0)
                 else:
                     raise ValueError("{} cannot be a scalar".format(var))
 
@@ -383,9 +387,12 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
 
         field_spec = self._get_field_spec_from_dtype(recarr)
         field_names = [i[0] for i in field_spec]
-        index_spec = [("iuzno", np.int32)] + field_spec[:3]
+        n = 3
+        if isinstance(self.dataset, xu.UgridDataset):
+            n = 2
+        index_spec = [("iuzno", np.int32)] + field_spec[:n]
         field_spec = (
-            [("landflag", np.int32)] + [("ivertcon", np.int32)] + field_spec[3:]
+            [("landflag", np.int32)] + [("ivertcon", np.int32)] + field_spec[n:]
         )
         sparse_dtype = np.dtype(index_spec + field_spec)
 
