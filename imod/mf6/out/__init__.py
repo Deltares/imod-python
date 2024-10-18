@@ -71,6 +71,8 @@ _OPEN_CBC: Dict[str, Callable] = {
 
 _OPEN_DVS = {
     "dis": dis.open_dvs,
+    "disv": disv.open_dvs,
+    "disu": disu.open_dvs,
 }
 
 
@@ -171,6 +173,7 @@ def open_dvs(
     (dense) xr.DataArrays or xu.UgridDataArrays, for DIS and DISV respectively.
     The conversion is done via the information stored in the Binary Grid file
     (GRB).
+
 
     Parameters
     ----------
