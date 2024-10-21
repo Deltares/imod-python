@@ -207,7 +207,7 @@ class River(BoundaryCondition, IRegridPackage):
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
         period_data: dict[str, list[datetime]],
-        target_discretization: StructuredDiscretization,
+        target_dis: StructuredDiscretization,
         target_npf: NodePropertyFlow,
         time_min: datetime,
         time_max: datetime,
@@ -235,7 +235,7 @@ class River(BoundaryCondition, IRegridPackage):
         period_data: dict
             Dictionary with iMOD5 period data. This can be constructed from the
             :func:`imod.formats.prj.open_projectfile_data` method.
-        target_discretization:  StructuredDiscretization package
+        target_dis:  StructuredDiscretization package
             The grid that should be used for the new package. Does not
             need to be identical to one of the input grids.
         time_min: datetime
@@ -263,9 +263,9 @@ class River(BoundaryCondition, IRegridPackage):
 
         logger = logging.logger
         # gather discretrizations
-        target_top = target_discretization.dataset["top"]
-        target_bottom = target_discretization.dataset["bottom"]
-        target_idomain = target_discretization.dataset["idomain"]
+        target_top = target_dis.dataset["top"]
+        target_bottom = target_dis.dataset["bottom"]
+        target_idomain = target_dis.dataset["idomain"]
         target_k = target_npf.dataset["k"]
 
         # gather input data

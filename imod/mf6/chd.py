@@ -155,7 +155,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         cls,
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        target_discretization: StructuredDiscretization,
+        target_dis: StructuredDiscretization,
         regridder_types: Optional[ConstantHeadRegridMethod] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "ConstantHead":
@@ -183,7 +183,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         imod5_data: dict
             Dictionary with iMOD5 data. This can be constructed from the
             :func:`imod.formats.prj.open_projectfile_data` method.
-        target_discretization:  StructuredDiscretization package
+        target_dis:  StructuredDiscretization package
             The grid that should be used for the new package. Does not
             need to be identical to one of the input grids.
         regridder_types: RegridMethodType, optional
@@ -197,7 +197,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         return cls._from_head_data(
             imod5_data[key]["head"],
             imod5_data["bnd"]["ibound"],
-            target_discretization,
+            target_dis,
             regridder_types,
             regrid_cache,
         )
@@ -207,7 +207,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
     def from_imod5_shd_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        target_discretization: StructuredDiscretization,
+        target_dis: StructuredDiscretization,
         regridder_types: Optional[ConstantHeadRegridMethod] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "ConstantHead":
@@ -230,7 +230,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         imod5_data: dict
             Dictionary with iMOD5 data. This can be constructed from the
             :func:`imod.formats.prj.open_projectfile_data` method.
-        target_discretization:  StructuredDiscretization package
+        target_dis:  StructuredDiscretization package
             The grid that should be used for the new package. Does not
             need to be identical to one of the input grids.
         regridder_types: ConstantHeadRegridMethod, optional
@@ -247,7 +247,7 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         return cls._from_head_data(
             imod5_data["shd"]["head"],
             imod5_data["bnd"]["ibound"],
-            target_discretization,
+            target_dis,
             regridder_types,
             regrid_cache,
         )
@@ -257,11 +257,11 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
         cls,
         head: GridDataArray,
         ibound: GridDataArray,
-        target_discretization: StructuredDiscretization,
+        target_dis: StructuredDiscretization,
         regridder_types: Optional[ConstantHeadRegridMethod] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "ConstantHead":
-        target_idomain = target_discretization.dataset["idomain"]
+        target_idomain = target_dis.dataset["idomain"]
 
         if regridder_types is None:
             regridder_types = ConstantHead.get_regrid_methods()
