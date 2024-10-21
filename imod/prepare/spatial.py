@@ -63,7 +63,7 @@ def _fill_np(data, invalid):
     return data[tuple(indices)]
 
 
-def fill(da, dims=("y", "x"), invalid=None):
+def fill(da, invalid=None, dims=("y", "x")):
     """
     Replace the value of invalid ``da`` cells (indicated by ``invalid``)
     using basic nearest neighbour interpolation.
