@@ -7,8 +7,6 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-import matplotlib.pyplot as plt
-
 import imod.mf6.simulation
 
 

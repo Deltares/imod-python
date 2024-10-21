@@ -3,7 +3,6 @@ import struct
 from typing import Any, BinaryIO, Dict, List, Optional, Tuple, cast
 
 import dask
-import numba
 import numpy as np
 import scipy.sparse
 import xarray as xr
@@ -21,6 +20,8 @@ from .common import (
     read_name_dvs,
     read_times_dvs,
 )
+
+XUGRID_FILL_VALUE = -1
 
 
 def _ugrid_iavert_javert(
@@ -346,70 +347,14 @@ def open_imeth6_budgets(
     return xu.UgridDataArray(da, grid)
 
 
-@numba.njit  # type: ignore[misc]
-def disv_lower_index(
-    ia: IntArray,
-    ja: IntArray,
-    ncells: int,
-    nlayer: int,
-    ncells_per_layer: int,
-) -> IntArray:
-    lower = np.full(ncells, -1, np.int64)
-    for i in range(ncells):
-        for nzi in range(ia[i], ia[i + 1]):
-            nzi -= 1  # python is 0-based, modflow6 is 1-based
-            j = ja[nzi] - 1  # python is 0-based, modflow6 is 1-based
-            d = j - i
-            if d < ncells_per_layer:  # upper, diagonal, horizontal
-                continue
-            elif d == ncells_per_layer:  # lower neighbor
-                lower[i] = nzi
-            else:  # skips one: must be pass through
-                npassed = int(d / ncells_per_layer)
-                for ipass in range(0, npassed):
-                    lower[i + ipass * ncells_per_layer] = nzi
-
-    return lower.reshape(nlayer, ncells_per_layer)
-
-
-def expand_indptr(ia: IntArray):
-    n = np.diff(ia)
-    return np.repeat(np.arange(ia.size - 1), n)
-
-
-def disv_horizontal_index(
-    ia: IntArray,
-    ja: IntArray,
-    nlayer: int,
-    ncells_per_layer: int,
-    edge_face_connectivity: IntArray,
-    fill_value: int,
-    face_coordinates: FloatArray,
-):
-    # Allocate output array
-    nedge = len(edge_face_connectivity)
-    horizontal = np.full((nlayer, nedge), -1)
-
-    # Grab the index values to the horizontal connections
-    i = expand_indptr(ia)
-    j = ja - 1
-    d = j - i
-    is_horizontal = (0 < d) & (d < ncells_per_layer)
-    index = np.arange(j.size)[is_horizontal].reshape((nlayer, -1))
-
-    # i -> j is pre-sorted (required by CSR structure); the edge_faces are repeated
-    # per layer. Because i -> j is sorted in terms of face numbering, we need
-    # only to figure out which order the edge_face_connectivity has.
-    is_connection = edge_face_connectivity[:, 1] != fill_value
-    edge_faces = edge_face_connectivity[is_connection]
-    order = np.argsort(np.lexsort(edge_faces.T[::-1]))
-    # Reshuffle for every layer
-    index = index[:, order]
-
-    # Now set the values in the output array
-    horizontal[:, is_connection] = index
-
+def compute_flow_orientation(
+    edge_face_connectivity: IntArray, face_coordinates: FloatArray
+) -> Tuple[FloatArray, FloatArray]:
     # Compute unit components (x: u, y: v)
+    nedge = len(edge_face_connectivity)
+    is_connection = edge_face_connectivity[:, 1] != XUGRID_FILL_VALUE
+    edge_faces = edge_face_connectivity[is_connection]
+    # Ensure direction matches flow from low cell index to high cell index.
     edge_faces.sort(axis=1)
     u = np.full(nedge, np.nan)
     v = np.full(nedge, np.nan)
@@ -419,32 +364,63 @@ def disv_horizontal_index(
     t = np.sqrt(dx**2 + dy**2)
     u[is_connection] = dx / t
     v[is_connection] = dy / t
-    return horizontal, u, v
+    return u, v
+
+
+def expand_indptr(ia: IntArray):
+    n = np.diff(ia)
+    return np.repeat(np.arange(ia.size - 1), n)
+
+
+def disv_indices(
+    ia: IntArray,
+    ja: IntArray,
+    nlayer: int,
+    ncells_per_layer: int,
+    edge_face_connectivity: IntArray,
+):
+    # Allocate output arrays
+    nedge = len(edge_face_connectivity)
+    horizontal = np.full((nlayer, nedge), -1)
+    lower = np.full((nlayer, ncells_per_layer), -1)
+
+    # Grab the index values to the horizontal connections
+    index = np.arange(ja.size)
+    i = expand_indptr(ia)
+    j = ja - 1
+    d = j - i
+    is_vertical = d >= ncells_per_layer
+    is_horizontal = (0 < d) & (d < ncells_per_layer)
+    vertical_index = index[is_vertical]
+    horizontal_index = index[is_horizontal].reshape((nlayer, -1))
+    # Set index for lower face flow.
+    lower.ravel()[j[is_vertical]] = vertical_index
+
+    # i -> j is pre-sorted (required by CSR structure); the edge_faces are repeated
+    # per layer. Because i -> j is sorted in terms of face numbering, we need
+    # only to figure out which order the edge_face_connectivity has.
+    is_connection = edge_face_connectivity[:, 1] != XUGRID_FILL_VALUE
+    edge_faces = edge_face_connectivity[is_connection]
+    # Find order to reshuffle for every layer
+    order = np.argsort(np.lexsort(edge_faces.T[::-1]))
+    horizontal_index = horizontal_index[:, order]
+    # Now set the values in the output array
+    horizontal[:, is_connection] = horizontal_index
+    return lower, horizontal
 
 
 def disv_to_horizontal_lower_indices(
     grb_content: dict,
 ) -> Tuple[xr.DataArray, xr.DataArray, xr.DataArray, xr.DataArray]:
     grid = grb_content["grid"]
-    horizontal, u, v = disv_horizontal_index(
+    lower, horizontal = disv_indices(
         ia=grb_content["ia"],
         ja=grb_content["ja"],
         nlayer=grb_content["nlayer"],
         ncells_per_layer=grb_content["ncells_per_layer"],
         edge_face_connectivity=grid.edge_face_connectivity,
-        fill_value=grid.fill_value,
-        face_coordinates=grid.face_coordinates,
     )
-    lower = disv_lower_index(
-        ia=grb_content["ia"],
-        ja=grb_content["ja"],
-        ncells=grb_content["ncells"],
-        nlayer=grb_content["nlayer"],
-        ncells_per_layer=grb_content["ncells_per_layer"],
-    )
-
-    # Compute unit_vector
-
+    u, v = compute_flow_orientation(grid.edge_face_connectivity, grid.face_coordinates)
     return (
         xr.DataArray(
             horizontal, grb_content["coords"], dims=["layer", grid.edge_dimension]

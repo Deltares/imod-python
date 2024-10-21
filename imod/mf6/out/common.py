@@ -1,8 +1,8 @@
 import pathlib
+import struct
 from typing import Any, BinaryIO, Dict, List, Union
 
 import numpy as np
-import struct
 
 # Type annotations
 IntArray = np.ndarray
