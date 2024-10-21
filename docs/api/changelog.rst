@@ -6,6 +6,13 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+Unreleased
+------
+
+Added
+~~~~~
+- Added function :func:`imod.mf6.open_dvs` to read dependent variable output files like the water content file of :class:`imod.mf6.UnsaturatedZoneFlow`
+
 0.17.2
 ------
 
