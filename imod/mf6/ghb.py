@@ -188,14 +188,14 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
         period_data: dict[str, list[datetime]],
-        target_discretization,
+        target_dis: StructuredDiscretization,
         target_npf: NodePropertyFlow,
         time_min: datetime,
         time_max: datetime,
         allocation_option: ALLOCATION_OPTION,
         distributing_option: DISTRIBUTING_OPTION,
-        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
         regridder_types: Optional[RegridMethodType] = None,
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "GeneralHeadBoundary":
         """
         Construct a GeneralHeadBoundary-package from iMOD5 data, loaded with the
@@ -213,7 +213,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         period_data: dict
             Dictionary with iMOD5 period data. This can be constructed from the
             :func:`imod.formats.prj.open_projectfile_data` method.
-        target_discretization:  StructuredDiscretization package
+        target_dis:  StructuredDiscretization package
             The grid that should be used for the new package. Does not
             need to be identical to one of the input grids.
         target_npf: NodePropertyFlow package
@@ -237,11 +237,11 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         -------
         A  Modflow 6 GeneralHeadBoundary packages.
         """
-        target_top = target_discretization.dataset["top"]
-        target_bottom = target_discretization.dataset["bottom"]
-        target_idomain = target_discretization.dataset["idomain"]
+        target_top = target_dis.dataset["top"]
+        target_bottom = target_dis.dataset["bottom"]
+        target_idomain = target_dis.dataset["idomain"]
 
-        idomain = target_discretization.dataset["idomain"]
+        idomain = target_dis.dataset["idomain"]
         data = {
             "head": imod5_data[key]["head"],
             "conductance": imod5_data[key]["conductance"],

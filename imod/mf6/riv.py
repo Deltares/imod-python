@@ -13,6 +13,7 @@ from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.drn import Drainage
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
+from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.regrid.regrid_schemes import RiverRegridMethod
 from imod.mf6.utilities.regrid import (
     RegridderWeightsCache,
@@ -206,11 +207,12 @@ class River(BoundaryCondition, IRegridPackage):
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
         period_data: dict[str, list[datetime]],
-        target_discretization: StructuredDiscretization,
+        target_dis: StructuredDiscretization,
+        target_npf: NodePropertyFlow,
         time_min: datetime,
         time_max: datetime,
-        allocation_option_riv: ALLOCATION_OPTION,
-        distributing_option_riv: DISTRIBUTING_OPTION,
+        allocation_option: ALLOCATION_OPTION,
+        distributing_option: DISTRIBUTING_OPTION,
         regridder_types: Optional[RiverRegridMethod] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> Tuple[Optional["River"], Optional[Drainage]]:
@@ -233,7 +235,7 @@ class River(BoundaryCondition, IRegridPackage):
         period_data: dict
             Dictionary with iMOD5 period data. This can be constructed from the
             :func:`imod.formats.prj.open_projectfile_data` method.
-        target_discretization:  StructuredDiscretization package
+        target_dis:  StructuredDiscretization package
             The grid that should be used for the new package. Does not
             need to be identical to one of the input grids.
         time_min: datetime
@@ -261,9 +263,10 @@ class River(BoundaryCondition, IRegridPackage):
 
         logger = logging.logger
         # gather discretrizations
-        target_top = target_discretization.dataset["top"]
-        target_bottom = target_discretization.dataset["bottom"]
-        target_idomain = target_discretization.dataset["idomain"]
+        target_top = target_dis.dataset["top"]
+        target_bottom = target_dis.dataset["bottom"]
+        target_idomain = target_dis.dataset["idomain"]
+        target_k = target_npf.dataset["k"]
 
         # gather input data
         data = {
@@ -289,7 +292,7 @@ class River(BoundaryCondition, IRegridPackage):
 
         if is_planar_conductance:
             riv_allocation = allocate_riv_cells(
-                allocation_option_riv,
+                allocation_option,
                 target_idomain == 1,
                 target_top,
                 target_bottom,
@@ -298,12 +301,12 @@ class River(BoundaryCondition, IRegridPackage):
             )
 
             regridded_package_data["conductance"] = distribute_riv_conductance(
-                distributing_option_riv,
+                distributing_option,
                 riv_allocation[0],
                 conductance,
                 target_top,
                 target_bottom,
-                conductance,
+                target_k,
                 regridded_package_data["stage"],
                 regridded_package_data["bottom_elevation"],
             )

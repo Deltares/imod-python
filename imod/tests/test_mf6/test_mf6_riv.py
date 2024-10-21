@@ -13,6 +13,7 @@ from pytest_cases import parametrize_with_cases
 import imod
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
+from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.write_context import WriteContext
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION
 from imod.prepare.topsystem.conductance import DISTRIBUTING_OPTION
@@ -458,16 +459,19 @@ def test_import_river_from_imod5(imod5_dataset, tmp_path):
     period_data = imod5_dataset[1]
     globaltimes = [np.datetime64("2000-01-01")]
     target_dis = StructuredDiscretization.from_imod5_data(imod5_data)
+    grid = target_dis.dataset["idomain"]
+    target_npf = NodePropertyFlow.from_imod5_data(imod5_data, grid)
 
     (riv, drn) = imod.mf6.River.from_imod5_data(
         "riv-1",
         imod5_data,
         period_data,
         target_dis,
+        target_npf,
         time_min=datetime(2000, 1, 1),
         time_max=datetime(2002, 1, 1),
-        allocation_option_riv=ALLOCATION_OPTION.at_elevation,
-        distributing_option_riv=DISTRIBUTING_OPTION.by_crosscut_thickness,
+        allocation_option=ALLOCATION_OPTION.at_elevation,
+        distributing_option=DISTRIBUTING_OPTION.by_crosscut_thickness,
         regridder_types=None,
     )
 
@@ -495,6 +499,8 @@ def test_import_river_from_imod5_infiltration_factors(imod5_dataset):
     imod5_data = imod5_dataset[0]
     period_data = imod5_dataset[1]
     target_dis = StructuredDiscretization.from_imod5_data(imod5_data)
+    grid = target_dis.dataset["idomain"]
+    target_npf = NodePropertyFlow.from_imod5_data(imod5_data, grid)
 
     original_infiltration_factor = imod5_data["riv-1"]["infiltration_factor"]
     imod5_data["riv-1"]["infiltration_factor"] = ones_like(original_infiltration_factor)
@@ -504,10 +510,11 @@ def test_import_river_from_imod5_infiltration_factors(imod5_dataset):
         imod5_data,
         period_data,
         target_dis,
+        target_npf,
         time_min=datetime(2000, 1, 1),
         time_max=datetime(2002, 1, 1),
-        allocation_option_riv=ALLOCATION_OPTION.at_elevation,
-        distributing_option_riv=DISTRIBUTING_OPTION.by_crosscut_thickness,
+        allocation_option=ALLOCATION_OPTION.at_elevation,
+        distributing_option=DISTRIBUTING_OPTION.by_crosscut_thickness,
         regridder_types=None,
     )
 
@@ -522,10 +529,11 @@ def test_import_river_from_imod5_infiltration_factors(imod5_dataset):
         imod5_data,
         period_data,
         target_dis,
+        target_npf,
         time_min=datetime(2000, 1, 1),
         time_max=datetime(2002, 1, 1),
-        allocation_option_riv=ALLOCATION_OPTION.at_elevation,
-        distributing_option_riv=DISTRIBUTING_OPTION.by_crosscut_thickness,
+        allocation_option=ALLOCATION_OPTION.at_elevation,
+        distributing_option=DISTRIBUTING_OPTION.by_crosscut_thickness,
         regridder_types=None,
     )
 
@@ -540,6 +548,8 @@ def test_import_river_from_imod5_period_data(imod5_dataset_periods):
     imod5_data = imod5_dataset_periods[0]
     imod5_periods = imod5_dataset_periods[1]
     target_dis = StructuredDiscretization.from_imod5_data(imod5_data, validate=False)
+    grid = target_dis.dataset["idomain"]
+    target_npf = NodePropertyFlow.from_imod5_data(imod5_data, grid)
 
     original_infiltration_factor = imod5_data["riv-1"]["infiltration_factor"]
     imod5_data["riv-1"]["infiltration_factor"] = ones_like(original_infiltration_factor)
@@ -549,6 +559,7 @@ def test_import_river_from_imod5_period_data(imod5_dataset_periods):
         imod5_data,
         imod5_periods,
         target_dis,
+        target_npf,
         datetime(2002, 2, 2),
         datetime(2022, 2, 2),
         ALLOCATION_OPTION.at_elevation,
@@ -567,6 +578,7 @@ def test_import_river_from_imod5_period_data(imod5_dataset_periods):
         imod5_data,
         imod5_periods,
         target_dis,
+        target_npf,
         datetime(2002, 2, 2),
         datetime(2022, 2, 2),
         ALLOCATION_OPTION.at_elevation,
