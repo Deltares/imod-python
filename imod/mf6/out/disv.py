@@ -22,6 +22,8 @@ from .common import (
     read_times_dvs,
 )
 
+XUGRID_FILL_VALUE = -1
+
 
 def _ugrid_iavert_javert(
     iavert: IntArray, javert: IntArray
@@ -346,6 +348,26 @@ def open_imeth6_budgets(
     return xu.UgridDataArray(da, grid)
 
 
+def compute_flow_orientation(
+    edge_face_connectivity: IntArray, face_coordinates: FloatArray
+) -> Tuple[FloatArray, FloatArray]:
+    # Compute unit components (x: u, y: v)
+    nedge = len(edge_face_connectivity)
+    is_connection = edge_face_connectivity[:, 1] != XUGRID_FILL_VALUE
+    edge_faces = edge_face_connectivity[is_connection]
+    # Ensure direction matches flow from low cell index to high cell index.
+    edge_faces.sort(axis=1)
+    u = np.full(nedge, np.nan)
+    v = np.full(nedge, np.nan)
+    xy = face_coordinates[edge_faces]
+    dx = xy[:, 1, 0] - xy[:, 0, 0]
+    dy = xy[:, 1, 1] - xy[:, 0, 1]
+    t = np.sqrt(dx**2 + dy**2)
+    u[is_connection] = dx / t
+    v[is_connection] = dy / t
+    return u, v
+
+
 @numba.njit  # type: ignore[misc]
 def disv_lower_index(
     ia: IntArray,
@@ -408,25 +430,14 @@ def disv_horizontal_index(
 
     # Now set the values in the output array
     horizontal[:, is_connection] = index
-
-    # Compute unit components (x: u, y: v)
-    edge_faces.sort(axis=1)
-    u = np.full(nedge, np.nan)
-    v = np.full(nedge, np.nan)
-    xy = face_coordinates[edge_faces]
-    dx = xy[:, 1, 0] - xy[:, 0, 0]
-    dy = xy[:, 1, 1] - xy[:, 0, 1]
-    t = np.sqrt(dx**2 + dy**2)
-    u[is_connection] = dx / t
-    v[is_connection] = dy / t
-    return horizontal, u, v
+    return horizontal
 
 
 def disv_to_horizontal_lower_indices(
     grb_content: dict,
 ) -> Tuple[xr.DataArray, xr.DataArray, xr.DataArray, xr.DataArray]:
     grid = grb_content["grid"]
-    horizontal, u, v = disv_horizontal_index(
+    horizontal = disv_horizontal_index(
         ia=grb_content["ia"],
         ja=grb_content["ja"],
         nlayer=grb_content["nlayer"],
@@ -442,9 +453,7 @@ def disv_to_horizontal_lower_indices(
         nlayer=grb_content["nlayer"],
         ncells_per_layer=grb_content["ncells_per_layer"],
     )
-
-    # Compute unit_vector
-
+    u, v = compute_flow_orientation(grid.edge_face_connectivity, grid.face_coordinates)
     return (
         xr.DataArray(
             horizontal, grb_content["coords"], dims=["layer", grid.edge_dimension]
