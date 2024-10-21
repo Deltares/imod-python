@@ -211,8 +211,8 @@ class River(BoundaryCondition, IRegridPackage):
         target_npf: NodePropertyFlow,
         time_min: datetime,
         time_max: datetime,
-        allocation_option_riv: ALLOCATION_OPTION,
-        distributing_option_riv: DISTRIBUTING_OPTION,
+        allocation_option: ALLOCATION_OPTION,
+        distributing_option: DISTRIBUTING_OPTION,
         regridder_types: Optional[RiverRegridMethod] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> Tuple[Optional["River"], Optional[Drainage]]:
@@ -292,7 +292,7 @@ class River(BoundaryCondition, IRegridPackage):
 
         if is_planar_conductance:
             riv_allocation = allocate_riv_cells(
-                allocation_option_riv,
+                allocation_option,
                 target_idomain == 1,
                 target_top,
                 target_bottom,
@@ -301,7 +301,7 @@ class River(BoundaryCondition, IRegridPackage):
             )
 
             regridded_package_data["conductance"] = distribute_riv_conductance(
-                distributing_option_riv,
+                distributing_option,
                 riv_allocation[0],
                 conductance,
                 target_top,
