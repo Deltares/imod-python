@@ -89,6 +89,7 @@ def test_simple_model(fixed_format_parser):
         np.array([100.0, 300.0, 100.0, 200.0]),
     )
     assert_equal(results["layer"], np.array([3, 1, 3, 2]))
+    assert_equal(results["svat_groundwater"], np.array([1, 2, 3, 4]))
 
 
 def test_simple_model_1_subunit(fixed_format_parser):
@@ -167,3 +168,4 @@ def test_simple_model_1_subunit(fixed_format_parser):
         np.array([100.0, 300.0]),
     )
     assert_equal(results["layer"], np.array([3, 2]))
+    assert_equal(results["svat_groundwater"], np.array([1, 2]))
