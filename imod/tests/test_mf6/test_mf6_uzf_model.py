@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import imod.mf6.simulation
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def uzf_model():
     # Initiate model
     gwf_model = imod.mf6.GroundwaterFlowModel(newton=True)
