@@ -470,8 +470,8 @@ def test_import_river_from_imod5(imod5_dataset, tmp_path):
         target_npf,
         time_min=datetime(2000, 1, 1),
         time_max=datetime(2002, 1, 1),
-        allocation_option_riv=ALLOCATION_OPTION.at_elevation,
-        distributing_option_riv=DISTRIBUTING_OPTION.by_crosscut_thickness,
+        allocation_option=ALLOCATION_OPTION.at_elevation,
+        distributing_option=DISTRIBUTING_OPTION.by_crosscut_thickness,
         regridder_types=None,
     )
 
@@ -513,8 +513,8 @@ def test_import_river_from_imod5_infiltration_factors(imod5_dataset):
         target_npf,
         time_min=datetime(2000, 1, 1),
         time_max=datetime(2002, 1, 1),
-        allocation_option_riv=ALLOCATION_OPTION.at_elevation,
-        distributing_option_riv=DISTRIBUTING_OPTION.by_crosscut_thickness,
+        allocation_option=ALLOCATION_OPTION.at_elevation,
+        distributing_option=DISTRIBUTING_OPTION.by_crosscut_thickness,
         regridder_types=None,
     )
 
@@ -532,8 +532,8 @@ def test_import_river_from_imod5_infiltration_factors(imod5_dataset):
         target_npf,
         time_min=datetime(2000, 1, 1),
         time_max=datetime(2002, 1, 1),
-        allocation_option_riv=ALLOCATION_OPTION.at_elevation,
-        distributing_option_riv=DISTRIBUTING_OPTION.by_crosscut_thickness,
+        allocation_option=ALLOCATION_OPTION.at_elevation,
+        distributing_option=DISTRIBUTING_OPTION.by_crosscut_thickness,
         regridder_types=None,
     )
 
