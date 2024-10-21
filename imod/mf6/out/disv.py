@@ -3,7 +3,6 @@ import struct
 from typing import Any, BinaryIO, Dict, List, Optional, Tuple, cast
 
 import dask
-import numba
 import numpy as np
 import scipy.sparse
 import xarray as xr
@@ -368,7 +367,11 @@ def compute_flow_orientation(
     return u, v
 
 
-@numba.njit  # type: ignore[misc]
+def expand_indptr(ia: IntArray):
+    n = np.diff(ia)
+    return np.repeat(np.arange(ia.size - 1), n)
+
+
 def disv_lower_index(
     ia: IntArray,
     ja: IntArray,
@@ -376,27 +379,14 @@ def disv_lower_index(
     nlayer: int,
     ncells_per_layer: int,
 ) -> IntArray:
-    lower = np.full(ncells, -1, np.int64)
-    for i in range(ncells):
-        for nzi in range(ia[i], ia[i + 1]):
-            nzi -= 1  # python is 0-based, modflow6 is 1-based
-            j = ja[nzi] - 1  # python is 0-based, modflow6 is 1-based
-            d = j - i
-            if d < ncells_per_layer:  # upper, diagonal, horizontal
-                continue
-            elif d == ncells_per_layer:  # lower neighbor
-                lower[i] = nzi
-            else:  # skips one: must be pass through
-                npassed = int(d / ncells_per_layer)
-                for ipass in range(0, npassed):
-                    lower[i + ipass * ncells_per_layer] = nzi
-
-    return lower.reshape(nlayer, ncells_per_layer)
-
-
-def expand_indptr(ia: IntArray):
-    n = np.diff(ia)
-    return np.repeat(np.arange(ia.size - 1), n)
+    lower = np.full((nlayer, ncells_per_layer), -1)
+    i = expand_indptr(ia)
+    j = ja - 1
+    d = j - i
+    is_vertical = d >= ncells_per_layer
+    index = np.arange(j.size)
+    lower.ravel()[j[is_vertical]] = index[is_vertical]
+    return lower
 
 
 def disv_horizontal_index(
@@ -406,7 +396,6 @@ def disv_horizontal_index(
     ncells_per_layer: int,
     edge_face_connectivity: IntArray,
     fill_value: int,
-    face_coordinates: FloatArray,
 ):
     # Allocate output array
     nedge = len(edge_face_connectivity)
@@ -444,7 +433,6 @@ def disv_to_horizontal_lower_indices(
         ncells_per_layer=grb_content["ncells_per_layer"],
         edge_face_connectivity=grid.edge_face_connectivity,
         fill_value=grid.fill_value,
-        face_coordinates=grid.face_coordinates,
     )
     lower = disv_lower_index(
         ia=grb_content["ia"],
