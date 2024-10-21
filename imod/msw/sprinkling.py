@@ -33,7 +33,7 @@ class Sprinkling(MetaSwapPackage):
         "max_abstraction_surfacewater_mm_d": VariableMetaData(8, None, None, str),
         "max_abstraction_groundwater_m3_d": VariableMetaData(8, 0.0, 1e9, float),
         "max_abstraction_surfacewater_m3_d": VariableMetaData(8, 0.0, 1e9, float),
-        "svat_groundwater": VariableMetaData(10, None, None, str),
+        "svat_groundwater": VariableMetaData(10, 1, 99999999, int),
         "layer": VariableMetaData(6, 1, 9999, int),
         "trajectory": VariableMetaData(10, None, None, str),
     }
@@ -47,7 +47,6 @@ class Sprinkling(MetaSwapPackage):
     _to_fill = (
         "max_abstraction_groundwater_mm_d",
         "max_abstraction_surfacewater_mm_d",
-        "svat_groundwater",
         "trajectory",
     )
 
@@ -77,7 +76,7 @@ class Sprinkling(MetaSwapPackage):
         # Tile well_layers for each subunit
         layer = np.tile(well_layer, (n_subunit, 1))
 
-        data_dict = {"svat": well_svat[well_active], "layer": layer[well_active]}
+        data_dict = {"svat": well_svat[well_active], "layer": layer[well_active], "svat_groundwater": well_svat[well_active]}
 
         for var in self._without_subunit:
             well_arr = self.dataset[var].values[well_row, well_column]
