@@ -146,7 +146,7 @@ def test_dis_indices__single_column():
     # +---+
     ia = np.array([1, 2, 4, 6, 7])
     ja = np.array([2, 1, 3, 2, 4, 3])
-    # nja index      0  1  2  3  4  5
+    # nja index    0  1  2  3  4  5
     ncells = 4
     nlayer = 1
     nrow = 4
@@ -174,6 +174,51 @@ def test_dis_indices__single_column():
         ]
     )
     assert np.allclose(front[0], front_expected)
+
+
+def test_dis_indices__single_row_column():
+    # Note: ia and ja use 1-based indexing as produced by modflow6!
+    # Cell numbering, vertical-view:
+    #
+    # +---+
+    # | 1 |
+    # +---+
+    # | 2 |
+    # +---+
+    # | 3 |
+    # +---+
+    # | 4 |
+    # +---+
+    ia = np.array([1, 2, 4, 6, 7])
+    ja = np.array([2, 1, 3, 2, 4, 3])
+    # nja index    0  1  2  3  4  5
+    ncells = 4
+    nlayer = 4
+    nrow = 1
+    ncol = 1
+    right, front, lower = imod.mf6.out.dis.dis_indices(
+        ia, ja, ncells, nlayer, nrow, ncol
+    )
+    assert right.shape == front.shape == lower.shape == (nlayer, nrow, ncol)
+    assert (right == -1).all()  # No right connections
+    assert (front == -1).all()  # No front connections
+    lower_expected = np.array(
+        [
+            [
+                0,
+            ],
+            [
+                2,
+            ],
+            [
+                4,
+            ],
+            [
+                -1,
+            ],
+        ]
+    )
+    assert np.allclose(lower[:, 0], lower_expected)
 
 
 def test_dis_indices__idomain():
