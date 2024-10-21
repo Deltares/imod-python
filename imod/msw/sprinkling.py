@@ -76,7 +76,11 @@ class Sprinkling(MetaSwapPackage):
         # Tile well_layers for each subunit
         layer = np.tile(well_layer, (n_subunit, 1))
 
-        data_dict = {"svat": well_svat[well_active], "layer": layer[well_active], "svat_groundwater": well_svat[well_active]}
+        data_dict = {
+            "svat": well_svat[well_active],
+            "layer": layer[well_active],
+            "svat_groundwater": well_svat[well_active],
+        }
 
         for var in self._without_subunit:
             well_arr = self.dataset[var].values[well_row, well_column]
