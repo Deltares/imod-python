@@ -47,11 +47,8 @@ def round_z(z_extent, dz):
     return zmin, zmax
 
 
-def _fill_np(data, invalid):
-    if invalid is None or np.isnan(invalid):
-        nodata = np.isnan(data)
-    else:
-        nodata = data == invalid
+def _fill_np(data):
+    nodata = np.isnan(data)
     if not nodata.any():
         return data.copy()
     # see: https://stackoverflow.com/questions/5551286/filling-gaps-in-a-numpy-array
@@ -63,23 +60,19 @@ def _fill_np(data, invalid):
     return data[tuple(indices)]
 
 
-def fill(da, invalid=None, dims=("y", "x")):
+def fill(da, dims=None):
     """
-    Replace the value of invalid ``da`` cells (indicated by ``invalid``)
-    using basic nearest neighbour interpolation.
+    Fill in NaNs using basic nearest neighbour interpolation.
 
     Parameters
     ----------
     da: xr.DataArray with gaps
-        array containing missing value
+        array containing NaN values.
     dims: sequence of str, optional, default is ("y", "x").
         Dimensions along which to search for nearest neighbors. For example,
         ("y", "x") will perform 2D interpolation in the horizontal plane, while
         ("layer", "y", "x") will perform 3D interpolation including the
         vertical dimension.
-    invalid: xr.DataArray
-        Which values to fill.
-        If None (default), uses: ``nodata = np.isnan(data)``
 
     Returns
     -------
@@ -108,6 +101,8 @@ def fill(da, invalid=None, dims=("y", "x")):
 
     >>> filled = imod.prepare.fill(da, dims=("layer", "y", "x"))
     """
+    if dims is None:
+        dims = ("y", "x")
 
     return xr.apply_ufunc(
         _fill_np,
@@ -118,7 +113,6 @@ def fill(da, invalid=None, dims=("y", "x")):
         dask="parallelized",
         vectorize=True,
         keep_attrs=True,
-        kwargs={"invalid": invalid},
     ).transpose(*da.dims)
 
 
