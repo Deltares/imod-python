@@ -6,6 +6,23 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+Unreleased
+----------
+
+Fixed
+~~~~~
+
+- :func:`imod.prepare.fill` previously assigned to the result of an xarray
+  ``.sel`` operation. This might not work for dask backed data and has been
+  fixed.
+
+Changed
+~~~~~~~
+
+- :func:`imod.prepare.fill` now takes a ``dims`` argument instead of ``by``,
+  and will fill over N dimensions. Secondly, the function no longer takes
+  an ``invalid`` argument, but instead always treats NaNs as missing.
+
 0.17.2
 ------
 
