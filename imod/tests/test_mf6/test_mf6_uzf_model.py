@@ -7,7 +7,6 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-import imod.mf6.simulation
 
 
 @pytest.fixture(scope="function")
