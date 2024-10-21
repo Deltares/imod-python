@@ -372,74 +372,53 @@ def expand_indptr(ia: IntArray):
     return np.repeat(np.arange(ia.size - 1), n)
 
 
-def disv_lower_index(
-    ia: IntArray,
-    ja: IntArray,
-    ncells: int,
-    nlayer: int,
-    ncells_per_layer: int,
-) -> IntArray:
-    lower = np.full((nlayer, ncells_per_layer), -1)
-    i = expand_indptr(ia)
-    j = ja - 1
-    d = j - i
-    is_vertical = d >= ncells_per_layer
-    index = np.arange(j.size)
-    lower.ravel()[j[is_vertical]] = index[is_vertical]
-    return lower
-
-
-def disv_horizontal_index(
+def disv_indices(
     ia: IntArray,
     ja: IntArray,
     nlayer: int,
     ncells_per_layer: int,
     edge_face_connectivity: IntArray,
-    fill_value: int,
 ):
-    # Allocate output array
+    # Allocate output arrays
     nedge = len(edge_face_connectivity)
     horizontal = np.full((nlayer, nedge), -1)
+    lower = np.full((nlayer, ncells_per_layer), -1)
 
     # Grab the index values to the horizontal connections
+    index = np.arange(ja.size)
     i = expand_indptr(ia)
     j = ja - 1
     d = j - i
+    is_vertical = d >= ncells_per_layer
     is_horizontal = (0 < d) & (d < ncells_per_layer)
-    index = np.arange(j.size)[is_horizontal].reshape((nlayer, -1))
+    vertical_index = index[is_vertical]
+    horizontal_index = index[is_horizontal].reshape((nlayer, -1))
+    # Set index for lower face flow.
+    lower.ravel()[j[is_vertical]] = vertical_index
 
     # i -> j is pre-sorted (required by CSR structure); the edge_faces are repeated
     # per layer. Because i -> j is sorted in terms of face numbering, we need
     # only to figure out which order the edge_face_connectivity has.
-    is_connection = edge_face_connectivity[:, 1] != fill_value
+    is_connection = edge_face_connectivity[:, 1] != XUGRID_FILL_VALUE
     edge_faces = edge_face_connectivity[is_connection]
+    # Find order to reshuffle for every layer
     order = np.argsort(np.lexsort(edge_faces.T[::-1]))
-    # Reshuffle for every layer
-    index = index[:, order]
-
+    horizontal_index = horizontal_index[:, order]
     # Now set the values in the output array
-    horizontal[:, is_connection] = index
-    return horizontal
+    horizontal[:, is_connection] = horizontal_index
+    return lower, horizontal
 
 
 def disv_to_horizontal_lower_indices(
     grb_content: dict,
 ) -> Tuple[xr.DataArray, xr.DataArray, xr.DataArray, xr.DataArray]:
     grid = grb_content["grid"]
-    horizontal = disv_horizontal_index(
+    lower, horizontal = disv_indices(
         ia=grb_content["ia"],
         ja=grb_content["ja"],
         nlayer=grb_content["nlayer"],
         ncells_per_layer=grb_content["ncells_per_layer"],
         edge_face_connectivity=grid.edge_face_connectivity,
-        fill_value=grid.fill_value,
-    )
-    lower = disv_lower_index(
-        ia=grb_content["ia"],
-        ja=grb_content["ja"],
-        ncells=grb_content["ncells"],
-        nlayer=grb_content["nlayer"],
-        ncells_per_layer=grb_content["ncells_per_layer"],
     )
     u, v = compute_flow_orientation(grid.edge_face_connectivity, grid.face_coordinates)
     return (
