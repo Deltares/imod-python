@@ -44,7 +44,9 @@ def expand_repetitions(
     return expanded
 
 
-def resample_timeseries(well_rate: pd.DataFrame, times: list[datetime]) -> pd.DataFrame:
+def resample_timeseries(
+    well_rate: pd.DataFrame, times: list[datetime] | pd.DatetimeIndex
+) -> pd.DataFrame:
     """
     On input, well_rate is a dataframe containing a timeseries for rate for one well
     while "times" is a list of datetimes.
@@ -71,6 +73,7 @@ def resample_timeseries(well_rate: pd.DataFrame, times: list[datetime]) -> pd.Da
         well_rate,
         how="outer",
         on="time",
+        validate="m:m",
     ).fillna(method="ffill")
 
     # The entries before the start of the well timeseries do not have data yet,
