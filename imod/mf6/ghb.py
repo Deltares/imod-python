@@ -226,7 +226,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
             End-time of the simulation. Used for expanding period data.
         distributing_option: dict[str, DISTRIBUTING_OPTION]
             distributing option.
-        regrid_cache: Optional RegridderWeightsCache
+        regrid_cache: RegridderWeightsCache, optional
             stores regridder weights for different regridders. Can be used to speed up regridding,
             if the same regridders are used several times for regridding different arrays.
         regridder_types: RegridMethodType, optional
