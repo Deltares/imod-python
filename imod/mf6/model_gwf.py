@@ -242,7 +242,7 @@ class GroundwaterFlowModel(Modflow6Model):
         )
         grid = dis_pkg.dataset["idomain"]
         result["dis"] = dis_pkg
-        
+
         # import npf
         npf_pkg = NodePropertyFlow.from_imod5_data(
             imod5_data,
