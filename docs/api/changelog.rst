@@ -11,7 +11,13 @@ Unreleased
 
 Added
 ~~~~~
-- Added function :func:`imod.mf6.open_dvs` to read dependent variable output files like the water content file of :class:`imod.mf6.UnsaturatedZoneFlow`
+- Added :func:`imod.mf6.open_dvs` to read dependent variable output files like
+  the water content file of :class:`imod.mf6.UnsaturatedZoneFlow`.
+
+Fixed
+~~~~~
+- Fix `imod.mf6.open_cbc`: it failed with ``flowja=False`` on budget output for
+  DISV models if the model contained inactive cells.
 
 0.17.2
 ------

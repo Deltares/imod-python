@@ -160,7 +160,6 @@ def is_expected_hfb_partition_combination_fail(current_cases):
 def test_partitioning_unstructured(
     tmp_path: Path, circle_model: Modflow6Simulation, partition_array: xu.UgridDataArray
 ):
-    # %%
     simulation = circle_model
     # Increase the recharge to make the head gradient more pronounced.
     simulation["GWF_1"]["rch"]["rate"] *= 100
