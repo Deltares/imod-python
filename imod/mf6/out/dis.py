@@ -359,9 +359,9 @@ def dis_indices(
             d = j - i
             if d <= 0:  # left, back, upper
                 continue
-            elif d == 1:  # right neighbor
+            elif d == 1 and ncol > 1:  # right neighbor
                 right[i] = nzi
-            elif d == ncol:  # front neighbor
+            elif d == ncol and ncells_per_layer > 1:  # front neighbor
                 front[i] = nzi
             elif d == ncells_per_layer:  # lower neighbor
                 lower[i] = nzi
