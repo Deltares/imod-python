@@ -22,5 +22,5 @@ class IPackageBase(ABC):
 
     @classmethod
     @abstractmethod
-    def _from_dataset(self, ds: GridDataset):
+    def _from_dataset(cls, ds: GridDataset):
         raise NotImplementedError
