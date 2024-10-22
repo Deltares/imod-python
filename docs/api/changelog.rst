@@ -12,8 +12,9 @@ Unreleased
 Fixed
 ~~~~~
 
-- Fix `imod.mf6.open_cbc`: it failed with ``flowja=False`` on budget output for
+- `imod.mf6.open_cbc` failing with ``flowja=False`` on budget output for
   DISV models if the model contained inactive cells.
+- `imod.mf6.open_cbc` now works for 2D and 1D models. 
 - :func:`imod.prepare.fill` previously assigned to the result of an xarray
   ``.sel`` operation. This might not work for dask backed data and has been
   addressed.
