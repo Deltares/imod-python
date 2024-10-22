@@ -185,12 +185,12 @@ class Drainage(BoundaryCondition, IRegridPackage):
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
         period_data: dict[str, list[datetime]],
-        target_discretization: StructuredDiscretization,
+        target_dis: StructuredDiscretization,
         target_npf: NodePropertyFlow,
-        allocation_option: ALLOCATION_OPTION,
-        distributing_option: DISTRIBUTING_OPTION,
         time_min: datetime,
         time_max: datetime,
+        allocation_option: ALLOCATION_OPTION,
+        distributing_option: DISTRIBUTING_OPTION,
         regridder_types: Optional[DrainageRegridMethod] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "Drainage":
@@ -210,7 +210,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
         period_data: dict
             Dictionary with iMOD5 period data. This can be constructed from the
             :func:`imod.formats.prj.open_projectfile_data` method.
-        target_discretization:  StructuredDiscretization package
+        target_dis:  StructuredDiscretization package
             The grid that should be used for the new package. Does not
             need to be identical to one of the input grids.
         target_npf: NodePropertyFlow package
@@ -235,9 +235,9 @@ class Drainage(BoundaryCondition, IRegridPackage):
         A Modflow 6 Drainage package.
         """
 
-        target_top = target_discretization.dataset["top"]
-        target_bottom = target_discretization.dataset["bottom"]
-        target_idomain = target_discretization.dataset["idomain"]
+        target_top = target_dis.dataset["top"]
+        target_bottom = target_dis.dataset["bottom"]
+        target_idomain = target_dis.dataset["idomain"]
 
         data = {
             "elevation": imod5_data[key]["elevation"],
