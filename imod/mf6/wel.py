@@ -49,6 +49,8 @@ from imod.typing.grid import is_spatial_grid, ones_like
 from imod.util.expand_repetitions import resample_timeseries
 from imod.util.structured import values_within_range
 
+ABSTRACT_METH_ERROR_MSG = "Method in abstract base class called"
+
 
 def _assign_dims(arg: Any) -> Tuple | xr.DataArray:
     is_da = isinstance(arg, xr.DataArray)
@@ -519,7 +521,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         return message
 
     def _create_wells_df(self) -> pd.DataFrame:
-        raise NotImplementedError("Method in abstract base class called")
+        raise NotImplementedError(ABSTRACT_METH_ERROR_MSG)
 
     def _assign_wells_to_layers(
         self,
@@ -529,13 +531,13 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         bottom: GridDataArray,
         k: GridDataArray,
     ) -> pd.DataFrame:
-        raise NotImplementedError("Method in abstract base class called")
+        raise NotImplementedError(ABSTRACT_METH_ERROR_MSG)
 
     @classmethod
     def _validate_imod5_depth_information(
         cls, key: str, pkg_data: dict, df: pd.DataFrame
     ) -> None:
-        raise NotImplementedError("Method in abstract base class called")
+        raise NotImplementedError(ABSTRACT_METH_ERROR_MSG)
 
     @classmethod
     def from_imod5_data(
