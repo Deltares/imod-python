@@ -183,6 +183,86 @@ def test_dis_indices__idomain():
     assert np.allclose(lower.reshape(nlayer, nrow), lower_expected)
 
 
+def test_mf6_csr_to_coo():
+    indptr = np.array([1, 1, 2, 4, 6])
+    indices = np.array([1, 2, 3, 4, 5])
+    i, j = imod.mf6.out.disv.mf6_csr_to_coo(indptr, indices)
+    np.testing.assert_array_equal(i, [1, 2, 2, 3, 3])
+    np.testing.assert_array_equal(j, indices - 1)
+
+
+def test_disv_indices():
+    r"""
+    Top view of grid:
+          ______
+        /|      |\
+       / |      | \
+      /  |      |  \
+     / 1 |  2   | 3 \
+    /____|______|____\
+
+    Vertical cross-section of idomain:
+
+    ┌─────┌─────┌─────┐
+    │     │     │     │
+    │  0  │  1  │  0  │
+    │    1│    2│    3│
+    ┌─────┌─────┌─────┐
+    │     │     │     │
+    │  0  │ -1  │  1  │
+    │    4│    5│    6│
+    ┌─────┌─────┌─────┐
+    │     │     │     │
+    │  1  │  1  │  1  │
+    │    7│    8│    9│
+    └─────└─────└─────┘ 
+
+    nlayer = 3, nface = 3
+    1-based cell number in lower right corner.
+    """
+    nlayer = 3
+    nface = 3
+    shape = (nlayer, nface)
+    idomain = np.zeros(shape, dtype=int)
+    idomain[0, 1] = 1
+    idomain[1, 1] = -1
+    idomain[1, 2] = 1
+    idomain[2, :] = 1
+
+    # i = 2, 6, 7, 8
+    # j = 8, 9, 8, 9
+    ia = np.array([0, 0, 1, 1, 1, 1, 2, 3, 4])
+    ja = np.array([8, 9, 8, 9])
+
+    # Top view: 3 cells
+    edge_face_connectivity = np.array(
+        [
+            [0, -1],
+            [0, -1],
+            [0, 1],  # 2
+            [1, -1],
+            [1, -1],
+            [1, 2],  # 5
+            [2, -1],
+            [2, -1],
+        ]
+    )
+    n_edge = len(edge_face_connectivity)
+    expected_lower = np.full(shape, -1)
+    expected_lower[0, 1] = 0
+    expected_lower[1, 1] = 0
+    expected_lower[1, 2] = 1
+    expected_horizontal = np.full((nlayer, n_edge), -1)
+    expected_horizontal[2, 2] = 2
+    expected_horizontal[2, 5] = 3
+
+    lower, horizontal = imod.mf6.out.disv.disv_indices(
+        ia, ja, idomain, edge_face_connectivity
+    )
+    np.testing.assert_array_equal(lower, expected_lower)
+    np.testing.assert_array_equal(horizontal, expected_horizontal)
+
+
 @pytest.mark.usefixtures("twri_result")
 def test_open_cbc__dis(twri_result):
     modeldir = twri_result

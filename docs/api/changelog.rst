@@ -12,9 +12,17 @@ Unreleased
 Fixed
 ~~~~~
 
+- Fix `imod.mf6.open_cbc`: it failed with ``flowja=False`` on budget output for
+  DISV models if the model contained inactive cells.
 - :func:`imod.prepare.fill` previously assigned to the result of an xarray
   ``.sel`` operation. This might not work for dask backed data and has been
-  fixed.
+  addressed.
+
+Added
+~~~~~
+
+- Added :func:`imod.mf6.open_dvs` to read dependent variable output files like
+  the water content file of :class:`imod.mf6.UnsaturatedZoneFlow`.
 
 Changed
 ~~~~~~~
