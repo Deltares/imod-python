@@ -382,7 +382,7 @@ class GroundwaterFlowModel(Modflow6Model):
         if len(hfb_keys) != 0:
             for hfb_key in hfb_keys:
                 result[hfb_key] = (
-                    SingleLayerHorizontalFlowBarrierResistance.from_imod5_dataset(
+                    SingleLayerHorizontalFlowBarrierResistance.from_imod5_data(
                         hfb_key, imod5_data
                     )
                 )

@@ -689,7 +689,7 @@ def test_hfb_from_imod5(imod5_dataset, tmp_path):
         imod5_data, target_dis.dataset["idomain"]
     )
 
-    hfb = SingleLayerHorizontalFlowBarrierResistance.from_imod5_dataset(
+    hfb = SingleLayerHorizontalFlowBarrierResistance.from_imod5_data(
         "hfb-3", imod5_data
     )
     hfb_package = hfb.to_mf6_pkg(

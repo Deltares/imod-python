@@ -1296,7 +1296,7 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         return barrier_values
 
     @classmethod
-    def from_imod5_dataset(
+    def from_imod5_data(
         cls, key: str, imod5_data: Dict[str, Dict[str, GridDataArray]]
     ):
         imod5_keys = list(imod5_data.keys())
