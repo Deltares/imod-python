@@ -964,7 +964,7 @@ class SingleLayerHorizontalFlowBarrierHydraulicCharacteristic(
     >>>         "layer": [1,]
     >>>     },
     >>> )
-    >>> hfb = imod.mf6.LayeredHorizontalFlowBarrierHydraulicCharacteristic(barrier_gdf)
+    >>> hfb = imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic(barrier_gdf)
 
     """
 
@@ -1105,7 +1105,7 @@ class SingleLayerHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     >>>         "layer": [1,],
     >>>     },
     >>> )
-    >>> hfb = imod.mf6.LayeredHorizontalFlowBarrierMultiplier(barrier_gdf)
+    >>> hfb = imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier(barrier_gdf)
 
     """
 
@@ -1258,7 +1258,7 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     >>>         "layer": [2,],
     >>>     },
     >>> )
-    >>> hfb = imod.mf6.LayeredHorizontalFlowBarrierResistance(barrier_gdf)
+    >>> hfb = imod.mf6.SingleLayerHorizontalFlowBarrierResistance(barrier_gdf)
 
 
     """
