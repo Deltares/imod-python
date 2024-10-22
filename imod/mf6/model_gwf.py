@@ -230,8 +230,9 @@ class GroundwaterFlowModel(Modflow6Model):
 
         """
         # first import the singleton packages
-        # import discretization
+        # import dis
         regrid_cache = RegridderWeightsCache()
+        result = GroundwaterFlowModel()
 
         dis_pkg = StructuredDiscretization.from_imod5_data(
             imod5_data,
@@ -240,7 +241,8 @@ class GroundwaterFlowModel(Modflow6Model):
             False,
         )
         grid = dis_pkg.dataset["idomain"]
-
+        result["dis"] = dis_pkg
+        
         # import npf
         npf_pkg = NodePropertyFlow.from_imod5_data(
             imod5_data,
@@ -248,19 +250,27 @@ class GroundwaterFlowModel(Modflow6Model):
             cast(NodePropertyFlowRegridMethod, regridder_types.get("npf")),
             regrid_cache,
         )
+        result["npf"] = npf_pkg
 
         # import sto
-        sto_pkg = None
         if "sto" in imod5_data.keys():
-            sto_pkg = StorageCoefficient.from_imod5_data(
+            result["sto"] = StorageCoefficient.from_imod5_data(
                 imod5_data,
                 grid,
                 cast(StorageCoefficientRegridMethod, regridder_types.get("sto")),
                 regrid_cache,
             )
+        else:
+            zeros = zeros_like(grid, dtype=float)
+            result["sto"] = StorageCoefficient(
+                storage_coefficient=zeros,
+                specific_yield=zeros,
+                transient=False,
+                convertible=zeros.astype(int),
+            )
 
         # import initial conditions
-        ic_pkg = InitialConditions.from_imod5_data(
+        result["ic"] = InitialConditions.from_imod5_data(
             imod5_data,
             grid,
             cast(InitialConditionsRegridMethod, regridder_types.get("ic")),
@@ -268,23 +278,13 @@ class GroundwaterFlowModel(Modflow6Model):
         )
 
         # import recharge
-        rch_pkg = None
         if "rch" in imod5_data.keys():
-            rch_pkg = Recharge.from_imod5_data(
+            result["rch"] = Recharge.from_imod5_data(
                 imod5_data,
                 dis_pkg,
                 cast(RechargeRegridMethod, regridder_types.get("rch")),
                 regrid_cache,
             )
-
-        result = GroundwaterFlowModel()
-        result["dis"] = dis_pkg
-        result["npf"] = npf_pkg
-        if sto_pkg is not None:
-            result["sto"] = sto_pkg
-        result["ic"] = ic_pkg
-        if rch_pkg is not None:
-            result["rch"] = rch_pkg
 
         # now import the non-singleton packages'
 
@@ -336,7 +336,6 @@ class GroundwaterFlowModel(Modflow6Model):
             result[ghb_key] = ghb_pkg
 
         # import drainage
-
         drainage_keys = [key for key in imod5_keys if key[0:3] == "drn"]
         for drn_key in drainage_keys:
             drn_pkg = Drainage.from_imod5_data(
@@ -413,14 +412,5 @@ class GroundwaterFlowModel(Modflow6Model):
                 result["chd_merged"] = merged_chd
             for key, chd_package in chd_packages.items():
                 result[key] = chd_package
-
-        if "sto" not in result.keys():
-            zeros = zeros_like(grid, dtype=float)
-            result["sto"] = StorageCoefficient(
-                storage_coefficient=zeros,
-                specific_yield=zeros,
-                transient=False,
-                convertible=zeros.astype(int),
-            )
 
         return result
