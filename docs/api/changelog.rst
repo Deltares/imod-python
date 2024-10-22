@@ -7,11 +7,12 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
 
-[Unreleased- feature branch]
-----------------------------
+[Unreleased]
+------------
 
 Fixed
 ~~~~~
+
 - Multiple ``HorizontalFlowBarrier`` objects attached to
   :class:`imod.mf6.GroundwaterFlowModel` are merged into a single horizontal
   flow barrier for MODFLOW 6
@@ -19,9 +20,18 @@ Fixed
   would be snapped to the same cell edge. These are now summed.
 - Improve performance validation upon Package initialization
 - Improve performance writing ``HorizontalFlowBarrier`` objects
+- `imod.mf6.open_cbc` failing with ``flowja=False`` on budget output for
+  DISV models if the model contained inactive cells.
+- `imod.mf6.open_cbc` now works for 2D and 1D models. 
+- :func:`imod.prepare.fill` previously assigned to the result of an xarray
+  ``.sel`` operation. This might not work for dask backed data and has been
+  addressed.
+- Added :func:`imod.mf6.open_dvs` to read dependent variable output files like
+  the water content file of :class:`imod.mf6.UnsaturatedZoneFlow`.
 
 Changed
 ~~~~~~~
+
 - :class:`imod.mf6.Well` now also validates that well filter top is above well
   filter bottom
 - :func:`open_projectfile_data` now also imports well filter top and bottom.
@@ -49,6 +59,10 @@ Changed
   ``strict_well_validation``, which controls the behavior for when wells are
   removed entirely during their assignment to layers. This replaces the
   ``is_partitioned`` argument.
+- :func:`imod.prepare.fill` now takes a ``dims`` argument instead of ``by``,
+  and will fill over N dimensions. Secondly, the function no longer takes
+  an ``invalid`` argument, but instead always treats NaNs as missing.
+
 
 Added
 ~~~~~

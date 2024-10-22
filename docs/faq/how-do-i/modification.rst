@@ -341,4 +341,4 @@ Sum properties over layers
 .. _xarray documentation on resampling: https://xarray.pydata.org/en/stable/user-guide/time-series.html#resampling-and-grouped-operations.
 .. _xarray documentation on interpolation of NaN values: https://xarray.pydata.org/en/stable/generated/xarray.DataArray.interpolate_na.html
 .. _convolution: https://en.wikipedia.org/wiki/Convolution
-.. _xarray-spatial's zonal stats: https://xarray-spatial.org/reference/_autosummary/xrspatial.zonal.stats.html
+.. _xarray-spatial's zonal stats: https://xarray-spatial.readthedocs.io/en/stable/reference/_autosummary/xrspatial.zonal.stats.html
