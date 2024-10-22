@@ -226,7 +226,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
         regridder_types: DrainageRegridMethod, optional
             Optional dataclass with regridder types for a specific variable.
             Use this to override default regridding methods.
-        regrid_cache:Optional RegridderWeightsCache
+        regrid_cache: Optional RegridderWeightsCache
             stores regridder weights for different regridders. Can be used to speed up regridding,
             if the same regridders are used several times for regridding different arrays.
 
