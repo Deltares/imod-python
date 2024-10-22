@@ -1015,7 +1015,7 @@ class Well(GridAgnosticWell):
     def cleanup(self, dis: StructuredDiscretization | VerticesDiscretization):
         """
         Clean up package inplace. This method calls
-        :func:`imod.prepare.cleanup.cleanup_wel`, see documentation of that
+        :func:`imod.prepare.cleanup_wel`, see documentation of that
         function for details on cleanup.
 
         dis: imod.mf6.StructuredDiscretization | imod.mf6.VerticesDiscretization

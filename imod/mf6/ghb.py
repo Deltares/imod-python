@@ -172,7 +172,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
     def cleanup(self, dis: StructuredDiscretization | VerticesDiscretization) -> None:
         """
         Clean up package inplace. This method calls
-        :func:`imod.prepare.cleanup.cleanup_ghb`, see documentation of that
+        :func:`imod.prepare.cleanup_ghb`, see documentation of that
         function for details on cleanup.
 
         dis: imod.mf6.StructuredDiscretization | imod.mf6.VerticesDiscretization
