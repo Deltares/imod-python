@@ -5,6 +5,7 @@ import pathlib
 import subprocess
 import warnings
 from copy import deepcopy
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, DefaultDict, Iterable, Optional, Union, cast
 
@@ -24,7 +25,7 @@ from imod.logging import standard_log_decorator
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwfgwt import GWFGWT
 from imod.mf6.gwtgwt import GWTGWT
-from imod.mf6.ims import Solution
+from imod.mf6.ims import Solution, SolutionPresetModerate
 from imod.mf6.interfaces.imodel import IModel
 from imod.mf6.interfaces.isimulation import ISimulation
 from imod.mf6.model import Modflow6Model
@@ -37,11 +38,17 @@ from imod.mf6.multimodel.exchange_creator_unstructured import (
 from imod.mf6.multimodel.modelsplitter import create_partition_info, slice_model
 from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
+from imod.mf6.regrid.regrid_schemes import RegridMethodType
 from imod.mf6.ssm import SourceSinkMixing
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.utilities.mask import _mask_all_models
 from imod.mf6.utilities.regrid import _regrid_like
+from imod.mf6.validation_context import ValidationContext
 from imod.mf6.write_context import WriteContext
+from imod.prepare.topsystem.default_allocation_methods import (
+    SimulationAllocationOptions,
+    SimulationDistributingOptions,
+)
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
 from imod.typing.grid import (
@@ -91,6 +98,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         self.name = name
         self.directory = None
         self._initialize_template()
+        self._validation_context = ValidationContext()
 
     def __setitem__(self, key, value):
         super().__setitem__(key, value)
@@ -247,8 +255,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         """
         # create write context
         write_context = WriteContext(directory, binary, use_absolute_paths)
+        self._validation_context.validate = validate
         if self.is_split():
-            write_context.is_partitioned = True
+            self._validation_context.strict_well_validation = False
 
         # Check models for required content
         for key, model in self.items():
@@ -290,8 +299,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                     value.write(
                         modelname=key,
                         globaltimes=globaltimes,
-                        validate=validate,
                         write_context=model_write_context,
+                        validate_context=self._validation_context,
                     )
                 )
             elif isinstance(value, Package):
@@ -1316,3 +1325,67 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             -1 sets cells to vertical passthrough
         """
         _mask_all_models(self, mask)
+
+    @classmethod
+    @standard_log_decorator()
+    def from_imod5_data(
+        cls,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        period_data: dict[str, dict[str, GridDataArray]],
+        allocation_options: SimulationAllocationOptions,
+        distributing_options: SimulationDistributingOptions,
+        times: list[datetime],
+        regridder_types: dict[str, RegridMethodType] = {},
+    ) -> "Modflow6Simulation":
+        """
+        Imports a GroundwaterFlowModel (GWF) from the data in an IMOD5 project file.
+        It adds the packages for which import from imod5 is supported.
+        Some packages (like OC) must be added manually later.
+
+
+        Parameters
+        ----------
+        imod5_data: dict[str, dict[str, GridDataArray]]
+            dictionary containing the arrays mentioned in the project file as xarray datasets,
+            under the key of the package type to which it belongs
+        allocation_options: SimulationAllocationOptions
+            object containing the allocation options per package type.
+            If you want a package to have a different allocation option,
+            then it should be imported separately
+        distributing_options: SimulationDistributingOptions
+            object containing the conductivity distribution options per package type.
+            If you want a package to have a different allocation option,
+            then it should be imported separately
+        times:  list[datetime]
+            time discretization of the model to be imported.
+        regridder_types: dict[str, RegridMethodType]
+            the key is the package name. The value is the RegridMethodType
+            object containing the settings for regridding the package with the
+            specified key
+
+        Returns
+        -------
+        """
+        simulation = Modflow6Simulation("imported_simulation")
+        simulation._validation_context.strict_well_validation = False
+
+        # import GWF model,
+        groundwaterFlowModel = GroundwaterFlowModel.from_imod5_data(
+            imod5_data,
+            period_data,
+            allocation_options,
+            distributing_options,
+            times,
+            regridder_types,
+        )
+        simulation["imported_model"] = groundwaterFlowModel
+
+        # generate ims package
+        solution = SolutionPresetModerate(
+            ["imported_model"],
+            print_option="all",
+        )
+        simulation["ims"] = solution
+
+        simulation.create_time_discretization(additional_times=times)
+        return simulation

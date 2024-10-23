@@ -6,34 +6,99 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
-Unreleased
-----------
+
+[Unreleased]
+------------
 
 Fixed
 ~~~~~
 
+- Multiple ``HorizontalFlowBarrier`` objects attached to
+  :class:`imod.mf6.GroundwaterFlowModel` are merged into a single horizontal
+  flow barrier for MODFLOW 6
+- Bug where error would be thrown when barriers in a ``HorizontalFlowBarrier``
+  would be snapped to the same cell edge. These are now summed.
+- Improve performance validation upon Package initialization
+- Improve performance writing ``HorizontalFlowBarrier`` objects
 - `imod.mf6.open_cbc` failing with ``flowja=False`` on budget output for
   DISV models if the model contained inactive cells.
 - `imod.mf6.open_cbc` now works for 2D and 1D models. 
 - :func:`imod.prepare.fill` previously assigned to the result of an xarray
   ``.sel`` operation. This might not work for dask backed data and has been
   addressed.
-
-Added
-~~~~~
-
 - Added :func:`imod.mf6.open_dvs` to read dependent variable output files like
   the water content file of :class:`imod.mf6.UnsaturatedZoneFlow`.
 
 Changed
 ~~~~~~~
 
+- :class:`imod.mf6.Well` now also validates that well filter top is above well
+  filter bottom
+- :func:`open_projectfile_data` now also imports well filter top and bottom.
+- :class:`imod.mf6.Well` now logs a warning if any wells are removed during writing.
+- :class:`imod.mf6.HorizontalFlowBarrierResistance`,
+  :class:`imod.mf6.HorizontalFlowBarrierMultiplier`,
+  :class:`imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic` now uses
+  vertical Polygons instead of Linestrings as geometry, and ``"ztop"`` and
+  ``"zbottom"`` variables are not used anymore. See
+  :func:`imod.prepare.linestring_to_square_zpolygons` and
+  :func:`imod.prepare.linestring_to_trapezoid_zpolygons` to generate these
+  polygons.
+- :func:`open_projectfile_data` now returns well data grouped by ipf name,
+  instead of generic, separate number per entry.
+- :class:`imod.mf6.Well` now supports wells which have a filter with zero
+  length, where ``"screen_top"`` equals ``"screen_bottom"``.
+- :class:`imod.mf6.Well` shares the same default ``minimum_thickness`` as
+  :func:`imod.prepare.assign_wells`, which is 0.05, before this was 1.0.
+- :func:`imod.prepare.allocate_drn_cells`,
+  :func:`imod.prepare.allocate_ghb_cells`,
+  :func:`imod.prepare.allocate_riv_cells`, now allocate to the first model layer
+  when elevations are above or equal to model top for all methods in
+  :func:`imod.prepare.ALLOCATION_OPTION`.
+- :meth:`imod.mf6.Well.to_mf6_pkg` got a new argument:
+  ``strict_well_validation``, which controls the behavior for when wells are
+  removed entirely during their assignment to layers. This replaces the
+  ``is_partitioned`` argument.
 - :func:`imod.prepare.fill` now takes a ``dims`` argument instead of ``by``,
   and will fill over N dimensions. Secondly, the function no longer takes
   an ``invalid`` argument, but instead always treats NaNs as missing.
 
-0.17.2
-------
+
+Added
+~~~~~
+
+- :meth:`imod.mf6.Modflow6Simulation.from_imod5_data` to import imod5 data
+  loaded with :func:`imod.formats.prj.open_projectfile_data` as a MODFLOW 6
+  simulation.
+- :func:`imod.prepare.linestring_to_square_zpolygons` and
+  :func:`imod.prepare.linestring_to_trapezoid_zpolygons` to generate vertical
+  polygons that can be used to specify horizontal flow barriers, specifically:
+  :class:`imod.mf6.HorizontalFlowBarrierResistance`,
+  :class:`imod.mf6.HorizontalFlowBarrierMultiplier`,
+  :class:`imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic`.
+- :class:`imod.mf6.LayeredWell` to specify wells directly to layers instead
+  assigning them with filter depths.
+- :func:`imod.prepare.cleanup_drn`, :func:`imod.prepare.cleanup_ghb`,
+  :func:`imod.prepare.cleanup_riv`, :func:`imod.prepare.cleanup_wel`. These are
+  utility functions to clean up drainage, general head boundaries, and rivers,
+  respectively.
+- :meth:`imod.mf6.Drainage.cleanup`,
+  :meth:`imod.mf6.GeneralHeadboundary.cleanup`, :meth:`imod.mf6.River.cleanup`,
+  :meth:`imod.mf6.Well.cleanup` convenience methods to call the corresponding
+  cleanup utility functions with the appropriate arguments.
+
+
+Removed
+~~~~~~~
+
+- :func:`imod.formats.prj.convert_to_disv` has been removed. This functionality
+  has been replaced by :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`. To
+  convert a structured simulation to an unstructured simulation, call:
+  :meth:`imod.mf6.Modflow6Simulation.regrid_like`
+
+
+[0.17.2] - 2024-09-17
+---------------------
 
 Fixed
 ~~~~~
@@ -77,6 +142,16 @@ Changed
   :class:`imod.mf6.regrid.RiverRegridMethod`,
   :class:`imod.mf6.regrid.SpecificStorageRegridMethod`,
   :class:`imod.mf6.regrid.StorageCoefficientRegridMethod`.
+- Renamed ``imod.mf6.LayeredHorizontalFlowBarrier`` classes to
+  :class:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance`,
+  :class:`imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic`,
+  :class:`imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier`,
+
+Fixed
+~~~~~
+- :func:`imod.formats.prj.open_projectfile_data` now reports the path to a
+  faulty IPF or IDF file in the error message.
+
 
 
 
@@ -318,9 +393,12 @@ Added
 - Added Python 3.11 support.
 - The GWF-GWF exchange options are derived from user created packages (NPF, OC) and
   set automatically.
-- Added the ``simulation_start_time`` and ``time_unit`` arguments. To the ``Modflow6Simulation.open_`` methods, and ``imod.mf6.out.open_`` functions. This converts the ``"time"`` coordinate to datetimes.
-- added :meth:`imod.mf6.Modflow6Simulation.mask_all_models`  to apply a mask to all models under a simulation,
-  provided the simulation is not split and the models use the same discretization. 
+- Added the ``simulation_start_time`` and ``time_unit`` arguments. To the
+  ``Modflow6Simulation.open_`` methods, and ``imod.mf6.out.open_`` functions.
+  This converts the ``"time"`` coordinate to datetimes.
+- added :meth:`imod.mf6.Modflow6Simulation.mask_all_models` to apply a mask to
+  all models under a simulation, provided the simulation is not split and the
+  models use the same discretization. 
 
 
 Changed

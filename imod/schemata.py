@@ -74,7 +74,7 @@ def scalar_None(obj):
     if not isinstance(obj, (xr.DataArray, xu.UgridDataArray)):
         return False
     else:
-        return (len(obj.shape) == 0) & (~obj.notnull()).all()
+        return (len(obj.shape) == 0) and (obj.isnull()).all()
 
 
 def align_other_obj_with_coords(
@@ -500,6 +500,36 @@ class AnyValueSchema(ValueSchema):
         if not condition.any():
             raise ValidationError(
                 f"not a single value complies with criterion: {self.operator_str} {self.other}"
+            )
+
+
+class MaxNUniqueValuesSchema(BaseSchema):
+    """
+    Fails if amount of unique values exceeds a limit.
+    """
+
+    def __init__(self, max_unique_values: int):
+        self.max_unique_values = max_unique_values
+
+    def validate(self, obj: GridDataArray, **kwargs) -> None:
+        if len(np.unique(obj)) > self.max_unique_values:
+            raise ValidationError(
+                f"Amount of unique values exceeds limit of {self.max_unique_values}"
+            )
+
+
+class UniqueValuesSchema(BaseSchema):
+    def __init__(self, other_value: list) -> None:
+        """
+        Validate if unique values in other values list
+        """
+        self.other_value = other_value
+
+    def validate(self, obj: GridDataArray, **kwargs) -> None:
+        unique_values = np.unique(obj)
+        if not np.all(np.isin(unique_values, self.other_value)):
+            raise ValidationError(
+                f"Unique values not matching: {self.other_value}, got unique values: {unique_values}"
             )
 
 

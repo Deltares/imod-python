@@ -16,6 +16,7 @@ from imod.mf6 import ConstantHead
 from imod.mf6.model import Modflow6Model
 from imod.mf6.model_gwf import GroundwaterFlowModel
 from imod.mf6.package import Package
+from imod.mf6.validation_context import ValidationContext
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 
@@ -105,6 +106,7 @@ class TestModel:
         model_name = "Test model"
         model = Modflow6Model()
         # create write context
+        validation_context = ValidationContext()
         write_context = WriteContext(tmp_path)
 
         discretization_mock = MagicMock(spec_set=Package)
@@ -119,7 +121,9 @@ class TestModel:
         global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
 
         # Act.
-        status = model.write(model_name, global_times_mock, True, write_context)
+        status = model.write(
+            model_name, global_times_mock, write_context, validation_context
+        )
 
         # Assert.
         assert not status.has_errors()
@@ -130,6 +134,7 @@ class TestModel:
         model_name = "Test model"
         model = Modflow6Model()
         # create write context
+        validation_context = ValidationContext()
         write_context = WriteContext(tmp_path)
 
         template_mock = MagicMock(spec_set=Template)
@@ -139,7 +144,9 @@ class TestModel:
         global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
 
         # Act.
-        status = model.write(model_name, global_times_mock, True, write_context)
+        status = model.write(
+            model_name, global_times_mock, write_context, validation_context
+        )
 
         # Assert.
         assert status.has_errors()
@@ -150,6 +157,7 @@ class TestModel:
         model_name = "Test model"
         model = Modflow6Model()
         # create write context
+        validation_context = ValidationContext()
         write_context = WriteContext(tmp_path)
 
         discretization_mock = MagicMock(spec_set=Package)
@@ -168,7 +176,7 @@ class TestModel:
 
         # Act.
         status = model.write(
-            model_name, global_times_mock, True, write_context=write_context
+            model_name, global_times_mock, write_context, validation_context
         )
 
         # Assert.
@@ -178,6 +186,7 @@ class TestModel:
         # Arrange.
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
+        validation_context = ValidationContext()
         write_context = WriteContext(simulation_directory=tmp_path)
 
         model = Modflow6Model()
@@ -205,7 +214,9 @@ class TestModel:
 
         # Act.
         write_context = WriteContext(tmp_path)
-        status = model.write(model_name, global_times_mock, True, write_context)
+        status = model.write(
+            model_name, global_times_mock, write_context, validation_context
+        )
 
         # Assert.
         assert len(status.errors) == 2

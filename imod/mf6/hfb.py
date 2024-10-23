@@ -4,10 +4,12 @@ import textwrap
 import typing
 from copy import deepcopy
 from enum import Enum
-from typing import TYPE_CHECKING, Optional, Tuple
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 
 import cftime
 import numpy as np
+import numpy.typing as npt
+import pandas as pd
 import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
@@ -17,9 +19,16 @@ from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
+from imod.mf6.utilities.clip import clip_line_gdf_by_grid
 from imod.mf6.utilities.grid import broadcast_to_full_domain
-from imod.schemata import EmptyIndexesSchema
-from imod.typing import GridDataArray
+from imod.mf6.utilities.hfb import (
+    _create_zlinestring_from_bound_df,
+    _extract_hfb_bounds_from_zpolygons,
+    _prepare_index_names,
+)
+from imod.schemata import EmptyIndexesSchema, MaxNUniqueValuesSchema
+from imod.typing import GeoDataFrameType, GridDataArray, LineStringType
+from imod.typing.grid import as_ugrid_dataarray
 from imod.util.imports import MissingOptionalModule
 
 if TYPE_CHECKING:
@@ -30,16 +39,20 @@ else:
     except ImportError:
         gpd = MissingOptionalModule("geopandas")
 
-try:
+
+if TYPE_CHECKING:
     import shapely
-except ImportError:
-    shapely = MissingOptionalModule("shapely")
+else:
+    try:
+        import shapely
+    except ImportError:
+        shapely = MissingOptionalModule("shapely")
 
 
 @typedispatch
 def _derive_connected_cell_ids(
     idomain: xr.DataArray, grid: xu.Ugrid2d, edge_index: np.ndarray
-):
+) -> xr.Dataset:
     """
     Derive the cell ids of the connected cells of an edge on a structured grid.
 
@@ -88,7 +101,7 @@ def _derive_connected_cell_ids(
 @typedispatch  # type: ignore[no-redef]
 def _derive_connected_cell_ids(
     _: xu.UgridDataArray, grid: xu.Ugrid2d, edge_index: np.ndarray
-):
+) -> xr.Dataset:
     """
     Derive the cell ids of the connected cells of an edge on an unstructured grid.
 
@@ -175,21 +188,93 @@ def to_connected_cells_dataset(
             },
         )
 
-    barrier_dataset = (
-        barrier_dataset.stack(cell_id=("layer", "edge_index"), create_index=False)
-        .drop_vars("edge_index")
-        .reset_coords()
+    barrier_dataset = barrier_dataset.stack(
+        cell_id=("layer", "edge_index"), create_index=True
     )
 
     return barrier_dataset.dropna("cell_id")
 
 
+def _make_linestring_from_polygon(
+    dataframe: GeoDataFrameType,
+) -> List[LineStringType]:
+    """
+    Make linestring from a polygon with one axis in the vertical dimension (z),
+    and one axis in the horizontal plane (x & y dimension).
+    """
+    coordinates, index = shapely.get_coordinates(dataframe.geometry, return_index=True)
+    df = pd.DataFrame(
+        {"polygon_index": index, "x": coordinates[:, 0], "y": coordinates[:, 1]}
+    )
+    df = df.drop_duplicates().reset_index(drop=True)
+    df = df.set_index("polygon_index")
+
+    linestrings = [
+        shapely.LineString(gb.values) for _, gb in df.groupby("polygon_index")
+    ]
+
+    return linestrings
+
+
+def _select_dataframe_with_snapped_line_index(
+    snapped_dataset: xr.Dataset, edge_index: np.ndarray, dataframe: GeoDataFrameType
+):
+    """
+    Select dataframe rows with line indices of snapped edges. Usually, the
+    broadcasting results in a larger dataframe where individual rows of input
+    dataframe are repeated for multiple edges.
+    """
+    line_index = snapped_dataset["line_index"].values
+    line_index = line_index[edge_index].astype(int)
+    return dataframe.iloc[line_index]
+
+
+def _extract_mean_hfb_bounds_from_dataframe(
+    dataframe: GeoDataFrameType,
+) -> Tuple[pd.Series, pd.Series]:
+    """
+    Extract hfb bounds from dataframe. Requires dataframe geometry to be of type
+    shapely "Z Polygon".
+
+    For the upper z bounds, function takes the average of the depth of the two
+    upper nodes. The same holds for the lower z bounds, but then with the two
+    lower nodes.
+
+    As a visual representation, this happens for each z bound:
+
+    .                 .
+     \         >>>
+      \   .    >>>     ---  .
+       \ /     >>>         -
+        .                 .
+
+    """
+    dataframe = _prepare_index_names(dataframe)
+
+    if not dataframe.geometry.has_z.all():
+        raise TypeError("GeoDataFrame geometry has no z, which is required.")
+
+    lower, upper = _extract_hfb_bounds_from_zpolygons(dataframe)
+    # Compute means inbetween nodes.
+    index_names = lower.index.names
+    lower_mean = lower.groupby(index_names)["z"].mean()
+    upper_mean = upper.groupby(index_names)["z"].mean()
+
+    # Assign to dataframe to map means to right index.
+    df_to_broadcast = dataframe.copy()
+    df_to_broadcast["lower"] = lower_mean
+    df_to_broadcast["upper"] = upper_mean
+
+    return df_to_broadcast["lower"], df_to_broadcast["upper"]
+
+
 def _fraction_layer_overlap(
     snapped_dataset: xu.UgridDataset,
     edge_index: np.ndarray,
+    dataframe: GeoDataFrameType,
     top: xu.UgridDataArray,
     bottom: xu.UgridDataArray,
-):
+) -> xr.DataArray:
     """
     Computes the fraction a barrier occupies inside a layer.
     """
@@ -202,11 +287,10 @@ def _fraction_layer_overlap(
     layer_bounds[..., 0] = typing.cast(np.ndarray, bottom_mean.values).T
     layer_bounds[..., 1] = typing.cast(np.ndarray, top_mean.values).T
 
+    zmin, zmax = _extract_mean_hfb_bounds_from_dataframe(dataframe)
     hfb_bounds = np.empty((n_edge, n_layer, 2), dtype=float)
-    hfb_bounds[..., 0] = (
-        snapped_dataset["zbottom"].values[edge_index].reshape(n_edge, 1)
-    )
-    hfb_bounds[..., 1] = snapped_dataset["ztop"].values[edge_index].reshape(n_edge, 1)
+    hfb_bounds[..., 0] = zmin.values[:, np.newaxis]
+    hfb_bounds[..., 1] = zmax.values[:, np.newaxis]
 
     overlap = _vectorized_overlap(hfb_bounds, layer_bounds)
     height = layer_bounds[..., 1] - layer_bounds[..., 0]
@@ -245,7 +329,7 @@ def _mean_left_and_right(
     return xr.concat((uda_left, uda_right), dim="two").mean("two")
 
 
-def _vectorized_overlap(bounds_a: np.ndarray, bounds_b: np.ndarray):
+def _vectorized_overlap(bounds_a: np.ndarray, bounds_b: np.ndarray) -> np.ndarray:
     """
     Vectorized overlap computation. Returns the overlap of 2 vectors along the same axis.
     If there is no overlap zero will be returned.
@@ -270,6 +354,73 @@ def _vectorized_overlap(bounds_a: np.ndarray, bounds_b: np.ndarray):
         np.minimum(bounds_a[..., 1], bounds_b[..., 1])
         - np.maximum(bounds_a[..., 0], bounds_b[..., 0]),
     )
+
+
+def _prepare_barrier_dataset_for_mf6_adapter(dataset: xr.Dataset) -> xr.Dataset:
+    """
+    Prepare barrier dataset for the initialization of Mf6HorizontalFlowBarrier.
+    The dataset is expected to have "edge_index" and "layer" coordinates and a
+    multi-index "cell_id" coordinate. The dataset contains as variables:
+    "cell_id1", "cell_id2", and "hydraulic_characteristic".
+
+    - Reset coords to get a coordless "cell_id" dimension instead of a multi-index coord
+    - Assign "layer" as variable to dataset instead of as coord.
+    """
+    # Store layer to work around multiindex issue where dropping the edge_index
+    # removes the layer as well.
+    layer = dataset.coords["layer"].values
+    # Drop leftover coordinate and reset cell_id.
+    dataset = dataset.drop_vars("edge_index").reset_coords()
+    # Attach layer again
+    dataset["layer"] = ("cell_id", layer)
+    return dataset
+
+
+def _snap_to_grid_and_aggregate(
+    barrier_dataframe: GeoDataFrameType, grid2d: xu.Ugrid2d, vardict_agg: dict[str, str]
+) -> tuple[xu.UgridDataset, npt.NDArray]:
+    """
+    Snap barrier dataframe to grid and aggregate multiple lines with a list of
+    methods per variable.
+
+    Parameters
+    ----------
+    barrier_dataframe: geopandas.GeoDataFrame
+        GeoDataFrame with barriers, should have variable "line_index".
+    grid2d: xugrid.Ugrid2d
+        Grid to snap lines to
+    vardict_agg: dict
+        Mapping of variable name to aggregation method
+
+    Returns
+    -------
+    snapping_dataset: xugrid.UgridDataset
+        Dataset with all variables snapped and aggregated to cell edges
+    edge_index: numpy.array
+        1D array with indices of cell edges that lines were snapped to
+    """
+    snapping_df = xu.create_snap_to_grid_dataframe(
+        barrier_dataframe, grid2d, max_snap_distance=0.5
+    )
+    # Map other variables to snapping_df with line indices
+    line_index = snapping_df["line_index"]
+    vars_to_snap = list(vardict_agg.keys())
+    if "line_index" in vars_to_snap:
+        vars_to_snap.remove("line_index")  # snapping_df already has line_index
+    for varname in vars_to_snap:
+        snapping_df[varname] = barrier_dataframe[varname].iloc[line_index].to_numpy()
+    # Aggregate to grid edges
+    gb_edge = snapping_df.groupby("edge_index")
+    # Initialize dataset and dataarray with the right shape and dims
+    snapped_dataset = xu.UgridDataset(grids=[grid2d])
+    new = xr.DataArray(np.full(grid2d.n_edge, np.nan), dims=[grid2d.edge_dimension])
+    edge_index = np.array(list(gb_edge.indices.keys()))
+    # Aggregate with different methods per variable
+    for varname, method in vardict_agg.items():
+        snapped_dataset[varname] = new.copy()
+        snapped_dataset[varname].data[edge_index] = gb_edge[varname].aggregate(method)
+
+    return snapped_dataset, edge_index
 
 
 class BarrierType(Enum):
@@ -301,7 +452,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         ] + self._get_vertical_variables()
 
     @property
-    def line_data(self) -> "gpd.GeoDataFrame":
+    def line_data(self) -> GeoDataFrameType:
         variables_for_gdf = self._get_variable_names_for_gdf()
         return gpd.GeoDataFrame(
             self.dataset[variables_for_gdf].to_dataframe(),
@@ -309,7 +460,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         )
 
     @line_data.setter
-    def line_data(self, value: "gpd.GeoDataFrame") -> None:
+    def line_data(self, value: GeoDataFrameType) -> None:
         variables_for_gdf = self._get_variable_names_for_gdf()
         self.dataset = self.dataset.merge(
             value.to_xarray(), overwrite_vars=variables_for_gdf, join="right"
@@ -336,49 +487,37 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
     ):
         raise NotImplementedError()
 
-    def to_mf6_pkg(
+    def _to_connected_cells_dataset(
         self,
         idomain: GridDataArray,
         top: GridDataArray,
         bottom: GridDataArray,
         k: GridDataArray,
-        validate: bool = False,
-    ) -> Mf6HorizontalFlowBarrier:
+    ) -> xr.Dataset:
         """
-        Write package to Modflow 6 package.
-
-        Based on the model grid, top and bottoms, the layers in which the barrier belong are computed. If the
-        barrier only partially occupies a layer an effective resistance or hydraulic conductivity for that layer is
-        calculated. This calculation is skipped for the Multiplier type.
-
-        Parameters
-        ----------
-        idomain: GridDataArray
-             Grid with active cells.
-        top: GridDataArray
-            Grid with top of model layers.
-        bottom: GridDataArray
-            Grid with bottom of model layers.
-        k: GridDataArray
-            Grid with hydraulic conductivities.
-        validate: bool
-            Run validation before converting
+        Method does the following
+        - forces input grids to unstructured
+        - snaps lines to cell edges
+        - remove edge values connected to cell edges
+        - compute barrier values
+        - remove edge values to inactive cells
+        - finds connected cells in dataset
 
         Returns
         -------
-
+        dataset with connected cells, containing:
+            - cell_id1
+            - cell_id2
+            - layer
+            - value name
         """
-        if validate:
-            self._validate(self._write_schemata)
-
         top, bottom = broadcast_to_full_domain(idomain, top, bottom)
         k = idomain * k
+        # Enforce unstructured
         unstructured_grid, top, bottom, k = (
-            self.__to_unstructured(idomain, top, bottom, k)
-            if isinstance(idomain, xr.DataArray)
-            else [idomain, top, bottom, k]
+            as_ugrid_dataarray(grid) for grid in [idomain, top, bottom, k]
         )
-        snapped_dataset, edge_index = self.__snap_to_grid(idomain)
+        snapped_dataset, edge_index = self._snap_to_grid(idomain)
         edge_index = self.__remove_invalid_edges(unstructured_grid, edge_index)
 
         barrier_values = self._compute_barrier_values(
@@ -401,7 +540,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
                 )
             )
 
-        barrier_dataset = to_connected_cells_dataset(
+        return to_connected_cells_dataset(
             idomain,
             unstructured_grid.ugrid.grid,
             edge_index,
@@ -412,16 +551,65 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             },
         )
 
-        barrier_dataset["print_input"] = self.dataset["print_input"]
+    def _to_mf6_pkg(self, barrier_dataset: xr.Dataset) -> Mf6HorizontalFlowBarrier:
+        """
+        Internal method, which does the following
+        - final coordinate cleanup of barrier dataset
+        - adds missing options to dataset
 
+        Parameters
+        ----------
+        barrier_dataset: xr.Dataset
+            Xarray dataset with dimensions "cell_dims1", "cell_dims2", "cell_id".
+            Additional coordinates should be "layer" and "edge_index".
+
+        Returns
+        -------
+        Mf6HorizontalFlowBarrier
+        """
+        barrier_dataset["print_input"] = self.dataset["print_input"]
+        barrier_dataset = _prepare_barrier_dataset_for_mf6_adapter(barrier_dataset)
         return Mf6HorizontalFlowBarrier(**barrier_dataset.data_vars)
+
+    def to_mf6_pkg(
+        self,
+        idomain: GridDataArray,
+        top: GridDataArray,
+        bottom: GridDataArray,
+        k: GridDataArray,
+    ) -> Mf6HorizontalFlowBarrier:
+        """
+        Write package to Modflow 6 package.
+
+        Based on the model grid, top and bottoms, the layers in which the barrier belong are computed. If the
+        barrier only partially occupies a layer an effective resistance or hydraulic conductivity for that layer is
+        calculated. This calculation is skipped for the Multiplier type.
+
+        Parameters
+        ----------
+        idomain: GridDataArray
+             Grid with active cells.
+        top: GridDataArray
+            Grid with top of model layers.
+        bottom: GridDataArray
+            Grid with bottom of model layers.
+        k: GridDataArray
+            Grid with hydraulic conductivities.
+
+        Returns
+        -------
+        Mf6HorizontalFlowBarrier
+            Low level representation of the HFB package as MODFLOW 6 expects it.
+        """
+        barrier_dataset = self._to_connected_cells_dataset(idomain, top, bottom, k)
+        return self._to_mf6_pkg(barrier_dataset)
 
     def is_empty(self) -> bool:
         if super().is_empty():
             return True
 
         linestrings = self.dataset["geometry"]
-        only_empty_lines = all(ls.is_empty for ls in linestrings.values)
+        only_empty_lines = all(ls.is_empty for ls in linestrings.values.ravel())
         return only_empty_lines
 
     def _resistance_layer(
@@ -484,7 +672,12 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             snapped_dataset[self._get_variable_name()]
         ).values[edge_index]
 
-        fraction = _fraction_layer_overlap(snapped_dataset, edge_index, top, bottom)
+        dataframe = _select_dataframe_with_snapped_line_index(
+            snapped_dataset, edge_index, self.line_data
+        )
+        fraction = _fraction_layer_overlap(
+            snapped_dataset, edge_index, dataframe, top, bottom
+        )
 
         c_aquifer = 1.0 / k_mean
         inverse_c = (fraction / resistance) + ((1.0 - fraction) / c_aquifer)
@@ -580,8 +773,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         sliced : Package
         """
         cls = type(self)
-        new = cls.__new__(cls)
-        new.dataset = copy.deepcopy(self.dataset)
+        new = cls._from_dataset(copy.deepcopy(self.dataset))
         new.line_data = self.line_data
         return new
 
@@ -592,37 +784,36 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         """
         return deepcopy(self)
 
-    @staticmethod
-    def __to_unstructured(
-        idomain: xr.DataArray, top: xr.DataArray, bottom: xr.DataArray, k: xr.DataArray
-    ) -> Tuple[
-        xu.UgridDataArray, xu.UgridDataArray, xu.UgridDataArray, xu.UgridDataArray
-    ]:
-        unstruct = xu.UgridDataArray.from_structured(idomain)
-        top = xu.UgridDataArray.from_structured(top)
-        bottom = xu.UgridDataArray.from_structured(bottom)
-        k = xu.UgridDataArray.from_structured(k)
-
-        return unstruct, top, bottom, k
-
-    def __snap_to_grid(
+    def _snap_to_grid(
         self, idomain: GridDataArray
     ) -> Tuple[xu.UgridDataset, np.ndarray]:
-        if "layer" in self.dataset:
-            variable_names = [self._get_variable_name(), "geometry", "layer"]
+        variable_name = self._get_variable_name()
+        has_layer = "layer" in self._get_vertical_variables()
+        # Create geodataframe with barriers
+        if has_layer:
+            varnames_for_df = [variable_name, "geometry", "layer"]
         else:
-            variable_names = [self._get_variable_name(), "geometry", "ztop", "zbottom"]
-        barrier_dataframe = self.dataset[variable_names].to_dataframe()
-
-        snapped_dataset, _ = typing.cast(
-            xu.UgridDataset,
-            xu.snap_to_grid(barrier_dataframe, grid=idomain, max_snap_distance=0.5),
+            varnames_for_df = [variable_name, "geometry"]
+        barrier_dataframe = gpd.GeoDataFrame(
+            self.dataset[varnames_for_df].to_dataframe()
         )
-        edge_index = np.argwhere(
-            snapped_dataset[self._get_variable_name()].notnull().values
-        ).ravel()
+        # Convert vertical polygon to linestring
+        if not has_layer:
+            lower, _ = _extract_hfb_bounds_from_zpolygons(barrier_dataframe)
+            linestring = _create_zlinestring_from_bound_df(lower)
+            barrier_dataframe["geometry"] = linestring["geometry"]
+        # Clip barriers outside domain
+        barrier_dataframe = clip_line_gdf_by_grid(
+            barrier_dataframe, idomain.sel(layer=1)
+        )
+        # Prepare variable names and methods for aggregation
+        vardict_agg = {"line_index": "first", variable_name: "sum"}
+        if has_layer:
+            vardict_agg["layer"] = "first"
+        # Create grid from structured
+        grid2d = as_ugrid_dataarray(idomain.sel(layer=1)).grid
 
-        return snapped_dataset, edge_index
+        return _snap_to_grid_and_aggregate(barrier_dataframe, grid2d, vardict_agg)
 
     @staticmethod
     def __remove_invalid_edges(
@@ -679,7 +870,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
 class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
     """
-     Horizontal Flow Barrier (HFB) package
+    Horizontal Flow Barrier (HFB) package
 
     Input to the Horizontal Flow Barrier (HFB) Package is read from the file
     that has type "HFB6" in the Name File. Only one HFB Package can be
@@ -692,21 +883,20 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
         Dataframe that describes:
          - geometry: the geometries of the barriers,
          - hydraulic_characteristic: the hydraulic characteristic of the barriers
-         - ztop: the top z-value of the barriers
-         - zbottom: the bottom z-value of the barriers
     print_input: bool
 
     Examples
     --------
 
-    >>> barrier_x = [-1000.0, 0.0, 1000.0]
-    >>> barrier_y = [500.0, 250.0, 500.0]
+    >>> x = [-10.0, 0.0, 10.0]
+    >>> y = [10.0, 0.0, -10.0]
+    >>> ztop = [10.0, 20.0, 15.0]
+    >>> zbot = [-10.0, -20.0, 0.0]
+    >>> polygons = linestring_to_trapezoid_zpolygons(x, y, ztop, zbot)
     >>> barrier_gdf = gpd.GeoDataFrame(
-    >>>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
+    >>>     geometry=polygons,
     >>>     data={
-    >>>         "hydraulic_characteristic": [1e-3,],
-    >>>         "ztop": [10.0,],
-    >>>         "zbottom": [0.0,],
+    >>>         "resistance": [1e-3, 1e-3],
     >>>     },
     >>> )
     >>> hfb = imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic(barrier_gdf)
@@ -728,7 +918,7 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
         return "hydraulic_characteristic"
 
     def _get_vertical_variables(self) -> list:
-        return ["ztop", "zbottom"]
+        return []
 
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
@@ -740,9 +930,11 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
         return barrier_values
 
 
-class LayeredHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
+class SingleLayerHorizontalFlowBarrierHydraulicCharacteristic(
+    HorizontalFlowBarrierBase
+):
     """
-     Horizontal Flow Barrier (HFB) package
+    Horizontal Flow Barrier (HFB) package
 
     Input to the Horizontal Flow Barrier (HFB) Package is read from the file
     that has type "HFB6" in the Name File. Only one HFB Package can be
@@ -754,8 +946,10 @@ class LayeredHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierB
     geometry: gpd.GeoDataFrame
         Dataframe that describes:
          - geometry: the geometries of the barriers,
-         - hydraulic_characteristic: the hydraulic characteristic of the barriers
-         - layer: model layer for the barrier
+         - hydraulic_characteristic: the hydraulic characteristic of the
+           barriers
+         - layer: model layer for the barrier, only 1 single layer can be
+           entered.
     print_input: bool
 
     Examples
@@ -770,9 +964,14 @@ class LayeredHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierB
     >>>         "layer": [1,]
     >>>     },
     >>> )
-    >>> hfb = imod.mf6.LayeredHorizontalFlowBarrierHydraulicCharacteristic(barrier_gdf)
+    >>> hfb = imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic(barrier_gdf)
 
     """
+
+    _write_schemata = {
+        "geometry": [EmptyIndexesSchema()],
+        "layer": [MaxNUniqueValuesSchema(1)],
+    }
 
     @init_log_decorator()
     def __init__(
@@ -805,7 +1004,7 @@ class LayeredHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierB
 
 class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     """
-     Horizontal Flow Barrier (HFB) package
+    Horizontal Flow Barrier (HFB) package
 
     Input to the Horizontal Flow Barrier (HFB) Package is read from the file
     that has type "HFB6" in the Name File. Only one HFB Package can be
@@ -820,21 +1019,20 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
         Dataframe that describes:
          - geometry: the geometries of the barriers,
          - multiplier: the multiplier of the barriers
-         - ztop: the top z-value of the barriers
-         - zbottom: the bottom z-value of the barriers
     print_input: bool
 
     Examples
     --------
 
-    >>> barrier_x = [-1000.0, 0.0, 1000.0]
-    >>> barrier_y = [500.0, 250.0, 500.0]
+    >>> x = [-10.0, 0.0, 10.0]
+    >>> y = [10.0, 0.0, -10.0]
+    >>> ztop = [10.0, 20.0, 15.0]
+    >>> zbot = [-10.0, -20.0, 0.0]
+    >>> polygons = linestring_to_trapezoid_zpolygons(x, y, ztop, zbot)
     >>> barrier_gdf = gpd.GeoDataFrame(
-    >>>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
+    >>>     geometry=polygons,
     >>>     data={
-    >>>         "multiplier": [1.5,],
-    >>>         "ztop": [10.0,],
-    >>>         "zbottom": [0.0,],
+    >>>         "multiplier": [10.0, 10.0],
     >>>     },
     >>> )
     >>> hfb = imod.mf6.HorizontalFlowBarrierMultiplier(barrier_gdf)
@@ -856,12 +1054,17 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
         return "multiplier"
 
     def _get_vertical_variables(self) -> list:
-        return ["ztop", "zbottom"]
+        return []
 
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
     ):
-        fraction = _fraction_layer_overlap(snapped_dataset, edge_index, top, bottom)
+        dataframe = _select_dataframe_with_snapped_line_index(
+            snapped_dataset, edge_index, self.line_data
+        )
+        fraction = _fraction_layer_overlap(
+            snapped_dataset, edge_index, dataframe, top, bottom
+        )
 
         barrier_values = (
             fraction.where(fraction)
@@ -871,16 +1074,14 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
         return barrier_values
 
 
-class LayeredHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
+class SingleLayerHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     """
-     Horizontal Flow Barrier (HFB) package
+    Horizontal Flow Barrier (HFB) package
 
     Input to the Horizontal Flow Barrier (HFB) Package is read from the file
     that has type "HFB6" in the Name File. Only one HFB Package can be
     specified for a GWF model.
     https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.2.2.pdf
-
-    If parts of the barrier overlap a layer the multiplier is applied to the entire layer.
 
     Parameters
     ----------
@@ -888,7 +1089,8 @@ class LayeredHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
         Dataframe that describes:
          - geometry: the geometries of the barriers,
          - multiplier: the multiplier of the barriers
-         - layer: model layer for the barrier
+         - layer: model layer for the barrier, only 1 single layer can be
+           entered.
     print_input: bool
 
     Examples
@@ -903,9 +1105,14 @@ class LayeredHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     >>>         "layer": [1,],
     >>>     },
     >>> )
-    >>> hfb = imod.mf6.LayeredHorizontalFlowBarrierMultiplier(barrier_gdf)
+    >>> hfb = imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier(barrier_gdf)
 
     """
+
+    _write_schemata = {
+        "geometry": [EmptyIndexesSchema()],
+        "layer": [MaxNUniqueValuesSchema(1)],
+    }
 
     @init_log_decorator()
     def __init__(
@@ -971,21 +1178,21 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         Dataframe that describes:
          - geometry: the geometries of the barriers,
          - resistance: the resistance of the barriers
-         - ztop: the top z-value of the barriers
-         - zbottom: the bottom z-value of the barriers
+
     print_input: bool
 
     Examples
     --------
 
-    >>> barrier_x = [-1000.0, 0.0, 1000.0]
-    >>> barrier_y = [500.0, 250.0, 500.0]
+    >>> x = [-10.0, 0.0, 10.0]
+    >>> y = [10.0, 0.0, -10.0]
+    >>> ztop = [10.0, 20.0, 15.0]
+    >>> zbot = [-10.0, -20.0, 0.0]
+    >>> polygons = linestring_to_trapezoid_zpolygons(x, y, ztop, zbot)
     >>> barrier_gdf = gpd.GeoDataFrame(
-    >>>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
+    >>>     geometry=polygons,
     >>>     data={
-    >>>         "resistance": [1e3,],
-    >>>         "ztop": [10.0,],
-    >>>         "zbottom": [0.0,],
+    >>>         "resistance": [1e3, 1e3],
     >>>     },
     >>> )
     >>> hfb = imod.mf6.HorizontalFlowBarrierResistance(barrier_gdf)
@@ -1008,7 +1215,7 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         return "resistance"
 
     def _get_vertical_variables(self) -> list:
-        return ["ztop", "zbottom"]
+        return []
 
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
@@ -1020,7 +1227,7 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         return barrier_values
 
 
-class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
+class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     """
     Horizontal Flow Barrier (HFB) package
 
@@ -1035,7 +1242,8 @@ class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
         Dataframe that describes:
          - geometry: the geometries of the barriers,
          - resistance: the resistance of the barriers
-         - layer: model layer for the barrier
+         - layer: model layer for the barrier, only 1 single layer can be
+           entered.
     print_input: bool
 
     Examples
@@ -1050,10 +1258,15 @@ class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     >>>         "layer": [2,],
     >>>     },
     >>> )
-    >>> hfb = imod.mf6.LayeredHorizontalFlowBarrierResistance(barrier_gdf)
+    >>> hfb = imod.mf6.SingleLayerHorizontalFlowBarrierResistance(barrier_gdf)
 
 
     """
+
+    _write_schemata = {
+        "geometry": [EmptyIndexesSchema()],
+        "layer": [MaxNUniqueValuesSchema(1)],
+    }
 
     @init_log_decorator()
     def __init__(
@@ -1080,5 +1293,25 @@ class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
             edge_index,
             idomain,
         )
-
         return barrier_values
+
+    @classmethod
+    def from_imod5_data(cls, key: str, imod5_data: Dict[str, Dict[str, GridDataArray]]):
+        imod5_keys = list(imod5_data.keys())
+        if key not in imod5_keys:
+            raise ValueError("hfb key not present.")
+
+        hfb_dict = imod5_data[key]
+        if not list(hfb_dict.keys()) == ["geodataframe", "layer"]:
+            raise ValueError("hfb is not a SingleLayerHorizontalFlowBarrierResistance")
+        layer = hfb_dict["layer"]
+        if layer == 0:
+            raise ValueError(
+                "assigning to layer 0 is not supported for "
+                "SingleLayerHorizontalFlowBarrierResistance. "
+                "Try HorizontalFlowBarrierResistance class."
+            )
+        geometry_layer = hfb_dict["geodataframe"]
+        geometry_layer["layer"] = layer
+
+        return cls(geometry_layer)

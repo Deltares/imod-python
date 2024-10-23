@@ -1,5 +1,6 @@
 import abc
-from typing import Any, Dict
+from copy import deepcopy
+from typing import Any, Dict, Optional
 
 import numpy as np
 
@@ -10,6 +11,7 @@ from imod.mf6.regrid.regrid_schemes import (
     SpecificStorageRegridMethod,
     StorageCoefficientRegridMethod,
 )
+from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
@@ -18,6 +20,8 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
 )
+from imod.typing import GridDataArray
+from imod.typing.grid import zeros_like
 
 
 class Storage(Package):
@@ -191,6 +195,10 @@ class SpecificStorage(StorageBase):
         d = self._render_dict(directory, pkgname, globaltimes, binary)
         return self._template.render(d)
 
+    @classmethod
+    def get_regrid_methods(cls) -> SpecificStorageRegridMethod:
+        return deepcopy(cls._regrid_method)
+
 
 class StorageCoefficient(StorageBase):
     """
@@ -288,12 +296,7 @@ class StorageCoefficient(StorageBase):
             AllValueSchema(">=", 0.0),
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),
-        "convertible": (
-            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
-            # No need to check coords: dataset ensures they align with idomain.
-        ),
     }
-
     _template = Package._initialize_template(_pkg_id)
     _regrid_method = StorageCoefficientRegridMethod()
 
@@ -321,3 +324,63 @@ class StorageCoefficient(StorageBase):
         d = self._render_dict(directory, pkgname, globaltimes, binary)
         d["storagecoefficient"] = True
         return self._template.render(d)
+
+    @classmethod
+    def from_imod5_data(
+        cls,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        target_grid: GridDataArray,
+        regridder_types: Optional[StorageCoefficientRegridMethod] = None,
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
+    ) -> "StorageCoefficient":
+        """
+        Construct a StorageCoefficient-package from iMOD5 data, loaded with the
+        :func:`imod.formats.prj.open_projectfile_data` function.
+
+        .. note::
+
+            The method expects the iMOD5 model to be fully 3D, not quasi-3D.
+
+        Parameters
+        ----------
+        imod5_data: dict
+            Dictionary with iMOD5 data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
+        target_grid: GridDataArray
+            The grid that should be used for the new package. Does not
+            need to be identical to one of the input grids.
+        regridder_types: StorageCoefficientRegridMethod, optional
+            Optional dataclass with regridder types for a specific variable.
+            Use this to override default regridding methods.
+        regrid_cache: RegridderWeightsCache, optional
+            stores regridder weights for different regridders. Can be used to speed up regridding,
+            if the same regridders are used several times for regridding different arrays.
+
+        Returns
+        -------
+        Modflow 6 StorageCoefficient package. Its specific yield is 0 and it's transient if any storage_coefficient
+             is larger than 0. All cells are set to inconvertible (they stay confined throughout the simulation)
+        """
+
+        data = {
+            "storage_coefficient": imod5_data["sto"]["storage_coefficient"],
+        }
+
+        if regridder_types is None:
+            regridder_types = StorageCoefficient.get_regrid_methods()
+
+        new_package_data = _regrid_package_data(
+            data, target_grid, regridder_types, regrid_cache, {}
+        )
+
+        new_package_data["convertible"] = zeros_like(target_grid, dtype=int)
+        new_package_data["transient"] = np.any(
+            new_package_data["storage_coefficient"].values > 0
+        )
+        new_package_data["specific_yield"] = None
+
+        return cls(**new_package_data, validate=True, save_flows=False)
+
+    @classmethod
+    def get_regrid_methods(cls) -> StorageCoefficientRegridMethod:
+        return deepcopy(cls._regrid_method)
