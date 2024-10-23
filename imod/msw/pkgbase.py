@@ -45,6 +45,15 @@ class MetaSwapPackage(abc.ABC):
     def dataset(self, value):
         self._dataset = value
 
+    @classmethod
+    def _from_dataset(cls, ds: GridDataset):
+        """
+        Create package from dataset. Note that no initialization is done.
+        """
+        instance = cls.__new__(cls)
+        instance.dataset = ds
+        return instance
+
     def isel(self):
         raise NotImplementedError(
             f"Selection on packages not yet supported. "
