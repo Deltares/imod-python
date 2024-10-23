@@ -109,5 +109,5 @@ def test_model_regrid(msw_model, tmp_path):
     mf6_discretization = get_target_mf6_discretization()
 
     regrid_context = RegridderWeightsCache()
-    regridded_model = msw_model.regrid_like(mf6_discretization, True, regrid_context)
+    regridded_model = msw_model.regrid_like(mf6_discretization, regrid_context)
     regridded_model.write(tmp_path)
