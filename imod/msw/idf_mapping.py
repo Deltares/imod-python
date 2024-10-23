@@ -103,12 +103,11 @@ class IdfMapping(MetaSwapPackage, IRegridPackage):
 
         nodata = self.dataset["nodata"].values[()]
         regridded_area = _regrid_array(
-            self,
-            "area",
+            self.dataset["area"],
             regrid_context,
             regridder_settings["area"][0],
             regridder_settings["area"][1],
             target_grid,
         )
 
-        return IdfMapping(regridded_area, nodata)
+        return type(self)(regridded_area, nodata)

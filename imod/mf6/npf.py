@@ -1,11 +1,21 @@
 import warnings
+from copy import deepcopy
+from typing import Optional
 
 import numpy as np
+import xarray as xr
 
 from imod.logging import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
-from imod.mf6.regrid.regrid_schemes import NodePropertyFlowRegridMethod
+from imod.mf6.regrid.regrid_schemes import (
+    NodePropertyFlowRegridMethod,
+)
+from imod.mf6.utilities.imod5_converter import fill_missing_layers
+from imod.mf6.utilities.regrid import (
+    RegridderWeightsCache,
+    _regrid_package_data,
+)
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
@@ -16,6 +26,7 @@ from imod.schemata import (
     IndexesSchema,
 )
 from imod.typing import GridDataArray
+from imod.typing.grid import zeros_like
 
 
 def _dataarray_to_bool(griddataarray: GridDataArray) -> bool:
@@ -441,3 +452,79 @@ class NodePropertyFlow(Package, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
+
+    @classmethod
+    def from_imod5_data(
+        cls,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        target_grid: GridDataArray,
+        regridder_types: Optional[NodePropertyFlowRegridMethod] = None,
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
+    ) -> "NodePropertyFlow":
+        """
+        Construct an npf-package from iMOD5 data, loaded with the
+        :func:`imod.formats.prj.open_projectfile_data` function.
+
+        .. note::
+
+            The method expects the iMOD5 model to be fully 3D, not quasi-3D.
+
+        Parameters
+        ----------
+        imod5_data: dict
+            Dictionary with iMOD5 data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
+        target_grid: GridDataArray
+            The grid that should be used for the new package. Does not
+            need to be identical to one of the input grids.
+        regridder_types: RegridMethodType, optional
+            Optional dataclass with regridder types for a specific variable.
+            Use this to override default regridding methods.
+        regrid_cache: RegridderWeightsCache, optional
+            stores regridder weights for different regridders. Can be used to speed up regridding,
+            if the same regridders are used several times for regridding different arrays.
+
+        Returns
+        -------
+        Modflow 6 npf package.
+
+        """
+
+        data = {
+            "k": imod5_data["khv"]["kh"],
+        }
+        has_vertical_anisotropy = (
+            "kva" in imod5_data.keys()
+            and "vertical_anisotropy" in imod5_data["kva"].keys()
+        )
+        has_horizontal_anisotropy = "ani" in imod5_data.keys()
+
+        if has_vertical_anisotropy:
+            data["k33"] = data["k"] * imod5_data["kva"]["vertical_anisotropy"]
+        if has_horizontal_anisotropy:
+            if not np.all(np.isnan(imod5_data["ani"]["factor"].values)):
+                factor = imod5_data["ani"]["factor"]
+                factor = fill_missing_layers(factor, target_grid, 1)
+                data["k22"] = data["k"] * factor
+            if not np.all(np.isnan(imod5_data["ani"]["angle"].values)):
+                angle1 = imod5_data["ani"]["angle"]
+                angle1 = 90.0 - angle1
+                angle1 = xr.where(angle1 < 0, 360.0 + angle1, angle1)
+                angle1 = fill_missing_layers(angle1, target_grid, 0)
+                data["angle1"] = angle1
+
+        icelltype = zeros_like(target_grid, dtype=int)
+
+        if regridder_types is None:
+            regridder_types = NodePropertyFlow.get_regrid_methods()
+
+        new_package_data = _regrid_package_data(
+            data, target_grid, regridder_types, regrid_cache, {}
+        )
+        new_package_data["icelltype"] = icelltype
+
+        return NodePropertyFlow(**new_package_data, validate=True)
+
+    @classmethod
+    def get_regrid_methods(cls) -> NodePropertyFlowRegridMethod:
+        return deepcopy(cls._regrid_method)

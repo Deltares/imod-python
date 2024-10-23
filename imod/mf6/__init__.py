@@ -21,9 +21,9 @@ from imod.mf6.hfb import (
     HorizontalFlowBarrierHydraulicCharacteristic,
     HorizontalFlowBarrierMultiplier,
     HorizontalFlowBarrierResistance,
-    LayeredHorizontalFlowBarrierHydraulicCharacteristic,
-    LayeredHorizontalFlowBarrierMultiplier,
-    LayeredHorizontalFlowBarrierResistance,
+    SingleLayerHorizontalFlowBarrierHydraulicCharacteristic,
+    SingleLayerHorizontalFlowBarrierMultiplier,
+    SingleLayerHorizontalFlowBarrierResistance,
 )
 from imod.mf6.ic import InitialConditions
 from imod.mf6.ims import (
@@ -39,7 +39,14 @@ from imod.mf6.model_gwt import GroundwaterTransportModel
 from imod.mf6.mst import MobileStorageTransfer
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.oc import OutputControl
-from imod.mf6.out import open_cbc, open_conc, open_hds, read_cbc_headers, read_grb
+from imod.mf6.out import (
+    open_cbc,
+    open_conc,
+    open_dvs,
+    open_hds,
+    read_cbc_headers,
+    read_grb,
+)
 from imod.mf6.rch import Recharge
 from imod.mf6.riv import River
 from imod.mf6.simulation import Modflow6Simulation
@@ -49,5 +56,5 @@ from imod.mf6.sto import SpecificStorage, Storage, StorageCoefficient
 from imod.mf6.timedis import TimeDiscretization
 from imod.mf6.utilities.regrid import RegridderType, RegridderWeightsCache
 from imod.mf6.uzf import UnsaturatedZoneFlow
-from imod.mf6.wel import Well, WellDisStructured, WellDisVertices
+from imod.mf6.wel import LayeredWell, Well, WellDisStructured, WellDisVertices
 from imod.mf6.write_context import WriteContext

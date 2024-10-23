@@ -4,7 +4,6 @@ from copy import deepcopy
 from dataclasses import dataclass
 from os.path import relpath
 from pathlib import Path
-from typing import Optional, Union
 
 
 @dataclass
@@ -28,22 +27,18 @@ class WriteContext:
          it will be set to the simulation_directrory.
     """
 
-    def __init__(
-        self,
-        simulation_directory: Path = Path("."),
-        use_binary: bool = False,
-        use_absolute_paths: bool = False,
-        write_directory: Optional[Union[str, Path]] = None,
-    ):
-        self.__simulation_directory = Path(simulation_directory)
-        self.__use_binary = use_binary
-        self.__use_absolute_paths = use_absolute_paths
-        self.__write_directory = (
-            Path(write_directory)
-            if write_directory is not None
-            else self.__simulation_directory
+    simulation_directory: Path = Path(".")
+    use_binary: bool = False
+    use_absolute_paths: bool = False
+    write_directory: Path = None  # type: ignore
+
+    def __post_init__(self):
+        self.simulation_directory = Path(self.simulation_directory)
+        self.write_directory = (
+            Path(self.write_directory)
+            if self.write_directory is not None
+            else self.simulation_directory
         )
-        self.__is_partitioned = False
 
     def get_formatted_write_directory(self) -> Path:
         """
@@ -52,33 +47,13 @@ class WriteContext:
         be relative to the simulation directory, which makes it usable by MF6.
         """
         if self.use_absolute_paths:
-            return self.__write_directory
-        return Path(relpath(self.write_directory, self.__simulation_directory))
+            return self.write_directory
+        return Path(relpath(self.write_directory, self.simulation_directory))
 
     def copy_with_new_write_directory(self, new_write_directory: Path) -> WriteContext:
         new_context = deepcopy(self)
-        new_context.__write_directory = Path(new_write_directory)
+        new_context.write_directory = Path(new_write_directory)
         return new_context
-
-    @property
-    def simulation_directory(self) -> Path:
-        return self.__simulation_directory
-
-    @property
-    def use_binary(self) -> bool:
-        return self.__use_binary
-
-    @use_binary.setter
-    def use_binary(self, value) -> None:
-        self.__use_binary = value
-
-    @property
-    def use_absolute_paths(self) -> bool:
-        return self.__use_absolute_paths
-
-    @property
-    def write_directory(self) -> Path:
-        return self.__write_directory
 
     @property
     def root_directory(self) -> Path:
@@ -87,14 +62,6 @@ class WriteContext:
         that are in agreement with the use_absolute_paths setting.
         """
         if self.use_absolute_paths:
-            return self.__simulation_directory
+            return self.simulation_directory
         else:
             return Path("")
-
-    @property
-    def is_partitioned(self) -> bool:
-        return self.__is_partitioned
-
-    @is_partitioned.setter
-    def is_partitioned(self, value: bool) -> None:
-        self.__is_partitioned = value

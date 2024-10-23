@@ -40,8 +40,8 @@ def create_package_instances(is_structured: bool) -> List[Package]:
             k22=3.0,
         ),
         imod.mf6.SpecificStorage(
-            specific_storage=grid_data_function(np.float_, 1.0e-4, 5.0),
-            specific_yield=grid_data_function(np.float_, 0.15, 5.0),
+            specific_storage=grid_data_function(np.float64, 1.0e-4, 5.0),
+            specific_yield=grid_data_function(np.float64, 0.15, 5.0),
             convertible=0,
             transient=False,
         ),
@@ -62,27 +62,27 @@ def create_package_instances(is_structured: bool) -> List[Package]:
             transient=False,
         ),
         imod.mf6.StorageCoefficient(
-            storage_coefficient=grid_data_function(np.float_, 1.0e-4, 5.0),
-            specific_yield=grid_data_function(np.float_, 0.15, 5.0),
+            storage_coefficient=grid_data_function(np.float64, 1.0e-4, 5.0),
+            specific_yield=grid_data_function(np.float64, 0.15, 5.0),
             convertible=grid_data_function(np.int32, 0, 5.0),
             transient=True,
         ),
         imod.mf6.Drainage(
-            elevation=grid_data_function(np.float_, 1.0e-4, 5.0),
-            conductance=grid_data_function(np.float_, 1.0e-4, 5.0),
+            elevation=grid_data_function(np.float64, 1.0e-4, 5.0),
+            conductance=grid_data_function(np.float64, 1.0e-4, 5.0),
             print_input=True,
             print_flows=True,
             save_flows=True,
         ),
         imod.mf6.ConstantHead(
-            grid_data_function(np.float_, 1.0e-4, 5.0),
+            grid_data_function(np.float64, 1.0e-4, 5.0),
             print_input=True,
             print_flows=True,
             save_flows=True,
         ),
         imod.mf6.GeneralHeadBoundary(
-            head=grid_data_function(np.float_, 1.0e-4, 5.0),
-            conductance=grid_data_function(np.float_, 1.0e-4, 5.0),
+            head=grid_data_function(np.float64, 1.0e-4, 5.0),
+            conductance=grid_data_function(np.float64, 1.0e-4, 5.0),
         ),
         imod.mf6.OutputControl(save_head="all", save_budget="all"),
         imod.mf6.Recharge(grid_data_function(np.float64, 0.002, 5.0).sel(layer=[1])),
@@ -94,7 +94,7 @@ def create_package_instances(is_structured: bool) -> List[Package]:
         packages.append(
             imod.mf6.StructuredDiscretization(
                 top=20.0,
-                bottom=grid_data_function_layered(np.float_, -1, 5.0),
+                bottom=grid_data_function_layered(np.float64, -1, 5.0),
                 idomain=grid_data_function(np.int_, 1, 5.0),
             )
         )
@@ -102,7 +102,7 @@ def create_package_instances(is_structured: bool) -> List[Package]:
         packages.append(
             imod.mf6.VerticesDiscretization(
                 top=20.0,
-                bottom=grid_data_function_layered(np.float_, -1, 5.0),
+                bottom=grid_data_function_layered(np.float64, -1, 5.0),
                 idomain=grid_data_function(np.int_, 1, 5.0),
             )
         )
@@ -117,10 +117,10 @@ def test_regrid_structured():
     structured_grid_packages = create_package_instances(is_structured=True)
     new_grid = grid_data_structured(np.float64, 12, 2.5)
 
-    regrid_context = RegridderWeightsCache()
+    regrid_cache = RegridderWeightsCache()
     new_packages = []
     for package in structured_grid_packages:
-        new_packages.append(package.regrid_like(new_grid, regrid_context))
+        new_packages.append(package.regrid_like(new_grid, regrid_cache))
 
     new_idomain = new_packages[0].dataset["icelltype"]
 
@@ -137,11 +137,11 @@ def test_regrid_unstructured():
     """
     unstructured_grid_packages = create_package_instances(is_structured=False)
     new_grid = grid_data_unstructured(np.float64, 12, 2.5)
-    regrid_context = RegridderWeightsCache()
+    regrid_cache = RegridderWeightsCache()
 
     new_packages = []
     for package in unstructured_grid_packages:
-        new_packages.append(package.regrid_like(new_grid, regrid_context))
+        new_packages.append(package.regrid_like(new_grid, regrid_cache))
 
     new_idomain = new_packages[0].dataset["icelltype"]
     for new_package in new_packages:
@@ -170,12 +170,12 @@ def test_regrid_structured_missing_dx_and_dy():
     )
 
     new_grid = grid_data_structured(np.float64, 12, 0.25)
-    regrid_context = RegridderWeightsCache()
+    regrid_cache = RegridderWeightsCache()
     with pytest.raises(
         ValueError,
         match="DataArray icelltype does not have both a dx and dy coordinates",
     ):
-        _ = package.regrid_like(new_grid, regrid_context)
+        _ = package.regrid_like(new_grid, regrid_cache)
 
 
 def test_regrid(tmp_path: Path):
@@ -208,8 +208,8 @@ def test_regrid(tmp_path: Path):
         save_flows=True,
         alternative_cell_averaging="AMT-HMK",
     )
-    regrid_context = RegridderWeightsCache()
-    new_npf = npf.regrid_like(k, regrid_context)
+    regrid_cache = RegridderWeightsCache()
+    new_npf = npf.regrid_like(k, regrid_cache)
 
     # check the rendered versions are the same, they contain the options
     new_rendered = new_npf.render(tmp_path, "regridded", None, False)
@@ -247,8 +247,8 @@ def test_regridding_can_skip_validation():
 
     # Regrid the package to a finer domain
     new_grid = grid_data_structured(np.float64, 1.0, 0.025)
-    regrid_context = RegridderWeightsCache()
-    regridded_package = sto_package.regrid_like(new_grid, regrid_context)
+    regrid_cache = RegridderWeightsCache()
+    regridded_package = sto_package.regrid_like(new_grid, regrid_cache)
 
     # Check that write validation still fails for the regridded package
     new_bottom = deepcopy(new_grid)
@@ -293,8 +293,8 @@ def test_regridding_layer_based_array():
         validate=False,
     )
     new_grid = grid_data_structured(np.float64, 1.0, 0.025)
-    regrid_context = RegridderWeightsCache()
-    regridded_package = sto_package.regrid_like(new_grid, regrid_context)
+    regrid_cache = RegridderWeightsCache()
+    regridded_package = sto_package.regrid_like(new_grid, regrid_cache)
 
     assert (
         regridded_package.dataset.coords["dx"].values[()]

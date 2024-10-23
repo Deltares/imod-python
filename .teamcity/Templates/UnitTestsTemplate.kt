@@ -3,7 +3,9 @@ package Templates
 import jetbrains.buildServer.configs.kotlin.DslContext
 import jetbrains.buildServer.configs.kotlin.Template
 import jetbrains.buildServer.configs.kotlin.buildFeatures.XmlReport
+import jetbrains.buildServer.configs.kotlin.buildFeatures.dockerSupport
 import jetbrains.buildServer.configs.kotlin.buildFeatures.xmlReport
+import jetbrains.buildServer.configs.kotlin.buildSteps.ScriptBuildStep
 import jetbrains.buildServer.configs.kotlin.buildSteps.powerShell
 import jetbrains.buildServer.configs.kotlin.buildSteps.script
 
@@ -28,10 +30,14 @@ object UnitTestsTemplate : Template({
             id = "Run_unittests"
             workingDir = "imod-python"
             scriptContent = """
-                set Path=%system.teamcity.build.checkoutDir%\modflow6;"d:\ProgramData\pixi"
+                SET PATH=%%PATH%%;%system.teamcity.build.checkoutDir%\modflow6
                 pixi run --environment default --frozen unittests
             """.trimIndent()
             formatStderrAsError = true
+            dockerImage = "%DockerContainer%:%DockerVersion%"
+            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Windows
+            dockerRunParameters = """--cpus=8 --memory=32g"""
+            dockerPull = true
         }
         powerShell {
             name = "Extract coverage statistics"
@@ -51,17 +57,21 @@ object UnitTestsTemplate : Template({
                     Write-Host "##teamcity[buildStatisticValue key='CodeCoverageAbsLTotal' value='${'$'}TOTALLINES']"
                 """.trimIndent()
             }
+            param("plugin.docker.imagePlatform", "windows")
+            param("plugin.docker.imageId", "%DockerContainer%:%DockerVersion%")
+            param("plugin.docker.pull.enabled", "true")
         }
     }
 
     features {
+        dockerSupport {
+            loginToRegistry = on {
+                dockerRegistryId = "PROJECT_EXT_134"
+            }
+        }
         xmlReport {
             reportType = XmlReport.XmlReportType.JUNIT
             rules = "imod-python/imod/tests/*report.xml"
         }
-    }
-
-    requirements {
-        equals("env.OS", "Windows_NT")
     }
 })

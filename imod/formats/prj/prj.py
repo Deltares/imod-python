@@ -3,7 +3,10 @@ Utilities for parsing a project file.
 """
 
 import shlex
+import textwrap
 from collections import defaultdict
+from dataclasses import asdict, dataclass
+from dataclasses import field as data_field
 from datetime import datetime
 from itertools import chain
 from os import PathLike
@@ -15,6 +18,8 @@ import pandas as pd
 import xarray as xr
 
 import imod
+import imod.logging
+from imod.logging.loglevel import LogLevel
 
 FilePath = Union[str, "PathLike[str]"]
 
@@ -519,7 +524,43 @@ def _try_read_with_func(func, path, *args, **kwargs):
         raise type(e)(f"{e}. Error thrown while opening file: {path}")
 
 
-def _create_datarray_from_paths(paths: List[str], headers: List[Dict[str, Any]]):
+def _get_array_transformation_parameters(
+    headers: List[Dict[str, Any]], key: str, dim: str
+) -> Union[xr.DataArray | float]:
+    """
+    In imod5 prj files one can add linear transformation parameters to transform
+    the data read from an idf file: we can specify a multiplication factor and a
+    constant that will be added to the values. The factor and addition
+    parameters can be can be scalar (if applied to 1 idf), or they can be
+    xr.DataArrays if the factor and addition are for example layer- or
+    time-dependent  (if both we apply the transformations one at a time)
+
+    Parameters
+    ----------
+    headers: List[Dict[str, Any]]
+        prj-file lines which we want to import, serialized as a dictionary.
+    key: str
+        specifies the name of the transformation parameter in the idf file.
+        Usually "factor" or "addition"
+    dim: str
+        the name of the dimension over which transformation parameters are
+        expected to differ for the current import. Usually "time"or "layer"
+    """
+    if dim in headers[0].keys():
+        return xr.DataArray(
+            data=[header[key] for header in headers],
+            dims=(dim,),
+            coords={dim: [header[dim] for header in headers]},
+        )
+    else:
+        return headers[0][key]
+
+
+def _create_dataarray_from_paths(
+    paths: List[str], headers: List[Dict[str, Any]], dim: str
+) -> xr.DataArray:
+    factor = _get_array_transformation_parameters(headers, "factor", dim)
+    addition = _get_array_transformation_parameters(headers, "addition", dim)
     da = _try_read_with_func(
         imod.formats.array_io.reading._load,
         paths,
@@ -527,22 +568,38 @@ def _create_datarray_from_paths(paths: List[str], headers: List[Dict[str, Any]])
         _read=imod.idf._read,
         headers=headers,
     )
-    return da
+
+    # Ensure factor and addition do not have more dimensions than da
+    if isinstance(factor, xr.DataArray):
+        missing_dims = set(factor.dims) - set(da.dims)
+        if missing_dims:
+            factor = factor.isel({d: 0 for d in missing_dims}, drop=True)
+            addition = addition.isel({d: 0 for d in missing_dims}, drop=True)
+
+    return da * factor + addition
 
 
-def _create_dataarray_from_values(values: List[float], headers: List[Dict[str, Any]]):
+def _create_dataarray_from_values(
+    values: List[float], headers: List[Dict[str, Any]], dim: str
+):
+    factor = _get_array_transformation_parameters(headers, "factor", dim)
+    addition = _get_array_transformation_parameters(headers, "addition", dim)
     coords = _merge_coords(headers)
     firstdims = headers[0]["dims"]
     shape = [len(coord) for coord in coords.values()]
     da = xr.DataArray(np.reshape(values, shape), dims=firstdims, coords=coords)
-    return da
+    return da * factor + addition
 
 
 def _create_dataarray(
-    paths: List[str], headers: List[Dict[str, Any]], values: List[float]
+    paths: List[str], headers: List[Dict[str, Any]], values: List[float], dim: str
 ) -> xr.DataArray:
     """
     Create a DataArray from a list of IDF paths, or from constant values.
+
+    There are mixed cases possible, where some of the layers or stress periods
+    contain only a single constant value, and the others are specified as IDFs.
+    In that case, we cannot do a straightforward concatenation.
     """
     values_valid = []
     paths_valid = []
@@ -557,54 +614,19 @@ def _create_dataarray(
             paths_valid.append(path)
 
     if paths_valid and values_valid:
-        dap = _create_datarray_from_paths(paths_valid, headers_paths)
-        dav = _create_dataarray_from_values(values_valid, headers_values)
+        # Both lists contain entries: mixed case.
+        dap = _create_dataarray_from_paths(paths_valid, headers_paths, dim=dim)
+        dav = _create_dataarray_from_values(values_valid, headers_values, dim=dim)
         dap.name = "tmp"
         dav.name = "tmp"
         da = xr.merge((dap, dav), join="outer")["tmp"]
     elif paths_valid:
-        da = _create_datarray_from_paths(paths_valid, headers_paths)
+        # Only paths provided
+        da = _create_dataarray_from_paths(paths_valid, headers_paths, dim=dim)
     elif values_valid:
-        da = _create_dataarray_from_values(values_valid, headers_values)
+        # Only scalar values provided
+        da = _create_dataarray_from_values(values_valid, headers_values, dim=dim)
 
-    da = apply_factor_and_addition(headers, da)
-    return da
-
-
-def apply_factor_and_addition(headers, da):
-    if not ("layer" in da.coords or "time" in da.dims):
-        factor = headers[0]["factor"]
-        addition = headers[0]["addition"]
-        da = da * factor + addition
-    elif "layer" in da.coords and "time" not in da.dims:
-        da = apply_factor_and_addition_per_layer(headers, da)
-    else:
-        header_per_time = defaultdict(list)
-        for time in da.coords["time"].values:
-            for header in headers:
-                if np.datetime64(header["time"]) == time:
-                    header_per_time[time].append(header)
-
-        for time in da.coords["time"]:
-            da.loc[{"time": time}] = apply_factor_and_addition(
-                header_per_time[np.datetime64(time.values)],
-                da.sel(time=time, drop=True),
-            )
-    return da
-
-
-def apply_factor_and_addition_per_layer(headers, da):
-    layer = da.coords["layer"].values
-    header_per_layer = {}
-    for header in headers:
-        if header["layer"] in header_per_layer.keys():
-            raise ValueError("error in project file: layer repetition")
-        header_per_layer[header["layer"]] = header
-    addition_values = [header_per_layer[lay]["addition"] for lay in layer]
-    factor_values = [header_per_layer[lay]["factor"] for lay in layer]
-    addition = xr.DataArray(addition_values, coords={"layer": layer}, dims=("layer"))
-    factor = xr.DataArray(factor_values, coords={"layer": layer}, dims=("layer",))
-    da = da * factor + addition
     return da
 
 
@@ -628,7 +650,7 @@ def _open_package_idf(
             headers.append(header)
             values.append(value)
 
-        das[variable] = _create_dataarray(paths, headers, values)
+        das[variable] = _create_dataarray(paths, headers, values, dim="layer")
 
     return [das]
 
@@ -755,7 +777,7 @@ def _open_boundary_condition_idf(
         for i, (paths, headers, values) in enumerate(
             zip(system_paths.values(), system_headers.values(), system_values.values())
         ):
-            das[i][variable] = _create_dataarray(paths, headers, values)
+            das[i][variable] = _create_dataarray(paths, headers, values, dim="time")
 
     repeats = sorted(all_repeats)
     return das, repeats
@@ -779,11 +801,40 @@ def _read_package_gen(
     return out
 
 
+@dataclass
+class IpfResult:
+    has_associated: bool = data_field(default_factory=bool)
+    dataframe: list[pd.DataFrame] = data_field(default_factory=list)
+    layer: list[int] = data_field(default_factory=list)
+    time: list[str] = data_field(default_factory=list)
+    factor: list[float] = data_field(default_factory=list)
+    addition: list[float] = data_field(default_factory=list)
+
+    def append(
+        self,
+        dataframe: pd.DataFrame,
+        layer: int,
+        time: str,
+        factor: float,
+        addition: float,
+    ):
+        self.dataframe.append(dataframe)
+        self.layer.append(layer)
+        self.time.append(time)
+        self.factor.append(factor)
+        self.addition.append(addition)
+
+
 def _read_package_ipf(
     block_content: Dict[str, Any], periods: Dict[str, datetime]
-) -> Tuple[List[Dict[str, Any]], List[datetime]]:
-    out = []
+) -> Tuple[Dict[str, Dict], List[datetime]]:
+    out = defaultdict(IpfResult)
     repeats = []
+
+    # we will store in this set the tuples of (x, y, id, well_top, well_bot)
+    # which should be unique for each well
+    imported_wells = {}
+
     for entry in block_content["ipf"]:
         timestring = entry["time"]
         layer = entry["layer"]
@@ -800,14 +851,16 @@ def _read_package_ipf(
         ipf_df, indexcol, ext = _try_read_with_func(imod.ipf._read_ipf, path)
         if indexcol == 0:
             # No associated files
+            has_associated = False
             columns = ("x", "y", "rate")
             if layer <= 0:
                 df = ipf_df.iloc[:, :5]
-                columns = columns + ("top", "bottom")
+                columns = columns + ("filt_top", "filt_bot")
             else:
                 df = ipf_df.iloc[:, :3]
             df.columns = columns
         else:
+            has_associated = True
             dfs = []
             for row in ipf_df.itertuples():
                 filename = row[indexcol]
@@ -819,21 +872,46 @@ def _read_package_ipf(
                 df_assoc["x"] = row[1]
                 df_assoc["y"] = row[2]
                 df_assoc["id"] = path_assoc.stem
-                if layer <= 0:
-                    df_assoc["top"] = row[4]
-                    df_assoc["bottom"] = row[5]
+                df_assoc["filt_top"] = row[4]
+                df_assoc["filt_bot"] = row[5]
+
+                well_characteristics = (
+                    row[1],
+                    row[2],
+                    path_assoc.stem,
+                    row[4],
+                    row[5],
+                )
+                if well_characteristics not in imported_wells.keys():
+                    imported_wells[well_characteristics] = 0
+                else:
+                    suffix = imported_wells[well_characteristics] + 1
+                    imported_wells[well_characteristics] = suffix
+                    df_assoc["id"] = df_assoc["id"] + f"_{suffix}"
+
+                    log_message = textwrap.dedent(
+                        f"""A well with the same x, y, id, filter_top and filter_bot was already imported.
+                    This happened at x  = {row[1]}, y = { row[2]}, id = {path_assoc.stem}
+                    Now the ID for this new well was appended with the suffix  _{suffix})
+                    """
+                    )
+
+                    imod.logging.logger.log(
+                        loglevel=LogLevel.WARNING,
+                        message=log_message,
+                        additional_depth=2,
+                    )
+
                 dfs.append(df_assoc)
             df = pd.concat(dfs, ignore_index=True, sort=False)
         df["rate"] = df["rate"] * factor + addition
 
-        d = {
-            "dataframe": df,
-            "layer": layer,
-            "time": time,
-        }
-        out.append(d)
+        out[path.stem].has_associated = has_associated
+        out[path.stem].append(df, layer, time, factor, addition)
+
+    out_dict_ls: dict[str, dict] = {key: asdict(o) for key, o in out.items()}
     repeats = sorted(repeats)
-    return out, repeats
+    return out_dict_ls, repeats
 
 
 def read_projectfile(path: FilePath) -> Dict[str, Any]:
@@ -986,7 +1064,12 @@ def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
             raise type(e)(f"{e}. Errored while opening/reading data entries for: {key}")
 
         strippedkey = key.strip("(").strip(")")
-        if len(data) > 1:
+        if strippedkey == "wel":
+            for key, d in data.items():
+                named_key = f"{strippedkey}-{key}"
+                prj_data[named_key] = d
+                repeat_stress[named_key] = repeats
+        elif len(data) > 1:
             for i, da in enumerate(data):
                 numbered_key = f"{strippedkey}-{i + 1}"
                 prj_data[numbered_key] = da

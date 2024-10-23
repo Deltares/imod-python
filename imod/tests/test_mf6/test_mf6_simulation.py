@@ -10,15 +10,28 @@ from unittest import mock
 from unittest.mock import MagicMock
 
 import numpy as np
+import pandas as pd
 import pytest
 import rasterio
 import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.mf6 import LayeredWell, Well
 from imod.mf6.model import Modflow6Model
 from imod.mf6.multimodel.modelsplitter import PartitionInfo
+from imod.mf6.oc import OutputControl
+from imod.mf6.regrid.regrid_schemes import (
+    DiscretizationRegridMethod,
+    NodePropertyFlowRegridMethod,
+    StorageCoefficientRegridMethod,
+)
+from imod.mf6.simulation import Modflow6Simulation
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo
+from imod.prepare.topsystem.default_allocation_methods import (
+    SimulationAllocationOptions,
+    SimulationDistributingOptions,
+)
 from imod.schemata import ValidationError
 from imod.tests.fixtures.mf6_small_models_fixture import (
     grid_data_structured,
@@ -237,7 +250,9 @@ def split_transient_twri_model(transient_twri_model):
     active = transient_twri_model["GWF_1"].domain.sel(layer=1)
 
     number_partitions = 3
-    split_location = np.linspace(active.y.min(), active.y.max(), number_partitions + 1)
+    split_location = np.linspace(
+        active.y.min().item(), active.y.max().item(), number_partitions + 1
+    )
 
     coords = active.coords
     submodel_labels = zeros_like(active)
@@ -369,7 +384,7 @@ class TestModflow6Simulation:
         active = transient_twri_model["GWF_1"].domain.sel(layer=1)
         number_partitions = 3
         split_location = np.linspace(
-            active.y.min(), active.y.max(), number_partitions + 1
+            active.y.min().item(), active.y.max().item(), number_partitions + 1
         )
 
         coords = active.coords
@@ -461,3 +476,171 @@ def compare_submodel_partition_info(first: PartitionInfo, second: PartitionInfo)
     return (first.id == second.id) and np.array_equal(
         first.active_domain, second.active_domain
     )
+
+
+@pytest.mark.unittest_jit
+@pytest.mark.usefixtures("imod5_dataset")
+def test_import_from_imod5(imod5_dataset, tmp_path):
+    imod5_data = imod5_dataset[0]
+    period_data = imod5_dataset[1]
+    default_simulation_allocation_options = SimulationAllocationOptions
+    default_simulation_distributing_options = SimulationDistributingOptions
+
+    datelist = pd.date_range(start="1/1/1989", end="1/1/2013", freq="W")
+
+    simulation = Modflow6Simulation.from_imod5_data(
+        imod5_data,
+        period_data,
+        default_simulation_allocation_options,
+        default_simulation_distributing_options,
+        datelist,
+    )
+    simulation["imported_model"]["oc"] = OutputControl(
+        save_head="last", save_budget="last"
+    )
+    simulation.create_time_discretization(["01-01-2003", "02-01-2003"])
+    # Cleanup
+    # Remove HFB packages outside domain
+    # TODO: Build in support for hfb packages outside domain
+    for hfb_outside in ["hfb-24", "hfb-26"]:
+        simulation["imported_model"].pop(hfb_outside)
+    # Align NoData to domain
+    idomain = simulation["imported_model"].domain
+    simulation.mask_all_models(idomain)
+    # write and validate the simulation.
+    simulation.write(tmp_path, binary=False, validate=True)
+
+    # Test if simulation attribute appropiately set
+    assert simulation._validation_context.strict_well_validation is False
+
+
+@pytest.mark.unittest_jit
+@pytest.mark.usefixtures("imod5_dataset")
+def test_from_imod5__strict_well_validation_set(imod5_dataset):
+    imod5_data = imod5_dataset[0]
+    period_data = imod5_dataset[1]
+    default_simulation_allocation_options = SimulationAllocationOptions
+    default_simulation_distributing_options = SimulationDistributingOptions
+
+    datelist = pd.date_range(start="1/1/1989", end="1/1/1990", freq="W")
+
+    simulation = Modflow6Simulation.from_imod5_data(
+        imod5_data,
+        period_data,
+        default_simulation_allocation_options,
+        default_simulation_distributing_options,
+        datelist,
+    )
+    assert simulation._validation_context.strict_well_validation is False
+    assert Modflow6Simulation("test")._validation_context.strict_well_validation is True
+
+
+@pytest.mark.unittest_jit
+@pytest.mark.usefixtures("imod5_dataset")
+def test_import_from_imod5__correct_well_type(imod5_dataset):
+    # Unpack
+    imod5_data = imod5_dataset[0]
+    period_data = imod5_dataset[1]
+    # Temporarily change layer number to 0, to force Well object instead of
+    # LayeredWell
+    original_wel_layer = imod5_data["wel-WELLS_L3"]["layer"]
+    imod5_data["wel-WELLS_L3"]["layer"] = [0] * len(original_wel_layer)
+    # Other arrangement
+    default_simulation_allocation_options = SimulationAllocationOptions
+    default_simulation_distributing_options = SimulationDistributingOptions
+    datelist = pd.date_range(start="1/1/1989", end="1/1/2013", freq="W")
+
+    # Act
+    simulation = Modflow6Simulation.from_imod5_data(
+        imod5_data,
+        period_data,
+        default_simulation_allocation_options,
+        default_simulation_distributing_options,
+        datelist,
+    )
+    # Set layer back to right value (before AssertionError might be thrown)
+    imod5_data["wel-WELLS_L3"]["layer"] = original_wel_layer
+    # Assert
+    assert isinstance(simulation["imported_model"]["wel-WELLS_L3"], Well)
+    assert isinstance(simulation["imported_model"]["wel-WELLS_L4"], LayeredWell)
+    assert isinstance(simulation["imported_model"]["wel-WELLS_L5"], LayeredWell)
+
+
+@pytest.mark.unittest_jit
+@pytest.mark.usefixtures("imod5_dataset")
+def test_import_from_imod5__nonstandard_regridding(imod5_dataset, tmp_path):
+    imod5_data = imod5_dataset[0]
+    period_data = imod5_dataset[1]
+    default_simulation_allocation_options = SimulationAllocationOptions
+    default_simulation_distributing_options = SimulationDistributingOptions
+
+    regridding_option = {}
+    regridding_option["npf"] = NodePropertyFlowRegridMethod()
+    regridding_option["dis"] = DiscretizationRegridMethod()
+    regridding_option["sto"] = StorageCoefficientRegridMethod()
+    times = pd.date_range(start="1/1/2018", end="12/1/2018", freq="ME")
+
+    simulation = Modflow6Simulation.from_imod5_data(
+        imod5_data,
+        period_data,
+        default_simulation_allocation_options,
+        default_simulation_distributing_options,
+        times,
+        regridding_option,
+    )
+    simulation["imported_model"]["oc"] = OutputControl(
+        save_head="last", save_budget="last"
+    )
+    simulation.create_time_discretization(["01-01-2003", "02-01-2003"])
+    # Cleanup
+    # Remove HFB packages outside domain
+    # TODO: Build in support for hfb packages outside domain
+    for hfb_outside in ["hfb-24", "hfb-26"]:
+        simulation["imported_model"].pop(hfb_outside)
+    # Align NoData to domain
+    idomain = simulation["imported_model"].domain
+    simulation.mask_all_models(idomain)
+    # write and validate the simulation.
+    simulation.write(tmp_path, binary=False, validate=True)
+
+
+@pytest.mark.unittest_jit
+@pytest.mark.usefixtures("imod5_dataset")
+def test_import_from_imod5_no_storage_no_recharge(imod5_dataset, tmp_path):
+    # this test imports an imod5 simulation, but it has no recharge and no storage package.
+    imod5_data = imod5_dataset[0]
+    imod5_data.pop("sto")
+    imod5_data.pop("rch")
+    period_data = imod5_dataset[1]
+
+    default_simulation_allocation_options = SimulationAllocationOptions
+    default_simulation_distributing_options = SimulationDistributingOptions
+
+    times = pd.date_range(start="1/1/2018", end="12/1/2018", freq="ME")
+
+    simulation = Modflow6Simulation.from_imod5_data(
+        imod5_data,
+        period_data,
+        default_simulation_allocation_options,
+        default_simulation_distributing_options,
+        times,
+    )
+    simulation["imported_model"]["oc"] = OutputControl(
+        save_head="last", save_budget="last"
+    )
+    simulation.create_time_discretization(["01-01-2003", "02-01-2003"])
+    # Cleanup
+    # Remove HFB packages outside domain
+    # TODO: Build in support for hfb packages outside domain
+    for hfb_outside in ["hfb-24", "hfb-26"]:
+        simulation["imported_model"].pop(hfb_outside)
+    # check storage is present and rch is absent
+    assert not simulation["imported_model"]["sto"].dataset["transient"].values[()]
+    package_keys = simulation["imported_model"].keys()
+    for key in package_keys:
+        assert key[0:3] != "rch"
+    # Align NoData to domain
+    idomain = simulation["imported_model"].domain
+    simulation.mask_all_models(idomain)
+    # write and validate the simulation.
+    simulation.write(tmp_path, binary=False, validate=True)

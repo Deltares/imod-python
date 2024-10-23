@@ -47,8 +47,8 @@ def test_round_extent():
 
 
 def test_fill():
-    da = xr.DataArray([np.nan, 1.0, 2.0], {"x": [1, 2, 3]}, ("x",))
-    expected = xr.DataArray([1.0, 1.0, 2.0], {"x": [1, 2, 3]}, ("x",))
+    da = xr.DataArray([[np.nan, 1.0, 2.0]], {"x": [1, 2, 3], "y": [1]}, ("y", "x"))
+    expected = xr.DataArray([[1.0, 1.0, 2.0]], {"x": [1, 2, 3], "y": [1]}, ("y", "x"))
     actual = imod.prepare.spatial.fill(da)
     assert actual.identical(expected)
 
@@ -64,8 +64,8 @@ def test_fill():
     expected_x = xr.DataArray(
         [[2.0, 2.0, 1.0], [2.0, 2.0, 2.0]], {"x": [1, 2, 3], "y": [1, 2]}, ("y", "x")
     )
-    actual_x = imod.prepare.spatial.fill(da, by="x")
-    actual_y = imod.prepare.spatial.fill(da, by="y")
+    actual_x = imod.prepare.spatial.fill(da, dims=("y",))
+    actual_y = imod.prepare.spatial.fill(da, dims=("x",))
     assert actual_x.identical(expected_x)
     assert actual_y.identical(expected_y)
 
@@ -142,11 +142,16 @@ def test_handle_dtype():
     assert imod.prepare.spatial._handle_dtype(np.int32, None) == (5, -2147483648)
     assert imod.prepare.spatial._handle_dtype(np.float32, None) == (6, np.nan)
     assert imod.prepare.spatial._handle_dtype(np.float64, None) == (7, np.nan)
+    assert imod.prepare.spatial._handle_dtype(np.uint64, None) == (12, 0)
+    assert imod.prepare.spatial._handle_dtype(np.int64, None) == (
+        13,
+        -9223372036854775808,
+    )
 
     with pytest.raises(ValueError):  # out of bounds
         imod.prepare.spatial._handle_dtype(np.uint32, -1)
-    with pytest.raises(ValueError):  # invalid dtype
-        imod.prepare.spatial._handle_dtype(np.int64, -1)
+    with pytest.raises(ValueError):  # out of bounds
+        imod.prepare.spatial._handle_dtype(np.uint64, -1)
 
 
 @parametrize_with_cases("shapefile, expected_value", cases=ShapefileCases)

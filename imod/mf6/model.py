@@ -6,7 +6,7 @@ import inspect
 import pathlib
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union
 
 import cftime
 import jinja2
@@ -19,16 +19,22 @@ from jinja2 import Template
 
 import imod
 from imod.logging import standard_log_decorator
+from imod.mf6.hfb import HorizontalFlowBarrierBase
 from imod.mf6.interfaces.imodel import IModel
 from imod.mf6.package import Package
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.utilities.mask import _mask_all_packages
+from imod.mf6.utilities.mf6hfb import merge_hfb_packages
 from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_like
 from imod.mf6.validation import pkg_errors_to_status_info
+from imod.mf6.validation_context import ValidationContext
+from imod.mf6.wel import GridAgnosticWell
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray
 from imod.typing.grid import is_spatial_grid
+
+HFB_PKGNAME = "hfb_merged"
 
 
 class Modflow6Model(collections.UserDict, IModel, abc.ABC):
@@ -145,12 +151,20 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
         d = {k: v for k, v in self._options.items() if not (v is None or v is False)}
         packages = []
+        has_hfb = False
         for pkgname, pkg in self.items():
             # Add the six to the package id
             pkg_id = pkg._pkg_id
+            # Skip if hfb
+            if pkg_id == "hfb":
+                has_hfb = True
+                continue
             key = f"{pkg_id}6"
             path = dir_for_render / f"{pkgname}.{pkg_id}"
             packages.append((key, path.as_posix(), pkgname))
+        if has_hfb:
+            path = dir_for_render / f"{HFB_PKGNAME}.hfb"
+            packages.append(("hfb6", path.as_posix(), HFB_PKGNAME))
         d["packages"] = packages
         return self._template.render(d)
 
@@ -227,7 +241,11 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
     @standard_log_decorator()
     def write(
-        self, modelname, globaltimes, validate: bool, write_context: WriteContext
+        self,
+        modelname,
+        globaltimes,
+        write_context: WriteContext,
+        validate_context: ValidationContext,
     ) -> StatusInfoBase:
         """
         Write model namefile
@@ -237,7 +255,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         workdir = write_context.simulation_directory
         modeldirectory = workdir / modelname
         Path(modeldirectory).mkdir(exist_ok=True, parents=True)
-        if validate:
+        if validate_context.validate:
             model_status_info = self.validate(modelname)
             if model_status_info.has_errors():
                 return model_status_info
@@ -252,40 +270,46 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         pkg_write_context = write_context.copy_with_new_write_directory(
             new_write_directory=modeldirectory
         )
+        mf6_hfb_ls: List[HorizontalFlowBarrierBase] = []
         for pkg_name, pkg in self.items():
             try:
-                if isinstance(pkg, imod.mf6.Well):
+                if issubclass(type(pkg), GridAgnosticWell):
                     top, bottom, idomain = self.__get_domain_geometry()
                     k = self.__get_k()
-                    mf6_well_pkg = pkg.to_mf6_pkg(
+                    mf6_well_pkg = pkg._to_mf6_pkg(
                         idomain,
                         top,
                         bottom,
                         k,
-                        validate,
-                        pkg_write_context.is_partitioned,
+                        validate_context,
                     )
-
                     mf6_well_pkg.write(
                         pkgname=pkg_name,
                         globaltimes=globaltimes,
                         write_context=pkg_write_context,
                     )
-                elif isinstance(pkg, imod.mf6.HorizontalFlowBarrierBase):
-                    top, bottom, idomain = self.__get_domain_geometry()
-                    k = self.__get_k()
-                    mf6_hfb_pkg = pkg.to_mf6_pkg(idomain, top, bottom, k, validate)
-                    mf6_hfb_pkg.write(
-                        pkgname=pkg_name,
-                        globaltimes=globaltimes,
-                        write_context=pkg_write_context,
-                    )
+                elif issubclass(type(pkg), imod.mf6.HorizontalFlowBarrierBase):
+                    mf6_hfb_ls.append(pkg)
                 else:
                     pkg.write(
                         pkgname=pkg_name,
                         globaltimes=globaltimes,
                         write_context=pkg_write_context,
                     )
+            except Exception as e:
+                raise type(e)(f"{e}\nError occured while writing {pkg_name}")
+
+        if len(mf6_hfb_ls) > 0:
+            try:
+                pkg_name = HFB_PKGNAME
+                top, bottom, idomain = self.__get_domain_geometry()
+                k = self.__get_k()
+                mf6_hfb_pkg = merge_hfb_packages(mf6_hfb_ls, idomain, top, bottom, k)
+                mf6_hfb_pkg.write(
+                    pkgname=pkg_name,
+                    globaltimes=globaltimes,
+                    write_context=pkg_write_context,
+                )
             except Exception as e:
                 raise type(e)(f"{e}\nError occured while writing {pkg_name}")
 
@@ -505,7 +529,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         self,
         target_grid: GridDataArray,
         validate: bool = True,
-        regrid_context: Optional[RegridderWeightsCache] = None,
+        regrid_cache: Optional[RegridderWeightsCache] = None,
     ) -> "Modflow6Model":
         """
         Creates a model by regridding the packages of this model to another discretization.
@@ -519,7 +543,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             a grid defined over the same discretization as the one we want to regrid the package to
         validate: bool
             set to true to validate the regridded packages
-        regrid_context: Optional RegridderWeightsCache
+        regrid_cache: RegridderWeightsCache, optional
             stores regridder weights for different regridders. Can be used to speed up regridding,
             if the same regridders are used several times for regridding different arrays.
 
@@ -528,7 +552,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         a model with similar packages to the input model, and with all the data-arrays regridded to another discretization,
         similar to the one used in input argument "target_grid"
         """
-        return _regrid_like(self, target_grid, validate, regrid_context)
+        return _regrid_like(self, target_grid, validate, regrid_cache)
 
     def mask_all_packages(
         self,

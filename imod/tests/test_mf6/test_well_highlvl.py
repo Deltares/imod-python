@@ -12,7 +12,9 @@ import imod.tests
 import imod.tests.fixtures
 import imod.tests.fixtures.mf6_circle_fixture
 import imod.tests.fixtures.mf6_twri_fixture
+from imod.mf6.validation_context import ValidationContext
 from imod.mf6.write_context import WriteContext
+from imod.schemata import ValidationError
 from imod.tests.fixtures.mf6_small_models_fixture import (
     grid_data_structured,
     grid_data_structured_layered,
@@ -79,10 +81,9 @@ def test_write_well(tmp_path: Path, grid_data, grid_data_layered, reference_outp
     k = 100.0
     top = ones_like(active.sel(layer=1), dtype=np.float64)
     bottom = grid_data_layered(np.float64, -2.0, 10)
+    validation_context = ValidationContext(False)
     write_context = WriteContext(tmp_path)
-    mf6_pkg = well.to_mf6_pkg(
-        active, top, bottom, k, False, write_context.is_partitioned
-    )
+    mf6_pkg = well._to_mf6_pkg(active, top, bottom, k, validation_context)
     mf6_pkg.write("packagename", globaltimes, write_context)
     assert pathlib.Path.exists(tmp_path / "packagename.wel")
     assert pathlib.Path.exists(tmp_path / "packagename" / "wel.dat")
@@ -149,7 +150,8 @@ def test_write_well_from_model_transient_rate(
 def test_write_all_wells_filtered_out(
     tmp_path: Path, twri_simulation: imod.mf6.Modflow6Simulation
 ):
-    # for this test, we leave the low conductivity of the twri model as is, so all wells get filtered out
+    # for this test, we leave the low conductivity of the twri model as is, so
+    # all wells get filtered out
     twri_simulation["GWF_1"]["well"] = imod.mf6.Well(
         x=[1.0, 6002.0],
         y=[3.0, 5004.0],
@@ -160,15 +162,16 @@ def test_write_all_wells_filtered_out(
         validate=True,
     )
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         twri_simulation.write(tmp_path, binary=False)
 
 
 def test_write_one_well_filtered_out(
     tmp_path: Path, twri_simulation: imod.mf6.Modflow6Simulation
 ):
-    # for this test, we increase the low conductivity of the twri model . But one of the wells violates the thickness constraint (the second one)
-    # and gets filtered out alltogether
+    # for this test, we increase the low conductivity of the twri model . But
+    # one of the wells violates the thickness constraint (the second one) and
+    # gets filtered out alltogether
     twri_simulation["GWF_1"]["npf"]["k"] *= 20000
     twri_simulation["GWF_1"]["well"] = imod.mf6.Well(
         x=[1.0, 6002.0],
@@ -180,7 +183,7 @@ def test_write_one_well_filtered_out(
         validate=True,
     )
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         twri_simulation.write(tmp_path, binary=False)
 
 
@@ -233,7 +236,7 @@ def test_constraints_are_configurable(
     twri_simulation["GWF_1"]["well"]["minimum_k"] = 1.0
     twri_simulation["GWF_1"]["well"]["minimum_thickness"] = 1.0
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         twri_simulation.write(tmp_path, binary=False)
 
     # reset the constraints again so that all constraints are met
@@ -246,7 +249,7 @@ def test_constraints_are_configurable(
     twri_simulation["GWF_1"]["well"]["minimum_k"] = 1e-9
     twri_simulation["GWF_1"]["well"]["minimum_thickness"] = 700.0
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         twri_simulation.write(tmp_path, binary=False)
 
 

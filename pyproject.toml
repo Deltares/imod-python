@@ -31,6 +31,7 @@ dependencies = [
     "cftime >=1",
     "dask",
     "fastcore",
+    "filelock",
     "Jinja2",
     "loguru",
     "matplotlib",
@@ -74,7 +75,7 @@ exclude_lines = [
 ]
 
 [tool.ruff.lint]
-select = ["C4", "E", "F", "I", "PD"]
+select = ["C4", "E", "F", "I", "NPY201", "PD"]
 ignore = [
     "E501", # line-too-long. This rule can't be fullfilled by the ruff formatter. The same behavior as black.
     "PD003",
@@ -157,6 +158,8 @@ ignore_missing_imports = true
 [tool.pytest.ini_options]
 markers = [
     "example: marks test as example (deselect with '-m \"not example\"')",
+    "user_acceptance: marks user acceptance tests (deselect with '-m \"not user_acceptance\"')",
+    "unittest_jit: marks unit tests that should be jitted (deselect with '-m \"not unittest_jit\"')"
 ]
 
 [tool.hatch.version]

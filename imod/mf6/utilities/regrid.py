@@ -21,8 +21,14 @@ from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.interfaces.isimulation import ISimulation
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.utilities.clip import clip_by_grid
+from imod.mf6.utilities.package import _is_valid
 from imod.schemata import ValidationError
-from imod.typing.grid import GridDataArray, get_grid_geometry_hash, ones_like
+from imod.typing.grid import (
+    GridDataArray,
+    GridDataset,
+    get_grid_geometry_hash,
+    ones_like,
+)
 from imod.util.regrid_method_type import (
     EmptyRegridMethod,
     RegridderType,
@@ -138,58 +144,104 @@ def assign_coord_if_present(
 
 
 def _regrid_array(
-    package: IRegridPackage,
-    varname: str,
+    da: GridDataArray,
     regridder_collection: RegridderWeightsCache,
-    regridder_name: RegridderType,
-    regridder_function: str,
+    regridder_name: Union[RegridderType, BaseRegridder],
+    regridder_function: Optional[str],
     target_grid: GridDataArray,
 ) -> Optional[GridDataArray]:
     """
-    Regrids a data_array. The array is specified by its key in the dataset.
-    Each data-array can represent:
-    -a scalar value, valid for the whole grid
-    -an array of a different scalar per layer
-    -an array with a value per grid block
-    -None
+    Regrids a GridDataArray. Each DataArray can represent:
+    - a scalar value, valid for the whole grid
+    - an array of a different scalar per layer
+    - an array with a value per grid block
+    - None
     """
 
     # skip regridding for arrays with no valid values (such as "None")
-    if not package._valid(package.dataset[varname].values[()]):
+    if not _is_valid(da.values[()]):
         return None
 
     # the dataarray might be a scalar. If it is, then it does not need regridding.
-    if is_scalar(package.dataset[varname]):
-        return package.dataset[varname].values[()]
+    if is_scalar(da):
+        return da.values[()]  # type: ignore [attr-defined]
 
-    if isinstance(package.dataset[varname], xr.DataArray):
-        coords = package.dataset[varname].coords
+    if isinstance(da, xr.DataArray):
+        coords = da.coords
         # if it is an xr.DataArray it may be layer-based; then no regridding is needed
         if not ("x" in coords and "y" in coords):
-            return package.dataset[varname]
+            return da
 
         # if it is an xr.DataArray it needs the dx, dy coordinates for regridding, which are otherwise not mandatory
         if not ("dx" in coords and "dy" in coords):
             raise ValueError(
-                f"DataArray {varname} does not have both a dx and dy coordinates"
+                f"GridDataArray {da.name} does not have both a dx and dy coordinates"
             )
 
     # obtain an instance of a regridder for the chosen method
     regridder = regridder_collection.get_regridder(
-        package.dataset[varname],
+        da,
         target_grid,
         regridder_name,
         regridder_function,
     )
 
     # store original dtype of data
-    original_dtype = package.dataset[varname].dtype
+    original_dtype = da.dtype
 
     # regrid data array
-    regridded_array = regridder.regrid(package.dataset[varname])
+    regridded_array = regridder.regrid(da)
 
     # reconvert the result to the same dtype as the original
     return regridded_array.astype(original_dtype)
+
+
+def _regrid_package_data(
+    package_data: dict[str, GridDataArray] | GridDataset,
+    target_grid: GridDataArray,
+    regridder_settings: RegridMethodType,
+    regrid_cache: RegridderWeightsCache,
+    new_package_data: Optional[dict[str, GridDataArray]] = None,
+) -> dict[str, GridDataArray]:
+    """
+    Regrid package data. Loops over regridder settings to regrid variables one
+    by one. Variables not existent in the package data are skipped. Regridded
+    package data is added to a dictionary, which can optionally be provided as
+    argument to extend.
+    """
+    if new_package_data is None:
+        new_package_data = {}
+
+    settings_dict = RegridMethodType.asdict(regridder_settings)
+    for (
+        varname,
+        regridder_type_and_function,
+    ) in settings_dict.items():
+        regridder_function: Optional[str] = None
+        regridder_name = regridder_type_and_function[0]
+        if len(regridder_type_and_function) > 1:
+            regridder_function = regridder_type_and_function[1]
+
+        # skip variables that are not in this dataset
+        if varname not in package_data.keys():
+            continue
+
+        # regrid the variable
+        new_package_data[varname] = _regrid_array(
+            package_data[varname],
+            regrid_cache,
+            regridder_name,
+            regridder_function,
+            target_grid,
+        )
+        # set dx and dy if present in target_grid
+        new_package_data[varname] = assign_coord_if_present(
+            "dx", target_grid, new_package_data[varname]
+        )
+        new_package_data[varname] = assign_coord_if_present(
+            "dy", target_grid, new_package_data[varname]
+        )
+    return new_package_data
 
 
 def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, list[str]]:
@@ -220,7 +272,7 @@ def _get_unique_regridder_types(model: IModel) -> defaultdict[RegridderType, lis
 def _regrid_like(
     package: IRegridPackage,
     target_grid: GridDataArray,
-    regrid_context: RegridderWeightsCache,
+    regrid_cache: RegridderWeightsCache,
     regridder_types: Optional[RegridMethodType] = None,
 ) -> IPackage:
     """
@@ -247,7 +299,7 @@ def _regrid_like(
         package to regrid
     target_grid: xr.DataArray or xu.UgridDataArray
         a grid defined over the same discretization as the one we want to regrid the package to
-    regrid_context: RegridderWeightsCache
+    regrid_cache: RegridderWeightsCache
         stores regridder weights for different regridders. Can be used to speed up regridding,
         if the same regridders are used several times for regridding different arrays.
     regridder_types: RegridMethodType, optional
@@ -268,41 +320,17 @@ def _regrid_like(
         remove_expanded_auxiliary_variables_from_dataset(package)
 
     if regridder_types is None:
-        regridder_settings = asdict(package.get_regrid_methods(), dict_factory=dict)
-    else:
-        regridder_settings = asdict(regridder_types, dict_factory=dict)
+        regridder_types = package._regrid_method
 
-    new_package_data = package.get_non_grid_data(list(regridder_settings.keys()))
+    new_package_data = package.get_non_grid_data(regridder_types.asdict().keys())
+    new_package_data = _regrid_package_data(
+        package.dataset,
+        target_grid,
+        regridder_types,
+        regrid_cache,
+        new_package_data=new_package_data,
+    )
 
-    for (
-        varname,
-        regridder_type_and_function,
-    ) in regridder_settings.items():
-        regridder_function = None
-        regridder_name = regridder_type_and_function[0]
-        if len(regridder_type_and_function) > 1:
-            regridder_function = regridder_type_and_function[1]
-
-        # skip variables that are not in this dataset
-        if varname not in package.dataset.keys():
-            continue
-
-        # regrid the variable
-        new_package_data[varname] = _regrid_array(
-            package,
-            varname,
-            regrid_context,
-            regridder_name,
-            regridder_function,
-            target_grid,
-        )
-        # set dx and dy if present in target_grid
-        new_package_data[varname] = assign_coord_if_present(
-            "dx", target_grid, new_package_data[varname]
-        )
-        new_package_data[varname] = assign_coord_if_present(
-            "dy", target_grid, new_package_data[varname]
-        )
     if hasattr(package, "auxiliary_data_fields"):
         expand_transient_auxiliary_variables(package)
 
@@ -314,7 +342,7 @@ def _regrid_like(
     model: IModel,
     target_grid: GridDataArray,
     validate: bool = True,
-    regrid_context: Optional[RegridderWeightsCache] = None,
+    regrid_cache: Optional[RegridderWeightsCache] = None,
 ) -> IModel:
     """
     Creates a model by regridding the packages of this model to another discretization.
@@ -328,7 +356,7 @@ def _regrid_like(
         a grid defined over the same discretization as the one we want to regrid the package to
     validate: bool
         set to true to validate the regridded packages
-    regrid_context: Optional RegridderWeightsCache
+    regrid_cache: RegridderWeightsCache, optional
         stores regridder weights for different regridders. Can be used to speed up regridding,
         if the same regridders are used several times for regridding different arrays.
 
@@ -343,18 +371,18 @@ def _regrid_like(
             f"regridding this model cannot be done due to the presence of package {error_with_object_name}"
         )
     new_model = model.__class__()
-    if regrid_context is None:
-        regrid_context = RegridderWeightsCache()
+    if regrid_cache is None:
+        regrid_cache = RegridderWeightsCache()
     for pkg_name, pkg in model.items():
         if isinstance(pkg, (IRegridPackage, ILineDataPackage, IPointDataPackage)):
-            new_model[pkg_name] = pkg.regrid_like(target_grid, regrid_context)
+            new_model[pkg_name] = pkg.regrid_like(target_grid, regrid_cache)
         else:
             raise NotImplementedError(
                 f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
             )
 
     methods = _get_unique_regridder_types(model)
-    output_domain = _get_regridding_domain(model, target_grid, regrid_context, methods)
+    output_domain = _get_regridding_domain(model, target_grid, regrid_cache, methods)
     new_model.mask_all_packages(output_domain)
     new_model.purge_empty_packages()
     if validate:
@@ -400,7 +428,7 @@ def _regrid_like(
         raise ValueError(
             "Unable to regrid simulation. Regridding can only be done on simulations that have a single flow model."
         )
-    regrid_context = RegridderWeightsCache()
+    regrid_cache = RegridderWeightsCache()
 
     models = simulation.get_models()
     for model_name, model in models.items():
@@ -413,7 +441,7 @@ def _regrid_like(
     result = simulation.__class__(regridded_simulation_name)
     for key, item in simulation.items():
         if isinstance(item, IModel):
-            result[key] = item.regrid_like(target_grid, validate, regrid_context)
+            result[key] = item.regrid_like(target_grid, validate, regrid_cache)
         elif key == "gwtgwf_exchanges":
             pass
         elif isinstance(item, IPackage) and not isinstance(item, IRegridPackage):
@@ -458,7 +486,7 @@ def _regrid_like(package: object, target_grid: GridDataArray, *_) -> None:
 def _get_regridding_domain(
     model: IModel,
     target_grid: GridDataArray,
-    regrid_context: RegridderWeightsCache,
+    regrid_cache: RegridderWeightsCache,
     methods: defaultdict[RegridderType, list[str]],
 ) -> GridDataArray:
     """
@@ -469,7 +497,7 @@ def _get_regridding_domain(
     idomain = model.domain
     included_in_all = ones_like(target_grid)
     regridders = [
-        regrid_context.get_regridder(idomain, target_grid, regriddertype, function)
+        regrid_cache.get_regridder(idomain, target_grid, regriddertype, function)
         for regriddertype, functionlist in methods.items()
         for function in functionlist
     ]

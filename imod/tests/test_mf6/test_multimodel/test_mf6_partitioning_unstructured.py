@@ -4,13 +4,14 @@ from pathlib import Path
 import geopandas as gpd
 import numpy as np
 import pytest
-import shapely
+import xarray as xr
 import xugrid as xu
 from pytest_cases import parametrize_with_cases
 
 import imod
 from imod.mf6 import Modflow6Simulation
-from imod.typing.grid import zeros_like
+from imod.prepare.hfb import linestring_to_square_zpolygons
+from imod.typing.grid import ones_like, zeros_like
 
 
 @pytest.mark.usefixtures("circle_model")
@@ -72,13 +73,17 @@ class HorizontalFlowBarrierCases:
         # Vertical line at x = -100
         barrier_y = [-990.0, 990.0]
         barrier_x = [-100.0, -100.0]
+        barrier_ztop = [10.0]
+        barrier_zbottom = [0.0]
+
+        polygons = linestring_to_square_zpolygons(
+            barrier_x, barrier_y, barrier_ztop, barrier_zbottom
+        )
 
         return gpd.GeoDataFrame(
-            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            geometry=polygons,
             data={
                 "resistance": [10.0],
-                "ztop": [10.0],
-                "zbottom": [0.0],
             },
         )
 
@@ -86,13 +91,17 @@ class HorizontalFlowBarrierCases:
         # Horizontal line at y = -100.0
         barrier_x = [-990.0, 990.0]
         barrier_y = [-100.0, -100.0]
+        barrier_ztop = [10.0]
+        barrier_zbottom = [0.0]
+
+        polygons = linestring_to_square_zpolygons(
+            barrier_x, barrier_y, barrier_ztop, barrier_zbottom
+        )
 
         return gpd.GeoDataFrame(
-            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            geometry=polygons,
             data={
                 "resistance": [10.0],
-                "ztop": [10.0],
-                "zbottom": [0.0],
             },
         )
 
@@ -100,27 +109,17 @@ class HorizontalFlowBarrierCases:
         # Horizontal line at y = -100.0 running outside domain
         barrier_x = [-990.0, 10_000.0]
         barrier_y = [-100.0, -100.0]
+        barrier_ztop = [10.0]
+        barrier_zbottom = [0.0]
 
-        return gpd.GeoDataFrame(
-            geometry=[shapely.linestrings(barrier_x, barrier_y)],
-            data={
-                "resistance": [10.0],
-                "ztop": [10.0],
-                "zbottom": [0.0],
-            },
+        polygons = linestring_to_square_zpolygons(
+            barrier_x, barrier_y, barrier_ztop, barrier_zbottom
         )
 
-    def case_hfb_horizontal_origin(self):
-        # Horizontal line through origin
-        barrier_x = [-990.0, 990.0]
-        barrier_y = [0.0, 0.0]
-
         return gpd.GeoDataFrame(
-            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            geometry=polygons,
             data={
                 "resistance": [10.0],
-                "ztop": [10.0],
-                "zbottom": [0.0],
             },
         )
 
@@ -128,13 +127,17 @@ class HorizontalFlowBarrierCases:
         # Diagonal line
         barrier_y = [-480.0, 480.0]
         barrier_x = [-480.0, 480.0]
+        barrier_ztop = [10.0]
+        barrier_zbottom = [0.0]
+
+        polygons = linestring_to_square_zpolygons(
+            barrier_x, barrier_y, barrier_ztop, barrier_zbottom
+        )
 
         return gpd.GeoDataFrame(
-            geometry=[shapely.linestrings(barrier_x, barrier_y)],
+            geometry=polygons,
             data={
                 "resistance": [10.0],
-                "ztop": [10.0],
-                "zbottom": [0.0],
             },
         )
 
@@ -159,7 +162,6 @@ def is_expected_hfb_partition_combination_fail(current_cases):
 def test_partitioning_unstructured(
     tmp_path: Path, circle_model: Modflow6Simulation, partition_array: xu.UgridDataArray
 ):
-    # %%
     simulation = circle_model
     # Increase the recharge to make the head gradient more pronounced.
     simulation["GWF_1"]["rch"]["rate"] *= 100
@@ -241,6 +243,63 @@ def test_partitioning_unstructured_with_inactive_cells(
     actual_head = split_simulation.open_head()
     actual_head = actual_head.ugrid.reindex_like(expected_head)
     # _ = split_simulation.open_flow_budget()
+
+    # Compare the head result of the original simulation with the result of the partitioned simulation
+    np.testing.assert_allclose(
+        actual_head["head"].values, expected_head.values, rtol=1e-5, atol=1e-3
+    )
+
+
+@pytest.mark.usefixtures("circle_model")
+def test_partitioning_unstructured_voronoi_conversion(
+    tmp_path: Path,
+    circle_model: Modflow6Simulation,
+):
+    # get original domain
+    grid_triangles = circle_model["GWF_1"].domain
+
+    # get voronoi grid
+    voronoi_grid = grid_triangles.ugrid.grid.tesselate_centroidal_voronoi()
+    nface = voronoi_grid.n_face
+    nlayer = len(grid_triangles["layer"])
+
+    layer = np.arange(nlayer, dtype=int) + 1
+
+    voronoi_idomain = xu.UgridDataArray(
+        xr.DataArray(
+            np.ones((nlayer, nface), dtype=np.int32),
+            coords={"layer": layer},
+            dims=["layer", voronoi_grid.face_dimension],
+            name="idomain",
+        ),
+        grid=voronoi_grid,
+    )
+
+    # get voronoi partition array
+    voronoi_partition_array = ones_like(voronoi_idomain.isel({"layer": 0}))
+    voronoi_partition_array.values[:50] = 0
+    voronoi_partition_array.name = "idomain"
+
+    # regrid original model to voronoi grid
+    voronoi_simulation = circle_model.regrid_like("regridded", voronoi_idomain, True)
+
+    # Run the original example, so without partitioning, and save the simulation
+    # results
+    original_dir = tmp_path / "original"
+    voronoi_simulation.write(original_dir, binary=False)
+
+    voronoi_simulation.run()
+
+    expected_head = voronoi_simulation.open_head()
+
+    # split the voronoi grid simulation into partitions.
+    split_simulation = voronoi_simulation.split(voronoi_partition_array)
+
+    split_simulation.write(tmp_path, binary=False)
+    split_simulation.run()
+
+    actual_head = split_simulation.open_head()
+    actual_head = actual_head.ugrid.reindex_like(expected_head)
 
     # Compare the head result of the original simulation with the result of the partitioned simulation
     np.testing.assert_allclose(

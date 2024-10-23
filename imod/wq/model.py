@@ -599,7 +599,7 @@ class SeawatModel(Model):
             ibound = self[baskey]["ibound"]
             cell_max_nparticles = self[advkey]["cell_max_nparticles"]
             self[advkey]["max_nparticles"] = int(
-                np.product(ibound.shape) * 0.5 * cell_max_nparticles
+                np.prod(ibound.shape) * 0.5 * cell_max_nparticles
             )
 
         content.append(

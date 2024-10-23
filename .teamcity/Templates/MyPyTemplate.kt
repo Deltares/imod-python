@@ -3,7 +3,9 @@ package Templates
 import jetbrains.buildServer.configs.kotlin.DslContext
 import jetbrains.buildServer.configs.kotlin.Template
 import jetbrains.buildServer.configs.kotlin.buildFeatures.XmlReport
+import jetbrains.buildServer.configs.kotlin.buildFeatures.dockerSupport
 import jetbrains.buildServer.configs.kotlin.buildFeatures.xmlReport
+import jetbrains.buildServer.configs.kotlin.buildSteps.ScriptBuildStep
 import jetbrains.buildServer.configs.kotlin.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.failureConditions.BuildFailureOnMetric
 import jetbrains.buildServer.configs.kotlin.failureConditions.failOnMetricChange
@@ -29,6 +31,10 @@ object MyPyTemplate : Template({
                     pixi run --environment default --frozen mypy
                 """.trimIndent()
             formatStderrAsError = true
+            dockerImage = "%DockerContainer%:%DockerVersion%"
+            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Windows
+            dockerRunParameters = """--cpus=4 --memory=16g"""
+            dockerPull = true
         }
     }
 
@@ -45,13 +51,14 @@ object MyPyTemplate : Template({
     }
 
     features {
+        dockerSupport {
+            loginToRegistry = on {
+                dockerRegistryId = "PROJECT_EXT_134"
+            }
+        }
         xmlReport {
             reportType = XmlReport.XmlReportType.JUNIT
             rules = "imod-python/*.xml"
         }
-    }
-
-    requirements {
-        equals("env.OS", "Windows_NT")
     }
 })

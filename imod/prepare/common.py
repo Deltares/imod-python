@@ -157,11 +157,11 @@ def _reshape(src, dst, ndim_regrid):
 
 
 def _is_subset(a1, a2):
-    if np.in1d(a2, a1).all():
+    if np.isin(a2, a1).all():
         # This means all are present
         # now check if it's an actual subset
         # Generate number, and fetch only those present
-        idx = np.arange(a1.size)[np.in1d(a1, a2)]
+        idx = np.arange(a1.size)[np.isin(a1, a2)]
         if idx.size > 1:
             increment = np.diff(idx)
             # If the maximum increment is only 1, it's a subset

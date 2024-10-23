@@ -5,6 +5,7 @@ from imod.mf6 import GroundwaterFlowModel
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.schemata import DTypeSchema
+from imod.util.regrid_method_type import EmptyRegridMethod, RegridMethodType
 
 
 def with_index_dim(array_like):
@@ -165,3 +166,7 @@ class SourceSinkMixing(BoundaryCondition, IRegridPackage):
             save_flows=save_flows,
             validate=validate,
         )
+
+    @classmethod
+    def get_regrid_methods(cls) -> RegridMethodType:
+        return EmptyRegridMethod()

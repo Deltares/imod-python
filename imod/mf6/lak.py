@@ -1051,7 +1051,7 @@ class Lake(BoundaryCondition):
             for tssname in self._period_data:
                 if len(period_data[tssname].dims) > 0:
                     for index in period_data.coords["index"].values:
-                        value = period_data[tssname].sel(index=index).values[()]
+                        value = period_data[tssname].sel(index=index).item()
                         isvalid = False
                         if isinstance(value, str):
                             isvalid = value != ""

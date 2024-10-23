@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 
 import xarray as xr
 
+from imod.typing import GridDataset
+
 
 class IPackageBase(ABC):
     """
@@ -16,4 +18,9 @@ class IPackageBase(ABC):
     @dataset.setter
     @abstractmethod
     def dataset(self, value: xr.Dataset) -> None:
+        raise NotImplementedError
+
+    @classmethod
+    @abstractmethod
+    def _from_dataset(cls, ds: GridDataset):
         raise NotImplementedError
