@@ -1,6 +1,7 @@
 import tempfile
 from pathlib import Path
 
+import numpy as np
 import pytest
 
 from imod.mf6.utilities.regrid import (
@@ -85,7 +86,7 @@ def test_initial_conditions_rootzone_regrid(simple_2d_grid_with_subunits):
 
     regrid_context = RegridderWeightsCache()
     regridded = ic.regrid_like(new_grid, regrid_context)
-    assert regridded.dataset["initial_pF"] == 2.2
+    np.testing.assert_almost_equal(regridded.dataset["initial_pF"], 2.2)
 
 
 def test_initial_conditions_saved_state():
