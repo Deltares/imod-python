@@ -1,5 +1,5 @@
 import pathlib
-from typing import TYPE_CHECKING, Callable, Iterable, Union
+from typing import TYPE_CHECKING, Callable, Iterable, Optional, Union
 
 import dask
 import numba
@@ -213,22 +213,33 @@ def laplace_interpolate(
     return source.copy(data=hnew[0])
 
 
-def rasterize(geodataframe, like, column=None, fill=np.nan, **kwargs):
+def rasterize(
+    geodataframe: "gpd.GeoDataFrame",
+    like: xr.DataArray,
+    column: Optional[str | int | float] = None,
+    fill: Optional[float | int] = np.nan,
+    dtype: Optional[DTypeLike] = None,
+    **kwargs,
+) -> xr.DataArray:
     """
     Rasterize a geopandas GeoDataFrame onto the given
     xarray coordinates.
 
     Parameters
     ----------
-    geodataframe : geopandas.GeoDataFrame
-    column : str, int, float
-        column name of geodataframe to burn into raster
-    like : xarray.DataArray
+    geodataframe: geopandas.GeoDataFrame
+        Geodataframe with polygons to rasterize.
+    like: xarray.DataArray
         Example DataArray. The rasterized result will match the shape and
         coordinates of this DataArray.
-    fill : float, int
+    column: str, int, float, optional
+        column name of geodataframe to burn into raster
+    fill: float, int, optional
         Fill value for nodata areas. Optional, default value is np.nan.
-    kwargs : additional keyword arguments for rasterio.features.rasterize.
+    dtype: dtypelike, optional
+        Data type of output raster. Defaults to data type of grid provided as
+        "like".
+    kwargs: additional keyword arguments for rasterio.features.rasterize, optional
         See: https://rasterio.readthedocs.io/en/stable/api/rasterio.features.html#rasterio.features.rasterize
 
     Returns
@@ -249,11 +260,15 @@ def rasterize(geodataframe, like, column=None, fill=np.nan, **kwargs):
     except TypeError:
         iterable_shapes: Iterable = (shapes,)  # type: ignore[no-redef]
 
+    if dtype is None:
+        dtype = like.dtype
+
     raster = rasterio.features.rasterize(
         iterable_shapes,
         out_shape=like.shape,
         fill=fill,
         transform=imod.util.spatial.transform(like),
+        dtype=dtype,
         **kwargs,
     )
 
