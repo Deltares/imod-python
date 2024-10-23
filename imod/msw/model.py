@@ -249,7 +249,6 @@ class MetaSwapModel(Model):
     def regrid_like(
         self,
         mf6_regridded_dis: mf6.StructuredDiscretization,
-        validate: bool = True,
         regrid_context: Optional[RegridderWeightsCache] = None,
         regridder_types: Optional[dict[str, Tuple[RegridderType, str]]] = None,
     ) -> "MetaSwapModel":
