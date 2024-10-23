@@ -15,7 +15,7 @@ Fixed
 
 - Multiple ``HorizontalFlowBarrier`` objects attached to
   :class:`imod.mf6.GroundwaterFlowModel` are merged into a single horizontal
-  flow barrier for MODFLOW 6
+  flow barrier for MODFLOW 6.
 - Bug where error would be thrown when barriers in a ``HorizontalFlowBarrier``
   would be snapped to the same cell edge. These are now summed.
 - Improve performance validation upon Package initialization
@@ -86,7 +86,9 @@ Added
   :meth:`imod.mf6.GeneralHeadboundary.cleanup`, :meth:`imod.mf6.River.cleanup`,
   :meth:`imod.mf6.Well.cleanup` convenience methods to call the corresponding
   cleanup utility functions with the appropriate arguments.
-
+- :meth:`imod.msw.MetaSwapModel.regrid_like` to regrid MetaSWAP models. This is
+  still experimental functionality, regridding the :class:`imod.msw.Sprinkling`
+  is not yet supported.
 
 Removed
 ~~~~~~~
