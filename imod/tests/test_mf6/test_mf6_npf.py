@@ -8,8 +8,8 @@ import pytest
 import xarray as xr
 
 import imod
-from imod.mf6.utilities.regridding_types import RegridderType
 from imod.schemata import ValidationError
+from imod.util.regrid_method_type import RegridderType
 
 
 def test_render():

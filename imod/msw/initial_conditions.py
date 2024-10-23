@@ -1,16 +1,20 @@
 import pathlib
 import shutil
 
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
+from imod.util.regrid_method_type import EmptyRegridMethod, RegridMethodType
 
 
-class InitialConditionsEquilibrium(MetaSwapPackage):
+class InitialConditionsEquilibrium(MetaSwapPackage, IRegridPackage):
     """
     Use an equilibrium profile to initialize the model.
 
     This class is responsible for the file `init_svat.inp`
     """
+
+    _regrid_method: RegridMethodType = EmptyRegridMethod()
 
     _file_name = "init_svat.inp"
     _option = "Equilibrium"
@@ -23,7 +27,7 @@ class InitialConditionsEquilibrium(MetaSwapPackage):
         file.write(self._option + "\n")
 
 
-class InitialConditionsRootzonePressureHead(MetaSwapPackage):
+class InitialConditionsRootzonePressureHead(MetaSwapPackage, IRegridPackage):
     """
     Use the pF-value of the root zone pressure head as initial condition.
 
@@ -40,6 +44,7 @@ class InitialConditionsRootzonePressureHead(MetaSwapPackage):
     _metadata_dict = {
         "initial_pF": VariableMetaData(6, 0.0, 6.0, float),
     }
+    _regrid_method: RegridMethodType = EmptyRegridMethod()
 
     def __init__(self, initial_pF=2.2):
         super().__init__()
@@ -53,7 +58,7 @@ class InitialConditionsRootzonePressureHead(MetaSwapPackage):
         self.write_dataframe_fixed_width(file, dataframe)
 
 
-class InitialConditionsPercolation(MetaSwapPackage):
+class InitialConditionsPercolation(MetaSwapPackage, IRegridPackage):
     """
     The precipitation intensity at the starting time (iybg, tdbg in
     PARA_SIM.INP) is used for initializing the percolation flux in the profiles.
@@ -68,6 +73,7 @@ class InitialConditionsPercolation(MetaSwapPackage):
     _file_name = "init_svat.inp"
     _option = "MeteoInputP"
     _metadata_dict: dict = {}
+    _regrid_method: RegridMethodType = EmptyRegridMethod()
 
     def __init__(self):
         super().__init__()
@@ -103,3 +109,6 @@ class InitialConditionsSavedState(MetaSwapPackage):
         filename = directory / self._file_name
 
         shutil.copyfile(self.saved_state, filename)
+
+    def is_regridding_supported(self) -> bool:
+        return False

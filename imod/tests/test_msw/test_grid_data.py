@@ -9,8 +9,10 @@ from hypothesis.strategies import floats
 from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
 
+from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.msw import GridData
 from imod.msw.fixed_format import format_fixed_width
+from imod.util.spatial import get_total_grid_area
 
 
 @given(
@@ -234,9 +236,9 @@ def test_generate_index_array():
     assert_equal(svat.values, svat_expected.values)
 
 
-def test_simple_model(fixed_format_parser):
+def simple_model():
     x = [1.0, 2.0, 3.0]
-    y = [1.0, 2.0, 3.0]
+    y = [3.0, 2.0, 1.0]
     subunit = [0, 1]
     dx = 1.0
     dy = 1.0
@@ -324,6 +326,12 @@ def test_simple_model(fixed_format_parser):
         active,
     )
 
+    return grid_data
+
+
+def test_simple_model(fixed_format_parser):
+    grid_data = simple_model()
+
     index, svat = grid_data.generate_index_array()
 
     with tempfile.TemporaryDirectory() as output_dir:
@@ -340,6 +348,19 @@ def test_simple_model(fixed_format_parser):
     assert_equal(results["soil_physical_unit"], np.array([2, 8, 2, 5]))
     assert_equal(results["landuse"], np.array([1, 1, 2, 2]))
     assert_almost_equal(results["rootzone_depth"], np.array([1.0, 1.0, 1.0, 1.0]))
+
+
+def test_simple_model_regrid(simple_2d_grid_with_subunits):
+    grid_data = simple_model()
+    new_grid = simple_2d_grid_with_subunits
+
+    regrid_context = RegridderWeightsCache()
+
+    regridded_griddata = grid_data.regrid_like(new_grid, regrid_context)
+
+    regridded_area = regridded_griddata.dataset["area"].sum(dim="subunit")
+    regridded_total_area = get_total_grid_area(new_grid.sel({"subunit": 0}, drop=True))
+    assert np.sum(regridded_area.values) == regridded_total_area
 
 
 def test_simple_model_1_subunit(fixed_format_parser):
@@ -443,7 +464,7 @@ def test_area_grid_exceeds_cell_area():
     """
     Test where provided area grid exceeds total cell area, should throw error.
     """
-    x = [1.0, 2.0, 3.0]
+    x = [1.0, 3.0, 5.0]
     y = [1.0, 2.0, 3.0]
     subunit = [0, 1]
     dx = 1.0

@@ -10,10 +10,11 @@ import xarray as xr
 from numpy import nan
 from numpy.testing import assert_equal
 
+from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.msw import MeteoGrid
 
 
-def test_meteo_grid():
+def setup_meteo_grid():
     x = [1.0, 2.0, 3.0]
     y = [1.0, 2.0, 3.0]
     time = pd.date_range(start="2000-01-01", end="2000-01-02", freq="D")
@@ -47,6 +48,12 @@ def test_meteo_grid():
     # fmt: on
 
     meteo_grid = MeteoGrid(precipitation, evapotranspiration)
+
+    return meteo_grid
+
+
+def test_meteo_grid():
+    meteo_grid = setup_meteo_grid()
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
@@ -104,3 +111,15 @@ def test_meteo_no_time_grid():
 
     with pytest.raises(ValueError):
         MeteoGrid(precipitation, evapotranspiration)
+
+
+def test_regrid_meteo(simple_2d_grid_with_subunits):
+    meteo = setup_meteo_grid()
+    new_grid = simple_2d_grid_with_subunits
+
+    regrid_context = RegridderWeightsCache()
+
+    regridded_ponding = meteo.regrid_like(new_grid, regrid_context)
+
+    assert np.all(regridded_ponding.dataset["x"].values == new_grid["x"].values)
+    assert np.all(regridded_ponding.dataset["y"].values == new_grid["y"].values)
