@@ -5,7 +5,7 @@ import pandas as pd
 import xarray as xr
 
 from imod.mf6.dis import StructuredDiscretization
-from imod.mf6.wel import WellDisStructured
+from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 
@@ -41,7 +41,7 @@ class CouplerMapping(MetaSwapPackage):
     def __init__(
         self,
         modflow_dis: StructuredDiscretization,
-        well: Optional[WellDisStructured] = None,
+        well: Optional[Mf6Wel] = None,
     ):
         super().__init__()
 
@@ -103,16 +103,19 @@ class CouplerMapping(MetaSwapPackage):
         """
         n_subunit = svat["subunit"].size
 
-        # Convert to Python's 0-based index
-        well_row = self.well["row"] - 1
-        well_column = self.well["column"] - 1
-        well_layer = self.well["layer"] - 1
+        well_mf_cellid = self.well["cellid"]
+        if len(well_mf_cellid.coords["nmax_cellid"]) != 3:
+            raise TypeError("Coupling to unstructured grids is not supported.")
+
+        well_layer = well_mf_cellid[0]
+        well_row = well_mf_cellid[1] - 1
+        well_column = well_mf_cellid[2] - 1
 
         n_mod = self.idomain_active.sum()
         mod_id = xr.full_like(self.idomain_active, 0, dtype=np.int64)
         mod_id.values[self.idomain_active.values] = np.arange(1, n_mod + 1)
 
-        well_mod_id = mod_id[well_layer, well_row, well_column]
+        well_mod_id = mod_id[well_layer - 1, well_row, well_column]
         well_mod_id = np.tile(well_mod_id, (n_subunit, 1))
 
         well_svat = svat.values[:, well_row, well_column]
@@ -123,7 +126,7 @@ class CouplerMapping(MetaSwapPackage):
         well_mod_id_1d = well_mod_id[well_active]
 
         # Tile well_layers for each subunit
-        layer = np.tile(well_layer + 1, (n_subunit, 1))
+        layer = np.tile(well_layer, (n_subunit, 1))
         layer_1d = layer[well_active]
 
         return (well_mod_id_1d, well_svat_1d, layer_1d)

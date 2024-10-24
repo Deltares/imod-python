@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from imod.mf6.wel import WellDisStructured
+from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 
@@ -55,7 +55,7 @@ class Sprinkling(MetaSwapPackage):
         self,
         max_abstraction_groundwater: xr.DataArray,
         max_abstraction_surfacewater: xr.DataArray,
-        well: WellDisStructured,
+        well: Mf6Wel,
     ):
         super().__init__()
         self.dataset["max_abstraction_groundwater_m3_d"] = max_abstraction_groundwater
@@ -65,9 +65,13 @@ class Sprinkling(MetaSwapPackage):
         self._pkgcheck()
 
     def _render(self, file, index, svat):
-        well_row = self.well["row"] - 1
-        well_column = self.well["column"] - 1
-        well_layer = self.well["layer"]
+        well_mf_cellid = self.well["cellid"]
+        if len(well_mf_cellid.coords["nmax_cellid"]) != 3:
+            raise TypeError("Coupling to unstructured grids is not supported.")
+
+        well_layer = well_mf_cellid[0]
+        well_row = well_mf_cellid[1] - 1
+        well_column = well_mf_cellid[2] - 1
 
         n_subunit = svat["subunit"].size
 
