@@ -5,6 +5,8 @@ import xarray as xr
 from numpy import nan
 
 from imod import mf6, msw
+from imod.mf6.mf6_wel_adapter import Mf6Wel
+from imod.mf6.wel import derive_cellid_from_points
 
 
 def make_coupled_mf6_model():
@@ -75,14 +77,13 @@ def make_coupled_mf6_model():
     # Create wells
     wel_layer = 3
 
-    ix = np.tile(np.arange(ncol) + 1, nrow)
-    iy = np.repeat(np.arange(nrow) + 1, ncol)
-    rate = np.zeros(ix.shape)
-    layer = np.full_like(ix, wel_layer)
+    well_x = np.tile(x, nrow)
+    well_y = np.repeat(y, ncol)
+    well_rate = np.zeros(well_x.shape)
+    well_layer = np.full_like(well_x, wel_layer)
 
-    gwf_model["wells_msw"] = mf6.WellDisStructured(
-        layer=layer, row=iy, column=ix, rate=rate
-    )
+    cellids = derive_cellid_from_points(idomain, well_x, well_y, well_layer)
+    gwf_model["well_msw"] = Mf6Wel(cellids, well_rate)
 
     # Attach it to a simulation
     simulation = mf6.Modflow6Simulation("test")
@@ -192,12 +193,13 @@ def make_msw_model():
 
     wel_layer = 3
 
-    ix = np.tile(np.arange(ncol) + 1, nrow)
-    iy = np.repeat(np.arange(nrow) + 1, ncol)
-    rate = np.zeros(ix.shape)
-    layer = np.full_like(ix, wel_layer)
+    well_x = np.tile(x, nrow)
+    well_y = np.repeat(y, ncol)
+    well_rate = np.zeros(well_x.shape)
+    well_layer = np.full_like(well_x, wel_layer)
 
-    well = mf6.WellDisStructured(layer=layer, row=iy, column=ix, rate=rate)
+    cellids = derive_cellid_from_points(active, well_x, well_y, well_layer).astype(int)
+    well = Mf6Wel(cellids, well_rate)
 
     # %% Modflow 6
     dz = np.array([1, 10, 100])
