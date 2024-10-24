@@ -65,17 +65,17 @@ class Sprinkling(MetaSwapPackage):
         self._pkgcheck()
 
     def _render(self, file, index, svat):
-        well_mf_cellid = self.well["cellid"]
-        if len(well_mf_cellid.coords["nmax_cellid"]) != 3:
+        cellid = self.well["cellid"]
+        if len(cellid.coords["nmax_cellid"]) != 3:
             raise TypeError("Coupling to unstructured grids is not supported.")
 
-        well_layer = well_mf_cellid[0]
-        well_row = well_mf_cellid[1] - 1
-        well_column = well_mf_cellid[2] - 1
+        well_layer = cellid.sel(nmax_cellid="layer").data
+        well_row = cellid.sel(nmax_cellid="row").data - 1
+        well_column = cellid.sel(nmax_cellid="column").data - 1
 
         n_subunit = svat["subunit"].size
 
-        well_svat = svat.values[:, well_row, well_column]
+        well_svat = svat.data[:, well_row, well_column]
         well_active = well_svat != 0
 
         # Tile well_layers for each subunit
@@ -84,7 +84,7 @@ class Sprinkling(MetaSwapPackage):
         data_dict = {"svat": well_svat[well_active], "layer": layer[well_active]}
 
         for var in self._without_subunit:
-            well_arr = self.dataset[var].values[well_row, well_column]
+            well_arr = self.dataset[var].data[well_row, well_column]
             well_arr = np.tile(well_arr, (n_subunit, 1))
             data_dict[var] = well_arr[well_active]
 
