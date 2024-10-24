@@ -21,7 +21,7 @@ class CouplerMapping(MetaSwapPackage):
     ----------
     modflow_dis: StructuredDiscretization
         Modflow 6 structured discretization
-    well: WellDisStructured (optional)
+    well: Mf6Wel (optional)
         If given, this parameter describes sprinkling of SVAT units from MODFLOW
         cells.
     """

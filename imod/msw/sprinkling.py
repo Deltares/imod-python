@@ -22,7 +22,7 @@ class Sprinkling(MetaSwapPackage):
     max_abstraction_surfacewater: array of floats (xr.DataArray)
         Describes the maximum abstraction of surfacewater to SVAT units in m3
         per day. This array must not have a subunit coordinate.
-    well: WellDisStructured
+    well: Mf6Wel
         Describes the sprinkling of SVAT units coming groundwater.
     """
 
