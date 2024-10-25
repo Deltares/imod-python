@@ -17,7 +17,7 @@ import jetbrains.buildServer.configs.kotlin.triggers.vcs
 object MainProject : Project({
     params {
         param("DockerContainer", "containers.deltares.nl/hydrology_product_line_imod/windows-pixi")
-        param("DockerVersion", "v0.26.1")
+        param("DockerVersion", "v0.34.0")
     }
 
     buildType(Lint)
