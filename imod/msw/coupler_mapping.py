@@ -105,13 +105,13 @@ class CouplerMapping(MetaSwapPackage):
         """
         n_subunit = svat["subunit"].size
 
-        cellid = self.well["cellid"]
-        if len(cellid.coords["nmax_cellid"]) != 3:
+        well_cellid = self.well["cellid"]
+        if len(well_cellid.coords["nmax_cellid"]) != 3:
             raise TypeError("Coupling to unstructured grids is not supported.")
 
-        well_layer = cellid.sel(nmax_cellid="layer").data
-        well_row = cellid.sel(nmax_cellid="row").data - 1
-        well_column = cellid.sel(nmax_cellid="column").data - 1
+        well_layer = well_cellid.sel(nmax_cellid="layer").data
+        well_row = well_cellid.sel(nmax_cellid="row").data - 1
+        well_column = well_cellid.sel(nmax_cellid="column").data - 1
 
         n_mod = self.idomain_active.sum()
         mod_id = xr.full_like(self.idomain_active, 0, dtype=np.int64)
