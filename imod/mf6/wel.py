@@ -317,8 +317,8 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
 
         # Groupby index and select first, to unset any duplicate records
         # introduced by the multi-indexed "time" dimension.
-        df_for_cellid = assigned_wells.groupby("index").first()
-        d_for_cellid = df_for_cellid[["x", "y", "layer"]].to_dict("list")
+        unique_assigned_wells = assigned_wells.groupby("index").first()
+        d_for_cellid = unique_assigned_wells[["x", "y", "layer"]].to_dict("list")
 
         return derive_cellid_from_points(like, **d_for_cellid)
 
