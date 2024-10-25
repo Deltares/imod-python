@@ -60,6 +60,8 @@ class Sprinkling(MetaSwapPackage):
         super().__init__()
         self.dataset["max_abstraction_groundwater_m3_d"] = max_abstraction_groundwater
         self.dataset["max_abstraction_surfacewater_m3_d"] = max_abstraction_surfacewater
+        if not isinstance(well, Mf6Wel):
+            raise TypeError(rf"well not of type 'Mf6Wel', got '{type(well)}'")
         self.well = well
 
         self._pkgcheck()

@@ -45,6 +45,8 @@ class CouplerMapping(MetaSwapPackage):
     ):
         super().__init__()
 
+        if well and (not isinstance(well, Mf6Wel)):
+            raise TypeError(rf"well not of type 'Mf6Wel', got '{type(well)}'")
         self.well = well
         # Test if equal or larger than 1, to ignore idomain == -1 as well. Don't
         # assign to self.dataset, as grid extent might differ from svat when
