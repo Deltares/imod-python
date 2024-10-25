@@ -7,6 +7,17 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
 
+[Unreleased - feature branch]
+-----------------------------
+
+Changed
+~~~~~~~
+
+- :class:`imod.msw.CouplingMapping` and :class:`imod.msw.Sprinkling` now take
+  the :class:`imod.mf6.mf6_wel_adapter.Mf6Wel` as well argument instead of the
+  deprecated :class:`imod.mf6.WellDisStructured`.
+
+
 [Unreleased]
 ------------
 
