@@ -19,7 +19,7 @@ from imod.logging.loglevel import LogLevel
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.utilities.grid import broadcast_to_full_domain
-from imod.mf6.wel import LayeredWell, Well
+from imod.mf6.wel import LayeredWell, Well, derive_cellid_from_points
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
@@ -708,7 +708,7 @@ def test_derive_cellid_from_points(basic_dis, well_high_lvl_test_data_stationary
     )
 
     # Act
-    cellid = imod.mf6.wel.Well._derive_cellid_from_points(idomain, x, y, layer)
+    cellid = derive_cellid_from_points(idomain, x, y, layer)
 
     # Assert
     np.testing.assert_array_equal(cellid, cellid_expected)
