@@ -86,7 +86,7 @@ class Mf6Wel(BoundaryCondition):
             dsvar[var] = ds[var]
         arrdict["var_values"] = dsvar
 
-        arrdict["cellid_names"] = ds.coords["nmax_cellid"].values
+        arrdict["cellid_names"] = ds.coords["dim_cellid"].values
         arrdict["nrow"] = ds.coords["ncellid"].size
         arrdict["cellid"] = ds["cellid"]
 
@@ -100,7 +100,7 @@ class Mf6Wel(BoundaryCondition):
         # Initialize the structured array
         recarr = np.empty(arrdict["nrow"], dtype=sparse_dtype)
         for cellid_name in arrdict["cellid_names"]:
-            recarr[cellid_name] = arrdict["cellid"].sel(nmax_cellid=cellid_name).values
+            recarr[cellid_name] = arrdict["cellid"].sel(dim_cellid=cellid_name).values
 
         for var in arrdict["data_vars"]:
             recarr[var] = arrdict["var_values"][var]

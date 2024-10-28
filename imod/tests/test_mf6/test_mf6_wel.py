@@ -37,9 +37,9 @@ times = [
 class GridAgnosticWellCases:
     def case_well_stationary(self, well_high_lvl_test_data_stationary):
         obj = imod.mf6.Well(*well_high_lvl_test_data_stationary)
-        dims_expected = {
+        sizes_expected = {
             "ncellid": 8,
-            "nmax_cellid": 3,
+            "dim_cellid": 3,
             "species": 2,
         }
         cellid_expected = np.array(
@@ -56,7 +56,7 @@ class GridAgnosticWellCases:
             dtype=np.int64,
         )
         rate_expected = np.array(np.ones((8,), dtype=np.float32))
-        return obj, dims_expected, cellid_expected, rate_expected
+        return obj, sizes_expected, cellid_expected, rate_expected
 
     def case_well_stationary_multilevel(self, well_high_lvl_test_data_stationary):
         x, y, screen_top, _, rate_wel, concentration = (
@@ -64,9 +64,9 @@ class GridAgnosticWellCases:
         )
         screen_bottom = [-20.0] * 8
         obj = imod.mf6.Well(x, y, screen_top, screen_bottom, rate_wel, concentration)
-        dims_expected = {
+        sizes_expected = {
             "ncellid": 12,
-            "nmax_cellid": 3,
+            "dim_cellid": 3,
             "species": 2,
         }
         cellid_expected = np.array(
@@ -87,16 +87,16 @@ class GridAgnosticWellCases:
             dtype=np.int64,
         )
         rate_expected = np.array([0.25] * 4 + [0.75] * 4 + [1.0] * 4)
-        return obj, dims_expected, cellid_expected, rate_expected
+        return obj, sizes_expected, cellid_expected, rate_expected
 
     def case_well_point_filter(self, well_high_lvl_test_data_stationary):
         x, y, screen_point, _, rate_wel, concentration = (
             well_high_lvl_test_data_stationary
         )
         obj = imod.mf6.Well(x, y, screen_point, screen_point, rate_wel, concentration)
-        dims_expected = {
+        sizes_expected = {
             "ncellid": 8,
-            "nmax_cellid": 3,
+            "dim_cellid": 3,
             "species": 2,
         }
         cellid_expected = np.array(
@@ -113,14 +113,14 @@ class GridAgnosticWellCases:
             dtype=np.int64,
         )
         rate_expected = np.array(np.ones((8,), dtype=np.float32))
-        return obj, dims_expected, cellid_expected, rate_expected
+        return obj, sizes_expected, cellid_expected, rate_expected
 
     def case_well_transient(self, well_high_lvl_test_data_transient):
         obj = imod.mf6.Well(*well_high_lvl_test_data_transient)
-        dims_expected = {
+        sizes_expected = {
             "ncellid": 8,
             "time": 5,
-            "nmax_cellid": 3,
+            "dim_cellid": 3,
             "species": 2,
         }
         cellid_expected = np.array(
@@ -137,15 +137,15 @@ class GridAgnosticWellCases:
             dtype=np.int64,
         )
         rate_expected = np.outer(np.ones((8,), dtype=np.float32), np.arange(5) + 1)
-        return obj, dims_expected, cellid_expected, rate_expected
+        return obj, sizes_expected, cellid_expected, rate_expected
 
     def case_layered_well_stationary(self, well_high_lvl_test_data_stationary):
         x, y, _, _, rate_wel, concentration = well_high_lvl_test_data_stationary
         layer = [1, 1, 1, 1, 2, 2, 2, 2]
         obj = imod.mf6.LayeredWell(x, y, layer, rate_wel, concentration)
-        dims_expected = {
+        sizes_expected = {
             "ncellid": 8,
-            "nmax_cellid": 3,
+            "dim_cellid": 3,
             "species": 2,
         }
         cellid_expected = np.array(
@@ -162,16 +162,16 @@ class GridAgnosticWellCases:
             dtype=np.int64,
         )
         rate_expected = np.array(np.ones((8,), dtype=np.float32))
-        return obj, dims_expected, cellid_expected, rate_expected
+        return obj, sizes_expected, cellid_expected, rate_expected
 
     def case_layered_well_transient(self, well_high_lvl_test_data_transient):
         x, y, _, _, rate_wel, concentration = well_high_lvl_test_data_transient
         layer = [1, 1, 1, 1, 2, 2, 2, 2]
         obj = imod.mf6.LayeredWell(x, y, layer, rate_wel, concentration)
-        dims_expected = {
+        sizes_expected = {
             "ncellid": 8,
             "time": 5,
-            "nmax_cellid": 3,
+            "dim_cellid": 3,
             "species": 2,
         }
         cellid_expected = np.array(
@@ -188,28 +188,28 @@ class GridAgnosticWellCases:
             dtype=np.int64,
         )
         rate_expected = np.outer(np.ones((8,), dtype=np.float32), np.arange(5) + 1)
-        return obj, dims_expected, cellid_expected, rate_expected
+        return obj, sizes_expected, cellid_expected, rate_expected
 
 
 @parametrize_with_cases(
-    ["wel", "dims_expected", "cellid_expected", "rate_expected"],
+    ["wel", "sizes_expected", "cellid_expected", "rate_expected"],
     cases=GridAgnosticWellCases,
 )
-def test_to_mf6_pkg(basic_dis, wel, dims_expected, cellid_expected, rate_expected):
+def test_to_mf6_pkg(basic_dis, wel, sizes_expected, cellid_expected, rate_expected):
     # Arrange
     idomain, top, bottom = basic_dis
     active = idomain == 1
     k = xr.ones_like(idomain)
 
-    nmax_cellid_expected = np.array(["layer", "row", "column"])
+    dim_cellid_expected = np.array(["layer", "row", "column"])
 
     # Act
     mf6_wel = wel.to_mf6_pkg(active, top, bottom, k)
     mf6_ds = mf6_wel.dataset
 
     # Assert
-    assert dict(mf6_ds.dims) == dims_expected
-    np.testing.assert_equal(mf6_ds.coords["nmax_cellid"].values, nmax_cellid_expected)
+    assert dict(mf6_ds.sizes) == sizes_expected
+    np.testing.assert_equal(mf6_ds.coords["dim_cellid"].values, dim_cellid_expected)
     np.testing.assert_equal(mf6_ds["cellid"].values, cellid_expected)
     np.testing.assert_equal(mf6_ds["rate"].values, rate_expected)
 
@@ -692,7 +692,7 @@ def test_derive_cellid_from_points(basic_dis, well_high_lvl_test_data_stationary
     x, y, _, _, _, _ = well_high_lvl_test_data_stationary
     layer = [1, 1, 1, 1, 2, 2, 2, 2]
 
-    nmax_cellid_expected = np.array(["layer", "row", "column"])
+    dim_cellid_expected = np.array(["layer", "row", "column"])
     cellid_expected = np.array(
         [
             [1, 1, 9],
@@ -712,7 +712,7 @@ def test_derive_cellid_from_points(basic_dis, well_high_lvl_test_data_stationary
 
     # Assert
     np.testing.assert_array_equal(cellid, cellid_expected)
-    np.testing.assert_equal(cellid.coords["nmax_cellid"].values, nmax_cellid_expected)
+    np.testing.assert_equal(cellid.coords["dim_cellid"].values, dim_cellid_expected)
 
 
 def test_render__stationary(well_test_data_stationary):

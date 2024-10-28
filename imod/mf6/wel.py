@@ -274,14 +274,14 @@ def derive_cellid_from_points(
 
     # Prepare cellid array of the right shape.
     cellid_ls = [indices_layer] + [indices_cell2d[dim] for dim in indices_cell2d_dims]
-    cellid = xr.concat(cellid_ls, dim="nmax_cellid")
+    cellid = xr.concat(cellid_ls, dim="dim_cellid")
     # Rename generic dimension name "index" to ncellid.
     cellid = cellid.rename(index="ncellid")
     # Put dimensions in right order after concatenation.
-    cellid = cellid.transpose("ncellid", "nmax_cellid")
+    cellid = cellid.transpose("ncellid", "dim_cellid")
     # Assign extra coordinate names.
     coords = {
-        "nmax_cellid": ["layer"] + cell2d_coords,
+        "dim_cellid": ["layer"] + cell2d_coords,
         "x": ("ncellid", x),
         "y": ("ncellid", y),
     }

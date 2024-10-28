@@ -68,12 +68,12 @@ class Sprinkling(MetaSwapPackage):
 
     def _render(self, file, index, svat):
         well_cellid = self.well["cellid"]
-        if len(well_cellid.coords["nmax_cellid"]) != 3:
+        if len(well_cellid.coords["dim_cellid"]) != 3:
             raise TypeError("Coupling to unstructured grids is not supported.")
 
-        well_layer = well_cellid.sel(nmax_cellid="layer").data
-        well_row = well_cellid.sel(nmax_cellid="row").data - 1
-        well_column = well_cellid.sel(nmax_cellid="column").data - 1
+        well_layer = well_cellid.sel(dim_cellid="layer").data
+        well_row = well_cellid.sel(dim_cellid="row").data - 1
+        well_column = well_cellid.sel(dim_cellid="column").data - 1
 
         n_subunit = svat["subunit"].size
 
