@@ -7,14 +7,15 @@ from typing import TYPE_CHECKING, TypeAlias, TypeVar, Union
 import numpy as np
 import xarray as xr
 import xugrid as xu
+from numpy.typing import NDArray
 
 GridDataArray: TypeAlias = Union[xr.DataArray, xu.UgridDataArray]
 GridDataset: TypeAlias = Union[xr.Dataset, xu.UgridDataset]
 ScalarAsDataArray: TypeAlias = Union[xr.DataArray, xu.UgridDataArray]
 ScalarAsDataset: TypeAlias = Union[xr.Dataset, xu.UgridDataset]
 UnstructuredData: TypeAlias = Union[xu.UgridDataset, xu.UgridDataArray]
-FloatArray: TypeAlias = np.ndarray
-IntArray: TypeAlias = np.ndarray
+FloatArray: TypeAlias = NDArray[np.floating]
+IntArray: TypeAlias = NDArray[np.int_]
 
 
 # Types for optional dependencies.

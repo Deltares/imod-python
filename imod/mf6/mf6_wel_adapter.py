@@ -17,6 +17,7 @@ from typing import Any, Dict, Optional
 import numpy as np
 
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.interfaces.ipackage import IPackage
 from imod.schemata import DTypeSchema
 
 # FUTURE: There was an idea to autogenerate modflow 6 adapters.
@@ -24,7 +25,7 @@ from imod.schemata import DTypeSchema
 # https://github.com/Deltares/xugrid/blob/main/xugrid/core/wrap.py#L90
 
 
-class Mf6Wel(BoundaryCondition):
+class Mf6Wel(BoundaryCondition, IPackage):
     """
     Package resembling input for Modflow 6 List Input. This class has
     methods for the modflow 6 wel packages with time component.

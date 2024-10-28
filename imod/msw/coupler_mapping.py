@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, cast
 
 import numpy as np
 import pandas as pd
@@ -8,6 +8,7 @@ from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
+from imod.typing import IntArray
 
 
 class CouplerMapping(MetaSwapPackage):
@@ -69,7 +70,7 @@ class CouplerMapping(MetaSwapPackage):
 
         self.dataset["mod_id"].values[:, idomain_top_active.values] = mod_id_1d
 
-    def _render(self, file, index, svat):
+    def _render(self, file, index, svat: xr.DataArray):
         self._create_mod_id_rch(svat)
         # package check only possible after calling _create_mod_id_rch
         self._pkgcheck()
@@ -101,13 +102,14 @@ class CouplerMapping(MetaSwapPackage):
 
     def _create_well_id(
         self, svat: xr.DataArray
-    ) -> tuple[np.ndarray[int], np.ndarray[int], np.ndarray[int]]:
+    ) -> tuple[IntArray, IntArray, IntArray]:
         """
         Get modflow indices, svats, and layer number for the wells
         """
         n_subunit = svat["subunit"].size
 
-        well_cellid = self.well["cellid"]
+        well = cast(Mf6Wel, self.well)
+        well_cellid = well.dataset["cellid"]
         if len(well_cellid.coords["dim_cellid"]) != 3:
             raise TypeError("Coupling to unstructured grids is not supported.")
 
