@@ -16,6 +16,7 @@ from typing import Any, Dict, Optional
 
 import numpy as np
 import xarray as xr
+from numpy.typing import NDArray
 
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.ipackage import IPackage
@@ -26,7 +27,60 @@ from imod.schemata import DTypeSchema
 # https://github.com/Deltares/xugrid/blob/main/xugrid/core/wrap.py#L90
 
 
-def create_cellid_da(
+def cellid_from_arrays__structured(
+    layer: NDArray[np.int_], row: NDArray[np.int_], column: NDArray[np.int_]
+):
+    """
+    Create DataArray of cellids for structured indices.
+
+    Parameters
+    ----------
+    layer: numpy.array
+        1D array of integers for layer
+    row: numpy.array
+        1D array of integers for row
+    column: numpy.array
+        1D array of integers for column
+
+    Returns
+    -------
+    cellid: xr.DataArray
+        2D DataArray with ``ncellid`` rows and 3 columns.
+    """
+    return _cellid_from_kwargs(layer=layer, row=row, column=column)
+
+
+def cellid_from_arrays__unstructured(layer: NDArray[np.int_], cell2d: NDArray[np.int_]):
+    """
+    Create DataArray of cellids for unstructured indices.
+
+    Parameters
+    ----------
+    layer: numpy.array
+        1D array of integers for layer
+    cell2d: numpy.array
+        1D array of integers for cell2d indices
+
+    Returns
+    -------
+    cellid: xr.DataArray
+        2D DataArray with ``ncellid`` rows and 2 columns.
+    """
+    return _cellid_from_kwargs(layer=layer, cell2d=cell2d)
+
+
+def _cellid_from_kwargs(**kwargs):
+    dim_cellid_coord = list(kwargs.keys())
+    arr_ls = list(kwargs.values())
+    index = np.arange(len(arr_ls[0]))
+    indices_ls = [
+        xr.DataArray(ind_arr, coords={"index": index}, dims=("index",))
+        for ind_arr in arr_ls
+    ]
+    return concat_indices_to_cellid(indices_ls, dim_cellid_coord)
+
+
+def concat_indices_to_cellid(
     indices_ls: list[xr.DataArray], dim_cellid_coord: list[str]
 ) -> xr.DataArray:
     """
@@ -46,7 +100,7 @@ def create_cellid_da(
     Returns
     -------
     cellid: xr.DataArray
-        2D DataArray with a ``ncellid`` rows and 3 to 2 columns, depending
+        2D DataArray with ``ncellid`` rows and 3 to 2 columns, depending
         on whether on a structured or unstructured grid.
     """
     cellid = xr.concat(indices_ls, dim="dim_cellid")

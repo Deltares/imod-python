@@ -26,7 +26,7 @@ from imod.mf6.boundary_condition import (
     DisVerticesBoundaryCondition,
 )
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
-from imod.mf6.mf6_wel_adapter import Mf6Wel, create_cellid_da
+from imod.mf6.mf6_wel_adapter import Mf6Wel, concat_indices_to_cellid
 from imod.mf6.package import Package
 from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.utilities.grid import broadcast_to_full_domain
@@ -275,7 +275,7 @@ def derive_cellid_from_points(
     # Prepare cellid array of the right shape.
     cellid_ls = [indices_layer] + [indices_cell2d[dim] for dim in indices_cell2d_dims]
     dim_cellid_coords = ["layer"] + cell2d_coords
-    cellid = create_cellid_da(cellid_ls, dim_cellid_coords)
+    cellid = concat_indices_to_cellid(cellid_ls, dim_cellid_coords)
     # Assign extra coordinate names.
     xy_coords = {
         "x": ("ncellid", x),
