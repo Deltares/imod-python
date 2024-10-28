@@ -1,13 +1,14 @@
-from typing import Optional
+from typing import Optional, cast
 
 import numpy as np
 import pandas as pd
 import xarray as xr
 
 from imod.mf6.dis import StructuredDiscretization
-from imod.mf6.wel import WellDisStructured
+from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
+from imod.typing import IntArray
 
 
 class CouplerMapping(MetaSwapPackage):
@@ -21,7 +22,7 @@ class CouplerMapping(MetaSwapPackage):
     ----------
     modflow_dis: StructuredDiscretization
         Modflow 6 structured discretization
-    well: WellDisStructured (optional)
+    well: Mf6Wel (optional)
         If given, this parameter describes sprinkling of SVAT units from MODFLOW
         cells.
     """
@@ -41,10 +42,12 @@ class CouplerMapping(MetaSwapPackage):
     def __init__(
         self,
         modflow_dis: StructuredDiscretization,
-        well: Optional[WellDisStructured] = None,
+        well: Optional[Mf6Wel] = None,
     ):
         super().__init__()
 
+        if well and (not isinstance(well, Mf6Wel)):
+            raise TypeError(rf"well not of type 'Mf6Wel', got '{type(well)}'")
         self.well = well
         # Test if equal or larger than 1, to ignore idomain == -1 as well. Don't
         # assign to self.dataset, as grid extent might differ from svat when
@@ -67,7 +70,7 @@ class CouplerMapping(MetaSwapPackage):
 
         self.dataset["mod_id"].values[:, idomain_top_active.values] = mod_id_1d
 
-    def _render(self, file, index, svat):
+    def _render(self, file, index, svat: xr.DataArray):
         self._create_mod_id_rch(svat)
         # package check only possible after calling _create_mod_id_rch
         self._pkgcheck()
@@ -97,25 +100,31 @@ class CouplerMapping(MetaSwapPackage):
 
         return self.write_dataframe_fixed_width(file, dataframe)
 
-    def _create_well_id(self, svat):
+    def _create_well_id(
+        self, svat: xr.DataArray
+    ) -> tuple[IntArray, IntArray, IntArray]:
         """
         Get modflow indices, svats, and layer number for the wells
         """
         n_subunit = svat["subunit"].size
 
-        # Convert to Python's 0-based index
-        well_row = self.well["row"] - 1
-        well_column = self.well["column"] - 1
-        well_layer = self.well["layer"] - 1
+        well = cast(Mf6Wel, self.well)
+        well_cellid = well.dataset["cellid"]
+        if len(well_cellid.coords["dim_cellid"]) != 3:
+            raise TypeError("Coupling to unstructured grids is not supported.")
+
+        well_layer = well_cellid.sel(dim_cellid="layer").data
+        well_row = well_cellid.sel(dim_cellid="row").data - 1
+        well_column = well_cellid.sel(dim_cellid="column").data - 1
 
         n_mod = self.idomain_active.sum()
         mod_id = xr.full_like(self.idomain_active, 0, dtype=np.int64)
-        mod_id.values[self.idomain_active.values] = np.arange(1, n_mod + 1)
+        mod_id.data[self.idomain_active.data] = np.arange(1, n_mod + 1)
 
-        well_mod_id = mod_id[well_layer, well_row, well_column]
+        well_mod_id = mod_id.data[well_layer - 1, well_row, well_column]
         well_mod_id = np.tile(well_mod_id, (n_subunit, 1))
 
-        well_svat = svat.values[:, well_row, well_column]
+        well_svat = svat.data[:, well_row, well_column]
 
         well_active = well_svat != 0
 
@@ -123,7 +132,7 @@ class CouplerMapping(MetaSwapPackage):
         well_mod_id_1d = well_mod_id[well_active]
 
         # Tile well_layers for each subunit
-        layer = np.tile(well_layer + 1, (n_subunit, 1))
+        layer = np.tile(well_layer, (n_subunit, 1))
         layer_1d = layer[well_active]
 
         return (well_mod_id_1d, well_svat_1d, layer_1d)

@@ -6,7 +6,9 @@ import xarray as xr
 from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
 
-from imod import mf6, msw
+from imod import msw
+from imod.mf6.mf6_wel_adapter import Mf6Wel
+from imod.mf6.wel import derive_cellid_from_points
 
 
 def test_simple_model(fixed_format_parser):
@@ -54,15 +56,11 @@ def test_simple_model(fixed_format_parser):
 
     # Well
     well_layer = [3, 2, 1]
-    well_row = [1, 2, 3]
-    well_column = [2, 2, 2]
+    well_y = y
+    well_x = [2.0, 2.0, 2.0]
     well_rate = [-5.0] * 3
-    well = mf6.WellDisStructured(
-        layer=well_layer,
-        row=well_row,
-        column=well_column,
-        rate=well_rate,
-    )
+    cellids = derive_cellid_from_points(svat, well_x, well_y, well_layer)
+    well = Mf6Wel(cellids, well_rate)
 
     coupler_mapping = msw.Sprinkling(
         max_abstraction_groundwater,
@@ -132,15 +130,11 @@ def test_simple_model_1_subunit(fixed_format_parser):
 
     # Well
     well_layer = [3, 2]
-    well_row = [1, 3]
-    well_column = [2, 2]
+    well_y = [1.0, 3.0]
+    well_x = [2.0, 2.0]
     well_rate = [-5.0] * 2
-    well = mf6.WellDisStructured(
-        layer=well_layer,
-        row=well_row,
-        column=well_column,
-        rate=well_rate,
-    )
+    cellids = derive_cellid_from_points(svat, well_x, well_y, well_layer)
+    well = Mf6Wel(cellids, well_rate)
 
     coupler_mapping = msw.Sprinkling(
         max_abstraction_groundwater,

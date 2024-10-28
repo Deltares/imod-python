@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from imod.mf6.wel import WellDisStructured
+from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 
@@ -22,7 +22,7 @@ class Sprinkling(MetaSwapPackage):
     max_abstraction_surfacewater: array of floats (xr.DataArray)
         Describes the maximum abstraction of surfacewater to SVAT units in m3
         per day. This array must not have a subunit coordinate.
-    well: WellDisStructured
+    well: Mf6Wel
         Describes the sprinkling of SVAT units coming groundwater.
     """
 
@@ -55,23 +55,29 @@ class Sprinkling(MetaSwapPackage):
         self,
         max_abstraction_groundwater: xr.DataArray,
         max_abstraction_surfacewater: xr.DataArray,
-        well: WellDisStructured,
+        well: Mf6Wel,
     ):
         super().__init__()
         self.dataset["max_abstraction_groundwater_m3_d"] = max_abstraction_groundwater
         self.dataset["max_abstraction_surfacewater_m3_d"] = max_abstraction_surfacewater
+        if not isinstance(well, Mf6Wel):
+            raise TypeError(rf"well not of type 'Mf6Wel', got '{type(well)}'")
         self.well = well
 
         self._pkgcheck()
 
     def _render(self, file, index, svat):
-        well_row = self.well["row"] - 1
-        well_column = self.well["column"] - 1
-        well_layer = self.well["layer"]
+        well_cellid = self.well["cellid"]
+        if len(well_cellid.coords["dim_cellid"]) != 3:
+            raise TypeError("Coupling to unstructured grids is not supported.")
+
+        well_layer = well_cellid.sel(dim_cellid="layer").data
+        well_row = well_cellid.sel(dim_cellid="row").data - 1
+        well_column = well_cellid.sel(dim_cellid="column").data - 1
 
         n_subunit = svat["subunit"].size
 
-        well_svat = svat.values[:, well_row, well_column]
+        well_svat = svat.data[:, well_row, well_column]
         well_active = well_svat != 0
 
         # Tile well_layers for each subunit
@@ -80,7 +86,7 @@ class Sprinkling(MetaSwapPackage):
         data_dict = {"svat": well_svat[well_active], "layer": layer[well_active]}
 
         for var in self._without_subunit:
-            well_arr = self.dataset[var].values[well_row, well_column]
+            well_arr = self.dataset[var].data[well_row, well_column]
             well_arr = np.tile(well_arr, (n_subunit, 1))
             data_dict[var] = well_arr[well_active]
 
