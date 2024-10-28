@@ -218,6 +218,41 @@ def get_all_imod5_prj_well_times(imod5_data: dict) -> list[datetime]:
     return sorted(set(wel_times_flat))
 
 
+def create_cellid_da(
+    indices_ls: list[GridDataArray], dim_cellid_coord: list[str]
+) -> GridDataArray:
+    """
+    Create DataArray of cellids from list of one-dimensional DataArrays with
+    indices.
+
+    Parameters
+    ----------
+    indices_ls: list of xr.DataArrays or xu.UgridDataArrays
+        List of one-dimensional DataArrays with indices. For structured grids,
+        these are the layer, rows, columns. For unstructured grids, these are
+        layer, cell2d.
+    dim_cellid_coord: list of strings
+        List of coordinate names, which are assigned to the ``"dim_cellid"``
+        dimension.
+
+    Returns
+    -------
+    cellid: xr.DataArray
+        2D DataArray with a ``ncellid`` rows and 3 to 2 columns, depending
+        on whether on a structured or unstructured grid.
+    """
+    cellid = xr.concat(indices_ls, dim="dim_cellid")
+    # Rename generic dimension name "index" to ncellid.
+    cellid = cellid.rename(index="ncellid")
+    # Put dimensions in right order after concatenation.
+    cellid = cellid.transpose("ncellid", "dim_cellid")
+    # Assign extra coordinate names.
+    coords = {
+        "dim_cellid": dim_cellid_coord,
+    }
+    return cellid.assign_coords(coords=coords)
+
+
 def derive_cellid_from_points(
     dst_grid: GridDataArray,
     x: list,
@@ -274,18 +309,14 @@ def derive_cellid_from_points(
 
     # Prepare cellid array of the right shape.
     cellid_ls = [indices_layer] + [indices_cell2d[dim] for dim in indices_cell2d_dims]
-    cellid = xr.concat(cellid_ls, dim="dim_cellid")
-    # Rename generic dimension name "index" to ncellid.
-    cellid = cellid.rename(index="ncellid")
-    # Put dimensions in right order after concatenation.
-    cellid = cellid.transpose("ncellid", "dim_cellid")
+    dim_cellid_coords = ["layer"] + cell2d_coords
+    cellid = create_cellid_da(cellid_ls, dim_cellid_coords)
     # Assign extra coordinate names.
-    coords = {
-        "dim_cellid": ["layer"] + cell2d_coords,
+    xy_coords = {
         "x": ("ncellid", x),
         "y": ("ncellid", y),
     }
-    cellid = cellid.assign_coords(coords=coords)
+    cellid = cellid.assign_coords(coords=xy_coords)
 
     return cellid
 
