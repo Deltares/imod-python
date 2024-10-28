@@ -99,7 +99,9 @@ class CouplerMapping(MetaSwapPackage):
 
         return self.write_dataframe_fixed_width(file, dataframe)
 
-    def _create_well_id(self, svat):
+    def _create_well_id(
+        self, svat: xr.DataArray
+    ) -> tuple[np.ndarray[int], np.ndarray[int], np.ndarray[int]]:
         """
         Get modflow indices, svats, and layer number for the wells
         """
