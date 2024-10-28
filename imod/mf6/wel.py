@@ -26,7 +26,7 @@ from imod.mf6.boundary_condition import (
     DisVerticesBoundaryCondition,
 )
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
-from imod.mf6.mf6_wel_adapter import Mf6Wel
+from imod.mf6.mf6_wel_adapter import Mf6Wel, create_cellid_da
 from imod.mf6.package import Package
 from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.utilities.grid import broadcast_to_full_domain
@@ -216,41 +216,6 @@ def get_all_imod5_prj_well_times(imod5_data: dict) -> list[datetime]:
     # Get unique times by converting to set and sorting. ``sorted`` also
     # transforms set to a list again.
     return sorted(set(wel_times_flat))
-
-
-def create_cellid_da(
-    indices_ls: list[GridDataArray], dim_cellid_coord: list[str]
-) -> GridDataArray:
-    """
-    Create DataArray of cellids from list of one-dimensional DataArrays with
-    indices.
-
-    Parameters
-    ----------
-    indices_ls: list of xr.DataArrays or xu.UgridDataArrays
-        List of one-dimensional DataArrays with indices. For structured grids,
-        these are the layer, rows, columns. For unstructured grids, these are
-        layer, cell2d.
-    dim_cellid_coord: list of strings
-        List of coordinate names, which are assigned to the ``"dim_cellid"``
-        dimension.
-
-    Returns
-    -------
-    cellid: xr.DataArray
-        2D DataArray with a ``ncellid`` rows and 3 to 2 columns, depending
-        on whether on a structured or unstructured grid.
-    """
-    cellid = xr.concat(indices_ls, dim="dim_cellid")
-    # Rename generic dimension name "index" to ncellid.
-    cellid = cellid.rename(index="ncellid")
-    # Put dimensions in right order after concatenation.
-    cellid = cellid.transpose("ncellid", "dim_cellid")
-    # Assign extra coordinate names.
-    coords = {
-        "dim_cellid": dim_cellid_coord,
-    }
-    return cellid.assign_coords(coords=coords)
 
 
 def derive_cellid_from_points(

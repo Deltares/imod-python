@@ -15,6 +15,7 @@ consisting of layer, row, and column, closely resembling input for Modflow6.
 from typing import Any, Dict, Optional
 
 import numpy as np
+import xarray as xr
 
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.ipackage import IPackage
@@ -23,6 +24,41 @@ from imod.schemata import DTypeSchema
 # FUTURE: There was an idea to autogenerate modflow 6 adapters.
 # This was relevant:
 # https://github.com/Deltares/xugrid/blob/main/xugrid/core/wrap.py#L90
+
+
+def create_cellid_da(
+    indices_ls: list[xr.DataArray], dim_cellid_coord: list[str]
+) -> xr.DataArray:
+    """
+    Create DataArray of cellids from list of one-dimensional DataArrays with
+    indices.
+
+    Parameters
+    ----------
+    indices_ls: list of xr.DataArrays
+        List of one-dimensional DataArrays with indices. For structured grids,
+        these are the layer, rows, columns. For unstructured grids, these are
+        layer, cell2d.
+    dim_cellid_coord: list of strings
+        List of coordinate names, which are assigned to the ``"dim_cellid"``
+        dimension.
+
+    Returns
+    -------
+    cellid: xr.DataArray
+        2D DataArray with a ``ncellid`` rows and 3 to 2 columns, depending
+        on whether on a structured or unstructured grid.
+    """
+    cellid = xr.concat(indices_ls, dim="dim_cellid")
+    # Rename generic dimension name "index" to ncellid.
+    cellid = cellid.rename(index="ncellid")
+    # Put dimensions in right order after concatenation.
+    cellid = cellid.transpose("ncellid", "dim_cellid")
+    # Assign extra coordinate names.
+    coords = {
+        "dim_cellid": dim_cellid_coord,
+    }
+    return cellid.assign_coords(coords=coords)
 
 
 class Mf6Wel(BoundaryCondition, IPackage):
