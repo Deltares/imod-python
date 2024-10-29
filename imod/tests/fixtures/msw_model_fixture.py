@@ -118,9 +118,6 @@ def make_msw_model():
     dx = 1.0
     dy = -1.0
 
-    nrow = len(y)
-    ncol = len(x)
-
     freq = "D"
     times = pd.date_range(start="1/1/1971", end="1/3/1971", freq=freq)
 
@@ -189,30 +186,6 @@ def make_msw_model():
     )
     lu = xr.ones_like(vegetation_index_da, dtype=float)
 
-    # %% Well
-
-    wel_layer = 3
-
-    well_x = np.tile(x, nrow)
-    well_y = np.repeat(y, ncol)
-    well_rate = np.zeros(well_x.shape)
-    well_layer = np.full_like(well_x, wel_layer)
-
-    cellids = derive_cellid_from_points(active, well_x, well_y, well_layer).astype(int)
-    well = Mf6Wel(cellids, well_rate)
-
-    # %% Modflow 6
-    dz = np.array([1, 10, 100])
-    layer = [1, 2, 3]
-
-    top = 0.0
-    bottom = top - xr.DataArray(
-        np.cumsum(layer * dz), coords={"layer": layer}, dims="layer"
-    )
-
-    idomain = xr.full_like(msw_grid, 1, dtype=int).expand_dims(layer=layer)
-    dis = mf6.StructuredDiscretization(top=top, bottom=bottom, idomain=idomain)
-
     # %% Initiate model
     msw_model = msw.MetaSwapModel(unsaturated_database=unsaturated_database)
     msw_model["grid"] = msw.GridData(
@@ -235,7 +208,6 @@ def make_msw_model():
     msw_model["sprinkling"] = msw.Sprinkling(
         max_abstraction_groundwater=xr.full_like(msw_grid, 100.0),
         max_abstraction_surfacewater=xr.full_like(msw_grid, 100.0),
-        well=well,
     )
 
     # %% Ponding
@@ -299,7 +271,7 @@ def make_msw_model():
     )
 
     # %% Metaswap Mappings
-    msw_model["mod2svat"] = msw.CouplerMapping(modflow_dis=dis, well=well)
+    msw_model["mod2svat"] = msw.CouplerMapping()
 
     # %% Output Control
     msw_model["oc_idf"] = msw.IdfMapping(area, -9999.0)

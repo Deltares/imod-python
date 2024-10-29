@@ -8,9 +8,12 @@ from imod import mf6, msw
 from imod.mf6.utilities.regrid import RegridderWeightsCache
 
 
-def test_msw_model_write(msw_model, tmp_path):
+def test_msw_model_write(msw_model, coupled_mf6_model, tmp_path):
+    mf6_dis = coupled_mf6_model["GWF_1"]["dis"]
+    mf6_wel = coupled_mf6_model["GWF_1"]["well_msw"]
+
     output_dir = tmp_path / "metaswap"
-    msw_model.write(output_dir)
+    msw_model.write(output_dir, mf6_dis, mf6_wel)
 
     assert len(list(output_dir.rglob(r"*.inp"))) == 16
     assert len(list(output_dir.rglob(r"*.asc"))) == 4
@@ -102,7 +105,8 @@ def get_target_mf6_discretization():
     return dis
 
 
-def test_model_regrid(msw_model, tmp_path):
+def test_model_regrid(msw_model, coupled_mf6_model, tmp_path):
+    mf6_wel = coupled_mf6_model["GWF_1"]["well_msw"]
     # sprinkling not supported yet for regridding
     msw_model.pop("sprinkling")
 
@@ -110,4 +114,6 @@ def test_model_regrid(msw_model, tmp_path):
 
     regrid_context = RegridderWeightsCache()
     regridded_model = msw_model.regrid_like(mf6_discretization, regrid_context)
-    regridded_model.write(tmp_path)
+    # TODO: Assign grid agnostic well to coupled_m f6_model, regrid coupled
+    #   model, and convert well package to mf6 package
+    regridded_model.write(tmp_path, mf6_discretization, mf6_wel)

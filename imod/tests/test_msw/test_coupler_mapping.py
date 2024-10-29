@@ -53,11 +53,11 @@ def test_simple_model_with_sprinkling(fixed_format_parser):
         idomain=xr.full_like(like, 1, dtype=np.int32),
     )
 
-    coupler_mapping = msw.CouplerMapping(dis, well)
+    coupler_mapping = msw.CouplerMapping()
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        coupler_mapping.write(output_dir, index, svat)
+        coupler_mapping.write(output_dir, index, svat, dis, well)
 
         results = fixed_format_parser(
             output_dir / msw.CouplerMapping._file_name,
@@ -108,11 +108,11 @@ def test_simple_model_with_sprinkling_1_subunit(fixed_format_parser):
         idomain=xr.full_like(like, 1, dtype=np.int32),
     )
 
-    coupler_mapping = msw.CouplerMapping(dis, well)
+    coupler_mapping = msw.CouplerMapping()
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        coupler_mapping.write(output_dir, index, svat)
+        coupler_mapping.write(output_dir, index, svat, dis, well)
 
         results = fixed_format_parser(
             output_dir / msw.CouplerMapping._file_name,
@@ -159,11 +159,11 @@ def test_simple_model_without_sprinkling(fixed_format_parser):
         idomain=xr.full_like(like, 1, dtype=np.int32),
     )
 
-    coupler_mapping = msw.CouplerMapping(dis)
+    coupler_mapping = msw.CouplerMapping()
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        coupler_mapping.write(output_dir, index, svat)
+        coupler_mapping.write(output_dir, index, svat, dis, None)
 
         results = fixed_format_parser(
             output_dir / msw.CouplerMapping._file_name,

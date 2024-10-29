@@ -62,15 +62,14 @@ def test_simple_model(fixed_format_parser):
     cellids = derive_cellid_from_points(svat, well_x, well_y, well_layer)
     well = Mf6Wel(cellids, well_rate)
 
-    coupler_mapping = msw.Sprinkling(
+    sprinkling = msw.Sprinkling(
         max_abstraction_groundwater,
         max_abstraction_surfacewater,
-        well,
     )
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        coupler_mapping.write(output_dir, index, svat)
+        sprinkling.write(output_dir, index, svat, None, well)
 
         results = fixed_format_parser(
             output_dir / msw.Sprinkling._file_name,
@@ -136,15 +135,14 @@ def test_simple_model_1_subunit(fixed_format_parser):
     cellids = derive_cellid_from_points(svat, well_x, well_y, well_layer)
     well = Mf6Wel(cellids, well_rate)
 
-    coupler_mapping = msw.Sprinkling(
+    sprinkling = msw.Sprinkling(
         max_abstraction_groundwater,
         max_abstraction_surfacewater,
-        well,
     )
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        coupler_mapping.write(output_dir, index, svat)
+        sprinkling.write(output_dir, index, svat, None, well)
 
         results = fixed_format_parser(
             output_dir / msw.Sprinkling._file_name,

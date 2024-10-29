@@ -81,7 +81,7 @@ def test_simple_model(fixed_format_parser):
     ponding, index, svat = setup_ponding()
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        ponding.write(output_dir, index, svat)
+        ponding.write(output_dir, index, svat, None, None)
 
         results = fixed_format_parser(
             output_dir / Ponding._file_name, Ponding._metadata_dict

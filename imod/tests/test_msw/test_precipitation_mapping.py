@@ -62,7 +62,7 @@ def test_precipitation_mapping_simple(fixed_format_parser):
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        precipitation_mapping.write(output_dir, index, svat)
+        precipitation_mapping.write(output_dir, index, svat, None, None)
 
         results = fixed_format_parser(
             output_dir / msw.PrecipitationMapping._file_name,
@@ -127,7 +127,7 @@ def test_precipitation_mapping_negative_dy_meteo(fixed_format_parser):
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        precipitation_mapping.write(output_dir, index, svat)
+        precipitation_mapping.write(output_dir, index, svat, None, None)
 
         results = fixed_format_parser(
             output_dir / msw.PrecipitationMapping._file_name,
@@ -189,7 +189,7 @@ def test_precipitation_mapping_negative_dy_meteo_svat(fixed_format_parser):
     precipitation_mapping = msw.PrecipitationMapping(precipitation)
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        precipitation_mapping.write(output_dir, index, svat)
+        precipitation_mapping.write(output_dir, index, svat, None, None)
 
         results = fixed_format_parser(
             output_dir / msw.PrecipitationMapping._file_name,
@@ -257,4 +257,4 @@ def test_precipitation_mapping_out_of_bound():
         output_dir = Path(output_dir)
         # The grid is out of bounds, which is why we expect a ValueError to be raisen
         with pytest.raises(ValueError):
-            precipitation_mapping.write(output_dir, index, svat)
+            precipitation_mapping.write(output_dir, index, svat, None, None)
