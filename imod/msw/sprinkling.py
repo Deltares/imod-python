@@ -5,13 +5,15 @@ import pandas as pd
 import xarray as xr
 
 from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
+from imod.msw.regrid.regrid_schemes import SprinklingRegridMethod
 from imod.typing import IntArray
 
 
-class Sprinkling(MetaSwapPackage):
+class Sprinkling(MetaSwapPackage, IRegridPackage):
     """
     This contains the sprinkling capacities of links between SVAT units and
     groundwater/surface water locations.
@@ -33,8 +35,8 @@ class Sprinkling(MetaSwapPackage):
         "svat": VariableMetaData(10, 1, 99999999, int),
         "max_abstraction_groundwater_mm_d": VariableMetaData(8, None, None, str),
         "max_abstraction_surfacewater_mm_d": VariableMetaData(8, None, None, str),
-        "max_abstraction_groundwater_m3_d": VariableMetaData(8, 0.0, 1e9, float),
-        "max_abstraction_surfacewater_m3_d": VariableMetaData(8, 0.0, 1e9, float),
+        "max_abstraction_groundwater": VariableMetaData(8, 0.0, 1e9, float),
+        "max_abstraction_surfacewater": VariableMetaData(8, 0.0, 1e9, float),
         "svat_groundwater": VariableMetaData(10, None, None, str),
         "layer": VariableMetaData(6, 1, 9999, int),
         "trajectory": VariableMetaData(10, None, None, str),
@@ -42,8 +44,8 @@ class Sprinkling(MetaSwapPackage):
 
     _with_subunit = ()
     _without_subunit = (
-        "max_abstraction_groundwater_m3_d",
-        "max_abstraction_surfacewater_m3_d",
+        "max_abstraction_groundwater",
+        "max_abstraction_surfacewater",
     )
 
     _to_fill = (
@@ -53,14 +55,16 @@ class Sprinkling(MetaSwapPackage):
         "trajectory",
     )
 
+    _regrid_method = SprinklingRegridMethod()
+
     def __init__(
         self,
         max_abstraction_groundwater: xr.DataArray,
         max_abstraction_surfacewater: xr.DataArray,
     ):
         super().__init__()
-        self.dataset["max_abstraction_groundwater_m3_d"] = max_abstraction_groundwater
-        self.dataset["max_abstraction_surfacewater_m3_d"] = max_abstraction_surfacewater
+        self.dataset["max_abstraction_groundwater"] = max_abstraction_groundwater
+        self.dataset["max_abstraction_surfacewater"] = max_abstraction_surfacewater
 
         self._pkgcheck()
 
@@ -108,8 +112,3 @@ class Sprinkling(MetaSwapPackage):
         self._check_range(dataframe)
 
         return self.write_dataframe_fixed_width(file, dataframe)
-
-    def is_regridding_supported(self) -> bool:
-        # regridding for the sprikling package is currently not supported, but
-        # this will be fixed in issue #728
-        return False

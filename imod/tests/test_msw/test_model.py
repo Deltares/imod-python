@@ -107,9 +107,6 @@ def get_target_mf6_discretization():
 
 def test_model_regrid(msw_model, coupled_mf6_model, tmp_path):
     mf6_wel = coupled_mf6_model["GWF_1"]["well_msw"]
-    # sprinkling not supported yet for regridding
-    msw_model.pop("sprinkling")
-
     mf6_discretization = get_target_mf6_discretization()
 
     regrid_context = RegridderWeightsCache()

@@ -78,11 +78,11 @@ def test_simple_model(fixed_format_parser):
 
     assert_equal(results["svat"], np.array([1, 2, 3, 4]))
     assert_almost_equal(
-        results["max_abstraction_groundwater_m3_d"],
+        results["max_abstraction_groundwater"],
         np.array([100.0, 300.0, 100.0, 200.0]),
     )
     assert_almost_equal(
-        results["max_abstraction_surfacewater_m3_d"],
+        results["max_abstraction_surfacewater"],
         np.array([100.0, 300.0, 100.0, 200.0]),
     )
     assert_equal(results["layer"], np.array([3, 1, 3, 2]))
@@ -151,11 +151,11 @@ def test_simple_model_1_subunit(fixed_format_parser):
 
     assert_equal(results["svat"], np.array([1, 2]))
     assert_almost_equal(
-        results["max_abstraction_groundwater_m3_d"],
+        results["max_abstraction_groundwater"],
         np.array([100.0, 300.0]),
     )
     assert_almost_equal(
-        results["max_abstraction_surfacewater_m3_d"],
+        results["max_abstraction_surfacewater"],
         np.array([100.0, 300.0]),
     )
     assert_equal(results["layer"], np.array([3, 2]))
