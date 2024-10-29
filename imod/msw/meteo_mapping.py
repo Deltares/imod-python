@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Optional
+from typing import Optional, TextIO
 
 import numpy as np
 import pandas as pd
@@ -21,10 +21,12 @@ class MeteoMapping(MetaSwapPackage):
     new packages.
     """
 
+    meteo: GridDataArray
+
     def __init__(self):
         super().__init__()
 
-    def _render(self, file, index, svat):
+    def _render(self, file: TextIO, index: np.ndarray, svat: xr.DataArray):
         data_dict = {"svat": svat.values.ravel()[index]}
 
         row, column = self.grid_mapping(svat, self.meteo)

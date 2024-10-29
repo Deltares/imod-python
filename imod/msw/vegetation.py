@@ -1,3 +1,5 @@
+from typing import TextIO
+
 import numpy as np
 import xarray as xr
 
@@ -77,7 +79,7 @@ class AnnualCropFactors(MetaSwapPackage, IRegridPackage):
 
         self._pkgcheck()
 
-    def _render(self, file, *args):
+    def _render(self, file: TextIO, *args):
         dataframe = self.dataset.to_dataframe(
             dim_order=("vegetation_index", "day_of_year")
         ).reset_index()

@@ -106,7 +106,7 @@ class MetaSwapModel(Model):
             self._render_unsaturated_database_path(unsaturated_database)
         )
 
-    def _render_unsaturated_database_path(self, unsaturated_database):
+    def _render_unsaturated_database_path(self, unsaturated_database: Union[str, Path]):
         # Force to Path object
         unsaturated_database = Path(unsaturated_database)
 

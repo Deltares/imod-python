@@ -1,3 +1,5 @@
+from typing import TextIO
+
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -66,7 +68,7 @@ class Sprinkling(MetaSwapPackage):
 
         self._pkgcheck()
 
-    def _render(self, file, index, svat):
+    def _render(self, file: TextIO, index: np.ndarray, svat: xr.DataArray):
         well_cellid = self.well["cellid"]
         if len(well_cellid.coords["dim_cellid"]) != 3:
             raise TypeError("Coupling to unstructured grids is not supported.")

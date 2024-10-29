@@ -1,4 +1,4 @@
-from typing import Optional, cast
+from typing import Optional, TextIO, cast
 
 import numpy as np
 import pandas as pd
@@ -70,7 +70,7 @@ class CouplerMapping(MetaSwapPackage):
 
         self.dataset["mod_id"].values[:, idomain_top_active.values] = mod_id_1d
 
-    def _render(self, file, index, svat: xr.DataArray):
+    def _render(self, file: TextIO, index: np.ndarray, svat: xr.DataArray):
         self._create_mod_id_rch(svat)
         # package check only possible after calling _create_mod_id_rch
         self._pkgcheck()

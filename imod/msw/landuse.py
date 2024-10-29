@@ -1,3 +1,5 @@
+from typing import TextIO
+
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
@@ -193,7 +195,7 @@ class LanduseOptions(MetaSwapPackage, IRegridPackage):
 
         self._pkgcheck()
 
-    def _render(self, file, *args):
+    def _render(self, file: TextIO, *args):
         dataframe = self.dataset.to_dataframe(
             dim_order=("landuse_index",)
         ).reset_index()

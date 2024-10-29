@@ -1,4 +1,8 @@
+from typing import TextIO
+
+import numpy as np
 import pandas as pd
+import xarray as xr
 
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.msw.fixed_format import VariableMetaData
@@ -51,7 +55,7 @@ class Ponding(MetaSwapPackage, IRegridPackage):
 
         self._pkgcheck()
 
-    def _render(self, file, index, svat):
+    def _render(self, file: TextIO, index: np.ndarray, svat: xr.DataArray):
         data_dict = {"svat": svat.values.ravel()[index]}
 
         for var in self._with_subunit:

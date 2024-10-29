@@ -1,7 +1,7 @@
 import abc
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any, Optional, TextIO, Union
 
 import numpy as np
 import pandas as pd
@@ -27,6 +27,10 @@ class MetaSwapPackage(abc.ABC):
     __slots__ = "_pkg_id"
     _file_name = "filename_not_set"
     _regrid_method: RegridMethodType = EmptyRegridMethod()
+    _with_subunit: tuple = ()
+    _without_subunit: tuple = ()
+    _to_fill: tuple = ()
+    _metadata_dict: dict = {}
 
     def __init__(self):
         self.dataset = xr.Dataset()
@@ -113,7 +117,7 @@ class MetaSwapPackage(abc.ABC):
         """
         return da.values.ravel()[index]
 
-    def _render(self, file, index, svat):
+    def _render(self, file: TextIO, index: np.ndarray, svat: xr.DataArray):
         """
         Collect to be written data in a DataFrame and call
         ``self.write_dataframe_fixed_width``
