@@ -7,7 +7,7 @@ import xarray as xr
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.fixed_format import VariableMetaData
-from imod.msw.pkgbase import MetaSwapPackage
+from imod.msw.pkgbase import DataDictType, MetaSwapPackage
 from imod.typing import IntArray
 
 
@@ -70,12 +70,12 @@ class CouplerMapping(MetaSwapPackage):
 
         self.dataset["mod_id"].values[:, idomain_top_active.values] = mod_id_1d
 
-    def _render(self, file: TextIO, index: np.ndarray, svat: xr.DataArray):
+    def _render(self, file: TextIO, index: IntArray, svat: xr.DataArray):
         self._create_mod_id_rch(svat)
         # package check only possible after calling _create_mod_id_rch
         self._pkgcheck()
 
-        data_dict = {"svat": svat.values.ravel()[index]}
+        data_dict: DataDictType = {"svat": svat.values.ravel()[index]}
 
         data_dict["layer"] = np.full_like(data_dict["svat"], 1)
 

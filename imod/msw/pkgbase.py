@@ -1,7 +1,7 @@
 import abc
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Optional, TextIO, Union
+from typing import Any, Optional, TextIO, TypeAlias, Union
 
 import numpy as np
 import pandas as pd
@@ -12,8 +12,11 @@ from imod.mf6.utilities.regrid import (
     _regrid_like,
 )
 from imod.msw.fixed_format import format_fixed_width
+from imod.typing import IntArray
 from imod.typing.grid import GridDataArray, GridDataset
 from imod.util.regrid_method_type import EmptyRegridMethod, RegridMethodType
+
+DataDictType: TypeAlias = dict[str, IntArray | int | str]
 
 
 class MetaSwapPackage(abc.ABC):
@@ -76,7 +79,7 @@ class MetaSwapPackage(abc.ABC):
             f"{__class__.__name__}(**{self._pkg_id}.dataset.sel(**selection))"
         )
 
-    def write(self, directory: Union[str, Path], index: np.ndarray, svat: xr.DataArray):
+    def write(self, directory: Union[str, Path], index: IntArray, svat: xr.DataArray):
         """
         Write MetaSWAP package to its corresponding fixed format file. This has
         the `.inp` extension.
@@ -110,19 +113,19 @@ class MetaSwapPackage(abc.ABC):
                 file.write(content)
             file.write("\n")
 
-    def _index_da(self, da, index):
+    def _index_da(self, da: xr.DataArray, index: IntArray) -> np.ndarray:
         """
         Helper method that converts a DataArray to a 1d numpy array, and
         consequently applies boolean indexing.
         """
         return da.values.ravel()[index]
 
-    def _render(self, file: TextIO, index: np.ndarray, svat: xr.DataArray):
+    def _render(self, file: TextIO, index: IntArray, svat: xr.DataArray):
         """
         Collect to be written data in a DataFrame and call
         ``self.write_dataframe_fixed_width``
         """
-        data_dict = {"svat": svat.values.ravel()[index]}
+        data_dict: DataDictType = {"svat": svat.values.ravel()[index]}
 
         subunit = svat.coords["subunit"]
 

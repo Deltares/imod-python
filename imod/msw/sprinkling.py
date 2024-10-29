@@ -7,6 +7,7 @@ import xarray as xr
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
+from imod.typing import IntArray
 
 
 class Sprinkling(MetaSwapPackage):
@@ -68,7 +69,7 @@ class Sprinkling(MetaSwapPackage):
 
         self._pkgcheck()
 
-    def _render(self, file: TextIO, index: np.ndarray, svat: xr.DataArray):
+    def _render(self, file: TextIO, index: IntArray, svat: xr.DataArray):
         well_cellid = self.well["cellid"]
         if len(well_cellid.coords["dim_cellid"]) != 3:
             raise TypeError("Coupling to unstructured grids is not supported.")
