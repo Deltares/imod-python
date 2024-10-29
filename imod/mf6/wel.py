@@ -283,7 +283,7 @@ def derive_cellid_from_points(
     }
     cellid = cellid.assign_coords(coords=xy_coords)
 
-    return cellid
+    return cellid.astype(int)
 
 
 class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
