@@ -1,4 +1,4 @@
-from typing import TextIO
+from typing import Any, TextIO
 
 import pandas as pd
 import xarray as xr
@@ -55,7 +55,7 @@ class Ponding(MetaSwapPackage, IRegridPackage):
 
         self._pkgcheck()
 
-    def _render(self, file: TextIO, index: IntArray, svat: xr.DataArray):
+    def _render(self, file: TextIO, index: IntArray, svat: xr.DataArray, *args: Any):
         data_dict: DataDictType = {"svat": svat.values.ravel()[index]}
 
         for var in self._with_subunit:

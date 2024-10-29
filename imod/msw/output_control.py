@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Optional, TextIO
+from typing import Any, Optional, TextIO
 
 import pandas as pd
 
@@ -87,7 +87,7 @@ class VariableOutputControl(MetaSwapPackage, IRegridPackage):
         for key, value in kwargs.items():
             self.dataset[key] = int(value)
 
-    def _render(self, file: TextIO, *args):
+    def _render(self, file: TextIO, *args: Any, **kwargs: Any):
         variable, option = zip(
             *[(var, self.dataset[var].values) for var in self.dataset.data_vars]
         )
@@ -125,7 +125,7 @@ class TimeOutputControl(MetaSwapPackage, IRegridPackage):
 
         self.dataset["times"] = time
 
-    def _render(self, file: TextIO, *args):
+    def _render(self, file: TextIO, *args: Any, **kwargs: Any):
         year, time_since_start_year = to_metaswap_timeformat(self.dataset["times"])
 
         dataframe = pd.DataFrame(

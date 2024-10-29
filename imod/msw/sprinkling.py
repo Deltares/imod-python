@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
@@ -25,8 +26,6 @@ class Sprinkling(MetaSwapPackage):
     max_abstraction_surfacewater: array of floats (xr.DataArray)
         Describes the maximum abstraction of surfacewater to SVAT units in m3
         per day. This array must not have a subunit coordinate.
-    well: Mf6Wel
-        Describes the sprinkling of SVAT units coming groundwater.
     """
 
     _file_name = "scap_svat.inp"
@@ -58,19 +57,25 @@ class Sprinkling(MetaSwapPackage):
         self,
         max_abstraction_groundwater: xr.DataArray,
         max_abstraction_surfacewater: xr.DataArray,
-        well: Mf6Wel,
     ):
         super().__init__()
         self.dataset["max_abstraction_groundwater_m3_d"] = max_abstraction_groundwater
         self.dataset["max_abstraction_surfacewater_m3_d"] = max_abstraction_surfacewater
-        if not isinstance(well, Mf6Wel):
-            raise TypeError(rf"well not of type 'Mf6Wel', got '{type(well)}'")
-        self.well = well
 
         self._pkgcheck()
 
-    def _render(self, file: TextIO, index: IntArray, svat: xr.DataArray):
-        well_cellid = self.well["cellid"]
+    def _render(
+        self,
+        file: TextIO,
+        index: IntArray,
+        svat: xr.DataArray,
+        mf6_dis: StructuredDiscretization,
+        mf6_well: Mf6Wel,
+    ):
+        if not isinstance(mf6_well, Mf6Wel):
+            raise TypeError(rf"well not of type 'Mf6Wel', got '{type(mf6_well)}'")
+
+        well_cellid = mf6_well["cellid"]
         if len(well_cellid.coords["dim_cellid"]) != 3:
             raise TypeError("Coupling to unstructured grids is not supported.")
 

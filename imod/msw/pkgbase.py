@@ -7,6 +7,8 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.utilities.regrid import (
     RegridderWeightsCache,
     _regrid_like,
@@ -79,16 +81,37 @@ class MetaSwapPackage(abc.ABC):
             f"{__class__.__name__}(**{self._pkg_id}.dataset.sel(**selection))"
         )
 
-    def write(self, directory: Union[str, Path], index: IntArray, svat: xr.DataArray):
+    def write(
+        self,
+        directory: Union[str, Path],
+        index: IntArray,
+        svat: xr.DataArray,
+        mf6_dis: StructuredDiscretization,
+        mf6_well: Mf6Wel,
+    ):
         """
         Write MetaSWAP package to its corresponding fixed format file. This has
         the `.inp` extension.
+
+        Parameters
+        ----------
+        directory: string and Path
+            Directory to write package in.
+        index: numpy array of integers
+            Array of integers with indices.
+        svat: xr.DataArray
+            Grid with svats, has dimensions "subunit, y, x".
+        mf6_dis: StructuredDiscretization (optional)
+            Modflow 6 structured discretization.
+        mf6_well: Mf6Wel (optional)
+            If given, this parameter describes sprinkling of SVAT units from MODFLOW
+            cells.
         """
         directory = Path(directory)
 
         filename = directory / self._file_name
         with open(filename, "w") as f:
-            self._render(f, index, svat)
+            self._render(f, index, svat, mf6_dis, mf6_well)
 
     def _check_range(self, dataframe):
         """
@@ -120,7 +143,14 @@ class MetaSwapPackage(abc.ABC):
         """
         return da.values.ravel()[index]
 
-    def _render(self, file: TextIO, index: IntArray, svat: xr.DataArray):
+    def _render(
+        self,
+        file: TextIO,
+        index: IntArray,
+        svat: xr.DataArray,
+        mf6_dis: StructuredDiscretization,
+        mf6_well: Mf6Wel,
+    ):  # mf6_dis: StructuredDiscretization, mf6_well: Mf6Wel):
         """
         Collect to be written data in a DataFrame and call
         ``self.write_dataframe_fixed_width``
