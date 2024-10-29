@@ -125,7 +125,7 @@ class TimeOutputControl(MetaSwapPackage, IRegridPackage):
 
         self.dataset["times"] = time
 
-    def _render(self, file: TextIO, *args: Any, **kwargs: Any):
+    def _render(self, file: TextIO, *args: Any):
         year, time_since_start_year = to_metaswap_timeformat(self.dataset["times"])
 
         dataframe = pd.DataFrame(

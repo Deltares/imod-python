@@ -150,7 +150,7 @@ class MetaSwapPackage(abc.ABC):
         svat: xr.DataArray,
         mf6_dis: StructuredDiscretization,
         mf6_well: Mf6Wel,
-    ):  # mf6_dis: StructuredDiscretization, mf6_well: Mf6Wel):
+    ) -> None:
         """
         Collect to be written data in a DataFrame and call
         ``self.write_dataframe_fixed_width``

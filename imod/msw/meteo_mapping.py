@@ -32,7 +32,6 @@ class MeteoMapping(MetaSwapPackage):
         index: IntArray,
         svat: xr.DataArray,
         *args: Any,
-        **kwargs: Any,
     ):
         data_dict = {"svat": svat.values.ravel()[index]}
 

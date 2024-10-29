@@ -28,7 +28,7 @@ class CouplerMapping(MetaSwapPackage):
         "layer": VariableMetaData(5, 0, 9999, int),
     }
 
-    _with_subunit = ("mod_id",)
+    _with_subunit = ()
     _without_subunit = ()
     _to_fill = ("free",)
 

@@ -195,7 +195,7 @@ class LanduseOptions(MetaSwapPackage, IRegridPackage):
 
         self._pkgcheck()
 
-    def _render(self, file: TextIO, *args: Any, **kwargs: Any):
+    def _render(self, file: TextIO, *args: Any):
         dataframe = self.dataset.to_dataframe(
             dim_order=("landuse_index",)
         ).reset_index()
