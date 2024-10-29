@@ -8,12 +8,11 @@ from imod import mf6, msw
 from imod.mf6.utilities.regrid import RegridderWeightsCache
 
 
-def test_msw_model_write(msw_model, coupled_mf6_model, tmp_path):
+def test_msw_model_write(msw_model, coupled_mf6_model, coupled_mf6wel, tmp_path):
     mf6_dis = coupled_mf6_model["GWF_1"]["dis"]
-    mf6_wel = coupled_mf6_model["GWF_1"]["well_msw"]
 
     output_dir = tmp_path / "metaswap"
-    msw_model.write(output_dir, mf6_dis, mf6_wel)
+    msw_model.write(output_dir, mf6_dis, coupled_mf6wel)
 
     assert len(list(output_dir.rglob(r"*.inp"))) == 16
     assert len(list(output_dir.rglob(r"*.asc"))) == 4
@@ -105,12 +104,37 @@ def get_target_mf6_discretization():
     return dis
 
 
-def test_model_regrid(msw_model, coupled_mf6_model, tmp_path):
-    mf6_wel = coupled_mf6_model["GWF_1"]["well_msw"]
+def test_model_regrid(msw_model, coupled_mf6wel, tmp_path):
+    """
+    Test where only msw model is regridded, modflow 6 wells placed in same
+    row/col number, thus change spatially.
+    """
     mf6_discretization = get_target_mf6_discretization()
 
     regrid_context = RegridderWeightsCache()
-    regridded_model = msw_model.regrid_like(mf6_discretization, regrid_context)
-    # TODO: Assign grid agnostic well to coupled_m f6_model, regrid coupled
-    #   model, and convert well package to mf6 package
-    regridded_model.write(tmp_path, mf6_discretization, mf6_wel)
+    regridded_msw_model = msw_model.regrid_like(mf6_discretization, regrid_context)
+    regridded_msw_model.write(tmp_path, mf6_discretization, coupled_mf6wel)
+
+
+def test_coupled_model_regrid(msw_model, coupled_mf6_model, tmp_path):
+    """
+    Test where only msw model is regridded, modflow 6 wells placed in same
+    row/col number, thus change spatially.
+    """
+    mf6_discretization = get_target_mf6_discretization()
+
+    regrid_context = RegridderWeightsCache()
+    regridded_msw_model = msw_model.regrid_like(mf6_discretization, regrid_context)
+    regridded_mf6_model = coupled_mf6_model.regrid_like(
+        "regridded", mf6_discretization["idomain"]
+    )
+    regridded_npf = regridded_mf6_model["GWF_1"]["npf"]
+    grid_agnostic_well = coupled_mf6_model["GWF_1"]["well_msw"]
+    regridded_mf6_wel = grid_agnostic_well.to_mf6_pkg(
+        mf6_discretization["idomain"],
+        mf6_discretization["top"],
+        mf6_discretization["bottom"],
+        regridded_npf["k"],
+    )
+
+    regridded_msw_model.write(tmp_path, mf6_discretization, regridded_mf6_wel)

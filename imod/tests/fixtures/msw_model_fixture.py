@@ -75,15 +75,13 @@ def make_coupled_mf6_model():
     gwf_model["oc"] = mf6.OutputControl(save_head="last", save_budget="last")
 
     # Create wells
-    wel_layer = 3
-
+    layer = 3
     well_x = np.tile(x, nrow)
     well_y = np.repeat(y, ncol)
     well_rate = np.zeros(well_x.shape)
-    well_layer = np.full_like(well_x, wel_layer)
+    well_layer = np.full_like(well_x, layer, dtype=int)
 
-    cellids = derive_cellid_from_points(idomain, well_x, well_y, well_layer)
-    gwf_model["well_msw"] = Mf6Wel(cellids, well_rate)
+    gwf_model["well_msw"] = mf6.LayeredWell(well_x, well_y, well_layer, well_rate)
 
     # Attach it to a simulation
     simulation = mf6.Modflow6Simulation("test")
@@ -279,6 +277,36 @@ def make_msw_model():
     msw_model["oc_time"] = msw.TimeOutputControl(time=times)
 
     return msw_model
+
+
+@pytest.fixture(scope="function")
+def coupled_mf6wel():
+    x = [1.0, 2.0, 3.0]
+    y = [3.0, 2.0, 1.0]
+    layer = [1, 2, 3]
+    dx = 1.0
+    dy = -1.0
+
+    nlay = len(layer)
+    nrow = len(y)
+    ncol = len(x)
+
+    like = xr.DataArray(
+        data=np.ones((nlay, nrow, ncol)),
+        dims=("layer", "y", "x"),
+        coords={"layer": layer, "y": y, "x": x, "dx": dx, "dy": dy},
+    )
+    idomain = like.astype(np.int32)
+
+    layer = 3
+    well_x = np.tile(x, nrow)
+    well_y = np.repeat(y, ncol)
+    well_rate = np.zeros(well_x.shape)
+    well_layer = np.full_like(well_x, layer, dtype=int)
+
+    cellids = derive_cellid_from_points(idomain, well_x, well_y, well_layer)
+    well_msw = Mf6Wel(cellids, well_rate)
+    return well_msw
 
 
 @pytest.fixture(scope="function")
