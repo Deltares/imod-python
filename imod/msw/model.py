@@ -250,9 +250,7 @@ class MetaSwapModel(Model):
 
         # write package contents
         for pkgname in self:
-            self[pkgname].write(
-                directory, index, svat, mf6_dis, mf6_wel
-            )
+            self[pkgname].write(directory, index, svat, mf6_dis, mf6_wel)
 
     def regrid_like(
         self,
