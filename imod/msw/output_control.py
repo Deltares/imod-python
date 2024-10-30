@@ -87,7 +87,7 @@ class VariableOutputControl(MetaSwapPackage, IRegridPackage):
         for key, value in kwargs.items():
             self.dataset[key] = int(value)
 
-    def _render(self, file: TextIO, *args: Any, **kwargs: Any):
+    def _render(self, file: TextIO, *args: Any):
         variable, option = zip(
             *[(var, self.dataset[var].values) for var in self.dataset.data_vars]
         )
