@@ -84,7 +84,7 @@ METASWAP_VARS = (
     "meteo_station_number",
     "surface_elevation",
     "artificial_recharge",
-    "artifical_recharge_layer",
+    "artificial_recharge_layer",
     "artificial_recharge_capacity",
     "wetted_area",
     "urban_area",
@@ -1047,7 +1047,10 @@ def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
                 data, repeats = _read_package_ipf(block_content, periods)
             elif key == "(cap)":
                 variables = set(METASWAP_VARS).intersection(block_content.keys())
+                ipf_var = "artificial_recharge_layer"
+                block_content_ipf = {"ipf": block_content.pop(ipf_var)}
                 data = _open_package_idf(block_content, variables)
+                data_ipf, _ = _read_package_ipf(block_content_ipf, periods)
             elif key in ("extra", "(pcg)"):
                 data = [block_content]
             elif key in KEYS:
