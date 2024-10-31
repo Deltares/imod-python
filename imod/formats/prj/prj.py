@@ -1068,11 +1068,18 @@ def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
             elif key == "(wel)":
                 data, repeats = _read_package_ipf(block_content, periods)
             elif key == "(cap)":
+                maybe_ipf_var = "artificial_recharge_layer"
+                maybe_ipf_content = block_content.pop(maybe_ipf_var)
+                maybe_ipf_path = maybe_ipf_content[0]["path"]
+                is_ipf = maybe_ipf_path.suffix.lower() == ".ipf"
+                if not is_ipf:
+                    # Not ipf, potential ipf content is in fact idf content, so
+                    # needs to be reattached.
+                    block_content[maybe_ipf_var] = maybe_ipf_content
                 variables = set(METASWAP_VARS).intersection(block_content.keys())
-                ipf_var = "artificial_recharge_layer"
-                data_ipf = imod.ipf.read(block_content.pop(ipf_var))
                 data = _open_package_idf(block_content, variables)
-                data[0][ipf_var] = data_ipf
+                if is_ipf:
+                    data[0][maybe_ipf_var] = imod.ipf.read(maybe_ipf_path)
             elif key in ("extra", "(pcg)"):
                 data = [block_content]
             elif key in KEYS:
