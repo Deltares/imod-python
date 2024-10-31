@@ -801,6 +801,14 @@ def _read_package_gen(
     return out
 
 
+IPF_LOG_MESSAGE_TEMPLATE = """\
+    A well with the same x, y, id, filter_top and
+    filter_bot was already imported. This happened at x =
+    {row[1]}, y = {row[2]}, id = {path_assoc.stem}. Now the
+    ID for this new well was appended with the suffix _{suffix})
+    """
+
+
 @dataclass
 class IpfResult:
     has_associated: bool = data_field(default_factory=bool)
@@ -865,23 +873,19 @@ def _read_package_ipf(
             for row in ipf_df.itertuples():
                 filename = row[indexcol]
                 path_assoc = path.parent.joinpath(f"{filename}.{ext}")
+                well_characteristics_dict = {
+                    "x": row[1],
+                    "y": row[2],
+                    "id": path_assoc.stem,
+                    "filt_top": row[4],
+                    "filt_bot": row[5],
+                }
                 df_assoc = _try_read_with_func(
                     imod.ipf.read_associated, path_assoc
                 ).iloc[:, :2]
                 df_assoc.columns = ["time", "rate"]
-                df_assoc["x"] = row[1]
-                df_assoc["y"] = row[2]
-                df_assoc["id"] = path_assoc.stem
-                df_assoc["filt_top"] = row[4]
-                df_assoc["filt_bot"] = row[5]
-
-                well_characteristics = (
-                    row[1],
-                    row[2],
-                    path_assoc.stem,
-                    row[4],
-                    row[5],
-                )
+                df_assoc = df_assoc.assign(**well_characteristics_dict)
+                well_characteristics = tuple(well_characteristics_dict.values())
                 if well_characteristics not in imported_wells.keys():
                     imported_wells[well_characteristics] = 0
                 else:
@@ -890,12 +894,10 @@ def _read_package_ipf(
                     df_assoc["id"] = df_assoc["id"] + f"_{suffix}"
 
                     log_message = textwrap.dedent(
-                        f"""A well with the same x, y, id, filter_top and filter_bot was already imported.
-                    This happened at x  = {row[1]}, y = { row[2]}, id = {path_assoc.stem}
-                    Now the ID for this new well was appended with the suffix  _{suffix})
-                    """
+                        IPF_LOG_MESSAGE_TEMPLATE.format(
+                            row=row, path_assoc=path_assoc, suffix=suffix
+                        )
                     )
-
                     imod.logging.logger.log(
                         loglevel=LogLevel.WARNING,
                         message=log_message,
