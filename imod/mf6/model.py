@@ -194,7 +194,9 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
     def _get_k(self):
         npf_key = self._get_pkgkey(imod.mf6.NodePropertyFlow._pkg_id)
         if not npf_key:
-            raise KeyError("No NodePropertyFlow package was assigned to Modflow6Model, make sure this is included.")
+            raise KeyError(
+                "No NodePropertyFlow package was assigned to Modflow6Model, make sure this is included."
+            )
         npf = self[npf_key]
         return npf["k"]
 

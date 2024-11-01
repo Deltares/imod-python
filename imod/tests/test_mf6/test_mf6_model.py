@@ -393,12 +393,14 @@ def test_prepare_wel_to_mf6(
     # Assert
     assert isinstance(mf6_well, Mf6Wel)
 
+
 def test_prepare_wel_to_mf6__error(
     structured_flow_model: GroundwaterFlowModel,
 ):
     # Act
     with pytest.raises(TypeError):
         structured_flow_model.prepare_wel_for_mf6("dis", True, True)
+
 
 def test_get_k(structured_flow_model: GroundwaterFlowModel):
     # Act
@@ -412,6 +414,7 @@ def test_get_k(structured_flow_model: GroundwaterFlowModel):
     k = structured_flow_model._get_k()
     # Assert
     assert isinstance(k, xr.DataArray)
+
 
 def test_get_domain_geometry(structured_flow_model: GroundwaterFlowModel):
     # Act
