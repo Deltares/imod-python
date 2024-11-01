@@ -6,11 +6,120 @@ from pathlib import Path
 import geopandas as gpd
 import pandas as pd
 import pytest
+import pytest_cases
 import shapely.geometry as sg
 import xarray as xr
 
 import imod
 from imod.formats.prj import prj
+
+PRJ_TEMPLATE = textwrap.dedent(
+    """
+    0001,(CAP),1,MetaSwap,[bnd,lus,rtz,slt,mst,sfl,rti,rti,rti,wra,wua,pua,pra,rua,rra,rua,rra,iua,ira,pwd,smf,spf]
+    022,001
+    1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf"
+    1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf"
+    1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf"
+    1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf"
+    1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf"
+    1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf",
+    1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf",
+    1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/{sprinkling_well}",
+    1,1, 001, 1.0, 0.0,  25.00000,''  # capacity
+    1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf"
+    1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf"
+    1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf"
+    1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf"
+    1,1, 001, 1.0, 0.0,  1.0     ,''  # runof resistance urban area
+    1,1, 001, 1.0, 0.0,  1.0     ,''  # runof resistance rural area
+    1,1, 001, 1.0, 0.0,  1.0     ,''  # runon resistance urban area
+    1,1, 001, 1.0, 0.0,  1.0     ,''  # runon resistance rural area
+    1,1, 001, 1.0, 0.0,  0.0     ,''  # qinfbasic urban area
+    1,1, 001, 1.0, 0.0,  0.05    ,''  # qinfbasic urban area
+    1,1, 001, 1.0, 0.0,  0.0     ,''  # pwt level
+    1,1, 001, 1.0, 0.0,  1.0     ,''  # soil moisture factor
+    1,1, 001, 1.0, 0.0,  1.0     ,''  # conductivity factor
+    008,EXTRA FILES
+    aa.idf
+    ab.idf
+    ac.idf
+    ad.idf
+    ae.idf
+    af.idf
+    ag.idf
+    ah.idf
+
+    0001,(BND),1, Boundary Condition,[BND]
+    001,002
+        1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf",
+        1,2, 002, 1.0, 0.0, -999.9900,"{basepath}/a.idf",
+    0001,(KHV),1, Horizontal Permeability,[KHV]
+    001,002
+        1,2, 001, 1.0, 0.0, -999.9900,'{basepath}/a.idf',
+        1,2, 002, 1.0, 0.0, -999.9900,"{basepath}/a.idf",
+
+    0003,(GHB),1, General Head Boundary,[GHB]
+    1900-01-01
+    002,001
+        1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/cond.idf",
+        1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/head.idf",
+    1901-01-02 00:00:00
+    002,001
+        1,2, 001, 1.0, 0.0, -999.9900,'{basepath}/cond.idf',
+        1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/head.idf",
+    1901-01-03 00:00:00
+    002,001
+        1,2, 001, 1.0, 0.0, -999.9900,'{basepath}/cond.idf',
+        1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/head.idf",
+
+    0001,(WEL),1, Wells,[WRA]
+    STEADY-STATE
+    001,002
+        1,2, 001, 1.0, 0.0, -999.9900 ,"{basepath}/wells_l1.ipf"
+        1,2, 002, 1.0, 0.0, -999.9900 ,"{basepath}/wells_l2.ipf"
+
+    003,(RCH),1
+    1900-01-01
+    001,001
+        1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/rch.idf",
+    summer
+    001,001
+        1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/rch.idf",
+    winter
+    001,001
+        1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/rch.idf",
+
+    0001,(HFB),1, Horizontal Flow Barrier,[HFB]
+    001,002
+        1,2, 000, 100000.0, 1.0, -999.9900 ,"{basepath}/first.gen"
+        1,2, 000, 100000.0, 1.0, -999.9900 ,"{basepath}/second.gen"
+
+    0001,(PCG),1, Precondition Conjugate-Gradient,[]
+        MXITER=  500
+        ITER1=   25
+        HCLOSE=  0.1000000E-02
+        RCLOSE=  0.1000000
+        RELAX=   0.9800000
+        NPCOND=  1
+        IPRPCG=  1
+        MUTPCG=  0
+        DAMPPCG= 1.000000
+        DAMPPCGT=1.000000
+        IQERROR= 0
+        QERROR=  0.1000000
+
+    Periods
+    summer
+    01-04-1900 00:00:00
+    winter
+    01-10-1900 00:00:00
+
+    Species
+    "benzene",1
+    "chloride",2
+
+    """
+)
 
 
 def test_tokenize():
@@ -345,6 +454,20 @@ def test_process_time():
         prj._process_time("2000-01-01 00:00", yearfirst=False)
 
 
+class SprinklingWellCases:
+    def case_sprinkling_idf(self):
+        return "a.idf"
+
+    def case_sprinkling_ipf(self):
+        return "wells_l1.ipf"
+
+
+def get_case_name(request):
+    id_name = request.node.callspec.id
+    cases = id_name.split("-")
+    return cases[-1]
+
+
 class TestProjectFile:
     @pytest.fixture(autouse=True)
     def setup(self, tmp_path_factory):
@@ -355,118 +478,6 @@ class TestProjectFile:
         # Technically project file paths should be absolute?...
         basepath = tmp_path_factory.mktemp("prj-data")
         self.basepath = basepath
-
-        filecontent = textwrap.dedent(
-            f"""
-            0001,(CAP),1,MetaSwap,[bnd,lus,rtz,slt,mst,sfl,rti,rti,rti,wra,wua,pua,pra,rua,rra,rua,rra,iua,ira,pwd,smf,spf]
-            022,001
-            1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf"
-            1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf"
-            1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf"
-            1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf"
-            1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf"
-            1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf",
-            1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf",
-            1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf",
-            1,1, 001, 1.0, 0.0,  25.00000,''  # capacity
-            1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf"
-            1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf"
-            1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf"
-            1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf"
-            1,1, 001, 1.0, 0.0,  1.0     ,''  # runof resistance urban area
-            1,1, 001, 1.0, 0.0,  1.0     ,''  # runof resistance rural area
-            1,1, 001, 1.0, 0.0,  1.0     ,''  # runon resistance urban area
-            1,1, 001, 1.0, 0.0,  1.0     ,''  # runon resistance rural area
-            1,1, 001, 1.0, 0.0,  0.0     ,''  # qinfbasic urban area
-            1,1, 001, 1.0, 0.0,  0.05    ,''  # qinfbasic urban area
-            1,1, 001, 1.0, 0.0,  0.0     ,''  # pwt level
-            1,1, 001, 1.0, 0.0,  1.0     ,''  # soil moisture factor
-            1,1, 001, 1.0, 0.0,  1.0     ,''  # conductivity factor
-            008,EXTRA FILES
-            aa.idf
-            ab.idf
-            ac.idf
-            ad.idf
-            ae.idf
-            af.idf
-            ag.idf
-            ah.idf
-
-            0001,(BND),1, Boundary Condition,[BND]
-            001,002
-             1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf",
-             1,2, 002, 1.0, 0.0, -999.9900,"{basepath}/a.idf",
-            0001,(KHV),1, Horizontal Permeability,[KHV]
-            001,002
-             1,2, 001, 1.0, 0.0, -999.9900,'{basepath}/a.idf',
-             1,2, 002, 1.0, 0.0, -999.9900,"{basepath}/a.idf",
-
-            0003,(GHB),1, General Head Boundary,[GHB]
-            1900-01-01
-            002,001
-             1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/cond.idf",
-             1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/head.idf",
-            1901-01-02 00:00:00
-            002,001
-             1,2, 001, 1.0, 0.0, -999.9900,'{basepath}/cond.idf',
-             1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/head.idf",
-            1901-01-03 00:00:00
-            002,001
-             1,2, 001, 1.0, 0.0, -999.9900,'{basepath}/cond.idf',
-             1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/head.idf",
-
-            0001,(WEL),1, Wells,[WRA]
-            STEADY-STATE
-            001,002
-             1,2, 001, 1.0, 0.0, -999.9900 ,"{basepath}/wells_l1.ipf"
-             1,2, 002, 1.0, 0.0, -999.9900 ,"{basepath}/wells_l2.ipf"
-
-            003,(RCH),1
-            1900-01-01
-            001,001
-             1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/rch.idf",
-            summer
-            001,001
-             1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/rch.idf",
-            winter
-            001,001
-             1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/rch.idf",
-
-            0001,(HFB),1, Horizontal Flow Barrier,[HFB]
-            001,002
-             1,2, 000, 100000.0, 1.0, -999.9900 ,"{basepath}/first.gen"
-             1,2, 000, 100000.0, 1.0, -999.9900 ,"{basepath}/second.gen"
-
-            0001,(PCG),1, Precondition Conjugate-Gradient,[]
-             MXITER=  500
-             ITER1=   25
-             HCLOSE=  0.1000000E-02
-             RCLOSE=  0.1000000
-             RELAX=   0.9800000
-             NPCOND=  1
-             IPRPCG=  1
-             MUTPCG=  0
-             DAMPPCG= 1.000000
-             DAMPPCGT=1.000000
-             IQERROR= 0
-             QERROR=  0.1000000
-
-            Periods
-            summer
-            01-04-1900 00:00:00
-            winter
-            01-10-1900 00:00:00
-
-            Species
-            "benzene",1
-            "chloride",2
-
-            """
-        )
-
-        self.prj_path = basepath / "testprojectfile.prj"
-        with open(self.prj_path, "w") as f:
-            f.write(filecontent)
 
         # Write first GEN as binary
         geom = sg.LineString(
@@ -515,18 +526,46 @@ class TestProjectFile:
         imod.ipf.save(basepath / "wells_l1.ipf", df)
         imod.ipf.save(basepath / "wells_l2.ipf", df)
 
-    def test_read_projectfile(self):
-        content = imod.prj.read_projectfile(self.prj_path)
+    @pytest_cases.fixture()
+    @pytest_cases.parametrize_with_cases(
+        "sprinkling_well_file", cases=SprinklingWellCases
+    )
+    def projectfile(self, sprinkling_well_file):
+        sprinkling_ext = sprinkling_well_file[:3]
+        prj_path = self.basepath / f"testprojectfile_sprinkling_{sprinkling_ext}.prj"
+        with open(prj_path, "w") as f:
+            f.write(
+                PRJ_TEMPLATE.format(
+                    basepath=self.basepath, sprinkling_well=sprinkling_well_file
+                )
+            )
+        return prj_path
+
+    def test_read_projectfile(self, projectfile):
+        content = imod.prj.read_projectfile(projectfile)
         assert isinstance(content, dict)
 
-    def test_open_projectfile_data(self):
-        content, repeats = imod.prj.open_projectfile_data(self.prj_path)
+    def test_open_projectfile_data(self, projectfile, request):
+        case_name = get_case_name(request)
+        if case_name == "sprinkling_idf":
+            expected_sprinkling_type = xr.DataArray
+        elif case_name == "sprinkling_ipf":
+            expected_sprinkling_type = pd.DataFrame
+        else:
+            raise ValueError(
+                f"Unexpected case name, expected 'sprinkling_idf' or 'sprinkling_ipf', got '{case_name}'"
+            )
+
+        content, repeats = imod.prj.open_projectfile_data(projectfile)
         assert isinstance(content, dict)
         assert isinstance(repeats, dict)
         assert isinstance(content["ghb"]["conductance"], xr.DataArray)
         assert isinstance(content["ghb"]["head"], xr.DataArray)
         assert isinstance(content["rch"]["rate"], xr.DataArray)
         assert isinstance(content["cap"]["landuse"], xr.DataArray)
+        assert isinstance(
+            content["cap"]["artificial_recharge_layer"], expected_sprinkling_type
+        )
         assert isinstance(content["wel-wells_l1"]["dataframe"][0], pd.DataFrame)
         assert isinstance(content["wel-wells_l2"]["dataframe"][0], pd.DataFrame)
         assert isinstance(content["hfb-1"]["geodataframe"], gpd.GeoDataFrame)
@@ -534,8 +573,8 @@ class TestProjectFile:
         assert isinstance(content["pcg"], dict)
         assert set(repeats["rch"]) == {datetime(1899, 4, 1), datetime(1899, 10, 1)}
 
-    def test_open_projectfile_data__faulty_well(self):
-        basepath = self.prj_path.parent
+    def test_open_projectfile_data__faulty_well(self, projectfile):
+        basepath = self.basepath
         # Setup faulty well
         wellpath = basepath / "wells_l2.ipf"
         wellpath_backup = basepath / "wells_l2.backup"
@@ -544,14 +583,14 @@ class TestProjectFile:
             f.write("!@#$(!())\n#*@*!(!())")
 
         with pytest.raises(ValueError, match="wells_l2.ipf"):
-            imod.prj.open_projectfile_data(self.prj_path)
+            imod.prj.open_projectfile_data(projectfile)
 
         # Teardown
         wellpath.unlink()
         wellpath_backup.rename(wellpath)
 
-    def test_open_projectfile_data__faulty_grid(self):
-        basepath = self.prj_path.parent
+    def test_open_projectfile_data__faulty_grid(self, projectfile):
+        basepath = self.basepath
         # Setup faulty grid
         gridpath = basepath / "a.idf"
         gridpath_backup = basepath / "a.backup"
@@ -560,14 +599,14 @@ class TestProjectFile:
             f.write("!@#$(!())\n#*@*!(!())")
 
         with pytest.raises(ValueError, match="a.idf"):
-            imod.prj.open_projectfile_data(self.prj_path)
+            imod.prj.open_projectfile_data(projectfile)
 
         # Teardown
         gridpath.unlink()
         gridpath_backup.rename(gridpath)
 
-    def test_open_projectfile_data__faulty_gen(self):
-        basepath = self.prj_path.parent
+    def test_open_projectfile_data__faulty_gen(self, projectfile):
+        basepath = self.basepath
         # Setup faulty gen
         genpath = basepath / "first.gen"
         genpath_backup = basepath / "first.backup"
@@ -576,7 +615,7 @@ class TestProjectFile:
             f.write("!@#$(!())\n#*@*!(!())")
 
         with pytest.raises(IndexError, match="first.gen"):
-            imod.prj.open_projectfile_data(self.prj_path)
+            imod.prj.open_projectfile_data(projectfile)
 
         # Teardown
         genpath.unlink()
