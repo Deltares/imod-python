@@ -73,7 +73,6 @@ class CouplerMapping(MetaSwapPackage):
         idomain_top_active = idomain_active.sel(layer=1, drop=True)
         mod_id = self._create_mod_id_rch(svat, idomain_top_active)
 
-        # package check only possible after calling _create_mod_id_rch
         self._pkgcheck()
 
         data_dict: DataDictType = {"svat": svat.values.ravel()[index]}
