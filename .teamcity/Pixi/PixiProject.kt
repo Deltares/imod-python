@@ -46,7 +46,11 @@ object UpdateDependencies : BuildType({
                     
                     if (git status -suno pixi.lock) 
                     {
-                      echo "Commit changes" 
+                      echo "Setup username and email"
+                      git config --global user.name "Teamcity"
+                      git config --global user.email "teamcity@deltares.nl"
+                      
+                      echo "Commit changes"
                       git commit -m "Update pixi.lock"
 
                       echo "Push changes" 
