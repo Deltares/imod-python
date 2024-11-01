@@ -13,6 +13,7 @@ from xugrid.core.wrap import UgridDataArray
 
 import imod
 from imod.mf6 import ConstantHead
+from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.model import Modflow6Model
 from imod.mf6.model_gwf import GroundwaterFlowModel
 from imod.mf6.package import Package
@@ -370,3 +371,52 @@ def test_deepcopy(
 ):
     # test  making a deepcopy will not crash
     _ = deepcopy(unstructured_flow_model)
+
+
+def test_prepare_wel_to_mf6(
+    structured_flow_model: GroundwaterFlowModel,
+):
+    # Arrange
+    # add a well to the model
+    well = imod.mf6.Well(
+        x=[3.0],
+        y=[3.0],
+        screen_top=[0.0],
+        screen_bottom=[-3.0],
+        rate=[1.0],
+        print_flows=True,
+        validate=True,
+    )
+    structured_flow_model["well"] = well
+    # Act
+    mf6_well = structured_flow_model.prepare_wel_for_mf6("well", True, True)
+    # Assert
+    assert isinstance(mf6_well, Mf6Wel)
+
+def test_prepare_wel_to_mf6__error(
+    structured_flow_model: GroundwaterFlowModel,
+):
+    # Act
+    with pytest.raises(TypeError):
+        structured_flow_model.prepare_wel_for_mf6("dis", True, True)
+
+def test_get_k(structured_flow_model: GroundwaterFlowModel):
+    # Act
+    k = structured_flow_model._get_k()
+    # Assert
+    assert isinstance(k, xr.DataArray)
+    # Arrange
+    npf = structured_flow_model.pop("npf")
+    structured_flow_model["npf_with_other_name"] = npf
+    # Act
+    k = structured_flow_model._get_k()
+    # Assert
+    assert isinstance(k, xr.DataArray)
+
+def test_get_domain_geometry(structured_flow_model: GroundwaterFlowModel):
+    # Act
+    top, bottom, idomain = structured_flow_model._get_domain_geometry()
+    # Assert
+    assert isinstance(top, xr.DataArray)
+    assert isinstance(bottom, xr.DataArray)
+    assert isinstance(idomain, xr.DataArray)
