@@ -6,7 +6,8 @@ from typing import Optional, Tuple, Union
 import jinja2
 import numpy as np
 
-from imod import mf6
+from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.msw.coupler_mapping import CouplerMapping
 from imod.msw.grid_data import GridData
@@ -106,7 +107,7 @@ class MetaSwapModel(Model):
             self._render_unsaturated_database_path(unsaturated_database)
         )
 
-    def _render_unsaturated_database_path(self, unsaturated_database):
+    def _render_unsaturated_database_path(self, unsaturated_database: Union[str, Path]):
         # Force to Path object
         unsaturated_database = Path(unsaturated_database)
 
@@ -204,7 +205,12 @@ class MetaSwapModel(Model):
         if not optional_package:
             raise KeyError(f"Could not find package of type: {pkg_type}")
 
-    def write(self, directory: Union[str, Path]):
+    def write(
+        self,
+        directory: Union[str, Path],
+        mf6_dis: StructuredDiscretization,
+        mf6_wel: Mf6Wel,
+    ):
         """
         Write packages and simulation settings (para_sim.inp).
 
@@ -244,11 +250,11 @@ class MetaSwapModel(Model):
 
         # write package contents
         for pkgname in self:
-            self[pkgname].write(directory, index, svat)
+            self[pkgname].write(directory, index, svat, mf6_dis, mf6_wel)
 
     def regrid_like(
         self,
-        mf6_regridded_dis: mf6.StructuredDiscretization,
+        mf6_regridded_dis: StructuredDiscretization,
         regrid_context: Optional[RegridderWeightsCache] = None,
         regridder_types: Optional[dict[str, Tuple[RegridderType, str]]] = None,
     ) -> "MetaSwapModel":
@@ -273,6 +279,6 @@ class MetaSwapModel(Model):
                 raise ValueError(f"package {pkgname} cannot be  regridded")
             regridded_model[pkgname] = regridded_package
         if mod2svat_name is not None:
-            regridded_model[mod2svat_name] = CouplerMapping(mf6_regridded_dis)
+            regridded_model[mod2svat_name] = CouplerMapping()
 
         return regridded_model

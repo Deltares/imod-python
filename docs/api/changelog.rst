@@ -13,9 +13,20 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Changed
 ~~~~~~~
 
+- :class:`imod.msw.CouplingMapping`, :class:`imod.msw.Sprinkling`,
+  `imod.msw.Sprinkling.MetaSwapModel`, now take the
+  :class:`imod.mf6.mf6_wel_adapter.Mf6Wel` and the
+  :class:`imod.mf6.StructuredDiscretization` packages as arguments at their
+  respective ``write`` method, instead of upon initializing these MetaSWAP
+  objects.
 - :class:`imod.msw.CouplingMapping` and :class:`imod.msw.Sprinkling` now take
   the :class:`imod.mf6.mf6_wel_adapter.Mf6Wel` as well argument instead of the
   deprecated :class:`imod.mf6.WellDisStructured`.
+
+Added
+~~~~~
+
+- :meth:`imod.msw.MetaSwapModel.regrid_like` to regrid MetaSWAP models.
 
 
 [Unreleased]
@@ -97,9 +108,7 @@ Added
   :meth:`imod.mf6.GeneralHeadboundary.cleanup`, :meth:`imod.mf6.River.cleanup`,
   :meth:`imod.mf6.Well.cleanup` convenience methods to call the corresponding
   cleanup utility functions with the appropriate arguments.
-- :meth:`imod.msw.MetaSwapModel.regrid_like` to regrid MetaSWAP models. This is
-  still experimental functionality, regridding the :class:`imod.msw.Sprinkling`
-  is not yet supported.
+
 
 Removed
 ~~~~~~~

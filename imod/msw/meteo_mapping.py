@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Optional
+from typing import Any, Optional, TextIO
 
 import numpy as np
 import pandas as pd
@@ -9,7 +9,7 @@ from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.prepare import common
-from imod.typing import GridDataArray
+from imod.typing import GridDataArray, IntArray
 from imod.util.regrid_method_type import RegridMethodType
 
 
@@ -21,10 +21,18 @@ class MeteoMapping(MetaSwapPackage):
     new packages.
     """
 
+    meteo: GridDataArray
+
     def __init__(self):
         super().__init__()
 
-    def _render(self, file, index, svat):
+    def _render(
+        self,
+        file: TextIO,
+        index: IntArray,
+        svat: xr.DataArray,
+        *args: Any,
+    ):
         data_dict = {"svat": svat.values.ravel()[index]}
 
         row, column = self.grid_mapping(svat, self.meteo)

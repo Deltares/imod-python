@@ -61,7 +61,7 @@ def test_evapotranspiration_mapping_simple(fixed_format_parser):
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        evapotranspiration_mapping.write(output_dir, index, svat)
+        evapotranspiration_mapping.write(output_dir, index, svat, None, None)
 
         results = fixed_format_parser(
             output_dir / msw.EvapotranspirationMapping._file_name,
@@ -125,7 +125,7 @@ def test_evapotranspiration_mapping_negative_dx(fixed_format_parser):
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        evapotranspiration_mapping.write(output_dir, index, svat)
+        evapotranspiration_mapping.write(output_dir, index, svat, None, None)
 
         results = fixed_format_parser(
             output_dir / msw.EvapotranspirationMapping._file_name,
@@ -192,4 +192,4 @@ def test_evapotranspiration_mapping_out_of_bound():
         output_dir = Path(output_dir)
         # The grid is out of bounds, which is why we expect a ValueError to be raisen
         with pytest.raises(ValueError):
-            evapotranspiration_mapping.write(output_dir, index, svat)
+            evapotranspiration_mapping.write(output_dir, index, svat, None, None)
