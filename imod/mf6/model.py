@@ -243,9 +243,6 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
     def prepare_wel_for_mf6(
         self, pkgname: str, validate: bool = True, strict_well_validation: bool = True
     ) -> Mf6Wel:
-        validate_context = ValidationContext(
-            validate=validate, strict_well_validation=strict_well_validation
-        )
         """
         Prepare grid-agnostic well for MODFLOW6, using the models grid
         information and hydraulic conductivities. Allocates LayeredWell & Well
@@ -272,6 +269,9 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             Direct representation of MODFLOW6 WEL package, with 'cellid'
             indicating layer, row columns.
         """
+        validate_context = ValidationContext(
+            validate=validate, strict_well_validation=strict_well_validation
+        )
         return self._prepare_wel_for_mf6(pkgname, validate_context)
 
     @standard_log_decorator()
