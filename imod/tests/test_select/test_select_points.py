@@ -47,6 +47,7 @@ def test_uda(test_da):
 @pytest.fixture(scope="function")
 def uda_elevation():
     from xugrid.data.sample_data import REGISTRY
+
     with FileLock(REGISTRY.path / "xugrid_elevation_nl.nc.lock"):
         elevation = xu.data.elevation_nl()
     return xu.concat(
