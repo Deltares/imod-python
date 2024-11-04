@@ -64,7 +64,7 @@ def __arr_like_points(points: dict, fill_value: Any) -> npt.NDArray:
     return np.full(shape, fill_value)
 
 
-def points_in_bounds(da: GridDataArray, **points) -> npt.NDArray[np.bool]:
+def points_in_bounds(da: GridDataArray, **points) -> npt.NDArray[np.bool_]:
     """
     Returns whether points specified by keyword arguments fall within the bounds
     of ``da``.
