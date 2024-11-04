@@ -407,13 +407,15 @@ def test_get_k(structured_flow_model: GroundwaterFlowModel):
     k = structured_flow_model._get_k()
     # Assert
     assert isinstance(k, xr.DataArray)
+    assert np.all(k == 1.23)
     # Arrange
     npf = structured_flow_model.pop("npf")
-    structured_flow_model["npf_with_other_name"] = npf
+    structured_flow_model["npf_other_name"] = npf
     # Act
     k = structured_flow_model._get_k()
     # Assert
     assert isinstance(k, xr.DataArray)
+    assert np.all(k == 1.23)
 
 
 def test_get_domain_geometry(structured_flow_model: GroundwaterFlowModel):
@@ -423,3 +425,11 @@ def test_get_domain_geometry(structured_flow_model: GroundwaterFlowModel):
     assert isinstance(top, xr.DataArray)
     assert isinstance(bottom, xr.DataArray)
     assert isinstance(idomain, xr.DataArray)
+
+    assert top.dtype == np.float64
+    assert bottom.dtype == np.float64
+    assert idomain.dtype == np.int32
+
+    assert np.all(np.isin(top.values, [10.0]))
+    assert np.all(np.isin(bottom.values, [-1.0, -2.0, -3.0]))
+    assert np.all(np.isin(idomain.values, [1]))
