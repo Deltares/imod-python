@@ -554,7 +554,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         clipped : Modflow6Model
         """
 
-        top, bottom, idomain = self._get_domain_geometry()
+        top, bottom, _ = self._get_domain_geometry()
 
         clipped = type(self)(**self._options)
         for key, pkg in self.items():
