@@ -1010,6 +1010,13 @@ def read_projectfile(path: FilePath) -> Dict[str, Any]:
     return content
 
 
+def _is_var_ipf_and_path(block_content: dict[str, Any], var: str):
+    block_item = block_content[var]
+    path = block_item[0]["path"]
+    is_ipf = path.suffix.lower() == ".ipf"
+    return is_ipf, path
+
+
 def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
     """
     Read the contents of an iMOD project file and read/open the data present in
@@ -1069,15 +1076,17 @@ def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
                 data, repeats = _read_package_ipf(block_content, periods)
             elif key == "(cap)":
                 maybe_ipf_var = "artificial_recharge_layer"
-                maybe_ipf_content = block_content.pop(maybe_ipf_var)
-                maybe_ipf_path = maybe_ipf_content[0]["path"]
-                is_ipf = maybe_ipf_path.suffix.lower() == ".ipf"
-                if not is_ipf:
-                    # Not ipf, potential ipf content is in fact idf content, so
-                    # needs to be reattached.
-                    block_content[maybe_ipf_var] = maybe_ipf_content
+                is_ipf, maybe_ipf_path = _is_var_ipf_and_path(
+                    block_content, maybe_ipf_var
+                )
+                # If its an ipf drop it and manually add it by calling the
+                # ipf.read function. If its not an ipf then its an idf, which
+                # doesnt need any special treatment.
+                if is_ipf:
+                    block_content.pop(maybe_ipf_var)
                 variables = set(METASWAP_VARS).intersection(block_content.keys())
                 data = _open_package_idf(block_content, variables)
+                # Read and reattach ipf data to package data.
                 if is_ipf:
                     data[0][maybe_ipf_var] = imod.ipf.read(maybe_ipf_path)
             elif key in ("extra", "(pcg)"):
