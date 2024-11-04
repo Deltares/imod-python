@@ -11,7 +11,7 @@ from datetime import datetime
 from itertools import chain
 from os import PathLike
 from pathlib import Path
-from typing import Any, Dict, List, Sequence, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -84,7 +84,7 @@ METASWAP_VARS = (
     "meteo_station_number",
     "surface_elevation",
     "artificial_recharge",
-    "artifical_recharge_layer",
+    "artificial_recharge_layer",
     "artificial_recharge_capacity",
     "wetted_area",
     "urban_area",
@@ -632,7 +632,7 @@ def _create_dataarray(
 
 def _open_package_idf(
     block_content: Dict[str, Any], variables: Sequence[str]
-) -> List[xr.DataArray]:
+) -> list[dict[str, xr.DataArray]]:
     das = {}
     for variable in variables:
         variable_content = block_content[variable]
@@ -801,6 +801,14 @@ def _read_package_gen(
     return out
 
 
+IPF_LOG_MESSAGE_TEMPLATE = """\
+    A well with the same x, y, id, filter_top and
+    filter_bot was already imported. This happened at x =
+    {row[1]}, y = {row[2]}, id = {path_assoc.stem}. Now the
+    ID for this new well was appended with the suffix _{suffix})
+    """
+
+
 @dataclass
 class IpfResult:
     has_associated: bool = data_field(default_factory=bool)
@@ -825,6 +833,73 @@ class IpfResult:
         self.addition.append(addition)
 
 
+def _process_ipf_time(
+    entry: Dict[str, Any], periods: Dict[str, datetime], repeats: list[str]
+) -> tuple[Optional[str], list[str]]:
+    timestring = entry["time"]
+    time = periods.get(timestring)
+    if time is None:
+        time = _process_time(timestring)
+    else:
+        repeats.append(time)
+    return time, repeats
+
+
+def _prepare_df_unassociated(ipf_df: pd.DataFrame, layer: int) -> pd.DataFrame:
+    columns = ("x", "y", "rate")
+    if layer <= 0:
+        df = ipf_df.iloc[:, :5]
+        columns = columns + ("filt_top", "filt_bot")
+    else:
+        df = ipf_df.iloc[:, :3]
+    df.columns = columns
+    return df
+
+
+def _prepare_df_associated(
+    ipf_df: pd.DataFrame,
+    imported_wells: dict[tuple, int],
+    indexcol: int,
+    path: Path,
+    ext: str,
+) -> pd.DataFrame:
+    dfs = []
+    for row in ipf_df.itertuples():
+        filename = row[indexcol]
+        path_assoc = path.parent.joinpath(f"{filename}.{ext}")
+        well_characteristics_dict = {
+            "x": row[1],
+            "y": row[2],
+            "id": path_assoc.stem,
+            "filt_top": row[4],
+            "filt_bot": row[5],
+        }
+        df_assoc = _try_read_with_func(imod.ipf.read_associated, path_assoc).iloc[:, :2]
+        df_assoc.columns = ["time", "rate"]
+        df_assoc = df_assoc.assign(**well_characteristics_dict)
+        well_characteristics = tuple(well_characteristics_dict.values())
+        if well_characteristics not in imported_wells.keys():
+            imported_wells[well_characteristics] = 0
+        else:
+            suffix = imported_wells[well_characteristics] + 1
+            imported_wells[well_characteristics] = suffix
+            df_assoc["id"] = df_assoc["id"] + f"_{suffix}"
+
+            log_message = textwrap.dedent(
+                IPF_LOG_MESSAGE_TEMPLATE.format(
+                    row=row, path_assoc=path_assoc, suffix=suffix
+                )
+            )
+            imod.logging.logger.log(
+                loglevel=LogLevel.WARNING,
+                message=log_message,
+                additional_depth=2,
+            )
+
+        dfs.append(df_assoc)
+    return pd.concat(dfs, ignore_index=True, sort=False)
+
+
 def _read_package_ipf(
     block_content: Dict[str, Any], periods: Dict[str, datetime]
 ) -> Tuple[Dict[str, Dict], List[datetime]]:
@@ -836,15 +911,10 @@ def _read_package_ipf(
     imported_wells = {}
 
     for entry in block_content["ipf"]:
-        timestring = entry["time"]
+        time, repeats = _process_ipf_time(entry, periods, repeats)
         layer = entry["layer"]
-        time = periods.get(timestring)
         factor = entry["factor"]
         addition = entry["addition"]
-        if time is None:
-            time = _process_time(timestring)
-        else:
-            repeats.append(time)
 
         # Ensure the columns are identifiable.
         path = Path(entry["path"])
@@ -852,58 +922,10 @@ def _read_package_ipf(
         if indexcol == 0:
             # No associated files
             has_associated = False
-            columns = ("x", "y", "rate")
-            if layer <= 0:
-                df = ipf_df.iloc[:, :5]
-                columns = columns + ("filt_top", "filt_bot")
-            else:
-                df = ipf_df.iloc[:, :3]
-            df.columns = columns
+            df = _prepare_df_unassociated(ipf_df, layer)
         else:
             has_associated = True
-            dfs = []
-            for row in ipf_df.itertuples():
-                filename = row[indexcol]
-                path_assoc = path.parent.joinpath(f"{filename}.{ext}")
-                df_assoc = _try_read_with_func(
-                    imod.ipf.read_associated, path_assoc
-                ).iloc[:, :2]
-                df_assoc.columns = ["time", "rate"]
-                df_assoc["x"] = row[1]
-                df_assoc["y"] = row[2]
-                df_assoc["id"] = path_assoc.stem
-                df_assoc["filt_top"] = row[4]
-                df_assoc["filt_bot"] = row[5]
-
-                well_characteristics = (
-                    row[1],
-                    row[2],
-                    path_assoc.stem,
-                    row[4],
-                    row[5],
-                )
-                if well_characteristics not in imported_wells.keys():
-                    imported_wells[well_characteristics] = 0
-                else:
-                    suffix = imported_wells[well_characteristics] + 1
-                    imported_wells[well_characteristics] = suffix
-                    df_assoc["id"] = df_assoc["id"] + f"_{suffix}"
-
-                    log_message = textwrap.dedent(
-                        f"""A well with the same x, y, id, filter_top and filter_bot was already imported.
-                    This happened at x  = {row[1]}, y = { row[2]}, id = {path_assoc.stem}
-                    Now the ID for this new well was appended with the suffix  _{suffix})
-                    """
-                    )
-
-                    imod.logging.logger.log(
-                        loglevel=LogLevel.WARNING,
-                        message=log_message,
-                        additional_depth=2,
-                    )
-
-                dfs.append(df_assoc)
-            df = pd.concat(dfs, ignore_index=True, sort=False)
+            df = _prepare_df_associated(ipf_df, imported_wells, indexcol, path, ext)
         df["rate"] = df["rate"] * factor + addition
 
         out[path.stem].has_associated = has_associated
@@ -988,6 +1010,13 @@ def read_projectfile(path: FilePath) -> Dict[str, Any]:
     return content
 
 
+def _is_var_ipf_and_path(block_content: dict[str, Any], var: str):
+    block_item = block_content[var]
+    path = block_item[0]["path"]
+    is_ipf = path.suffix.lower() == ".ipf"
+    return is_ipf, path
+
+
 def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
     """
     Read the contents of an iMOD project file and read/open the data present in
@@ -1046,8 +1075,20 @@ def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
             elif key == "(wel)":
                 data, repeats = _read_package_ipf(block_content, periods)
             elif key == "(cap)":
+                maybe_ipf_var = "artificial_recharge_layer"
+                is_ipf, maybe_ipf_path = _is_var_ipf_and_path(
+                    block_content, maybe_ipf_var
+                )
+                # If its an ipf drop it and manually add it by calling the
+                # ipf.read function. If its not an ipf then its an idf, which
+                # doesnt need any special treatment.
+                if is_ipf:
+                    block_content.pop(maybe_ipf_var)
                 variables = set(METASWAP_VARS).intersection(block_content.keys())
                 data = _open_package_idf(block_content, variables)
+                # Read and reattach ipf data to package data.
+                if is_ipf:
+                    data[0][maybe_ipf_var] = imod.ipf.read(maybe_ipf_path)
             elif key in ("extra", "(pcg)"):
                 data = [block_content]
             elif key in KEYS:
