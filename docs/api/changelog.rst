@@ -35,7 +35,7 @@ Fixed
 
 - Bug where error was thrown when :class:`imod.mf6.NodePropertyFlow` was
   assigned to :class:`imod.mf6.GroundwaterFlowModel` with key different from
-  ``"npf"`` upon writing, as well as well or horizontal flow barrier packages.
+  ``"npf"`` upon writing, along with well or horizontal flow barrier packages.
 
 
 [Unreleased]
