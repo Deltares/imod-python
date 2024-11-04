@@ -33,6 +33,7 @@ Model objects & methods
     Modflow6Simulation.regrid_like
     GroundwaterFlowModel
     GroundwaterFlowModel.mask_all_packages
+    GroundwaterFlowModel.prepare_wel_for_mf6
     GroundwaterFlowModel.dump
     GroundwaterTransportModel
     GroundwaterTransportModel.mask_all_packages

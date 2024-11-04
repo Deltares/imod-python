@@ -27,6 +27,15 @@ Added
 ~~~~~
 
 - :meth:`imod.msw.MetaSwapModel.regrid_like` to regrid MetaSWAP models.
+- :meth:`imod.mf6.GroundwaterFlowModel.prepare_wel_for_mf6` to prepare wells for
+  MODFLOW6, for debugging purposes.
+
+Fixed
+~~~~~
+
+- Bug where error was thrown when :class:`imod.mf6.NodePropertyFlow` was
+  assigned to :class:`imod.mf6.GroundwaterFlowModel` with key different from
+  ``"npf"`` upon writing, along with well or horizontal flow barrier packages.
 
 
 [Unreleased]
