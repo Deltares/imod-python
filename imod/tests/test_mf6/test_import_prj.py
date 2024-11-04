@@ -266,9 +266,9 @@ def test_import_ipf_unique_id_and_logging(tmp_path):
 
     with open(logfile_path, "r") as log_file:
         log = log_file.read()
-        assert "This happened at x  = 197910, y = 362860, id = extractions" in log
-        assert "appended with the suffix  _1" in log
-        assert "appended with the suffix  _2" in log
+        assert "This happened at x =\n197910, y = 362860, id = extractions" in log
+        assert "appended with the suffix _1" in log
+        assert "appended with the suffix _2" in log
 
 
 def snippet_boundary_condition(factor: float, addition: float):
