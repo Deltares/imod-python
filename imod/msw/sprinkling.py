@@ -64,6 +64,12 @@ class Sprinkling(MetaSwapPackage):
         self._pkgcheck()
 
     def _render(self, file, index, svat):
+        def ravel_per_subunit(array: xr.DataArray) -> np.ndarray:
+            # per defined well element, all subunits
+            array_out = array.to_numpy()[:, well_row, well_column].ravel()
+            # per defined well element, per defined subunits
+            return array_out[np.isfinite(array_out)]
+
         well_row = self.well["row"] - 1
         well_column = self.well["column"] - 1
         well_layer = self.well["layer"]
@@ -73,20 +79,16 @@ class Sprinkling(MetaSwapPackage):
         layer_per_svat = xr.full_like(max_rate_per_svat, np.nan)
         layer_per_svat[:, well_row, well_column] = well_layer
 
-        layer_source_target = layer_per_svat.where(max_rate_per_svat > 0).to_numpy()
-        svat_source_target = svat.where(max_rate_per_svat > 0).to_numpy()
-        # per defined well element, all subunits
-        svat_source_target = svat_source_target[:, well_row, well_column].ravel()
-        layer_source_target = layer_source_target[:, well_row, well_column].ravel()
-        # per defined well element, per defined subunits
-        svat_source_target = svat_source_target[np.isfinite(svat_source_target)]
-        layer_source_target = layer_source_target[np.isfinite(layer_source_target)]
-        svat_source_target = svat_source_target.astype(dtype=np.int32)
-        layer_source_target = layer_source_target.astype(dtype=np.int32)
+        layer_source = ravel_per_subunit(
+            layer_per_svat.where(max_rate_per_svat > 0)
+        ).astype(dtype=np.int32)
+        svat_source_target = ravel_per_subunit(
+            svat.where(max_rate_per_svat > 0)
+        ).astype(dtype=np.int32)
 
         data_dict = {
             "svat": svat_source_target,
-            "layer": layer_source_target,
+            "layer": layer_source,
             "svat_groundwater": svat_source_target,
         }
 
