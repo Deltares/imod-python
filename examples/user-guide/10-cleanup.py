@@ -85,6 +85,8 @@ gwf_model["new_riv"] = imod.mf6.River(**new_riv_ds)
 
 tmp_dir = imod.util.temporary_directory()
 
+# Ignore the "with" statement, it is to succesfully render the Jupyter notebook
+# online.
 with PrintErrorInsteadOfRaise():
     gwf_simulation.write(tmp_dir)
 
