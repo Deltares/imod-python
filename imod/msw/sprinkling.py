@@ -64,33 +64,34 @@ class Sprinkling(MetaSwapPackage):
         self._pkgcheck()
 
     def _render(self, file, index, svat):
-        irow = self.well["row"] - 1
-        icol = self.well["column"] - 1
-        layer = self.well["layer"]
-        max_rate = self.dataset["max_abstraction_groundwater_m3_d"]
+        well_row = self.well["row"] - 1
+        well_column = self.well["column"] - 1
+        well_layer = self.well["layer"]
+        max_rate_per_svat = self.dataset["max_abstraction_groundwater_m3_d"].where(
+            svat > 0
+        )
+        layer_per_svat = xr.full_like(max_rate_per_svat, np.nan)
+        layer_per_svat[:, well_row, well_column] = well_layer
 
-        svat_source_target = svat.where(max_rate > 0).to_numpy()
-        svat_source_target = svat_source_target[
-            :, irow, icol
-        ].ravel()  # per defined well element, all subunits
-        svat_source_target = svat_source_target[
-            np.isfinite(svat_source_target)
-        ]  # per defined well element, per defined subunits
+        layer_source_target = layer_per_svat.where(max_rate_per_svat > 0).to_numpy()
+        svat_source_target = svat.where(max_rate_per_svat > 0).to_numpy()
+        # per defined well element, all subunits
+        svat_source_target = svat_source_target[:, well_row, well_column].ravel()
+        layer_source_target = layer_source_target[:, well_row, well_column].ravel()
+        # per defined well element, per defined subunits
+        svat_source_target = svat_source_target[np.isfinite(svat_source_target)]
+        layer_source_target = layer_source_target[np.isfinite(layer_source_target)]
         svat_source_target = svat_source_target.astype(dtype=np.int32)
-
-        if svat_source_target.size != irow.size:
-            raise ValueError(
-                "Provided well-pacakge does not correspond with the abstraction rate"
-            )
+        layer_source_target = layer_source_target.astype(dtype=np.int32)
 
         data_dict = {
             "svat": svat_source_target,
-            "layer": layer,
+            "layer": layer_source_target,
             "svat_groundwater": svat_source_target,
         }
 
         for var in self._with_subunit:
-            array = self.dataset[var].where(max_rate > 0).to_numpy()
+            array = self.dataset[var].where(max_rate_per_svat > 0).to_numpy()
             array = array[np.isfinite(array)]
             data_dict[var] = array
 
