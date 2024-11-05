@@ -41,6 +41,14 @@ def get_colleagues_data(gwf_model):
     return riv_ds
 
 
+class PrintErrorInsteadOfRaise:
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_val, tb):
+        if exc_type:
+            print(f"{exc_val}")
+            return True  # swallow the exception
 
 # %%
 #
@@ -57,7 +65,6 @@ new_riv_ds = get_colleagues_data(gwf_model)
 # %%
 # Let's do a brief visual check if the colleague's data seems alright:
 
-# Plot
 imod.visualize.plot_map(
     new_riv_ds["stage"].max(dim="layer"), "viridis", np.linspace(-1, 19, 9)
 )
@@ -78,7 +85,8 @@ gwf_model["new_riv"] = imod.mf6.River(**new_riv_ds)
 
 tmp_dir = imod.util.temporary_directory()
 
-#gwf_simulation.write(tmp_dir)
+with PrintErrorInsteadOfRaise():
+    gwf_simulation.write(tmp_dir)
 
 # %%
 #
