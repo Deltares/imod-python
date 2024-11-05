@@ -38,11 +38,11 @@ class Sprinkling(MetaSwapPackage):
         "trajectory": VariableMetaData(10, None, None, str),
     }
 
-    _with_subunit = ()
-    _without_subunit = (
+    _with_subunit = (
         "max_abstraction_groundwater_m3_d",
         "max_abstraction_surfacewater_m3_d",
     )
+    _without_subunit = ()
 
     _to_fill = (
         "max_abstraction_groundwater_mm_d",
@@ -64,28 +64,35 @@ class Sprinkling(MetaSwapPackage):
         self._pkgcheck()
 
     def _render(self, file, index, svat):
-        well_row = self.well["row"] - 1
-        well_column = self.well["column"] - 1
-        well_layer = self.well["layer"]
+        irow = self.well["row"] - 1
+        icol = self.well["column"] - 1
+        layer = self.well["layer"]
+        max_rate = self.dataset["max_abstraction_groundwater_m3_d"]
 
-        n_subunit = svat["subunit"].size
+        svat_source_target = svat.where(max_rate > 0).to_numpy()
+        svat_source_target = svat_source_target[
+            :, irow, icol
+        ].ravel()  # per defined well element, all subunits
+        svat_source_target = svat_source_target[
+            np.isfinite(svat_source_target)
+        ]  # per defined well element, per defined subunits
+        svat_source_target = svat_source_target.astype(dtype=np.int32)
 
-        well_svat = svat.values[:, well_row, well_column]
-        well_active = well_svat != 0
-
-        # Tile well_layers for each subunit
-        layer = np.tile(well_layer, (n_subunit, 1))
+        if svat_source_target.size != irow.size:
+            raise ValueError(
+                "Provided well-pacakge does not correspond with the abstraction rate"
+            )
 
         data_dict = {
-            "svat": well_svat[well_active],
-            "layer": layer[well_active],
-            "svat_groundwater": well_svat[well_active],
+            "svat": svat_source_target,
+            "layer": layer,
+            "svat_groundwater": svat_source_target,
         }
 
-        for var in self._without_subunit:
-            well_arr = self.dataset[var].values[well_row, well_column]
-            well_arr = np.tile(well_arr, (n_subunit, 1))
-            data_dict[var] = well_arr[well_active]
+        for var in self._with_subunit:
+            array = self.dataset[var].where(max_rate > 0).to_numpy()
+            array = array[np.isfinite(array)]
+            data_dict[var] = array
 
         for var in self._to_fill:
             data_dict[var] = ""
