@@ -217,10 +217,10 @@ gwf_simulation.write(tmp_dir)
 # Cleaning data without a MODFLOW6 simulation
 # -------------------------------------------
 #
-# There might be situations where you do not have a MODFLOW6 simulation at hand,
-# and you still want to clean up your river grids. For this you can use the
-# :func:`imod.prepare.cleanup_riv` function. For this you need to separately
-# provide your grids.
+# There might be situations where you do not have a MODFLOW6 simulation or River
+# package at hand, and you still want to clean up your river grids. For this you
+# can use the :func:`imod.prepare.cleanup_riv` function. For this you need to
+# separately provide your grids.
 #
 
 idomain = dis_pkg["idomain"]
@@ -237,7 +237,8 @@ riv_cleaned_dict
 
 # %%
 #
-# This returns a dictionary which you can feed to the River package.
+# This returns a dictionary which you can use however you want, and furthermore
+# feed to the River package.
 
 riv_pkg = imod.mf6.River(**riv_cleaned_dict)
 
