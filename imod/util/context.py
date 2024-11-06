@@ -42,7 +42,7 @@ def cd(path: Union[str, pathlib.Path]):
 
 
 @contextlib.contextmanager
-def print_if_error(exception_type: BaseException):
+def print_if_error(exception_type: type[BaseException]):
     """
     Prints error instead of raising it. Useful for cases when pieces of code are
     expected to fail, but the script needs to continue. This is a common
