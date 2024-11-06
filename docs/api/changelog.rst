@@ -91,6 +91,10 @@ Added
 - :meth:`imod.msw.MetaSwapModel.regrid_like` to regrid MetaSWAP models. This is
   still experimental functionality, regridding the :class:`imod.msw.Sprinkling`
   is not yet supported.
+- The context :func:`imod.util.context.print_if_error` to print an error instead
+  of raising it in a ``with`` statement. This is useful for code snippets which
+  definitely will fail.
+
 
 Removed
 ~~~~~~~
