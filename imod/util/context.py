@@ -43,17 +43,22 @@ def cd(path: Union[str, pathlib.Path]):
 
 @contextlib.contextmanager
 def print_if_error(exception_type: BaseException):
+    """
+    Prints error instead of raising it. Useful for cases when pieces of code are
+    expected to fail, but the script needs to continue. This is a common
+    use-case for examples in the documentation.
+
+    Parameters
+    ----------
+    exception_type: Exception
+        Exception to accept
+    
+    Examples
+    --------
+    >>> with print_if_error(TypeError):
+            1 + "a"
+    """
     try:
         yield
     except exception_type as e:
         print(e)
-
-
-class PrintErrorInsteadOfRaise:
-    def __enter__(self):
-        pass
-
-    def __exit__(self, exc_type, exc_val, _):
-        if exc_type:
-            print(f"{exc_val}")
-            return True  # swallow the exception
