@@ -52,7 +52,7 @@ def print_if_error(exception_type: BaseException):
     ----------
     exception_type: Exception
         Exception to accept
-    
+
     Examples
     --------
     >>> with print_if_error(TypeError):
