@@ -1,4 +1,7 @@
 """
+Data cleanup
+============
+
 More often than not, data contained in databases is not entirely consistent,
 causing errors. It therefore is useful to have some utilities at hand to clean
 up data. We included some convenience methods to help cleaning up inconsistent
@@ -23,8 +26,6 @@ from imod.util.context import print_if_error
 tmpdir = imod.util.temporary_directory()
 
 gwf_simulation = imod.data.hondsrug_simulation(tmpdir / "hondsrug_saved")
-
-# %%
 
 
 # %%
@@ -105,7 +106,7 @@ imod.visualize.plot_map(stage_above_riv_bot.max(dim="layer"), "viridis", [0, 1])
 
 diff = new_riv_ds["bottom_elevation"] - new_riv_ds["stage"]
 
-max_diff = diff.max()
+max_diff = diff.max().values
 
 max_diff
 
@@ -117,7 +118,7 @@ max_diff
 imod.visualize.plot_map(
     diff.where(stage_above_riv_bot).max(dim="layer"),
     "viridis",
-    np.linspace(0, max_diff.values, 9),
+    np.linspace(0, max_diff, 9),
 )
 
 # %%
@@ -125,8 +126,8 @@ imod.visualize.plot_map(
 # That is only a small area. Plotting these errors can help you analyze the size
 # of problems and communicate with your colleague where there are problems.
 #
-# Data cleanup
-# ------------
+# The ``cleanup`` method
+# ----------------------
 #
 # The data quality seems acceptable for now to carry on modelling, so we can
 # already set up a model for the project. We need to communicate with colleagues
@@ -169,7 +170,7 @@ cleaned_ds = gwf_model["new_riv"].dataset
 diff_stage = dirty_ds["stage"] - cleaned_ds["stage"]
 
 imod.visualize.plot_map(
-    diff_stage.max(dim="layer"), "viridis", np.linspace(0, max_diff.values, 9)
+    diff_stage.max(dim="layer"), "viridis", np.linspace(0, max_diff, 9)
 )
 
 # %%
@@ -182,7 +183,7 @@ imod.visualize.plot_map(
 diff_riv_bot = dirty_ds["bottom_elevation"] - cleaned_ds["bottom_elevation"]
 
 imod.visualize.plot_map(
-    diff_riv_bot.max(dim="layer"), "viridis", np.linspace(0, max_diff.values, 9)
+    diff_riv_bot.max(dim="layer"), "viridis", np.linspace(0, max_diff, 9)
 )
 # %%
 #
@@ -190,10 +191,19 @@ imod.visualize.plot_map(
 # Furthermore the area in the west where no active stages were defined are also
 # deactivated.
 #
+# We advice to always verify if the data is cleaned in a manner that fits your
+# use-case. For example, you might need to raise the stages to the river bottom
+# elevation, instead of lowering the latter to the former like the ``cleanup``
+# method just did. In such case, you need to manually fix the data.
+#
+# The ``cleanup`` method helps getting your data through the model validation,
+# but is not guaranteed to be the "best" way to clean up your data!
+#
 # Writing the cleaned model
 # -------------------------
 #
-# The river package has been Let's see if we can write the model.
+# Now that the river package has been cleaned, let's see if we can write the
+# model.
 
 gwf_simulation.write(tmp_dir)
 
