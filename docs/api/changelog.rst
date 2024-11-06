@@ -59,6 +59,10 @@ Fixed
   addressed.
 - Added :func:`imod.mf6.open_dvs` to read dependent variable output files like
   the water content file of :class:`imod.mf6.UnsaturatedZoneFlow`.
+- `imod.prj.open_projectfile_data` is now able to also read IPF data for
+  sprinkling wells in the CAP package.
+- Fix that caused iMOD Python to break upon import with numpy >=1.23, <2.0 .
+
 
 Changed
 ~~~~~~~
