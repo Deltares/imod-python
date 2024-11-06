@@ -117,7 +117,7 @@ imod has significantly more:
 Many of these packages have binary dependencies, but both FloPy and imod can be
 installed via ``pip``. However, full functionality -- such as exporting to
 netCDF, reading and writing GIS formats, or 3D visualization -- involves more
-complex dependencies, which require the ``mamba`` or ``conda`` package managers
+complex dependencies, which require the ``pixi`` or ``conda`` package managers
 to install correctly (especially on Windows).
  
 Large data

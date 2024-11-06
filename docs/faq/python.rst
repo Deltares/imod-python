@@ -73,69 +73,34 @@ use the same version of ``A``, but you'll find that suddenly package ``D``
 affairs is colloquially called `"dependency hell"`_.
 
 
-Installing Python packages with mamba -- `without the agonizing pain`_
-----------------------------------------------------------------------
+Installing Python packages -- `without the agonizing pain`_
+-----------------------------------------------------------
 
-We highly recommend installing packages using ``mamba`` or ``conda``. Conda is
-a package and environment manager that installs packages from a remote
-repository (which is a remote storage location of software packages); Mamba is
-a (much) faster version of conda. Pip (acronym for "Pip install packages") can
-also be used for installing Python packages, but was designed mainly to install
-pure Python packages, without binary dependencies; trying to ``pip install``
-packages with complex depencies is therefore a recipe for frustration and
-disaster.
+We highly recommend installing packages using ``pixi`` or alternatively ``conda``
 
-Conda does several things. First and foremost, it solves the dependency problem
-when installing a package. Secondly, it also installs binary dependencies.
-Thirdly, it provides isolated Python installations (termed environments). You
-might create a new environment if you have unsatisfiable version requirements,
-like two versions of Python (e.g. 2.7 and 3.9).
+Pixi and conda are package- and environment managers that installs packages from
+a remote repository (which is a remote storage location of software packages).
+Pip (acronym for "Pip install packages") can also be used for installing Python
+packages, but was designed mainly to install pure Python packages, without
+binary dependencies; trying to ``pip install`` packages with complex depencies
+is therefore a recipe for frustration and disaster.
 
-Mamba is a reimplementation of the conda package manager in C++. As the imod
-package has a large number of dependencies, using ``mamba`` instead of
-``conda`` can strongly reduce installation times (from e.g. 30 minutes to 3
-minutes!). As ``mamba`` has become sufficiently stable, we now strongly
-recommend it over ``conda`` for installing packages and creating environments.
+Pixi and conda, do several things. First and foremost, they solve the dependency
+problem when installing a package. Secondly, they also installs binary
+dependencies. Thirdly, they provides isolated Python installations (termed
+environments). You might create a new environment if you have unsatisfiable
+version requirements, like two versions of Python (e.g. 2.7 and 3.9).
 
-Some packages cannot be installed by conda/mamba because they are not available
+Additionally, pixi allows you to store an environment in a specific state in a
+textfile, allowing you to share envrionments with colleagues. conda and pip have
+similar functionality, but this is far from as robust as pixi implemented this.
+
+Some packages cannot be installed by conda/pixi because they are not available
 on the conda channels. In that case, you can fall back on ``pip`` to install
 the package (``pip install {package name}``).
 
 Find the articles: `Understanding conda and pip`_ and Conda:`Myths and
-Misconceptions`_ for additional information. See also the `Mamba homepage`_.
-
-
-Anaconda, Miniconda, Miniforge, Mambaforge
-------------------------------------------
-
-Ananaconda and Miniconda both provide a Python installation and conda as the
-package manager. The difference between them is that Anaconda comes with a
-large number of packages pre-installed in the base environment (which is why
-the installation is over a gigabyte). Miniconda, on the other hand, comes
-bare bones. Since we recommend working from environments to install packages
-into (see below), we do not consider the full Anaconda installer attractive.
-
-.. note::
-
-  Since April 2020, Anaconda has `changed`_ their `Terms of Service`_, limiting
-  use of the anaconda repository to commercial users. If you worry you fall in
-  the category of commercial users, we recommend installing Miniforge or
-  Mambaforge instead. The change has negligible consequences for imod users, as
-  we've long fully relied on the community led `conda-forge`_ channel.
-
-You can find the Miniforge homepage and the Miniforge and Mambaforge installers
-here:
-
-* https://github.com/conda-forge/miniforge
-* https://github.com/conda-forge/miniforge#mambaforge
-
-You can find installers for Miniconda or Anaconda here:
-
-* https://conda.io/miniconda.html
-* https://www.anaconda.com/distribution/
-
-During installation, tick the box "Add Anaconda/Miniforge to PATH", even though it
-colors a suggestive red.
+Misconceptions`_ for additional information. See also the `pixi docs`_.
 
 
 Setting up an environment
@@ -176,8 +141,8 @@ Then start the interactive environment::
     pixi shell --environment interactive
 
 
-Installing a newer or old version
----------------------------------
+Installing a development version of iMOD Python
+-----------------------------------------------
 
 Since we're currently in the process of adding a lot of features, the version
 on PyPI or conda-forge doesn't always install the carry the latest updates.
@@ -194,18 +159,39 @@ To get the latest developments at a later point in time, execute within the
 
     git pull
     
-Installing specific (older) versions is possible by specifying a version
-number::
-
-    pip install imod==0.11.0
-    
 Past versions can also be found on the iMOD Python `releases page`_.
+
+
+Anaconda, Miniconda, Miniforge
+------------------------------
+
+Ananaconda and Miniconda both provide a Python installation and conda as the
+package manager. The difference between them is that Anaconda comes with a
+large number of packages pre-installed in the base environment (which is why
+the installation is over a gigabyte). Miniconda, on the other hand, comes
+bare bones. Since we recommend working from environments to install packages
+into (see below), we do not consider the full Anaconda installer attractive.
+
+.. note::
+
+  Since April 2020, Anaconda has `changed`_ their `Terms of Service`_, limiting
+  use of the anaconda repository to commercial users. If you worry you fall in
+  the category of commercial users, we recommend installing Miniforge instead.
+  The change has negligible consequences for imod users, as we've long fully
+  relied on the community led `conda-forge`_ channel.
+
+You can find the Miniforge homepage and the Miniforge installers here:
+
+* https://github.com/conda-forge/miniforge
+
+You can find installers for Miniconda here:
+
+* https://conda.io/miniconda.html
 
 .. _"dependency hell": https://en.wikipedia.org/wiki/Dependency_hell
 .. _without the agonizing pain: https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.110.418>
 .. _Understanding conda and pip: https://www.anaconda.com/understanding-conda-and-pip
 .. _Myths and Misconceptions: https://jakevdp.github.io/blog/2016/08/25/conda-myths-and-misconceptions/
-.. _Mamba homepage: https://github.com/mamba-org/mamba
 .. _changed: https://www.anaconda.com/blog/sustaining-our-stewardship-of-the-open-source-data-science-community
 .. _Terms of Service: https://www.anaconda.com/terms-of-service
 .. _conda-forge: https://conda-forge.org/
