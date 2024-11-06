@@ -39,3 +39,21 @@ def cd(path: Union[str, pathlib.Path]):
         yield
     finally:
         os.chdir(curdir)
+
+
+@contextlib.contextmanager
+def print_if_error(exception_type: BaseException):
+    try:
+        yield
+    except exception_type as e:
+        print(e)
+
+
+class PrintErrorInsteadOfRaise:
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_val, _):
+        if exc_type:
+            print(f"{exc_val}")
+            return True  # swallow the exception
