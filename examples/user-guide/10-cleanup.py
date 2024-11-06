@@ -17,7 +17,7 @@ import imod
 # %%
 # These imports can be ignored
 from imod.schemata import ValidationError
-from imod.util.context import print_if_error
+from imod.util import print_if_error
 
 # %%
 # There is a separate example contained in
