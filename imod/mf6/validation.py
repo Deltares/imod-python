@@ -91,6 +91,8 @@ def pkg_errors_to_status_info(
             var_status_info.add_error(str(var_error))
         pkg_status_info.add(var_status_info)
     if suggest_cleanup:
-        suggest_text = "  -> You might fix this by calling the package's ``.cleanup()`` method."
+        suggest_text = (
+            "  -> You might fix this by calling the package's ``.cleanup()`` method."
+        )
         pkg_status_info.set_footer_text(suggest_text)
     return pkg_status_info
