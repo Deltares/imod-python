@@ -50,7 +50,7 @@ class StatusInfo(StatusInfoBase):
 
     def to_string(self) -> str:
         header = self.title + ":" + "\n"
-        indented_errors = "{1}{0}".format("\n".join(self.errors), "\t* ")
+        indented_errors = "{1}{0}".format("\n* ".join(self.errors), "\t")
         return header + indented_errors
 
 
