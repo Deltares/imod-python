@@ -63,6 +63,7 @@ class NestedStatusInfo(StatusInfoBase):
     def __init__(self, title: str = ""):
         super().__init__(title)
         self.__children: list[StatusInfoBase] = []
+        self.__footer_text: str = ""
 
     def add(self, status_info: StatusInfoBase):
         self.__children.append(status_info)
@@ -80,10 +81,14 @@ class NestedStatusInfo(StatusInfoBase):
                 return True
         return False
 
+    def set_footer_text(self, text: str) -> None:
+        self.__footer_text = text
+
     def to_string(self) -> str:
         string = ""
         for child in self.__children:
             string += "\n* " + child.to_string()
 
         string = string.replace("\n", "\n\t")
-        return self.title + ":" + string
+        footer = "\n" + self.__footer_text + "\n"
+        return self.title + ":" + string + footer
