@@ -19,9 +19,12 @@ from jinja2 import Template
 
 import imod
 from imod.logging import standard_log_decorator
+from imod.mf6.drn import Drainage
+from imod.mf6.ghb import GeneralHeadBoundary
 from imod.mf6.hfb import HorizontalFlowBarrierBase
 from imod.mf6.interfaces.imodel import IModel
 from imod.mf6.package import Package
+from imod.mf6.riv import River
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.utilities.mask import _mask_all_packages
 from imod.mf6.utilities.mf6hfb import merge_hfb_packages
@@ -35,6 +38,11 @@ from imod.typing import GridDataArray
 from imod.typing.grid import is_spatial_grid
 
 HFB_PKGNAME = "hfb_merged"
+pkgtypes_with_cleanup = [River, Drainage, GeneralHeadBoundary, GridAgnosticWell]
+
+
+def pkg_has_cleanup(pkg: Package):
+    return any(isinstance(pkg, pkgtype) for pkgtype in pkgtypes_with_cleanup)
 
 
 class Modflow6Model(collections.UserDict, IModel, abc.ABC):
@@ -235,7 +243,12 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 bottom=bottom,
             )
             if len(pkg_errors) > 0:
-                model_status_info.add(pkg_errors_to_status_info(pkg_name, pkg_errors))
+                suggest_cleanup = False
+                if pkg_has_cleanup(pkg):
+                    suggest_cleanup = True
+                model_status_info.add(
+                    pkg_errors_to_status_info(pkg_name, pkg_errors, suggest_cleanup)
+                )
 
         return model_status_info
 
