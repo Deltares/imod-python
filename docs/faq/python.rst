@@ -78,7 +78,7 @@ Installing Python packages -- `without the agonizing pain`_
 
 We highly recommend installing packages using ``pixi`` or alternatively ``conda``
 
-Pixi and conda are package- and environment managers that installs packages from
+Pixi and conda are package- and environment-managers that install packages from
 a remote repository (which is a remote storage location of software packages).
 Pip (acronym for "Pip install packages") can also be used for installing Python
 packages, but was designed mainly to install pure Python packages, without
@@ -86,21 +86,30 @@ binary dependencies; trying to ``pip install`` packages with complex depencies
 is therefore a recipe for frustration and disaster.
 
 Pixi and conda, do several things. First and foremost, they solve the dependency
-problem when installing a package. Secondly, they also installs binary
+problem when installing a package. Secondly, they also install binary
 dependencies. Thirdly, they provides isolated Python installations (termed
 environments). You might create a new environment if you have unsatisfiable
 version requirements, like two versions of Python (e.g. 2.7 and 3.9).
 
 Additionally, pixi allows you to store an environment in a specific state in a
-textfile, allowing you to share envrionments with colleagues. conda and pip have
-similar functionality, but this is far from as robust as pixi implemented this.
+textfile, allowing you to share envrionments with colleagues. Conda and pip have
+similar functionality, but this is by far not as robust as pixi implemented
+this.
 
 Some packages cannot be installed by conda/pixi because they are not available
-on the conda channels. In that case, you can fall back on ``pip`` to install
-the package (``pip install {package name}``).
+on the conda channels. In that case, with pixi you can install these from PyPI
+(Python Package Index) as follows::
 
-Find the articles: `Understanding conda and pip`_ and Conda:`Myths and
-Misconceptions`_ for additional information. See also the `pixi docs`_.
+  pixi add <package_name> --pypi
+
+With conda you can fall back on ``pip`` to install the package:: 
+
+  pip install <package_name>
+
+
+Find the articles: `Let's stop dependency hell`_, `Understanding conda and pip`_
+and Conda:`Myths and Misconceptions`_ for additional information. See also the
+`pixi docs`_.
 
 
 Setting up an environment
@@ -189,6 +198,7 @@ You can find installers for Miniconda here:
 * https://conda.io/miniconda.html
 
 .. _"dependency hell": https://en.wikipedia.org/wiki/Dependency_hell
+.. _let's stop dependency hell: https://prefix.dev/blog/launching_pixi
 .. _without the agonizing pain: https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.110.418>
 .. _Understanding conda and pip: https://www.anaconda.com/understanding-conda-and-pip
 .. _Myths and Misconceptions: https://jakevdp.github.io/blog/2016/08/25/conda-myths-and-misconceptions/

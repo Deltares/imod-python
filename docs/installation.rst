@@ -114,12 +114,14 @@ You can activate your environment using::
 
   pixi shell
 
-These commands created a ``pixi.toml`` and a ``pixi.lock``. The ``pixi.toml``
-captures the instructions you gave pixi to look for dependencies. The
-``pixi.lock`` is textfile that captures the environment in a specific state, so
-with exact version numbers. This is very useful, as it allows you to transfer
-environments to other machines, by just copying two textfiles. The lockfile will
-be updated if you run ``pixi update`` or change the ``pixi.toml`` file. Both the
+These commands create a ``pixi.toml`` and a ``pixi.lock``. The ``pixi.toml``
+contains the dependencies of your project. If you followed the commands above,
+the only dependency present in the toml should be ``imod``. The ``pixi.lock`` is
+a textfile that captures the environment in a specific state, so all
+dependencies, with their dependencies and so on, with exact version numbers.
+This is very useful, as it allows you to get the exact same environment on a
+different machine, by just copying two textfiles. The lockfile will be updated
+if you run ``pixi update`` or change the ``pixi.toml`` file. Both the
 ``pixi.toml`` as well as the ``pixi.lock`` are required to fully reproduce an
 environment. 
 
