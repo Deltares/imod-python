@@ -7,7 +7,7 @@ imod/util.py. Therefore these should be available under the imod.util namespace.
 
 import warnings
 
-from imod.util.context import cd, ignore_warnings
+from imod.util.context import cd, ignore_warnings, print_if_error
 from imod.util.path import temporary_directory
 from imod.util.spatial import (
     coord_reference,
