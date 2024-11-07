@@ -4,7 +4,7 @@ Data cleanup
 
 More often than not, data contained in databases is not entirely consistent,
 causing errors. It therefore is useful to have some utilities at hand to clean
-up data. We included some convenience methods to help cleaning up inconsistent
+up data. We included some convenience methods to help clean up inconsistent
 datasets.
 """
 
@@ -140,9 +140,9 @@ imod.visualize.plot_map(
 #
 # Let's clean up the problematic river data using the
 # :meth:`imod.mf6.River.cleanup` method. Note that this method changes the data
-# inplace. This means that the package's will be updated, without returning a
-# new copy of the package. This means that do comparisons of the
-# dataset before and after the fix, we can copy the dirty dataset first.
+# inplace. This means that the package will be updated, without returning a new
+# copy of the package. This means that we need to copy the dirty dataset first,
+# before we can do comparisons of the dataset before and after the fix.
 
 dirty_ds = gwf_model["new_riv"].dataset.copy()
 

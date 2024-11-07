@@ -260,8 +260,8 @@ def colleagues_river_data(path: Union[str, Path]):
     riv_ds_old = gwf_model["riv"].dataset
     # Existing RIV package has only layer coord with [1, 3, 5, 6]. This causes
     # problems with some methods, at least with cleanup. Therefore align data
-    # here for the cleanup example. Not sure if we want to support river
-    # packages with limited layer coords.
+    # here for the cleanup example. River packages with limited layer coords are
+    # currently not fully supported.
     riv_ds, _ = xr.align(riv_ds_old, dis_ds, join="outer")
     x = riv_ds.coords["x"]
     y = riv_ds.coords["y"]
