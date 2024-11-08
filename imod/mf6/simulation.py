@@ -280,7 +280,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         # Write time discretization file
         globaltimes = self["time_discretization"]["time"].values
-        self["time_discretization"].write(
+        self["time_discretization"]._write(
             pkgname="time_discretization",
             globaltimes=globaltimes,
             write_context=write_context,

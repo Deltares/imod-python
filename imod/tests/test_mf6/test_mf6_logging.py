@@ -97,7 +97,7 @@ def test_write_model_is_logged(
             add_default_file_handler=False,
             add_default_stream_handler=True,
         )
-        transport_model.write(
+        transport_model._write(
             "model.txt", globaltimes, write_context, validation_context
         )
 

@@ -1016,7 +1016,7 @@ def test_import_and_convert_to_mf6(imod5_dataset, tmp_path, wel_class):
 
     # write the package for validation
     write_context = WriteContext(simulation_directory=tmp_path)
-    mf6_well.write("wel", [], write_context)
+    mf6_well._write("wel", [], write_context)
 
 
 @parametrize("wel_class", [Well])

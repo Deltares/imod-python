@@ -390,7 +390,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             try:
                 if issubclass(type(pkg), GridAgnosticWell):
                     mf6_well_pkg = self._prepare_wel_for_mf6(pkg_name, validate_context)
-                    mf6_well_pkg.write(
+                    mf6_well_pkg._write(
                         pkgname=pkg_name,
                         globaltimes=globaltimes,
                         write_context=pkg_write_context,
@@ -398,7 +398,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 elif issubclass(type(pkg), imod.mf6.HorizontalFlowBarrierBase):
                     mf6_hfb_ls.append(pkg)
                 else:
-                    pkg.write(
+                    pkg._write(
                         pkgname=pkg_name,
                         globaltimes=globaltimes,
                         write_context=pkg_write_context,
