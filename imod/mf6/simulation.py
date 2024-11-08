@@ -243,14 +243,14 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         ----------
         directory: str, pathlib.Path
             Directory to write Modflow 6 simulation to.
-        binary: ({True, False}, optional)
+        use_binary: ({True, False}, optional)
             Whether to write time-dependent input for stress packages as binary
             files, which are smaller in size, or more human-readable text files.
         validate: ({True, False}, optional)
             Whether to validate the Modflow6 simulation, including models, at
             write. If True, erronous model input will throw a
             ``ValidationError``.
-        absolute_paths: ({True, False}, optional)
+        use_absolute_paths: ({True, False}, optional)
             True if all paths written to the mf6 inputfiles should be absolute.
         """
         # create write context
