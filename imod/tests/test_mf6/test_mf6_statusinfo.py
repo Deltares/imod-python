@@ -30,6 +30,7 @@ class TestStatusInfo:
         assert status_info.has_errors()
         assert len(status_info.errors) == 3
 
+
 @fixture(scope="function")
 def nested_status_info():
     root = NestedStatusInfo("root")
@@ -73,7 +74,7 @@ class TestNestedStatusInfo:
     def test_set_footer(self, nested_status_info: NestedStatusInfo):
         # Act
         nested_status_info.set_footer_text("footer")
-        
+
         # Assert
         nested_status_info._NestedStatusInfo__footer_text == "footer"
 

@@ -41,7 +41,10 @@ CONC_DIMS_SCHEMA = (
     | DimsSchema("species", "{face_dim}")
 )
 
-SUGGESTION_TEXT = "-> You might fix this by calling the package's ``.cleanup()`` method."
+SUGGESTION_TEXT = (
+    "-> You might fix this by calling the package's ``.cleanup()`` method."
+)
+
 
 class DisBottomSchema(NoDataComparisonSchema):
     """
