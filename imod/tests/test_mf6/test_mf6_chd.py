@@ -10,7 +10,6 @@ import imod
 from imod.mf6.chd import ConstantHead
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.utilities.chd_concat import concat_layered_chd_packages
-from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 
 
@@ -188,8 +187,7 @@ def test_write_concentration_period_data(head_fc, concentration_fc):
         save_flows=True,
     )
     with tempfile.TemporaryDirectory() as output_dir:
-        write_context = WriteContext(simulation_directory=output_dir)
-        chd._write("chd", globaltimes, write_context)
+        chd.write("chd", globaltimes, output_dir)
         with open(output_dir + "/chd/chd-0.dat", "r") as f:
             data = f.read()
             assert (
@@ -215,8 +213,7 @@ def test_from_imod5(imod5_dataset, tmp_path):
     assert len(chd3.dataset["layer"].values) == 1
 
     # write the packages for write validation
-    write_context = WriteContext(simulation_directory=tmp_path, use_binary=False)
-    chd3._write("chd3", [1], write_context)
+    chd3.write("chd3", [1], tmp_path, use_binary=False)
 
 
 @pytest.mark.usefixtures("imod5_dataset")
@@ -234,8 +231,7 @@ def test_from_imod5_shd(imod5_dataset, tmp_path):
     assert isinstance(chd_shd, imod.mf6.ConstantHead)
     assert len(chd_shd.dataset["layer"].values) == 37
     # write the packages for write validation
-    write_context = WriteContext(simulation_directory=tmp_path, use_binary=False)
-    chd_shd._write("chd_shd", [1], write_context)
+    chd_shd.write("chd_shd", [1], tmp_path, use_binary=False)
 
 
 @pytest.mark.unittest_jit
@@ -280,5 +276,4 @@ def test_concatenate_chd(imod5_dataset, tmp_path, remove_merged_packages):
     else:
         assert len(chd_packages) == 14
     # write the packages for write validation
-    write_context = WriteContext(simulation_directory=tmp_path, use_binary=False)
-    merged_package._write("merged_chd", [1], write_context)
+    merged_package.write("merged_chd", [1], tmp_path, use_binary=False)

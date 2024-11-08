@@ -7,7 +7,6 @@ import pytest
 import xarray as xr
 
 import imod
-from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 
 
@@ -281,8 +280,7 @@ def test_oc_write(tmp_path):
     with imod.util.cd(tmp_path):
         directory = tmp_path / "input/gwf"
         directory.mkdir(exist_ok=True, parents=True)
-        write_context = WriteContext(simulation_directory=directory)
-        oc._write("outputcontrol", globaltimes, write_context)
+        oc.write("outputcontrol", globaltimes, directory)
 
         assert (directory / "outputcontrol.oc").is_file()
         assert (tmp_path / "output").exists()
