@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Optional
 
 
 class StatusInfoBase(ABC):
@@ -81,8 +82,9 @@ class NestedStatusInfo(StatusInfoBase):
                 return True
         return False
 
-    def set_footer_text(self, text: str) -> None:
-        self.__footer_text = "\n" + text
+    def set_footer_text(self, text: Optional[str]) -> None:
+        if text:
+            self.__footer_text = "\n" + text
 
     def to_string(self) -> str:
         string = ""

@@ -38,11 +38,14 @@ from imod.typing import GridDataArray
 from imod.typing.grid import is_spatial_grid
 
 HFB_PKGNAME = "hfb_merged"
-pkgtypes_with_cleanup = [River, Drainage, GeneralHeadBoundary, GridAgnosticWell]
+SUGGESTION_TEXT = (
+    "-> You might fix this by calling the package's ``.cleanup()`` method."
+)
+PKGTYPES_WITH_CLEANUP = [River, Drainage, GeneralHeadBoundary, GridAgnosticWell]
 
 
 def pkg_has_cleanup(pkg: Package):
-    return any(isinstance(pkg, pkgtype) for pkgtype in pkgtypes_with_cleanup)
+    return any(isinstance(pkg, pkgtype) for pkgtype in PKGTYPES_WITH_CLEANUP)
 
 
 class Modflow6Model(collections.UserDict, IModel, abc.ABC):
@@ -243,11 +246,9 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 bottom=bottom,
             )
             if len(pkg_errors) > 0:
-                suggest_cleanup = False
-                if pkg_has_cleanup(pkg):
-                    suggest_cleanup = True
+                footer = SUGGESTION_TEXT if pkg_has_cleanup(pkg) else None
                 model_status_info.add(
-                    pkg_errors_to_status_info(pkg_name, pkg_errors, suggest_cleanup)
+                    pkg_errors_to_status_info(pkg_name, pkg_errors, footer)
                 )
 
         return model_status_info
