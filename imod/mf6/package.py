@@ -4,6 +4,7 @@ import abc
 import pathlib
 from collections import defaultdict
 from copy import deepcopy
+from pathlib import Path
 from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
 
 import cftime
@@ -259,6 +260,36 @@ class Package(PackageBase, IPackage, abc.ABC):
                     return layered, None
 
         return layered, values
+
+    def write(
+        self,
+        pkgname: str,
+        globaltimes: list[np.datetime64] | np.ndarray,
+        directory: str | Path,
+        use_binary: bool = False,
+        use_absolute_paths: bool = False,
+    ):
+        """
+        Write package to file
+
+        Parameters
+        ----------
+        pkgname: str
+            Package name
+        globaltimes: array of np.datetime64
+            Times of simulation
+        directory: str or Path
+            Directory to write package in
+        use_binary: ({True, False}, optional)
+            Whether to write time-dependent input for stress packages as binary
+            files, which are smaller in size, or more human-readable text files.
+        use_absolute_paths: ({True, False}, optional)
+            True if all paths written to the mf6 inputfiles should be absolute.
+        """
+        write_context = WriteContext(
+            Path(directory), use_binary, use_absolute_paths,
+        )
+        self._write(pkgname, globaltimes, write_context)
 
     @standard_log_decorator()
     def _write(
