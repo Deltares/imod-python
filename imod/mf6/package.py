@@ -277,7 +277,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         pkgname: str
             Package name
         globaltimes: array of np.datetime64
-            Times of simulation
+            Times of the simulation's stress periods.
         directory: str or Path
             Directory to write package in
         use_binary: ({True, False}, optional)
