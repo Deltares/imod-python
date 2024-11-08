@@ -30,7 +30,7 @@ from imod.mf6.utilities.regrid import (
     _regrid_like,
 )
 from imod.mf6.utilities.schemata import filter_schemata_dict
-from imod.mf6.validation import pkg_errors_to_status_info
+from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext
 from imod.schemata import (
     AllNoDataSchema,
@@ -328,8 +328,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             return
         errors = self._validate(self._init_schemata)
         if len(errors) > 0:
-            status_info = pkg_errors_to_status_info(self._pkg_id, errors)
-            message = status_info.to_string()
+            message = validation_pkg_error_message(errors)
             raise ValidationError(message)
         return
 
