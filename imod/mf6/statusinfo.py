@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Optional
 
 
 class StatusInfoBase(ABC):
@@ -50,7 +51,8 @@ class StatusInfo(StatusInfoBase):
 
     def to_string(self) -> str:
         header = self.title + ":" + "\n"
-        indented_errors = "{1}{0}".format("\n".join(self.errors), "\t* ")
+        bullet = "\t* "
+        indented_errors = f"{bullet}" + f"\n{bullet}".join(self.errors)
         return header + indented_errors
 
 
@@ -62,6 +64,7 @@ class NestedStatusInfo(StatusInfoBase):
     def __init__(self, title: str = ""):
         super().__init__(title)
         self.__children: list[StatusInfoBase] = []
+        self.__footer_text: str = ""
 
     def add(self, status_info: StatusInfoBase):
         self.__children.append(status_info)
@@ -79,10 +82,17 @@ class NestedStatusInfo(StatusInfoBase):
                 return True
         return False
 
+    def set_footer_text(self, text: Optional[str]) -> None:
+        if text:
+            self.__footer_text = "\n" + text
+
     def to_string(self) -> str:
         string = ""
         for child in self.__children:
             string += "\n* " + child.to_string()
 
+        string += self.__footer_text
+
         string = string.replace("\n", "\n\t")
+
         return self.title + ":" + string

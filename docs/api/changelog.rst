@@ -31,6 +31,8 @@ Fixed
 - `imod.prj.open_projectfile_data` is now able to also read IPF data for
   sprinkling wells in the CAP package.
 - Fix that caused iMOD Python to break upon import with numpy >=1.23, <2.0 .
+- ValidationError message now contains a suggestion to use the cleanup method,
+  if available in the erroneous package.
 - Bug where error was thrown when :class:`imod.mf6.NodePropertyFlow` was
   assigned to :class:`imod.mf6.GroundwaterFlowModel` with key different from
   ``"npf"`` upon writing, along with well or horizontal flow barrier packages.
