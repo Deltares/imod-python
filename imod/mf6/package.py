@@ -287,7 +287,9 @@ class Package(PackageBase, IPackage, abc.ABC):
             True if all paths written to the mf6 inputfiles should be absolute.
         """
         write_context = WriteContext(
-            Path(directory), use_binary, use_absolute_paths,
+            Path(directory),
+            use_binary,
+            use_absolute_paths,
         )
         self._write(pkgname, globaltimes, write_context)
 
