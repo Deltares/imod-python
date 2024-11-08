@@ -1,13 +1,19 @@
+from typing import TextIO
+
 import numpy as np
 import pandas as pd
 import xarray as xr
 
-from imod.mf6.wel import WellDisStructured
+from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
+from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
+from imod.msw.regrid.regrid_schemes import SprinklingRegridMethod
+from imod.typing import IntArray
 
 
-class Sprinkling(MetaSwapPackage):
+class Sprinkling(MetaSwapPackage, IRegridPackage):
     """
     This contains the sprinkling capacities of links between SVAT units and
     groundwater/surface water locations.
@@ -22,8 +28,6 @@ class Sprinkling(MetaSwapPackage):
     max_abstraction_surfacewater: array of floats (xr.DataArray)
         Describes the maximum abstraction of surfacewater to SVAT units in m3
         per day. This array must not have a subunit coordinate.
-    well: WellDisStructured
-        Describes the sprinkling of SVAT units coming groundwater.
     """
 
     _file_name = "scap_svat.inp"
@@ -31,8 +35,8 @@ class Sprinkling(MetaSwapPackage):
         "svat": VariableMetaData(10, 1, 99999999, int),
         "max_abstraction_groundwater_mm_d": VariableMetaData(8, None, None, str),
         "max_abstraction_surfacewater_mm_d": VariableMetaData(8, None, None, str),
-        "max_abstraction_groundwater_m3_d": VariableMetaData(8, 0.0, 1e9, float),
-        "max_abstraction_surfacewater_m3_d": VariableMetaData(8, 0.0, 1e9, float),
+        "max_abstraction_groundwater": VariableMetaData(8, 0.0, 1e9, float),
+        "max_abstraction_surfacewater": VariableMetaData(8, 0.0, 1e9, float),
         "svat_groundwater": VariableMetaData(10, None, None, str),
         "layer": VariableMetaData(6, 1, 9999, int),
         "trajectory": VariableMetaData(10, None, None, str),
@@ -40,8 +44,8 @@ class Sprinkling(MetaSwapPackage):
 
     _with_subunit = ()
     _without_subunit = (
-        "max_abstraction_groundwater_m3_d",
-        "max_abstraction_surfacewater_m3_d",
+        "max_abstraction_groundwater",
+        "max_abstraction_surfacewater",
     )
 
     _to_fill = (
@@ -51,27 +55,41 @@ class Sprinkling(MetaSwapPackage):
         "trajectory",
     )
 
+    _regrid_method = SprinklingRegridMethod()
+
     def __init__(
         self,
         max_abstraction_groundwater: xr.DataArray,
         max_abstraction_surfacewater: xr.DataArray,
-        well: WellDisStructured,
     ):
         super().__init__()
-        self.dataset["max_abstraction_groundwater_m3_d"] = max_abstraction_groundwater
-        self.dataset["max_abstraction_surfacewater_m3_d"] = max_abstraction_surfacewater
-        self.well = well
+        self.dataset["max_abstraction_groundwater"] = max_abstraction_groundwater
+        self.dataset["max_abstraction_surfacewater"] = max_abstraction_surfacewater
 
         self._pkgcheck()
 
-    def _render(self, file, index, svat):
-        well_row = self.well["row"] - 1
-        well_column = self.well["column"] - 1
-        well_layer = self.well["layer"]
+    def _render(
+        self,
+        file: TextIO,
+        index: IntArray,
+        svat: xr.DataArray,
+        mf6_dis: StructuredDiscretization,
+        mf6_well: Mf6Wel,
+    ):
+        if not isinstance(mf6_well, Mf6Wel):
+            raise TypeError(rf"well not of type 'Mf6Wel', got '{type(mf6_well)}'")
+
+        well_cellid = mf6_well["cellid"]
+        if len(well_cellid.coords["dim_cellid"]) != 3:
+            raise TypeError("Coupling to unstructured grids is not supported.")
+
+        well_layer = well_cellid.sel(dim_cellid="layer").data
+        well_row = well_cellid.sel(dim_cellid="row").data - 1
+        well_column = well_cellid.sel(dim_cellid="column").data - 1
 
         n_subunit = svat["subunit"].size
 
-        well_svat = svat.values[:, well_row, well_column]
+        well_svat = svat.data[:, well_row, well_column]
         well_active = well_svat != 0
 
         # Tile well_layers for each subunit
@@ -80,7 +98,7 @@ class Sprinkling(MetaSwapPackage):
         data_dict = {"svat": well_svat[well_active], "layer": layer[well_active]}
 
         for var in self._without_subunit:
-            well_arr = self.dataset[var].values[well_row, well_column]
+            well_arr = self.dataset[var].data[well_row, well_column]
             well_arr = np.tile(well_arr, (n_subunit, 1))
             data_dict[var] = well_arr[well_active]
 
@@ -94,8 +112,3 @@ class Sprinkling(MetaSwapPackage):
         self._check_range(dataframe)
 
         return self.write_dataframe_fixed_width(file, dataframe)
-
-    def is_regridding_supported(self) -> bool:
-        # regridding for the sprikling package is currently not supported, but
-        # this will be fixed in issue #728
-        return False

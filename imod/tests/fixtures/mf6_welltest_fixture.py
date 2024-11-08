@@ -18,8 +18,8 @@ def mf6wel_test_data_stationary():
             [2, 4, 6],
         ],
     )
-    coords = {"ncellid": np.arange(8) + 1, "nmax_cellid": ["layer", "row", "column"]}
-    cellid = xr.DataArray(cellid_values, coords=coords, dims=("ncellid", "nmax_cellid"))
+    coords = {"ncellid": np.arange(8) + 1, "dim_cellid": ["layer", "row", "column"]}
+    cellid = xr.DataArray(cellid_values, coords=coords, dims=("ncellid", "dim_cellid"))
     rate = xr.DataArray(
         [1.0] * 8, coords={"ncellid": np.arange(8) + 1}, dims=("ncellid",)
     )
@@ -40,8 +40,8 @@ def mf6wel_test_data_transient():
             [2, 4, 6],
         ],
     )
-    coords = {"ncellid": np.arange(8) + 1, "nmax_cellid": ["layer", "row", "column"]}
-    cellid = xr.DataArray(cellid_values, coords=coords, dims=("ncellid", "nmax_cellid"))
+    coords = {"ncellid": np.arange(8) + 1, "dim_cellid": ["layer", "row", "column"]}
+    cellid = xr.DataArray(cellid_values, coords=coords, dims=("ncellid", "dim_cellid"))
 
     rate = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 
