@@ -82,13 +82,15 @@ class NestedStatusInfo(StatusInfoBase):
         return False
 
     def set_footer_text(self, text: str) -> None:
-        self.__footer_text = text
+        self.__footer_text = "\n" + text
 
     def to_string(self) -> str:
         string = ""
         for child in self.__children:
             string += "\n* " + child.to_string()
 
+        string += self.__footer_text
+
         string = string.replace("\n", "\n\t")
-        footer = "\n" + self.__footer_text + "\n"
-        return self.title + ":" + string + footer
+
+        return self.title + ":" + string
