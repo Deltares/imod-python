@@ -320,9 +320,9 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         validate: bool = True,
     ):
         """
-        Write MODFLOW6 model to file. Mote that this method is purely inteded
-        for debugging purposes. It does not result in a functional
-        model. For that, the model needs to be part of a
+        Write MODFLOW6 model to file. Note that this method is purely intended
+        for debugging purposes. It does not result in a functional model. For
+        that the model needs to be part of a
         :class:`imod.mf6.Modflow6Simulation`, of which the ``write`` method
         should be called.
 
