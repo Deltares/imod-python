@@ -296,7 +296,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             # skip timedis, exchanges
             if isinstance(value, Modflow6Model):
                 status_info.add(
-                    value.write(
+                    value._write(
                         modelname=key,
                         globaltimes=globaltimes,
                         write_context=model_write_context,
