@@ -1,5 +1,3 @@
-from textwrap import dedent
-
 from pytest import fixture
 
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo
@@ -52,6 +50,16 @@ def nested_status_info():
     return root
 
 
+EXPECTED_TEXT_TEMPLATE = """\
+root:
+\t* child1:
+\t\t* grandchild1:
+\t\t* grandchild2:
+\t\t\t* test error2
+\t\t\t* test error3
+\t* child2:
+\t\t* test error1"""
+
 
 class TestNestedStatusInfo:
     def test_flatten_nested_errors(self, nested_status_info):
@@ -60,7 +68,7 @@ class TestNestedStatusInfo:
         errors = nested_status_info.errors
         # Assert.
         assert has_errors
-        assert len(errors) == 2
+        assert len(errors) == 3
 
     def test_set_footer(self, nested_status_info: NestedStatusInfo):
         # Act
@@ -69,25 +77,9 @@ class TestNestedStatusInfo:
         # Assert
         nested_status_info._NestedStatusInfo__footer_text == "footer"
 
-# 'root:\n\t* child1:\n\t\t* grandchild1:\n\t\t\n\t\t\n\t\t* grandchild2:\n\t\t\t* test error2\n\t\n\t\n\t* child2:\n\t\t* test error1\n\n'
-
     def test_to_string(self, nested_status_info):
         # Arrange
-        expected_text = dedent("""root:
-        \t* child1
-        \t\t* grandchild1:
-        \t\t
-        \t\t
-        \t\t* grandchild2:
-        \t\t\t* test error2
-        \t\t\t* test error3
-        \t
-        \t
-        \t* child2
-        \t\t* test error1
-
-
-        """)
+        expected_text = EXPECTED_TEXT_TEMPLATE.format(footer="")
         # Act
         actual = nested_status_info.to_string()
         # Assert
@@ -95,13 +87,10 @@ class TestNestedStatusInfo:
 
     def test_to_string_with_footer(self, nested_status_info):
         # Arrange
-        expected_text = dedent("""\
-        \t* test error1
-        \t\t* test error2
-        footer
-        """)
+        footer_text = "footer"
+        expected_text = EXPECTED_TEXT_TEMPLATE + "\n\t" + footer_text
         # Act
-        nested_status_info.set_footer_text("footer")
+        nested_status_info.set_footer_text(footer_text)
         actual = nested_status_info.to_string()
         # Assert
         assert expected_text == actual
