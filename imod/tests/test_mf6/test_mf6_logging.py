@@ -63,12 +63,12 @@ def test_write_package_is_logged(drainage, tmp_path):
             is not None
         )
         assert (
-            "Beginning execution of imod.mf6.package.write for object Drainage..."
+            "Beginning execution of imod.mf6.package._write for object Drainage..."
             in log
         )
         assert (
             re.search(
-                f"Finished execution of imod.mf6.package.write  for object Drainage in {simple_real_number_regexp} seconds...",
+                f"Finished execution of imod.mf6.package._write  for object Drainage in {simple_real_number_regexp} seconds...",
                 log,
             )
             is not None
@@ -106,11 +106,11 @@ def test_write_model_is_logged(
         log = log_file.read()
 
         assert (
-            "Beginning execution of imod.mf6.model.write for object GroundwaterTransportModel"
+            "Beginning execution of imod.mf6.model._write for object GroundwaterTransportModel"
             in log
         )
         assert (
-            "Finished execution of imod.mf6.model.write  for object GroundwaterTransportModel"
+            "Finished execution of imod.mf6.model._write  for object GroundwaterTransportModel"
             in log
         )
 
