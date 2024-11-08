@@ -66,6 +66,9 @@ Changed
 - :func:`imod.prepare.fill` now takes a ``dims`` argument instead of ``by``,
   and will fill over N dimensions. Secondly, the function no longer takes
   an ``invalid`` argument, but instead always treats NaNs as missing.
+- Reverted the need for providing WriteContext objects to MODFLOW6 Model and
+  Package objects' ``write`` method. These now use similar arguments to the
+  :meth:`imod.mf6.Modflow6Simulation.write` method.
 
 
 Added
