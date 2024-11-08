@@ -75,14 +75,6 @@ class DisBottomSchema(NoDataComparisonSchema):
                 raise ValidationError("inactive bottom above active cell")
 
 
-def validation_pkg_error_message(pkg_errors):
-    messages = []
-    for var, var_errors in pkg_errors.items():
-        messages.append(f"* {var}")
-        messages.extend(f"\t- {error}" for error in var_errors)
-    return "\n" + "\n".join(messages)
-
-
 def pkg_errors_to_status_info(
     pkg_name: str,
     pkg_errors: dict[str, list[ValidationError]],

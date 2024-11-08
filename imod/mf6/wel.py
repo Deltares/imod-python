@@ -30,7 +30,7 @@ from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
 from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.utilities.grid import broadcast_to_full_domain
-from imod.mf6.validation import validation_pkg_error_message
+from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.validation_context import ValidationContext
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
@@ -446,7 +446,9 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         if validation_context.validate:
             errors = self._validate(self._write_schemata)
             if len(errors) > 0:
-                message = validation_pkg_error_message(errors)
+                message = pkg_errors_to_status_info(
+                    self._pkg_id, errors, suggest_cleanup=True
+                )
                 raise ValidationError(message)
 
         wells_df = self._create_wells_df()
