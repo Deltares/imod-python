@@ -305,7 +305,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 top, bottom, idomain = self.__get_domain_geometry()
                 k = self.__get_k()
                 mf6_hfb_pkg = merge_hfb_packages(mf6_hfb_ls, idomain, top, bottom, k)
-                mf6_hfb_pkg.write(
+                mf6_hfb_pkg._write(
                     pkgname=pkg_name,
                     globaltimes=globaltimes,
                     write_context=pkg_write_context,

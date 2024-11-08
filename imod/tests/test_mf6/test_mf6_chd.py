@@ -189,7 +189,7 @@ def test_write_concentration_period_data(head_fc, concentration_fc):
     )
     with tempfile.TemporaryDirectory() as output_dir:
         write_context = WriteContext(simulation_directory=output_dir)
-        chd.write("chd", globaltimes, write_context)
+        chd._write("chd", globaltimes, write_context)
         with open(output_dir + "/chd/chd-0.dat", "r") as f:
             data = f.read()
             assert (
@@ -216,7 +216,7 @@ def test_from_imod5(imod5_dataset, tmp_path):
 
     # write the packages for write validation
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=False)
-    chd3.write("chd3", [1], write_context)
+    chd3._write("chd3", [1], write_context)
 
 
 @pytest.mark.usefixtures("imod5_dataset")
@@ -235,7 +235,7 @@ def test_from_imod5_shd(imod5_dataset, tmp_path):
     assert len(chd_shd.dataset["layer"].values) == 37
     # write the packages for write validation
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=False)
-    chd_shd.write("chd_shd", [1], write_context)
+    chd_shd._write("chd_shd", [1], write_context)
 
 
 @pytest.mark.unittest_jit
@@ -281,4 +281,4 @@ def test_concatenate_chd(imod5_dataset, tmp_path, remove_merged_packages):
         assert len(chd_packages) == 14
     # write the packages for write validation
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=False)
-    merged_package.write("merged_chd", [1], write_context)
+    merged_package._write("merged_chd", [1], write_context)

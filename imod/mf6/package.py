@@ -261,7 +261,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         return layered, values
 
     @standard_log_decorator()
-    def write(
+    def _write(
         self,
         pkgname: str,
         globaltimes: Union[list[np.datetime64], np.ndarray],

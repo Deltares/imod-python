@@ -308,11 +308,11 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                     ims_write_context = write_context.copy_with_new_write_directory(
                         write_context.simulation_directory
                     )
-                    value.write(key, globaltimes, ims_write_context)
+                    value._write(key, globaltimes, ims_write_context)
             elif isinstance(value, list):
                 for exchange in value:
                     if isinstance(exchange, imod.mf6.exchangebase.ExchangeBase):
-                        exchange.write(
+                        exchange._write(
                             exchange.package_name(), globaltimes, write_context
                         )
 

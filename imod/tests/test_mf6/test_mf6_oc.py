@@ -282,7 +282,7 @@ def test_oc_write(tmp_path):
         directory = tmp_path / "input/gwf"
         directory.mkdir(exist_ok=True, parents=True)
         write_context = WriteContext(simulation_directory=directory)
-        oc.write("outputcontrol", globaltimes, write_context)
+        oc._write("outputcontrol", globaltimes, write_context)
 
         assert (directory / "outputcontrol.oc").is_file()
         assert (tmp_path / "output").exists()

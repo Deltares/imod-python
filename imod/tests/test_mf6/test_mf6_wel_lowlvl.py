@@ -94,7 +94,7 @@ def test_mf6wel_write__stationary(
     write_context = WriteContext(directory, use_binary=True)
 
     # Act
-    mf6wel.write(pkgname, globaltimes, write_context)
+    mf6wel._write(pkgname, globaltimes, write_context)
 
     # Assert
     assert len(list(directory.glob("**/*"))) == 3
@@ -116,7 +116,7 @@ def test_mf6wel_write__transient(
     directory.mkdir(exist_ok=True)
     write_context = WriteContext(directory, use_binary=True)
     # Act
-    mf6wel.write(pkgname, globaltimes, write_context)
+    mf6wel._write(pkgname, globaltimes, write_context)
 
     # Assert
     assert len(list(directory.glob("**/*"))) == 7

@@ -32,7 +32,7 @@ def test_from_imod5_non_planar(imod5_dataset_periods, tmp_path):
 
     # write the packages for write validation
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=False)
-    ghb.write("ghb", [1], write_context)
+    ghb._write("ghb", [1], write_context)
 
 
 def test_from_imod5_planar(imod5_dataset_periods, tmp_path):
@@ -63,4 +63,4 @@ def test_from_imod5_planar(imod5_dataset_periods, tmp_path):
 
     # write the packages for write validation
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=False)
-    ghb.write("ghb", [1], write_context)
+    ghb._write("ghb", [1], write_context)

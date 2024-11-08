@@ -275,7 +275,7 @@ class BoundaryCondition(Package, abc.ABC):
             path = directory / pkgname / f"{self._pkg_id}.{ext}"
             self._write_datafile(path, bin_ds, binary=binary)
 
-    def write(
+    def _write(
         self,
         pkgname: str,
         globaltimes: Union[list[np.datetime64], np.ndarray],
@@ -287,7 +287,7 @@ class BoundaryCondition(Package, abc.ABC):
         directory is modelname
         """
 
-        super().write(pkgname, globaltimes, write_context)
+        super()._write(pkgname, globaltimes, write_context)
         directory = write_context.write_directory
 
         self._write_perioddata(
@@ -347,7 +347,7 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
         package_data = self._package_data_to_sparse()
         self._write_file(outpath, package_data)
 
-    def write(
+    def _write(
         self,
         pkgname: str,
         globaltimes: Union[list[np.datetime64], np.ndarray],
@@ -357,7 +357,7 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
         boundary_condition_write_context.use_binary = False
 
         self.fill_stress_perioddata()
-        super().write(pkgname, globaltimes, boundary_condition_write_context)
+        super()._write(pkgname, globaltimes, boundary_condition_write_context)
 
         directory = boundary_condition_write_context.write_directory
         self.write_packagedata(directory, pkgname, binary=False)

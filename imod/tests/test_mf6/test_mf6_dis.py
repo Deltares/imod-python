@@ -183,7 +183,7 @@ def test_write_ascii_griddata_2d_3d(idomain_and_bottom, tmp_path):
     directory.mkdir()
     write_context = WriteContext(simulation_directory=directory)
 
-    dis.write(pkgname="dis", globaltimes=[], write_context=write_context)
+    dis._write(pkgname="dis", globaltimes=[], write_context=write_context)
 
     with open(directory / "dis/top.dat") as f:
         top_content = f.readlines()
@@ -235,7 +235,7 @@ def test_from_imod5_data__write(imod5_dataset, tmp_path):
     dis = imod.mf6.StructuredDiscretization.from_imod5_data(imod5_data)
 
     # Test if package written without ValidationError
-    dis.write(pkgname="dis", globaltimes=[], write_context=write_context)
+    dis._write(pkgname="dis", globaltimes=[], write_context=write_context)
 
     # Assert if files written
     assert (directory / "dis/top.dat").exists()

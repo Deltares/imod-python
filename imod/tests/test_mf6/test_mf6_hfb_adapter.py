@@ -115,7 +115,7 @@ def test_hfb_writing_one_layer(barrier, tmp_path):
     ).T
 
     # Act
-    hfb.write("hfb", None, write_context)
+    hfb._write("hfb", None, write_context)
 
     # Assert
     hfb_bin_path = tmp_path / "hfb" / "hfb.bin"

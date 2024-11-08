@@ -121,7 +121,7 @@ def test_uzf_writes_full_paths_if_requested(uzf_test_data, tmp_path):
             pkgdir_separator_count = 2
 
         write_context = WriteContext(tmp_path, False, path_setting)
-        uzf.write("uzf", global_times, write_context)
+        uzf._write("uzf", global_times, write_context)
 
         with open(tmp_path / "uzf.uzf", "r") as f:
             content = f.read()

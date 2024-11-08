@@ -118,7 +118,7 @@ class TimeDiscretization(Package):
                 f"Got {da.dims}. Can be at max ('time', )."
             )
 
-    def write(self, pkgname, globaltimes, write_context):
+    def _write(self, pkgname, globaltimes, write_context):
         timedis_content = self.render(
             write_context.write_directory,
             pkgname,

@@ -49,7 +49,7 @@ def test_write_package_is_logged(drainage, tmp_path):
         )
         drn = imod.mf6.Drainage(**drainage)
         write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
-        drn.write("mydrn", [1], write_context)
+        drn._write("mydrn", [1], write_context)
 
     # assert
     with open(logfile_path, "r") as log_file:
