@@ -78,7 +78,7 @@ def test_simple_model(fixed_format_parser):
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        scaling_factors.write(output_dir, index, svat)
+        scaling_factors.write(output_dir, index, svat, None, None)
 
         results = fixed_format_parser(
             output_dir / ScalingFactors._file_name, ScalingFactors._metadata_dict

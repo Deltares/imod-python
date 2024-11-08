@@ -19,9 +19,13 @@ from jinja2 import Template
 
 import imod
 from imod.logging import standard_log_decorator
+from imod.mf6.drn import Drainage
+from imod.mf6.ghb import GeneralHeadBoundary
 from imod.mf6.hfb import HorizontalFlowBarrierBase
 from imod.mf6.interfaces.imodel import IModel
+from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
+from imod.mf6.riv import River
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.utilities.mask import _mask_all_packages
 from imod.mf6.utilities.mf6hfb import merge_hfb_packages
@@ -35,6 +39,14 @@ from imod.typing import GridDataArray
 from imod.typing.grid import is_spatial_grid
 
 HFB_PKGNAME = "hfb_merged"
+SUGGESTION_TEXT = (
+    "-> You might fix this by calling the package's ``.cleanup()`` method."
+)
+PKGTYPES_WITH_CLEANUP = [River, Drainage, GeneralHeadBoundary, GridAgnosticWell]
+
+
+def pkg_has_cleanup(pkg: Package):
+    return any(isinstance(pkg, pkgtype) for pkgtype in PKGTYPES_WITH_CLEANUP)
 
 
 class Modflow6Model(collections.UserDict, IModel, abc.ABC):
@@ -175,7 +187,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
         self._check_for_required_packages(modelkey)
 
-    def __get_domain_geometry(
+    def _get_domain_geometry(
         self,
     ) -> tuple[
         Union[xr.DataArray, xu.UgridDataArray],
@@ -190,14 +202,15 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         idomain = discretization["idomain"]
         return top, bottom, idomain
 
-    def __get_k(self):
-        try:
-            npf = self[imod.mf6.NodePropertyFlow._pkg_id]
-        except RuntimeError:
-            raise ValidationError("expected one package of type ModePropertyFlow")
-
-        k = npf["k"]
-        return k
+    def _get_k(self):
+        npf_key = self._get_pkgkey(imod.mf6.NodePropertyFlow._pkg_id)
+        if not npf_key:
+            raise KeyError(
+                """Unable to obtain the hydraulic conductivity. Make sure a
+                NodePropertyFlow package is assigned to the Modflow6Model."""
+            )
+        npf = self[npf_key]
+        return npf["k"]
 
     @standard_log_decorator()
     def validate(self, model_name: str = "") -> StatusInfoBase:
@@ -235,10 +248,68 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 bottom=bottom,
             )
             if len(pkg_errors) > 0:
-                model_status_info.add(pkg_errors_to_status_info(pkg_name, pkg_errors))
+                footer = SUGGESTION_TEXT if pkg_has_cleanup(pkg) else None
+                model_status_info.add(
+                    pkg_errors_to_status_info(pkg_name, pkg_errors, footer)
+                )
 
         return model_status_info
 
+    def prepare_wel_for_mf6(
+        self, pkgname: str, validate: bool = True, strict_well_validation: bool = True
+    ) -> Mf6Wel:
+        """
+        Prepare grid-agnostic well for MODFLOW6, using the models grid
+        information and hydraulic conductivities. Allocates LayeredWell & Well
+        objects, which have x,y locations, to row & columns. Furthermore, Well
+        objects are allocated to model layers, depending on screen depth.
+
+        This function is called upon writing the model, it is included in the
+        public API for the user's debugging purposes.
+
+        Parameters
+        ----------
+        pkgname: string
+            Name of well package that is to be prepared for MODFLOW6
+        validate: bool, default True
+            Run validation before converting
+        strict_well_validation: bool, default True
+            Set well validation strict:
+            Throw error if well is removed entirely during its assignment to
+            layers.
+
+        Returns
+        -------
+        Mf6Wel
+            Direct representation of MODFLOW6 WEL package, with 'cellid'
+            indicating layer, row columns.
+        """
+        validate_context = ValidationContext(
+            validate=validate, strict_well_validation=strict_well_validation
+        )
+        return self._prepare_wel_for_mf6(pkgname, validate_context)
+
+    @standard_log_decorator()
+    def _prepare_wel_for_mf6(
+        self, pkgname: str, validate_context: ValidationContext
+    ) -> Mf6Wel:
+        pkg = self[pkgname]
+        if not isinstance(pkg, GridAgnosticWell):
+            raise TypeError(
+                f"""Package '{pkgname}' not of appropriate type, should be of type:
+                 'Well', 'LayeredWell', got {type(pkg)}"""
+            )
+        top, bottom, idomain = self._get_domain_geometry()
+        k = self._get_k()
+        return pkg._to_mf6_pkg(
+            idomain,
+            top,
+            bottom,
+            k,
+            validate_context,
+        )
+
+    @standard_log_decorator()
     def write(
         self,
         modelname: str,
@@ -318,15 +389,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         for pkg_name, pkg in self.items():
             try:
                 if issubclass(type(pkg), GridAgnosticWell):
-                    top, bottom, idomain = self.__get_domain_geometry()
-                    k = self.__get_k()
-                    mf6_well_pkg = pkg._to_mf6_pkg(
-                        idomain,
-                        top,
-                        bottom,
-                        k,
-                        validate_context,
-                    )
+                    mf6_well_pkg = self._prepare_wel_for_mf6(pkg_name, validate_context)
                     mf6_well_pkg.write(
                         pkgname=pkg_name,
                         globaltimes=globaltimes,
@@ -346,8 +409,8 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         if len(mf6_hfb_ls) > 0:
             try:
                 pkg_name = HFB_PKGNAME
-                top, bottom, idomain = self.__get_domain_geometry()
-                k = self.__get_k()
+                top, bottom, idomain = self._get_domain_geometry()
+                k = self._get_k()
                 mf6_hfb_pkg = merge_hfb_packages(mf6_hfb_ls, idomain, top, bottom, k)
                 mf6_hfb_pkg._write(
                     pkgname=pkg_name,
@@ -550,7 +613,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         clipped : Modflow6Model
         """
 
-        top, bottom, idomain = self.__get_domain_geometry()
+        top, bottom, _ = self._get_domain_geometry()
 
         clipped = type(self)(**self._options)
         for key, pkg in self.items():

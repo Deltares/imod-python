@@ -1,19 +1,24 @@
 import abc
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any, Optional, TextIO, TypeAlias, Union
 
 import numpy as np
 import pandas as pd
 import xarray as xr
 
+from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.utilities.regrid import (
     RegridderWeightsCache,
     _regrid_like,
 )
 from imod.msw.fixed_format import format_fixed_width
+from imod.typing import IntArray
 from imod.typing.grid import GridDataArray, GridDataset
 from imod.util.regrid_method_type import EmptyRegridMethod, RegridMethodType
+
+DataDictType: TypeAlias = dict[str, IntArray | int | str]
 
 
 class MetaSwapPackage(abc.ABC):
@@ -27,6 +32,10 @@ class MetaSwapPackage(abc.ABC):
     __slots__ = "_pkg_id"
     _file_name = "filename_not_set"
     _regrid_method: RegridMethodType = EmptyRegridMethod()
+    _with_subunit: tuple = ()
+    _without_subunit: tuple = ()
+    _to_fill: tuple = ()
+    _metadata_dict: dict = {}
 
     def __init__(self):
         self.dataset = xr.Dataset()
@@ -72,16 +81,37 @@ class MetaSwapPackage(abc.ABC):
             f"{__class__.__name__}(**{self._pkg_id}.dataset.sel(**selection))"
         )
 
-    def write(self, directory: Union[str, Path], index: np.ndarray, svat: xr.DataArray):
+    def write(
+        self,
+        directory: Union[str, Path],
+        index: IntArray,
+        svat: xr.DataArray,
+        mf6_dis: StructuredDiscretization,
+        mf6_well: Mf6Wel,
+    ):
         """
         Write MetaSWAP package to its corresponding fixed format file. This has
         the `.inp` extension.
+
+        Parameters
+        ----------
+        directory: string and Path
+            Directory to write package in.
+        index: numpy array of integers
+            Array of integers with indices.
+        svat: xr.DataArray
+            Grid with svats, has dimensions "subunit, y, x".
+        mf6_dis: StructuredDiscretization (optional)
+            Modflow 6 structured discretization.
+        mf6_well: Mf6Wel (optional)
+            If given, this parameter describes sprinkling of SVAT units from MODFLOW
+            cells.
         """
         directory = Path(directory)
 
         filename = directory / self._file_name
         with open(filename, "w") as f:
-            self._render(f, index, svat)
+            self._render(f, index, svat, mf6_dis, mf6_well)
 
     def _check_range(self, dataframe):
         """
@@ -106,19 +136,26 @@ class MetaSwapPackage(abc.ABC):
                 file.write(content)
             file.write("\n")
 
-    def _index_da(self, da, index):
+    def _index_da(self, da: xr.DataArray, index: IntArray) -> np.ndarray:
         """
         Helper method that converts a DataArray to a 1d numpy array, and
         consequently applies boolean indexing.
         """
         return da.values.ravel()[index]
 
-    def _render(self, file, index, svat):
+    def _render(
+        self,
+        file: TextIO,
+        index: IntArray,
+        svat: xr.DataArray,
+        mf6_dis: StructuredDiscretization,
+        mf6_well: Mf6Wel,
+    ) -> None:
         """
         Collect to be written data in a DataFrame and call
         ``self.write_dataframe_fixed_width``
         """
-        data_dict = {"svat": svat.values.ravel()[index]}
+        data_dict: DataDictType = {"svat": svat.values.ravel()[index]}
 
         subunit = svat.coords["subunit"]
 

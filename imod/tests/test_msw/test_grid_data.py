@@ -65,7 +65,7 @@ def test_write(
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        grid_data.write(output_dir, index, svat)
+        grid_data.write(output_dir, index, svat, None, None)
 
         results = fixed_format_parser(
             output_dir / GridData._file_name, GridData._metadata_dict
@@ -336,7 +336,7 @@ def test_simple_model(fixed_format_parser):
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        grid_data.write(output_dir, index, svat)
+        grid_data.write(output_dir, index, svat, None, None)
 
         results = fixed_format_parser(
             output_dir / GridData._file_name, GridData._metadata_dict
@@ -446,7 +446,7 @@ def test_simple_model_1_subunit(fixed_format_parser):
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        grid_data.write(output_dir, index, svat)
+        grid_data.write(output_dir, index, svat, None, None)
 
         results = fixed_format_parser(
             output_dir / GridData._file_name, GridData._metadata_dict

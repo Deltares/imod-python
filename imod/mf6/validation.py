@@ -2,7 +2,7 @@
 This module contains specific validation utilities for Modflow 6.
 """
 
-from typing import cast
+from typing import Optional, cast
 
 import numpy as np
 
@@ -80,7 +80,9 @@ def validation_pkg_error_message(pkg_errors):
 
 
 def pkg_errors_to_status_info(
-    pkg_name: str, pkg_errors: dict[str, list[ValidationError]]
+    pkg_name: str,
+    pkg_errors: dict[str, list[ValidationError]],
+    footer_text: Optional[str],
 ) -> StatusInfoBase:
     pkg_status_info = NestedStatusInfo(f"{pkg_name} package")
     for var_name, var_errors in pkg_errors.items():
@@ -88,5 +90,5 @@ def pkg_errors_to_status_info(
         for var_error in var_errors:
             var_status_info.add_error(str(var_error))
         pkg_status_info.add(var_status_info)
-
+    pkg_status_info.set_footer_text(footer_text)
     return pkg_status_info

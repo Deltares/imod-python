@@ -31,6 +31,11 @@ Fixed
 - `imod.prj.open_projectfile_data` is now able to also read IPF data for
   sprinkling wells in the CAP package.
 - Fix that caused iMOD Python to break upon import with numpy >=1.23, <2.0 .
+- ValidationError message now contains a suggestion to use the cleanup method,
+  if available in the erroneous package.
+- Bug where error was thrown when :class:`imod.mf6.NodePropertyFlow` was
+  assigned to :class:`imod.mf6.GroundwaterFlowModel` with key different from
+  ``"npf"`` upon writing, along with well or horizontal flow barrier packages.
 
 
 Changed
@@ -69,6 +74,15 @@ Changed
 - Reverted the need for providing WriteContext objects to MODFLOW6 Model and
   Package objects' ``write`` method. These now use similar arguments to the
   :meth:`imod.mf6.Modflow6Simulation.write` method.
+- :class:`imod.msw.CouplingMapping`, :class:`imod.msw.Sprinkling`,
+  `imod.msw.Sprinkling.MetaSwapModel`, now take the
+  :class:`imod.mf6.mf6_wel_adapter.Mf6Wel` and the
+  :class:`imod.mf6.StructuredDiscretization` packages as arguments at their
+  respective ``write`` method, instead of upon initializing these MetaSWAP
+  objects.
+- :class:`imod.msw.CouplingMapping` and :class:`imod.msw.Sprinkling` now take
+  the :class:`imod.mf6.mf6_wel_adapter.Mf6Wel` as well argument instead of the
+  deprecated :class:`imod.mf6.WellDisStructured`.
 
 
 Added
@@ -99,7 +113,9 @@ Added
 - The context :func:`imod.util.context.print_if_error` to print an error instead
   of raising it in a ``with`` statement. This is useful for code snippets which
   definitely will fail.
-
+- :meth:`imod.msw.MetaSwapModel.regrid_like` to regrid MetaSWAP models.
+- :meth:`imod.mf6.GroundwaterFlowModel.prepare_wel_for_mf6` to prepare wells for
+  MODFLOW6, for debugging purposes.
 
 Removed
 ~~~~~~~
