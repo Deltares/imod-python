@@ -273,7 +273,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             write. If True, erronous model input will throw a
             ``ValidationError``.
         """
-        write_context = WriteContext(directory, use_binary, use_absolute_paths)
+        write_context = WriteContext(Path(directory), use_binary, use_absolute_paths)
         validate_context = ValidationContext(validate, validate)
 
         status_info = self._write(
