@@ -1,5 +1,6 @@
 import pathlib
 import shutil
+from typing import Any, TextIO
 
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.msw.fixed_format import VariableMetaData
@@ -23,7 +24,7 @@ class InitialConditionsEquilibrium(MetaSwapPackage, IRegridPackage):
     def __init__(self):
         super().__init__()
 
-    def _render(self, file, *args):
+    def _render(self, file: TextIO, *args: Any):
         file.write(self._option + "\n")
 
 
@@ -50,7 +51,7 @@ class InitialConditionsRootzonePressureHead(MetaSwapPackage, IRegridPackage):
         super().__init__()
         self.dataset["initial_pF"] = initial_pF
 
-    def _render(self, file, *args):
+    def _render(self, file: TextIO, *args: Any):
         file.write(self._option + "\n")
 
         dataframe = self.dataset.assign_coords(index=[0]).to_dataframe()
@@ -78,7 +79,7 @@ class InitialConditionsPercolation(MetaSwapPackage, IRegridPackage):
     def __init__(self):
         super().__init__()
 
-    def _render(self, file, *args):
+    def _render(self, file: TextIO, *args: Any):
         file.write(self._option + "\n")
 
 

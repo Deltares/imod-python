@@ -119,7 +119,7 @@ def test_write(
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        infiltration.write(output_dir, index, svat)
+        infiltration.write(output_dir, index, svat, None, None)
 
         results = fixed_format_parser(
             output_dir / Infiltration._file_name, Infiltration._metadata_dict
@@ -186,7 +186,7 @@ def test_simple_model(fixed_format_parser):
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        infiltration.write(output_dir, index, svat)
+        infiltration.write(output_dir, index, svat, None, None)
 
         results = fixed_format_parser(
             output_dir / Infiltration._file_name, Infiltration._metadata_dict

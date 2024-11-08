@@ -6,6 +6,8 @@ import xarray as xr
 from numpy.testing import assert_equal
 
 from imod import mf6, msw
+from imod.mf6.mf6_wel_adapter import Mf6Wel
+from imod.mf6.wel import derive_cellid_from_points
 
 
 def test_simple_model_with_sprinkling(fixed_format_parser):
@@ -35,15 +37,11 @@ def test_simple_model_with_sprinkling(fixed_format_parser):
 
     # Well
     well_layer = [3, 2, 1]
-    well_row = [1, 2, 3]
-    well_column = [2, 2, 2]
+    well_y = y
+    well_x = [2.0, 2.0, 2.0]
     well_rate = [-5.0] * 3
-    well = mf6.WellDisStructured(
-        layer=well_layer,
-        row=well_row,
-        column=well_column,
-        rate=well_rate,
-    )
+    cellids = derive_cellid_from_points(svat, well_x, well_y, well_layer)
+    well = Mf6Wel(cellids, well_rate)
 
     like = xr.full_like(svat.sel(subunit=1, drop=True), 1.0, dtype=float).expand_dims(
         layer=[1, 2, 3]
@@ -55,11 +53,11 @@ def test_simple_model_with_sprinkling(fixed_format_parser):
         idomain=xr.full_like(like, 1, dtype=np.int32),
     )
 
-    coupler_mapping = msw.CouplerMapping(dis, well)
+    coupler_mapping = msw.CouplerMapping()
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        coupler_mapping.write(output_dir, index, svat)
+        coupler_mapping.write(output_dir, index, svat, dis, well)
 
         results = fixed_format_parser(
             output_dir / msw.CouplerMapping._file_name,
@@ -94,15 +92,11 @@ def test_simple_model_with_sprinkling_1_subunit(fixed_format_parser):
 
     # Well
     well_layer = [3, 2]
-    well_row = [1, 3]
-    well_column = [2, 2]
+    well_y = [3.0, 1.0]
+    well_x = [2.0, 2.0]
     well_rate = [-5.0] * 2
-    well = mf6.WellDisStructured(
-        layer=well_layer,
-        row=well_row,
-        column=well_column,
-        rate=well_rate,
-    )
+    cellids = derive_cellid_from_points(svat, well_x, well_y, well_layer)
+    well = Mf6Wel(cellids, well_rate)
 
     like = xr.full_like(svat.sel(subunit=0, drop=True), 1.0, dtype=float).expand_dims(
         layer=[1, 2, 3]
@@ -114,11 +108,11 @@ def test_simple_model_with_sprinkling_1_subunit(fixed_format_parser):
         idomain=xr.full_like(like, 1, dtype=np.int32),
     )
 
-    coupler_mapping = msw.CouplerMapping(dis, well)
+    coupler_mapping = msw.CouplerMapping()
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        coupler_mapping.write(output_dir, index, svat)
+        coupler_mapping.write(output_dir, index, svat, dis, well)
 
         results = fixed_format_parser(
             output_dir / msw.CouplerMapping._file_name,
@@ -165,11 +159,11 @@ def test_simple_model_without_sprinkling(fixed_format_parser):
         idomain=xr.full_like(like, 1, dtype=np.int32),
     )
 
-    coupler_mapping = msw.CouplerMapping(dis)
+    coupler_mapping = msw.CouplerMapping()
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        coupler_mapping.write(output_dir, index, svat)
+        coupler_mapping.write(output_dir, index, svat, dis, None)
 
         results = fixed_format_parser(
             output_dir / msw.CouplerMapping._file_name,

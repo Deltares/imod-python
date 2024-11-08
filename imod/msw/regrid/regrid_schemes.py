@@ -9,6 +9,35 @@ from imod.util.regrid_method_type import (
 
 
 @dataclass(config=_CONFIG)
+class SprinklingRegridMethod(RegridMethodType):
+    """
+    Object containing regridder methods for the
+    :class:`imod.msw.Sprinkling` package. This can be provided to the
+    ``regrid_like`` method to regrid with custom settings.
+
+    Parameters
+    ----------
+    max_abstraction_groundwater: tuple, default (RegridderType.OVERLAP, "mean")
+    max_abstraction_surfacewater: tuple, default (RegridderType.OVERLAP, "mean")
+
+    Examples
+    --------
+    Regrid with custom settings:
+
+    >>> regrid_method = SprinklingRegridMethod(max_abstraction_groundwater=(RegridderType.BARYCENTRIC,))
+    >>> sprinking.regrid_like(target_grid, RegridderWeightsCache(), regrid_method)
+
+    The RegridderType.OVERLAP and RegridderType.RELATIVEOVERLAP require an extra
+    method as string.
+
+    >>> regrid_method = SprinklingRegridMethod(max_abstraction_groundwater=(RegridderType.OVERLAP, "max",))
+    """
+
+    max_abstraction_groundwater: _RegridVarType = (RegridderType.OVERLAP, "mean")
+    max_abstraction_surfacewater: _RegridVarType = (RegridderType.OVERLAP, "mean")
+
+
+@dataclass(config=_CONFIG)
 class MeteoGridRegridMethod(RegridMethodType):
     """
     Object containing regridder methods for the
