@@ -243,14 +243,14 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         ----------
         directory: str, pathlib.Path
             Directory to write Modflow 6 simulation to.
-        binary: ({True, False}, optional)
+        use_binary: ({True, False}, optional)
             Whether to write time-dependent input for stress packages as binary
             files, which are smaller in size, or more human-readable text files.
         validate: ({True, False}, optional)
             Whether to validate the Modflow6 simulation, including models, at
             write. If True, erronous model input will throw a
             ``ValidationError``.
-        absolute_paths: ({True, False}, optional)
+        use_absolute_paths: ({True, False}, optional)
             True if all paths written to the mf6 inputfiles should be absolute.
         """
         # create write context
@@ -280,7 +280,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         # Write time discretization file
         globaltimes = self["time_discretization"]["time"].values
-        self["time_discretization"].write(
+        self["time_discretization"]._write(
             pkgname="time_discretization",
             globaltimes=globaltimes,
             write_context=write_context,
@@ -296,7 +296,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             # skip timedis, exchanges
             if isinstance(value, Modflow6Model):
                 status_info.add(
-                    value.write(
+                    value._write(
                         modelname=key,
                         globaltimes=globaltimes,
                         write_context=model_write_context,
@@ -308,11 +308,11 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                     ims_write_context = write_context.copy_with_new_write_directory(
                         write_context.simulation_directory
                     )
-                    value.write(key, globaltimes, ims_write_context)
+                    value._write(key, globaltimes, ims_write_context)
             elif isinstance(value, list):
                 for exchange in value:
                     if isinstance(exchange, imod.mf6.exchangebase.ExchangeBase):
-                        exchange.write(
+                        exchange._write(
                             exchange.package_name(), globaltimes, write_context
                         )
 

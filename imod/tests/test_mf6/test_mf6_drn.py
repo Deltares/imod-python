@@ -102,7 +102,7 @@ def test_write(drainage, tmp_path):
 
     drn = imod.mf6.Drainage(**drainage)
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
-    drn.write("mydrn", [1], write_context)
+    drn._write("mydrn", [1], write_context)
 
     block_expected = textwrap.dedent(
         """\
@@ -523,4 +523,4 @@ def test_from_imod5(
 
     # write the packages for write validation
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=False)
-    drn_2.write("mydrn", [1], write_context)
+    drn_2._write("mydrn", [1], write_context)

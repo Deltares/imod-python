@@ -312,8 +312,53 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
     @standard_log_decorator()
     def write(
         self,
-        modelname,
-        globaltimes,
+        modelname: str,
+        globaltimes: Union[list[np.datetime64], np.ndarray],
+        directory: str | Path,
+        use_binary: bool = True,
+        use_absolute_paths: bool = False,
+        validate: bool = True,
+    ):
+        """
+        Write MODFLOW6 model to file. Note that this method is purely intended
+        for debugging purposes. It does not result in a functional model. For
+        that the model needs to be part of a
+        :class:`imod.mf6.Modflow6Simulation`, of which the ``write`` method
+        should be called.
+
+        Parameters
+        ----------
+        modelname: str
+            Model name
+        globaltimes: list[np.datetime64] | np.ndarray
+            Times of the simulation's stress periods.
+        directory: str | Path
+            Directory in which the simulation will be written.
+        use_binary: bool = True
+            Whether to write time-dependent input for stress packages as binary
+            files, which are smaller in size, or more human-readable text files.
+        use_absolute_paths: bool = False
+            True if all paths written to the mf6 inputfiles should be absolute.
+        validate: bool = True
+            Whether to validate the Modflow6 simulation, including models, at
+            write. If True, erronous model input will throw a
+            ``ValidationError``.
+        """
+        write_context = WriteContext(Path(directory), use_binary, use_absolute_paths)
+        validate_context = ValidationContext(validate, validate)
+
+        status_info = self._write(
+            modelname, globaltimes, write_context, validate_context
+        )
+
+        if status_info.has_errors():
+            raise ValidationError("\n" + status_info.to_string())
+
+    @standard_log_decorator()
+    def _write(
+        self,
+        modelname: str,
+        globaltimes: Union[list[np.datetime64], np.ndarray],
         write_context: WriteContext,
         validate_context: ValidationContext,
     ) -> StatusInfoBase:
@@ -345,7 +390,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             try:
                 if issubclass(type(pkg), GridAgnosticWell):
                     mf6_well_pkg = self._prepare_wel_for_mf6(pkg_name, validate_context)
-                    mf6_well_pkg.write(
+                    mf6_well_pkg._write(
                         pkgname=pkg_name,
                         globaltimes=globaltimes,
                         write_context=pkg_write_context,
@@ -353,7 +398,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 elif issubclass(type(pkg), imod.mf6.HorizontalFlowBarrierBase):
                     mf6_hfb_ls.append(pkg)
                 else:
-                    pkg.write(
+                    pkg._write(
                         pkgname=pkg_name,
                         globaltimes=globaltimes,
                         write_context=pkg_write_context,
@@ -367,7 +412,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 top, bottom, idomain = self._get_domain_geometry()
                 k = self._get_k()
                 mf6_hfb_pkg = merge_hfb_packages(mf6_hfb_ls, idomain, top, bottom, k)
-                mf6_hfb_pkg.write(
+                mf6_hfb_pkg._write(
                     pkgname=pkg_name,
                     globaltimes=globaltimes,
                     write_context=pkg_write_context,

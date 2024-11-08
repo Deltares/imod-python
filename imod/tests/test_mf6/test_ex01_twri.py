@@ -57,7 +57,7 @@ def test_dis_render(twri_model, tmp_path):
     assert actual == expected
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
 
-    dis.write(pkgname="dis", globaltimes=None, write_context=write_context)
+    dis._write(pkgname="dis", globaltimes=None, write_context=write_context)
     assert (tmp_path / "dis.dis").is_file()
     assert (tmp_path / "dis").is_dir()
     assert (tmp_path / "dis" / "idomain.bin").is_file()
@@ -94,7 +94,7 @@ def test_chd_render(twri_model, tmp_path):
     )
     assert actual == expected
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
-    chd.write(pkgname="chd", globaltimes=None, write_context=write_context)
+    chd._write(pkgname="chd", globaltimes=None, write_context=write_context)
     assert (tmp_path / "chd.chd").is_file()
     assert (tmp_path / "chd").is_dir()
     assert (tmp_path / "chd" / "chd.bin").is_file()
@@ -131,7 +131,7 @@ def test_drn_render(twri_model, tmp_path):
     )
     assert actual == expected
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
-    drn.write(pkgname="drn", globaltimes=None, write_context=write_context)
+    drn._write(pkgname="drn", globaltimes=None, write_context=write_context)
     assert (tmp_path / "drn.drn").is_file()
     assert (tmp_path / "drn").is_dir()
     assert (tmp_path / "drn" / "drn.bin").is_file()
@@ -160,7 +160,7 @@ def test_ic_render(twri_model, tmp_path):
     )
     assert actual == expected
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
-    ic.write(pkgname="ic", globaltimes=None, write_context=write_context)
+    ic._write(pkgname="ic", globaltimes=None, write_context=write_context)
     assert (tmp_path / "ic.ic").is_file()
 
 
@@ -197,7 +197,7 @@ def test_npf_render(twri_model, tmp_path):
     )
     assert actual == expected
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
-    npf.write(pkgname="npf", globaltimes=None, write_context=write_context)
+    npf._write(pkgname="npf", globaltimes=None, write_context=write_context)
     assert (tmp_path / "npf.npf").is_file()
 
 
@@ -275,7 +275,7 @@ def test_rch_render(twri_model, tmp_path):
     )
     assert actual == expected
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
-    rch.write(pkgname="rch", globaltimes=None, write_context=write_context)
+    rch._write(pkgname="rch", globaltimes=None, write_context=write_context)
     assert (tmp_path / "rch.rch").is_file()
     assert (tmp_path / "rch").is_dir()
     assert (tmp_path / "rch" / "rch.bin").is_file()
@@ -342,7 +342,7 @@ def test_solver_render(twri_model, tmp_path):
     )
     assert actual == expected
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
-    solver.write(pkgname="solver", globaltimes=None, write_context=write_context)
+    solver._write(pkgname="solver", globaltimes=None, write_context=write_context)
     assert (tmp_path / "solver.ims").is_file()
 
 
@@ -375,7 +375,7 @@ def test_gwfmodel_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    gwfmodel.write("GWF_1", globaltimes, write_context, validation_context)
+    gwfmodel._write("GWF_1", globaltimes, write_context, validation_context)
     assert (tmp_path / "GWF_1" / "GWF_1.nam").is_file()
     assert (tmp_path / "GWF_1").is_dir()
 

@@ -445,7 +445,7 @@ def test_write_concentration_period_data(concentration_fc):
     )
     with tempfile.TemporaryDirectory() as output_dir:
         write_context = WriteContext(simulation_directory=output_dir)
-        riv.write("riv", globaltimes, write_context)
+        riv._write("riv", globaltimes, write_context)
         with open(output_dir + "/riv/riv-0.dat", "r") as f:
             data = f.read()
             assert (
@@ -476,8 +476,8 @@ def test_import_river_from_imod5(imod5_dataset, tmp_path):
     )
 
     write_context = WriteContext(simulation_directory=tmp_path)
-    riv.write("riv", globaltimes, write_context)
-    drn.write("drn", globaltimes, write_context)
+    riv._write("riv", globaltimes, write_context)
+    drn._write("drn", globaltimes, write_context)
 
     errors = riv._validate(
         imod.mf6.River._write_schemata,

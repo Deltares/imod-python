@@ -301,7 +301,7 @@ def test_write_concentration_period_data(rate_fc, concentration_fc):
         write_context = WriteContext(
             simulation_directory=output_dir, write_directory=output_dir
         )
-        rch.write(pkgname="rch", globaltimes=globaltimes, write_context=write_context)
+        rch._write(pkgname="rch", globaltimes=globaltimes, write_context=write_context)
 
         with open(output_dir + "/rch/rch-0.dat", "r") as f:
             data = f.read()

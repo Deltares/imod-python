@@ -316,7 +316,7 @@ class TestModflow6Simulation:
 
         model_mock = MagicMock(spec_set=Modflow6Model)
         model_mock._model_id = "test_model_id"
-        model_mock.write.return_value = model_status_info
+        model_mock._write.return_value = model_status_info
 
         simulation["test_model"] = model_mock
 

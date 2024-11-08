@@ -183,7 +183,7 @@ class OutputControl(Package, IRegridPackage):
 
         return self._template.render(d)
 
-    def write(
+    def _write(
         self,
         pkgname: str,
         globaltimes: Union[list[np.datetime64], np.ndarray],
@@ -191,7 +191,7 @@ class OutputControl(Package, IRegridPackage):
     ):
         # We need to overload the write here to ensure the output directory is
         # created in advance for MODFLOW6.
-        super().write(pkgname, globaltimes, write_context)
+        super()._write(pkgname, globaltimes, write_context)
 
         for datavar in ("head_file", "concentration_file", "budget_file"):
             path = self.dataset[datavar].values[()]

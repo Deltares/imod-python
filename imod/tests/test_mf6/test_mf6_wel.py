@@ -903,7 +903,7 @@ def test_render__concentration_dis_structured_constant_time(well_test_data_stati
 
     with tempfile.TemporaryDirectory() as output_dir:
         write_context = WriteContext(simulation_directory=output_dir)
-        wel.write("wel", globaltimes, write_context)
+        wel._write("wel", globaltimes, write_context)
         with open(output_dir + "/wel/wel.dat", "r") as f:
             data = f.read()
             assert (
@@ -938,7 +938,7 @@ def test_render__concentration_dis_vertices_constant_time(well_test_data_station
 
     with tempfile.TemporaryDirectory() as output_dir:
         write_context = WriteContext(simulation_directory=output_dir)
-        wel.write("wel", globaltimes, write_context)
+        wel._write("wel", globaltimes, write_context)
         with open(output_dir + "/wel/wel.dat", "r") as f:
             data = f.read()
             assert (
@@ -974,7 +974,7 @@ def test_render__concentration_dis_vertices_transient(well_test_data_transient):
     with tempfile.TemporaryDirectory() as output_dir:
         write_context = WriteContext(simulation_directory=output_dir)
 
-        wel.write("wel", time, write_context)
+        wel._write("wel", time, write_context)
         with open(output_dir + "/wel/wel-0.dat", "r") as f:
             data = f.read()
             assert (
@@ -1016,7 +1016,7 @@ def test_import_and_convert_to_mf6(imod5_dataset, tmp_path, wel_class):
 
     # write the package for validation
     write_context = WriteContext(simulation_directory=tmp_path)
-    mf6_well.write("wel", [], write_context)
+    mf6_well._write("wel", [], write_context)
 
 
 @parametrize("wel_class", [Well])

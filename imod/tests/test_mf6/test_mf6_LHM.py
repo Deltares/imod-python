@@ -91,4 +91,4 @@ def test_mf6_LHM_write_HFB(tmp_path):
         out_dir.mkdir(parents=True, exist_ok=True)
         write_context = WriteContext(out_dir, use_binary=True, use_absolute_paths=False)
 
-        mf6_hfb.write("hfb", times, write_context)
+        mf6_hfb._write("hfb", times, write_context)

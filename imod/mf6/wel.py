@@ -352,7 +352,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             )
         )
 
-    def write(
+    def _write(
         self,
         pkgname: str,
         globaltimes: Union[list[np.datetime64], np.ndarray],
