@@ -10,7 +10,6 @@ datasets.
 
 # sphinx_gallery_thumbnail_number = -1
 
-
 # %%
 # We'll start with the usual imports
 import matplotlib.pyplot as plt
