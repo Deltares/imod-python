@@ -8,6 +8,8 @@ up data. We included some convenience methods to help clean up inconsistent
 datasets.
 """
 
+# sphinx_gallery_thumbnail_number = -1
+
 # %%
 # We'll start with the usual imports
 import numpy as np
@@ -169,9 +171,10 @@ cleaned_ds = gwf_model["new_riv"].dataset
 
 diff_stage = dirty_ds["stage"] - cleaned_ds["stage"]
 
-imod.visualize.plot_map(
+fig, ax = imod.visualize.plot_map(
     diff_stage.max(dim="layer"), "viridis", np.linspace(0, max_diff, 9)
 )
+ax.set_title("stage lowered by cleanup (m)")
 
 # %%
 #
@@ -182,9 +185,11 @@ imod.visualize.plot_map(
 
 diff_riv_bot = dirty_ds["bottom_elevation"] - cleaned_ds["bottom_elevation"]
 
-imod.visualize.plot_map(
+fig, ax = imod.visualize.plot_map(
     diff_riv_bot.max(dim="layer"), "viridis", np.linspace(0, max_diff, 9)
 )
+ax.set_title("river bottom lowered by cleanup (m)")
+
 # %%
 #
 # You can see the bottom elevation was lowered by the cleanup method.

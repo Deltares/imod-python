@@ -7,8 +7,8 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
 
-[Unreleased]
-------------
+[0.18.0]
+--------
 
 Fixed
 ~~~~~
