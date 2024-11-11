@@ -7,7 +7,7 @@ Furthermore we can also easily debug a failing build by running the container lo
 
 
 Dockerfile
-----------
+~~~~~~~~~~
 The dockerfile can be found at `.teamcity\\Dockerfile\\Dockerfile` and is displayed below as well.
 
 .. literalinclude:: ../../.teamcity/Dockerfile/Dockerfile

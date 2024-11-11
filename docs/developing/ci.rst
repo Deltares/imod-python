@@ -48,6 +48,9 @@ To pull the latest image use the command below:
 
 Sometimes you want to use an older version of the docker builder. To get an older version you can run the same command but use a different tag.
 To find out which tags are available and which is the latest you can have a look at the `artifacts page`_.
+The tag name corresponds with the pixi version inside the docker image e.g. :34.0 means that the image contains pixi v34.0.
+
+
 To pull a specific version run:
 
 .. code-block:: console
