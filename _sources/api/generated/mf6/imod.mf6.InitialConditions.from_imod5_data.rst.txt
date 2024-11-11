@@ -1,0 +1,6 @@
+﻿imod.mf6.InitialConditions.from\_imod5\_data
+============================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: InitialConditions.from_imod5_data

@@ -14,6 +14,7 @@
    .. autosummary::
    
       ~TimeDiscretization.__init__
+      ~TimeDiscretization.cleanup
       ~TimeDiscretization.clip_box
       ~TimeDiscretization.copy
       ~TimeDiscretization.from_file

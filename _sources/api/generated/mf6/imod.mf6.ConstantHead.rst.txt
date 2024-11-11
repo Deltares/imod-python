@@ -14,9 +14,12 @@
    .. autosummary::
    
       ~ConstantHead.__init__
+      ~ConstantHead.cleanup
       ~ConstantHead.clip_box
       ~ConstantHead.copy
       ~ConstantHead.from_file
+      ~ConstantHead.from_imod5_data
+      ~ConstantHead.from_imod5_shd_data
       ~ConstantHead.get_non_grid_data
       ~ConstantHead.get_period_varnames
       ~ConstantHead.get_regrid_methods

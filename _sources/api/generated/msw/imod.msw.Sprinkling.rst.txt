@@ -14,7 +14,11 @@
    .. autosummary::
    
       ~Sprinkling.__init__
+      ~Sprinkling.get_non_grid_data
+      ~Sprinkling.get_regrid_methods
+      ~Sprinkling.is_regridding_supported
       ~Sprinkling.isel
+      ~Sprinkling.regrid_like
       ~Sprinkling.sel
       ~Sprinkling.write
       ~Sprinkling.write_dataframe_fixed_width
@@ -22,5 +26,12 @@
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Sprinkling.auxiliary_data_fields
+      ~Sprinkling.dataset
    
    

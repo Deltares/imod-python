@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.formats.prj.prj &#8212; iMOD Python 0.17.2 documentation</title>
+    <title>imod.formats.prj.prj &#8212; iMOD Python 0.18.0 documentation</title>
   
   
   
@@ -15,17 +15,19 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
   </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-
-  
-  <link href="../../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+  <link href="../../../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css?v=d2d258e8" />
@@ -33,13 +35,14 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
+  <!-- So that users can add custom icons -->
+  <script src="../../../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="../../../../_static/documentation_options.js?v=9fbddafe"></script>
-    <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../_static/documentation_options.js?v=ba2e7b09"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/formats/prj/prj';</script>
     <script src="../../../../_static/deltares.js?v=8d5578be"></script>
@@ -47,6 +50,7 @@
     <link rel="search" title="Search" href="../../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.18.0.dev" />
   </head>
   
   
@@ -62,19 +66,8 @@
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../../../../search.html"
       method="get">
@@ -82,7 +75,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search the docs ..."
          aria-label="Search the docs ..."
          autocomplete="off"
@@ -90,8 +82,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -122,8 +114,8 @@
     
     
     
-    <img src="../../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 0.17.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark" alt="iMOD Python 0.17.2 documentation - Home"/>`);</script>
+    <img src="../../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 0.18.0 documentation - Home"/>
+    <img src="../../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 0.18.0 documentation - Home"/>
   
   
 </a></div>
@@ -179,7 +171,7 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../../../developing.html">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../developing/index.html">
     Developing
   </a>
 </li>
@@ -198,29 +190,21 @@
         <div class="navbar-item navbar-persistent--container">
           
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
       
       
         <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
       
         <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
@@ -257,15 +241,11 @@ document.write(`
   
     <div class="navbar-persistent--mobile">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
     </div>
   
 
@@ -282,7 +262,8 @@ document.write(`
       
         
       
-      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
   
@@ -333,7 +314,7 @@ document.write(`
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../developing.html">
+  <a class="nav-link nav-internal" href="../../../../developing/index.html">
     Developing
   </a>
 </li>
@@ -350,15 +331,11 @@ document.write(`
         
           <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
         
           <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
@@ -414,8 +391,6 @@ document.write(`
       
         <div class="header-article-item">
 
-
-
 <nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
@@ -427,7 +402,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Module code</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">imod.formats.prj.prj</li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">imod.formats.prj.prj</span></li>
   </ul>
 </nav>
 </div>
@@ -450,18 +425,23 @@ document.write(`
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">shlex</span>
+<span class="kn">import</span> <span class="nn">textwrap</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">asdict</span><span class="p">,</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">field</span> <span class="k">as</span> <span class="n">data_field</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
 <span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">PathLike</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
 
 <span class="kn">import</span> <span class="nn">imod</span>
+<span class="kn">import</span> <span class="nn">imod.logging</span>
+<span class="kn">from</span> <span class="nn">imod.logging.loglevel</span> <span class="kn">import</span> <span class="n">LogLevel</span>
 
 <span class="n">FilePath</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;PathLike[str]&quot;</span><span class="p">]</span>
 
@@ -526,7 +506,7 @@ document.write(`
     <span class="s2">&quot;meteo_station_number&quot;</span><span class="p">,</span>
     <span class="s2">&quot;surface_elevation&quot;</span><span class="p">,</span>
     <span class="s2">&quot;artificial_recharge&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;artifical_recharge_layer&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;artificial_recharge_layer&quot;</span><span class="p">,</span>
     <span class="s2">&quot;artificial_recharge_capacity&quot;</span><span class="p">,</span>
     <span class="s2">&quot;wetted_area&quot;</span><span class="p">,</span>
     <span class="s2">&quot;urban_area&quot;</span><span class="p">,</span>
@@ -966,7 +946,43 @@ document.write(`
         <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">. Error thrown while opening file: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_create_datarray_from_paths</span><span class="p">(</span><span class="n">paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">headers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]):</span>
+<span class="k">def</span> <span class="nf">_get_array_transformation_parameters</span><span class="p">(</span>
+    <span class="n">headers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span> <span class="o">|</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    In imod5 prj files one can add linear transformation parameters to transform</span>
+<span class="sd">    the data read from an idf file: we can specify a multiplication factor and a</span>
+<span class="sd">    constant that will be added to the values. The factor and addition</span>
+<span class="sd">    parameters can be can be scalar (if applied to 1 idf), or they can be</span>
+<span class="sd">    xr.DataArrays if the factor and addition are for example layer- or</span>
+<span class="sd">    time-dependent  (if both we apply the transformations one at a time)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    headers: List[Dict[str, Any]]</span>
+<span class="sd">        prj-file lines which we want to import, serialized as a dictionary.</span>
+<span class="sd">    key: str</span>
+<span class="sd">        specifies the name of the transformation parameter in the idf file.</span>
+<span class="sd">        Usually &quot;factor&quot; or &quot;addition&quot;</span>
+<span class="sd">    dim: str</span>
+<span class="sd">        the name of the dimension over which transformation parameters are</span>
+<span class="sd">        expected to differ for the current import. Usually &quot;time&quot;or &quot;layer&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">headers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">header</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">header</span> <span class="ow">in</span> <span class="n">headers</span><span class="p">],</span>
+            <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="n">dim</span><span class="p">,),</span>
+            <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="n">dim</span><span class="p">:</span> <span class="p">[</span><span class="n">header</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="k">for</span> <span class="n">header</span> <span class="ow">in</span> <span class="n">headers</span><span class="p">]},</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">headers</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">key</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_create_dataarray_from_paths</span><span class="p">(</span>
+    <span class="n">paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">headers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+    <span class="n">factor</span> <span class="o">=</span> <span class="n">_get_array_transformation_parameters</span><span class="p">(</span><span class="n">headers</span><span class="p">,</span> <span class="s2">&quot;factor&quot;</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span>
+    <span class="n">addition</span> <span class="o">=</span> <span class="n">_get_array_transformation_parameters</span><span class="p">(</span><span class="n">headers</span><span class="p">,</span> <span class="s2">&quot;addition&quot;</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span>
     <span class="n">da</span> <span class="o">=</span> <span class="n">_try_read_with_func</span><span class="p">(</span>
         <span class="n">imod</span><span class="o">.</span><span class="n">formats</span><span class="o">.</span><span class="n">array_io</span><span class="o">.</span><span class="n">reading</span><span class="o">.</span><span class="n">_load</span><span class="p">,</span>
         <span class="n">paths</span><span class="p">,</span>
@@ -974,22 +990,38 @@ document.write(`
         <span class="n">_read</span><span class="o">=</span><span class="n">imod</span><span class="o">.</span><span class="n">idf</span><span class="o">.</span><span class="n">_read</span><span class="p">,</span>
         <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">return</span> <span class="n">da</span>
+
+    <span class="c1"># Ensure factor and addition do not have more dimensions than da</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">factor</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+        <span class="n">missing_dims</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">factor</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">missing_dims</span><span class="p">:</span>
+            <span class="n">factor</span> <span class="o">=</span> <span class="n">factor</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="n">d</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">missing_dims</span><span class="p">},</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">addition</span> <span class="o">=</span> <span class="n">addition</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="n">d</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">missing_dims</span><span class="p">},</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">da</span> <span class="o">*</span> <span class="n">factor</span> <span class="o">+</span> <span class="n">addition</span>
 
 
-<span class="k">def</span> <span class="nf">_create_dataarray_from_values</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">headers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]):</span>
+<span class="k">def</span> <span class="nf">_create_dataarray_from_values</span><span class="p">(</span>
+    <span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">headers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">):</span>
+    <span class="n">factor</span> <span class="o">=</span> <span class="n">_get_array_transformation_parameters</span><span class="p">(</span><span class="n">headers</span><span class="p">,</span> <span class="s2">&quot;factor&quot;</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span>
+    <span class="n">addition</span> <span class="o">=</span> <span class="n">_get_array_transformation_parameters</span><span class="p">(</span><span class="n">headers</span><span class="p">,</span> <span class="s2">&quot;addition&quot;</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span>
     <span class="n">coords</span> <span class="o">=</span> <span class="n">_merge_coords</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
     <span class="n">firstdims</span> <span class="o">=</span> <span class="n">headers</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;dims&quot;</span><span class="p">]</span>
     <span class="n">shape</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">coord</span><span class="p">)</span> <span class="k">for</span> <span class="n">coord</span> <span class="ow">in</span> <span class="n">coords</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
     <span class="n">da</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">shape</span><span class="p">),</span> <span class="n">dims</span><span class="o">=</span><span class="n">firstdims</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">da</span>
+    <span class="k">return</span> <span class="n">da</span> <span class="o">*</span> <span class="n">factor</span> <span class="o">+</span> <span class="n">addition</span>
 
 
 <span class="k">def</span> <span class="nf">_create_dataarray</span><span class="p">(</span>
-    <span class="n">paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">headers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="n">paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">headers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">str</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create a DataArray from a list of IDF paths, or from constant values.</span>
+
+<span class="sd">    There are mixed cases possible, where some of the layers or stress periods</span>
+<span class="sd">    contain only a single constant value, and the others are specified as IDFs.</span>
+<span class="sd">    In that case, we cannot do a straightforward concatenation.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">values_valid</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">paths_valid</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1004,60 +1036,25 @@ document.write(`
             <span class="n">paths_valid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">paths_valid</span> <span class="ow">and</span> <span class="n">values_valid</span><span class="p">:</span>
-        <span class="n">dap</span> <span class="o">=</span> <span class="n">_create_datarray_from_paths</span><span class="p">(</span><span class="n">paths_valid</span><span class="p">,</span> <span class="n">headers_paths</span><span class="p">)</span>
-        <span class="n">dav</span> <span class="o">=</span> <span class="n">_create_dataarray_from_values</span><span class="p">(</span><span class="n">values_valid</span><span class="p">,</span> <span class="n">headers_values</span><span class="p">)</span>
+        <span class="c1"># Both lists contain entries: mixed case.</span>
+        <span class="n">dap</span> <span class="o">=</span> <span class="n">_create_dataarray_from_paths</span><span class="p">(</span><span class="n">paths_valid</span><span class="p">,</span> <span class="n">headers_paths</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">)</span>
+        <span class="n">dav</span> <span class="o">=</span> <span class="n">_create_dataarray_from_values</span><span class="p">(</span><span class="n">values_valid</span><span class="p">,</span> <span class="n">headers_values</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">)</span>
         <span class="n">dap</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;tmp&quot;</span>
         <span class="n">dav</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;tmp&quot;</span>
         <span class="n">da</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">((</span><span class="n">dap</span><span class="p">,</span> <span class="n">dav</span><span class="p">),</span> <span class="n">join</span><span class="o">=</span><span class="s2">&quot;outer&quot;</span><span class="p">)[</span><span class="s2">&quot;tmp&quot;</span><span class="p">]</span>
     <span class="k">elif</span> <span class="n">paths_valid</span><span class="p">:</span>
-        <span class="n">da</span> <span class="o">=</span> <span class="n">_create_datarray_from_paths</span><span class="p">(</span><span class="n">paths_valid</span><span class="p">,</span> <span class="n">headers_paths</span><span class="p">)</span>
+        <span class="c1"># Only paths provided</span>
+        <span class="n">da</span> <span class="o">=</span> <span class="n">_create_dataarray_from_paths</span><span class="p">(</span><span class="n">paths_valid</span><span class="p">,</span> <span class="n">headers_paths</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">values_valid</span><span class="p">:</span>
-        <span class="n">da</span> <span class="o">=</span> <span class="n">_create_dataarray_from_values</span><span class="p">(</span><span class="n">values_valid</span><span class="p">,</span> <span class="n">headers_values</span><span class="p">)</span>
+        <span class="c1"># Only scalar values provided</span>
+        <span class="n">da</span> <span class="o">=</span> <span class="n">_create_dataarray_from_values</span><span class="p">(</span><span class="n">values_valid</span><span class="p">,</span> <span class="n">headers_values</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">)</span>
 
-    <span class="n">da</span> <span class="o">=</span> <span class="n">apply_factor_and_addition</span><span class="p">(</span><span class="n">headers</span><span class="p">,</span> <span class="n">da</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">da</span>
-
-
-<span class="k">def</span> <span class="nf">apply_factor_and_addition</span><span class="p">(</span><span class="n">headers</span><span class="p">,</span> <span class="n">da</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="s2">&quot;layer&quot;</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span> <span class="ow">or</span> <span class="s2">&quot;time&quot;</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">):</span>
-        <span class="n">factor</span> <span class="o">=</span> <span class="n">headers</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;factor&quot;</span><span class="p">]</span>
-        <span class="n">addition</span> <span class="o">=</span> <span class="n">headers</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;addition&quot;</span><span class="p">]</span>
-        <span class="n">da</span> <span class="o">=</span> <span class="n">da</span> <span class="o">*</span> <span class="n">factor</span> <span class="o">+</span> <span class="n">addition</span>
-    <span class="k">elif</span> <span class="s2">&quot;layer&quot;</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span> <span class="ow">and</span> <span class="s2">&quot;time&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
-        <span class="n">da</span> <span class="o">=</span> <span class="n">apply_factor_and_addition_per_layer</span><span class="p">(</span><span class="n">headers</span><span class="p">,</span> <span class="n">da</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">header_per_time</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">time</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">header</span> <span class="ow">in</span> <span class="n">headers</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="n">time</span><span class="p">:</span>
-                    <span class="n">header_per_time</span><span class="p">[</span><span class="n">time</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">time</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]:</span>
-            <span class="n">da</span><span class="o">.</span><span class="n">loc</span><span class="p">[{</span><span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">time</span><span class="p">}]</span> <span class="o">=</span> <span class="n">apply_factor_and_addition</span><span class="p">(</span>
-                <span class="n">header_per_time</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">values</span><span class="p">)],</span>
-                <span class="n">da</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
-            <span class="p">)</span>
-    <span class="k">return</span> <span class="n">da</span>
-
-
-<span class="k">def</span> <span class="nf">apply_factor_and_addition_per_layer</span><span class="p">(</span><span class="n">headers</span><span class="p">,</span> <span class="n">da</span><span class="p">):</span>
-    <span class="n">layer</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-    <span class="n">header_per_layer</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">header</span> <span class="ow">in</span> <span class="n">headers</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">header_per_layer</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;error in project file: layer repetition&quot;</span><span class="p">)</span>
-        <span class="n">header_per_layer</span><span class="p">[</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">header</span>
-    <span class="n">addition_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">header_per_layer</span><span class="p">[</span><span class="n">lay</span><span class="p">][</span><span class="s2">&quot;addition&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">lay</span> <span class="ow">in</span> <span class="n">layer</span><span class="p">]</span>
-    <span class="n">factor_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">header_per_layer</span><span class="p">[</span><span class="n">lay</span><span class="p">][</span><span class="s2">&quot;factor&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">lay</span> <span class="ow">in</span> <span class="n">layer</span><span class="p">]</span>
-    <span class="n">addition</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">addition_values</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">layer</span><span class="p">},</span> <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">))</span>
-    <span class="n">factor</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">factor_values</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">layer</span><span class="p">},</span> <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;layer&quot;</span><span class="p">,))</span>
-    <span class="n">da</span> <span class="o">=</span> <span class="n">da</span> <span class="o">*</span> <span class="n">factor</span> <span class="o">+</span> <span class="n">addition</span>
     <span class="k">return</span> <span class="n">da</span>
 
 
 <span class="k">def</span> <span class="nf">_open_package_idf</span><span class="p">(</span>
     <span class="n">block_content</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">variables</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">]]:</span>
     <span class="n">das</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
         <span class="n">variable_content</span> <span class="o">=</span> <span class="n">block_content</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
@@ -1075,7 +1072,7 @@ document.write(`
             <span class="n">headers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
             <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
-        <span class="n">das</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span> <span class="o">=</span> <span class="n">_create_dataarray</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+        <span class="n">das</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span> <span class="o">=</span> <span class="n">_create_dataarray</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="p">[</span><span class="n">das</span><span class="p">]</span>
 
@@ -1202,7 +1199,7 @@ document.write(`
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
             <span class="nb">zip</span><span class="p">(</span><span class="n">system_paths</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">system_headers</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">system_values</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
         <span class="p">):</span>
-            <span class="n">das</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">variable</span><span class="p">]</span> <span class="o">=</span> <span class="n">_create_dataarray</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+            <span class="n">das</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">variable</span><span class="p">]</span> <span class="o">=</span> <span class="n">_create_dataarray</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">)</span>
 
     <span class="n">repeats</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">all_repeats</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">das</span><span class="p">,</span> <span class="n">repeats</span>
@@ -1226,61 +1223,139 @@ document.write(`
     <span class="k">return</span> <span class="n">out</span>
 
 
+<span class="n">IPF_LOG_MESSAGE_TEMPLATE</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">    A well with the same x, y, id, filter_top and</span>
+<span class="s2">    filter_bot was already imported. This happened at x =</span>
+<span class="s2">    </span><span class="si">{row[1]}</span><span class="s2">, y = </span><span class="si">{row[2]}</span><span class="s2">, id = </span><span class="si">{path_assoc.stem}</span><span class="s2">. Now the</span>
+<span class="s2">    ID for this new well was appended with the suffix _</span><span class="si">{suffix}</span><span class="s2">)</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">IpfResult</span><span class="p">:</span>
+    <span class="n">has_associated</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">data_field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="n">dataframe</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">layer</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">time</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">factor</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">addition</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dataframe</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">layer</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">time</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">factor</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">addition</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">factor</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">factor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addition</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">addition</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_process_ipf_time</span><span class="p">(</span>
+    <span class="n">entry</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">periods</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">datetime</span><span class="p">],</span> <span class="n">repeats</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+    <span class="n">timestring</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">periods</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timestring</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="n">_process_time</span><span class="p">(</span><span class="n">timestring</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">repeats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">time</span><span class="p">,</span> <span class="n">repeats</span>
+
+
+<span class="k">def</span> <span class="nf">_prepare_df_unassociated</span><span class="p">(</span><span class="n">ipf_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">layer</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;rate&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">layer</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">ipf_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">5</span><span class="p">]</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;filt_top&quot;</span><span class="p">,</span> <span class="s2">&quot;filt_bot&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">ipf_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span>
+    <span class="k">return</span> <span class="n">df</span>
+
+
+<span class="k">def</span> <span class="nf">_prepare_df_associated</span><span class="p">(</span>
+    <span class="n">ipf_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">imported_wells</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+    <span class="n">indexcol</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">ext</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">ipf_df</span><span class="o">.</span><span class="n">itertuples</span><span class="p">():</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">indexcol</span><span class="p">]</span>
+        <span class="n">path_assoc</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">well_characteristics_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">path_assoc</span><span class="o">.</span><span class="n">stem</span><span class="p">,</span>
+            <span class="s2">&quot;filt_top&quot;</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>
+            <span class="s2">&quot;filt_bot&quot;</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span>
+        <span class="p">}</span>
+        <span class="n">df_assoc</span> <span class="o">=</span> <span class="n">_try_read_with_func</span><span class="p">(</span><span class="n">imod</span><span class="o">.</span><span class="n">ipf</span><span class="o">.</span><span class="n">read_associated</span><span class="p">,</span> <span class="n">path_assoc</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">df_assoc</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;rate&quot;</span><span class="p">]</span>
+        <span class="n">df_assoc</span> <span class="o">=</span> <span class="n">df_assoc</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="o">**</span><span class="n">well_characteristics_dict</span><span class="p">)</span>
+        <span class="n">well_characteristics</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">well_characteristics_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">well_characteristics</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">imported_wells</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">imported_wells</span><span class="p">[</span><span class="n">well_characteristics</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">suffix</span> <span class="o">=</span> <span class="n">imported_wells</span><span class="p">[</span><span class="n">well_characteristics</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">imported_wells</span><span class="p">[</span><span class="n">well_characteristics</span><span class="p">]</span> <span class="o">=</span> <span class="n">suffix</span>
+            <span class="n">df_assoc</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_assoc</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="n">log_message</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span>
+                <span class="n">IPF_LOG_MESSAGE_TEMPLATE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">row</span><span class="o">=</span><span class="n">row</span><span class="p">,</span> <span class="n">path_assoc</span><span class="o">=</span><span class="n">path_assoc</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">imod</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                <span class="n">loglevel</span><span class="o">=</span><span class="n">LogLevel</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span>
+                <span class="n">message</span><span class="o">=</span><span class="n">log_message</span><span class="p">,</span>
+                <span class="n">additional_depth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_assoc</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+
 <span class="k">def</span> <span class="nf">_read_package_ipf</span><span class="p">(</span>
     <span class="n">block_content</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">periods</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">datetime</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">List</span><span class="p">[</span><span class="n">datetime</span><span class="p">]]:</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">datetime</span><span class="p">]]:</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="n">IpfResult</span><span class="p">)</span>
     <span class="n">repeats</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># we will store in this set the tuples of (x, y, id, well_top, well_bot)</span>
+    <span class="c1"># which should be unique for each well</span>
+    <span class="n">imported_wells</span> <span class="o">=</span> <span class="p">{}</span>
+
     <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">block_content</span><span class="p">[</span><span class="s2">&quot;ipf&quot;</span><span class="p">]:</span>
-        <span class="n">timestring</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span>
+        <span class="n">time</span><span class="p">,</span> <span class="n">repeats</span> <span class="o">=</span> <span class="n">_process_ipf_time</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">periods</span><span class="p">,</span> <span class="n">repeats</span><span class="p">)</span>
         <span class="n">layer</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span>
-        <span class="n">time</span> <span class="o">=</span> <span class="n">periods</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timestring</span><span class="p">)</span>
         <span class="n">factor</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;factor&quot;</span><span class="p">]</span>
         <span class="n">addition</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;addition&quot;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">time</span> <span class="o">=</span> <span class="n">_process_time</span><span class="p">(</span><span class="n">timestring</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">repeats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
 
         <span class="c1"># Ensure the columns are identifiable.</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">])</span>
         <span class="n">ipf_df</span><span class="p">,</span> <span class="n">indexcol</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_try_read_with_func</span><span class="p">(</span><span class="n">imod</span><span class="o">.</span><span class="n">ipf</span><span class="o">.</span><span class="n">_read_ipf</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">indexcol</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="c1"># No associated files</span>
-            <span class="n">columns</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;rate&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">layer</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">df</span> <span class="o">=</span> <span class="n">ipf_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">5</span><span class="p">]</span>
-                <span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;top&quot;</span><span class="p">,</span> <span class="s2">&quot;bottom&quot;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">df</span> <span class="o">=</span> <span class="n">ipf_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span>
-            <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span>
+            <span class="n">has_associated</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">_prepare_df_unassociated</span><span class="p">(</span><span class="n">ipf_df</span><span class="p">,</span> <span class="n">layer</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">ipf_df</span><span class="o">.</span><span class="n">itertuples</span><span class="p">():</span>
-                <span class="n">filename</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">indexcol</span><span class="p">]</span>
-                <span class="n">path_assoc</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="n">df_assoc</span> <span class="o">=</span> <span class="n">_try_read_with_func</span><span class="p">(</span>
-                    <span class="n">imod</span><span class="o">.</span><span class="n">ipf</span><span class="o">.</span><span class="n">read_associated</span><span class="p">,</span> <span class="n">path_assoc</span>
-                <span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span>
-                <span class="n">df_assoc</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;rate&quot;</span><span class="p">]</span>
-                <span class="n">df_assoc</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-                <span class="n">df_assoc</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-                <span class="n">df_assoc</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_assoc</span><span class="o">.</span><span class="n">stem</span>
-                <span class="k">if</span> <span class="n">layer</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">df_assoc</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
-                    <span class="n">df_assoc</span><span class="p">[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
-                <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_assoc</span><span class="p">)</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">has_associated</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">_prepare_df_associated</span><span class="p">(</span><span class="n">ipf_df</span><span class="p">,</span> <span class="n">imported_wells</span><span class="p">,</span> <span class="n">indexcol</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">ext</span><span class="p">)</span>
         <span class="n">df</span><span class="p">[</span><span class="s2">&quot;rate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;rate&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">factor</span> <span class="o">+</span> <span class="n">addition</span>
 
-        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;dataframe&quot;</span><span class="p">:</span> <span class="n">df</span><span class="p">,</span>
-            <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">layer</span><span class="p">,</span>
-            <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">time</span><span class="p">,</span>
-        <span class="p">}</span>
-        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="n">path</span><span class="o">.</span><span class="n">stem</span><span class="p">]</span><span class="o">.</span><span class="n">has_associated</span> <span class="o">=</span> <span class="n">has_associated</span>
+        <span class="n">out</span><span class="p">[</span><span class="n">path</span><span class="o">.</span><span class="n">stem</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">layer</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">addition</span><span class="p">)</span>
+
+    <span class="n">out_dict_ls</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">asdict</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
     <span class="n">repeats</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">repeats</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">out</span><span class="p">,</span> <span class="n">repeats</span>
+    <span class="k">return</span> <span class="n">out_dict_ls</span><span class="p">,</span> <span class="n">repeats</span>
 
 
 <div class="viewcode-block" id="read_projectfile">
@@ -1360,6 +1435,13 @@ document.write(`
 
 
 
+<span class="k">def</span> <span class="nf">_is_var_ipf_and_path</span><span class="p">(</span><span class="n">block_content</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">var</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="n">block_item</span> <span class="o">=</span> <span class="n">block_content</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">block_item</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;path&quot;</span><span class="p">]</span>
+    <span class="n">is_ipf</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;.ipf&quot;</span>
+    <span class="k">return</span> <span class="n">is_ipf</span><span class="p">,</span> <span class="n">path</span>
+
+
 <div class="viewcode-block" id="open_projectfile_data">
 <a class="viewcode-back" href="../../../../api/generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data">[docs]</a>
 <span class="k">def</span> <span class="nf">open_projectfile_data</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
@@ -1420,8 +1502,20 @@ document.write(`
             <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;(wel)&quot;</span><span class="p">:</span>
                 <span class="n">data</span><span class="p">,</span> <span class="n">repeats</span> <span class="o">=</span> <span class="n">_read_package_ipf</span><span class="p">(</span><span class="n">block_content</span><span class="p">,</span> <span class="n">periods</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;(cap)&quot;</span><span class="p">:</span>
+                <span class="n">maybe_ipf_var</span> <span class="o">=</span> <span class="s2">&quot;artificial_recharge_layer&quot;</span>
+                <span class="n">is_ipf</span><span class="p">,</span> <span class="n">maybe_ipf_path</span> <span class="o">=</span> <span class="n">_is_var_ipf_and_path</span><span class="p">(</span>
+                    <span class="n">block_content</span><span class="p">,</span> <span class="n">maybe_ipf_var</span>
+                <span class="p">)</span>
+                <span class="c1"># If its an ipf drop it and manually add it by calling the</span>
+                <span class="c1"># ipf.read function. If its not an ipf then its an idf, which</span>
+                <span class="c1"># doesnt need any special treatment.</span>
+                <span class="k">if</span> <span class="n">is_ipf</span><span class="p">:</span>
+                    <span class="n">block_content</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">maybe_ipf_var</span><span class="p">)</span>
                 <span class="n">variables</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">METASWAP_VARS</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">block_content</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">_open_package_idf</span><span class="p">(</span><span class="n">block_content</span><span class="p">,</span> <span class="n">variables</span><span class="p">)</span>
+                <span class="c1"># Read and reattach ipf data to package data.</span>
+                <span class="k">if</span> <span class="n">is_ipf</span><span class="p">:</span>
+                    <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">maybe_ipf_var</span><span class="p">]</span> <span class="o">=</span> <span class="n">imod</span><span class="o">.</span><span class="n">ipf</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">maybe_ipf_path</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="s2">&quot;(pcg)&quot;</span><span class="p">):</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">block_content</span><span class="p">]</span>
             <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">KEYS</span><span class="p">:</span>
@@ -1438,7 +1532,12 @@ document.write(`
             <span class="k">raise</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">. Errored while opening/reading data entries for: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="n">strippedkey</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;(&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;)&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">strippedkey</span> <span class="o">==</span> <span class="s2">&quot;wel&quot;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">named_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">strippedkey</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">prj_data</span><span class="p">[</span><span class="n">named_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span>
+                <span class="n">repeat_stress</span><span class="p">[</span><span class="n">named_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">repeats</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">da</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
                 <span class="n">numbered_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">strippedkey</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="n">prj_data</span><span class="p">[</span><span class="n">numbered_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">da</span>
@@ -1512,8 +1611,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1533,7 +1632,7 @@ document.write(`
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
     <br/>
   </p>
 </div>
@@ -1546,7 +1645,7 @@ document.write(`
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
 </p></div>
       
     </div>

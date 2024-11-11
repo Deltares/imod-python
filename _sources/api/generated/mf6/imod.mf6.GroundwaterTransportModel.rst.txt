@@ -31,6 +31,7 @@
       ~GroundwaterTransportModel.mask_all_packages
       ~GroundwaterTransportModel.pop
       ~GroundwaterTransportModel.popitem
+      ~GroundwaterTransportModel.prepare_wel_for_mf6
       ~GroundwaterTransportModel.purge_empty_packages
       ~GroundwaterTransportModel.regrid_like
       ~GroundwaterTransportModel.render

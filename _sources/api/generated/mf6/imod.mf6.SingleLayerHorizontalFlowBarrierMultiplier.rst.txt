@@ -1,0 +1,54 @@
+﻿imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier
+===================================================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: SingleLayerHorizontalFlowBarrierMultiplier
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SingleLayerHorizontalFlowBarrierMultiplier.__init__
+      ~SingleLayerHorizontalFlowBarrierMultiplier.cleanup
+      ~SingleLayerHorizontalFlowBarrierMultiplier.clip_box
+      ~SingleLayerHorizontalFlowBarrierMultiplier.copy
+      ~SingleLayerHorizontalFlowBarrierMultiplier.from_file
+      ~SingleLayerHorizontalFlowBarrierMultiplier.get_non_grid_data
+      ~SingleLayerHorizontalFlowBarrierMultiplier.get_period_varnames
+      ~SingleLayerHorizontalFlowBarrierMultiplier.get_regrid_methods
+      ~SingleLayerHorizontalFlowBarrierMultiplier.is_clipping_supported
+      ~SingleLayerHorizontalFlowBarrierMultiplier.is_empty
+      ~SingleLayerHorizontalFlowBarrierMultiplier.is_grid_agnostic_package
+      ~SingleLayerHorizontalFlowBarrierMultiplier.is_regridding_supported
+      ~SingleLayerHorizontalFlowBarrierMultiplier.is_splitting_supported
+      ~SingleLayerHorizontalFlowBarrierMultiplier.isel
+      ~SingleLayerHorizontalFlowBarrierMultiplier.mask
+      ~SingleLayerHorizontalFlowBarrierMultiplier.regrid_like
+      ~SingleLayerHorizontalFlowBarrierMultiplier.render
+      ~SingleLayerHorizontalFlowBarrierMultiplier.sel
+      ~SingleLayerHorizontalFlowBarrierMultiplier.set_repeat_stress
+      ~SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg
+      ~SingleLayerHorizontalFlowBarrierMultiplier.to_netcdf
+      ~SingleLayerHorizontalFlowBarrierMultiplier.write
+      ~SingleLayerHorizontalFlowBarrierMultiplier.write_binary_griddata
+      ~SingleLayerHorizontalFlowBarrierMultiplier.write_blockfile
+      ~SingleLayerHorizontalFlowBarrierMultiplier.write_text_griddata
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~SingleLayerHorizontalFlowBarrierMultiplier.auxiliary_data_fields
+      ~SingleLayerHorizontalFlowBarrierMultiplier.dataset
+      ~SingleLayerHorizontalFlowBarrierMultiplier.line_data
+   
+   

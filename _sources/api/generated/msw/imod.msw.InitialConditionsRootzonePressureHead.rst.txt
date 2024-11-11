@@ -14,7 +14,11 @@
    .. autosummary::
    
       ~InitialConditionsRootzonePressureHead.__init__
+      ~InitialConditionsRootzonePressureHead.get_non_grid_data
+      ~InitialConditionsRootzonePressureHead.get_regrid_methods
+      ~InitialConditionsRootzonePressureHead.is_regridding_supported
       ~InitialConditionsRootzonePressureHead.isel
+      ~InitialConditionsRootzonePressureHead.regrid_like
       ~InitialConditionsRootzonePressureHead.sel
       ~InitialConditionsRootzonePressureHead.write
       ~InitialConditionsRootzonePressureHead.write_dataframe_fixed_width
@@ -22,5 +26,12 @@
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~InitialConditionsRootzonePressureHead.auxiliary_data_fields
+      ~InitialConditionsRootzonePressureHead.dataset
    
    

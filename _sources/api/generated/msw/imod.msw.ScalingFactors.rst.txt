@@ -14,7 +14,11 @@
    .. autosummary::
    
       ~ScalingFactors.__init__
+      ~ScalingFactors.get_non_grid_data
+      ~ScalingFactors.get_regrid_methods
+      ~ScalingFactors.is_regridding_supported
       ~ScalingFactors.isel
+      ~ScalingFactors.regrid_like
       ~ScalingFactors.sel
       ~ScalingFactors.write
       ~ScalingFactors.write_dataframe_fixed_width
@@ -22,5 +26,12 @@
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ScalingFactors.auxiliary_data_fields
+      ~ScalingFactors.dataset
    
    

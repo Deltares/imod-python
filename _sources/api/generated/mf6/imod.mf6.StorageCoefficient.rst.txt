@@ -14,9 +14,11 @@
    .. autosummary::
    
       ~StorageCoefficient.__init__
+      ~StorageCoefficient.cleanup
       ~StorageCoefficient.clip_box
       ~StorageCoefficient.copy
       ~StorageCoefficient.from_file
+      ~StorageCoefficient.from_imod5_data
       ~StorageCoefficient.get_non_grid_data
       ~StorageCoefficient.get_options
       ~StorageCoefficient.get_regrid_methods

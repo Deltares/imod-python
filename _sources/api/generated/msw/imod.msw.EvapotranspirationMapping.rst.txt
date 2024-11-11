@@ -14,8 +14,12 @@
    .. autosummary::
    
       ~EvapotranspirationMapping.__init__
+      ~EvapotranspirationMapping.get_non_grid_data
+      ~EvapotranspirationMapping.get_regrid_methods
       ~EvapotranspirationMapping.grid_mapping
+      ~EvapotranspirationMapping.is_regridding_supported
       ~EvapotranspirationMapping.isel
+      ~EvapotranspirationMapping.regrid_like
       ~EvapotranspirationMapping.sel
       ~EvapotranspirationMapping.write
       ~EvapotranspirationMapping.write_dataframe_fixed_width
@@ -23,5 +27,13 @@
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~EvapotranspirationMapping.auxiliary_data_fields
+      ~EvapotranspirationMapping.dataset
+      ~EvapotranspirationMapping.meteo
    
    

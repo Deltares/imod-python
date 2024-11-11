@@ -14,7 +14,11 @@
    .. autosummary::
    
       ~Ponding.__init__
+      ~Ponding.get_non_grid_data
+      ~Ponding.get_regrid_methods
+      ~Ponding.is_regridding_supported
       ~Ponding.isel
+      ~Ponding.regrid_like
       ~Ponding.sel
       ~Ponding.write
       ~Ponding.write_dataframe_fixed_width
@@ -22,5 +26,12 @@
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Ponding.auxiliary_data_fields
+      ~Ponding.dataset
    
    

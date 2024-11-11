@@ -14,6 +14,7 @@
    .. autosummary::
    
       ~MobileStorageTransfer.__init__
+      ~MobileStorageTransfer.cleanup
       ~MobileStorageTransfer.clip_box
       ~MobileStorageTransfer.copy
       ~MobileStorageTransfer.from_file

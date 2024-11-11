@@ -1,0 +1,6 @@
+﻿imod.mf6.HorizontalFlowBarrierMultiplier.to\_mf6\_pkg
+=====================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: HorizontalFlowBarrierMultiplier.to_mf6_pkg

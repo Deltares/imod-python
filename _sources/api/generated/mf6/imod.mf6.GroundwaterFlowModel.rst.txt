@@ -19,6 +19,7 @@
       ~GroundwaterFlowModel.copy
       ~GroundwaterFlowModel.dump
       ~GroundwaterFlowModel.from_file
+      ~GroundwaterFlowModel.from_imod5_data
       ~GroundwaterFlowModel.fromkeys
       ~GroundwaterFlowModel.get
       ~GroundwaterFlowModel.has_key
@@ -31,6 +32,7 @@
       ~GroundwaterFlowModel.mask_all_packages
       ~GroundwaterFlowModel.pop
       ~GroundwaterFlowModel.popitem
+      ~GroundwaterFlowModel.prepare_wel_for_mf6
       ~GroundwaterFlowModel.purge_empty_packages
       ~GroundwaterFlowModel.regrid_like
       ~GroundwaterFlowModel.render

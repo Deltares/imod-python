@@ -15,6 +15,7 @@
    
       ~Solution.__init__
       ~Solution.add_model_to_solution
+      ~Solution.cleanup
       ~Solution.clip_box
       ~Solution.copy
       ~Solution.from_file

@@ -1,0 +1,6 @@
+﻿imod.mf6.Well.mask
+==================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: Well.mask

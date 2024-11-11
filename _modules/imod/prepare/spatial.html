@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.prepare.spatial &#8212; iMOD Python 0.17.2 documentation</title>
+    <title>imod.prepare.spatial &#8212; iMOD Python 0.18.0 documentation</title>
   
   
   
@@ -15,17 +15,19 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
   </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-
-  
-  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+  <link href="../../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
@@ -33,13 +35,14 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="../../../_static/documentation_options.js?v=9fbddafe"></script>
-    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/documentation_options.js?v=ba2e7b09"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/prepare/spatial';</script>
     <script src="../../../_static/deltares.js?v=8d5578be"></script>
@@ -47,6 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.18.0.dev" />
   </head>
   
   
@@ -62,19 +66,8 @@
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../../../search.html"
       method="get">
@@ -82,7 +75,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search the docs ..."
          aria-label="Search the docs ..."
          autocomplete="off"
@@ -90,8 +82,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -122,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 0.17.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark" alt="iMOD Python 0.17.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 0.18.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 0.18.0 documentation - Home"/>
   
   
 </a></div>
@@ -179,7 +171,7 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../../developing.html">
+  <a class="nav-link dropdown-item nav-internal" href="../../../developing/index.html">
     Developing
   </a>
 </li>
@@ -198,29 +190,21 @@
         <div class="navbar-item navbar-persistent--container">
           
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
       
       
         <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
       
         <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
@@ -257,15 +241,11 @@ document.write(`
   
     <div class="navbar-persistent--mobile">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
     </div>
   
 
@@ -282,7 +262,8 @@ document.write(`
       
         
       
-      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
   
@@ -333,7 +314,7 @@ document.write(`
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../developing.html">
+  <a class="nav-link nav-internal" href="../../../developing/index.html">
     Developing
   </a>
 </li>
@@ -350,15 +331,11 @@ document.write(`
         
           <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
         
           <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
@@ -414,8 +391,6 @@ document.write(`
       
         <div class="header-article-item">
 
-
-
 <nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
@@ -427,7 +402,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">imod.prepare.spatial</li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">imod.prepare.spatial</span></li>
   </ul>
 </nav>
 </div>
@@ -446,7 +421,7 @@ document.write(`
                   
   <h1>Source code for imod.prepare.spatial</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">pathlib</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">dask</span>
 <span class="kn">import</span> <span class="nn">numba</span>
@@ -494,34 +469,34 @@ document.write(`
     <span class="k">return</span> <span class="n">zmin</span><span class="p">,</span> <span class="n">zmax</span>
 
 
-<span class="k">def</span> <span class="nf">_fill_np</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">invalid</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Basic nearest neighbour interpolation&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">_fill_np</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="n">nodata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">nodata</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="c1"># see: https://stackoverflow.com/questions/5551286/filling-gaps-in-a-numpy-array</span>
-    <span class="n">ind</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">ndimage</span><span class="o">.</span><span class="n">distance_transform_edt</span><span class="p">(</span>
-        <span class="n">invalid</span><span class="p">,</span> <span class="n">return_distances</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_indices</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">ndimage</span><span class="o">.</span><span class="n">distance_transform_edt</span><span class="p">(</span>
+        <span class="nb">input</span><span class="o">=</span><span class="n">nodata</span><span class="p">,</span>
+        <span class="n">return_distances</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">return_indices</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">ind</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">indices</span><span class="p">)]</span>
 
 
 <div class="viewcode-block" id="fill">
 <a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.fill.html#imod.prepare.fill">[docs]</a>
-<span class="k">def</span> <span class="nf">fill</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">fill</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Replace the value of invalid ``da`` cells (indicated by ``invalid``)</span>
-<span class="sd">    using basic nearest neighbour interpolation.</span>
+<span class="sd">    Fill in NaNs using basic nearest neighbour interpolation.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    da: xr.DataArray with gaps</span>
-<span class="sd">        array containing missing value</span>
-<span class="sd">    by: str, optional</span>
-<span class="sd">        dimension over which the array will be filled, one by one.</span>
-<span class="sd">        See the examples.</span>
-
-<span class="sd">    invalid: xr.DataArray</span>
-<span class="sd">        a binary array of same shape as ``da``.</span>
-<span class="sd">        data value are replaced where invalid is True</span>
-<span class="sd">        If None (default), uses: `invalid = np.isnan(data)`</span>
+<span class="sd">        array containing NaN values.</span>
+<span class="sd">    dims: sequence of str, optional, default is (&quot;y&quot;, &quot;x&quot;).</span>
+<span class="sd">        Dimensions along which to search for nearest neighbors. For example,</span>
+<span class="sd">        (&quot;y&quot;, &quot;x&quot;) will perform 2D interpolation in the horizontal plane, while</span>
+<span class="sd">        (&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;) will perform 3D interpolation including the</span>
+<span class="sd">        vertical dimension.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -540,24 +515,29 @@ document.write(`
 <span class="sd">    neighbor in the last dimension is chosen (for rasters, that&#39;s generally x).</span>
 
 <span class="sd">    A typical use case is filling a 3D array (layer, y, x), but only in the</span>
-<span class="sd">    horizontal dimensions. The ``by`` keyword can be used to do this:</span>
+<span class="sd">    horizontal dimensions. The ``dims`` keyword can be used to do control this:</span>
 
-<span class="sd">    &gt;&gt;&gt; filled = imod.prepare.fill(da, by=&quot;layer&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; filled = imod.prepare.fill(da, dims=(&quot;y&quot;, &quot;x&quot;))</span>
 
 <span class="sd">    In this case, the array is filled by one layer at a time.</span>
+
+<span class="sd">    To also incorporate nearest values across the layer dimension:</span>
+
+<span class="sd">    &gt;&gt;&gt; filled = imod.prepare.fill(da, dims=(&quot;layer&quot;, &quot;y&quot;, &quot;x&quot;))</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">dims</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dims</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
 
-    <span class="n">out</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">invalid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">invalid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">da</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">by</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">coordvalue</span> <span class="ow">in</span> <span class="n">da</span><span class="p">[</span><span class="n">by</span><span class="p">]:</span>
-            <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="n">by</span><span class="p">:</span> <span class="n">coordvalue</span><span class="p">}</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">d</span><span class="p">)[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">_fill_np</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">invalid</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">out</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">_fill_np</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">invalid</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">out</span></div>
+    <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">apply_ufunc</span><span class="p">(</span>
+        <span class="n">_fill_np</span><span class="p">,</span>
+        <span class="n">da</span><span class="p">,</span>
+        <span class="n">input_core_dims</span><span class="o">=</span><span class="p">[</span><span class="n">dims</span><span class="p">],</span>
+        <span class="n">output_core_dims</span><span class="o">=</span><span class="p">[</span><span class="n">dims</span><span class="p">],</span>
+        <span class="n">output_dtypes</span><span class="o">=</span><span class="p">[</span><span class="n">da</span><span class="o">.</span><span class="n">dtype</span><span class="p">],</span>
+        <span class="n">dask</span><span class="o">=</span><span class="s2">&quot;parallelized&quot;</span><span class="p">,</span>
+        <span class="n">vectorize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">keep_attrs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">*</span><span class="n">da</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span></div>
 
 
 
@@ -663,22 +643,33 @@ document.write(`
 
 <div class="viewcode-block" id="rasterize">
 <a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.rasterize.html#imod.prepare.rasterize">[docs]</a>
-<span class="k">def</span> <span class="nf">rasterize</span><span class="p">(</span><span class="n">geodataframe</span><span class="p">,</span> <span class="n">like</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">rasterize</span><span class="p">(</span>
+    <span class="n">geodataframe</span><span class="p">:</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">,</span>
+    <span class="n">like</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
+    <span class="n">column</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">fill</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DTypeLike</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Rasterize a geopandas GeoDataFrame onto the given</span>
 <span class="sd">    xarray coordinates.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    geodataframe : geopandas.GeoDataFrame</span>
-<span class="sd">    column : str, int, float</span>
-<span class="sd">        column name of geodataframe to burn into raster</span>
-<span class="sd">    like : xarray.DataArray</span>
+<span class="sd">    geodataframe: geopandas.GeoDataFrame</span>
+<span class="sd">        Geodataframe with polygons to rasterize.</span>
+<span class="sd">    like: xarray.DataArray</span>
 <span class="sd">        Example DataArray. The rasterized result will match the shape and</span>
 <span class="sd">        coordinates of this DataArray.</span>
-<span class="sd">    fill : float, int</span>
+<span class="sd">    column: str, int, float, optional</span>
+<span class="sd">        column name of geodataframe to burn into raster</span>
+<span class="sd">    fill: float, int, optional</span>
 <span class="sd">        Fill value for nodata areas. Optional, default value is np.nan.</span>
-<span class="sd">    kwargs : additional keyword arguments for rasterio.features.rasterize.</span>
+<span class="sd">    dtype: dtypelike, optional</span>
+<span class="sd">        Data type of output raster. Defaults to data type of grid provided as</span>
+<span class="sd">        &quot;like&quot;.</span>
+<span class="sd">    kwargs: additional keyword arguments for rasterio.features.rasterize, optional</span>
 <span class="sd">        See: https://rasterio.readthedocs.io/en/stable/api/rasterio.features.html#rasterio.features.rasterize</span>
 
 <span class="sd">    Returns</span>
@@ -699,11 +690,15 @@ document.write(`
     <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
         <span class="n">iterable_shapes</span><span class="p">:</span> <span class="n">Iterable</span> <span class="o">=</span> <span class="p">(</span><span class="n">shapes</span><span class="p">,)</span>  <span class="c1"># type: ignore[no-redef]</span>
 
+    <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">like</span><span class="o">.</span><span class="n">dtype</span>
+
     <span class="n">raster</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">rasterize</span><span class="p">(</span>
         <span class="n">iterable_shapes</span><span class="p">,</span>
         <span class="n">out_shape</span><span class="o">=</span><span class="n">like</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
         <span class="n">fill</span><span class="o">=</span><span class="n">fill</span><span class="p">,</span>
         <span class="n">transform</span><span class="o">=</span><span class="n">imod</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">like</span><span class="p">),</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -1602,8 +1597,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1623,7 +1618,7 @@ document.write(`
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
     <br/>
   </p>
 </div>
@@ -1636,7 +1631,7 @@ document.write(`
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
 </p></div>
       
     </div>

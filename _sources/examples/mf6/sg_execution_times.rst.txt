@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**09:40.437** total execution time for 12 files **from examples\mf6**:
+**11:01.645** total execution time for 12 files **from examples\mf6**:
 
 .. container::
 
@@ -33,38 +33,38 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_examples_mf6_hondsrug_partitioning.py` (``hondsrug_partitioning.py``)
-     - 04:02.369
+     - 04:47.308
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_hondsrug.py` (``hondsrug.py``)
-     - 02:14.016
+     - 02:32.836
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_circle_transport.py` (``circle_transport.py``)
-     - 01:00.800
+     - 01:15.616
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_Henry.py` (``Henry.py``)
-     - 01:00.689
+     - 00:59.781
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_transport_2d.py` (``transport_2d.py``)
-     - 00:54.070
+     - 00:57.441
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_different_ways_to_regrid_models.py` (``different_ways_to_regrid_models.py``)
-     - 00:17.641
+     - 00:18.262
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_circle_partitioned.py` (``circle_partitioned.py``)
-     - 00:04.043
+     - 00:03.963
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_example_1d_transport.py` (``example_1d_transport.py``)
-     - 00:03.217
+     - 00:03.226
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_circle.py` (``circle.py``)
-     - 00:02.353
+     - 00:01.751
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_lake.py` (``lake.py``)
-     - 00:00.676
+     - 00:00.926
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_ex01_twri.py` (``ex01_twri.py``)
-     - 00:00.548
+     - 00:00.534
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_example_models.py` (``example_models.py``)
-     - 00:00.016
+     - 00:00.000
      - 0.0

@@ -1,0 +1,55 @@
+﻿imod.mf6.SingleLayerHorizontalFlowBarrierResistance
+===================================================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: SingleLayerHorizontalFlowBarrierResistance
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SingleLayerHorizontalFlowBarrierResistance.__init__
+      ~SingleLayerHorizontalFlowBarrierResistance.cleanup
+      ~SingleLayerHorizontalFlowBarrierResistance.clip_box
+      ~SingleLayerHorizontalFlowBarrierResistance.copy
+      ~SingleLayerHorizontalFlowBarrierResistance.from_file
+      ~SingleLayerHorizontalFlowBarrierResistance.from_imod5_data
+      ~SingleLayerHorizontalFlowBarrierResistance.get_non_grid_data
+      ~SingleLayerHorizontalFlowBarrierResistance.get_period_varnames
+      ~SingleLayerHorizontalFlowBarrierResistance.get_regrid_methods
+      ~SingleLayerHorizontalFlowBarrierResistance.is_clipping_supported
+      ~SingleLayerHorizontalFlowBarrierResistance.is_empty
+      ~SingleLayerHorizontalFlowBarrierResistance.is_grid_agnostic_package
+      ~SingleLayerHorizontalFlowBarrierResistance.is_regridding_supported
+      ~SingleLayerHorizontalFlowBarrierResistance.is_splitting_supported
+      ~SingleLayerHorizontalFlowBarrierResistance.isel
+      ~SingleLayerHorizontalFlowBarrierResistance.mask
+      ~SingleLayerHorizontalFlowBarrierResistance.regrid_like
+      ~SingleLayerHorizontalFlowBarrierResistance.render
+      ~SingleLayerHorizontalFlowBarrierResistance.sel
+      ~SingleLayerHorizontalFlowBarrierResistance.set_repeat_stress
+      ~SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg
+      ~SingleLayerHorizontalFlowBarrierResistance.to_netcdf
+      ~SingleLayerHorizontalFlowBarrierResistance.write
+      ~SingleLayerHorizontalFlowBarrierResistance.write_binary_griddata
+      ~SingleLayerHorizontalFlowBarrierResistance.write_blockfile
+      ~SingleLayerHorizontalFlowBarrierResistance.write_text_griddata
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~SingleLayerHorizontalFlowBarrierResistance.auxiliary_data_fields
+      ~SingleLayerHorizontalFlowBarrierResistance.dataset
+      ~SingleLayerHorizontalFlowBarrierResistance.line_data
+   
+   

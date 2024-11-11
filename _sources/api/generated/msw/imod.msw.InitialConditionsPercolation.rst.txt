@@ -14,7 +14,11 @@
    .. autosummary::
    
       ~InitialConditionsPercolation.__init__
+      ~InitialConditionsPercolation.get_non_grid_data
+      ~InitialConditionsPercolation.get_regrid_methods
+      ~InitialConditionsPercolation.is_regridding_supported
       ~InitialConditionsPercolation.isel
+      ~InitialConditionsPercolation.regrid_like
       ~InitialConditionsPercolation.sel
       ~InitialConditionsPercolation.write
       ~InitialConditionsPercolation.write_dataframe_fixed_width
@@ -22,5 +26,12 @@
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~InitialConditionsPercolation.auxiliary_data_fields
+      ~InitialConditionsPercolation.dataset
    
    

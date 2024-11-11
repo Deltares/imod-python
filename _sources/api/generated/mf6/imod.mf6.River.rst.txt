@@ -14,9 +14,12 @@
    .. autosummary::
    
       ~River.__init__
+      ~River.cleanup
       ~River.clip_box
       ~River.copy
+      ~River.create_infiltration_factor_drain
       ~River.from_file
+      ~River.from_imod5_data
       ~River.get_non_grid_data
       ~River.get_period_varnames
       ~River.get_regrid_methods
@@ -31,6 +34,7 @@
       ~River.render
       ~River.sel
       ~River.set_repeat_stress
+      ~River.split_conductance
       ~River.to_netcdf
       ~River.write
       ~River.write_binary_griddata

@@ -22,6 +22,7 @@
       ~MetaSwapModel.keys
       ~MetaSwapModel.pop
       ~MetaSwapModel.popitem
+      ~MetaSwapModel.regrid_like
       ~MetaSwapModel.setdefault
       ~MetaSwapModel.update
       ~MetaSwapModel.values

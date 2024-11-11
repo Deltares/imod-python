@@ -1,0 +1,845 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>imod.prepare.cleanup &#8212; iMOD Python 0.18.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+
+    <script src="../../../_static/documentation_options.js?v=ba2e7b09"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/prepare/cleanup';</script>
+    <script src="../../../_static/deltares.js?v=8d5578be"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.18.0.dev" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 0.18.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 0.18.0 documentation - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../installation.html">
+    Installing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../faq/index.html">
+    FAQ
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../developing/index.html">
+    Developing
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-deltares fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Deltares</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../installation.html">
+    Installing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../user-guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../faq/index.html">
+    FAQ
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../developing/index.html">
+    Developing
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-deltares fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Deltares</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">imod.prepare.cleanup</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for imod.prepare.cleanup</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Cleanup utilities&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+<span class="kn">from</span> <span class="nn">imod.mf6.utilities.mask</span> <span class="kn">import</span> <span class="n">mask_arrays</span>
+<span class="kn">from</span> <span class="nn">imod.prepare.wells</span> <span class="kn">import</span> <span class="n">locate_wells</span><span class="p">,</span> <span class="n">validate_well_columnnames</span>
+<span class="kn">from</span> <span class="nn">imod.schemata</span> <span class="kn">import</span> <span class="n">scalar_None</span>
+<span class="kn">from</span> <span class="nn">imod.typing</span> <span class="kn">import</span> <span class="n">GridDataArray</span>
+
+
+<span class="k">class</span> <span class="nc">AlignLevelsMode</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">TOPDOWN</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">BOTTOMUP</span> <span class="o">=</span> <span class="mi">1</span>
+
+
+<span class="k">def</span> <span class="nf">align_nodata</span><span class="p">(</span><span class="n">grids</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="n">mask_arrays</span><span class="p">(</span><span class="n">grids</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">align_interface_levels</span><span class="p">(</span>
+    <span class="n">top</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">AlignLevelsMode</span> <span class="o">=</span> <span class="n">AlignLevelsMode</span><span class="o">.</span><span class="n">TOPDOWN</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">,</span> <span class="n">GridDataArray</span><span class="p">]:</span>
+    <span class="n">to_align</span> <span class="o">=</span> <span class="n">top</span> <span class="o">&lt;</span> <span class="n">bottom</span>
+
+    <span class="k">match</span> <span class="n">method</span><span class="p">:</span>
+        <span class="k">case</span> <span class="n">AlignLevelsMode</span><span class="o">.</span><span class="n">BOTTOMUP</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">top</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">to_align</span><span class="p">,</span> <span class="n">bottom</span><span class="p">),</span> <span class="n">bottom</span>
+        <span class="k">case</span> <span class="n">AlignLevelsMode</span><span class="o">.</span><span class="n">TOPDOWN</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">to_align</span><span class="p">,</span> <span class="n">top</span><span class="p">)</span>
+        <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unmatched case for method, got </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_cleanup_robin_boundary</span><span class="p">(</span>
+    <span class="n">idomain</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="n">grids</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GridDataArray</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GridDataArray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cleanup robin boundary condition (i.e. bc with conductance)&quot;&quot;&quot;</span>
+    <span class="n">active</span> <span class="o">=</span> <span class="n">idomain</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="c1"># Deactivate conductance cells outside active domain; this nodata</span>
+    <span class="c1"># inconsistency will be aligned in the final call to align_nodata</span>
+    <span class="n">conductance</span> <span class="o">=</span> <span class="n">grids</span><span class="p">[</span><span class="s2">&quot;conductance&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">active</span><span class="p">)</span>
+    <span class="n">concentration</span> <span class="o">=</span> <span class="n">grids</span><span class="p">[</span><span class="s2">&quot;concentration&quot;</span><span class="p">]</span>
+    <span class="c1"># Make conductance cells with erronous values inactive</span>
+    <span class="n">grids</span><span class="p">[</span><span class="s2">&quot;conductance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">conductance</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">conductance</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="c1"># Clip negative concentration cells to 0.0</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">concentration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">scalar_None</span><span class="p">(</span><span class="n">concentration</span><span class="p">):</span>
+        <span class="n">grids</span><span class="p">[</span><span class="s2">&quot;concentration&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">concentration</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">grids</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;concentration&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Align nodata</span>
+    <span class="k">return</span> <span class="n">align_nodata</span><span class="p">(</span><span class="n">grids</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="cleanup_riv">
+<a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.cleanup_riv.html#imod.prepare.cleanup_riv">[docs]</a>
+<span class="k">def</span> <span class="nf">cleanup_riv</span><span class="p">(</span>
+    <span class="n">idomain</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">stage</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">conductance</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">bottom_elevation</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">concentration</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GridDataArray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Clean up river data, fixes some common mistakes causing ValidationErrors by</span>
+<span class="sd">    doing the following:</span>
+
+<span class="sd">    - Cells where conductance &lt;= 0 are deactivated.</span>
+<span class="sd">    - Cells where concentration &lt; 0 are set to 0.0.</span>
+<span class="sd">    - Cells outside active domain (idomain==1) are removed.</span>
+<span class="sd">    - Align NoData: If one variable has an inactive cell in one cell, ensure</span>
+<span class="sd">      this cell is deactivated for all variables.</span>
+<span class="sd">    - River bottom elevations below model bottom of a layer are set to model</span>
+<span class="sd">      bottom of that layer.</span>
+<span class="sd">    - River bottom elevations which exceed river stage are lowered to river</span>
+<span class="sd">      stage.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    idomain: xarray.DataArray | xugrid.UgridDataArray</span>
+<span class="sd">        MODFLOW 6 model domain. idomain==1 is considered active domain.</span>
+<span class="sd">    bottom: xarray.DataArray | xugrid.UgridDataArray</span>
+<span class="sd">        Grid with model bottoms</span>
+<span class="sd">    stage: xarray.DataArray | xugrid.UgridDataArray</span>
+<span class="sd">        Grid with river stages</span>
+<span class="sd">    conductance: xarray.DataArray | xugrid.UgridDataArray</span>
+<span class="sd">        Grid with conductances</span>
+<span class="sd">    bottom_elevation: xarray.DataArray | xugrid.UgridDataArray</span>
+<span class="sd">        Grid with river bottom elevations</span>
+<span class="sd">    concentration: xarray.DataArray | xugrid.UgridDataArray, optional</span>
+<span class="sd">        Optional grid with concentrations</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict[str, xarray.DataArray | xugrid.UgridDataArray]</span>
+<span class="sd">        Dict of cleaned up grids. Has keys: &quot;stage&quot;, &quot;conductance&quot;,</span>
+<span class="sd">        &quot;bottom_elevation&quot;, &quot;concentration&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Output dict</span>
+    <span class="n">output_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;stage&quot;</span><span class="p">:</span> <span class="n">stage</span><span class="p">,</span>
+        <span class="s2">&quot;conductance&quot;</span><span class="p">:</span> <span class="n">conductance</span><span class="p">,</span>
+        <span class="s2">&quot;bottom_elevation&quot;</span><span class="p">:</span> <span class="n">bottom_elevation</span><span class="p">,</span>
+        <span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="n">concentration</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">output_dict</span> <span class="o">=</span> <span class="n">_cleanup_robin_boundary</span><span class="p">(</span><span class="n">idomain</span><span class="p">,</span> <span class="n">output_dict</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">output_dict</span><span class="p">[</span><span class="s2">&quot;stage&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">bottom</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;River stage below bottom of model layer, cannot fix this. &quot;</span>
+            <span class="s2">&quot;Probably rivers are assigned to the wrong layer, you can reallocate &quot;</span>
+            <span class="s2">&quot;river data to model layers with: &quot;</span>
+            <span class="s2">&quot;``imod.prepare.topsystem.allocate_riv_cells``.&quot;</span>
+        <span class="p">)</span>
+    <span class="c1"># Ensure bottom elevation above model bottom</span>
+    <span class="n">output_dict</span><span class="p">[</span><span class="s2">&quot;bottom_elevation&quot;</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">align_interface_levels</span><span class="p">(</span>
+        <span class="n">output_dict</span><span class="p">[</span><span class="s2">&quot;bottom_elevation&quot;</span><span class="p">],</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">AlignLevelsMode</span><span class="o">.</span><span class="n">BOTTOMUP</span>
+    <span class="p">)</span>
+    <span class="c1"># Ensure stage above bottom_elevation</span>
+    <span class="n">output_dict</span><span class="p">[</span><span class="s2">&quot;stage&quot;</span><span class="p">],</span> <span class="n">output_dict</span><span class="p">[</span><span class="s2">&quot;bottom_elevation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">align_interface_levels</span><span class="p">(</span>
+        <span class="n">output_dict</span><span class="p">[</span><span class="s2">&quot;stage&quot;</span><span class="p">],</span> <span class="n">output_dict</span><span class="p">[</span><span class="s2">&quot;bottom_elevation&quot;</span><span class="p">],</span> <span class="n">AlignLevelsMode</span><span class="o">.</span><span class="n">TOPDOWN</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">output_dict</span></div>
+
+
+
+<div class="viewcode-block" id="cleanup_drn">
+<a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.cleanup_drn.html#imod.prepare.cleanup_drn">[docs]</a>
+<span class="k">def</span> <span class="nf">cleanup_drn</span><span class="p">(</span>
+    <span class="n">idomain</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">elevation</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">conductance</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">concentration</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GridDataArray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Clean up drain data, fixes some common mistakes causing ValidationErrors by</span>
+<span class="sd">    doing the following:</span>
+
+<span class="sd">    - Cells where conductance &lt;= 0 are deactivated.</span>
+<span class="sd">    - Cells where concentration &lt; 0 are set to 0.0.</span>
+<span class="sd">    - Cells outside active domain (idomain==1) are removed.</span>
+<span class="sd">    - Align NoData: If one variable has an inactive cell in one cell, ensure</span>
+<span class="sd">      this cell is deactivated for all variables.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    idomain: xarray.DataArray | xugrid.UgridDataArray</span>
+<span class="sd">        MODFLOW 6 model domain. idomain==1 is considered active domain.</span>
+<span class="sd">    elevation: xarray.DataArray | xugrid.UgridDataArray</span>
+<span class="sd">        Grid with drain elevations</span>
+<span class="sd">    conductance: xarray.DataArray | xugrid.UgridDataArray</span>
+<span class="sd">        Grid with conductances</span>
+<span class="sd">    concentration: xarray.DataArray | xugrid.UgridDataArray, optional</span>
+<span class="sd">        Optional grid with concentrations</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict[str, xarray.DataArray | xugrid.UgridDataArray]</span>
+<span class="sd">        Dict of cleaned up grids. Has keys: &quot;elevation&quot;, &quot;conductance&quot;,</span>
+<span class="sd">        &quot;concentration&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Output dict</span>
+    <span class="n">output_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;elevation&quot;</span><span class="p">:</span> <span class="n">elevation</span><span class="p">,</span>
+        <span class="s2">&quot;conductance&quot;</span><span class="p">:</span> <span class="n">conductance</span><span class="p">,</span>
+        <span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="n">concentration</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">_cleanup_robin_boundary</span><span class="p">(</span><span class="n">idomain</span><span class="p">,</span> <span class="n">output_dict</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="cleanup_ghb">
+<a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.cleanup_ghb.html#imod.prepare.cleanup_ghb">[docs]</a>
+<span class="k">def</span> <span class="nf">cleanup_ghb</span><span class="p">(</span>
+    <span class="n">idomain</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">head</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">conductance</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">concentration</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GridDataArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GridDataArray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Clean up general head boundary data, fixes some common mistakes causing</span>
+<span class="sd">    ValidationErrors by doing the following:</span>
+
+<span class="sd">    - Cells where conductance &lt;= 0 are deactivated.</span>
+<span class="sd">    - Cells where concentration &lt; 0 are set to 0.0.</span>
+<span class="sd">    - Cells outside active domain (idomain==1) are removed.</span>
+<span class="sd">    - Align NoData: If one variable has an inactive cell in one cell, ensure</span>
+<span class="sd">      this cell is deactivated for all variables.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    idomain: xarray.DataArray | xugrid.UgridDataArray</span>
+<span class="sd">        MODFLOW 6 model domain. idomain==1 is considered active domain.</span>
+<span class="sd">    head: xarray.DataArray | xugrid.UgridDataArray</span>
+<span class="sd">        Grid with heads</span>
+<span class="sd">    conductance: xarray.DataArray | xugrid.UgridDataArray</span>
+<span class="sd">        Grid with conductances</span>
+<span class="sd">    concentration: xarray.DataArray | xugrid.UgridDataArray, optional</span>
+<span class="sd">        Optional grid with concentrations</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict[str, xarray.DataArray | xugrid.UgridDataArray]</span>
+<span class="sd">        Dict of cleaned up grids. Has keys: &quot;head&quot;, &quot;conductance&quot;,</span>
+<span class="sd">        &quot;concentration&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Output dict</span>
+    <span class="n">output_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;head&quot;</span><span class="p">:</span> <span class="n">head</span><span class="p">,</span>
+        <span class="s2">&quot;conductance&quot;</span><span class="p">:</span> <span class="n">conductance</span><span class="p">,</span>
+        <span class="s2">&quot;concentration&quot;</span><span class="p">:</span> <span class="n">concentration</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">_cleanup_robin_boundary</span><span class="p">(</span><span class="n">idomain</span><span class="p">,</span> <span class="n">output_dict</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">_locate_wells_in_bounds</span><span class="p">(</span>
+    <span class="n">wells</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">top</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Locate wells in model bounds, wells outside bounds are dropped. Returned</span>
+<span class="sd">    dataframes and series have well &quot;id&quot; as index.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    wells_in_bounds: pd.DataFrame</span>
+<span class="sd">        wells in model boundaries. Has &quot;id&quot; as index.</span>
+<span class="sd">    xy_top_series: pd.Series</span>
+<span class="sd">        model top at well xy location. Has &quot;id&quot; as index.</span>
+<span class="sd">    xy_base_series: pd.Series</span>
+<span class="sd">        model base at well xy location. Has &quot;id&quot; as index.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">id_in_bounds</span><span class="p">,</span> <span class="n">xy_top</span><span class="p">,</span> <span class="n">xy_bottom</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">locate_wells</span><span class="p">(</span>
+        <span class="n">wells</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span>
+    <span class="n">xy_base_model</span> <span class="o">=</span> <span class="n">xy_bottom</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Assign id as coordinates</span>
+    <span class="n">xy_top</span> <span class="o">=</span> <span class="n">xy_top</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="n">id_in_bounds</span><span class="p">))</span>
+    <span class="n">xy_base_model</span> <span class="o">=</span> <span class="n">xy_base_model</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="n">id_in_bounds</span><span class="p">))</span>
+    <span class="c1"># Create pandas dataframes/series with &quot;id&quot; as index.</span>
+    <span class="n">xy_top_series</span> <span class="o">=</span> <span class="n">xy_top</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;top&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span>
+    <span class="n">xy_base_series</span> <span class="o">=</span> <span class="n">xy_base_model</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;bottom&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)[</span><span class="s2">&quot;bottom&quot;</span><span class="p">]</span>
+    <span class="n">wells_in_bounds</span> <span class="o">=</span> <span class="n">wells</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">id_in_bounds</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">wells_in_bounds</span><span class="p">,</span> <span class="n">xy_top_series</span><span class="p">,</span> <span class="n">xy_base_series</span>
+
+
+<span class="k">def</span> <span class="nf">_clip_filter_screen_to_surface_level</span><span class="p">(</span>
+    <span class="n">cleaned_wells</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">xy_top_series</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">cleaned_wells</span><span class="p">[</span><span class="s2">&quot;screen_top&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cleaned_wells</span><span class="p">[</span><span class="s2">&quot;screen_top&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">upper</span><span class="o">=</span><span class="n">xy_top_series</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cleaned_wells</span>
+
+
+<span class="k">def</span> <span class="nf">_drop_wells_below_model_base</span><span class="p">(</span>
+    <span class="n">cleaned_wells</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">xy_base_series</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">is_below_base</span> <span class="o">=</span> <span class="n">cleaned_wells</span><span class="p">[</span><span class="s2">&quot;screen_top&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">xy_base_series</span>
+    <span class="k">return</span> <span class="n">cleaned_wells</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">is_below_base</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_clip_filter_bottom_to_model_base</span><span class="p">(</span>
+    <span class="n">cleaned_wells</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">xy_base_series</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">cleaned_wells</span><span class="p">[</span><span class="s2">&quot;screen_bottom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cleaned_wells</span><span class="p">[</span><span class="s2">&quot;screen_bottom&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span>
+        <span class="n">lower</span><span class="o">=</span><span class="n">xy_base_series</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">cleaned_wells</span>
+
+
+<span class="k">def</span> <span class="nf">_set_inverted_filters_to_point_filters</span><span class="p">(</span><span class="n">cleaned_wells</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="c1"># Convert all filters where screen bottom exceeds screen top to</span>
+    <span class="c1"># point filters</span>
+    <span class="n">cleaned_wells</span><span class="p">[</span><span class="s2">&quot;screen_bottom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cleaned_wells</span><span class="p">[</span><span class="s2">&quot;screen_bottom&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span>
+        <span class="n">upper</span><span class="o">=</span><span class="n">cleaned_wells</span><span class="p">[</span><span class="s2">&quot;screen_top&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">cleaned_wells</span>
+
+
+<span class="k">def</span> <span class="nf">_set_ultrathin_filters_to_point_filters</span><span class="p">(</span>
+    <span class="n">cleaned_wells</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">minimum_thickness</span><span class="p">:</span> <span class="nb">float</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">not_ultrathin_layer</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">cleaned_wells</span><span class="p">[</span><span class="s2">&quot;screen_top&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">cleaned_wells</span><span class="p">[</span><span class="s2">&quot;screen_bottom&quot;</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">&gt;</span> <span class="n">minimum_thickness</span>
+    <span class="n">cleaned_wells</span><span class="p">[</span><span class="s2">&quot;screen_bottom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cleaned_wells</span><span class="p">[</span><span class="s2">&quot;screen_bottom&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="n">not_ultrathin_layer</span><span class="p">,</span> <span class="n">cleaned_wells</span><span class="p">[</span><span class="s2">&quot;screen_top&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">cleaned_wells</span>
+
+
+<div class="viewcode-block" id="cleanup_wel">
+<a class="viewcode-back" href="../../../api/generated/prepare/imod.prepare.cleanup_wel.html#imod.prepare.cleanup_wel">[docs]</a>
+<span class="k">def</span> <span class="nf">cleanup_wel</span><span class="p">(</span>
+    <span class="n">wells</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">top</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">bottom</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+    <span class="n">minimum_thickness</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Clean up dataframe with wells, fixes some common mistakes in the following</span>
+<span class="sd">    order:</span>
+
+<span class="sd">    1. Wells outside grid bounds are dropped</span>
+<span class="sd">    2. Filters above surface level are set to surface level</span>
+<span class="sd">    3. Drop wells with filters entirely below base</span>
+<span class="sd">    4. Clip filter screen_bottom to model base</span>
+<span class="sd">    5. Clip filter screen_bottom to screen_top</span>
+<span class="sd">    6. Well filters thinner than minimum thickness are made point filters</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    wells: pandas.Dataframe</span>
+<span class="sd">        Dataframe with wells to be cleaned up. Requires columns ``&quot;x&quot;, &quot;y&quot;,</span>
+<span class="sd">        &quot;id&quot;, &quot;screen_top&quot;, &quot;screen_bottom&quot;``</span>
+<span class="sd">    top: xarray.DataArray | xugrid.UgridDataArray</span>
+<span class="sd">        Grid with model top</span>
+<span class="sd">    bottom: xarray.DataArray | xugrid.UgridDataArray</span>
+<span class="sd">        Grid with model bottoms</span>
+<span class="sd">    minimum_thickness: float</span>
+<span class="sd">        Minimum thickness, filter thinner than this thickness are set to point</span>
+<span class="sd">        filters</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pandas.DataFrame</span>
+<span class="sd">        Cleaned well dataframe.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">validate_well_columnnames</span><span class="p">(</span>
+        <span class="n">wells</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;screen_top&quot;</span><span class="p">,</span> <span class="s2">&quot;screen_bottom&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="n">cleaned_wells</span><span class="p">,</span> <span class="n">xy_top_series</span><span class="p">,</span> <span class="n">xy_base_series</span> <span class="o">=</span> <span class="n">_locate_wells_in_bounds</span><span class="p">(</span>
+        <span class="n">wells</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span>
+    <span class="p">)</span>
+    <span class="n">cleaned_wells</span> <span class="o">=</span> <span class="n">_clip_filter_screen_to_surface_level</span><span class="p">(</span><span class="n">cleaned_wells</span><span class="p">,</span> <span class="n">xy_top_series</span><span class="p">)</span>
+    <span class="n">cleaned_wells</span> <span class="o">=</span> <span class="n">_drop_wells_below_model_base</span><span class="p">(</span><span class="n">cleaned_wells</span><span class="p">,</span> <span class="n">xy_base_series</span><span class="p">)</span>
+    <span class="n">cleaned_wells</span> <span class="o">=</span> <span class="n">_clip_filter_bottom_to_model_base</span><span class="p">(</span><span class="n">cleaned_wells</span><span class="p">,</span> <span class="n">xy_base_series</span><span class="p">)</span>
+    <span class="n">cleaned_wells</span> <span class="o">=</span> <span class="n">_set_inverted_filters_to_point_filters</span><span class="p">(</span><span class="n">cleaned_wells</span><span class="p">)</span>
+    <span class="n">cleaned_wells</span> <span class="o">=</span> <span class="n">_set_ultrathin_filters_to_point_filters</span><span class="p">(</span>
+        <span class="n">cleaned_wells</span><span class="p">,</span> <span class="n">minimum_thickness</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">cleaned_wells</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -14,7 +14,11 @@
    .. autosummary::
    
       ~TimeOutputControl.__init__
+      ~TimeOutputControl.get_non_grid_data
+      ~TimeOutputControl.get_regrid_methods
+      ~TimeOutputControl.is_regridding_supported
       ~TimeOutputControl.isel
+      ~TimeOutputControl.regrid_like
       ~TimeOutputControl.sel
       ~TimeOutputControl.write
       ~TimeOutputControl.write_dataframe_fixed_width
@@ -22,5 +26,12 @@
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~TimeOutputControl.auxiliary_data_fields
+      ~TimeOutputControl.dataset
    
    

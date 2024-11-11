@@ -14,6 +14,7 @@
    .. autosummary::
    
       ~Buoyancy.__init__
+      ~Buoyancy.cleanup
       ~Buoyancy.clip_box
       ~Buoyancy.copy
       ~Buoyancy.from_file

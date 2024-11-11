@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>MODFLOW6 &#8212; iMOD Python 0.17.2 documentation</title>
+    <title>MODFLOW6 &#8212; iMOD Python 0.18.0 documentation</title>
   
   
   
@@ -16,17 +16,19 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
   </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-
-  
-  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
@@ -34,13 +36,14 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="../_static/documentation_options.js?v=9fbddafe"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/documentation_options.js?v=ba2e7b09"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/mf6';</script>
     <script src="../_static/deltares.js?v=8d5578be"></script>
@@ -50,6 +53,7 @@
     <link rel="prev" title="imod.logging.pythonlogger.PythonLogger" href="generated/logging/imod.logging.pythonlogger.PythonLogger.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.18.0.dev" />
   </head>
   
   
@@ -65,19 +69,8 @@
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../search.html"
       method="get">
@@ -85,7 +78,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search the docs ..."
          aria-label="Search the docs ..."
          autocomplete="off"
@@ -93,8 +85,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -125,8 +117,8 @@
     
     
     
-    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 0.17.2 documentation - Home"/>
-    <script>document.write(`<img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark" alt="iMOD Python 0.17.2 documentation - Home"/>`);</script>
+    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 0.18.0 documentation - Home"/>
+    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 0.18.0 documentation - Home"/>
   
   
 </a></div>
@@ -182,7 +174,7 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../developing.html">
+  <a class="nav-link dropdown-item nav-internal" href="../developing/index.html">
     Developing
   </a>
 </li>
@@ -201,29 +193,21 @@
         <div class="navbar-item navbar-persistent--container">
           
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
       
       
         <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
       
         <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
@@ -260,15 +244,11 @@ document.write(`
   
     <div class="navbar-persistent--mobile">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
     </div>
   
 
@@ -287,7 +267,8 @@ document.write(`
       
       
       
-      <div class="bd-sidebar-primary bd-sidebar">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -338,7 +319,7 @@ document.write(`
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../developing.html">
+  <a class="nav-link nav-internal" href="../developing/index.html">
     Developing
   </a>
 </li>
@@ -355,15 +336,11 @@ document.write(`
         
           <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
         
           <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
@@ -424,7 +401,6 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="generated/io/imod.formats.prj.read_projectfile.html">imod.formats.prj.read_projectfile</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html">imod.formats.prj.open_projectfile_data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/io/imod.formats.prj.read_timfile.html">imod.formats.prj.read_timfile</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/io/imod.formats.prj.convert_to_disv.html">imod.formats.prj.convert_to_disv</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="prepare.html">Prepare model input</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -441,6 +417,8 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.rasterize_celltable.html">imod.prepare.rasterize_celltable</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.zonal_aggregate_polygons.html">imod.prepare.zonal_aggregate_polygons</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.zonal_aggregate_raster.html">imod.prepare.zonal_aggregate_raster</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.linestring_to_square_zpolygons.html">imod.prepare.linestring_to_square_zpolygons</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.linestring_to_trapezoid_zpolygons.html">imod.prepare.linestring_to_trapezoid_zpolygons</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.assign_wells.html">imod.prepare.assign_wells</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.get_lower_active_grid_cells.html">imod.prepare.get_lower_active_grid_cells</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.get_lower_active_layer_number.html">imod.prepare.get_lower_active_layer_number</a></li>
@@ -458,6 +436,10 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.distribute_drn_conductance.html">imod.prepare.distribute_drn_conductance</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.distribute_ghb_conductance.html">imod.prepare.distribute_ghb_conductance</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.distribute_riv_conductance.html">imod.prepare.distribute_riv_conductance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.cleanup_drn.html">imod.prepare.cleanup_drn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.cleanup_ghb.html">imod.prepare.cleanup_ghb</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.cleanup_riv.html">imod.prepare.cleanup_riv</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/prepare/imod.prepare.cleanup_wel.html">imod.prepare.cleanup_wel</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="select.html">Select points and cross sections</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -509,6 +491,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.where.html">imod.util.where</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.cd.html">imod.util.cd</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.ignore_warnings.html">imod.util.ignore_warnings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.print_if_error.html">imod.util.print_if_error</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.to_datetime.html">imod.util.to_datetime</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.coord_reference.html">imod.util.coord_reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/util/imod.util.spatial_reference.html">imod.util.spatial_reference</a></li>
@@ -572,6 +555,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.regrid_like.html">imod.mf6.Modflow6Simulation.regrid_like</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.html">imod.mf6.GroundwaterFlowModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.mask_all_packages.html">imod.mf6.GroundwaterFlowModel.mask_all_packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.prepare_wel_for_mf6.html">imod.mf6.GroundwaterFlowModel.prepare_wel_for_mf6</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.dump.html">imod.mf6.GroundwaterFlowModel.dump</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterTransportModel.html">imod.mf6.GroundwaterTransportModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterTransportModel.mask_all_packages.html">imod.mf6.GroundwaterTransportModel.mask_all_packages</a></li>
@@ -587,20 +571,72 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.ApiPackage.html">imod.mf6.ApiPackage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Buoyancy.html">imod.mf6.Buoyancy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.ConstantHead.html">imod.mf6.ConstantHead</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.ConstantHead.from_imod5_data.html">imod.mf6.ConstantHead.from_imod5_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.ConstantHead.from_imod5_shd_data.html">imod.mf6.ConstantHead.from_imod5_shd_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.ConstantHead.mask.html">imod.mf6.ConstantHead.mask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.ConstantHead.regrid_like.html">imod.mf6.ConstantHead.regrid_like</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Drainage.html">imod.mf6.Drainage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Drainage.mask.html">imod.mf6.Drainage.mask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Drainage.from_imod5_data.html">imod.mf6.Drainage.from_imod5_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Drainage.regrid_like.html">imod.mf6.Drainage.regrid_like</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Drainage.cleanup.html">imod.mf6.Drainage.cleanup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Evapotranspiration.html">imod.mf6.Evapotranspiration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Evapotranspiration.mask.html">imod.mf6.Evapotranspiration.mask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Evapotranspiration.regrid_like.html">imod.mf6.Evapotranspiration.regrid_like</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GeneralHeadBoundary.html">imod.mf6.GeneralHeadBoundary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GeneralHeadBoundary.from_imod5_data.html">imod.mf6.GeneralHeadBoundary.from_imod5_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GeneralHeadBoundary.mask.html">imod.mf6.GeneralHeadBoundary.mask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GeneralHeadBoundary.regrid_like.html">imod.mf6.GeneralHeadBoundary.regrid_like</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GeneralHeadBoundary.cleanup.html">imod.mf6.GeneralHeadBoundary.cleanup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic.html">imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg.html">imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierMultiplier.html">imod.mf6.HorizontalFlowBarrierMultiplier</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierMultiplier.to_mf6_pkg.html">imod.mf6.HorizontalFlowBarrierMultiplier.to_mf6_pkg</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierResistance.html">imod.mf6.HorizontalFlowBarrierResistance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierResistance.to_mf6_pkg.html">imod.mf6.HorizontalFlowBarrierResistance.to_mf6_pkg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.LayeredWell.html">imod.mf6.LayeredWell</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.LayeredWell.from_imod5_data.html">imod.mf6.LayeredWell.from_imod5_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.LayeredWell.mask.html">imod.mf6.LayeredWell.mask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.LayeredWell.regrid_like.html">imod.mf6.LayeredWell.regrid_like</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.LayeredWell.to_mf6_pkg.html">imod.mf6.LayeredWell.to_mf6_pkg</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.InitialConditions.html">imod.mf6.InitialConditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.InitialConditions.from_imod5_data.html">imod.mf6.InitialConditions.from_imod5_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.InitialConditions.mask.html">imod.mf6.InitialConditions.mask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.InitialConditions.regrid_like.html">imod.mf6.InitialConditions.regrid_like</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.NodePropertyFlow.html">imod.mf6.NodePropertyFlow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.NodePropertyFlow.from_imod5_data.html">imod.mf6.NodePropertyFlow.from_imod5_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.NodePropertyFlow.mask.html">imod.mf6.NodePropertyFlow.mask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.NodePropertyFlow.regrid_like.html">imod.mf6.NodePropertyFlow.regrid_like</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.html">imod.mf6.Recharge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.from_imod5_data.html">imod.mf6.Recharge.from_imod5_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.mask.html">imod.mf6.Recharge.mask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.regrid_like.html">imod.mf6.Recharge.regrid_like</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.River.html">imod.mf6.River</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.River.from_imod5_data.html">imod.mf6.River.from_imod5_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.River.mask.html">imod.mf6.River.mask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.River.regrid_like.html">imod.mf6.River.regrid_like</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.River.cleanup.html">imod.mf6.River.cleanup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.html">imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg.html">imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.html">imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg.html">imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.html">imod.mf6.SingleLayerHorizontalFlowBarrierResistance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data.html">imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg.html">imod.mf6.SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SpecificStorage.html">imod.mf6.SpecificStorage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SpecificStorage.mask.html">imod.mf6.SpecificStorage.mask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.SpecificStorage.regrid_like.html">imod.mf6.SpecificStorage.regrid_like</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.html">imod.mf6.StorageCoefficient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.from_imod5_data.html">imod.mf6.StorageCoefficient.from_imod5_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.mask.html">imod.mf6.StorageCoefficient.mask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.regrid_like.html">imod.mf6.StorageCoefficient.regrid_like</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.UnsaturatedZoneFlow.html">imod.mf6.UnsaturatedZoneFlow</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Well.html">imod.mf6.Well</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Well.cleanup.html">imod.mf6.Well.cleanup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Well.from_imod5_data.html">imod.mf6.Well.from_imod5_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Well.mask.html">imod.mf6.Well.mask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Well.regrid_like.html">imod.mf6.Well.regrid_like</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Well.to_mf6_pkg.html">imod.mf6.Well.to_mf6_pkg</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.WellDisStructured.html">imod.mf6.WellDisStructured</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.WellDisVertices.html">imod.mf6.WellDisVertices</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.ApiPackage.html">imod.mf6.ApiPackage</a></li>
@@ -729,8 +765,6 @@ document.write(`
       
         <div class="header-article-item">
 
-
-
 <nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
@@ -742,7 +776,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link">API Reference</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">MODFLOW6</li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">MODFLOW6</span></li>
   </ul>
 </nav>
 </div>
@@ -824,16 +858,19 @@ document.write(`
 <tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.mask_all_packages.html#imod.mf6.GroundwaterFlowModel.mask_all_packages" title="imod.mf6.GroundwaterFlowModel.mask_all_packages"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GroundwaterFlowModel.mask_all_packages</span></code></a>(mask)</p></td>
 <td><p>This function applies a mask to all packages in a model.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.dump.html#imod.mf6.GroundwaterFlowModel.dump" title="imod.mf6.GroundwaterFlowModel.dump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GroundwaterFlowModel.dump</span></code></a>(directory, modelname)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.prepare_wel_for_mf6.html#imod.mf6.GroundwaterFlowModel.prepare_wel_for_mf6" title="imod.mf6.GroundwaterFlowModel.prepare_wel_for_mf6"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GroundwaterFlowModel.prepare_wel_for_mf6</span></code></a>(pkgname)</p></td>
+<td><p>Prepare grid-agnostic well for MODFLOW6, using the models grid information and hydraulic conductivities.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.dump.html#imod.mf6.GroundwaterFlowModel.dump" title="imod.mf6.GroundwaterFlowModel.dump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GroundwaterFlowModel.dump</span></code></a>(directory, modelname)</p></td>
 <td><p>Dump simulation to files.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterTransportModel.html#imod.mf6.GroundwaterTransportModel" title="imod.mf6.GroundwaterTransportModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GroundwaterTransportModel</span></code></a>([listing_file, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterTransportModel.html#imod.mf6.GroundwaterTransportModel" title="imod.mf6.GroundwaterTransportModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GroundwaterTransportModel</span></code></a>([listing_file, ...])</p></td>
 <td><p>The GroundwaterTransportModel (GWT) simulates transport of a single solute species flowing in groundwater.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterTransportModel.mask_all_packages.html#imod.mf6.GroundwaterTransportModel.mask_all_packages" title="imod.mf6.GroundwaterTransportModel.mask_all_packages"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GroundwaterTransportModel.mask_all_packages</span></code></a>(mask)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterTransportModel.mask_all_packages.html#imod.mf6.GroundwaterTransportModel.mask_all_packages" title="imod.mf6.GroundwaterTransportModel.mask_all_packages"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GroundwaterTransportModel.mask_all_packages</span></code></a>(mask)</p></td>
 <td><p>This function applies a mask to all packages in a model.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterTransportModel.dump.html#imod.mf6.GroundwaterTransportModel.dump" title="imod.mf6.GroundwaterTransportModel.dump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GroundwaterTransportModel.dump</span></code></a>(directory, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterTransportModel.dump.html#imod.mf6.GroundwaterTransportModel.dump" title="imod.mf6.GroundwaterTransportModel.dump"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GroundwaterTransportModel.dump</span></code></a>(directory, ...)</p></td>
 <td><p>Dump simulation to files.</p></td>
 </tr>
 </tbody>
@@ -893,47 +930,203 @@ document.write(`
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.ConstantHead.html#imod.mf6.ConstantHead" title="imod.mf6.ConstantHead"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConstantHead</span></code></a>(*_, **__)</p></td>
 <td><p>Constant-Head package.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.ConstantHead.from_imod5_data.html#imod.mf6.ConstantHead.from_imod5_data" title="imod.mf6.ConstantHead.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConstantHead.from_imod5_data</span></code></a>(key, ...[, ...])</p></td>
+<td><p>Construct a ConstantHead-package from iMOD5 data, loaded with the <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.ConstantHead.from_imod5_shd_data.html#imod.mf6.ConstantHead.from_imod5_shd_data" title="imod.mf6.ConstantHead.from_imod5_shd_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConstantHead.from_imod5_shd_data</span></code></a>(imod5_data, ...)</p></td>
+<td><p>Construct a ConstantHead-package from iMOD5 data, loaded with the <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.ConstantHead.mask.html#imod.mf6.ConstantHead.mask" title="imod.mf6.ConstantHead.mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConstantHead.mask</span></code></a>(mask)</p></td>
+<td><p>Mask values outside of domain.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.ConstantHead.regrid_like.html#imod.mf6.ConstantHead.regrid_like" title="imod.mf6.ConstantHead.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConstantHead.regrid_like</span></code></a>(target_grid, ...[, ...])</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
+</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Drainage.html#imod.mf6.Drainage" title="imod.mf6.Drainage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Drainage</span></code></a>(*_, **__)</p></td>
 <td><p>The Drain package is used to simulate head-dependent flux boundaries.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Drainage.mask.html#imod.mf6.Drainage.mask" title="imod.mf6.Drainage.mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Drainage.mask</span></code></a>(mask)</p></td>
+<td><p>Mask values outside of domain.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Drainage.from_imod5_data.html#imod.mf6.Drainage.from_imod5_data" title="imod.mf6.Drainage.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Drainage.from_imod5_data</span></code></a>(key, imod5_data, ...)</p></td>
+<td><p>Construct a drainage-package from iMOD5 data, loaded with the <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Drainage.regrid_like.html#imod.mf6.Drainage.regrid_like" title="imod.mf6.Drainage.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Drainage.regrid_like</span></code></a>(target_grid, regrid_cache)</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Drainage.cleanup.html#imod.mf6.Drainage.cleanup" title="imod.mf6.Drainage.cleanup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Drainage.cleanup</span></code></a>(dis)</p></td>
+<td><p>Clean up package inplace.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Evapotranspiration.html#imod.mf6.Evapotranspiration" title="imod.mf6.Evapotranspiration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Evapotranspiration</span></code></a>(*_, **__)</p></td>
 <td><p>Evapotranspiration (EVT) Package.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Evapotranspiration.mask.html#imod.mf6.Evapotranspiration.mask" title="imod.mf6.Evapotranspiration.mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Evapotranspiration.mask</span></code></a>(mask)</p></td>
+<td><p>Mask values outside of domain.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Evapotranspiration.regrid_like.html#imod.mf6.Evapotranspiration.regrid_like" title="imod.mf6.Evapotranspiration.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Evapotranspiration.regrid_like</span></code></a>(target_grid, ...)</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
+</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.GeneralHeadBoundary.html#imod.mf6.GeneralHeadBoundary" title="imod.mf6.GeneralHeadBoundary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GeneralHeadBoundary</span></code></a>(*_, **__)</p></td>
 <td><p>The General-Head Boundary package is used to simulate head-dependent flux boundaries.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.GeneralHeadBoundary.from_imod5_data.html#imod.mf6.GeneralHeadBoundary.from_imod5_data" title="imod.mf6.GeneralHeadBoundary.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GeneralHeadBoundary.from_imod5_data</span></code></a>(key, ...)</p></td>
+<td><p>Construct a GeneralHeadBoundary-package from iMOD5 data, loaded with the <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.GeneralHeadBoundary.mask.html#imod.mf6.GeneralHeadBoundary.mask" title="imod.mf6.GeneralHeadBoundary.mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GeneralHeadBoundary.mask</span></code></a>(mask)</p></td>
+<td><p>Mask values outside of domain.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.GeneralHeadBoundary.regrid_like.html#imod.mf6.GeneralHeadBoundary.regrid_like" title="imod.mf6.GeneralHeadBoundary.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GeneralHeadBoundary.regrid_like</span></code></a>(target_grid, ...)</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.GeneralHeadBoundary.cleanup.html#imod.mf6.GeneralHeadBoundary.cleanup" title="imod.mf6.GeneralHeadBoundary.cleanup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GeneralHeadBoundary.cleanup</span></code></a>(dis)</p></td>
+<td><p>Clean up package inplace.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic.html#imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic" title="imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HorizontalFlowBarrierHydraulicCharacteristic</span></code></a>(*_, ...)</p></td>
 <td><p>Horizontal Flow Barrier (HFB) package</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierMultiplier.html#imod.mf6.HorizontalFlowBarrierMultiplier" title="imod.mf6.HorizontalFlowBarrierMultiplier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HorizontalFlowBarrierMultiplier</span></code></a>(*_, **__)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg.html#imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg" title="imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg</span></code></a>(...)</p></td>
+<td><p>Write package to Modflow 6 package.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierMultiplier.html#imod.mf6.HorizontalFlowBarrierMultiplier" title="imod.mf6.HorizontalFlowBarrierMultiplier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HorizontalFlowBarrierMultiplier</span></code></a>(*_, **__)</p></td>
 <td><p>Horizontal Flow Barrier (HFB) package</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierMultiplier.to_mf6_pkg.html#imod.mf6.HorizontalFlowBarrierMultiplier.to_mf6_pkg" title="imod.mf6.HorizontalFlowBarrierMultiplier.to_mf6_pkg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HorizontalFlowBarrierMultiplier.to_mf6_pkg</span></code></a>(...)</p></td>
+<td><p>Write package to Modflow 6 package.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierResistance.html#imod.mf6.HorizontalFlowBarrierResistance" title="imod.mf6.HorizontalFlowBarrierResistance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HorizontalFlowBarrierResistance</span></code></a>(*_, **__)</p></td>
 <td><p>Horizontal Flow Barrier (HFB) package</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierResistance.to_mf6_pkg.html#imod.mf6.HorizontalFlowBarrierResistance.to_mf6_pkg" title="imod.mf6.HorizontalFlowBarrierResistance.to_mf6_pkg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HorizontalFlowBarrierResistance.to_mf6_pkg</span></code></a>(...)</p></td>
+<td><p>Write package to Modflow 6 package.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.LayeredWell.html#imod.mf6.LayeredWell" title="imod.mf6.LayeredWell"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LayeredWell</span></code></a>(*_, **__)</p></td>
+<td><p>Agnostic WEL package, which accepts x, y and layers.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.LayeredWell.from_imod5_data.html#imod.mf6.LayeredWell.from_imod5_data" title="imod.mf6.LayeredWell.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LayeredWell.from_imod5_data</span></code></a>(key, imod5_data, ...)</p></td>
+<td><p>Convert wells to imod5 data, loaded with <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a>, to a Well object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.LayeredWell.mask.html#imod.mf6.LayeredWell.mask" title="imod.mf6.LayeredWell.mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LayeredWell.mask</span></code></a>(domain)</p></td>
+<td><p>Mask wells based on two-dimensional domain.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.LayeredWell.regrid_like.html#imod.mf6.LayeredWell.regrid_like" title="imod.mf6.LayeredWell.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LayeredWell.regrid_like</span></code></a>(target_grid, ...[, ...])</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.LayeredWell.to_mf6_pkg.html#imod.mf6.LayeredWell.to_mf6_pkg" title="imod.mf6.LayeredWell.to_mf6_pkg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LayeredWell.to_mf6_pkg</span></code></a>(active, top, bottom, k)</p></td>
+<td><p>Write package to Modflow 6 package.</p></td>
+</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.InitialConditions.html#imod.mf6.InitialConditions" title="imod.mf6.InitialConditions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditions</span></code></a>(*_, **__)</p></td>
 <td><p>Initial Conditions (IC) Package information is read from the file that is specified by &quot;IC6&quot; as the file type.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.NodePropertyFlow.html#imod.mf6.NodePropertyFlow" title="imod.mf6.NodePropertyFlow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NodePropertyFlow</span></code></a>(*_, **__)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.InitialConditions.from_imod5_data.html#imod.mf6.InitialConditions.from_imod5_data" title="imod.mf6.InitialConditions.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditions.from_imod5_data</span></code></a>(...[, ...])</p></td>
+<td><p>Construct an InitialConditions-package from iMOD5 data, loaded with the <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.InitialConditions.mask.html#imod.mf6.InitialConditions.mask" title="imod.mf6.InitialConditions.mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditions.mask</span></code></a>(mask)</p></td>
+<td><p>Mask values outside of domain.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.InitialConditions.regrid_like.html#imod.mf6.InitialConditions.regrid_like" title="imod.mf6.InitialConditions.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitialConditions.regrid_like</span></code></a>(target_grid, ...)</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.NodePropertyFlow.html#imod.mf6.NodePropertyFlow" title="imod.mf6.NodePropertyFlow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NodePropertyFlow</span></code></a>(*_, **__)</p></td>
 <td><p>Node Property Flow package.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.NodePropertyFlow.from_imod5_data.html#imod.mf6.NodePropertyFlow.from_imod5_data" title="imod.mf6.NodePropertyFlow.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NodePropertyFlow.from_imod5_data</span></code></a>(imod5_data, ...)</p></td>
+<td><p>Construct an npf-package from iMOD5 data, loaded with the <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.NodePropertyFlow.mask.html#imod.mf6.NodePropertyFlow.mask" title="imod.mf6.NodePropertyFlow.mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NodePropertyFlow.mask</span></code></a>(mask)</p></td>
+<td><p>Mask values outside of domain.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.NodePropertyFlow.regrid_like.html#imod.mf6.NodePropertyFlow.regrid_like" title="imod.mf6.NodePropertyFlow.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NodePropertyFlow.regrid_like</span></code></a>(target_grid, ...)</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.html#imod.mf6.Recharge" title="imod.mf6.Recharge"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Recharge</span></code></a>(*_, **__)</p></td>
 <td><p>Recharge Package.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.River.html#imod.mf6.River" title="imod.mf6.River"><code class="xref py py-obj docutils literal notranslate"><span class="pre">River</span></code></a>(*_, **__)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.from_imod5_data.html#imod.mf6.Recharge.from_imod5_data" title="imod.mf6.Recharge.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Recharge.from_imod5_data</span></code></a>(imod5_data, target_dis)</p></td>
+<td><p>Construct an rch-package from iMOD5 data, loaded with the <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.mask.html#imod.mf6.Recharge.mask" title="imod.mf6.Recharge.mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Recharge.mask</span></code></a>(mask)</p></td>
+<td><p>Mask values outside of domain.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.regrid_like.html#imod.mf6.Recharge.regrid_like" title="imod.mf6.Recharge.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Recharge.regrid_like</span></code></a>(target_grid, regrid_cache)</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.River.html#imod.mf6.River" title="imod.mf6.River"><code class="xref py py-obj docutils literal notranslate"><span class="pre">River</span></code></a>(*_, **__)</p></td>
 <td><p>River package.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.River.from_imod5_data.html#imod.mf6.River.from_imod5_data" title="imod.mf6.River.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">River.from_imod5_data</span></code></a>(key, imod5_data, ...)</p></td>
+<td><p>Construct a river-package from iMOD5 data, loaded with the <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.River.mask.html#imod.mf6.River.mask" title="imod.mf6.River.mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">River.mask</span></code></a>(mask)</p></td>
+<td><p>Mask values outside of domain.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.River.regrid_like.html#imod.mf6.River.regrid_like" title="imod.mf6.River.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">River.regrid_like</span></code></a>(target_grid, regrid_cache)</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.River.cleanup.html#imod.mf6.River.cleanup" title="imod.mf6.River.cleanup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">River.cleanup</span></code></a>(dis)</p></td>
+<td><p>Clean up package inplace.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.html#imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic" title="imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierHydraulicCharacteristic</span></code></a>(*_, ...)</p></td>
+<td><p>Horizontal Flow Barrier (HFB) package</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg.html#imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg" title="imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg</span></code></a>(...)</p></td>
+<td><p>Write package to Modflow 6 package.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.html#imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier" title="imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierMultiplier</span></code></a>(*_, ...)</p></td>
+<td><p>Horizontal Flow Barrier (HFB) package</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg.html#imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg" title="imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg</span></code></a>(...)</p></td>
+<td><p>Write package to Modflow 6 package.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.html#imod.mf6.SingleLayerHorizontalFlowBarrierResistance" title="imod.mf6.SingleLayerHorizontalFlowBarrierResistance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierResistance</span></code></a>(*_, ...)</p></td>
+<td><p>Horizontal Flow Barrier (HFB) package</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data.html#imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data" title="imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierResistance.from_imod5_data</span></code></a>(...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg.html#imod.mf6.SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg" title="imod.mf6.SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg</span></code></a>(...)</p></td>
+<td><p>Write package to Modflow 6 package.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SpecificStorage.html#imod.mf6.SpecificStorage" title="imod.mf6.SpecificStorage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SpecificStorage</span></code></a>(*_, **__)</p></td>
 <td><p>Storage Package with specific storage.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SpecificStorage.mask.html#imod.mf6.SpecificStorage.mask" title="imod.mf6.SpecificStorage.mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SpecificStorage.mask</span></code></a>(mask)</p></td>
+<td><p>Mask values outside of domain.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SpecificStorage.regrid_like.html#imod.mf6.SpecificStorage.regrid_like" title="imod.mf6.SpecificStorage.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SpecificStorage.regrid_like</span></code></a>(target_grid, ...)</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.html#imod.mf6.StorageCoefficient" title="imod.mf6.StorageCoefficient"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StorageCoefficient</span></code></a>(*_, **__)</p></td>
 <td><p>Storage Package with a storage coefficient.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.UnsaturatedZoneFlow.html#imod.mf6.UnsaturatedZoneFlow" title="imod.mf6.UnsaturatedZoneFlow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UnsaturatedZoneFlow</span></code></a>(*_, **__)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.from_imod5_data.html#imod.mf6.StorageCoefficient.from_imod5_data" title="imod.mf6.StorageCoefficient.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StorageCoefficient.from_imod5_data</span></code></a>(...[, ...])</p></td>
+<td><p>Construct a StorageCoefficient-package from iMOD5 data, loaded with the <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.mask.html#imod.mf6.StorageCoefficient.mask" title="imod.mf6.StorageCoefficient.mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StorageCoefficient.mask</span></code></a>(mask)</p></td>
+<td><p>Mask values outside of domain.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.regrid_like.html#imod.mf6.StorageCoefficient.regrid_like" title="imod.mf6.StorageCoefficient.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StorageCoefficient.regrid_like</span></code></a>(target_grid, ...)</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.UnsaturatedZoneFlow.html#imod.mf6.UnsaturatedZoneFlow" title="imod.mf6.UnsaturatedZoneFlow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UnsaturatedZoneFlow</span></code></a>(*_, **__)</p></td>
 <td><p>Unsaturated Zone Flow (UZF) package.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Well.html#imod.mf6.Well" title="imod.mf6.Well"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Well</span></code></a>(*_, **__)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Well.html#imod.mf6.Well" title="imod.mf6.Well"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Well</span></code></a>(*_, **__)</p></td>
 <td><p>Agnostic WEL package, which accepts x, y and a top and bottom of the well screens.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Well.cleanup.html#imod.mf6.Well.cleanup" title="imod.mf6.Well.cleanup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Well.cleanup</span></code></a>(dis)</p></td>
+<td><p>Clean up package inplace.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Well.from_imod5_data.html#imod.mf6.Well.from_imod5_data" title="imod.mf6.Well.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Well.from_imod5_data</span></code></a>(key, imod5_data, times)</p></td>
+<td><p>Convert wells to imod5 data, loaded with <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a>, to a Well object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Well.mask.html#imod.mf6.Well.mask" title="imod.mf6.Well.mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Well.mask</span></code></a>(domain)</p></td>
+<td><p>Mask wells based on two-dimensional domain.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Well.regrid_like.html#imod.mf6.Well.regrid_like" title="imod.mf6.Well.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Well.regrid_like</span></code></a>(target_grid, regrid_cache)</p></td>
+<td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Well.to_mf6_pkg.html#imod.mf6.Well.to_mf6_pkg" title="imod.mf6.Well.to_mf6_pkg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Well.to_mf6_pkg</span></code></a>(active, top, bottom, k[, ...])</p></td>
+<td><p>Write package to Modflow 6 package.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.WellDisStructured.html#imod.mf6.WellDisStructured" title="imod.mf6.WellDisStructured"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WellDisStructured</span></code></a>(*_, **__)</p></td>
 <td><p>WEL package for structured discretization (DIS) models .</p></td>
@@ -993,7 +1186,7 @@ document.write(`
 <h2>Regrid Method Settings<a class="headerlink" href="#regrid-method-settings" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/regrid/imod.mf6.regrid.ConstantHeadRegridMethod.html#imod.mf6.regrid.ConstantHeadRegridMethod" title="imod.mf6.regrid.ConstantHeadRegridMethod"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConstantHeadRegridMethod</span></code></a>([head, concentration])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/regrid/imod.mf6.regrid.ConstantHeadRegridMethod.html#imod.mf6.regrid.ConstantHeadRegridMethod" title="imod.mf6.regrid.ConstantHeadRegridMethod"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ConstantHeadRegridMethod</span></code></a>([head, ...])</p></td>
 <td><p>Object containing regridder methods for the <a class="reference internal" href="generated/mf6/imod.mf6.ConstantHead.html#imod.mf6.ConstantHead" title="imod.mf6.ConstantHead"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.ConstantHead</span></code></a> package.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/regrid/imod.mf6.regrid.DiscretizationRegridMethod.html#imod.mf6.regrid.DiscretizationRegridMethod" title="imod.mf6.regrid.DiscretizationRegridMethod"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DiscretizationRegridMethod</span></code></a>([top, bottom, ...])</p></td>
@@ -1076,7 +1269,8 @@ document.write(`
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
 
   <div class="sidebar-secondary-item">
@@ -1126,8 +1320,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1147,7 +1341,7 @@ document.write(`
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
     <br/>
   </p>
 </div>
@@ -1160,7 +1354,7 @@ document.write(`
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
 </p></div>
       
     </div>

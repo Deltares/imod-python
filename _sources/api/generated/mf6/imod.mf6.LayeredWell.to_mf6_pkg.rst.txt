@@ -1,0 +1,6 @@
+﻿imod.mf6.LayeredWell.to\_mf6\_pkg
+=================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: LayeredWell.to_mf6_pkg

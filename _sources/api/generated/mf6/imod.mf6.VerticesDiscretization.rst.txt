@@ -14,6 +14,7 @@
    .. autosummary::
    
       ~VerticesDiscretization.__init__
+      ~VerticesDiscretization.cleanup
       ~VerticesDiscretization.clip_box
       ~VerticesDiscretization.copy
       ~VerticesDiscretization.from_file

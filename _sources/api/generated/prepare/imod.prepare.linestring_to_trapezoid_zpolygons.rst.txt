@@ -1,0 +1,6 @@
+﻿imod.prepare.linestring\_to\_trapezoid\_zpolygons
+=================================================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: linestring_to_trapezoid_zpolygons

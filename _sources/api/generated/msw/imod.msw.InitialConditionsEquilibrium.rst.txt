@@ -14,7 +14,11 @@
    .. autosummary::
    
       ~InitialConditionsEquilibrium.__init__
+      ~InitialConditionsEquilibrium.get_non_grid_data
+      ~InitialConditionsEquilibrium.get_regrid_methods
+      ~InitialConditionsEquilibrium.is_regridding_supported
       ~InitialConditionsEquilibrium.isel
+      ~InitialConditionsEquilibrium.regrid_like
       ~InitialConditionsEquilibrium.sel
       ~InitialConditionsEquilibrium.write
       ~InitialConditionsEquilibrium.write_dataframe_fixed_width
@@ -22,5 +26,12 @@
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~InitialConditionsEquilibrium.auxiliary_data_fields
+      ~InitialConditionsEquilibrium.dataset
    
    

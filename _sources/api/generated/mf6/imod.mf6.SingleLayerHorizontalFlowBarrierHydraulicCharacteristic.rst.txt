@@ -1,0 +1,54 @@
+﻿imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic
+================================================================
+
+.. currentmodule:: imod.mf6
+
+.. autoclass:: SingleLayerHorizontalFlowBarrierHydraulicCharacteristic
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.__init__
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.cleanup
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.clip_box
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.copy
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.from_file
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.get_non_grid_data
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.get_period_varnames
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.get_regrid_methods
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.is_clipping_supported
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.is_empty
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.is_grid_agnostic_package
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.is_regridding_supported
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.is_splitting_supported
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.isel
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.mask
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.regrid_like
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.render
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.sel
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.set_repeat_stress
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_netcdf
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.write
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.write_binary_griddata
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.write_blockfile
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.write_text_griddata
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.auxiliary_data_fields
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.dataset
+      ~SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.line_data
+   
+   

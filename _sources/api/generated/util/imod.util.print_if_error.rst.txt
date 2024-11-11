@@ -1,0 +1,6 @@
+﻿imod.util.print\_if\_error
+==========================
+
+.. currentmodule:: imod.util
+
+.. autofunction:: print_if_error

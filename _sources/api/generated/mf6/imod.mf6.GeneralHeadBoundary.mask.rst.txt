@@ -1,0 +1,6 @@
+﻿imod.mf6.GeneralHeadBoundary.mask
+=================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: GeneralHeadBoundary.mask

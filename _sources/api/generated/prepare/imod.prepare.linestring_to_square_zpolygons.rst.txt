@@ -1,0 +1,6 @@
+﻿imod.prepare.linestring\_to\_square\_zpolygons
+==============================================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: linestring_to_square_zpolygons

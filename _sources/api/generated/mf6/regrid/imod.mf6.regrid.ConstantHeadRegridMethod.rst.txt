@@ -14,6 +14,7 @@
    .. autosummary::
    
       ~ConstantHeadRegridMethod.__init__
+      ~ConstantHeadRegridMethod.asdict
    
    
 
@@ -25,5 +26,6 @@
    
       ~ConstantHeadRegridMethod.concentration
       ~ConstantHeadRegridMethod.head
+      ~ConstantHeadRegridMethod.ibound
    
    

@@ -15,7 +15,11 @@
    
       ~GridData.__init__
       ~GridData.generate_index_array
+      ~GridData.get_non_grid_data
+      ~GridData.get_regrid_methods
+      ~GridData.is_regridding_supported
       ~GridData.isel
+      ~GridData.regrid_like
       ~GridData.sel
       ~GridData.write
       ~GridData.write_dataframe_fixed_width
@@ -23,5 +27,12 @@
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~GridData.auxiliary_data_fields
+      ~GridData.dataset
    
    

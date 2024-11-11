@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**11:53.200** total execution time for 35 files **from all galleries**:
+**13:23.879** total execution time for 36 files **from all galleries**:
 
 .. container::
 
@@ -33,91 +33,94 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_examples_mf6_hondsrug_partitioning.py` (``..\examples\mf6\hondsrug_partitioning.py``)
-     - 04:02.369
+     - 04:47.308
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_hondsrug.py` (``..\examples\mf6\hondsrug.py``)
-     - 02:14.016
+     - 02:32.836
      - 0.0
    * - :ref:`sphx_glr_user-guide_08-regridding.py` (``..\examples\user-guide\08-regridding.py``)
-     - 01:28.138
+     - 01:34.740
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_circle_transport.py` (``..\examples\mf6\circle_transport.py``)
-     - 01:00.800
+     - 01:15.616
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_Henry.py` (``..\examples\mf6\Henry.py``)
-     - 01:00.689
+     - 00:59.781
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_transport_2d.py` (``..\examples\mf6\transport_2d.py``)
-     - 00:54.070
+     - 00:57.441
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_different_ways_to_regrid_models.py` (``..\examples\mf6\different_ways_to_regrid_models.py``)
-     - 00:17.641
+     - 00:18.262
      - 0.0
    * - :ref:`sphx_glr_user-guide_09-topsystem.py` (``..\examples\user-guide\09-topsystem.py``)
-     - 00:10.029
+     - 00:10.191
      - 0.0
    * - :ref:`sphx_glr_user-guide_01-raster-data.py` (``..\examples\user-guide\01-raster-data.py``)
-     - 00:06.264
-     - 0.0
-   * - :ref:`sphx_glr_examples_visualize_flowvel_streamlines.py` (``..\examples\visualize\flowvel_streamlines.py``)
-     - 00:05.355
+     - 00:07.252
      - 0.0
    * - :ref:`sphx_glr_examples_prepare_point_interpolation.py` (``..\examples\prepare\point_interpolation.py``)
-     - 00:04.859
+     - 00:04.828
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_circle_partitioned.py` (``..\examples\mf6\circle_partitioned.py``)
-     - 00:04.043
-     - 0.0
-   * - :ref:`sphx_glr_examples_mf6_example_1d_transport.py` (``..\examples\mf6\example_1d_transport.py``)
-     - 00:03.217
-     - 0.0
-   * - :ref:`sphx_glr_user-guide_06-lazy-evaluation.py` (``..\examples\user-guide\06-lazy-evaluation.py``)
-     - 00:03.076
+     - 00:03.963
      - 0.0
    * - :ref:`sphx_glr_examples_imod-wq_Hydrocoin.py` (``..\examples\imod-wq\Hydrocoin.py``)
-     - 00:02.984
+     - 00:03.453
      - 0.0
-   * - :ref:`sphx_glr_examples_mf6_circle.py` (``..\examples\mf6\circle.py``)
-     - 00:02.353
+   * - :ref:`sphx_glr_user-guide_06-lazy-evaluation.py` (``..\examples\user-guide\06-lazy-evaluation.py``)
+     - 00:03.357
+     - 0.0
+   * - :ref:`sphx_glr_examples_mf6_example_1d_transport.py` (``..\examples\mf6\example_1d_transport.py``)
+     - 00:03.226
+     - 0.0
+   * - :ref:`sphx_glr_user-guide_10-cleanup.py` (``..\examples\user-guide\10-cleanup.py``)
+     - 00:03.046
+     - 0.0
+   * - :ref:`sphx_glr_examples_visualize_flowvel_streamlines.py` (``..\examples\visualize\flowvel_streamlines.py``)
+     - 00:02.832
      - 0.0
    * - :ref:`sphx_glr_examples_imod-wq_Elder.py` (``..\examples\imod-wq\Elder.py``)
-     - 00:01.984
+     - 00:02.391
      - 0.0
    * - :ref:`sphx_glr_examples_visualize_plot_map.py` (``..\examples\visualize\plot_map.py``)
-     - 00:01.906
+     - 00:01.766
+     - 0.0
+   * - :ref:`sphx_glr_examples_mf6_circle.py` (``..\examples\mf6\circle.py``)
+     - 00:01.751
      - 0.0
    * - :ref:`sphx_glr_user-guide_02-vector-data.py` (``..\examples\user-guide\02-vector-data.py``)
-     - 00:01.291
+     - 00:01.442
      - 0.0
    * - :ref:`sphx_glr_examples_imod-wq_VerticalInterface.py` (``..\examples\imod-wq\VerticalInterface.py``)
-     - 00:01.172
+     - 00:01.266
      - 0.0
    * - :ref:`sphx_glr_examples_imod-wq_SaltwaterPocket.py` (``..\examples\imod-wq\SaltwaterPocket.py``)
-     - 00:00.953
-     - 0.0
-   * - :ref:`sphx_glr_examples_prepare_reproject.py` (``..\examples\prepare\reproject.py``)
-     - 00:00.875
-     - 0.0
-   * - :ref:`sphx_glr_examples_prepare_polygonize_raster.py` (``..\examples\prepare\polygonize_raster.py``)
-     - 00:00.844
-     - 0.0
-   * - :ref:`sphx_glr_examples_imod-wq_FreshwaterLens.py` (``..\examples\imod-wq\FreshwaterLens.py``)
-     - 00:00.828
-     - 0.0
-   * - :ref:`sphx_glr_examples_prepare_rasterize_shp.py` (``..\examples\prepare\rasterize_shp.py``)
-     - 00:00.750
+     - 00:01.016
      - 0.0
    * - :ref:`sphx_glr_examples_mf6_lake.py` (``..\examples\mf6\lake.py``)
-     - 00:00.676
+     - 00:00.926
+     - 0.0
+   * - :ref:`sphx_glr_examples_prepare_reproject.py` (``..\examples\prepare\reproject.py``)
+     - 00:00.812
+     - 0.0
+   * - :ref:`sphx_glr_examples_imod-wq_FreshwaterLens.py` (``..\examples\imod-wq\FreshwaterLens.py``)
+     - 00:00.797
+     - 0.0
+   * - :ref:`sphx_glr_examples_prepare_polygonize_raster.py` (``..\examples\prepare\polygonize_raster.py``)
+     - 00:00.719
+     - 0.0
+   * - :ref:`sphx_glr_examples_prepare_rasterize_shp.py` (``..\examples\prepare\rasterize_shp.py``)
+     - 00:00.672
      - 0.0
    * - :ref:`sphx_glr_examples_imodflow_ImodflowProjectfile.py` (``..\examples\imodflow\ImodflowProjectfile.py``)
-     - 00:00.563
-     - 0.0
-   * - :ref:`sphx_glr_examples_mf6_ex01_twri.py` (``..\examples\mf6\ex01_twri.py``)
-     - 00:00.548
+     - 00:00.641
      - 0.0
    * - :ref:`sphx_glr_examples_imod-wq_Henry-wq.py` (``..\examples\imod-wq\Henry-wq.py``)
-     - 00:00.500
+     - 00:00.625
+     - 0.0
+   * - :ref:`sphx_glr_examples_mf6_ex01_twri.py` (``..\examples\mf6\ex01_twri.py``)
+     - 00:00.534
      - 0.0
    * - :ref:`sphx_glr_examples_metaswap_read_metaswap_file.py` (``..\examples\metaswap\read_metaswap_file.py``)
      - 00:00.297
@@ -125,10 +128,10 @@ Computation times
    * - :ref:`sphx_glr_user-guide_07-time-discretization.py` (``..\examples\user-guide\07-time-discretization.py``)
      - 00:00.094
      - 0.0
-   * - :ref:`sphx_glr_examples_mf6_example_models.py` (``..\examples\mf6\example_models.py``)
-     - 00:00.016
-     - 0.0
    * - :ref:`sphx_glr_examples_metaswap_metaswap_example.py` (``..\examples\metaswap\metaswap_example.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_examples_mf6_example_models.py` (``..\examples\mf6\example_models.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_user-guide_03-timeseries-data.py` (``..\examples\user-guide\03-timeseries-data.py``)

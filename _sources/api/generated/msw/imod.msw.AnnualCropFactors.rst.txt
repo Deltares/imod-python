@@ -14,7 +14,11 @@
    .. autosummary::
    
       ~AnnualCropFactors.__init__
+      ~AnnualCropFactors.get_non_grid_data
+      ~AnnualCropFactors.get_regrid_methods
+      ~AnnualCropFactors.is_regridding_supported
       ~AnnualCropFactors.isel
+      ~AnnualCropFactors.regrid_like
       ~AnnualCropFactors.sel
       ~AnnualCropFactors.write
       ~AnnualCropFactors.write_dataframe_fixed_width
@@ -22,5 +26,12 @@
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~AnnualCropFactors.auxiliary_data_fields
+      ~AnnualCropFactors.dataset
    
    

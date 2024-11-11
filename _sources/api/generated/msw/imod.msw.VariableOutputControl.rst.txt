@@ -14,7 +14,11 @@
    .. autosummary::
    
       ~VariableOutputControl.__init__
+      ~VariableOutputControl.get_non_grid_data
+      ~VariableOutputControl.get_regrid_methods
+      ~VariableOutputControl.is_regridding_supported
       ~VariableOutputControl.isel
+      ~VariableOutputControl.regrid_like
       ~VariableOutputControl.sel
       ~VariableOutputControl.write
       ~VariableOutputControl.write_dataframe_fixed_width
@@ -22,5 +26,12 @@
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~VariableOutputControl.auxiliary_data_fields
+      ~VariableOutputControl.dataset
    
    

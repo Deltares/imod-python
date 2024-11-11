@@ -20,6 +20,7 @@
       ~Modflow6Simulation.create_time_discretization
       ~Modflow6Simulation.dump
       ~Modflow6Simulation.from_file
+      ~Modflow6Simulation.from_imod5_data
       ~Modflow6Simulation.fromkeys
       ~Modflow6Simulation.get
       ~Modflow6Simulation.get_exchange_relationships

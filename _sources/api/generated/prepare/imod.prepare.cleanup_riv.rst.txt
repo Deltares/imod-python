@@ -1,0 +1,6 @@
+﻿imod.prepare.cleanup\_riv
+=========================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: cleanup_riv

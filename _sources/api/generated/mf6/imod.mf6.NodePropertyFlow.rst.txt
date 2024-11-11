@@ -14,9 +14,11 @@
    .. autosummary::
    
       ~NodePropertyFlow.__init__
+      ~NodePropertyFlow.cleanup
       ~NodePropertyFlow.clip_box
       ~NodePropertyFlow.copy
       ~NodePropertyFlow.from_file
+      ~NodePropertyFlow.from_imod5_data
       ~NodePropertyFlow.get_non_grid_data
       ~NodePropertyFlow.get_regrid_methods
       ~NodePropertyFlow.get_xt3d_option

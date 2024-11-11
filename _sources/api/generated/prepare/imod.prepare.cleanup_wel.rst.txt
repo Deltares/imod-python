@@ -1,0 +1,6 @@
+﻿imod.prepare.cleanup\_wel
+=========================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: cleanup_wel

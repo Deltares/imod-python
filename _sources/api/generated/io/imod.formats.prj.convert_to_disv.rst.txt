@@ -1,6 +1,0 @@
-﻿imod.formats.prj.convert\_to\_disv
-==================================
-
-.. currentmodule:: imod.formats.prj
-
-.. autofunction:: convert_to_disv

@@ -14,8 +14,12 @@
    .. autosummary::
    
       ~PrecipitationMapping.__init__
+      ~PrecipitationMapping.get_non_grid_data
+      ~PrecipitationMapping.get_regrid_methods
       ~PrecipitationMapping.grid_mapping
+      ~PrecipitationMapping.is_regridding_supported
       ~PrecipitationMapping.isel
+      ~PrecipitationMapping.regrid_like
       ~PrecipitationMapping.sel
       ~PrecipitationMapping.write
       ~PrecipitationMapping.write_dataframe_fixed_width
@@ -23,5 +27,13 @@
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~PrecipitationMapping.auxiliary_data_fields
+      ~PrecipitationMapping.dataset
+      ~PrecipitationMapping.meteo
    
    

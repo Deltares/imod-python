@@ -1,0 +1,6 @@
+﻿imod.prepare.cleanup\_ghb
+=========================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: cleanup_ghb

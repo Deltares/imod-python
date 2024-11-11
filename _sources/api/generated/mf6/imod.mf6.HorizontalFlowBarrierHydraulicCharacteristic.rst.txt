@@ -14,6 +14,7 @@
    .. autosummary::
    
       ~HorizontalFlowBarrierHydraulicCharacteristic.__init__
+      ~HorizontalFlowBarrierHydraulicCharacteristic.cleanup
       ~HorizontalFlowBarrierHydraulicCharacteristic.clip_box
       ~HorizontalFlowBarrierHydraulicCharacteristic.copy
       ~HorizontalFlowBarrierHydraulicCharacteristic.from_file

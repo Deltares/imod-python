@@ -14,7 +14,11 @@
    .. autosummary::
    
       ~InitialConditionsSavedState.__init__
+      ~InitialConditionsSavedState.get_non_grid_data
+      ~InitialConditionsSavedState.get_regrid_methods
+      ~InitialConditionsSavedState.is_regridding_supported
       ~InitialConditionsSavedState.isel
+      ~InitialConditionsSavedState.regrid_like
       ~InitialConditionsSavedState.sel
       ~InitialConditionsSavedState.write
       ~InitialConditionsSavedState.write_dataframe_fixed_width
@@ -22,5 +26,12 @@
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~InitialConditionsSavedState.auxiliary_data_fields
+      ~InitialConditionsSavedState.dataset
    
    

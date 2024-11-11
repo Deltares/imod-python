@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; iMOD Python 0.17.2 documentation</title>
+    <title>Index &#8212; iMOD Python 0.18.0 documentation</title>
   
   
   
@@ -15,17 +15,19 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
   </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-
-  
-  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+  <link href="_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
@@ -33,13 +35,14 @@
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="_static/documentation_options.js?v=9fbddafe"></script>
-    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/documentation_options.js?v=ba2e7b09"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
     <script src="_static/deltares.js?v=8d5578be"></script>
@@ -47,6 +50,7 @@
     <link rel="search" title="Search" href="search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.18.0.dev" />
   </head>
   
   
@@ -62,19 +66,8 @@
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-primary-sidebar-checkbox"/>
-  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          id="pst-secondary-sidebar-checkbox"/>
-  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="search.html"
       method="get">
@@ -82,7 +75,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search the docs ..."
          aria-label="Search the docs ..."
          autocomplete="off"
@@ -90,8 +82,8 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
 
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
@@ -122,8 +114,8 @@
     
     
     
-    <img src="_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 0.17.2 documentation - Home"/>
-    <script>document.write(`<img src="_static/imod-python-logo-dark.svg" class="logo__image only-dark" alt="iMOD Python 0.17.2 documentation - Home"/>`);</script>
+    <img src="_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 0.18.0 documentation - Home"/>
+    <img src="_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 0.18.0 documentation - Home"/>
   
   
 </a></div>
@@ -179,7 +171,7 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="developing.html">
+  <a class="nav-link dropdown-item nav-internal" href="developing/index.html">
     Developing
   </a>
 </li>
@@ -198,29 +190,21 @@
         <div class="navbar-item navbar-persistent--container">
           
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
       
       
         <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
       
         <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
@@ -257,15 +241,11 @@ document.write(`
   
     <div class="navbar-persistent--mobile">
 
- <script>
- document.write(`
-   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
     </div>
   
 
@@ -282,7 +262,8 @@ document.write(`
       
         
       
-      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
   
@@ -333,7 +314,7 @@ document.write(`
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="developing.html">
+  <a class="nav-link nav-internal" href="developing/index.html">
     Developing
   </a>
 </li>
@@ -350,15 +331,11 @@ document.write(`
         
           <div class="navbar-item">
 
-<script>
-document.write(`
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
-  </button>
-`);
-</script></div>
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
         
           <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
@@ -540,6 +517,8 @@ document.write(`
 </li>
         <li><a href="api/generated/mf6/imod.mf6.InitialConditions.html#imod.mf6.InitialConditions.__init__">(imod.mf6.InitialConditions method)</a>
 </li>
+        <li><a href="api/generated/mf6/imod.mf6.LayeredWell.html#imod.mf6.LayeredWell.__init__">(imod.mf6.LayeredWell method)</a>
+</li>
         <li><a href="api/generated/mf6/imod.mf6.MassSourceLoading.html#imod.mf6.MassSourceLoading.__init__">(imod.mf6.MassSourceLoading method)</a>
 </li>
         <li><a href="api/generated/mf6/imod.mf6.MobileStorageTransfer.html#imod.mf6.MobileStorageTransfer.__init__">(imod.mf6.MobileStorageTransfer method)</a>
@@ -581,6 +560,12 @@ document.write(`
         <li><a href="api/generated/mf6/regrid/imod.mf6.regrid.StorageCoefficientRegridMethod.html#imod.mf6.regrid.StorageCoefficientRegridMethod.__init__">(imod.mf6.regrid.StorageCoefficientRegridMethod method)</a>
 </li>
         <li><a href="api/generated/mf6/imod.mf6.River.html#imod.mf6.River.__init__">(imod.mf6.River method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.html#imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.__init__">(imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.html#imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.__init__">(imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.html#imod.mf6.SingleLayerHorizontalFlowBarrierResistance.__init__">(imod.mf6.SingleLayerHorizontalFlowBarrierResistance method)</a>
 </li>
         <li><a href="api/generated/mf6/imod.mf6.Solution.html#imod.mf6.Solution.__init__">(imod.mf6.Solution method)</a>
 </li>
@@ -801,6 +786,24 @@ document.write(`
 </li>
       <li><a href="api/generated/wq/imod.wq.SeawatModel.html#imod.wq.SeawatModel.check">check (imod.wq.SeawatModel attribute)</a>
 </li>
+      <li><a href="api/generated/mf6/imod.mf6.Drainage.cleanup.html#imod.mf6.Drainage.cleanup">cleanup() (imod.mf6.Drainage method)</a>
+
+      <ul>
+        <li><a href="api/generated/mf6/imod.mf6.GeneralHeadBoundary.cleanup.html#imod.mf6.GeneralHeadBoundary.cleanup">(imod.mf6.GeneralHeadBoundary method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.River.cleanup.html#imod.mf6.River.cleanup">(imod.mf6.River method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.Well.cleanup.html#imod.mf6.Well.cleanup">(imod.mf6.Well method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/generated/prepare/imod.prepare.cleanup_drn.html#imod.prepare.cleanup_drn">cleanup_drn() (in module imod.prepare)</a>
+</li>
+      <li><a href="api/generated/prepare/imod.prepare.cleanup_ghb.html#imod.prepare.cleanup_ghb">cleanup_ghb() (in module imod.prepare)</a>
+</li>
+      <li><a href="api/generated/prepare/imod.prepare.cleanup_riv.html#imod.prepare.cleanup_riv">cleanup_riv() (in module imod.prepare)</a>
+</li>
+      <li><a href="api/generated/prepare/imod.prepare.cleanup_wel.html#imod.prepare.cleanup_wel">cleanup_wel() (in module imod.prepare)</a>
+</li>
       <li><a href="api/generated/mf6/imod.mf6.Modflow6Simulation.clip_box.html#imod.mf6.Modflow6Simulation.clip_box">clip_box() (imod.mf6.Modflow6Simulation method)</a>
 </li>
       <li><a href="api/generated/logging/imod.logging.config.configure.html#imod.logging.config.configure">configure() (in module imod.logging.config)</a>
@@ -815,16 +818,14 @@ document.write(`
         <li><a href="api/generated/wq/imod.wq.ConstantHead.html#imod.wq.ConstantHead">(class in imod.wq)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/generated/mf6/regrid/imod.mf6.regrid.ConstantHeadRegridMethod.html#imod.mf6.regrid.ConstantHeadRegridMethod">ConstantHeadRegridMethod (class in imod.mf6.regrid)</a>
 </li>
       <li><a href="api/generated/evaluate/imod.evaluate.convert_pointwaterhead_freshwaterhead.html#imod.evaluate.convert_pointwaterhead_freshwaterhead">convert_pointwaterhead_freshwaterhead() (in module imod.evaluate)</a>
 </li>
-      <li><a href="api/generated/io/imod.formats.prj.convert_to_disv.html#imod.formats.prj.convert_to_disv">convert_to_disv() (in module imod.formats.prj)</a>
-</li>
       <li><a href="api/generated/util/imod.util.coord_reference.html#imod.util.coord_reference">coord_reference() (in module imod.util)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/generated/msw/imod.msw.CouplerMapping.html#imod.msw.CouplerMapping">CouplerMapping (class in imod.msw)</a>
 </li>
       <li><a href="api/generated/wq/imod.wq.AdvectionFiniteDifference.html#imod.wq.AdvectionFiniteDifference.courant">courant (imod.wq.AdvectionFiniteDifference attribute)</a>
@@ -989,11 +990,37 @@ document.write(`
 </li>
       <li><a href="api/generated/prepare/imod.prepare.fill.html#imod.prepare.fill">fill() (in module imod.prepare)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/generated/evaluate/imod.evaluate.flow_velocity.html#imod.evaluate.flow_velocity">flow_velocity() (in module imod.evaluate)</a>
 </li>
       <li><a href="api/generated/mf6/imod.mf6.SourceSinkMixing.from_flow_model.html#imod.mf6.SourceSinkMixing.from_flow_model">from_flow_model() (imod.mf6.SourceSinkMixing static method)</a>
+</li>
+      <li><a href="api/generated/mf6/imod.mf6.ConstantHead.from_imod5_data.html#imod.mf6.ConstantHead.from_imod5_data">from_imod5_data() (imod.mf6.ConstantHead class method)</a>
+
+      <ul>
+        <li><a href="api/generated/mf6/imod.mf6.Drainage.from_imod5_data.html#imod.mf6.Drainage.from_imod5_data">(imod.mf6.Drainage class method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.GeneralHeadBoundary.from_imod5_data.html#imod.mf6.GeneralHeadBoundary.from_imod5_data">(imod.mf6.GeneralHeadBoundary class method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.InitialConditions.from_imod5_data.html#imod.mf6.InitialConditions.from_imod5_data">(imod.mf6.InitialConditions class method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.LayeredWell.from_imod5_data.html#imod.mf6.LayeredWell.from_imod5_data">(imod.mf6.LayeredWell class method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.NodePropertyFlow.from_imod5_data.html#imod.mf6.NodePropertyFlow.from_imod5_data">(imod.mf6.NodePropertyFlow class method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.Recharge.from_imod5_data.html#imod.mf6.Recharge.from_imod5_data">(imod.mf6.Recharge class method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.River.from_imod5_data.html#imod.mf6.River.from_imod5_data">(imod.mf6.River class method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data.html#imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data">(imod.mf6.SingleLayerHorizontalFlowBarrierResistance class method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.StorageCoefficient.from_imod5_data.html#imod.mf6.StorageCoefficient.from_imod5_data">(imod.mf6.StorageCoefficient class method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.Well.from_imod5_data.html#imod.mf6.Well.from_imod5_data">(imod.mf6.Well class method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/mf6/imod.mf6.ConstantHead.from_imod5_shd_data.html#imod.mf6.ConstantHead.from_imod5_shd_data">from_imod5_shd_data() (imod.mf6.ConstantHead class method)</a>
 </li>
       <li><a href="api/generated/util/imod.util.from_mdal_compliant_ugrid2d.html#imod.util.from_mdal_compliant_ugrid2d">from_mdal_compliant_ugrid2d() (in module imod.util)</a>
 </li>
@@ -1183,12 +1210,20 @@ document.write(`
 </li>
       <li><a href="api/generated/prepare/imod.prepare.laplace_interpolate.html#imod.prepare.laplace_interpolate">laplace_interpolate() (in module imod.prepare)</a>
 </li>
+      <li><a href="api/generated/mf6/imod.mf6.LayeredWell.html#imod.mf6.LayeredWell">LayeredWell (class in imod.mf6)</a>
+</li>
       <li><a href="api/generated/wq/imod.wq.LayerPropertyFlow.html#imod.wq.LayerPropertyFlow">LayerPropertyFlow (class in imod.wq)</a>
 </li>
       <li><a href="api/generated/prepare/imod.prepare.LayerRegridder.html#imod.prepare.LayerRegridder">LayerRegridder (class in imod.prepare)</a>
 </li>
       <li><a href="api/generated/visualize/imod.visualize.line_3d.html#imod.visualize.line_3d">line_3d() (in module imod.visualize)</a>
 </li>
+      <li><a href="api/generated/prepare/imod.prepare.linestring_to_square_zpolygons.html#imod.prepare.linestring_to_square_zpolygons">linestring_to_square_zpolygons() (in module imod.prepare)</a>
+</li>
+      <li><a href="api/generated/prepare/imod.prepare.linestring_to_trapezoid_zpolygons.html#imod.prepare.linestring_to_trapezoid_zpolygons">linestring_to_trapezoid_zpolygons() (in module imod.prepare)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/generated/logging/imod.logging.ilogger.ILogger.html#imod.logging.ilogger.ILogger.log">log() (imod.logging.ilogger.ILogger method)</a>
 
       <ul>
@@ -1199,8 +1234,6 @@ document.write(`
         <li><a href="api/generated/logging/imod.logging.pythonlogger.PythonLogger.html#imod.logging.pythonlogger.PythonLogger.log">(imod.logging.pythonlogger.PythonLogger method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/generated/logging/imod.logging.config.LoggerType.html#imod.logging.config.LoggerType">LoggerType (class in imod.logging.config)</a>
 </li>
       <li><a href="api/generated/logging/imod.logging.loglevel.LogLevel.html#imod.logging.loglevel.LogLevel">LogLevel (class in imod.logging.loglevel)</a>
@@ -1215,6 +1248,32 @@ document.write(`
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/generated/mf6/imod.mf6.ConstantHead.mask.html#imod.mf6.ConstantHead.mask">mask() (imod.mf6.ConstantHead method)</a>
+
+      <ul>
+        <li><a href="api/generated/mf6/imod.mf6.Drainage.mask.html#imod.mf6.Drainage.mask">(imod.mf6.Drainage method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.Evapotranspiration.mask.html#imod.mf6.Evapotranspiration.mask">(imod.mf6.Evapotranspiration method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.GeneralHeadBoundary.mask.html#imod.mf6.GeneralHeadBoundary.mask">(imod.mf6.GeneralHeadBoundary method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.InitialConditions.mask.html#imod.mf6.InitialConditions.mask">(imod.mf6.InitialConditions method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.LayeredWell.mask.html#imod.mf6.LayeredWell.mask">(imod.mf6.LayeredWell method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.NodePropertyFlow.mask.html#imod.mf6.NodePropertyFlow.mask">(imod.mf6.NodePropertyFlow method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.Recharge.mask.html#imod.mf6.Recharge.mask">(imod.mf6.Recharge method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.River.mask.html#imod.mf6.River.mask">(imod.mf6.River method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.SpecificStorage.mask.html#imod.mf6.SpecificStorage.mask">(imod.mf6.SpecificStorage method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.StorageCoefficient.mask.html#imod.mf6.StorageCoefficient.mask">(imod.mf6.StorageCoefficient method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.Well.mask.html#imod.mf6.Well.mask">(imod.mf6.Well method)</a>
+</li>
+      </ul></li>
       <li><a href="api/generated/mf6/imod.mf6.GroundwaterFlowModel.mask_all_packages.html#imod.mf6.GroundwaterFlowModel.mask_all_packages">mask_all_packages() (imod.mf6.GroundwaterFlowModel method)</a>
 
       <ul>
@@ -1233,6 +1292,8 @@ document.write(`
 </li>
       <li><a href="api/generated/metamod/imod.couplers.metamod.MetaMod.html#imod.couplers.metamod.MetaMod">MetaMod (class in imod.couplers.metamod)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/generated/flow/imod.flow.MetaSwap.html#imod.flow.MetaSwap">MetaSwap (class in imod.flow)</a>
 </li>
       <li><a href="api/generated/msw/imod.msw.MetaSwapModel.html#imod.msw.MetaSwapModel">MetaSwapModel (class in imod.msw)</a>
@@ -1247,8 +1308,6 @@ document.write(`
         <li><a href="api/generated/prepare/imod.prepare.Voxelizer.html#imod.prepare.Voxelizer.method">(imod.prepare.Voxelizer attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/generated/mf6/imod.mf6.MobileStorageTransfer.html#imod.mf6.MobileStorageTransfer">MobileStorageTransfer (class in imod.mf6)</a>
 </li>
       <li><a href="api/generated/mf6/regrid/imod.mf6.regrid.MobileStorageTransferRegridMethod.html#imod.mf6.regrid.MobileStorageTransferRegridMethod">MobileStorageTransferRegridMethod (class in imod.mf6.regrid)</a>
@@ -1376,10 +1435,10 @@ document.write(`
 </li>
       <li><a href="api/generated/select/imod.select.points_values.html#imod.select.points_values">points_values() (in module imod.select)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/generated/prepare/imod.prepare.polygonize.html#imod.prepare.polygonize">polygonize() (in module imod.prepare)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/generated/msw/imod.msw.Ponding.html#imod.msw.Ponding">Ponding (class in imod.msw)</a>
 </li>
       <li><a href="api/generated/msw/imod.msw.PrecipitationMapping.html#imod.msw.PrecipitationMapping">PrecipitationMapping (class in imod.msw)</a>
@@ -1390,6 +1449,10 @@ document.write(`
         <li><a href="api/generated/wq/imod.wq.PreconditionedConjugateGradientSolver.html#imod.wq.PreconditionedConjugateGradientSolver">(class in imod.wq)</a>
 </li>
       </ul></li>
+      <li><a href="api/generated/mf6/imod.mf6.GroundwaterFlowModel.prepare_wel_for_mf6.html#imod.mf6.GroundwaterFlowModel.prepare_wel_for_mf6">prepare_wel_for_mf6() (imod.mf6.GroundwaterFlowModel method)</a>
+</li>
+      <li><a href="api/generated/util/imod.util.print_if_error.html#imod.util.print_if_error">print_if_error() (in module imod.util)</a>
+</li>
       <li><a href="api/generated/logging/imod.logging.config.LoggerType.html#imod.logging.config.LoggerType.PYTHON">PYTHON (imod.logging.config.LoggerType attribute)</a>
 </li>
       <li><a href="api/generated/logging/imod.logging.pythonlogger.PythonLogger.html#imod.logging.pythonlogger.PythonLogger">PythonLogger (class in imod.logging.pythonlogger)</a>
@@ -1442,8 +1505,6 @@ document.write(`
         <li><a href="api/generated/mf6/imod.mf6.Recharge.html#imod.mf6.Recharge">(class in imod.mf6)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/generated/wq/imod.wq.RechargeHighestActive.html#imod.wq.RechargeHighestActive">RechargeHighestActive (class in imod.wq)</a>
 </li>
       <li><a href="api/generated/wq/imod.wq.RechargeLayers.html#imod.wq.RechargeLayers">RechargeLayers (class in imod.wq)</a>
@@ -1452,8 +1513,36 @@ document.write(`
 </li>
       <li><a href="api/generated/wq/imod.wq.RechargeTopLayer.html#imod.wq.RechargeTopLayer">RechargeTopLayer (class in imod.wq)</a>
 </li>
-      <li><a href="api/generated/mf6/imod.mf6.Modflow6Simulation.regrid_like.html#imod.mf6.Modflow6Simulation.regrid_like">regrid_like() (imod.mf6.Modflow6Simulation method)</a>
+      <li><a href="api/generated/mf6/imod.mf6.ConstantHead.regrid_like.html#imod.mf6.ConstantHead.regrid_like">regrid_like() (imod.mf6.ConstantHead method)</a>
+
+      <ul>
+        <li><a href="api/generated/mf6/imod.mf6.Drainage.regrid_like.html#imod.mf6.Drainage.regrid_like">(imod.mf6.Drainage method)</a>
 </li>
+        <li><a href="api/generated/mf6/imod.mf6.Evapotranspiration.regrid_like.html#imod.mf6.Evapotranspiration.regrid_like">(imod.mf6.Evapotranspiration method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.GeneralHeadBoundary.regrid_like.html#imod.mf6.GeneralHeadBoundary.regrid_like">(imod.mf6.GeneralHeadBoundary method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.InitialConditions.regrid_like.html#imod.mf6.InitialConditions.regrid_like">(imod.mf6.InitialConditions method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.LayeredWell.regrid_like.html#imod.mf6.LayeredWell.regrid_like">(imod.mf6.LayeredWell method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.Modflow6Simulation.regrid_like.html#imod.mf6.Modflow6Simulation.regrid_like">(imod.mf6.Modflow6Simulation method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.NodePropertyFlow.regrid_like.html#imod.mf6.NodePropertyFlow.regrid_like">(imod.mf6.NodePropertyFlow method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.Recharge.regrid_like.html#imod.mf6.Recharge.regrid_like">(imod.mf6.Recharge method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.River.regrid_like.html#imod.mf6.River.regrid_like">(imod.mf6.River method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.SpecificStorage.regrid_like.html#imod.mf6.SpecificStorage.regrid_like">(imod.mf6.SpecificStorage method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.StorageCoefficient.regrid_like.html#imod.mf6.StorageCoefficient.regrid_like">(imod.mf6.StorageCoefficient method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.Well.regrid_like.html#imod.mf6.Well.regrid_like">(imod.mf6.Well method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/generated/prepare/imod.prepare.Regridder.html#imod.prepare.Regridder">Regridder (class in imod.prepare)</a>
 </li>
       <li><a href="api/generated/prepare/imod.prepare.reproject.html#imod.prepare.reproject">reproject() (in module imod.prepare)</a>
@@ -1488,6 +1577,12 @@ document.write(`
 </li>
       <li><a href="api/generated/wq/imod.wq.SeawatModel.html#imod.wq.SeawatModel">SeawatModel (class in imod.wq)</a>
 </li>
+      <li><a href="api/generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.html#imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic">SingleLayerHorizontalFlowBarrierHydraulicCharacteristic (class in imod.mf6)</a>
+</li>
+      <li><a href="api/generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.html#imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier">SingleLayerHorizontalFlowBarrierMultiplier (class in imod.mf6)</a>
+</li>
+      <li><a href="api/generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.html#imod.mf6.SingleLayerHorizontalFlowBarrierResistance">SingleLayerHorizontalFlowBarrierResistance (class in imod.mf6)</a>
+</li>
       <li><a href="api/generated/wq/imod.wq.AdvectionModifiedMOC.html#imod.wq.AdvectionModifiedMOC.sink_nparticles">sink_nparticles (imod.wq.AdvectionModifiedMOC attribute)</a>
 </li>
       <li><a href="api/generated/wq/imod.wq.AdvectionModifiedMOC.html#imod.wq.AdvectionModifiedMOC.sink_particle_placement">sink_particle_placement (imod.wq.AdvectionModifiedMOC attribute)</a>
@@ -1504,14 +1599,14 @@ document.write(`
 </li>
       <li><a href="api/generated/util/imod.util.spatial_reference.html#imod.util.spatial_reference">spatial_reference() (in module imod.util)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/generated/flow/imod.flow.SpecificStorage.html#imod.flow.SpecificStorage">SpecificStorage (class in imod.flow)</a>
 
       <ul>
         <li><a href="api/generated/mf6/imod.mf6.SpecificStorage.html#imod.mf6.SpecificStorage">(class in imod.mf6)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/generated/mf6/regrid/imod.mf6.regrid.SpecificStorageRegridMethod.html#imod.mf6.regrid.SpecificStorageRegridMethod">SpecificStorageRegridMethod (class in imod.mf6.regrid)</a>
 </li>
       <li><a href="api/generated/mf6/imod.mf6.Modflow6Simulation.split.html#imod.mf6.Modflow6Simulation.split">split() (imod.mf6.Modflow6Simulation method)</a>
@@ -1562,6 +1657,24 @@ document.write(`
 </li>
       <li><a href="api/generated/util/imod.util.to_datetime.html#imod.util.to_datetime">to_datetime() (in module imod.util)</a>
 </li>
+      <li><a href="api/generated/mf6/imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg.html#imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg">to_mf6_pkg() (imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic method)</a>
+
+      <ul>
+        <li><a href="api/generated/mf6/imod.mf6.HorizontalFlowBarrierMultiplier.to_mf6_pkg.html#imod.mf6.HorizontalFlowBarrierMultiplier.to_mf6_pkg">(imod.mf6.HorizontalFlowBarrierMultiplier method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.HorizontalFlowBarrierResistance.to_mf6_pkg.html#imod.mf6.HorizontalFlowBarrierResistance.to_mf6_pkg">(imod.mf6.HorizontalFlowBarrierResistance method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.LayeredWell.to_mf6_pkg.html#imod.mf6.LayeredWell.to_mf6_pkg">(imod.mf6.LayeredWell method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg.html#imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg">(imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg.html#imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg">(imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg.html#imod.mf6.SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg">(imod.mf6.SingleLayerHorizontalFlowBarrierResistance method)</a>
+</li>
+        <li><a href="api/generated/mf6/imod.mf6.Well.to_mf6_pkg.html#imod.mf6.Well.to_mf6_pkg">(imod.mf6.Well method)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/generated/util/imod.util.to_ugrid2d.html#imod.util.to_ugrid2d">to_ugrid2d() (in module imod.util)</a>
@@ -1712,8 +1825,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script defer src="_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1733,7 +1846,7 @@ document.write(`
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
     <br/>
   </p>
 </div>
@@ -1746,7 +1859,7 @@ document.write(`
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
 </p></div>
       
     </div>

@@ -14,7 +14,11 @@
    .. autosummary::
    
       ~CouplerMapping.__init__
+      ~CouplerMapping.get_non_grid_data
+      ~CouplerMapping.get_regrid_methods
+      ~CouplerMapping.is_regridding_supported
       ~CouplerMapping.isel
+      ~CouplerMapping.regrid_like
       ~CouplerMapping.sel
       ~CouplerMapping.write
       ~CouplerMapping.write_dataframe_fixed_width
@@ -22,5 +26,12 @@
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~CouplerMapping.auxiliary_data_fields
+      ~CouplerMapping.dataset
    
    

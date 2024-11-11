@@ -1,0 +1,6 @@
+﻿imod.prepare.cleanup\_drn
+=========================
+
+.. currentmodule:: imod.prepare
+
+.. autofunction:: cleanup_drn

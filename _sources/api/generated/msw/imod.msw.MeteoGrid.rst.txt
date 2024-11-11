@@ -15,7 +15,11 @@
    
       ~MeteoGrid.__init__
       ~MeteoGrid.check_string_lengths
+      ~MeteoGrid.get_non_grid_data
+      ~MeteoGrid.get_regrid_methods
+      ~MeteoGrid.is_regridding_supported
       ~MeteoGrid.isel
+      ~MeteoGrid.regrid_like
       ~MeteoGrid.sel
       ~MeteoGrid.write
       ~MeteoGrid.write_dataframe_fixed_width
@@ -24,5 +28,12 @@
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~MeteoGrid.auxiliary_data_fields
+      ~MeteoGrid.dataset
    
    

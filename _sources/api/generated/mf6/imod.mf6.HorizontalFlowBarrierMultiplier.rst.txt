@@ -14,6 +14,7 @@
    .. autosummary::
    
       ~HorizontalFlowBarrierMultiplier.__init__
+      ~HorizontalFlowBarrierMultiplier.cleanup
       ~HorizontalFlowBarrierMultiplier.clip_box
       ~HorizontalFlowBarrierMultiplier.copy
       ~HorizontalFlowBarrierMultiplier.from_file

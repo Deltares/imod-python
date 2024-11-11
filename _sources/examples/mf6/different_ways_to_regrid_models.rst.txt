@@ -106,7 +106,7 @@ Let's plot the k-field. This is going to be the input for the regridder, and the
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x00000204CDD83190>
+    <matplotlib.collections.QuadMesh object at 0x000001A345312590>
 
 
 
@@ -192,7 +192,7 @@ Let's plot the k-field. This is the regridded output, and it should should somew
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x00000204D1107950>
+    <matplotlib.collections.QuadMesh object at 0x000001A349E0B350>
 
 
 
@@ -227,7 +227,7 @@ A second way to regrid  twri  is to regrid the groundwater flow model.
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x00000204CF387B90>
+    <matplotlib.collections.QuadMesh object at 0x000001A346084E90>
 
 
 
@@ -247,10 +247,10 @@ because initializing a regridder is costly.
 
 
     regridder_types = NodePropertyFlowRegridMethod(k=(RegridderType.CENTROIDLOCATOR,))
-    regrid_context = RegridderWeightsCache()
+    regrid_cache = RegridderWeightsCache()
     npf_regridded = model["npf"].regrid_like(
         target_grid=target_grid,
-        regrid_context=regrid_context,
+        regrid_cache=regrid_cache,
         regridder_types=regridder_types,
     )
     new_model["npf"] = npf_regridded
@@ -273,14 +273,14 @@ because initializing a regridder is costly.
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x00000204CF02D0D0>
+    <matplotlib.collections.QuadMesh object at 0x000001A34612A910>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 17.641 seconds)
+   **Total running time of the script:** (0 minutes 18.262 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_different_ways_to_regrid_models.py:

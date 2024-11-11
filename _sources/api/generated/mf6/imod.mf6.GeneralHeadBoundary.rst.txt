@@ -14,9 +14,11 @@
    .. autosummary::
    
       ~GeneralHeadBoundary.__init__
+      ~GeneralHeadBoundary.cleanup
       ~GeneralHeadBoundary.clip_box
       ~GeneralHeadBoundary.copy
       ~GeneralHeadBoundary.from_file
+      ~GeneralHeadBoundary.from_imod5_data
       ~GeneralHeadBoundary.get_non_grid_data
       ~GeneralHeadBoundary.get_period_varnames
       ~GeneralHeadBoundary.get_regrid_methods

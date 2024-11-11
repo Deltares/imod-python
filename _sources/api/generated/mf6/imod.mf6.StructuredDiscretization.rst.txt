@@ -14,9 +14,11 @@
    .. autosummary::
    
       ~StructuredDiscretization.__init__
+      ~StructuredDiscretization.cleanup
       ~StructuredDiscretization.clip_box
       ~StructuredDiscretization.copy
       ~StructuredDiscretization.from_file
+      ~StructuredDiscretization.from_imod5_data
       ~StructuredDiscretization.get_non_grid_data
       ~StructuredDiscretization.get_regrid_methods
       ~StructuredDiscretization.is_clipping_supported

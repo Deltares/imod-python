@@ -1,0 +1,6 @@
+﻿imod.mf6.NodePropertyFlow.regrid\_like
+======================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: NodePropertyFlow.regrid_like

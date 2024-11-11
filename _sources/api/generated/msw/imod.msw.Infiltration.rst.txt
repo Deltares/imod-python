@@ -14,7 +14,11 @@
    .. autosummary::
    
       ~Infiltration.__init__
+      ~Infiltration.get_non_grid_data
+      ~Infiltration.get_regrid_methods
+      ~Infiltration.is_regridding_supported
       ~Infiltration.isel
+      ~Infiltration.regrid_like
       ~Infiltration.sel
       ~Infiltration.write
       ~Infiltration.write_dataframe_fixed_width
@@ -22,5 +26,12 @@
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Infiltration.auxiliary_data_fields
+      ~Infiltration.dataset
    
    

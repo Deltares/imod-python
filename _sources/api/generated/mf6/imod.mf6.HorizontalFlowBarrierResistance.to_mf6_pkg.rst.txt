@@ -1,0 +1,6 @@
+﻿imod.mf6.HorizontalFlowBarrierResistance.to\_mf6\_pkg
+=====================================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: HorizontalFlowBarrierResistance.to_mf6_pkg

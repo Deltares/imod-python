@@ -14,9 +14,11 @@
    .. autosummary::
    
       ~Drainage.__init__
+      ~Drainage.cleanup
       ~Drainage.clip_box
       ~Drainage.copy
       ~Drainage.from_file
+      ~Drainage.from_imod5_data
       ~Drainage.get_non_grid_data
       ~Drainage.get_period_varnames
       ~Drainage.get_regrid_methods

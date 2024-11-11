@@ -186,6 +186,23 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
     </div>
 
 
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="More often than not, data contained in databases is not entirely consistent, causing errors. It therefore is useful to have some utilities at hand to clean up data. We included some convenience methods to help clean up inconsistent datasets.">
+
+.. only:: html
+
+  .. image:: /user-guide/images/thumb/sphx_glr_10-cleanup_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_user-guide_10-cleanup.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Data cleanup</div>
+    </div>
+
+
 .. thumbnail-parent-div-close
 
 .. raw:: html
@@ -204,6 +221,7 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
    /user-guide/07-time-discretization
    /user-guide/08-regridding
    /user-guide/09-topsystem
+   /user-guide/10-cleanup
 
 
 .. only:: html

@@ -14,6 +14,7 @@
    .. autosummary::
    
       ~Evapotranspiration.__init__
+      ~Evapotranspiration.cleanup
       ~Evapotranspiration.clip_box
       ~Evapotranspiration.copy
       ~Evapotranspiration.from_file
