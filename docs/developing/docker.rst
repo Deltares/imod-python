@@ -6,11 +6,19 @@ This is done by defining the the docker image and tag to be used by the pipeline
 Furthermore we can also easily debug a failing build by running the container locally on our machine.
 
 
+Dockerfile
+----------
+The dockerfile can be found at `.teamcity\\Dockerfile\\Dockerfile` and is displayed below as well.
+
+.. literalinclude:: ../../.teamcity/Dockerfile/Dockerfile
+    :language: docker
+
+
 .. _How to build:
 
 How to build
 ------------
-The dockerfile to build the image can be found at `.teamcity\\Dockerfile\\Dockerfile`. A prerequisite of building the image is that you have `Docker Desktop`_ installed on your machine.
+A prerequisite of building the image is that you have `Docker Desktop`_ installed on your machine.
 Once installed open a console and navigate to the folder where the dockerfile resides.
 
 To build the image:
@@ -21,7 +29,6 @@ To build the image:
   docker build -t windows-pixi:34.0 . -m 2GB  
 
 The image tag is not randomly chosen. It matches the Pixi version shipped with the image. So make sure the tag equals the version inside the dockerfile.
-
 
 Updating the Pixi version
 -------------------------
@@ -51,6 +58,7 @@ After you connected to the registry you can tag and push your image:
     docker push containers.deltares.nl/hydrology_product_line_imod/windows-pixi:34.0
 
 Again, make sure the tags match the ``PIXI_VERSION`` inside the dockerfile.
+
 
 .. _Docker Desktop: https://www.docker.com/products/docker-desktop/
 .. _here: https://containers.deltares.nl

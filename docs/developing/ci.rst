@@ -38,9 +38,17 @@ The docker build container is also used on the build server and therefore settin
 
 Obtain the image
 ~~~~~~~~~~~~~~~~
-To obtain the container you can either pull it from the Deltares registry or build it yourself.
+To obtain the container you can either pull it from the `docker registry`_ registry or build it yourself.
 
-To pull it use the following command:
+To pull the latest image use the command below:
+
+.. code-block:: console
+
+   docker pull containers.deltares.nl/hydrology_product_line_imod/windows-pixi:latest
+
+Sometimes you want to use an older version of the docker builder. To get an older version you can run the same command but use a different tag.
+To find out which tags are available and which is the latest you can have a look at the `artifacts page`_.
+To pull a specific version run:
 
 .. code-block:: console
 
@@ -54,7 +62,10 @@ To spin up the container run the following command:
 
 .. code-block:: console
 
-   docker run --rm -it windows-pixi:34.0
+   docker run --rm -it windows-pixi:latest
 
 This commands spins up an interactive session which will be automatically removed whenever you exit it.
 Your next steps should be to clone the imod-python repository, checkout the branch you want to debug and run the pixi tasks corresponding to the failing build step.
+
+.. _docker registry: https://containers.deltares.nl
+.. _artifacts page: https://containers.deltares.nl/harbor/projects/32/repositories/windows-pixi/artifacts-tab
