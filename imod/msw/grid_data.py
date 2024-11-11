@@ -1,11 +1,60 @@
+from datetime import datetime
+from typing import Optional
+
 import numpy as np
 import xarray as xr
 
+from imod.mf6 import StructuredDiscretization
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
+from imod.mf6.regrid.regrid_schemes import (
+    RegridMethodType,
+)
+from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import GridDataRegridMethod
+from imod.typing import GridDataArray
+from imod.typing.grid import concat, ones_like
 from imod.util.spatial import get_cell_area, spatial_reference
+
+
+def get_cell_area_from_imod5_data(
+    imod5_data: dict[str, dict[str, GridDataArray]],
+) -> GridDataArray:
+    # area's per type of svats
+    mf6_area = get_cell_area(imod5_data["cap"]["wetted_area"])
+    wetted_area = imod5_data["cap"]["wetted_area"]
+    urban_area = imod5_data["cap"]["urban_area"]
+    rural_area = mf6_area - (wetted_area + urban_area)
+    if (wetted_area > mf6_area).any():
+        print(f"wetted area was set to the max cell area of {mf6_area}")
+        wetted_area = wetted_area.where(wetted_area <= mf6_area, other=mf6_area)
+    if (rural_area < 0.0).any():
+        print(
+            "found urban area > than (cel-area - wetted area). Urban area was set to 0"
+        )
+        urban_area = urban_area.where(rural_area > 0.0, other=0.0)
+    rural_area = mf6_area - (wetted_area + urban_area)
+    return concat([rural_area, urban_area], dim="subunit")
+
+
+def get_landuse_from_imod5_data(
+    imod5_data: dict[str, dict[str, GridDataArray]],
+) -> GridDataArray:
+    rural_landuse = imod5_data["cap"]["landuse"]
+    # Urban landuse = 18
+    urban_landuse = ones_like(rural_landuse) * 18
+    return concat([rural_landuse, urban_landuse], dim="subunit")
+
+
+def get_rootzone_thickness_from_imod5_data(
+    imod5_data: dict[str, dict[str, GridDataArray]],
+) -> GridDataArray:
+    # iMOD5 grid has values in cm,
+    # MetaSWAP needs them in m.
+    rootzone_thickness = imod5_data["cap"]["rootzone_thickness"] * 0.01
+    # rootzone depth is equal for both svats.
+    return concat([rootzone_thickness, rootzone_thickness], dim="subunit")
 
 
 class GridData(MetaSwapPackage, IRegridPackage):
@@ -111,3 +160,37 @@ class GridData(MetaSwapPackage, IRegridPackage):
             raise ValueError(
                 "Provided area grid with total areas larger than cell area"
             )
+
+    @classmethod
+    def from_imod5_data(
+        cls,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        period_data: dict[str, list[datetime]],
+        target_dis: StructuredDiscretization,
+        regridder_types: Optional[RegridMethodType] = None,
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
+    ) -> "GridData":
+        data = {}
+        data["area"] = get_cell_area_from_imod5_data(imod5_data)
+        data["landuse"] = get_landuse_from_imod5_data(imod5_data)
+        data["rootzone_thickness"] = get_rootzone_thickness_from_imod5_data(imod5_data)
+        data["surface_elevation"] = imod5_data["cap"]["surface_elevation"]
+        data["soil_physical_unit"] = imod5_data["cap"]["soil_physical_unit"]
+
+        mf6_top_active = target_dis["idomain"].isel(layer=0, drop=True)
+        subunit_active = (
+            (imod5_data["cap"]["boundary"] == 1)
+            & (data["area"] > 0)
+            & (mf6_top_active >= 1)
+        )
+        active = subunit_active.all(dim="subunit")
+        data_active = {
+            key: (
+                griddata.where(subunit_active)
+                if key in cls._with_subunit
+                else griddata.where(active)
+            )
+            for key, griddata in data.items()
+        }
+        data_active["active"] = active
+        return cls(**data_active)
