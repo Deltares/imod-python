@@ -34,6 +34,7 @@ in-depth description.
    documentation
    ci
    releasing
+   docker
 
 .. _Contributing to xarray guide: https://xarray.pydata.org/en/latest/contributing.html
 .. _pages: https://github.com/Deltares/imod-python/issues
