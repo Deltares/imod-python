@@ -12,7 +12,6 @@ datasets.
 
 # %%
 # We'll start with the usual imports
-import matplotlib.pyplot as plt
 import numpy as np
 
 import imod
@@ -176,7 +175,6 @@ fig, ax = imod.visualize.plot_map(
     diff_stage.max(dim="layer"), "viridis", np.linspace(0, max_diff, 9)
 )
 ax.set_title("stage lowered by cleanup (m)")
-plt.show()
 
 # %%
 #
@@ -191,7 +189,6 @@ fig, ax = imod.visualize.plot_map(
     diff_riv_bot.max(dim="layer"), "viridis", np.linspace(0, max_diff, 9)
 )
 ax.set_title("river bottom lowered by cleanup (m)")
-plt.show()
 
 # %%
 #
