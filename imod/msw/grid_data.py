@@ -18,9 +18,8 @@ from imod.util.spatial import get_cell_area, spatial_reference
 
 
 def _concat_subunits(arg1: GridDataArray, arg2: GridDataArray):
-    return concat(
-        [arg1, arg2], dim="subunit"
-    ).assign_coords(subunit = [0, 1])
+    return concat([arg1, arg2], dim="subunit").assign_coords(subunit=[0, 1])
+
 
 def get_cell_area_from_imod5_data(
     imod5_data: dict[str, dict[str, GridDataArray]],
