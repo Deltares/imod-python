@@ -17,6 +17,11 @@ from imod.typing.grid import concat, ones_like
 from imod.util.spatial import get_cell_area, spatial_reference
 
 
+def _concat_subunits(arg1: GridDataArray, arg2: GridDataArray):
+    return concat(
+        [arg1, arg2], dim="subunit"
+    ).assign_coords(subunit = [0, 1])
+
 def get_cell_area_from_imod5_data(
     imod5_data: dict[str, dict[str, GridDataArray]],
 ) -> GridDataArray:
@@ -34,7 +39,7 @@ def get_cell_area_from_imod5_data(
         )
         urban_area = urban_area.where(rural_area > 0.0, other=0.0)
     rural_area = mf6_area - (wetted_area + urban_area)
-    return concat([rural_area, urban_area], dim="subunit")
+    return _concat_subunits(rural_area, urban_area)
 
 
 def get_landuse_from_imod5_data(
@@ -43,17 +48,17 @@ def get_landuse_from_imod5_data(
     rural_landuse = imod5_data["cap"]["landuse"]
     # Urban landuse = 18
     urban_landuse = ones_like(rural_landuse) * 18
-    return concat([rural_landuse, urban_landuse], dim="subunit")
+    return _concat_subunits(rural_landuse, urban_landuse)
 
 
-def get_rootzone_thickness_from_imod5_data(
+def get_rootzone_depth_from_imod5_data(
     imod5_data: dict[str, dict[str, GridDataArray]],
 ) -> GridDataArray:
     # iMOD5 grid has values in cm,
     # MetaSWAP needs them in m.
     rootzone_thickness = imod5_data["cap"]["rootzone_thickness"] * 0.01
     # rootzone depth is equal for both svats.
-    return concat([rootzone_thickness, rootzone_thickness], dim="subunit")
+    return _concat_subunits(rootzone_thickness, rootzone_thickness)
 
 
 class GridData(MetaSwapPackage, IRegridPackage):
@@ -171,7 +176,7 @@ class GridData(MetaSwapPackage, IRegridPackage):
         data = {}
         data["area"] = get_cell_area_from_imod5_data(imod5_data)
         data["landuse"] = get_landuse_from_imod5_data(imod5_data)
-        data["rootzone_thickness"] = get_rootzone_thickness_from_imod5_data(imod5_data)
+        data["rootzone_depth"] = get_rootzone_depth_from_imod5_data(imod5_data)
         data["surface_elevation"] = imod5_data["cap"]["surface_elevation"]
         data["soil_physical_unit"] = imod5_data["cap"]["soil_physical_unit"]
 
