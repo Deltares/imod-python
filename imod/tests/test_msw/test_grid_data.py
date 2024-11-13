@@ -11,6 +11,7 @@ from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
 from pytest_cases import case, parametrize_with_cases
 
+from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.msw import GridData
 from imod.msw.fixed_format import format_fixed_width
@@ -108,7 +109,7 @@ def test_write(
 @pytest.fixture(scope="function")
 def coords_planar() -> dict:
     x = [1.0, 2.0, 3.0]
-    y = [1.0, 2.0, 3.0]
+    y = [3.0, 2.0, 1.0]
     dx = 1.0
     dy = 1.0
     return {"y": y, "x": x, "dx": dx, "dy": dy}
@@ -436,3 +437,31 @@ def test_non_equidistant(grid_data_dict: dict[str, xr.DataArray]):
 
     with pytest.raises(ValueError):
         GridData(**grid_data_dict)
+
+
+@parametrize_with_cases("grid_data_dict", cases=".")
+def test_from_imod5_data(grid_data_dict: dict[str, xr.DataArray]):
+    cap_data = {}
+    cap_data["wetted_area"] = 1 - grid_data_dict["area"].sum(dim="subunit")
+    like = grid_data_dict["area"].sel(subunit=0, drop=True)
+    top = xr.zeros_like(like, dtype=float)
+    cap_data["boundary"] = xr.ones_like(like, dtype=int)
+    cap_data["urban_area"] = xr.zeros_like(like, dtype=float) + 0.1
+    cap_data["landuse"] = xr.ones_like(like, dtype=int)
+    cap_data["rootzone_thickness"] = xr.ones_like(like, dtype=int)
+    cap_data["surface_elevation"] = top
+    cap_data["soil_physical_unit"] = xr.ones_like(like, dtype=int)
+    cap_data["active"] = xr.ones_like(like, dtype=bool)
+
+    imod5_data = {"cap": cap_data}
+
+    layer = xr.DataArray([1, 1], coords={"layer": [1, 2]}, dims=("layer", ))
+    idomain = layer * xr.ones_like(like, dtype=int)
+
+    # Dis only needed for idomain
+    dis = StructuredDiscretization(top, top-0.1, idomain, validate=False)
+
+    griddata = GridData.from_imod5_data(imod5_data, target_dis=dis)
+    expected_rootzone_depth = cap_data["rootzone_thickness"] * 0.01
+    xr.testing.assert_allclose(expected_rootzone_depth, griddata["rootzone_depth"].sel(subunit=0, drop=True))
+    assert (griddata["landuse"].sel(subunit = 1, drop=True) == 18).all()
