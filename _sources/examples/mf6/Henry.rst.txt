@@ -497,7 +497,7 @@ Visualize the results
  .. code-block:: none
 
 
-    <matplotlib.contour.QuadContourSet object at 0x000001A345482510>
+    <matplotlib.contour.QuadContourSet object at 0x000001ECE1663B90>
 
 
 
@@ -527,14 +527,14 @@ formed:
  .. code-block:: none
 
 
-    <matplotlib.contour.QuadContourSet object at 0x000001A34E576ED0>
+    <matplotlib.contour.QuadContourSet object at 0x000001ECD6589E10>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 59.781 seconds)
+   **Total running time of the script:** (1 minutes 7.253 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_Henry.py:

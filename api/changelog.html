@@ -550,6 +550,7 @@
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.open_transport_budget.html">imod.mf6.Modflow6Simulation.open_transport_budget</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.open_head.html">imod.mf6.Modflow6Simulation.open_head</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.open_concentration.html">imod.mf6.Modflow6Simulation.open_concentration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.from_imod5_data.html">imod.mf6.Modflow6Simulation.from_imod5_data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.clip_box.html">imod.mf6.Modflow6Simulation.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.split.html">imod.mf6.Modflow6Simulation.split</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.regrid_like.html">imod.mf6.Modflow6Simulation.regrid_like</a></li>
@@ -557,6 +558,7 @@
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.mask_all_packages.html">imod.mf6.GroundwaterFlowModel.mask_all_packages</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.prepare_wel_for_mf6.html">imod.mf6.GroundwaterFlowModel.prepare_wel_for_mf6</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.dump.html">imod.mf6.GroundwaterFlowModel.dump</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.from_imod5_data.html">imod.mf6.GroundwaterFlowModel.from_imod5_data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterTransportModel.html">imod.mf6.GroundwaterTransportModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterTransportModel.mask_all_packages.html">imod.mf6.GroundwaterTransportModel.mask_all_packages</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterTransportModel.dump.html">imod.mf6.GroundwaterTransportModel.dump</a></li>
@@ -878,7 +880,7 @@ deprecated <a class="reference internal" href="generated/mf6/imod.mf6.WellDisStr
 <section id="added">
 <h3>Added<a class="headerlink" href="#added" title="Link to this heading">#</a></h3>
 <ul class="simple">
-<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.from_imod5_data()</span></code> to import imod5 data
+<li><p><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.from_imod5_data.html#imod.mf6.Modflow6Simulation.from_imod5_data" title="imod.mf6.Modflow6Simulation.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.from_imod5_data()</span></code></a> to import imod5 data
 loaded with <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> as a MODFLOW 6
 simulation.</p></li>
 <li><p><a class="reference internal" href="generated/prepare/imod.prepare.linestring_to_square_zpolygons.html#imod.prepare.linestring_to_square_zpolygons" title="imod.prepare.linestring_to_square_zpolygons"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.prepare.linestring_to_square_zpolygons()</span></code></a> and
@@ -912,7 +914,7 @@ MODFLOW6, for debugging purposes.</p></li>
 <h3>Removed<a class="headerlink" href="#removed" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.convert_to_disv()</span></code> has been removed. This functionality
-has been replaced by <code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.from_imod5_data()</span></code>. To
+has been replaced by <a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.from_imod5_data.html#imod.mf6.Modflow6Simulation.from_imod5_data" title="imod.mf6.Modflow6Simulation.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.from_imod5_data()</span></code></a>. To
 convert a structured simulation to an unstructured simulation, call:
 <a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.regrid_like.html#imod.mf6.Modflow6Simulation.regrid_like" title="imod.mf6.Modflow6Simulation.regrid_like"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.regrid_like()</span></code></a></p></li>
 </ul>

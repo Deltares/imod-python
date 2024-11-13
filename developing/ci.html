@@ -384,7 +384,13 @@
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Developing examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="documentation.html">Building documentation and examples</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Debugging Continuous Integration</a></li>
+
+
 <li class="toctree-l1"><a class="reference internal" href="releasing.html">How to release a new version</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docker.html">Docker build image</a></li>
+
+
+
 </ul>
 </div>
 </nav></div>
@@ -442,8 +448,15 @@
                   
   <section id="debugging-continuous-integration">
 <h1>Debugging Continuous Integration<a class="headerlink" href="#debugging-continuous-integration" title="Link to this heading">#</a></h1>
+<p>When the CI pipeline fails you want to be able to reproduce it locally. There are 2 general approaches to doing this.
+- Running the pipeline steps locally
+- Running the pipeline steps inside the docker build container</p>
+</section>
+<section id="running-the-pipeline-steps-locally">
+<h1>Running the pipeline steps locally<a class="headerlink" href="#running-the-pipeline-steps-locally" title="Link to this heading">#</a></h1>
 <p>The commands run during the Continuous Integration are they same as the tasks defined
-in the pixi tasks list. For example if the MyPy step fails you can locally run the command:</p>
+in the pixi tasks list. Therefor you can directly call these tasks on your local repository.</p>
+<p>For example if the MyPy step fails you can locally run the command:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pixi run --environment default mypy_lint</span>
 </pre></div>
 </div>
@@ -455,6 +468,36 @@ in the pixi tasks list. For example if the MyPy step fails you can locally run t
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pixi task list</span>
 </pre></div>
 </div>
+</section>
+<section id="running-the-pipeline-steps-inside-the-docker-build-container">
+<h1>Running the pipeline steps inside the docker build container<a class="headerlink" href="#running-the-pipeline-steps-inside-the-docker-build-container" title="Link to this heading">#</a></h1>
+<p>If you’re unable to reproduce a failing build using the method above you can try running it inside the docker build container.
+The docker build container is also used on the build server and therefore settings one up locally should provide you with the exact same environment.</p>
+<section id="obtain-the-image">
+<h2>Obtain the image<a class="headerlink" href="#obtain-the-image" title="Link to this heading">#</a></h2>
+<p>To obtain the container you can either pull it from the <a class="reference external" href="https://containers.deltares.nl">docker registry</a> registry or build it yourself.</p>
+<p>To pull the latest image use the command below:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">docker pull containers.deltares.nl/hydrology_product_line_imod/windows-pixi:latest</span>
+</pre></div>
+</div>
+<p>Sometimes you want to use an older version of the docker builder. To get an older version you can run the same command but use a different tag.
+To find out which tags are available and which is the latest you can have a look at the <a class="reference external" href="https://containers.deltares.nl/harbor/projects/32/repositories/windows-pixi/artifacts-tab">artifacts page</a>.
+The tag name corresponds with the pixi version inside the docker image e.g. :34.0 means that the image contains pixi v34.0.</p>
+<p>To pull a specific version run:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">docker pull containers.deltares.nl/hydrology_product_line_imod/windows-pixi:34.0</span>
+</pre></div>
+</div>
+<p>To build it yourself see <a class="reference internal" href="docker.html#how-to-build"><span class="std std-ref">How to build</span></a>.</p>
+</section>
+<section id="create-the-container">
+<h2>Create the container<a class="headerlink" href="#create-the-container" title="Link to this heading">#</a></h2>
+<p>To spin up the container run the following command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">docker run --rm -it windows-pixi:latest</span>
+</pre></div>
+</div>
+<p>This commands spins up an interactive session which will be automatically removed whenever you exit it.
+Your next steps should be to clone the imod-python repository, checkout the branch you want to debug and run the pixi tasks corresponding to the failing build step.</p>
+</section>
 </section>
 
 
@@ -495,6 +538,25 @@ in the pixi tasks list. For example if the MyPy step fails you can locally run t
                 <dialog id="pst-secondary-sidebar-modal"></dialog>
                 <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Debugging Continuous Integration</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-pipeline-steps-locally">Running the pipeline steps locally</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-pipeline-steps-inside-the-docker-build-container">Running the pipeline steps inside the docker build container</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#obtain-the-image">Obtain the image</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#create-the-container">Create the container</a></li>
+</ul>
+</li>
+</ul>
+
+  </nav></div>
 
   <div class="sidebar-secondary-item">
 

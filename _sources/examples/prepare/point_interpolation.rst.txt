@@ -409,7 +409,7 @@ heads.
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x000001A34ECE7890>
+    <matplotlib.image.AxesImage object at 0x000001ECD69F1350>
 
 
 
@@ -449,7 +449,7 @@ and the closing criteria.
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x000001A346372250>
+    <matplotlib.image.AxesImage object at 0x000001ECDF7DB510>
 
 
 
@@ -496,14 +496,14 @@ values as well, which allows us to set transparency per cell.
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x000001A34596D410>
+    <matplotlib.image.AxesImage object at 0x000001ECD6957350>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 4.828 seconds)
+   **Total running time of the script:** (0 minutes 6.590 seconds)
 
 
 .. _sphx_glr_download_examples_prepare_point_interpolation.py:
