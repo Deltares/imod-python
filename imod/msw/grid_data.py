@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Optional
 
 import numpy as np
@@ -165,7 +164,6 @@ class GridData(MetaSwapPackage, IRegridPackage):
     def from_imod5_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        period_data: dict[str, list[datetime]],
         target_dis: StructuredDiscretization,
         regridder_types: Optional[RegridMethodType] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
