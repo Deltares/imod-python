@@ -8,6 +8,7 @@ from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import DataDictType, MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import PondingRegridMethod
 from imod.typing import IntArray
+from imod.typing.grid import concat
 
 
 class Ponding(MetaSwapPackage, IRegridPackage):
@@ -73,10 +74,13 @@ class Ponding(MetaSwapPackage, IRegridPackage):
 
     @classmethod
     def from_imod5_data(cls, imod5_data):
+        """
+        Concatenate ponding depths along subunits
+        """
         cap_data = imod5_data["cap"]
         data = {}
-        data["runoff_resistance"] = xr.concat([cap_data["rural_runoff_resistance"], cap_data["urban_runoff_resistance"]], dims="subunit").assign_coords(subunit=[0, 1])
-        data["runon_resistance"] = xr.concat([cap_data["rural_runon_resistance"], cap_data["urbon_runon_resistance"]], dims="subunit").assign_coords(subunit=[0, 1])
-        data["ponding_depth"] = xr.concat([cap_data["rural_ponding_depth"], cap_data["urban_ponding_depth"]], dims="subunit").assign_coords(subunit=[0, 1])
+        for key in cls._with_subunit:
+            data_ls = [cap_data[f"{landuse}_{key}"] for landuse in ["rural", "urban"]]
+            data[key] = concat(data_ls, dim="subunit").assign_coords(subunit=[0, 1])
 
         return cls(**data)
