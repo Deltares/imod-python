@@ -7,8 +7,8 @@ from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import DataDictType, MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import PondingRegridMethod
+from imod.msw.utilities.common import concat_imod5
 from imod.typing import IntArray
-from imod.typing.grid import concat
 
 
 class Ponding(MetaSwapPackage, IRegridPackage):
@@ -81,6 +81,6 @@ class Ponding(MetaSwapPackage, IRegridPackage):
         data = {}
         for key in cls._with_subunit:
             data_ls = [cap_data[f"{landuse}_{key}"] for landuse in ["rural", "urban"]]
-            data[key] = concat(data_ls, dim="subunit").assign_coords(subunit=[0, 1])
+            data[key] = concat_imod5(*data_ls)
 
         return cls(**data)
