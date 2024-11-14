@@ -6,6 +6,17 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+Fixed
+~~~~~
+
+- :class:`imod.msw.Sprinkling` now correctly writes source svats to scap_svat.inp file.
+
+
+Changed
+~~~~~~~
+
+- Variable ``max_abstraction_groundwater`` in :class:`imod.msw.Sprinkling` now needs to 
+  have a subunit coordinate.
 
 [0.18.0]
 --------
