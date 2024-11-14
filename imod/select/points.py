@@ -1,13 +1,16 @@
 import warnings
+from typing import Any
 
 import numpy as np
+import numpy.typing as npt
 import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.typing import GridDataArray
 
 
-def get_unstructured_cell2d_from_xy(uda, **points):
+def get_unstructured_cell2d_from_xy(uda: xu.UgridDataArray, **points) -> npt.NDArray:
     # Unstructured grids always require to be tested both on x and y coordinates
     # to see if points are within bounds.
     for coord in ["x", "y"]:
@@ -21,7 +24,7 @@ def get_unstructured_cell2d_from_xy(uda, **points):
     return uda.ugrid.grid.locate_points(xy)
 
 
-def __check_and_get_points_shape(points) -> dict:
+def __check_and_get_points_shape(points: dict) -> dict:
     """Check whether points have the right shape"""
     shapes = {}
     for coord, value in points.items():
@@ -36,13 +39,13 @@ def __check_and_get_points_shape(points) -> dict:
     return shapes
 
 
-def __check_point_shapes_consistency(shapes):
+def __check_point_shapes_consistency(shapes: dict):
     if not len(set(shapes.values())) == 1:
         msg = "\n".join([f"{coord}: {shape}" for coord, shape in shapes.items()])
         raise ValueError(f"Shapes of coordinates do match each other:\n{msg}")
 
 
-def _check_points(points):
+def _check_points(points: dict):
     """
     Check whether the array with points has the right and consistent shape.
     """
@@ -51,7 +54,7 @@ def _check_points(points):
     __check_point_shapes_consistency(shapes)
 
 
-def __arr_like_points(points, fill_value):
+def __arr_like_points(points: dict, fill_value: Any) -> npt.NDArray:
     """
     Return array with the same shape as the first array provided in points.
     """
@@ -61,7 +64,7 @@ def __arr_like_points(points, fill_value):
     return np.full(shape, fill_value)
 
 
-def points_in_bounds(da, **points):
+def points_in_bounds(da: GridDataArray, **points) -> npt.NDArray[np.bool_]:
     """
     Returns whether points specified by keyword arguments fall within the bounds
     of ``da``.
@@ -117,7 +120,7 @@ def points_in_bounds(da, **points):
     return in_bounds
 
 
-def check_points_in_bounds(da, points, out_of_bounds):
+def check_points_in_bounds(da: GridDataArray, points: dict, out_of_bounds: str):
     inside = points_in_bounds(da, **points)
     # Error handling
     msg = "Not all points are located within the bounds of the DataArray"
@@ -137,7 +140,9 @@ def check_points_in_bounds(da, points, out_of_bounds):
     return points, inside
 
 
-def _get_indices_1d(da, coordname, x):
+def _get_indices_1d(
+    da: xr.DataArray, coordname: str, x: npt.NDArray[np.floating]
+) -> npt.NDArray[np.intp]:
     x = np.atleast_1d(x)
     x_decreasing = da.indexes[coordname].is_monotonic_decreasing
     dx, xmin, _ = imod.util.spatial.coord_reference(da.coords[coordname])
@@ -172,7 +177,9 @@ def _get_indices_1d(da, coordname, x):
     return ixs
 
 
-def points_indices(da, out_of_bounds="raise", **points):
+def points_indices(
+    da: GridDataArray, out_of_bounds: str = "raise", **points
+) -> dict[str, xr.DataArray]:
     """
     Get the indices for points as defined by the arrays x and y.
 
@@ -184,7 +191,7 @@ def points_indices(da, out_of_bounds="raise", **points):
 
     Parameters
     ----------
-    da : xr.DataArray
+    da : xarray.DataArray | xu.UgridDataArray
     out_of_bounds : {"raise", "warn", "ignore"}, default: "raise"
         What to do if the points are not located in the bounds of the
         DataArray:
@@ -246,7 +253,7 @@ def points_indices(da, out_of_bounds="raise", **points):
     return indices
 
 
-def points_values(da, out_of_bounds="raise", **points):
+def points_values(da: GridDataArray, out_of_bounds="raise", **points) -> GridDataArray:
     """
     Get values from specified points.
 
@@ -287,12 +294,17 @@ def points_values(da, out_of_bounds="raise", **points):
     indices = imod.select.points.points_indices(
         da, out_of_bounds=out_of_bounds, **iterable_points
     )
-    selection = da.isel(**indices)
+    selection = da.isel(indexers=indices)
 
     return selection
 
 
-def points_set_values(da, values, out_of_bounds="raise", **points):
+def points_set_values(
+    da: GridDataArray,
+    values: int | float | npt.NDArray[np.number],
+    out_of_bounds: str = "raise",
+    **points,
+):
     """
     Set values at specified points.
 

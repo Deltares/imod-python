@@ -1,12 +1,14 @@
 import numpy as np
 import xarray as xr
 
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
-from imod.util.spatial import spatial_reference
+from imod.msw.regrid.regrid_schemes import GridDataRegridMethod
+from imod.util.spatial import get_cell_area, spatial_reference
 
 
-class GridData(MetaSwapPackage):
+class GridData(MetaSwapPackage, IRegridPackage):
     """
     This contains the grid data of MetaSWAP.
 
@@ -50,6 +52,8 @@ class GridData(MetaSwapPackage):
     _without_subunit = ("surface_elevation", "soil_physical_unit")
     _to_fill = ("soil_physical_unit_string", "temp")
 
+    _regrid_method = GridDataRegridMethod()
+
     def __init__(
         self,
         area: xr.DataArray,
@@ -60,6 +64,7 @@ class GridData(MetaSwapPackage):
         active: xr.DataArray,
     ):
         super().__init__()
+
         self.dataset["area"] = area
         self.dataset["landuse"] = landuse
         self.dataset["rootzone_depth"] = rootzone_depth
@@ -95,7 +100,7 @@ class GridData(MetaSwapPackage):
 
         active = self.dataset["active"]
 
-        cell_area = active.astype(float) * dx * abs(dy)
+        cell_area = get_cell_area(active)
         total_area = self.dataset["area"].sum(dim="subunit")
 
         # Apparently all regional models intentionally provided area grids

@@ -2,6 +2,7 @@
 from .sample_data import (
     ahn,
     circle,
+    colleagues_river_data,
     fluxes,
     head_observations,
     hondsrug_crosssection,

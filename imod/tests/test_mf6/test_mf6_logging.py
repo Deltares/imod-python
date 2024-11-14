@@ -10,6 +10,7 @@ import xarray as xr
 
 import imod
 from imod.logging import LoggerType, LogLevel, standard_log_decorator
+from imod.mf6.validation_context import ValidationContext
 from imod.mf6.write_context import WriteContext
 
 out = StringIO()
@@ -48,7 +49,7 @@ def test_write_package_is_logged(drainage, tmp_path):
         )
         drn = imod.mf6.Drainage(**drainage)
         write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
-        drn.write("mydrn", [1], write_context)
+        drn._write("mydrn", [1], write_context)
 
     # assert
     with open(logfile_path, "r") as log_file:
@@ -62,12 +63,12 @@ def test_write_package_is_logged(drainage, tmp_path):
             is not None
         )
         assert (
-            "Beginning execution of imod.mf6.package.write for object Drainage..."
+            "Beginning execution of imod.mf6.package._write for object Drainage..."
             in log
         )
         assert (
             re.search(
-                f"Finished execution of imod.mf6.package.write  for object Drainage in {simple_real_number_regexp} seconds...",
+                f"Finished execution of imod.mf6.package._write  for object Drainage in {simple_real_number_regexp} seconds...",
                 log,
             )
             is not None
@@ -80,6 +81,7 @@ def test_write_model_is_logged(
     # arrange
     logfile_path = tmp_path / "logfile.txt"
     transport_model = flow_transport_simulation["tpt_c"]
+    validation_context = ValidationContext()
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
     globaltimes = np.array(
         [
@@ -95,18 +97,20 @@ def test_write_model_is_logged(
             add_default_file_handler=False,
             add_default_stream_handler=True,
         )
-        transport_model.write("model.txt", globaltimes, True, write_context)
+        transport_model._write(
+            "model.txt", globaltimes, write_context, validation_context
+        )
 
     # assert
     with open(logfile_path, "r") as log_file:
         log = log_file.read()
 
         assert (
-            "Beginning execution of imod.mf6.model.write for object GroundwaterTransportModel"
+            "Beginning execution of imod.mf6.model._write for object GroundwaterTransportModel"
             in log
         )
         assert (
-            "Finished execution of imod.mf6.model.write  for object GroundwaterTransportModel"
+            "Finished execution of imod.mf6.model._write  for object GroundwaterTransportModel"
             in log
         )
 

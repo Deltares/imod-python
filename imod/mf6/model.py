@@ -6,7 +6,7 @@ import inspect
 import pathlib
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union
 
 import cftime
 import jinja2
@@ -19,16 +19,34 @@ from jinja2 import Template
 
 import imod
 from imod.logging import standard_log_decorator
+from imod.mf6.drn import Drainage
+from imod.mf6.ghb import GeneralHeadBoundary
+from imod.mf6.hfb import HorizontalFlowBarrierBase
 from imod.mf6.interfaces.imodel import IModel
+from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
+from imod.mf6.riv import River
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.utilities.mask import _mask_all_packages
+from imod.mf6.utilities.mf6hfb import merge_hfb_packages
 from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_like
 from imod.mf6.validation import pkg_errors_to_status_info
+from imod.mf6.validation_context import ValidationContext
+from imod.mf6.wel import GridAgnosticWell
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray
 from imod.typing.grid import is_spatial_grid
+
+HFB_PKGNAME = "hfb_merged"
+SUGGESTION_TEXT = (
+    "-> You might fix this by calling the package's ``.cleanup()`` method."
+)
+PKGTYPES_WITH_CLEANUP = [River, Drainage, GeneralHeadBoundary, GridAgnosticWell]
+
+
+def pkg_has_cleanup(pkg: Package):
+    return any(isinstance(pkg, pkgtype) for pkgtype in PKGTYPES_WITH_CLEANUP)
 
 
 class Modflow6Model(collections.UserDict, IModel, abc.ABC):
@@ -145,12 +163,20 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
         d = {k: v for k, v in self._options.items() if not (v is None or v is False)}
         packages = []
+        has_hfb = False
         for pkgname, pkg in self.items():
             # Add the six to the package id
             pkg_id = pkg._pkg_id
+            # Skip if hfb
+            if pkg_id == "hfb":
+                has_hfb = True
+                continue
             key = f"{pkg_id}6"
             path = dir_for_render / f"{pkgname}.{pkg_id}"
             packages.append((key, path.as_posix(), pkgname))
+        if has_hfb:
+            path = dir_for_render / f"{HFB_PKGNAME}.hfb"
+            packages.append(("hfb6", path.as_posix(), HFB_PKGNAME))
         d["packages"] = packages
         return self._template.render(d)
 
@@ -161,7 +187,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
 
         self._check_for_required_packages(modelkey)
 
-    def __get_domain_geometry(
+    def _get_domain_geometry(
         self,
     ) -> tuple[
         Union[xr.DataArray, xu.UgridDataArray],
@@ -176,14 +202,15 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         idomain = discretization["idomain"]
         return top, bottom, idomain
 
-    def __get_k(self):
-        try:
-            npf = self[imod.mf6.NodePropertyFlow._pkg_id]
-        except RuntimeError:
-            raise ValidationError("expected one package of type ModePropertyFlow")
-
-        k = npf["k"]
-        return k
+    def _get_k(self):
+        npf_key = self._get_pkgkey(imod.mf6.NodePropertyFlow._pkg_id)
+        if not npf_key:
+            raise KeyError(
+                """Unable to obtain the hydraulic conductivity. Make sure a
+                NodePropertyFlow package is assigned to the Modflow6Model."""
+            )
+        npf = self[npf_key]
+        return npf["k"]
 
     @standard_log_decorator()
     def validate(self, model_name: str = "") -> StatusInfoBase:
@@ -221,13 +248,119 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 bottom=bottom,
             )
             if len(pkg_errors) > 0:
-                model_status_info.add(pkg_errors_to_status_info(pkg_name, pkg_errors))
+                footer = SUGGESTION_TEXT if pkg_has_cleanup(pkg) else None
+                model_status_info.add(
+                    pkg_errors_to_status_info(pkg_name, pkg_errors, footer)
+                )
 
         return model_status_info
 
+    def prepare_wel_for_mf6(
+        self, pkgname: str, validate: bool = True, strict_well_validation: bool = True
+    ) -> Mf6Wel:
+        """
+        Prepare grid-agnostic well for MODFLOW6, using the models grid
+        information and hydraulic conductivities. Allocates LayeredWell & Well
+        objects, which have x,y locations, to row & columns. Furthermore, Well
+        objects are allocated to model layers, depending on screen depth.
+
+        This function is called upon writing the model, it is included in the
+        public API for the user's debugging purposes.
+
+        Parameters
+        ----------
+        pkgname: string
+            Name of well package that is to be prepared for MODFLOW6
+        validate: bool, default True
+            Run validation before converting
+        strict_well_validation: bool, default True
+            Set well validation strict:
+            Throw error if well is removed entirely during its assignment to
+            layers.
+
+        Returns
+        -------
+        Mf6Wel
+            Direct representation of MODFLOW6 WEL package, with 'cellid'
+            indicating layer, row columns.
+        """
+        validate_context = ValidationContext(
+            validate=validate, strict_well_validation=strict_well_validation
+        )
+        return self._prepare_wel_for_mf6(pkgname, validate_context)
+
+    @standard_log_decorator()
+    def _prepare_wel_for_mf6(
+        self, pkgname: str, validate_context: ValidationContext
+    ) -> Mf6Wel:
+        pkg = self[pkgname]
+        if not isinstance(pkg, GridAgnosticWell):
+            raise TypeError(
+                f"""Package '{pkgname}' not of appropriate type, should be of type:
+                 'Well', 'LayeredWell', got {type(pkg)}"""
+            )
+        top, bottom, idomain = self._get_domain_geometry()
+        k = self._get_k()
+        return pkg._to_mf6_pkg(
+            idomain,
+            top,
+            bottom,
+            k,
+            validate_context,
+        )
+
     @standard_log_decorator()
     def write(
-        self, modelname, globaltimes, validate: bool, write_context: WriteContext
+        self,
+        modelname: str,
+        globaltimes: Union[list[np.datetime64], np.ndarray],
+        directory: str | Path,
+        use_binary: bool = True,
+        use_absolute_paths: bool = False,
+        validate: bool = True,
+    ):
+        """
+        Write MODFLOW6 model to file. Note that this method is purely intended
+        for debugging purposes. It does not result in a functional model. For
+        that the model needs to be part of a
+        :class:`imod.mf6.Modflow6Simulation`, of which the ``write`` method
+        should be called.
+
+        Parameters
+        ----------
+        modelname: str
+            Model name
+        globaltimes: list[np.datetime64] | np.ndarray
+            Times of the simulation's stress periods.
+        directory: str | Path
+            Directory in which the simulation will be written.
+        use_binary: bool = True
+            Whether to write time-dependent input for stress packages as binary
+            files, which are smaller in size, or more human-readable text files.
+        use_absolute_paths: bool = False
+            True if all paths written to the mf6 inputfiles should be absolute.
+        validate: bool = True
+            Whether to validate the Modflow6 simulation, including models, at
+            write. If True, erronous model input will throw a
+            ``ValidationError``.
+        """
+        write_context = WriteContext(Path(directory), use_binary, use_absolute_paths)
+        validate_context = ValidationContext(validate, validate)
+
+        status_info = self._write(
+            modelname, globaltimes, write_context, validate_context
+        )
+
+        if status_info.has_errors():
+            raise ValidationError("\n" + status_info.to_string())
+
+    @standard_log_decorator()
+    def _write(
+        self,
+        modelname: str,
+        globaltimes: Union[list[np.datetime64], np.ndarray],
+        write_context: WriteContext,
+        validate_context: ValidationContext,
     ) -> StatusInfoBase:
         """
         Write model namefile
@@ -237,7 +370,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         workdir = write_context.simulation_directory
         modeldirectory = workdir / modelname
         Path(modeldirectory).mkdir(exist_ok=True, parents=True)
-        if validate:
+        if validate_context.validate:
             model_status_info = self.validate(modelname)
             if model_status_info.has_errors():
                 return model_status_info
@@ -252,40 +385,38 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         pkg_write_context = write_context.copy_with_new_write_directory(
             new_write_directory=modeldirectory
         )
+        mf6_hfb_ls: List[HorizontalFlowBarrierBase] = []
         for pkg_name, pkg in self.items():
             try:
-                if isinstance(pkg, imod.mf6.Well):
-                    top, bottom, idomain = self.__get_domain_geometry()
-                    k = self.__get_k()
-                    mf6_well_pkg = pkg.to_mf6_pkg(
-                        idomain,
-                        top,
-                        bottom,
-                        k,
-                        validate,
-                        pkg_write_context.is_partitioned,
-                    )
-
-                    mf6_well_pkg.write(
+                if issubclass(type(pkg), GridAgnosticWell):
+                    mf6_well_pkg = self._prepare_wel_for_mf6(pkg_name, validate_context)
+                    mf6_well_pkg._write(
                         pkgname=pkg_name,
                         globaltimes=globaltimes,
                         write_context=pkg_write_context,
                     )
-                elif isinstance(pkg, imod.mf6.HorizontalFlowBarrierBase):
-                    top, bottom, idomain = self.__get_domain_geometry()
-                    k = self.__get_k()
-                    mf6_hfb_pkg = pkg.to_mf6_pkg(idomain, top, bottom, k, validate)
-                    mf6_hfb_pkg.write(
-                        pkgname=pkg_name,
-                        globaltimes=globaltimes,
-                        write_context=pkg_write_context,
-                    )
+                elif issubclass(type(pkg), imod.mf6.HorizontalFlowBarrierBase):
+                    mf6_hfb_ls.append(pkg)
                 else:
-                    pkg.write(
+                    pkg._write(
                         pkgname=pkg_name,
                         globaltimes=globaltimes,
                         write_context=pkg_write_context,
                     )
+            except Exception as e:
+                raise type(e)(f"{e}\nError occured while writing {pkg_name}")
+
+        if len(mf6_hfb_ls) > 0:
+            try:
+                pkg_name = HFB_PKGNAME
+                top, bottom, idomain = self._get_domain_geometry()
+                k = self._get_k()
+                mf6_hfb_pkg = merge_hfb_packages(mf6_hfb_ls, idomain, top, bottom, k)
+                mf6_hfb_pkg._write(
+                    pkgname=pkg_name,
+                    globaltimes=globaltimes,
+                    write_context=pkg_write_context,
+                )
             except Exception as e:
                 raise type(e)(f"{e}\nError occured while writing {pkg_name}")
 
@@ -482,7 +613,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         clipped : Modflow6Model
         """
 
-        top, bottom, idomain = self.__get_domain_geometry()
+        top, bottom, _ = self._get_domain_geometry()
 
         clipped = type(self)(**self._options)
         for key, pkg in self.items():
@@ -505,7 +636,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         self,
         target_grid: GridDataArray,
         validate: bool = True,
-        regrid_context: Optional[RegridderWeightsCache] = None,
+        regrid_cache: Optional[RegridderWeightsCache] = None,
     ) -> "Modflow6Model":
         """
         Creates a model by regridding the packages of this model to another discretization.
@@ -519,7 +650,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             a grid defined over the same discretization as the one we want to regrid the package to
         validate: bool
             set to true to validate the regridded packages
-        regrid_context: Optional RegridderWeightsCache
+        regrid_cache: RegridderWeightsCache, optional
             stores regridder weights for different regridders. Can be used to speed up regridding,
             if the same regridders are used several times for regridding different arrays.
 
@@ -528,7 +659,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         a model with similar packages to the input model, and with all the data-arrays regridded to another discretization,
         similar to the one used in input argument "target_grid"
         """
-        return _regrid_like(self, target_grid, validate, regrid_context)
+        return _regrid_like(self, target_grid, validate, regrid_cache)
 
     def mask_all_packages(
         self,

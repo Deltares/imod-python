@@ -23,7 +23,7 @@ def time_da():
 
 def riv_structured_transient(basic_dis__topsystem):
     ibound, top, bottom = basic_dis__topsystem
-    top = top.sel(layer=1)
+    top = top.sel(layer=1, drop=True)
     elevation = zeros_like(ibound.sel(layer=1), dtype=np.float64)
     # Deactivate second cell
     elevation[1, 1] = np.nan
@@ -36,6 +36,7 @@ def riv_structured_transient(basic_dis__topsystem):
 
 def riv_unstructured_transient(basic_disv__topsystem):
     ibound, top, bottom = basic_disv__topsystem
+    top = top.sel(layer=1, drop=True)
     elevation = zeros_like(ibound.sel(layer=1), dtype=np.float64)
     # Deactivate second cell
     elevation[1] = np.nan
@@ -49,7 +50,7 @@ def riv_unstructured_transient(basic_disv__topsystem):
 
 def riv_structured(basic_dis__topsystem):
     ibound, top, bottom = basic_dis__topsystem
-    top = top.sel(layer=1)
+    top = top.sel(layer=1, drop=True)
     elevation = zeros_like(ibound.sel(layer=1), dtype=np.float64)
     # Deactivate second cell
     elevation[1, 1] = np.nan
@@ -61,6 +62,7 @@ def riv_structured(basic_dis__topsystem):
 
 def riv_unstructured(basic_disv__topsystem):
     ibound, top, bottom = basic_disv__topsystem
+    top = top.sel(layer=1, drop=True)
     elevation = zeros_like(ibound.sel(layer=1), dtype=np.float64)
     # Deactivate second cell
     elevation[1] = np.nan
@@ -72,7 +74,7 @@ def riv_unstructured(basic_disv__topsystem):
 
 def drn_structured(basic_dis__topsystem):
     ibound, top, bottom = basic_dis__topsystem
-    top = top.sel(layer=1)
+    top = top.sel(layer=1, drop=True)
     elevation = zeros_like(ibound.sel(layer=1), dtype=np.float64)
     # Deactivate second cell
     elevation[1, 1] = np.nan
@@ -83,6 +85,7 @@ def drn_structured(basic_dis__topsystem):
 
 def drn_unstructured(basic_disv__topsystem):
     ibound, top, bottom = basic_disv__topsystem
+    top = top.sel(layer=1, drop=True)
     elevation = zeros_like(ibound.sel(layer=1), dtype=np.float64)
     # Deactivate second cell
     elevation[1] = np.nan
@@ -93,7 +96,7 @@ def drn_unstructured(basic_disv__topsystem):
 
 def ghb_structured(basic_dis__topsystem):
     ibound, top, bottom = basic_dis__topsystem
-    top = top.sel(layer=1)
+    top = top.sel(layer=1, drop=True)
     elevation = zeros_like(ibound.sel(layer=1), dtype=np.float64)
     # Deactivate second cell
     elevation[1, 1] = np.nan
@@ -104,6 +107,7 @@ def ghb_structured(basic_dis__topsystem):
 
 def ghb_unstructured(basic_disv__topsystem):
     ibound, top, bottom = basic_disv__topsystem
+    top = top.sel(layer=1, drop=True)
     elevation = zeros_like(ibound.sel(layer=1), dtype=np.float64)
     # Deactivate second cell
     elevation[1] = np.nan

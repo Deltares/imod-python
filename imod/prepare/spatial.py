@@ -1,5 +1,5 @@
 import pathlib
-from typing import TYPE_CHECKING, Callable, Iterable, Union
+from typing import TYPE_CHECKING, Callable, Iterable, Optional, Union
 
 import dask
 import numba
@@ -47,32 +47,32 @@ def round_z(z_extent, dz):
     return zmin, zmax
 
 
-def _fill_np(data, invalid):
-    """Basic nearest neighbour interpolation"""
+def _fill_np(data):
+    nodata = np.isnan(data)
+    if not nodata.any():
+        return data.copy()
     # see: https://stackoverflow.com/questions/5551286/filling-gaps-in-a-numpy-array
-    ind = scipy.ndimage.distance_transform_edt(
-        invalid, return_distances=False, return_indices=True
+    indices = scipy.ndimage.distance_transform_edt(
+        input=nodata,
+        return_distances=False,
+        return_indices=True,
     )
-    return data[tuple(ind)]
+    return data[tuple(indices)]
 
 
-def fill(da, invalid=None, by=None):
+def fill(da, dims=None):
     """
-    Replace the value of invalid ``da`` cells (indicated by ``invalid``)
-    using basic nearest neighbour interpolation.
+    Fill in NaNs using basic nearest neighbour interpolation.
 
     Parameters
     ----------
     da: xr.DataArray with gaps
-        array containing missing value
-    by: str, optional
-        dimension over which the array will be filled, one by one.
-        See the examples.
-
-    invalid: xr.DataArray
-        a binary array of same shape as ``da``.
-        data value are replaced where invalid is True
-        If None (default), uses: `invalid = np.isnan(data)`
+        array containing NaN values.
+    dims: sequence of str, optional, default is ("y", "x").
+        Dimensions along which to search for nearest neighbors. For example,
+        ("y", "x") will perform 2D interpolation in the horizontal plane, while
+        ("layer", "y", "x") will perform 3D interpolation including the
+        vertical dimension.
 
     Returns
     -------
@@ -91,24 +91,29 @@ def fill(da, invalid=None, by=None):
     neighbor in the last dimension is chosen (for rasters, that's generally x).
 
     A typical use case is filling a 3D array (layer, y, x), but only in the
-    horizontal dimensions. The ``by`` keyword can be used to do this:
+    horizontal dimensions. The ``dims`` keyword can be used to do control this:
 
-    >>> filled = imod.prepare.fill(da, by="layer")
+    >>> filled = imod.prepare.fill(da, dims=("y", "x"))
 
     In this case, the array is filled by one layer at a time.
+
+    To also incorporate nearest values across the layer dimension:
+
+    >>> filled = imod.prepare.fill(da, dims=("layer", "y", "x"))
     """
+    if dims is None:
+        dims = ("y", "x")
 
-    out = xr.full_like(da, np.nan)
-    if invalid is None:
-        invalid = np.isnan(da)
-    if by:
-        for coordvalue in da[by]:
-            d = {by: coordvalue}
-            out.sel(d)[...] = _fill_np(da.sel(d).values, invalid.sel(d).values)
-    else:
-        out.values = _fill_np(da.values, invalid.values)
-
-    return out
+    return xr.apply_ufunc(
+        _fill_np,
+        da,
+        input_core_dims=[dims],
+        output_core_dims=[dims],
+        output_dtypes=[da.dtype],
+        dask="parallelized",
+        vectorize=True,
+        keep_attrs=True,
+    ).transpose(*da.dims)
 
 
 def laplace_interpolate(
@@ -208,22 +213,33 @@ def laplace_interpolate(
     return source.copy(data=hnew[0])
 
 
-def rasterize(geodataframe, like, column=None, fill=np.nan, **kwargs):
+def rasterize(
+    geodataframe: "gpd.GeoDataFrame",
+    like: xr.DataArray,
+    column: Optional[str | int | float] = None,
+    fill: Optional[float | int] = np.nan,
+    dtype: Optional[DTypeLike] = None,
+    **kwargs,
+) -> xr.DataArray:
     """
     Rasterize a geopandas GeoDataFrame onto the given
     xarray coordinates.
 
     Parameters
     ----------
-    geodataframe : geopandas.GeoDataFrame
-    column : str, int, float
-        column name of geodataframe to burn into raster
-    like : xarray.DataArray
+    geodataframe: geopandas.GeoDataFrame
+        Geodataframe with polygons to rasterize.
+    like: xarray.DataArray
         Example DataArray. The rasterized result will match the shape and
         coordinates of this DataArray.
-    fill : float, int
+    column: str, int, float, optional
+        column name of geodataframe to burn into raster
+    fill: float, int, optional
         Fill value for nodata areas. Optional, default value is np.nan.
-    kwargs : additional keyword arguments for rasterio.features.rasterize.
+    dtype: dtypelike, optional
+        Data type of output raster. Defaults to data type of grid provided as
+        "like".
+    kwargs: additional keyword arguments for rasterio.features.rasterize, optional
         See: https://rasterio.readthedocs.io/en/stable/api/rasterio.features.html#rasterio.features.rasterize
 
     Returns
@@ -244,11 +260,15 @@ def rasterize(geodataframe, like, column=None, fill=np.nan, **kwargs):
     except TypeError:
         iterable_shapes: Iterable = (shapes,)  # type: ignore[no-redef]
 
+    if dtype is None:
+        dtype = like.dtype
+
     raster = rasterio.features.rasterize(
         iterable_shapes,
         out_shape=like.shape,
         fill=fill,
         transform=imod.util.spatial.transform(like),
+        dtype=dtype,
         **kwargs,
     )
 

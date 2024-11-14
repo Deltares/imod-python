@@ -736,3 +736,48 @@ def _polygonize(da: xr.DataArray) -> "gpd.GeoDataFrame":
     gdf = gpd.GeoDataFrame({"value": colvalues, "geometry": geometries})
     gdf.crs = da.attrs.get("crs")
     return gdf
+
+
+def get_total_grid_area(array: xr.DataArray) -> float:
+    """
+    Returns the total area of all cells summed together in a 2d grid with x and
+    y coordinates
+    """
+    if len(set(array.coords) - {"dy", "y", "dx", "x"}) != 0:
+        raise ValueError(
+            "area calculation is only implemented for grids with x, y, dx and dy coordinates"
+        )
+    cell_area = get_cell_area(array)
+    grid_area = np.sum(cell_area.values)
+    return grid_area
+
+
+def get_cell_area(array: xr.DataArray) -> xr.DataArray:
+    """
+    Returns a grid with in each cell the area of that cell. Implemented for 2d
+    grids (x, y, dx and dy coordinates)
+    """
+    if len(set(array.coords) - {"dy", "y", "dx", "x"}) != 0:
+        raise ValueError(
+            "area calculation is only implemented for grids with x, y, dx and dy coordinates"
+        )
+    x = array.coords["x"]
+    y = array.coords["y"]
+    dx, _, _ = coord_reference(x)
+    dy, _, _ = coord_reference(y)
+
+    area = xr.ones_like(array)
+
+    if isinstance(dx, float):
+        area = area * abs(dx)
+    elif isinstance(dx, np.ndarray):
+        dx_xarray = xr.DataArray(np.abs(dx), coords={"x": x})
+        area = area * dx_xarray
+
+    if isinstance(dy, float):
+        area = area * abs(dy)
+    elif isinstance(dy, np.ndarray):
+        dy_xarray = xr.DataArray(np.abs(dy), coords={"y": y})
+        area = area * dy_xarray
+
+    return area

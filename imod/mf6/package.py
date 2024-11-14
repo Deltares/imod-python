@@ -4,7 +4,8 @@ import abc
 import pathlib
 from collections import defaultdict
 from copy import deepcopy
-from typing import Any, Dict, List, Mapping, Optional, Tuple, Union
+from pathlib import Path
+from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
 
 import cftime
 import jinja2
@@ -23,8 +24,8 @@ from imod.mf6.pkgbase import (
     TRANSPORT_PACKAGES,
     PackageBase,
 )
-from imod.mf6.regrid.regrid_schemes import EmptyRegridMethod, RegridMethodType
 from imod.mf6.utilities.mask import mask_package
+from imod.mf6.utilities.package import _is_valid
 from imod.mf6.utilities.regrid import (
     RegridderWeightsCache,
     _regrid_like,
@@ -39,6 +40,7 @@ from imod.schemata import (
     ValidationError,
 )
 from imod.typing import GridDataArray
+from imod.util.regrid_method_type import EmptyRegridMethod, RegridMethodType
 
 
 class Package(PackageBase, IPackage, abc.ABC):
@@ -80,25 +82,12 @@ class Package(PackageBase, IPackage, abc.ABC):
             f"{type(self).__name__}(**{self._pkg_id}.dataset.sel(**selection))"
         )
 
-    def _valid(self, value):
-        """
-        Filters values that are None, False, or a numpy.bool_ False.
-        Needs to be this specific, since 0.0 and 0 are valid values, but are
-        equal to a boolean False.
-        """
-        # Test singletons
-        if value is False or value is None:
-            return False
-        # Test numpy bool (not singleton)
-        elif isinstance(value, np.bool_) and not value:
-            return False
-        # When dumping to netCDF and reading back, None will have been
-        # converted into a NaN. Only check NaN if it's a floating type to avoid
-        # TypeErrors.
-        elif np.issubdtype(type(value), np.floating) and np.isnan(value):
-            return False
-        else:
-            return True
+    def cleanup(self, dis: Any):
+        raise NotImplementedError("Method not implemented for this package.")
+
+    @staticmethod
+    def _valid(value: Any) -> bool:
+        return _is_valid(value)
 
     @staticmethod
     def _number_format(dtype: type):
@@ -272,8 +261,40 @@ class Package(PackageBase, IPackage, abc.ABC):
 
         return layered, values
 
-    @standard_log_decorator()
     def write(
+        self,
+        pkgname: str,
+        globaltimes: list[np.datetime64] | np.ndarray,
+        directory: str | Path,
+        use_binary: bool = False,
+        use_absolute_paths: bool = False,
+    ):
+        """
+        Write package to file
+
+        Parameters
+        ----------
+        pkgname: str
+            Package name
+        globaltimes: array of np.datetime64
+            Times of the simulation's stress periods.
+        directory: str or Path
+            Directory to write package in
+        use_binary: ({True, False}, optional)
+            Whether to write time-dependent input for stress packages as binary
+            files, which are smaller in size, or more human-readable text files.
+        use_absolute_paths: ({True, False}, optional)
+            True if all paths written to the mf6 inputfiles should be absolute.
+        """
+        write_context = WriteContext(
+            Path(directory),
+            use_binary,
+            use_absolute_paths,
+        )
+        self._write(pkgname, globaltimes, write_context)
+
+    @standard_log_decorator()
+    def _write(
         self,
         pkgname: str,
         globaltimes: Union[list[np.datetime64], np.ndarray],
@@ -531,9 +552,7 @@ class Package(PackageBase, IPackage, abc.ABC):
             selection = selection.sel(x=x_slice, y=y_slice)
 
         cls = type(self)
-        new = cls.__new__(cls)
-        new.dataset = selection
-        return new
+        return cls._from_dataset(selection)
 
     def mask(self, mask: GridDataArray) -> Any:
         """
@@ -560,7 +579,7 @@ class Package(PackageBase, IPackage, abc.ABC):
     def regrid_like(
         self,
         target_grid: GridDataArray,
-        regrid_context: RegridderWeightsCache,
+        regrid_cache: RegridderWeightsCache,
         regridder_types: Optional[RegridMethodType] = None,
     ) -> "Package":
         """
@@ -587,7 +606,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         ----------
         target_grid: xr.DataArray or xu.UgridDataArray
             a grid defined over the same discretization as the one we want to regrid the package to.
-        regrid_context: RegridderWeightsCache, optional
+        regrid_cache: RegridderWeightsCache, optional
             stores regridder weights for different regridders. Can be used to speed up regridding,
             if the same regridders are used several times for regridding different arrays.
         regridder_types: RegridMethodType, optional
@@ -600,7 +619,7 @@ class Package(PackageBase, IPackage, abc.ABC):
         similar to the one used in input argument "target_grid"
         """
         try:
-            result = _regrid_like(self, target_grid, regrid_context, regridder_types)
+            result = _regrid_like(self, target_grid, regrid_cache, regridder_types)
         except ValueError as e:
             raise e
         except Exception:
@@ -647,6 +666,28 @@ class Package(PackageBase, IPackage, abc.ABC):
                 result[name] = self.dataset[name].values[()]
         return result
 
+    def _call_func_on_grids(
+        self, func: Callable, dis: dict
+    ) -> dict[str, GridDataArray]:
+        """
+        Call function on dictionary of grids and merge settings back into
+        dictionary.
+
+        Parameters
+        ----------
+        func: Callable
+            Function to call on all grids
+        """
+        grid_varnames = list(self._write_schemata.keys())
+        grids = {
+            varname: self.dataset[varname]
+            for varname in grid_varnames
+            if varname in self.dataset.keys()
+        }
+        cleaned_grids = func(**dis, **grids)
+        settings = self.get_non_grid_data(grid_varnames)
+        return cleaned_grids | settings
+
     def is_splitting_supported(self) -> bool:
         return True
 
@@ -656,5 +697,6 @@ class Package(PackageBase, IPackage, abc.ABC):
     def is_clipping_supported(self) -> bool:
         return True
 
-    def get_regrid_methods(self) -> RegridMethodType:
-        return deepcopy(self._regrid_method)
+    @classmethod
+    def get_regrid_methods(cls) -> RegridMethodType:
+        return deepcopy(cls._regrid_method)

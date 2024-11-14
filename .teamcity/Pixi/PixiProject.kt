@@ -44,9 +44,16 @@ object UpdateDependencies : BuildType({
                     echo "Add any changes" 
                     git add pixi.lock
                     
-                    if (git status -suno) 
+                    if (git status -suno pixi.lock) 
                     {
+                      echo "Setup username and email"
+                      git config --global user.name "Teamcity"
+                      git config --global user.email "teamcity@deltares.nl"
+                      
+                      echo "Commit changes"
                       git commit -m "Update pixi.lock"
+
+                      echo "Push changes" 
                       git push -u origin pixi_update_%build.counter%
 
                       echo "Format PR body"
@@ -54,7 +61,8 @@ object UpdateDependencies : BuildType({
                       Set-Content body.md 'Teamcity automatically updated the dependencies defined the pixi.toml file. Please verify that all tests succeed before merging'
                       Add-Content -Path body.md -Value "`r`n"
                       Add-Content -Path body.md -Value ${'$'}diff
-
+                      
+                      echo "Create PR"
                       pixi run --environment default gh pr create --title "[TEAMCITY] Update project dependencies" --body-file body.md --reviewer JoerivanEngelen,Manangka
                       echo "Changes pushed and PR created"
                     }

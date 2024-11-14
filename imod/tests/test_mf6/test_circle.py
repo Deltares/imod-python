@@ -9,6 +9,7 @@ import xugrid as xu
 
 import imod
 from imod.logging import LoggerType, LogLevel
+from imod.mf6.validation_context import ValidationContext
 from imod.mf6.write_context import WriteContext
 
 
@@ -57,8 +58,8 @@ def test_gwfmodel_render(circle_model, tmp_path):
     simulation = circle_model
     globaltimes = simulation["time_discretization"]["time"].values
     gwfmodel = simulation["GWF_1"]
-    write_context = WriteContext()
-    actual = gwfmodel.render("GWF_1", write_context)
+    write_context1 = WriteContext()
+    actual = gwfmodel.render("GWF_1", write_context1)
     path = "GWF_1"
     expected = textwrap.dedent(
         f"""\
@@ -77,8 +78,9 @@ def test_gwfmodel_render(circle_model, tmp_path):
             """
     )
     assert actual == expected
-    context = WriteContext(tmp_path)
-    gwfmodel.write("GWF_1", globaltimes, True, context)
+    validation_context = ValidationContext(True)
+    write_context2 = WriteContext(tmp_path)
+    gwfmodel._write("GWF_1", globaltimes, write_context2, validation_context)
     assert (tmp_path / "GWF_1" / "GWF_1.nam").is_file()
     assert (tmp_path / "GWF_1").is_dir()
 
@@ -110,8 +112,8 @@ def test_gwfmodel_render_evt(circle_model_evt, tmp_path):
     simulation = circle_model_evt
     globaltimes = simulation["time_discretization"]["time"].values
     gwfmodel = simulation["GWF_1"]
-    write_context = WriteContext()
-    actual = gwfmodel.render("GWF_1", write_context)
+    write_context1 = WriteContext()
+    actual = gwfmodel.render("GWF_1", write_context1)
     path = "GWF_1"
     expected = textwrap.dedent(
         f"""\
@@ -131,7 +133,8 @@ def test_gwfmodel_render_evt(circle_model_evt, tmp_path):
             """
     )
     assert actual == expected
-    context = WriteContext(tmp_path)
-    gwfmodel.write("GWF_1", globaltimes, True, context)
+    validation_context = ValidationContext(True)
+    write_context2 = WriteContext(tmp_path)
+    gwfmodel._write("GWF_1", globaltimes, write_context2, validation_context)
     assert (tmp_path / "GWF_1" / "GWF_1.nam").is_file()
     assert (tmp_path / "GWF_1").is_dir()

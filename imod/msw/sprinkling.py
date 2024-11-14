@@ -14,7 +14,7 @@ from imod.typing import IntArray
 
 
 
-class Sprinkling(MetaSwapPackage):
+class Sprinkling(MetaSwapPackage, IRegridPackage):
     """
     This contains the sprinkling capacities of links between SVAT units and
     groundwater/surface water locations.
@@ -29,8 +29,6 @@ class Sprinkling(MetaSwapPackage):
     max_abstraction_surfacewater: array of floats (xr.DataArray)
         Describes the maximum abstraction of surfacewater to SVAT units in m3
         per day. This array must not have a subunit coordinate.
-    well: WellDisStructured
-        Describes the sprinkling of SVAT units coming groundwater.
     """
 
     _file_name = "scap_svat.inp"
@@ -38,16 +36,16 @@ class Sprinkling(MetaSwapPackage):
         "svat": VariableMetaData(10, 1, 99999999, int),
         "max_abstraction_groundwater_mm_d": VariableMetaData(8, None, None, str),
         "max_abstraction_surfacewater_mm_d": VariableMetaData(8, None, None, str),
-        "max_abstraction_groundwater_m3_d": VariableMetaData(8, 0.0, 1e9, float),
-        "max_abstraction_surfacewater_m3_d": VariableMetaData(8, 0.0, 1e9, float),
+        "max_abstraction_groundwater": VariableMetaData(8, 0.0, 1e9, float),
+        "max_abstraction_surfacewater": VariableMetaData(8, 0.0, 1e9, float),
         "svat_groundwater": VariableMetaData(10, 1, 99999999, int),
         "layer": VariableMetaData(6, 1, 9999, int),
         "trajectory": VariableMetaData(10, None, None, str),
     }
 
     _with_subunit = (
-        "max_abstraction_groundwater_m3_d",
-        "max_abstraction_surfacewater_m3_d",
+        "max_abstraction_groundwater",
+        "max_abstraction_surfacewater",
     )
     _without_subunit = ()
 
@@ -57,16 +55,16 @@ class Sprinkling(MetaSwapPackage):
         "trajectory",
     )
 
+    _regrid_method = SprinklingRegridMethod()
+
     def __init__(
         self,
         max_abstraction_groundwater: xr.DataArray,
         max_abstraction_surfacewater: xr.DataArray,
-        well: WellDisStructured,
     ):
         super().__init__()
-        self.dataset["max_abstraction_groundwater_m3_d"] = max_abstraction_groundwater
-        self.dataset["max_abstraction_surfacewater_m3_d"] = max_abstraction_surfacewater
-        self.well = well
+        self.dataset["max_abstraction_groundwater"] = max_abstraction_groundwater
+        self.dataset["max_abstraction_surfacewater"] = max_abstraction_surfacewater
 
         self._pkgcheck()
 
@@ -83,6 +81,11 @@ class Sprinkling(MetaSwapPackage):
             array_out = array.to_numpy()[:, well_row, well_column].ravel()
             # per defined well element, per defined subunits
             return array_out[np.isfinite(array_out)]
+            raise TypeError("Coupling to unstructured grids is not supported.")
+
+        well_layer = well_cellid.sel(dim_cellid="layer").data
+        well_row = well_cellid.sel(dim_cellid="row").data - 1
+        well_column = well_cellid.sel(dim_cellid="column").data - 1
             
         if not isinstance(mf6_well, Mf6Wel):
             raise TypeError(rf"well not of type 'Mf6Wel', got '{type(mf6_well)}'")

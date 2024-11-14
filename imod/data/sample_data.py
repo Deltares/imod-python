@@ -248,3 +248,30 @@ def hondsrug_planar_river() -> xr.Dataset:
     planar_river["stage"] = (top - planar_river["stage"]) / 2 + planar_river["stage"]
 
     return planar_river
+
+
+def colleagues_river_data(path: Union[str, Path]):
+    """
+    River data with some mistakes introduced to showcase cleanup
+    utilities.
+    """
+    gwf_model = hondsrug_simulation(path)["GWF"]
+    dis_ds = gwf_model["dis"].dataset
+    riv_ds_old = gwf_model["riv"].dataset
+    # Existing RIV package has only layer coord with [1, 3, 5, 6]. This causes
+    # problems with some methods, at least with cleanup. Therefore align data
+    # here for the cleanup example. River packages with limited layer coords are
+    # currently not fully supported.
+    riv_ds, _ = xr.align(riv_ds_old, dis_ds, join="outer")
+    x = riv_ds.coords["x"]
+    y = riv_ds.coords["y"]
+    riv_bot_da = riv_ds["bottom_elevation"]
+    riv_ds["stage"] += 0.05
+    riv_ds["stage"] = riv_ds["stage"].where(x > 239500)
+    riv_ds["conductance"] = riv_ds["conductance"].fillna(0.0)
+    x_preserve = (x < 244200) | (x > 246000)
+    y_preserve = (y < 560000) | (y > 561000)
+    riv_ds["bottom_elevation"] = riv_bot_da.where(
+        x_preserve | y_preserve, riv_bot_da + 0.15
+    )
+    return riv_ds

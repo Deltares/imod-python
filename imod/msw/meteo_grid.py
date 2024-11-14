@@ -7,11 +7,13 @@ import pandas as pd
 import xarray as xr
 
 import imod
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.msw.pkgbase import MetaSwapPackage
+from imod.msw.regrid.regrid_schemes import MeteoGridRegridMethod
 from imod.msw.timeutil import to_metaswap_timeformat
 
 
-class MeteoGrid(MetaSwapPackage):
+class MeteoGrid(MetaSwapPackage, IRegridPackage):
     """
     This contains the meteorological grid data. Grids are written to ESRI ASCII
     files. The meteorological data requires a time coordinate. Next to a
@@ -32,6 +34,8 @@ class MeteoGrid(MetaSwapPackage):
 
     _file_name = "mete_grid.inp"
     _meteo_dirname = "meteo_grids"
+
+    _regrid_method = MeteoGridRegridMethod()
 
     def __init__(self, precipitation: xr.DataArray, evapotranspiration: xr.DataArray):
         super().__init__()
@@ -109,7 +113,7 @@ class MeteoGrid(MetaSwapPackage):
 
         for varname in self.dataset.data_vars:
             # If grid, we have to add the filename of the .asc to be written
-            if self._is_grid(varname):
+            if self._is_grid(str(varname)):
                 dataframe[varname] = [
                     self._compose_filename(
                         {"time": time, "name": varname, "extension": ".asc"},
@@ -164,9 +168,11 @@ class MeteoGrid(MetaSwapPackage):
 
         # Write grid data to ESRI ASCII files
         for varname in self.dataset.data_vars:
-            if self._is_grid(varname):
-                path = (directory / self._meteo_dirname / varname).with_suffix(".asc")
-                imod.rasterio.save(path, self.dataset[varname], nodata=-9999.0)
+            if self._is_grid(str(varname)):
+                path = (directory / self._meteo_dirname / str(varname)).with_suffix(
+                    ".asc"
+                )
+                imod.rasterio.save(path, self.dataset[str(varname)], nodata=-9999.0)
 
     def _pkgcheck(self):
         for varname in self.dataset.data_vars:

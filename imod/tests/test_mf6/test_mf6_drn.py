@@ -1,15 +1,26 @@
 import pathlib
 import textwrap
+from datetime import datetime
 
 import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+from pytest_cases import parametrize_with_cases
 
 import imod
+import imod.mf6.drn
 from imod.logging import LoggerType, LogLevel
+from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.utilities.package import get_repeat_stress
 from imod.mf6.write_context import WriteContext
+from imod.prepare.topsystem.allocation import ALLOCATION_OPTION
+from imod.prepare.topsystem.conductance import DISTRIBUTING_OPTION
+from imod.prepare.topsystem.default_allocation_methods import (
+    SimulationAllocationOptions,
+    SimulationDistributingOptions,
+)
 from imod.schemata import ValidationError
 
 
@@ -91,7 +102,7 @@ def test_write(drainage, tmp_path):
 
     drn = imod.mf6.Drainage(**drainage)
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
-    drn.write("mydrn", [1], write_context)
+    drn._write("mydrn", [1], write_context)
 
     block_expected = textwrap.dedent(
         """\
@@ -465,3 +476,51 @@ def test_html_repr(drainage):
     html_string = imod.mf6.Drainage(**drainage)._repr_html_()
     assert isinstance(html_string, str)
     assert html_string.split("</div>")[0] == "<div>Drainage"
+
+
+class AllocationSettings:
+    def case_default(self):
+        return SimulationAllocationOptions.drn, SimulationDistributingOptions.drn
+
+    def case_custom(self):
+        return ALLOCATION_OPTION.at_elevation, DISTRIBUTING_OPTION.by_crosscut_thickness
+
+
+@parametrize_with_cases(
+    ["allocation_setting", "distribution_setting"], cases=AllocationSettings
+)
+def test_from_imod5(
+    imod5_dataset_periods, tmp_path, allocation_setting, distribution_setting
+):
+    period_data = imod5_dataset_periods[1]
+    imod5_dataset = imod5_dataset_periods[0]
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset, validate=False)
+    target_npf = NodePropertyFlow.from_imod5_data(
+        imod5_dataset, target_dis.dataset["idomain"]
+    )
+
+    drn_2 = imod.mf6.Drainage.from_imod5_data(
+        "drn-2",
+        imod5_dataset,
+        period_data,
+        target_dis,
+        target_npf,
+        allocation_option=allocation_setting,
+        distributing_option=distribution_setting,
+        time_min=datetime(2002, 2, 2),
+        time_max=datetime(2022, 2, 2),
+        regridder_types=None,
+    )
+
+    assert isinstance(drn_2, imod.mf6.Drainage)
+
+    pkg_errors = drn_2._validate(
+        schemata=drn_2._write_schemata,
+        idomain=target_dis["idomain"],
+        bottom=target_dis["bottom"],
+    )
+    assert len(pkg_errors) == 0
+
+    # write the packages for write validation
+    write_context = WriteContext(simulation_directory=tmp_path, use_binary=False)
+    drn_2._write("mydrn", [1], write_context)
