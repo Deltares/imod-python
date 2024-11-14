@@ -199,9 +199,7 @@ class GridData(MetaSwapPackage, IRegridPackage):
 
         mf6_top_active = target_dis["idomain"].isel(layer=0, drop=True)
         subunit_active = (
-            (imod5_cap["boundary"] == 1)
-            & (data["area"] > 0)
-            & (mf6_top_active >= 1)
+            (imod5_cap["boundary"] == 1) & (data["area"] > 0) & (mf6_top_active >= 1)
         )
         active = subunit_active.all(dim="subunit")
         data_active = {
