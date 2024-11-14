@@ -8,7 +8,7 @@ from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import DataDictType, MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import PondingRegridMethod
 from imod.msw.utilities.common import concat_imod5
-from imod.typing import IntArray
+from imod.typing import GridDataDict, IntArray
 
 
 class Ponding(MetaSwapPackage, IRegridPackage):
@@ -73,7 +73,7 @@ class Ponding(MetaSwapPackage, IRegridPackage):
         return self.write_dataframe_fixed_width(file, dataframe)
 
     @classmethod
-    def from_imod5_data(cls, imod5_data):
+    def from_imod5_data(cls, imod5_data: dict[str, GridDataDict]) -> "Ponding":
         """
         Concatenate ponding depths along subunits
         """
