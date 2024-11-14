@@ -1,10 +1,17 @@
+from typing import TextIO
+
 import numpy as np
 import pandas as pd
 import xarray as xr
 
-from imod.mf6.wel import WellDisStructured
+from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
+from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
+from imod.msw.regrid.regrid_schemes import SprinklingRegridMethod
+from imod.typing import IntArray
+
 
 
 class Sprinkling(MetaSwapPackage):
@@ -63,16 +70,30 @@ class Sprinkling(MetaSwapPackage):
 
         self._pkgcheck()
 
-    def _render(self, file, index, svat):
+    def _render(
+        self,
+        file: TextIO,
+        index: IntArray,
+        svat: xr.DataArray,
+        mf6_dis: StructuredDiscretization,
+        mf6_well: Mf6Wel,
+    ):
         def ravel_per_subunit(array: xr.DataArray) -> np.ndarray:
             # per defined well element, all subunits
             array_out = array.to_numpy()[:, well_row, well_column].ravel()
             # per defined well element, per defined subunits
             return array_out[np.isfinite(array_out)]
-
-        well_row = self.well["row"] - 1
-        well_column = self.well["column"] - 1
-        well_layer = self.well["layer"]
+            
+        if not isinstance(mf6_well, Mf6Wel):
+            raise TypeError(rf"well not of type 'Mf6Wel', got '{type(mf6_well)}'")
+            
+        well_cellid = mf6_well["cellid"]
+        if len(well_cellid.coords["dim_cellid"]) != 3:
+            raise TypeError("Coupling to unstructured grids is not supported.")
+        
+        well_layer = well_cellid.sel(dim_cellid="layer").data
+        well_row = well_cellid.sel(dim_cellid="row").data - 1
+        well_column = well_cellid.sel(dim_cellid="column").data - 1
         max_rate_per_svat = self.dataset["max_abstraction_groundwater_m3_d"].where(
             svat > 0
         )
