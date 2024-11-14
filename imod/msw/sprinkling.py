@@ -67,17 +67,34 @@ class Sprinkling(MetaSwapPackage):
 
 
     def _render(self, file, index, svat):
-        well_row = self.well["row"] - 1
-        layer = self.well["layer"]
-        max_rate = self.dataset["max_abstraction_groundwater_m3_d"]
+        def ravel_per_subunit(array: xr.DataArray) -> np.ndarray:
+            # per defined well element, all subunits
+            array_out = array.to_numpy()[:, well_row, well_column].ravel()
+            # per defined well element, per defined subunits
+            return array_out[np.isfinite(array_out)]
         
-        svat_source_target = svat.where(max_rate > 0).to_numpy()
-        svat_source_target = svat_source_target[np.isfinite(svat_source_target)].astype(dtype=np.int32)
+        well_row = self.well["row"] - 1
+        well_column = self.well["column"] - 1
+        well_layer = self.well["layer"]
+        max_rate_per_svat = self.dataset["max_abstraction_groundwater_m3_d"].where(
+            svat > 0
+        )
+        layer_per_svat = xr.full_like(max_rate_per_svat, np.nan)
+        layer_per_svat[:, well_row, well_column] = well_layer
 
-        if svat_source_target.size != well_row.size:
-            raise ValueError('Provided well-pacakge does not correspond with the abstraction rate')
+        layer_source = ravel_per_subunit(
+            layer_per_svat.where(max_rate_per_svat > 0)
+        ).astype(dtype=np.int32)
+        svat_source_target = ravel_per_subunit(
+            svat.where(max_rate_per_svat > 0)
+        ).astype(dtype=np.int32)
 
-        data_dict = {"svat": svat_source_target, "layer": layer, "svat_groundwater": svat_source_target}
+        data_dict = {
+            "svat": svat_source_target,
+            "layer": layer_source,
+            "svat_groundwater": svat_source_target,
+        }
+        
 
         for var in self._with_subunit:
             array = self.dataset[var].where(max_rate > 0).to_numpy()
