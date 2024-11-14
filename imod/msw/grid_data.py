@@ -13,7 +13,7 @@ from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import GridDataRegridMethod
-from imod.typing import GridDataArray
+from imod.typing import GridDataArray, GridDataDict
 from imod.typing.grid import concat, ones_like
 from imod.util.spatial import get_cell_area, spatial_reference
 
@@ -23,12 +23,12 @@ def _concat_subunits(arg1: GridDataArray, arg2: GridDataArray):
 
 
 def get_cell_area_from_imod5_data(
-    imod5_data: dict[str, dict[str, GridDataArray]],
+    imod5_cap: GridDataDict,
 ) -> GridDataArray:
     # area's per type of svats
-    mf6_area = get_cell_area(imod5_data["cap"]["wetted_area"])
-    wetted_area = imod5_data["cap"]["wetted_area"]
-    urban_area = imod5_data["cap"]["urban_area"]
+    mf6_area = get_cell_area(imod5_cap["wetted_area"])
+    wetted_area = imod5_cap["wetted_area"]
+    urban_area = imod5_cap["urban_area"]
     rural_area = mf6_area - (wetted_area + urban_area)
     if (wetted_area > mf6_area).any():
         logger.log(
@@ -49,20 +49,28 @@ def get_cell_area_from_imod5_data(
 
 
 def get_landuse_from_imod5_data(
-    imod5_data: dict[str, dict[str, GridDataArray]],
+    imod5_cap: GridDataDict,
 ) -> GridDataArray:
-    rural_landuse = imod5_data["cap"]["landuse"]
+    """
+    Get landuse from imod5 capillary zone data. This adds two subunits, one
+    based on the landuse grid, which specifies rural landuse. The other
+    specifies urban landuse, which is coded to value 18.
+    """
+    rural_landuse = imod5_cap["landuse"]
     # Urban landuse = 18
     urban_landuse = ones_like(rural_landuse) * 18
     return _concat_subunits(rural_landuse, urban_landuse)
 
 
 def get_rootzone_depth_from_imod5_data(
-    imod5_data: dict[str, dict[str, GridDataArray]],
+    imod5_cap: GridDataDict,
 ) -> GridDataArray:
-    # iMOD5 grid has values in cm,
-    # MetaSWAP needs them in m.
-    rootzone_thickness = imod5_data["cap"]["rootzone_thickness"] * 0.01
+    """
+    Get rootzone depth from imod5 capillary zone data. Also does a unit
+    conversion: iMOD5 specifies rootzone thickness in centimeters, whereas
+    MetaSWAP requires rootzone depth in meters.
+    """
+    rootzone_thickness = imod5_cap["rootzone_thickness"] * 0.01
     # rootzone depth is equal for both svats.
     return _concat_subunits(rootzone_thickness, rootzone_thickness)
 
@@ -174,21 +182,24 @@ class GridData(MetaSwapPackage, IRegridPackage):
     @classmethod
     def from_imod5_data(
         cls,
-        imod5_data: dict[str, dict[str, GridDataArray]],
+        imod5_data: dict[str, GridDataDict],
         target_dis: StructuredDiscretization,
         regridder_types: Optional[RegridMethodType] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ) -> "GridData":
+        # Get iMOD5 capillary zone data
+        imod5_cap = imod5_data["cap"]
+
         data = {}
-        data["area"] = get_cell_area_from_imod5_data(imod5_data)
-        data["landuse"] = get_landuse_from_imod5_data(imod5_data)
-        data["rootzone_depth"] = get_rootzone_depth_from_imod5_data(imod5_data)
-        data["surface_elevation"] = imod5_data["cap"]["surface_elevation"]
-        data["soil_physical_unit"] = imod5_data["cap"]["soil_physical_unit"]
+        data["area"] = get_cell_area_from_imod5_data(imod5_cap)
+        data["landuse"] = get_landuse_from_imod5_data(imod5_cap)
+        data["rootzone_depth"] = get_rootzone_depth_from_imod5_data(imod5_cap)
+        data["surface_elevation"] = imod5_cap["surface_elevation"]
+        data["soil_physical_unit"] = imod5_cap["soil_physical_unit"]
 
         mf6_top_active = target_dis["idomain"].isel(layer=0, drop=True)
         subunit_active = (
-            (imod5_data["cap"]["boundary"] == 1)
+            (imod5_cap["boundary"] == 1)
             & (data["area"] > 0)
             & (mf6_top_active >= 1)
         )
