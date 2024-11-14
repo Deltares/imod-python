@@ -112,25 +112,19 @@ def test_from_imod5_data():
     data_ponding, _, _ = setup_ponding()
     expected_ponding = Ponding(**data_ponding)
 
+    # Create cap data
     cap_data = {}
-    cap_data["rural_runoff_resistance"] = data_ponding["runoff_resistance"].sel(
-        subunit=0, drop=True
-    )
-    cap_data["urban_runoff_resistance"] = data_ponding["runoff_resistance"].sel(
-        subunit=1, drop=True
-    )
-    cap_data["rural_runon_resistance"] = data_ponding["runon_resistance"].sel(
-        subunit=0, drop=True
-    )
-    cap_data["urban_runon_resistance"] = data_ponding["runon_resistance"].sel(
-        subunit=1, drop=True
-    )
-    cap_data["rural_ponding_depth"] = data_ponding["ponding_depth"].sel(
-        subunit=0, drop=True
-    )
-    cap_data["urban_ponding_depth"] = data_ponding["ponding_depth"].sel(
-        subunit=1, drop=True
-    )
+    mapping_ls = [
+        ("rural_runoff_resistance", "runoff_resistance", 0),
+        ("rural_runoff_resistance", "runoff_resistance", 0),
+        ("urban_runoff_resistance", "runoff_resistance", 1),
+        ("rural_runon_resistance", "runon_resistance", 0),
+        ("urban_runon_resistance", "runon_resistance", 1),
+        ("rural_ponding_depth", "ponding_depth", 0),
+        ("urban_ponding_depth", "ponding_depth", 1),
+    ]
+    for cap_key, pkg_key, subunit_nr in mapping_ls:
+        cap_data[cap_key] = data_ponding[pkg_key].sel(subunit=subunit_nr, drop=True)
 
     imod5_data = {"cap": cap_data}
 
