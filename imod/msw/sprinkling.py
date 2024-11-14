@@ -97,7 +97,7 @@ class Sprinkling(MetaSwapPackage):
         
 
         for var in self._with_subunit:
-            array = self.dataset[var].where(max_rate > 0).to_numpy()
+            array = self.dataset[var].where(max_rate_per_svat > 0).to_numpy()
             array = array[np.isfinite(array)]
             data_dict[var] = array
 
