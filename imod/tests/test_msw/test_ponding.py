@@ -10,9 +10,10 @@ from imod.mf6.utilities.regrid import (
     RegridderWeightsCache,
 )
 from imod.msw import Ponding
+from imod.typing import GridDataArray, GridDataDict
 
 
-def setup_ponding():
+def setup_ponding() -> tuple[GridDataDict, np.ndarray, GridDataArray]:
     x = [1.0, 2.0, 3.0]
     y = [3.0, 2.0, 1.0]
     subunit = [0, 1]
