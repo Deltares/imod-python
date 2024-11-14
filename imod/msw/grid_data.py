@@ -3,6 +3,7 @@ from typing import Optional
 import numpy as np
 import xarray as xr
 
+from imod.logging import LogLevel, logger
 from imod.mf6 import StructuredDiscretization
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.regrid.regrid_schemes import (
@@ -30,11 +31,17 @@ def get_cell_area_from_imod5_data(
     urban_area = imod5_data["cap"]["urban_area"]
     rural_area = mf6_area - (wetted_area + urban_area)
     if (wetted_area > mf6_area).any():
-        print(f"wetted area was set to the max cell area of {mf6_area}")
+        logger.log(
+            loglevel=LogLevel.WARNING,
+            message=f"wetted area was set to the max cell area of {mf6_area}",
+            additional_depth=0,
+        )
         wetted_area = wetted_area.where(wetted_area <= mf6_area, other=mf6_area)
     if (rural_area < 0.0).any():
-        print(
-            "found urban area > than (cel-area - wetted area). Urban area was set to 0"
+        logger.log(
+            loglevel=LogLevel.WARNING,
+            message="found urban area > than (cel-area - wetted area). Urban area was set to 0",
+            additional_depth=0,
         )
         urban_area = urban_area.where(rural_area > 0.0, other=0.0)
     rural_area = mf6_area - (wetted_area + urban_area)
