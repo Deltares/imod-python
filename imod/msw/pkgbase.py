@@ -240,3 +240,6 @@ class MetaSwapPackage(abc.ABC):
 
     def get_regrid_methods(self) -> RegridMethodType:
         return deepcopy(self._regrid_method)
+
+    def from_imod5_data(self, *args, **kwargs):
+        raise NotImplementedError("Method not implemented for this package.")
