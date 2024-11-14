@@ -13,7 +13,6 @@ from imod.msw.regrid.regrid_schemes import SprinklingRegridMethod
 from imod.typing import IntArray
 
 
-
 class Sprinkling(MetaSwapPackage, IRegridPackage):
     """
     This contains the sprinkling capacities of links between SVAT units and
@@ -81,27 +80,19 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
             array_out = array.to_numpy()[:, well_row, well_column].ravel()
             # per defined well element, per defined subunits
             return array_out[np.isfinite(array_out)]
-            raise TypeError("Coupling to unstructured grids is not supported.")
+
+        if not isinstance(mf6_well, Mf6Wel):
+            raise TypeError(rf"well not of type 'Mf6Wel', got '{type(mf6_well)}'")
+
+        well_cellid = mf6_well["cellid"]
 
         well_layer = well_cellid.sel(dim_cellid="layer").data
         well_row = well_cellid.sel(dim_cellid="row").data - 1
         well_column = well_cellid.sel(dim_cellid="column").data - 1
-            
-        if not isinstance(mf6_well, Mf6Wel):
-            raise TypeError(rf"well not of type 'Mf6Wel', got '{type(mf6_well)}'")
-            
-        well_cellid = mf6_well["cellid"]
-        if len(well_cellid.coords["dim_cellid"]) != 3:
-            raise TypeError("Coupling to unstructured grids is not supported.")
-        
-        well_layer = well_cellid.sel(dim_cellid="layer").data
-        well_row = well_cellid.sel(dim_cellid="row").data - 1
-        well_column = well_cellid.sel(dim_cellid="column").data - 1
-        max_rate_per_svat = self.dataset["max_abstraction_groundwater_m3_d"].where(
-            svat > 0
-        )
+
+        max_rate_per_svat = self.dataset["max_abstraction_groundwater"].where(svat > 0)
         layer_per_svat = xr.full_like(max_rate_per_svat, np.nan)
-        layer_per_svat[:, well_row, well_column] = well_layer
+        layer_per_svat.values[:, well_row, well_column] = well_layer
 
         layer_source = ravel_per_subunit(
             layer_per_svat.where(max_rate_per_svat > 0)
