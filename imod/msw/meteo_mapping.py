@@ -1,16 +1,47 @@
 from copy import deepcopy
+from pathlib import Path
 from typing import Any, Optional, TextIO
 
 import numpy as np
 import pandas as pd
 import xarray as xr
 
+import imod
 from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.prepare import common
-from imod.typing import GridDataArray, IntArray
+from imod.typing import GridDataArray, GridDataDict, IntArray
 from imod.util.regrid_method_type import RegridMethodType
+
+
+def find_in_file_list(filename: str, paths: list[str]) -> str:
+    for file in paths:
+        if filename == Path(file[0]).name.lower():
+            return file[0]
+    raise ValueError(f"could not find {filename} in list of paths: {paths}")
+
+
+def open_first_meteo_grid(mete_grid_path: str, column_nr: int) -> xr.DataArray:
+    """
+    Find first meteo grid path in mete_grid.inp. Only read the first grid, so it
+    can be used to generate meteomappings.
+    """
+    if column_nr not in [2, 3]:
+        raise ValueError("Column nr should be 2 or 3")
+
+    f = open(mete_grid_path, "r")
+    lines = f.readlines()
+    meteo_filepath = Path(lines[0].split(",")[column_nr].replace('"', ""))
+    return imod.rasterio.open(meteo_filepath)
+
+
+def open_first_meteo_grid_from_imod5_data(
+    imod5_data: dict[str, GridDataDict], column_nr: int
+):
+    paths = imod5_data["extra"]["paths"]
+    metegrid_path = find_in_file_list("mete_grid.inp", paths)
+    return open_first_meteo_grid(metegrid_path, column_nr=column_nr)
 
 
 class MeteoMapping(MetaSwapPackage):
@@ -125,6 +156,20 @@ class PrecipitationMapping(MeteoMapping):
         super().__init__()
         self.meteo = precipitation
 
+    @classmethod
+    def from_imod5_data(
+        cls, imod5_data: dict[str, GridDataDict]
+    ) -> "PrecipitationMapping":
+        """
+        Construct precipitation mapping from imod5 data. Opens first ascii grid
+        in mete_grid.inp, which is used to construct mappings to svats. The
+        grids should not change in dimension over time. No checks are done
+        whether cells switch from inactive to active or vice versa.
+        """
+        column_nr = 2
+        meteo_grid = open_first_meteo_grid_from_imod5_data(imod5_data, column_nr)
+        return cls(meteo_grid)
+
 
 class EvapotranspirationMapping(MeteoMapping):
     """
@@ -156,3 +201,17 @@ class EvapotranspirationMapping(MeteoMapping):
     ):
         super().__init__()
         self.meteo = evapotranspiration
+
+    @classmethod
+    def from_imod5_data(
+        cls, imod5_data: dict[str, GridDataDict]
+    ) -> "EvapotranspirationMapping":
+        """
+        Construct evapotranspiration mapping from imod5 data. Opens first ascii
+        grid in mete_grid.inp, which is used to construct mappings to svats. The
+        grids should not change in dimension over time. No checks are done
+        whether cells switch from inactive to active or vice versa.
+        """
+        column_nr = 3
+        meteo_grid = open_first_meteo_grid_from_imod5_data(imod5_data, column_nr)
+        return cls(meteo_grid)
