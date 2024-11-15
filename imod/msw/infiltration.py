@@ -4,12 +4,8 @@ from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import InfiltrationRegridMethod
-from imod.typing import GridDataArray
-from imod.typing.grid import concat, ones_like
-
-
-def _concat_subunits(arg1: GridDataArray, arg2: GridDataArray):
-    return concat([arg1, arg2], dim="subunit").assign_coords(subunit=[0, 1])
+from imod.msw.utilities.common import concat_imod5
+from imod.typing.grid import ones_like
 
 
 class Infiltration(MetaSwapPackage, IRegridPackage):
@@ -98,7 +94,7 @@ class Infiltration(MetaSwapPackage, IRegridPackage):
             data_ls = [
                 cap_data[f"{landuse}_{var_key}"] for landuse in ["rural", "urban"]
             ]
-            data[var_rename] = _concat_subunits(*data_ls)
+            data[var_rename] = concat_imod5(*data_ls)
 
         data["bottom_resistance"] = ones_like(data["downward_resistance"])
         data["extra_storage_coefficient"] = ones_like(data["downward_resistance"])
