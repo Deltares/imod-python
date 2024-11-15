@@ -1,12 +1,15 @@
 import tempfile
+from copy import deepcopy
 from pathlib import Path
 
 import numpy as np
+import pytest
 import xarray as xr
 from hypothesis import given, settings
 from hypothesis.strategies import floats
 from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
+from pytest_cases import case, parametrize_with_cases
 
 from imod.mf6.utilities.regrid import (
     RegridderWeightsCache,
@@ -16,13 +19,40 @@ from imod.msw.fixed_format import format_fixed_width
 from imod.typing import GridDataDict
 
 
-def setup_infiltration_package() -> tuple[GridDataDict, xr.DataArray, np.ndarray]:
+@pytest.fixture(scope="function")
+def coords_planar() -> dict:
     x = [1.0, 2.0, 3.0]
     y = [3.0, 2.0, 1.0]
-    subunit = [0, 1]
     dx = 1.0
     dy = 1.0
+    return {"y": y, "x": x, "dx": dx, "dy": dy}
 
+
+@pytest.fixture(scope="function")
+def coords_subunit(coords_planar: dict) -> dict:
+    coords_subunit = deepcopy(coords_planar)
+    coords_subunit["subunit"] = [0, 1]
+    return coords_subunit
+
+
+@pytest.fixture(scope="function")
+def svat_index(coords_subunit: dict) -> tuple[xr.DataArray, np.ndarray]:
+    svat = xr.DataArray(
+        np.array(
+            [
+                [[0, 1, 0], [0, 0, 0], [0, 2, 0]],
+                [[0, 3, 0], [0, 4, 0], [0, 0, 0]],
+            ]
+        ),
+        dims=("subunit", "y", "x"),
+        coords=coords_subunit,
+    )
+    index = (svat != 0).values.ravel()
+    return svat, index
+
+
+@pytest.fixture(scope="function")
+def setup_infiltration_data(coords_planar, coords_subunit) -> GridDataDict:
     data = {}
     data["infiltration_capacity"] = xr.DataArray(
         np.array(
@@ -32,7 +62,7 @@ def setup_infiltration_package() -> tuple[GridDataDict, xr.DataArray, np.ndarray
             ]
         ),
         dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy},
+        coords=coords_subunit,
     )
     data["downward_resistance"] = xr.DataArray(
         np.array(
@@ -42,7 +72,7 @@ def setup_infiltration_package() -> tuple[GridDataDict, xr.DataArray, np.ndarray
             ]
         ),
         dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy},
+        coords=coords_subunit,
     )
     data["upward_resistance"] = xr.DataArray(
         np.array(
@@ -52,31 +82,33 @@ def setup_infiltration_package() -> tuple[GridDataDict, xr.DataArray, np.ndarray
             ]
         ),
         dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy},
+        coords=coords_subunit,
     )
     data["bottom_resistance"] = xr.DataArray(
         np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]),
         dims=("y", "x"),
-        coords={"y": y, "x": x, "dx": dx, "dy": dy},
+        coords=coords_planar,
     )
     data["extra_storage_coefficient"] = xr.DataArray(
         np.array([[0.1, 0.2, 0.3], [0.4, 0.5, 0.6], [0.7, 0.8, 0.9]]),
         dims=("y", "x"),
-        coords={"y": y, "x": x, "dx": dx, "dy": dy},
+        coords=coords_planar,
     )
-    svat = xr.DataArray(
-        np.array(
-            [
-                [[0, 1, 0], [0, 0, 0], [0, 2, 0]],
-                [[0, 3, 0], [0, 4, 0], [0, 0, 0]],
-            ]
-        ),
-        dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy},
-    )
-    index = (svat != 0).values.ravel()
 
-    return data, svat, index
+    return data
+
+
+@case(tags="r_low")
+def case_low_resistance(setup_infiltration_data: GridDataDict) -> GridDataDict:
+    return setup_infiltration_data
+
+
+@case(tags="r_high")
+def case_high_resistance(setup_infiltration_data: GridDataDict) -> GridDataDict:
+    data = setup_infiltration_data
+    data["downward_resistance"] += 10.0
+    data["upward_resistance"] += 10.0
+    return data
 
 
 @given(
@@ -179,9 +211,10 @@ def test_write(
     )
 
 
-def test_simple_model(fixed_format_parser):
-    data, svat, index = setup_infiltration_package()
-    infiltration = Infiltration(**data)
+@parametrize_with_cases("infiltration_data", cases=".", has_tag="r_low")
+def test_simple_model(fixed_format_parser, svat_index, infiltration_data):
+    svat, index = svat_index
+    infiltration = Infiltration(**infiltration_data)
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
@@ -203,9 +236,9 @@ def test_simple_model(fixed_format_parser):
     )
 
 
-def test_regrid():
-    data, _, _ = setup_infiltration_package()
-    infiltration = Infiltration(**data)
+@parametrize_with_cases("infiltration_data", cases=".", has_tag="r_low")
+def test_regrid(infiltration_data):
+    infiltration = Infiltration(**infiltration_data)
 
     x = [1.0, 1.5, 2.0, 2.5, 3.0]
     y = [3.0, 2.5, 2.0, 1.5, 1.0]
@@ -224,9 +257,15 @@ def test_regrid():
     assert_almost_equal(regridded.dataset.coords["y"].values, y)
 
 
-def test_from_imod5_data():
-    data_infiltration, _, _ = setup_infiltration_package()
+@parametrize_with_cases("data_infiltration", cases=".")
+def test_from_imod5_data(data_infiltration):
     expected_pkg = Infiltration(**data_infiltration)
+    # Deactivate cells which have a resistance lower than 5.0
+    for var in ["upward_resistance", "downward_resistance"]:
+        da = expected_pkg.dataset[var]
+        to_deactivate = da < 5.0
+        expected_pkg.dataset[var] = da.where(~to_deactivate, -9999.0)
+
     cap_data = {}
     mapping_ls = [
         ("rural_infiltration_capacity", "infiltration_capacity", 0),

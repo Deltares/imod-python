@@ -1,5 +1,8 @@
+from textwrap import dedent
+
 import xarray as xr
 
+from imod.logging import LogLevel, logger
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
@@ -7,6 +10,26 @@ from imod.msw.regrid.regrid_schemes import InfiltrationRegridMethod
 from imod.msw.utilities.common import concat_imod5
 from imod.typing import GridDataDict
 from imod.typing.grid import ones_like
+
+
+def deactivate_small_resistances_in_data(data: GridDataDict):
+    """
+    Deactivate cells where resistance smaller than 5 days are set to
+    -9999.0.
+    """
+    message = dedent("""Detected cells with resistances smaller than 5.0 in {var}, set
+    to inactive""")
+
+    for var in ["downward_resistance", "upward_resistance"]:
+        to_deactivate = data[var] < 5.0
+        if to_deactivate.any():
+            logger.log(
+                loglevel=LogLevel.WARNING,
+                message=message.format(var=var),
+                additional_depth=1,
+            )
+            data[var] = data[var].where(~to_deactivate, -9999.0)
+    return data
 
 
 class Infiltration(MetaSwapPackage, IRegridPackage):
@@ -93,6 +116,8 @@ class Infiltration(MetaSwapPackage, IRegridPackage):
                 cap_data[f"{landuse}_{var_key}"] for landuse in ["rural", "urban"]
             ]
             data[var_rename] = concat_imod5(*data_ls)
+
+        data = deactivate_small_resistances_in_data(data)
 
         like = data["downward_resistance"].isel(subunit=0, drop=True)
         data["bottom_resistance"] = ones_like(like)
