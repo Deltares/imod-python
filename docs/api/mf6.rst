@@ -28,6 +28,7 @@ Model objects & methods
     Modflow6Simulation.open_transport_budget
     Modflow6Simulation.open_head
     Modflow6Simulation.open_concentration
+    Modflow6Simulation.from_imod5_data
     Modflow6Simulation.clip_box
     Modflow6Simulation.split
     Modflow6Simulation.regrid_like
@@ -35,6 +36,7 @@ Model objects & methods
     GroundwaterFlowModel.mask_all_packages
     GroundwaterFlowModel.prepare_wel_for_mf6
     GroundwaterFlowModel.dump
+    GroundwaterFlowModel.from_imod5_data
     GroundwaterTransportModel
     GroundwaterTransportModel.mask_all_packages
     GroundwaterTransportModel.dump
