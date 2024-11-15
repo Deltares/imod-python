@@ -15,8 +15,15 @@ from imod.msw import Infiltration
 from imod.msw.fixed_format import format_fixed_width
 
 
-def setup_infiltration_package(subunit, y, x, dy, dx):
-    infiltration_capacity = xr.DataArray(
+def setup_infiltration_package():
+    x = [1.0, 2.0, 3.0]
+    y = [3.0, 2.0, 1.0]
+    subunit = [0, 1]
+    dx = 1.0
+    dy = 1.0
+
+    data = {}
+    data["infiltration_capacity"] = xr.DataArray(
         np.array(
             [
                 [[0.5, 0.5, 0.5], [nan, nan, nan], [1.0, 1.0, 1.0]],
@@ -26,8 +33,7 @@ def setup_infiltration_package(subunit, y, x, dy, dx):
         dims=("subunit", "y", "x"),
         coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy},
     )
-
-    downward_resistance = xr.DataArray(
+    data["downward_resistance"] = xr.DataArray(
         np.array(
             [
                 [[1.0, 2.0, 3.0], [nan, nan, nan], [7.0, 8.0, 9.0]],
@@ -37,8 +43,7 @@ def setup_infiltration_package(subunit, y, x, dy, dx):
         dims=("subunit", "y", "x"),
         coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy},
     )
-
-    upward_resistance = xr.DataArray(
+    data["upward_resistance"] = xr.DataArray(
         np.array(
             [
                 [[1.0, 2.0, 3.0], [nan, nan, nan], [7.0, 8.0, 9.0]],
@@ -48,19 +53,16 @@ def setup_infiltration_package(subunit, y, x, dy, dx):
         dims=("subunit", "y", "x"),
         coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy},
     )
-
-    bottom_resistance = xr.DataArray(
+    data["bottom_resistance"] = xr.DataArray(
         np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]),
         dims=("y", "x"),
         coords={"y": y, "x": x, "dx": dx, "dy": dy},
     )
-
-    extra_storage_coefficient = xr.DataArray(
+    data["extra_storage_coefficient"] = xr.DataArray(
         np.array([[0.1, 0.2, 0.3], [0.4, 0.5, 0.6], [0.7, 0.8, 0.9]]),
         dims=("y", "x"),
         coords={"y": y, "x": x, "dx": dx, "dy": dy},
     )
-
     svat = xr.DataArray(
         np.array(
             [
@@ -71,18 +73,9 @@ def setup_infiltration_package(subunit, y, x, dy, dx):
         dims=("subunit", "y", "x"),
         coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy},
     )
-    # fmt: on
     index = (svat != 0).values.ravel()
 
-    infiltration = Infiltration(
-        infiltration_capacity,
-        downward_resistance,
-        upward_resistance,
-        bottom_resistance,
-        extra_storage_coefficient,
-    )
-
-    return infiltration, svat, index
+    return data, svat, index
 
 
 @given(
@@ -186,13 +179,8 @@ def test_write(
 
 
 def test_simple_model(fixed_format_parser):
-    x = [1.0, 2.0, 3.0]
-    y = [1.0, 2.0, 3.0]
-    subunit = [0, 1]
-    dx = 1.0
-    dy = 1.0
-    # fmt: off
-    infiltration, svat, index = setup_infiltration_package(subunit, y, x, dy, dx)
+    data, svat, index = setup_infiltration_package()
+    infiltration = Infiltration(**data)
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
@@ -215,20 +203,14 @@ def test_simple_model(fixed_format_parser):
 
 
 def test_regrid():
-    x = [1.0, 2.0, 3.0]
-    y = [3.0, 2.0, 1.0]
-    subunit = [0, 1]
-    dx = 1.0
-    dy = 1.0
-
-    infiltration, _, _ = setup_infiltration_package(subunit, y, x, dy, dx)
+    data, _, _ = setup_infiltration_package()
+    infiltration = Infiltration(**data)
 
     x = [1.0, 1.5, 2.0, 2.5, 3.0]
     y = [3.0, 2.5, 2.0, 1.5, 1.0]
     subunit = [0, 1]
     dx = 0.5
     dy = 0.5
-    # fmt: off
     new_grid = xr.DataArray(
         dims=("subunit", "y", "x"),
         coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
@@ -239,3 +221,31 @@ def test_regrid():
     regridded = infiltration.regrid_like(new_grid, regrid_context )
     assert_almost_equal(regridded.dataset.coords["x"].values, x)
     assert_almost_equal(regridded.dataset.coords["y"].values, y)
+
+
+def test_from_imod5_data():
+    data_infiltration, _, _ = setup_infiltration_package()
+    expected_pkg = Infiltration(**data_infiltration)
+    cap_data = {}
+    mapping_ls = [
+        ("rural_infiltration_capacity", "infiltration_capacity", 0),
+        ("urban_infiltration_capacity", "infiltration_capacity", 1),
+        ("rural_runoff_resistance", "runoff_resistance", 0),
+        ("urban_runoff_resistance", "runoff_resistance", 1),
+        ("rural_runon_resistance", "runon_resistance", 0),
+        ("urban_runon_resistance", "runon_resistance", 1),
+    ]
+    for cap_key, pkg_key, subunit_nr in mapping_ls:
+        cap_data[cap_key] = data_infiltration[pkg_key].sel(subunit=subunit_nr, drop=True)
+
+    imod5_data = {"cap": cap_data}
+    actual_pkg = Infiltration.from_imod5_data(imod5_data)
+
+    ones_vars = ["bottom_resistance", "extra_storage_coefficient"]
+    expected = expected_pkg.dataset.drop_vars(ones_vars)
+    actual = actual_pkg.dataset.drop_vars(ones_vars)
+
+    xr.testing.assert_equal(actual, expected)
+
+    for var in ones_vars:
+        assert (actual_pkg.dataset[var] == 1.0).all()
