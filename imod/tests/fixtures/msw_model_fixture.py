@@ -226,8 +226,8 @@ def make_msw_model():
     # %% Infiltration
     msw_model["infiltration"] = msw.Infiltration(
         infiltration_capacity=xr.full_like(area, 1.0),
-        downward_resistance=xr.full_like(msw_grid, -9999.0),
-        upward_resistance=xr.full_like(msw_grid, -9999.0),
+        downward_resistance=xr.full_like(area, -9999.0),
+        upward_resistance=xr.full_like(area, -9999.0),
         bottom_resistance=xr.full_like(msw_grid, -9999.0),
         extra_storage_coefficient=xr.full_like(msw_grid, 0.1),
     )

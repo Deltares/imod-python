@@ -117,7 +117,6 @@ def test_from_imod5_data():
     cap_data = {}
     mapping_ls = [
         ("rural_runoff_resistance", "runoff_resistance", 0),
-        ("rural_runoff_resistance", "runoff_resistance", 0),
         ("urban_runoff_resistance", "runoff_resistance", 1),
         ("rural_runon_resistance", "runon_resistance", 0),
         ("urban_runon_resistance", "runon_resistance", 1),
