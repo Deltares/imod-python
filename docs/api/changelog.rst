@@ -7,6 +7,16 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
 
+[Unreleased]
+------------
+
+Changed
+~~~~~~~
+
+- :class:`imod.msw.Infiltration`'s variables ``upward_resistance`` and
+  ``downward_resistance`` now require a ``subunit`` coordinate.
+
+
 [0.18.0]
 --------
 
