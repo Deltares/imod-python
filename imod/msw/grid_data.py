@@ -13,13 +13,10 @@ from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import GridDataRegridMethod
+from imod.msw.utilities.common import concat_imod5
 from imod.typing import GridDataArray, GridDataDict
-from imod.typing.grid import concat, ones_like
+from imod.typing.grid import ones_like
 from imod.util.spatial import get_cell_area, spatial_reference
-
-
-def _concat_subunits(arg1: GridDataArray, arg2: GridDataArray):
-    return concat([arg1, arg2], dim="subunit").assign_coords(subunit=[0, 1])
 
 
 def get_cell_area_from_imod5_data(
@@ -45,7 +42,7 @@ def get_cell_area_from_imod5_data(
         )
         urban_area = urban_area.where(rural_area > 0.0, other=0.0)
     rural_area = mf6_area - (wetted_area + urban_area)
-    return _concat_subunits(rural_area, urban_area)
+    return concat_imod5(rural_area, urban_area)
 
 
 def get_landuse_from_imod5_data(
@@ -59,7 +56,7 @@ def get_landuse_from_imod5_data(
     rural_landuse = imod5_cap["landuse"]
     # Urban landuse = 18
     urban_landuse = ones_like(rural_landuse) * 18
-    return _concat_subunits(rural_landuse, urban_landuse)
+    return concat_imod5(rural_landuse, urban_landuse)
 
 
 def get_rootzone_depth_from_imod5_data(
@@ -72,7 +69,7 @@ def get_rootzone_depth_from_imod5_data(
     """
     rootzone_thickness = imod5_cap["rootzone_thickness"] * 0.01
     # rootzone depth is equal for both svats.
-    return _concat_subunits(rootzone_thickness, rootzone_thickness)
+    return concat_imod5(rootzone_thickness, rootzone_thickness)
 
 
 class GridData(MetaSwapPackage, IRegridPackage):
