@@ -28,15 +28,25 @@ def setup_infiltration_package(subunit, y, x, dy, dx):
     )
 
     downward_resistance = xr.DataArray(
-        np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]),
-        dims=("y", "x"),
-        coords={"y": y, "x": x, "dx": dx, "dy": dy},
+        np.array(
+            [
+                [[1.0, 2.0, 3.0], [nan, nan, nan], [7.0, 8.0, 9.0]],
+                [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [nan, nan, nan]],
+            ]
+        ),
+        dims=("subunit", "y", "x"),
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy},
     )
 
     upward_resistance = xr.DataArray(
-        np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]),
-        dims=("y", "x"),
-        coords={"y": y, "x": x, "dx": dx, "dy": dy},
+        np.array(
+            [
+                [[1.0, 2.0, 3.0], [nan, nan, nan], [7.0, 8.0, 9.0]],
+                [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [nan, nan, nan]],
+            ]
+        ),
+        dims=("subunit", "y", "x"),
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy},
     )
 
     bottom_resistance = xr.DataArray(

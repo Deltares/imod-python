@@ -4,6 +4,12 @@ from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import InfiltrationRegridMethod
+from imod.typing import GridDataArray
+from imod.typing.grid import concat, ones_like
+
+
+def _concat_subunits(arg1: GridDataArray, arg2: GridDataArray):
+    return concat([arg1, arg2], dim="subunit").assign_coords(subunit=[0, 1])
 
 
 class Infiltration(MetaSwapPackage, IRegridPackage):
@@ -19,11 +25,11 @@ class Infiltration(MetaSwapPackage, IRegridPackage):
         a subunit coordinate to describe different land uses.
     downward_resistance: array of floats (xr.DataArray)
         Describes the downward resisitance of SVAT units. Set to -9999.0 to make
-        MetaSWAP ignore this resistance. This array must not have a subunit
+        MetaSWAP ignore this resistance. This array must have a subunit
         coordinate.
     upward_resistance: array of floats (xr.DataArray)
         Describes the upward resistance of SVAT units. Set to -9999.0 to make
-        MetaSWAP ignore this resistance. This array must not have a subunit
+        MetaSWAP ignore this resistance. This array must have a subunit
         coordinate.
     bottom_resistance: array of floats (xr.DataArray)
         Describes the infiltration capacity of SVAT units. Set to -9999.0 to
@@ -47,10 +53,12 @@ class Infiltration(MetaSwapPackage, IRegridPackage):
         "extra_storage_coefficient": VariableMetaData(8, 0.01, 1.0, float),
     }
 
-    _with_subunit = ("infiltration_capacity",)
-    _without_subunit = (
+    _with_subunit = (
+        "infiltration_capacity",
         "downward_resistance",
         "upward_resistance",
+    )
+    _without_subunit = (
         "bottom_resistance",
         "extra_storage_coefficient",
     )
@@ -74,3 +82,25 @@ class Infiltration(MetaSwapPackage, IRegridPackage):
         self.dataset["extra_storage_coefficient"] = extra_storage_coefficient
 
         self._pkgcheck()
+
+    @classmethod
+    def from_imod5_data(cls, imod5_data) -> "Infiltration":
+        cap_data = imod5_data["cap"]
+        data = {}
+        # Use runon resistance as downward resistance, and runoff for downward
+        # resistance
+        key_mapping = {
+            "infiltration_capacity": "infiltration_capacity",
+            "downward_resistance": "runon_resistance",
+            "upward_resistance": "runoff_resistance",
+        }
+        for var_rename, var_key in key_mapping.items():
+            data_ls = [
+                cap_data[f"{landuse}_{var_key}"] for landuse in ["rural", "urban"]
+            ]
+            data[var_rename] = _concat_subunits(*data_ls)
+
+        data["bottom_resistance"] = ones_like(data["downward_resistance"])
+        data["extra_storage_coefficient"] = ones_like(data["downward_resistance"])
+
+        return cls(**data)
