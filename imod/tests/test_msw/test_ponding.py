@@ -10,11 +10,12 @@ from imod.mf6.utilities.regrid import (
     RegridderWeightsCache,
 )
 from imod.msw import Ponding
+from imod.typing import GridDataArray, GridDataDict
 
 
-def setup_ponding():
+def setup_ponding() -> tuple[GridDataDict, np.ndarray, GridDataArray]:
     x = [1.0, 2.0, 3.0]
-    y = [1.0, 2.0, 3.0]
+    y = [3.0, 2.0, 1.0]
     subunit = [0, 1]
     dx = 1.0
     dy = 1.0
@@ -69,16 +70,17 @@ def setup_ponding():
     # fmt: on
     index = (svat != 0).values.ravel()
 
-    ponding = Ponding(
-        ponding_depth=ponding_depth,
-        runoff_resistance=runoff_resistance,
-        runon_resistance=runoff_resistance,
-    )
-    return ponding, index, svat
+    data_ponding = {
+        "ponding_depth": ponding_depth,
+        "runoff_resistance": runoff_resistance,
+        "runon_resistance": runoff_resistance,
+    }
+    return data_ponding, index, svat
 
 
 def test_simple_model(fixed_format_parser):
-    ponding, index, svat = setup_ponding()
+    data_ponding, index, svat = setup_ponding()
+    ponding = Ponding(**data_ponding)
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
         ponding.write(output_dir, index, svat, None, None)
@@ -95,7 +97,8 @@ def test_simple_model(fixed_format_parser):
 
 
 def test_regrid_ponding(simple_2d_grid_with_subunits):
-    ponding, _, _ = setup_ponding()
+    data_ponding, _, _ = setup_ponding()
+    ponding = Ponding(**data_ponding)
     new_grid = simple_2d_grid_with_subunits
 
     regrid_context = RegridderWeightsCache()
@@ -104,3 +107,28 @@ def test_regrid_ponding(simple_2d_grid_with_subunits):
 
     assert np.all(regridded_ponding.dataset["x"].values == new_grid["x"].values)
     assert np.all(regridded_ponding.dataset["y"].values == new_grid["y"].values)
+
+
+def test_from_imod5_data():
+    data_ponding, _, _ = setup_ponding()
+    expected_ponding = Ponding(**data_ponding)
+
+    # Create cap data
+    cap_data = {}
+    mapping_ls = [
+        ("rural_runoff_resistance", "runoff_resistance", 0),
+        ("rural_runoff_resistance", "runoff_resistance", 0),
+        ("urban_runoff_resistance", "runoff_resistance", 1),
+        ("rural_runon_resistance", "runon_resistance", 0),
+        ("urban_runon_resistance", "runon_resistance", 1),
+        ("rural_ponding_depth", "ponding_depth", 0),
+        ("urban_ponding_depth", "ponding_depth", 1),
+    ]
+    for cap_key, pkg_key, subunit_nr in mapping_ls:
+        cap_data[cap_key] = data_ponding[pkg_key].sel(subunit=subunit_nr, drop=True)
+
+    imod5_data = {"cap": cap_data}
+
+    actual_ponding = Ponding.from_imod5_data(imod5_data)
+
+    xr.testing.assert_equal(expected_ponding.dataset, actual_ponding.dataset)
