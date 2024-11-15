@@ -5,6 +5,7 @@ from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import InfiltrationRegridMethod
 from imod.msw.utilities.common import concat_imod5
+from imod.typing import GridDataDict
 from imod.typing.grid import ones_like
 
 
@@ -77,7 +78,7 @@ class Infiltration(MetaSwapPackage, IRegridPackage):
         self._pkgcheck()
 
     @classmethod
-    def from_imod5_data(cls, imod5_data) -> "Infiltration":
+    def from_imod5_data(cls, imod5_data: dict[str, GridDataDict]) -> "Infiltration":
         cap_data = imod5_data["cap"]
         data = {}
         # Use runon resistance as downward resistance, and runoff for downward
@@ -93,7 +94,8 @@ class Infiltration(MetaSwapPackage, IRegridPackage):
             ]
             data[var_rename] = concat_imod5(*data_ls)
 
-        data["bottom_resistance"] = ones_like(data["downward_resistance"])
-        data["extra_storage_coefficient"] = ones_like(data["downward_resistance"])
+        like = data["downward_resistance"].isel(subunit=0, drop=True)
+        data["bottom_resistance"] = ones_like(like)
+        data["extra_storage_coefficient"] = ones_like(like)
 
         return cls(**data)
