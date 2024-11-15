@@ -13,9 +13,10 @@ from imod.mf6.utilities.regrid import (
 )
 from imod.msw import Infiltration
 from imod.msw.fixed_format import format_fixed_width
+from imod.typing import GridDataDict
 
 
-def setup_infiltration_package():
+def setup_infiltration_package() -> tuple[GridDataDict, xr.DataArray, np.ndarray]:
     x = [1.0, 2.0, 3.0]
     y = [3.0, 2.0, 1.0]
     subunit = [0, 1]
@@ -111,8 +112,8 @@ def test_write(
 ):
     infiltration = Infiltration(
         xr.DataArray(infiltration_capacity).expand_dims(subunit=[0]),
-        xr.DataArray(downward_resistance),
-        xr.DataArray(upward_resistance),
+        xr.DataArray(downward_resistance).expand_dims(subunit=[0]),
+        xr.DataArray(upward_resistance).expand_dims(subunit=[0]),
         xr.DataArray(bottom_resistance),
         xr.DataArray(extra_storage_coefficient),
     )
@@ -213,12 +214,12 @@ def test_regrid():
     dy = 0.5
     new_grid = xr.DataArray(
         dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy},
     )
-    new_grid.values[:,:,:] = 1
+    new_grid.values[:, :, :] = 1
 
     regrid_context = RegridderWeightsCache()
-    regridded = infiltration.regrid_like(new_grid, regrid_context )
+    regridded = infiltration.regrid_like(new_grid, regrid_context)
     assert_almost_equal(regridded.dataset.coords["x"].values, x)
     assert_almost_equal(regridded.dataset.coords["y"].values, y)
 
@@ -230,13 +231,15 @@ def test_from_imod5_data():
     mapping_ls = [
         ("rural_infiltration_capacity", "infiltration_capacity", 0),
         ("urban_infiltration_capacity", "infiltration_capacity", 1),
-        ("rural_runoff_resistance", "runoff_resistance", 0),
-        ("urban_runoff_resistance", "runoff_resistance", 1),
-        ("rural_runon_resistance", "runon_resistance", 0),
-        ("urban_runon_resistance", "runon_resistance", 1),
+        ("rural_runoff_resistance", "upward_resistance", 0),
+        ("urban_runoff_resistance", "upward_resistance", 1),
+        ("rural_runon_resistance", "downward_resistance", 0),
+        ("urban_runon_resistance", "downward_resistance", 1),
     ]
     for cap_key, pkg_key, subunit_nr in mapping_ls:
-        cap_data[cap_key] = data_infiltration[pkg_key].sel(subunit=subunit_nr, drop=True)
+        cap_data[cap_key] = data_infiltration[pkg_key].sel(
+            subunit=subunit_nr, drop=True
+        )
 
     imod5_data = {"cap": cap_data}
     actual_pkg = Infiltration.from_imod5_data(imod5_data)
