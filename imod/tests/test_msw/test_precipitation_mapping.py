@@ -2,7 +2,6 @@ import tempfile
 from pathlib import Path
 
 import numpy as np
-import pandas as pd
 import pytest
 import xarray as xr
 from numpy.testing import assert_equal
@@ -157,23 +156,30 @@ def test_precipitation_mapping_out_of_bound(svat_index):
 
 
 def test_from_imod5(tmpdir_factory):
-    datadir = tmpdir_factory.mktemp("precipitation_mapping")
+    datadir = Path(tmpdir_factory.mktemp("precipitation_mapping"))
 
+    # Arrange
     x = [-0.5, 1.5, 3.5]
-    y = [0.5, 2.5, 4.5]
+    y = [4.5, 2.5, 0.5]
     subunit = [0, 1]
     dx = 2.0
-    dy = 2.0
+    dy = -2.0
 
-    time = [np.datetime64(t) for t in["2001-01-01", "2001-01-02", "2001-01-03"]]
+    time = [np.datetime64(t) for t in ["2001-01-01", "2001-01-02", "2001-01-03"]]
     time_da = xr.DataArray([1.0, 1.0, 1.0], coords={"time": time})
 
-    precipitation = create_meteo_grid(x, y, subunit, dx, dy)
+    precipitation = create_meteo_grid(x, y, subunit, dx, dy).isel(subunit=0, drop=True)
     precipitation_times = time_da * precipitation
     mete_grid = msw.MeteoGrid(precipitation_times, precipitation_times)
     mete_grid.write(datadir)
 
-    imod5_data = {"paths": [["foo"], [datadir / "mete_grid.inp"], ["bar"]]}
-    precipitation_mapping = msw.PrecipitationMapping.from_imod5_data(imod5_data)
+    paths = [["foo"], [datadir / "mete_grid.inp"], ["bar"]]
+    imod5_data = {"extra": {"paths": paths}}
 
-    xr.testing.assert_equal(precipitation, precipitation_mapping.meteo)
+    # Act
+    precipitation_mapping = msw.PrecipitationMapping.from_imod5_data(imod5_data)
+    actual = precipitation_mapping.meteo
+
+    # Assert
+    assert len(actual.coords["time"]) == 1
+    xr.testing.assert_equal(precipitation, actual.isel(time=0, drop=True))

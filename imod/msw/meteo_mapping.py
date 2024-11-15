@@ -33,7 +33,7 @@ def open_first_meteo_grid(mete_grid_path: str, column_nr: int) -> xr.DataArray:
     f = open(mete_grid_path, "r")
     lines = f.readlines()
     meteo_filepath = Path(lines[0].split(",")[column_nr].replace('"', ""))
-    return imod.rasterio.open(meteo_filepath)
+    return imod.rasterio.open(mete_grid_path / ".." / meteo_filepath)
 
 
 def open_first_meteo_grid_from_imod5_data(
