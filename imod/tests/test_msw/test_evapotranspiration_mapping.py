@@ -37,6 +37,7 @@ def svat_index() -> xr.DataArray:
     index = (svat != 0).values.ravel()
     return svat, index
 
+
 def create_meteo_grid(x, y, subunit, dx, dy):
     # fmt: off
     return xr.DataArray(
@@ -55,6 +56,7 @@ def create_meteo_grid(x, y, subunit, dx, dy):
         coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
     )
     # fmt: on
+
 
 def test_evapotranspiration_mapping_simple(fixed_format_parser, svat_index):
     svat, index = svat_index
@@ -139,7 +141,9 @@ def test_evapotranspiration_from_imod5(tmpdir_factory):
     time = [np.datetime64(t) for t in ["2001-01-01", "2001-01-02", "2001-01-03"]]
     time_da = xr.DataArray([1.0, 1.0, 1.0], coords={"time": time})
 
-    evapotranspiration = create_meteo_grid(x, y, subunit, dx, dy).isel(subunit=0, drop=True)
+    evapotranspiration = create_meteo_grid(x, y, subunit, dx, dy).isel(
+        subunit=0, drop=True
+    )
     evapotranspiration_times = time_da * evapotranspiration
     mete_grid = msw.MeteoGrid(evapotranspiration_times, evapotranspiration_times)
     mete_grid.write(datadir)
@@ -148,7 +152,9 @@ def test_evapotranspiration_from_imod5(tmpdir_factory):
     imod5_data = {"extra": {"paths": paths}}
 
     # Act
-    evapotranspiration_mapping = msw.EvapotranspirationMapping.from_imod5_data(imod5_data)
+    evapotranspiration_mapping = msw.EvapotranspirationMapping.from_imod5_data(
+        imod5_data
+    )
     actual = evapotranspiration_mapping.meteo
 
     # Assert
