@@ -10,16 +10,10 @@ import imod
 from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
+from imod.msw.utilities.common import find_in_file_list
 from imod.prepare import common
 from imod.typing import GridDataArray, GridDataDict, IntArray
 from imod.util.regrid_method_type import RegridMethodType
-
-
-def find_in_file_list(filename: str, paths: list[str]) -> str:
-    for file in paths:
-        if filename == Path(file[0]).name.lower():
-            return file[0]
-    raise ValueError(f"could not find {filename} in list of paths: {paths}")
 
 
 def open_first_meteo_grid(mete_grid_path: str, column_nr: int) -> xr.DataArray:
