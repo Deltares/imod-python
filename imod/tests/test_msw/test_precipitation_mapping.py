@@ -155,7 +155,7 @@ def test_precipitation_mapping_out_of_bound(svat_index):
             precipitation_mapping.write(output_dir, index, svat, None, None)
 
 
-def test_from_imod5(tmpdir_factory):
+def test_precipitation_from_imod5(tmpdir_factory):
     datadir = Path(tmpdir_factory.mktemp("precipitation_mapping"))
 
     # Arrange
