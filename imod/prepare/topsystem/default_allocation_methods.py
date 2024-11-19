@@ -16,7 +16,7 @@ class SimulationAllocationOptions:
     drn: ALLOCATION_OPTION
         allocation option to be used for drainage packages, defaults to
         ``first_active_to_elevation``.
-    riv: ALLOCATION_OPTION 
+    riv: ALLOCATION_OPTION
         allocation option to be used for river packages, defaults to
         ``stage_to_riv_bot``.
     ghb: ALLOCATION_OPTION
@@ -25,9 +25,9 @@ class SimulationAllocationOptions:
 
     Examples
     --------
-    
+
     Initiate allocation default options
-    
+
     >>> alloc_options = SimulationAllocationOptions()
 
     You can set different options as follows:
@@ -57,15 +57,15 @@ class SimulationDistributingOptions:
     riv: DISTRIBUTING_OPTION
         distribution option to be used for river packages, defaults to
         ``by_corrected_transmissivity``.
-    ghb: DISTRIBUTING_OPTION 
+    ghb: DISTRIBUTING_OPTION
         distribution option to be used for general head boundary packages,
         defaults to ``by_layer_transmissivity``.
 
     Examples
     --------
-    
+
     Initiate default distributing options
-    
+
     >>> dist_options = SimulationDistributingOptions()
 
     You can set different options as follows:

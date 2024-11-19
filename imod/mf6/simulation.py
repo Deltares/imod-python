@@ -1356,7 +1356,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                 * Times of wells with associated timeseries are resampled to these times
                 * Start- and end times in the list are used to repeat the stresses
                   of periodic data (e.g. river stages in iMOD5 for "summer", "winter")
-                * The simulation is discretized to these times, using 
+                * The simulation is discretized to these times, using
                   :meth:`imod.mf6.Modflow6Simulation.create_time_discretization`
         allocation_options: SimulationAllocationOptions, optional
             object containing the allocation options per package type. If you
@@ -1394,7 +1394,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         >>> allocation_options = SimulationAllocationOptions()
         >>> allocation_options.riv = ALLOCATION_OPTION.at_elevation
         >>> mf6_sim = imod.mf6.Modflow6Simulation.from_imod5_data(imod5_data, period_data, times, allocation_options)
-        
+
         """
         if allocation_options is None:
             allocation_options = SimulationAllocationOptions()

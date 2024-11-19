@@ -238,7 +238,7 @@ class GroundwaterFlowModel(Modflow6Model):
             distributing_options = SimulationDistributingOptions()
         if regridder_types is None:
             regridder_types = {}
-        
+
         # first import the singleton packages
         # import dis
         regrid_cache = RegridderWeightsCache()
