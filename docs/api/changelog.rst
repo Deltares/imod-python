@@ -9,6 +9,13 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Added
+~~~~~
+
+- :class:`imod.prepare.topsystem.SimulationAllocationOptions`,
+  :class:`imod.prepare.topsystem.SimulationDistributingOptions`, which are used
+  to store default allocation and distributing options respectively.
+
 Fixed
 ~~~~~
 
@@ -18,6 +25,18 @@ Fixed
   values comply with criterion: > bottom``.
 - Fix bug where no ``ValidationError`` was thrown if there is an active RCH, DRN,
   GHB, or RIV cell where idomain = -1.
+
+Changed
+~~~~~~~
+
+- In :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`, and
+  :meth:`imod.mf6.GroundwaterFlowModel.from_imod5_data` the arguments
+  ``allocation_options``, ``distributing_options`` are now optional.
+- The order of arguments of :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`, 
+  and :meth:`imod.mf6.GroundwaterFlowModel.from_imod5_data`. It now is 
+  ``imod5_data, period_data, times, allocation_options, distributing_options, regridder_types``
+  instead of:
+  ``imod5_data, period_data, allocation_options, distributing_options, times, regridder_types``
 
 
 [0.18.0]
