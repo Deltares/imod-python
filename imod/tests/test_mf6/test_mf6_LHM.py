@@ -50,9 +50,9 @@ def LHM_imod5_data():
     simulation = Modflow6Simulation.from_imod5_data(
         imod5_data,
         period_data,
+        times,
         default_simulation_allocation_options,
         default_simulation_distributing_options,
-        times,
         regridding_option,
     )
     simulation["imported_model"]["oc"] = OutputControl(

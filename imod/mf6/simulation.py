@@ -1331,41 +1331,78 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
     def from_imod5_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        period_data: dict[str, dict[str, GridDataArray]],
-        allocation_options: SimulationAllocationOptions,
-        distributing_options: SimulationDistributingOptions,
+        period_data: dict[str, list[datetime]],
         times: list[datetime],
-        regridder_types: dict[str, RegridMethodType] = {},
+        allocation_options: Optional[SimulationAllocationOptions] = None,
+        distributing_options: Optional[SimulationDistributingOptions] = None,
+        regridder_types: Optional[dict[str, RegridMethodType]] = None,
     ) -> "Modflow6Simulation":
         """
-        Imports a GroundwaterFlowModel (GWF) from the data in an IMOD5 project file.
-        It adds the packages for which import from imod5 is supported.
-        Some packages (like OC) must be added manually later.
-
+        Imports a GroundwaterFlowModel (GWF) from the data in an IMOD5 project
+        file and puts it in a simulation. It adds the packages for which import
+        from imod5 is supported. Some packages (like OC) must be added manually
+        later.
 
         Parameters
         ----------
         imod5_data: dict[str, dict[str, GridDataArray]]
             dictionary containing the arrays mentioned in the project file as xarray datasets,
-            under the key of the package type to which it belongs
-        allocation_options: SimulationAllocationOptions
-            object containing the allocation options per package type.
-            If you want a package to have a different allocation option,
-            then it should be imported separately
-        distributing_options: SimulationDistributingOptions
-            object containing the conductivity distribution options per package type.
-            If you want a package to have a different allocation option,
-            then it should be imported separately
+            under the key of the package type to which it belongs.
+        period_data: dict[str, list[datetime]]
+            dictionary containing the package names mapped to a list of repeated
+            stress periods. These are set as ``repeat_stress``.
         times:  list[datetime]
-            time discretization of the model to be imported.
+            time discretization of the model to be imported. This is used for two things:
+                * Times of wells with associated timeseries are resampled to these times
+                * Start- and end times in the list are used to repeat the stresses
+                  of periodic data (e.g. river stages in iMOD5 for "summer", "winter")
+                * The simulation is discretized to these times, using 
+                  :meth:`imod.mf6.Modflow6Simulation.create_time_discretization`
+        allocation_options: SimulationAllocationOptions, optional
+            object containing the allocation options per package type. If you
+            want a specific package to have a different allocation option, then
+            it should be imported separately.
+        distributing_options: SimulationDistributingOptions, optional
+            object containing the conductivity distribution options per package
+            type. If you want a package to have a different allocation option,
+            then it should be imported separately.
         regridder_types: dict[str, RegridMethodType]
             the key is the package name. The value is the RegridMethodType
             object containing the settings for regridding the package with the
-            specified key
+            specified key.
 
         Returns
         -------
+        Modflow6Simulation
+            Simulation prepared for MODFLOW6
+
+        Examples
+        --------
+        Open projectfile data first:
+
+        >>> from imod.formats.prj import open_projectfile_data
+        >>> imod5_data, period_data = open_projectfile_data("path/to/projectfile")
+
+        You can then import the simulation as follows:
+
+        >>> times = [np.datetime("2001-01-01"), np.datetime("2002-01-01"), np.datetime("2003-01-01")]
+        >>> mf6_sim = imod.mf6.Modflow6Simulation.from_imod5_data(imod5_data, period_data, times)
+
+        Allocate rivers differently:
+
+        >>> from imod.prepare.topsystem import SimulationAllocationOptions, ALLOCATION_OPTION
+        >>> allocation_options = SimulationAllocationOptions()
+        >>> allocation_options.riv = ALLOCATION_OPTION.at_elevation
+        >>> mf6_sim = imod.mf6.Modflow6Simulation.from_imod5_data(imod5_data, period_data, times, allocation_options)
+        
         """
+        if allocation_options is None:
+            allocation_options = SimulationAllocationOptions()
+        if distributing_options is None:
+            distributing_options = SimulationDistributingOptions()
+        if regridder_types is None:
+            regridder_types = {}
+
         simulation = Modflow6Simulation("imported_simulation")
         simulation._validation_context.strict_well_validation = False
 
@@ -1373,9 +1410,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         groundwaterFlowModel = GroundwaterFlowModel.from_imod5_data(
             imod5_data,
             period_data,
+            times,
             allocation_options,
             distributing_options,
-            times,
             regridder_types,
         )
         simulation["imported_model"] = groundwaterFlowModel

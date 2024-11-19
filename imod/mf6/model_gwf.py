@@ -192,22 +192,29 @@ class GroundwaterFlowModel(Modflow6Model):
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
         period_data: dict[str, list[datetime]],
-        allocation_options: SimulationAllocationOptions,
-        distributing_options: SimulationDistributingOptions,
         times: list[datetime],
-        regridder_types: dict[str, RegridMethodType],
+        allocation_options: Optional[SimulationAllocationOptions] = None,
+        distributing_options: Optional[SimulationDistributingOptions] = None,
+        regridder_types: Optional[dict[str, RegridMethodType]] = None,
     ) -> "GroundwaterFlowModel":
         """
         Imports a GroundwaterFlowModel (GWF) from the data in an IMOD5 project file.
         It adds the packages for which import from imod5 is supported.
         Some packages (like OC) must be added manually later.
 
-
         Parameters
         ----------
         imod5_data: dict[str, dict[str, GridDataArray]]
             dictionary containing the arrays mentioned in the project file as xarray datasets,
             under the key of the package type to which it belongs
+        period_data: dict[str, list[datetime]]
+            dictionary containing the package names mapped to a list of repeated
+            stress periods. These are set as ``repeat_stress``.
+        times: list[datetime]
+            Time discretization of the simulation. These times are used for two things:
+               * Times of wells with associated timeseries are resampled to these times
+               * Start- and end times in the list are used to repeat the stresses
+                 of periodic data (e.g. river stages in iMOD5 for "summer", "winter")
         allocation_options: SimulationAllocationOptions
             object containing the allocation options per package type.
             If you want a package to have a different allocation option,
@@ -216,10 +223,6 @@ class GroundwaterFlowModel(Modflow6Model):
             object containing the conductivity distribution options per package type.
             If you want a package to have a different allocation option,
             then it should be imported separately
-        time_min: datetime
-            Begin-time of the simulation.
-        time_max: datetime
-            End-time of the simulation.
         regridder_types:  dict[str, RegridMethodType]
             the key is the package name. The value is a subclass of RegridMethodType.
 
@@ -229,6 +232,13 @@ class GroundwaterFlowModel(Modflow6Model):
         add the OC package to the model.
 
         """
+        if allocation_options is None:
+            allocation_options = SimulationAllocationOptions()
+        if distributing_options is None:
+            distributing_options = SimulationDistributingOptions()
+        if regridder_types is None:
+            regridder_types = {}
+        
         # first import the singleton packages
         # import dis
         regrid_cache = RegridderWeightsCache()
