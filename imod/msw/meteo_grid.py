@@ -1,5 +1,6 @@
 import csv
 from pathlib import Path
+from shutil import copyfile
 from typing import Optional, Union
 
 import numpy as np
@@ -11,6 +12,9 @@ from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import MeteoGridRegridMethod
 from imod.msw.timeutil import to_metaswap_timeformat
+from imod.msw.utilities.common import find_in_file_list
+from imod.typing import GridDataDict
+from imod.util.regrid_method_type import EmptyRegridMethod, RegridMethodType
 
 
 class MeteoGrid(MetaSwapPackage, IRegridPackage):
@@ -188,3 +192,37 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
                     f"Received excess dims {excess_dims} in {self.__class__} for "
                     f"{varname}, please provide data with {allowed_dims}"
                 )
+
+
+class MeteoGridCopy(MetaSwapPackage, IRegridPackage):
+    """
+    Class to copy existing ``mete_grid.inp``, which contains the meteorological
+    grid data. Next to a MeteoGridCopy instance, instances of
+    PrecipitationMapping and EvapotranspirationMapping are required as well to
+    specify meteorological information to MetaSWAP.
+
+    Parameters
+    ----------
+    path: Path to mete_grid.inp file
+    """
+
+    _file_name = "mete_grid.inp"
+    _meteo_dirname = "meteo_grids"
+
+    _regrid_method: RegridMethodType = EmptyRegridMethod()
+
+    def __init__(self, path: Path | str):
+        super().__init__()
+        self.dataset["path"] = path
+
+    def write(self, directory: Path | str, *args):
+        path_metegrid = Path(self.dataset["path"])
+        new_path = directory / self._file_name
+        copyfile(path_metegrid, new_path)
+
+    @classmethod
+    def from_imod5_data(cls, imod5_data: dict[str, GridDataDict]) -> "MeteoGridCopy":
+        paths = imod5_data["extra"]["paths"]
+        filepath = find_in_file_list(cls._file_name, paths)
+
+        return cls(filepath)
