@@ -16,6 +16,8 @@ Fixed
   cells with zero thickness where IDOMAIN = 0. Before, only cells with a zero
   thickness and IDOMAIN = -1 were supported, else the software threw a ``not all
   values comply with criterion: > bottom``.
+- Fix bug where no ``ValidationError`` was thrown if there is an active RCH, DRN,
+  GHB, or RIV cell where idomain = -1.
 
 
 [0.18.0]
