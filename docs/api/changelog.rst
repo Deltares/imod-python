@@ -6,6 +6,17 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[Unreleased]
+------------
+
+Fixed
+~~~~~
+
+- Relaxed validation for `imod.mf6.StructuredDiscretization` to also support
+  cells with zero thickness where IDOMAIN = 0. Before, only cells with a zero
+  thickness and IDOMAIN = -1 were supported, else the software threw a ``not all
+  values comply with criterion: > bottom``.
+
 
 [0.18.0]
 --------
