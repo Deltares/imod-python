@@ -113,6 +113,12 @@ def test_top_exceeding_bottom(idomain_and_bottom):
     errors = dis._validate(dis._write_schemata, idomain=idomain)
     assert len(errors) == 0
 
+    # Or inactive
+    idomain[0:2, :, :] = 0
+    dis = imod.mf6.StructuredDiscretization(top=-400.0, bottom=bottom, idomain=idomain)
+    errors = dis._validate(dis._write_schemata, idomain=idomain)
+    assert len(errors) == 0
+
 
 def test_overlaying_bottom_inactive(idomain_and_bottom):
     """
