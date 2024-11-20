@@ -128,18 +128,22 @@ class RegridderWeightsCache:
         self.weights_cache.pop(keys[0])
 
 
-def assign_coord_if_present(
+def handle_extra_coords(
     coordname: str, target_grid: GridDataArray, maybe_has_coords_attr: Any
 ):
     """
     If ``maybe_has_coords`` has a ``coords`` attribute and if coordname in
-    target_grid, copy coord.
+    target_grid, copy coord. If coord not in target_grid, but in
+    maybe_has_coords_attr, remove it.
     """
-    if coordname in target_grid.coords:
-        if coordname in target_grid.coords and hasattr(maybe_has_coords_attr, "coords"):
-            maybe_has_coords_attr = maybe_has_coords_attr.assign_coords(
+    if hasattr(maybe_has_coords_attr, "coords"):
+        if coordname in target_grid.coords:
+            return maybe_has_coords_attr.assign_coords(
                 {coordname: target_grid.coords[coordname].values[()]}
             )
+        elif coordname in maybe_has_coords_attr.coords:
+            return maybe_has_coords_attr.drop_vars(coordname)
+    
     return maybe_has_coords_attr
 
 
@@ -235,10 +239,10 @@ def _regrid_package_data(
             target_grid,
         )
         # set dx and dy if present in target_grid
-        new_package_data[varname] = assign_coord_if_present(
+        new_package_data[varname] = handle_extra_coords(
             "dx", target_grid, new_package_data[varname]
         )
-        new_package_data[varname] = assign_coord_if_present(
+        new_package_data[varname] = handle_extra_coords(
             "dy", target_grid, new_package_data[varname]
         )
     return new_package_data
@@ -274,6 +278,7 @@ def _regrid_like(
     target_grid: GridDataArray,
     regrid_cache: RegridderWeightsCache,
     regridder_types: Optional[RegridMethodType] = None,
+    as_pkg_type: Optional[type[IRegridPackage]] = None,
 ) -> IPackage:
     """
     Creates a package of the same type as this package, based on another
@@ -298,14 +303,20 @@ def _regrid_like(
     package: IRegridPackage:
         package to regrid
     target_grid: xr.DataArray or xu.UgridDataArray
-        a grid defined over the same discretization as the one we want to regrid the package to
+        a grid defined over the same discretization as the one we want to regrid
+        the package to
     regrid_cache: RegridderWeightsCache
-        stores regridder weights for different regridders. Can be used to speed up regridding,
-        if the same regridders are used several times for regridding different arrays.
+        stores regridder weights for different regridders. Can be used to speed
+        up regridding, if the same regridders are used several times for
+        regridding different arrays.
     regridder_types: RegridMethodType, optional
-        dictionary mapping arraynames (str) to a tuple of regrid type (a specialization class of BaseRegridder) and function name (str)
-        this dictionary can be used to override the default mapping method.
-
+        dictionary mapping arraynames (str) to a tuple of regrid type (a
+        specialization class of BaseRegridder) and function name (str) this
+        dictionary can be used to override the default mapping method.
+    as_pkg_type: RegridPackageType, optional
+        Package to initiate new package as. Is used to regrid
+        StructuredDiscretization to VerticesDiscretization.
+        
     Returns
     -------
     a package with the same options as this package, and with all the data-arrays regridded to another discretization,
@@ -315,6 +326,9 @@ def _regrid_like(
         raise NotImplementedError(
             f"Package {type(package).__name__} does not support regridding"
         )
+
+    if as_pkg_type is None:
+        as_pkg_type = package.__class__
 
     if hasattr(package, "auxiliary_data_fields"):
         remove_expanded_auxiliary_variables_from_dataset(package)
@@ -334,7 +348,7 @@ def _regrid_like(
     if hasattr(package, "auxiliary_data_fields"):
         expand_transient_auxiliary_variables(package)
 
-    return package.__class__(**new_package_data)
+    return as_pkg_type(**new_package_data)
 
 
 @typedispatch  # type: ignore[no-redef]
@@ -383,6 +397,8 @@ def _regrid_like(
 
     methods = _get_unique_regridder_types(model)
     output_domain = _get_regridding_domain(model, target_grid, regrid_cache, methods)
+    output_domain = handle_extra_coords("dx", target_grid, output_domain)
+    output_domain = handle_extra_coords("dy", target_grid, output_domain)
     new_model.mask_all_packages(output_domain)
     new_model.purge_empty_packages()
     if validate:
