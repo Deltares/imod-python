@@ -6,8 +6,8 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
-[Unreleased]
-------------
+[0.18.1] - 2024-11-20
+---------------------
 
 Added
 ~~~~~
@@ -39,8 +39,8 @@ Changed
   ``imod5_data, period_data, allocation_options, distributing_options, times, regridder_types``
 
 
-[0.18.0]
---------
+[0.18.0] - 2024-11-11
+---------------------
 
 Fixed
 ~~~~~
