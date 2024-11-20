@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Transport 2d example &#8212; iMOD Python 0.18.0 documentation</title>
+    <title>Transport 2d example &#8212; iMOD Python 0.18.1 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="../../_static/documentation_options.js?v=ba2e7b09"></script>
+    <script src="../../_static/documentation_options.js?v=1e56ff10"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/mf6/transport_2d';</script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="Lake package example" href="lake.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.18.0.dev" />
+  <meta name="docsearch:version" content="0.18.1.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 0.18.0 documentation - Home"/>
-    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 0.18.0 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 0.18.1 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 0.18.1 documentation - Home"/>
   
   
 </a></div>
@@ -699,7 +699,7 @@ We use the utility function  <code class="docutils literal notranslate"><span cl
 <span class="n">split_conc</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="mi">364</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_transport_2d_002.png" srcset="../../_images/sphx_glr_transport_2d_002.png" alt="dx = 10.0, dy = -10.0, layer = 1, time = 365.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x000001ECD7545E50&gt;
+<img src="../../_images/sphx_glr_transport_2d_002.png" srcset="../../_images/sphx_glr_transport_2d_002.png" alt="dx = 10.0, dy = -10.0, layer = 1, time = 365.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x00000289B00A1310&gt;
 </pre></div>
 </div>
 <p>Compute the difference between the split and unsplit simulation results for transport at the
@@ -709,10 +709,10 @@ end of the simulation, and print them</p>
 <span class="n">diff</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="mi">364</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_transport_2d_003.png" srcset="../../_images/sphx_glr_transport_2d_003.png" alt="dx = 10.0, dy = -10.0, layer = 1, time = 365.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x000001ECDF303910&gt;
+<img src="../../_images/sphx_glr_transport_2d_003.png" srcset="../../_images/sphx_glr_transport_2d_003.png" alt="dx = 10.0, dy = -10.0, layer = 1, time = 365.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.contour.QuadContourSet object at 0x00000289AF66C490&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 0.979 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 52.312 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-mf6-transport-2d-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/0c664f948b24c042ef878353e08d519b/transport_2d.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">transport_2d.ipynb</span></code></a></p>

@@ -658,14 +658,14 @@ can plot the contours as follows:
  .. code-block:: none
 
 
-    <matplotlib.contour.QuadContourSet object at 0x000001ECD74878D0>
+    <matplotlib.contour.QuadContourSet object at 0x00000289AE9D1510>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 18.173 seconds)
+   **Total running time of the script:** (1 minutes 9.728 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_circle_transport.py:

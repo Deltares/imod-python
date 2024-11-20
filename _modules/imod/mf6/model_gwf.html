@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.model_gwf &#8212; iMOD Python 0.18.0 documentation</title>
+    <title>imod.mf6.model_gwf &#8212; iMOD Python 0.18.1 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="../../../_static/documentation_options.js?v=ba2e7b09"></script>
+    <script src="../../../_static/documentation_options.js?v=1e56ff10"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/mf6/model_gwf';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.18.0.dev" />
+  <meta name="docsearch:version" content="0.18.1.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 0.18.0 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 0.18.0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 0.18.1 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 0.18.1 documentation - Home"/>
   
   
 </a></div>
@@ -621,22 +621,35 @@
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">imod5_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GridDataArray</span><span class="p">]],</span>
         <span class="n">period_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">datetime</span><span class="p">]],</span>
-        <span class="n">allocation_options</span><span class="p">:</span> <span class="n">SimulationAllocationOptions</span><span class="p">,</span>
-        <span class="n">distributing_options</span><span class="p">:</span> <span class="n">SimulationDistributingOptions</span><span class="p">,</span>
         <span class="n">times</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">datetime</span><span class="p">],</span>
-        <span class="n">regridder_types</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">RegridMethodType</span><span class="p">],</span>
+        <span class="n">allocation_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SimulationAllocationOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">distributing_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SimulationDistributingOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">regridder_types</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">RegridMethodType</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GroundwaterFlowModel&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Imports a GroundwaterFlowModel (GWF) from the data in an IMOD5 project file.</span>
-<span class="sd">        It adds the packages for which import from imod5 is supported.</span>
-<span class="sd">        Some packages (like OC) must be added manually later.</span>
+<span class="sd">        Imports a GroundwaterFlowModel (GWF) from the data in an iMOD5 project</span>
+<span class="sd">        file and puts it in a simulation. Quasi-3D iMOD5 models, i.e. models</span>
+<span class="sd">        where there is only horizontal flow in aquifers and vertical flow in</span>
+<span class="sd">        aquitards, are not supported.</span>
 
+<span class="sd">        This method adds all static and boundary condition packages from the</span>
+<span class="sd">        projectfile to the simulation. Output Control (OC) must be added</span>
+<span class="sd">        manually after importing.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        imod5_data: dict[str, dict[str, GridDataArray]]</span>
 <span class="sd">            dictionary containing the arrays mentioned in the project file as xarray datasets,</span>
 <span class="sd">            under the key of the package type to which it belongs</span>
+<span class="sd">        period_data: dict[str, list[datetime]]</span>
+<span class="sd">            dictionary containing the package names mapped to a list of repeated</span>
+<span class="sd">            stress periods. These are set as ``repeat_stress``.</span>
+<span class="sd">        times: list[datetime]</span>
+<span class="sd">            Time discretization of the simulation. These times are used for the</span>
+<span class="sd">            following:</span>
+<span class="sd">               * Times of wells with associated timeseries are resampled to these times</span>
+<span class="sd">               * Start- and end times in the list are used to repeat the stresses</span>
+<span class="sd">                 of periodic data (e.g. river stages in iMOD5 for &quot;summer&quot;, &quot;winter&quot;)</span>
 <span class="sd">        allocation_options: SimulationAllocationOptions</span>
 <span class="sd">            object containing the allocation options per package type.</span>
 <span class="sd">            If you want a package to have a different allocation option,</span>
@@ -645,10 +658,6 @@
 <span class="sd">            object containing the conductivity distribution options per package type.</span>
 <span class="sd">            If you want a package to have a different allocation option,</span>
 <span class="sd">            then it should be imported separately</span>
-<span class="sd">        time_min: datetime</span>
-<span class="sd">            Begin-time of the simulation.</span>
-<span class="sd">        time_max: datetime</span>
-<span class="sd">            End-time of the simulation.</span>
 <span class="sd">        regridder_types:  dict[str, RegridMethodType]</span>
 <span class="sd">            the key is the package name. The value is a subclass of RegridMethodType.</span>
 
@@ -658,6 +667,13 @@
 <span class="sd">        add the OC package to the model.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">allocation_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">allocation_options</span> <span class="o">=</span> <span class="n">SimulationAllocationOptions</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">distributing_options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">distributing_options</span> <span class="o">=</span> <span class="n">SimulationDistributingOptions</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">regridder_types</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">regridder_types</span> <span class="o">=</span> <span class="p">{}</span>
+
         <span class="c1"># first import the singleton packages</span>
         <span class="c1"># import dis</span>
         <span class="n">regrid_cache</span> <span class="o">=</span> <span class="n">RegridderWeightsCache</span><span class="p">()</span>

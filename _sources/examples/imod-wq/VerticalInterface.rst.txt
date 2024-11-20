@@ -129,7 +129,7 @@ Set up ibound, which sets where active cells are `(ibound = 1.0)`
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x000001ECE18D0C50>
+    <matplotlib.collections.QuadMesh object at 0x00000289BA0691D0>
 
 
 
@@ -186,7 +186,7 @@ that is: ``bnd[index] = -1```
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x000001ECDF058E50>
+    <matplotlib.collections.QuadMesh object at 0x00000289ADD4AE50>
 
 
 
@@ -357,7 +357,7 @@ plot results as follows:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.406 seconds)
+   **Total running time of the script:** (0 minutes 1.187 seconds)
 
 
 .. _sphx_glr_download_examples_imod-wq_VerticalInterface.py:
