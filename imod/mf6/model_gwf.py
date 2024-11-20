@@ -198,9 +198,14 @@ class GroundwaterFlowModel(Modflow6Model):
         regridder_types: Optional[dict[str, RegridMethodType]] = None,
     ) -> "GroundwaterFlowModel":
         """
-        Imports a GroundwaterFlowModel (GWF) from the data in an IMOD5 project file.
-        It adds the packages for which import from imod5 is supported.
-        Some packages (like OC) must be added manually later.
+        Imports a GroundwaterFlowModel (GWF) from the data in an iMOD5 project
+        file and puts it in a simulation. Quasi-3D iMOD5 models, i.e. models
+        where there is only horizontal flow in aquifers and vertical flow in
+        aquitards, are not supported.
+
+        This method adds all static and boundary condition packages from the
+        projectfile to the simulation. Output Control (OC) must be added
+        manually after importing.
 
         Parameters
         ----------

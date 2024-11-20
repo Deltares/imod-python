@@ -1338,10 +1338,17 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         regridder_types: Optional[dict[str, RegridMethodType]] = None,
     ) -> "Modflow6Simulation":
         """
-        Imports a GroundwaterFlowModel (GWF) from the data in an IMOD5 project
-        file and puts it in a simulation. It adds the packages for which import
-        from imod5 is supported. Some packages (like OC) must be added manually
-        later.
+        Imports a GroundwaterFlowModel (GWF) from the data in an iMOD5 project
+        file and puts it in a simulation. Quasi-3D iMOD5 models, i.e. models
+        where there is only horizontal flow in aquifers and vertical flow in
+        aquitards, are not supported.
+
+        This method adds all static and boundary condition packages from the
+        projectfile to the simulation. Output Control (OC) must be added
+        manually after importing. The
+        :func:`imod.mf6.ims.SolutionPresetModerate` solver settings are added
+        automatically under the "ims" key, but these can be overrided by the
+        user after importing.
 
         Parameters
         ----------
@@ -1354,7 +1361,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         times:  list[datetime]
             time discretization of the model to be imported. This is used for two things:
                 * Times of wells with associated timeseries are resampled to these times
-                * Start- and end times in the list are used to repeat the stresses
+                * Start and end times in the list are used to repeat the stresses
                   of periodic data (e.g. river stages in iMOD5 for "summer", "winter")
                 * The simulation is discretized to these times, using
                   :meth:`imod.mf6.Modflow6Simulation.create_time_discretization`
@@ -1394,6 +1401,10 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         >>> allocation_options = SimulationAllocationOptions()
         >>> allocation_options.riv = ALLOCATION_OPTION.at_elevation
         >>> mf6_sim = imod.mf6.Modflow6Simulation.from_imod5_data(imod5_data, period_data, times, allocation_options)
+
+        You can override solver settings if needed after importing:
+
+        >>> mf6_sim["imported_model"]["ims"] = SolutionPresetComplex()
 
         """
         if allocation_options is None:
