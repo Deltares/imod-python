@@ -216,7 +216,8 @@ class GroundwaterFlowModel(Modflow6Model):
             dictionary containing the package names mapped to a list of repeated
             stress periods. These are set as ``repeat_stress``.
         times: list[datetime]
-            Time discretization of the simulation. These times are used for two things:
+            Time discretization of the simulation. These times are used for the
+            following:
                * Times of wells with associated timeseries are resampled to these times
                * Start- and end times in the list are used to repeat the stresses
                  of periodic data (e.g. river stages in iMOD5 for "summer", "winter")
