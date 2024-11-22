@@ -1,7 +1,7 @@
 import csv
 from pathlib import Path
 from shutil import copyfile
-from typing import Optional, Union
+from typing import Optional, Union, cast
 
 import numpy as np
 import pandas as pd
@@ -13,7 +13,7 @@ from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import MeteoGridRegridMethod
 from imod.msw.timeutil import to_metaswap_timeformat
 from imod.msw.utilities.common import find_in_file_list
-from imod.typing import GridDataDict
+from imod.typing import Imod5DataDict
 from imod.util.regrid_method_type import EmptyRegridMethod, RegridMethodType
 
 
@@ -216,13 +216,14 @@ class MeteoGridCopy(MetaSwapPackage, IRegridPackage):
         self.dataset["path"] = path
 
     def write(self, directory: Path | str, *args):
-        path_metegrid = Path(self.dataset["path"].values[()])
+        directory = Path(directory)
+        path_metegrid = Path(str(self.dataset["path"].values[()]))
         new_path = directory / self._file_name
         copyfile(path_metegrid, new_path)
 
     @classmethod
-    def from_imod5_data(cls, imod5_data: dict[str, GridDataDict]) -> "MeteoGridCopy":
-        paths = imod5_data["extra"]["paths"]
+    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "MeteoGridCopy":
+        paths = cast(list[str], imod5_data["extra"]["paths"])
         filepath = find_in_file_list(cls._file_name, paths)
 
         return cls(filepath)

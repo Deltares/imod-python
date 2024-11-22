@@ -1,6 +1,6 @@
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Optional, TextIO
+from typing import Any, Optional, TextIO, cast
 
 import numpy as np
 import pandas as pd
@@ -12,11 +12,11 @@ from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.utilities.common import find_in_file_list
 from imod.prepare import common
-from imod.typing import GridDataArray, GridDataDict, IntArray
+from imod.typing import GridDataArray, Imod5DataDict, IntArray
 from imod.util.regrid_method_type import RegridMethodType
 
 
-def open_first_meteo_grid(mete_grid_path: str, column_nr: int) -> xr.DataArray:
+def open_first_meteo_grid(mete_grid_path: str | Path, column_nr: int) -> xr.DataArray:
     """
     Find first meteo grid path in mete_grid.inp. Only read the first grid, so it
     can be used to generate meteomappings.
@@ -24,16 +24,16 @@ def open_first_meteo_grid(mete_grid_path: str, column_nr: int) -> xr.DataArray:
     if column_nr not in [2, 3]:
         raise ValueError("Column nr should be 2 or 3")
 
+    mete_grid_path = Path(mete_grid_path)
+
     f = open(mete_grid_path, "r")
     lines = f.readlines()
     meteo_filepath = Path(lines[0].split(",")[column_nr].replace('"', ""))
     return imod.rasterio.open(mete_grid_path / ".." / meteo_filepath)
 
 
-def open_first_meteo_grid_from_imod5_data(
-    imod5_data: dict[str, GridDataDict], column_nr: int
-):
-    paths = imod5_data["extra"]["paths"]
+def open_first_meteo_grid_from_imod5_data(imod5_data: Imod5DataDict, column_nr: int):
+    paths = cast(list[str], imod5_data["extra"]["paths"])
     metegrid_path = find_in_file_list("mete_grid.inp", paths)
     return open_first_meteo_grid(metegrid_path, column_nr=column_nr)
 
@@ -151,9 +151,7 @@ class PrecipitationMapping(MeteoMapping):
         self.meteo = precipitation
 
     @classmethod
-    def from_imod5_data(
-        cls, imod5_data: dict[str, GridDataDict]
-    ) -> "PrecipitationMapping":
+    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "PrecipitationMapping":
         """
         Construct precipitation mapping from imod5 data. Opens first ascii grid
         in mete_grid.inp, which is used to construct mappings to svats. The
@@ -197,9 +195,7 @@ class EvapotranspirationMapping(MeteoMapping):
         self.meteo = evapotranspiration
 
     @classmethod
-    def from_imod5_data(
-        cls, imod5_data: dict[str, GridDataDict]
-    ) -> "EvapotranspirationMapping":
+    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "EvapotranspirationMapping":
         """
         Construct evapotranspiration mapping from imod5 data. Opens first ascii
         grid in mete_grid.inp, which is used to construct mappings to svats. The
