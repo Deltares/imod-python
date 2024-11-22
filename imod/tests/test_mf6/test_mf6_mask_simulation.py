@@ -37,7 +37,7 @@ def test_mask_simulation(
         == 0
     )
 
-    assert_simulation_can_run(flow_transport_simulation, "dis", tmp_path)
+    assert_simulation_can_run(flow_transport_simulation, tmp_path)
 
 
 def test_mask_split_simulation(

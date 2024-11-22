@@ -25,7 +25,7 @@ def test_regrid_structured_simulation_to_structured_simulation(
         "regridded_simulation", finer_idomain
     )
 
-    assert_simulation_can_run(new_simulation, "dis", tmp_path)
+    assert_simulation_can_run(new_simulation, tmp_path)
 
 
 def test_regrid_unstructured_simulation_to_unstructured_simulation(
@@ -39,7 +39,7 @@ def test_regrid_unstructured_simulation_to_unstructured_simulation(
     )
 
     # Test that the newly regridded simulation can run
-    assert_simulation_can_run(new_simulation, "disv", tmp_path)
+    assert_simulation_can_run(new_simulation, tmp_path)
 
 
 def test_regrid_structured_simulation_to_unstructured_simulation(
@@ -54,7 +54,7 @@ def test_regrid_structured_simulation_to_unstructured_simulation(
     assert isinstance(new_simulation["flow"]["dis"], VerticesDiscretization)
 
     # Test that the newly regridded simulation can run
-    assert_simulation_can_run(new_simulation, "disv", tmp_path)
+    assert_simulation_can_run(new_simulation, tmp_path)
 
 
 def test_regrid_unstructured_simulation_to_structured_simulation(

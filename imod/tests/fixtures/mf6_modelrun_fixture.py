@@ -6,9 +6,7 @@ from pandas import isnull
 import imod
 
 
-def assert_simulation_can_run(
-    simulation: imod.mf6.Modflow6Simulation, discretization_name: str, modeldir: Path
-):
+def assert_simulation_can_run(simulation: imod.mf6.Modflow6Simulation, modeldir: Path):
     """
     Runs the simulation and asserts that computed heads are not NaN.
     """
