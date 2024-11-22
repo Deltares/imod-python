@@ -85,7 +85,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
             AnyValueSchema(">", 0),
         ),
         "top": (
-            AllValueSchema(">", "bottom", ignore=("idomain", "==", -1)),
+            AllValueSchema(">", "bottom", ignore=("idomain", "<=", 0)),
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
             # No need to check coords: dataset ensures they align with idomain.
         ),

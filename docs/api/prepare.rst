@@ -38,6 +38,8 @@ Prepare model input
 
     ALLOCATION_OPTION
     DISTRIBUTING_OPTION
+    SimulationAllocationOptions
+    SimulationDistributingOptions
     allocate_drn_cells
     allocate_ghb_cells
     allocate_rch_cells
