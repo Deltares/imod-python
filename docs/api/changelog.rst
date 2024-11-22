@@ -6,6 +6,19 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[Unreleased]
+------------
+
+Fixed
+~~~~~
+
+- :meth:`imod.mf6.Modflow6Simulation.regrid_like` can now regrid a structured
+  model to an unstructured grid.
+- :meth:`imod.mf6.Modflow6Simulation.regrid_like` throws a
+  ``NotImplementedError`` when attempting to regrid an unstructured model to a
+  structured grid.
+
+
 [0.18.1] - 2024-11-20
 ---------------------
 
