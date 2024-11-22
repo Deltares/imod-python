@@ -154,7 +154,11 @@ def test_meteogridcopy_from_imod5():
 
         imod5_data = {}
         imod5_data["extra"] = {}
-        imod5_data["extra"]["paths"] = [["foo"], [(grid_dir / "mete_grid.inp").resolve()], ["bar"]]
+        imod5_data["extra"]["paths"] = [
+            ["foo"],
+            [(grid_dir / "mete_grid.inp").resolve()],
+            ["bar"],
+        ]
 
         meteo_grid_copy = MeteoGridCopy.from_imod5_data(imod5_data)
         copy_dir = Path(output_dir) / "copied"
