@@ -126,16 +126,40 @@ def test_regrid_meteo(simple_2d_grid_with_subunits):
     assert np.all(regridded_ponding.dataset["y"].values == new_grid["y"].values)
 
 
-def test_meteo_grid_copy():
+def test_meteogridcopy_write():
     # Arrange
     meteo_grid = setup_meteo_grid()
 
     with tempfile.TemporaryDirectory() as output_dir:
         grid_dir = Path(output_dir) / "grid"
+        grid_dir.mkdir(exist_ok=True, parents=True)
         meteo_grid.write(grid_dir)
 
         meteo_grid_copy = MeteoGridCopy(grid_dir / "mete_grid.inp")
         copy_dir = Path(output_dir) / "copied"
+        copy_dir.mkdir(exist_ok=True, parents=True)
+        # Act
         meteo_grid_copy.write(copy_dir)
+        # Assert
+        assert filecmp.cmp(grid_dir / "mete_grid.inp", copy_dir / "mete_grid.inp")
 
+
+def test_meteogridcopy_from_imod5():
+    meteo_grid = setup_meteo_grid()
+
+    with tempfile.TemporaryDirectory() as output_dir:
+        grid_dir = Path(output_dir) / "grid"
+        grid_dir.mkdir(exist_ok=True, parents=True)
+        meteo_grid.write(grid_dir)
+
+        imod5_data = {}
+        imod5_data["extra"] = {}
+        imod5_data["extra"]["paths"] = [["foo"], [(grid_dir / "mete_grid.inp").resolve()], ["bar"]]
+
+        meteo_grid_copy = MeteoGridCopy.from_imod5_data(imod5_data)
+        copy_dir = Path(output_dir) / "copied"
+        copy_dir.mkdir(exist_ok=True, parents=True)
+        # Act
+        meteo_grid_copy.write(copy_dir)
+        # Assert
         assert filecmp.cmp(grid_dir / "mete_grid.inp", copy_dir / "mete_grid.inp")
