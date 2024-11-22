@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 
 import imod
+from imod.mf6 import VerticesDiscretization
 from imod.mf6.regrid.regrid_schemes import ConstantHeadRegridMethod
 from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
@@ -50,9 +51,19 @@ def test_regrid_structured_simulation_to_unstructured_simulation(
     new_simulation = structured_flow_simulation.regrid_like(
         "regridded_simulation", finer_idomain
     )
+    assert isinstance(new_simulation["flow"]["dis"], VerticesDiscretization)
 
     # Test that the newly regridded simulation can run
     assert_simulation_can_run(new_simulation, "disv", tmp_path)
+
+
+def test_regrid_unstructured_simulation_to_structured_simulation(
+    unstructured_flow_simulation: imod.mf6.Modflow6Simulation,
+):
+    finer_idomain = grid_data_structured(np.int32, 1, 0.4)
+
+    with pytest.raises(NotImplementedError):
+        unstructured_flow_simulation.regrid_like("regridded_simulation", finer_idomain)
 
 
 def test_regridded_simulation_has_required_packages(
