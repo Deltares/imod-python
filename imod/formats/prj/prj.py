@@ -1017,7 +1017,7 @@ def _is_var_ipf_and_path(block_content: dict[str, Any], var: str):
     return is_ipf, path
 
 
-def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
+def open_projectfile_data(path: FilePath) -> tuple[dict[str, Any], dict[str, Any]]:
     """
     Read the contents of an iMOD project file and read/open the data present in
     it:

@@ -153,6 +153,22 @@ def test_check_conductance_zero(drainage):
         assert var == "conductance"
 
 
+@pytest.mark.parametrize("nodata_idomain", [0, -1])
+def test_validate_inside_nodata(drainage, nodata_idomain):
+    idomain = drainage["elevation"].astype(np.int16)
+    top = 1.0
+    bottom = top - idomain.coords["layer"]
+
+    idomain[:, 2, 2] = nodata_idomain
+
+    dis = imod.mf6.StructuredDiscretization(top=top, bottom=bottom, idomain=idomain)
+    drn = imod.mf6.Drainage(**drainage)
+    errors = drn._validate(drn._write_schemata, **dis.dataset)
+    assert len(errors) == 1
+    for var, error in errors.items():
+        assert var == "elevation"
+
+
 def test_validate_concentration(transient_concentration_drainage):
     idomain = transient_concentration_drainage["elevation"].astype(np.int16)
     top = 1.0
