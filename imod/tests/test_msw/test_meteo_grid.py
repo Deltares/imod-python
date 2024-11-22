@@ -1,4 +1,5 @@
 import csv
+import filecmp
 import os
 import tempfile
 from pathlib import Path
@@ -125,7 +126,7 @@ def test_regrid_meteo(simple_2d_grid_with_subunits):
     assert np.all(regridded_ponding.dataset["y"].values == new_grid["y"].values)
 
 
-def test_meteocopy():
+def test_meteo_grid_copy():
     # Arrange
     meteo_grid = setup_meteo_grid()
 
@@ -134,5 +135,7 @@ def test_meteocopy():
         meteo_grid.write(grid_dir)
 
         meteo_grid_copy = MeteoGridCopy(grid_dir / "mete_grid.inp")
-        
+        copy_dir = Path(output_dir) / "copied"
+        meteo_grid_copy.write(copy_dir)
 
+        assert filecmp.cmp(grid_dir / "mete_grid.inp", copy_dir / "mete_grid.inp")
