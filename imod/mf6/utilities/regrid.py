@@ -27,6 +27,7 @@ from imod.typing.grid import (
     GridDataArray,
     GridDataset,
     get_grid_geometry_hash,
+    is_unstructured,
     ones_like,
 )
 from imod.util.regrid_method_type import (
@@ -384,6 +385,13 @@ def _regrid_like(
         raise ValueError(
             f"regridding this model cannot be done due to the presence of package {error_with_object_name}"
         )
+    diskey = model._get_diskey()
+    dis = model[diskey]
+    if is_unstructured(dis["idomain"]) and not is_unstructured(target_grid):
+        raise NotImplementedError(
+            "Regridding unstructured model to a structured grid not supported."
+        )
+
     new_model = model.__class__()
     if regrid_cache is None:
         regrid_cache = RegridderWeightsCache()
