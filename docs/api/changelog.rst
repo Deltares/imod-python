@@ -9,6 +9,12 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Added
+~~~~~
+
+- :class:`imod.msw.MeteoGridCopy` to copy existing `mete_grid.inp` files, so
+  ASCII grids in large existing meteo databases do not have to be read.
+
 Changed
 ~~~~~~~
 
