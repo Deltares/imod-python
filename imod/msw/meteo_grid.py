@@ -216,7 +216,7 @@ class MeteoGridCopy(MetaSwapPackage, IRegridPackage):
         self.dataset["path"] = path
 
     def write(self, directory: Path | str, *args):
-        path_metegrid = Path(self.dataset["path"])
+        path_metegrid = Path(self.dataset["path"].values[()])
         new_path = directory / self._file_name
         copyfile(path_metegrid, new_path)
 
