@@ -143,7 +143,7 @@ def handle_extra_coords(
             )
         elif coordname in maybe_has_coords_attr.coords:
             return maybe_has_coords_attr.drop_vars(coordname)
-    
+
     return maybe_has_coords_attr
 
 
@@ -316,7 +316,7 @@ def _regrid_like(
     as_pkg_type: RegridPackageType, optional
         Package to initiate new package as. Is used to regrid
         StructuredDiscretization to VerticesDiscretization.
-        
+
     Returns
     -------
     a package with the same options as this package, and with all the data-arrays regridded to another discretization,

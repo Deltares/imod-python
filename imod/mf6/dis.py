@@ -247,7 +247,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         Regrid discretization package. Creates a StructuredDiscretization, or
         VerticesDiscretization package, based on type of target_grid. It regrids
         all the arrays in this package to the desired discretization, and leaves
-        the options unmodified. 
+        the options unmodified.
 
         The default regridding methods are specified in the ``_regrid_method``
         attribute of the package. These defaults can be overridden using the
@@ -257,7 +257,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         ----------
         target_grid: xr.DataArray or xu.UgridDataArray
             a grid defined over the same discretization as the one we want to
-            regrid the package to. 
+            regrid the package to.
         regrid_cache: RegridderWeightsCache, optional
             stores regridder weights for different regridders. Can be used to
             speed up regridding, if the same regridders are used several times
@@ -279,7 +279,9 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
             as_pkg_type = VerticesDiscretization
 
         try:
-            result = _regrid_like(self, target_grid, regrid_cache, regridder_types, as_pkg_type)
+            result = _regrid_like(
+                self, target_grid, regrid_cache, regridder_types, as_pkg_type
+            )
         except ValueError as e:
             raise e
         except Exception:
