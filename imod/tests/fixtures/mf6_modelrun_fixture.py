@@ -40,9 +40,7 @@ def assert_simulation_can_run(simulation: imod.mf6.Modflow6Simulation, modeldir:
         assert not np.any(isnull(head.values))
 
 
-def assert_model_can_run(
-    model: imod.mf6.GroundwaterFlowModel, discretization_name: str, modeldir: Path
-):
+def assert_model_can_run(model: imod.mf6.GroundwaterFlowModel, modeldir: Path):
     """
     This function creates a simulation given a flow model, and tries to run the simulation.
     solver parameters and time discretization are given default values that might not work for every model.
@@ -70,4 +68,4 @@ def assert_model_can_run(
         additional_times=["2000-01-01", "2000-01-02", "2000-01-03", "2000-01-04"]
     )
 
-    assert_simulation_can_run(simulation, discretization_name, modeldir)
+    assert_simulation_can_run(simulation, modeldir)
