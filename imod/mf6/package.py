@@ -596,7 +596,9 @@ class Package(PackageBase, IPackage, abc.ABC):
 
         Examples
         --------
-        To regrid the npf package with a non-default method for the k-field, call regrid_like with these arguments:
+
+        To regrid the npf package with a non-default method for the k-field,
+        call regrid_like with these arguments:
 
         >>> regridder_types = imod.mf6.regrid.NodePropertyFlowRegridMethod(k=(imod.RegridderType.OVERLAP, "mean"))
         >>> new_npf = npf.regrid_like(like,  RegridderWeightsCache, regridder_types)
@@ -605,13 +607,16 @@ class Package(PackageBase, IPackage, abc.ABC):
         Parameters
         ----------
         target_grid: xr.DataArray or xu.UgridDataArray
-            a grid defined over the same discretization as the one we want to regrid the package to.
+            a grid defined using the same discretization as the one we want to
+            regrid the package to.
         regrid_cache: RegridderWeightsCache, optional
-            stores regridder weights for different regridders. Can be used to speed up regridding,
-            if the same regridders are used several times for regridding different arrays.
+            stores regridder weights for different regridders. Can be used to
+            speed up regridding, if the same regridders are used several times
+            for regridding different arrays.
         regridder_types: RegridMethodType, optional
-            dictionary mapping arraynames (str) to a tuple of regrid type (a specialization class of BaseRegridder) and function name (str)
-            this dictionary can be used to override the default mapping method.
+            dictionary mapping arraynames (str) to a tuple of regrid type (a
+            specialization class of BaseRegridder) and function name (str) this
+            dictionary can be used to override the default mapping method.
 
         Returns
         -------

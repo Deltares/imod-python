@@ -256,7 +256,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         Parameters
         ----------
         target_grid: xr.DataArray or xu.UgridDataArray
-            a grid defined over the same discretization as the one we want to
+            a grid defined using the same discretization as the one we want to
             regrid the package to.
         regrid_cache: RegridderWeightsCache, optional
             stores regridder weights for different regridders. Can be used to

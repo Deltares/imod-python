@@ -294,7 +294,9 @@ def _regrid_like(
 
     Examples
     --------
-    To regrid the npf package with a non-default method for the k-field, call regrid_like with these arguments:
+    
+    To regrid the npf package with a non-default method for the k-field, call
+    regrid_like with these arguments:
 
     >>> regridder_types = imod.mf6.regrid.NodePropertyFlowRegridMethod(k=(imod.RegridderType.OVERLAP, "mean"))
     >>> new_npf = npf.regrid_like(like,  RegridderWeightsCache, regridder_types)
@@ -304,7 +306,7 @@ def _regrid_like(
     package: IRegridPackage:
         package to regrid
     target_grid: xr.DataArray or xu.UgridDataArray
-        a grid defined over the same discretization as the one we want to regrid
+        a grid defined using the same discretization as the one we want to regrid
         the package to
     regrid_cache: RegridderWeightsCache
         stores regridder weights for different regridders. Can be used to speed
@@ -320,8 +322,10 @@ def _regrid_like(
 
     Returns
     -------
-    a package with the same options as this package, and with all the data-arrays regridded to another discretization,
-    similar to the one used in input argument "target_grid"
+
+    a package with the same options as this package, and with all the
+    data-arrays regridded to another discretization, similar to the one used in
+    input argument "target_grid"
     """
     if not hasattr(package, "_regrid_method"):
         raise NotImplementedError(
@@ -360,25 +364,30 @@ def _regrid_like(
     regrid_cache: Optional[RegridderWeightsCache] = None,
 ) -> IModel:
     """
-    Creates a model by regridding the packages of this model to another discretization.
-    It regrids all the arrays in the package using the default regridding methods.
-    At the moment only regridding to a different planar grid is supported, meaning
-    ``target_grid`` has different ``"x"`` and ``"y"`` or different ``cell2d`` coords.
+    Creates a model by regridding the packages of this model to another
+    discretization. It regrids all the arrays in the package using the default
+    regridding methods. At the moment only regridding to a different planar grid
+    is supported, meaning ``target_grid`` has different ``"x"`` and ``"y"`` or
+    different ``cell2d`` coords.
 
     Parameters
     ----------
     target_grid: xr.DataArray or xu.UgridDataArray
-        a grid defined over the same discretization as the one we want to regrid the package to
+        a grid defined using the same discretization as the one we want to
+        regrid the package to
     validate: bool
         set to true to validate the regridded packages
     regrid_cache: RegridderWeightsCache, optional
-        stores regridder weights for different regridders. Can be used to speed up regridding,
-        if the same regridders are used several times for regridding different arrays.
+        stores regridder weights for different regridders. Can be used to speed
+        up regridding, if the same regridders are used several times for
+        regridding different arrays.
 
     Returns
     -------
-    a model with similar packages to the input model, and with all the data-arrays regridded to another discretization,
-    similar to the one used in input argument "target_grid"
+
+    a model with similar packages to the input model, and with all the
+    data-arrays regridded to another discretization, similar to the one used in
+    input argument "target_grid"
     """
     supported, error_with_object_name = model.is_regridding_supported()
     if not supported:
