@@ -1,11 +1,12 @@
 import pathlib
 from copy import deepcopy
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Union
 
 import numpy as np
 
 import imod
 from imod.logging import init_log_decorator, standard_log_decorator
+from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.interfaces.imaskingsettings import IMaskingSettings
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
@@ -14,6 +15,7 @@ from imod.mf6.utilities.grid import create_smallest_target_grid
 from imod.mf6.utilities.imod5_converter import convert_ibound_to_idomain
 from imod.mf6.utilities.regrid import (
     RegridderWeightsCache,
+    _regrid_like,
     _regrid_package_data,
 )
 from imod.mf6.validation import DisBottomSchema
@@ -28,7 +30,7 @@ from imod.schemata import (
     UniqueValuesSchema,
     ValidationError,
 )
-from imod.typing.grid import GridDataArray
+from imod.typing.grid import GridDataArray, is_unstructured
 
 
 class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
@@ -234,3 +236,54 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
     @classmethod
     def get_regrid_methods(cls) -> DiscretizationRegridMethod:
         return deepcopy(cls._regrid_method)
+
+    def regrid_like(
+        self,
+        target_grid: GridDataArray,
+        regrid_cache: RegridderWeightsCache,
+        regridder_types: Optional[RegridMethodType] = None,
+    ) -> Union["StructuredDiscretization", VerticesDiscretization]:
+        """
+        Regrid discretization package. Creates a StructuredDiscretization, or
+        VerticesDiscretization package, based on type of target_grid. It regrids
+        all the arrays in this package to the desired discretization, and leaves
+        the options unmodified.
+
+        The default regridding methods are specified in the ``_regrid_method``
+        attribute of the package. These defaults can be overridden using the
+        input parameters of this function.
+
+        Parameters
+        ----------
+        target_grid: xr.DataArray or xu.UgridDataArray
+            a grid defined using the same discretization as the one we want to
+            regrid the package to.
+        regrid_cache: RegridderWeightsCache, optional
+            stores regridder weights for different regridders. Can be used to
+            speed up regridding, if the same regridders are used several times
+            for regridding different arrays.
+        regridder_types: RegridMethodType, optional
+            dictionary mapping arraynames (str) to a tuple of regrid type (a
+            specialization class of BaseRegridder) and function name (str) this
+            dictionary can be used to override the default mapping method.
+
+        Returns
+        -------
+        StructuredDiscretization or VerticesDiscretization
+            Depending on type of target_grid. A package with the same options as
+            this package, and with all the data-arrays regridded to another
+            discretization, similar to the one used in input argument "target_grid"
+        """
+        as_pkg_type = None
+        if is_unstructured(target_grid):
+            as_pkg_type = VerticesDiscretization
+
+        try:
+            result = _regrid_like(
+                self, target_grid, regrid_cache, regridder_types, as_pkg_type
+            )
+        except ValueError as e:
+            raise e
+        except Exception:
+            raise ValueError("package could not be regridded.")
+        return result
