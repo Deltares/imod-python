@@ -129,23 +129,21 @@ class RegridderWeightsCache:
         self.weights_cache.pop(keys[0])
 
 
-def handle_extra_coords(
-    coordname: str, target_grid: GridDataArray, maybe_has_coords_attr: Any
-):
+def handle_extra_coords(coordname: str, target_grid: GridDataArray, variable_data: Any):
     """
-    If ``maybe_has_coords`` has a ``coords`` attribute and if coordname in
-    target_grid, copy coord. If coord not in target_grid, but in
-    maybe_has_coords_attr, remove it.
+    If ``variable_data`` has a ``coords`` attribute and if ``coordname`` in
+    ``target_grid``, copy coord. If ``coordname`` not in ``target_grid``, but in
+    ``variable_data``, remove it.
     """
-    if hasattr(maybe_has_coords_attr, "coords"):
+    if hasattr(variable_data, "coords"):
         if coordname in target_grid.coords:
-            return maybe_has_coords_attr.assign_coords(
+            return variable_data.assign_coords(
                 {coordname: target_grid.coords[coordname].values[()]}
             )
-        elif coordname in maybe_has_coords_attr.coords:
-            return maybe_has_coords_attr.drop_vars(coordname)
+        elif coordname in variable_data.coords:
+            return variable_data.drop_vars(coordname)
 
-    return maybe_has_coords_attr
+    return variable_data
 
 
 def _regrid_array(
@@ -294,7 +292,7 @@ def _regrid_like(
 
     Examples
     --------
-    
+
     To regrid the npf package with a non-default method for the k-field, call
     regrid_like with these arguments:
 
