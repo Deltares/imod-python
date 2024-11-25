@@ -18,17 +18,17 @@ from imod.util.regrid_method_type import RegridMethodType
 
 def open_first_meteo_grid(mete_grid_path: str | Path, column_nr: int) -> xr.DataArray:
     """
-    Find first meteo grid path in mete_grid.inp. Only read the first grid, so it
-    can be used to generate meteomappings.
+    Find and open first meteo grid path in mete_grid.inp. This grid is enough to
+    generate meteomappings.
     """
     if column_nr not in [2, 3]:
         raise ValueError("Column nr should be 2 or 3")
 
     mete_grid_path = Path(mete_grid_path)
 
-    f = open(mete_grid_path, "r")
-    lines = f.readlines()
-    meteo_filepath = Path(lines[0].split(",")[column_nr].replace('"', ""))
+    with open(mete_grid_path, "r") as f:
+        first_line = f.readline()
+    meteo_filepath = Path(first_line.split(",")[column_nr].replace('"', ""))
     return imod.rasterio.open(mete_grid_path / ".." / meteo_filepath)
 
 
