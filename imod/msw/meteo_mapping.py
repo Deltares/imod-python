@@ -1,5 +1,6 @@
 from copy import deepcopy
 from pathlib import Path
+from textwrap import dedent
 from typing import Any, Optional, TextIO, cast
 
 import numpy as np
@@ -16,6 +17,20 @@ from imod.typing import GridDataArray, Imod5DataDict, IntArray
 from imod.util.regrid_method_type import RegridMethodType
 
 
+def _is_parsable_and_existing_path(potential_path: str, mete_grid_path: Path):
+    """
+    mete_grid.inp can contain values like "0.", which are converted to float by
+    MetaSWAP. String is converted to path and checked if existing path.
+    """
+    try:
+        float(potential_path)
+        return False
+    except ValueError:
+        # Resolve paths relative to mete_grid.inp path.
+        path = mete_grid_path / ".." / Path(potential_path)
+        return path.is_file()
+
+
 def open_first_meteo_grid(mete_grid_path: str | Path, column_nr: int) -> xr.DataArray:
     """
     Find and open first meteo grid path in mete_grid.inp. This grid is enough to
@@ -25,11 +40,20 @@ def open_first_meteo_grid(mete_grid_path: str | Path, column_nr: int) -> xr.Data
         raise ValueError("Column nr should be 2 or 3")
 
     mete_grid_path = Path(mete_grid_path)
-
     with open(mete_grid_path, "r") as f:
-        first_line = f.readline()
-    meteo_filepath = Path(first_line.split(",")[column_nr].replace('"', ""))
-    return imod.rasterio.open(mete_grid_path / ".." / meteo_filepath)
+        lines = f.readlines()
+
+    potential_paths = [line.split(",")[column_nr].replace('"', "") for line in lines]
+    for potential_path in potential_paths:
+        if _is_parsable_and_existing_path(potential_path, mete_grid_path):
+            resolved_path = mete_grid_path / ".." / Path(potential_path)
+            return imod.rasterio.open(resolved_path)
+
+    error_message = dedent(f"""    
+    Did not find parsable path to existing .ASC file in column {column_nr}. Got
+    values (printing first 10): {potential_paths[:10]}.""")
+
+    raise ValueError(error_message)
 
 
 def open_first_meteo_grid_from_imod5_data(imod5_data: Imod5DataDict, column_nr: int):
