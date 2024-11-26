@@ -1,3 +1,4 @@
+import re
 import tempfile
 from pathlib import Path
 
@@ -5,6 +6,7 @@ import numpy as np
 import pytest
 import xarray as xr
 from numpy.testing import assert_equal
+from pytest_cases import parametrize_with_cases
 
 from imod import msw
 
@@ -155,9 +157,8 @@ def test_precipitation_mapping_out_of_bound(svat_index):
             precipitation_mapping.write(output_dir, index, svat, None, None)
 
 
-def test_precipitation_from_imod5(tmpdir_factory):
-    datadir = Path(tmpdir_factory.mktemp("precipitation_mapping"))
-
+def setup_meteo_grid(datadir):
+    """Setup precipitation grid and write mete_grid.inp"""
     # Arrange
     x = [-0.5, 1.5, 3.5]
     y = [4.5, 2.5, 0.5]
@@ -172,14 +173,48 @@ def test_precipitation_from_imod5(tmpdir_factory):
     precipitation_times = time_da * precipitation
     mete_grid = msw.MeteoGrid(precipitation_times, precipitation_times)
     mete_grid.write(datadir)
+    return precipitation
 
+
+class MeteGridCases:
+    """
+    Cases return strings to replace in mete_grid.inp, to set paths to floats.
+    """
+
+    def case_all_paths(self):
+        return r"nothing_to_replace"
+
+    def case_some_paths(self):
+        return r'"meteo_grids\\(\w+)_20010101000000.asc"'
+
+    def case_no_paths(self):
+        return r'"meteo_grids\\(\w+)_([0-9]+).asc"'
+
+
+@parametrize_with_cases("replace_string", cases=MeteGridCases)
+def test_precipitation_from_imod5(tmpdir_factory, replace_string, request):
+    # Arrange
+    datadir = Path(tmpdir_factory.mktemp("precipitation_mapping"))
+    precipitation = setup_meteo_grid(datadir)
     paths = [["foo"], [datadir / "mete_grid.inp"], ["bar"]]
     imod5_data = {"extra": {"paths": paths}}
 
-    # Act
-    precipitation_mapping = msw.PrecipitationMapping.from_imod5_data(imod5_data)
-    actual = precipitation_mapping.meteo
+    # Replace text in existing mete_grid.inp
+    with open(datadir / "mete_grid.inp", "r") as f:
+        text = f.read()
+    text_replaced = re.sub(replace_string, '"0.0"', text)
+    with open(datadir / "mete_grid.inp", "w") as f:
+        f.write(text_replaced)
 
-    # Assert
-    assert len(actual.coords["time"]) == 1
-    xr.testing.assert_equal(precipitation, actual.isel(time=0, drop=True))
+    # Act
+    if request.node.callspec.id == "no_paths":
+        with pytest.raises(ValueError):
+            msw.PrecipitationMapping.from_imod5_data(imod5_data)
+
+    else:
+        precipitation_mapping = msw.PrecipitationMapping.from_imod5_data(imod5_data)
+        actual = precipitation_mapping.meteo
+
+        # Assert
+        assert len(actual.coords["time"]) == 1
+        xr.testing.assert_equal(precipitation, actual.isel(time=0, drop=True))
