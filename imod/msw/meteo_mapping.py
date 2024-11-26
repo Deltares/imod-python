@@ -17,7 +17,7 @@ from imod.typing import GridDataArray, Imod5DataDict, IntArray
 from imod.util.regrid_method_type import RegridMethodType
 
 
-def _is_parsable_and_existing_path(potential_path: str, mete_grid_path: Path):
+def _is_parsable_and_existing_path(potential_path: str, mete_grid_path: Path) -> bool:
     """
     mete_grid.inp can contain values like "0.", which are converted to float by
     MetaSWAP. String is converted to path and checked if existing path.
