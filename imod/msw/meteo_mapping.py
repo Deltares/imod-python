@@ -34,7 +34,8 @@ def _is_parsable_and_existing_path(potential_path: str, mete_grid_path: Path) ->
 def open_first_meteo_grid(mete_grid_path: str | Path, column_nr: int) -> xr.DataArray:
     """
     Find and open first meteo grid path in mete_grid.inp. This grid is enough to
-    generate meteomappings.
+    generate meteomappings. There can be floats before in the column which
+    should be skipped.
     """
     if column_nr not in [2, 3]:
         raise ValueError("Column nr should be 2 or 3")
