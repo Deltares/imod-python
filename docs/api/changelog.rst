@@ -15,11 +15,25 @@ Added
 - :class:`imod.msw.MeteoGridCopy` to copy existing `mete_grid.inp` files, so
   ASCII grids in large existing meteo databases do not have to be read.
 
+Fixed
+~~~~~
+
+- :meth:`imod.mf6.Modflow6Simulation.regrid_like` can now regrid a structured
+  model to an unstructured grid.
+- :meth:`imod.mf6.Modflow6Simulation.regrid_like` throws a
+  ``NotImplementedError`` when attempting to regrid an unstructured model to a
+  structured grid.
+- :class:`imod.msw.Sprinkling` now correctly writes source svats to scap_svat.inp file.
+
+
 Changed
 ~~~~~~~
 
 - :class:`imod.msw.Infiltration`'s variables ``upward_resistance`` and
   ``downward_resistance`` now require a ``subunit`` coordinate.
+- Variables ``max_abstraction_groundwater`` and ``max_abstraction_surfacewater``
+  in :class:`imod.msw.Sprinkling` now needs to have a subunit coordinate.
+
 
 [0.18.1] - 2024-11-20
 ---------------------
