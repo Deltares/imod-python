@@ -102,7 +102,7 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
         svat_active = svat.where(is_active_per_svat)
         svat_source_target = _ravel_per_subunit(svat_active).astype(dtype=np.int32)
 
-        data_dict = {
+        data_dict: dict[str, str | np.ndarray] = {
             "svat": svat_source_target,
             "layer": layer_source,
             "svat_groundwater": svat_source_target,
