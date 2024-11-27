@@ -23,8 +23,8 @@ Fixed
 Changed
 ~~~~~~~
 
-- Variable ``max_abstraction_groundwater`` in :class:`imod.msw.Sprinkling` now needs to 
-  have a subunit coordinate.
+- Variables ``max_abstraction_groundwater`` and ``max_abstraction_surfacewater``
+  in :class:`imod.msw.Sprinkling` now needs to have a subunit coordinate.
 
 
 [0.18.1] - 2024-11-20
