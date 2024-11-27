@@ -13,6 +13,15 @@ from imod.msw.regrid.regrid_schemes import SprinklingRegridMethod
 from imod.typing import IntArray
 
 
+def _ravel_per_subunit(
+    da: xr.DataArray, well_row: np.ndarray, well_column: np.ndarray
+) -> np.ndarray:
+    # per defined well element, all subunits
+    array_out = da.to_numpy()[:, well_row, well_column].ravel()
+    # per defined well element, per defined subunits
+    return array_out[np.isfinite(array_out)]
+
+
 class Sprinkling(MetaSwapPackage, IRegridPackage):
     """
     This contains the sprinkling capacities of links between SVAT units and
@@ -75,12 +84,6 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
         mf6_dis: StructuredDiscretization,
         mf6_well: Mf6Wel,
     ):
-        def ravel_per_subunit(array: xr.DataArray) -> np.ndarray:
-            # per defined well element, all subunits
-            array_out = array.to_numpy()[:, well_row, well_column].ravel()
-            # per defined well element, per defined subunits
-            return array_out[np.isfinite(array_out)]
-
         if not isinstance(mf6_well, Mf6Wel):
             raise TypeError(rf"well not of type 'Mf6Wel', got '{type(mf6_well)}'")
 
@@ -94,12 +97,14 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
         layer_per_svat = xr.full_like(max_rate_per_svat, np.nan)
         layer_per_svat.values[:, well_row, well_column] = well_layer
 
-        layer_source = ravel_per_subunit(
-            layer_per_svat.where(max_rate_per_svat > 0)
+        is_active_per_svat = max_rate_per_svat > 0
+
+        layer_source = _ravel_per_subunit(
+            layer_per_svat.where(is_active_per_svat)
         ).astype(dtype=np.int32)
-        svat_source_target = ravel_per_subunit(
-            svat.where(max_rate_per_svat > 0)
-        ).astype(dtype=np.int32)
+        svat_source_target = _ravel_per_subunit(svat.where(is_active_per_svat)).astype(
+            dtype=np.int32
+        )
 
         data_dict = {
             "svat": svat_source_target,
@@ -108,7 +113,7 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
         }
 
         for var in self._with_subunit:
-            array = self.dataset[var].where(max_rate_per_svat > 0).to_numpy()
+            array = self.dataset[var].where(is_active_per_svat).to_numpy()
             array = array[np.isfinite(array)]
             data_dict[var] = array
 
