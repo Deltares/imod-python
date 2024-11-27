@@ -9,9 +9,10 @@ from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
-from imod.msw.utilities.common import concat_imod5
 from imod.msw.regrid.regrid_schemes import SprinklingRegridMethod
-from imod.typing import IntArray, GridDataDict
+from imod.msw.utilities.common import concat_imod5
+from imod.typing import Imod5DataDict, IntArray
+from imod.typing.grid import zeros_like
 
 
 class Sprinkling(MetaSwapPackage, IRegridPackage):
@@ -114,10 +115,31 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
 
         return self.write_dataframe_fixed_width(file, dataframe)
 
-
     @classmethod
-    def from_imod5_data(cls, imod5_data: dict[str, GridDataDict]) -> "Sprinkling":
+    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "Sprinkling":
         cap_data = imod5_data["cap"]
-        data = {}
+        if isinstance(cap_data["artificial_recharge_layer"], pd.DataFrame):
+            raise NotImplementedError(
+                "Assigning sprinkling wells with an IPF file is not supported, please specify them as IDF."
+            )
+        drop_layer_kwargs = {
+            "layer": 0,
+            "drop": True,
+            "missing_dims": "ignore",
+        }
+        type = cap_data["artificial_recharge"].isel(**drop_layer_kwargs)
+        capacity = cap_data["artificial_recharge_capacity"].isel(**drop_layer_kwargs)
+        max_abstraction_groundwater_rural = capacity.where(type == 1)
+        max_abstraction_surfacewater_rural = capacity.where(type == 2).fillna(0.0)
 
-        
+        max_abstraction_urban = zeros_like(type)
+
+        data = {}
+        data["max_abstraction_groundwater"] = concat_imod5(
+            max_abstraction_groundwater_rural, max_abstraction_urban
+        )
+        data["max_abstraction_surfacewater"] = concat_imod5(
+            max_abstraction_surfacewater_rural, max_abstraction_urban
+        )
+
+        return cls(**data)
