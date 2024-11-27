@@ -9,7 +9,7 @@ from imod.msw.initial_conditions import (
     InitialConditionsSavedState,
 )
 from imod.msw.landuse import LanduseOptions
-from imod.msw.meteo_grid import MeteoGrid
+from imod.msw.meteo_grid import MeteoGrid, MeteoGridCopy
 from imod.msw.meteo_mapping import EvapotranspirationMapping, PrecipitationMapping
 from imod.msw.model import MetaSwapModel
 from imod.msw.output_control import TimeOutputControl, VariableOutputControl
