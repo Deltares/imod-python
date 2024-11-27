@@ -17,6 +17,14 @@ Fixed
 - :meth:`imod.mf6.Modflow6Simulation.regrid_like` throws a
   ``NotImplementedError`` when attempting to regrid an unstructured model to a
   structured grid.
+- :class:`imod.msw.Sprinkling` now correctly writes source svats to scap_svat.inp file.
+
+
+Changed
+~~~~~~~
+
+- Variables ``max_abstraction_groundwater`` and ``max_abstraction_surfacewater``
+  in :class:`imod.msw.Sprinkling` now needs to have a subunit coordinate.
 
 
 [0.18.1] - 2024-11-20
