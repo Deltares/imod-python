@@ -635,7 +635,7 @@ class AllInsideNoDataSchema(NoDataComparisonSchema):
         valid = self.is_notnull(obj)
         other_valid = self.is_other_notnull(other_obj)
 
-        valid, other_valid = align_other_obj_with_coords(valid, other_obj)
+        valid, other_valid = align_other_obj_with_coords(valid, other_valid)
 
         if (valid & ~other_valid).any():
             raise ValidationError(f"data values found at nodata values of {self.other}")

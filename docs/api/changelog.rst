@@ -6,9 +6,17 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[Unreleased]
+------------
+
 Fixed
 ~~~~~
 
+- :meth:`imod.mf6.Modflow6Simulation.regrid_like` can now regrid a structured
+  model to an unstructured grid.
+- :meth:`imod.mf6.Modflow6Simulation.regrid_like` throws a
+  ``NotImplementedError`` when attempting to regrid an unstructured model to a
+  structured grid.
 - :class:`imod.msw.Sprinkling` now correctly writes source svats to scap_svat.inp file.
 
 
@@ -18,8 +26,42 @@ Changed
 - Variable ``max_abstraction_groundwater`` in :class:`imod.msw.Sprinkling` now needs to 
   have a subunit coordinate.
 
-[0.18.0]
---------
+
+[0.18.1] - 2024-11-20
+---------------------
+
+Added
+~~~~~
+
+- :class:`imod.prepare.topsystem.SimulationAllocationOptions`,
+  :class:`imod.prepare.topsystem.SimulationDistributingOptions`, which are used
+  to store default allocation and distributing options respectively.
+
+Fixed
+~~~~~
+
+- Relaxed validation for `imod.mf6.StructuredDiscretization` to also support
+  cells with zero thickness where IDOMAIN = 0. Before, only cells with a zero
+  thickness and IDOMAIN = -1 were supported, else the software threw a ``not all
+  values comply with criterion: > bottom``.
+- Fix bug where no ``ValidationError`` was thrown if there is an active RCH, DRN,
+  GHB, or RIV cell where idomain = -1.
+
+Changed
+~~~~~~~
+
+- In :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`, and
+  :meth:`imod.mf6.GroundwaterFlowModel.from_imod5_data` the arguments
+  ``allocation_options``, ``distributing_options`` are now optional.
+- The order of arguments of :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`, 
+  and :meth:`imod.mf6.GroundwaterFlowModel.from_imod5_data`. It now is 
+  ``imod5_data, period_data, times, allocation_options, distributing_options, regridder_types``
+  instead of:
+  ``imod5_data, period_data, allocation_options, distributing_options, times, regridder_types``
+
+
+[0.18.0] - 2024-11-11
+---------------------
 
 Fixed
 ~~~~~

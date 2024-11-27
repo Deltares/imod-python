@@ -491,9 +491,9 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
     simulation = Modflow6Simulation.from_imod5_data(
         imod5_data,
         period_data,
+        datelist,
         default_simulation_allocation_options,
         default_simulation_distributing_options,
-        datelist,
     )
     simulation["imported_model"]["oc"] = OutputControl(
         save_head="last", save_budget="last"
@@ -527,9 +527,9 @@ def test_from_imod5__strict_well_validation_set(imod5_dataset):
     simulation = Modflow6Simulation.from_imod5_data(
         imod5_data,
         period_data,
+        datelist,
         default_simulation_allocation_options,
         default_simulation_distributing_options,
-        datelist,
     )
     assert simulation._validation_context.strict_well_validation is False
     assert Modflow6Simulation("test")._validation_context.strict_well_validation is True
@@ -554,9 +554,9 @@ def test_import_from_imod5__correct_well_type(imod5_dataset):
     simulation = Modflow6Simulation.from_imod5_data(
         imod5_data,
         period_data,
+        datelist,
         default_simulation_allocation_options,
         default_simulation_distributing_options,
-        datelist,
     )
     # Set layer back to right value (before AssertionError might be thrown)
     imod5_data["wel-WELLS_L3"]["layer"] = original_wel_layer
@@ -583,9 +583,9 @@ def test_import_from_imod5__nonstandard_regridding(imod5_dataset, tmp_path):
     simulation = Modflow6Simulation.from_imod5_data(
         imod5_data,
         period_data,
+        times,
         default_simulation_allocation_options,
         default_simulation_distributing_options,
-        times,
         regridding_option,
     )
     simulation["imported_model"]["oc"] = OutputControl(
@@ -621,9 +621,9 @@ def test_import_from_imod5_no_storage_no_recharge(imod5_dataset, tmp_path):
     simulation = Modflow6Simulation.from_imod5_data(
         imod5_data,
         period_data,
+        times,
         default_simulation_allocation_options,
         default_simulation_distributing_options,
-        times,
     )
     simulation["imported_model"]["oc"] = OutputControl(
         save_head="last", save_budget="last"
