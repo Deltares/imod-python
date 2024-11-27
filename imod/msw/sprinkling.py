@@ -15,6 +15,13 @@ from imod.typing import Imod5DataDict, IntArray
 from imod.typing.grid import zeros_like
 
 
+def _ravel_per_subunit(da: xr.DataArray) -> np.ndarray:
+    # per defined well element, all subunits
+    array_out = da.to_numpy().ravel()
+    # per defined well element, per defined subunits
+    return array_out[np.isfinite(array_out)]
+
+
 class Sprinkling(MetaSwapPackage, IRegridPackage):
     """
     This contains the sprinkling capacities of links between SVAT units and
@@ -39,21 +46,20 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
         "max_abstraction_surfacewater_mm_d": VariableMetaData(8, None, None, str),
         "max_abstraction_groundwater": VariableMetaData(8, 0.0, 1e9, float),
         "max_abstraction_surfacewater": VariableMetaData(8, 0.0, 1e9, float),
-        "svat_groundwater": VariableMetaData(10, None, None, str),
+        "svat_groundwater": VariableMetaData(10, 1, 99999999, int),
         "layer": VariableMetaData(6, 1, 9999, int),
         "trajectory": VariableMetaData(10, None, None, str),
     }
 
-    _with_subunit = ()
-    _without_subunit = (
+    _with_subunit = (
         "max_abstraction_groundwater",
         "max_abstraction_surfacewater",
     )
+    _without_subunit = ()
 
     _to_fill = (
         "max_abstraction_groundwater_mm_d",
         "max_abstraction_surfacewater_mm_d",
-        "svat_groundwater",
         "trajectory",
     )
 
@@ -82,27 +88,31 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
             raise TypeError(rf"well not of type 'Mf6Wel', got '{type(mf6_well)}'")
 
         well_cellid = mf6_well["cellid"]
-        if len(well_cellid.coords["dim_cellid"]) != 3:
-            raise TypeError("Coupling to unstructured grids is not supported.")
 
         well_layer = well_cellid.sel(dim_cellid="layer").data
         well_row = well_cellid.sel(dim_cellid="row").data - 1
         well_column = well_cellid.sel(dim_cellid="column").data - 1
 
-        n_subunit = svat["subunit"].size
+        max_rate_per_svat = self.dataset["max_abstraction_groundwater"].where(svat > 0)
+        well_layer_per_svat = xr.full_like(max_rate_per_svat, np.nan)
+        well_layer_per_svat.values[:, well_row, well_column] = well_layer
 
-        well_svat = svat.data[:, well_row, well_column]
-        well_active = well_svat != 0
+        is_active_per_svat = (max_rate_per_svat > 0) & well_layer_per_svat.notnull()
 
-        # Tile well_layers for each subunit
-        layer = np.tile(well_layer, (n_subunit, 1))
+        layer_active = well_layer_per_svat.where(is_active_per_svat)
+        layer_source = _ravel_per_subunit(layer_active).astype(dtype=np.int32)
+        svat_active = svat.where(is_active_per_svat)
+        svat_source_target = _ravel_per_subunit(svat_active).astype(dtype=np.int32)
 
-        data_dict = {"svat": well_svat[well_active], "layer": layer[well_active]}
+        data_dict: dict[str, str | np.ndarray] = {
+            "svat": svat_source_target,
+            "layer": layer_source,
+            "svat_groundwater": svat_source_target,
+        }
 
-        for var in self._without_subunit:
-            well_arr = self.dataset[var].data[well_row, well_column]
-            well_arr = np.tile(well_arr, (n_subunit, 1))
-            data_dict[var] = well_arr[well_active]
+        for var in self._with_subunit:
+            data_with_well = self.dataset[var].where(is_active_per_svat)
+            data_dict[var] = _ravel_per_subunit(data_with_well)
 
         for var in self._to_fill:
             data_dict[var] = ""

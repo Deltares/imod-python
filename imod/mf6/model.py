@@ -639,25 +639,30 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         regrid_cache: Optional[RegridderWeightsCache] = None,
     ) -> "Modflow6Model":
         """
-        Creates a model by regridding the packages of this model to another discretization.
-        It regrids all the arrays in the package using the default regridding methods.
-        At the moment only regridding to a different planar grid is supported, meaning
-        ``target_grid`` has different ``"x"`` and ``"y"`` or different ``cell2d`` coords.
+        Creates a model by regridding the packages of this model to another
+        discretization. It regrids all the arrays in the package using the
+        default regridding methods. At the moment only regridding to a different
+        planar grid is supported, meaning ``target_grid`` has different ``"x"``
+        and ``"y"`` or different ``cell2d`` coords.
 
         Parameters
         ----------
         target_grid: xr.DataArray or xu.UgridDataArray
-            a grid defined over the same discretization as the one we want to regrid the package to
+            a grid defined using the same discretization as the one we want to
+            regrid the package to.
         validate: bool
             set to true to validate the regridded packages
         regrid_cache: RegridderWeightsCache, optional
-            stores regridder weights for different regridders. Can be used to speed up regridding,
-            if the same regridders are used several times for regridding different arrays.
+            stores regridder weights for different regridders. Can be used to
+            speed up regridding, if the same regridders are used several times
+            for regridding different arrays.
 
         Returns
         -------
-        a model with similar packages to the input model, and with all the data-arrays regridded to another discretization,
-        similar to the one used in input argument "target_grid"
+
+        a model with similar packages to the input model, and with all the
+        data-arrays regridded to another discretization, similar to the one used
+        in input argument "target_grid"
         """
         return _regrid_like(self, target_grid, validate, regrid_cache)
 

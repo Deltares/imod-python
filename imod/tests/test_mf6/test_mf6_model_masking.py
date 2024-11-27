@@ -27,7 +27,7 @@ def test_masked_model_validation_inactive_cell_pillar(
     # test output validity
     errors = unstructured_flow_model.validate("model")
     assert len(errors.errors) == 0
-    assert_model_can_run(unstructured_flow_model, "disv", tmp_path)
+    assert_model_can_run(unstructured_flow_model, tmp_path)
 
 
 @pytest.mark.parametrize("layer_and_face", [(1, 23), (2, 23), (3, 23)])
@@ -49,7 +49,7 @@ def test_masked_model_validation_one_inactive_cell(
     # test output validity
     errors = unstructured_flow_model.validate("model")
     assert len(errors.errors) == 0
-    assert_model_can_run(unstructured_flow_model, "disv", tmp_path)
+    assert_model_can_run(unstructured_flow_model, tmp_path)
 
 
 @pytest.mark.parametrize("layer_and_face", [(1, 23), (2, 23), (3, 23)])
@@ -90,7 +90,7 @@ def test_masked_model_layered_and_scalar_package_input(
     # Test output validity
     errors = unstructured_flow_model.validate("model")
     assert len(errors.errors) == 0
-    assert_model_can_run(unstructured_flow_model, "disv", tmp_path)
+    assert_model_can_run(unstructured_flow_model, tmp_path)
 
 
 @pytest.mark.parametrize("inactivity_marker", [0, -1])
@@ -175,7 +175,7 @@ def test_mask_structured_xy_masks_across_all_layers(
     )
     assert counts[0] == len(structured_flow_model.domain.layer)
     assert counts[1] == cell_count - len(structured_flow_model.domain.layer)
-    assert_model_can_run(structured_flow_model, "dis", tmp_path)
+    assert_model_can_run(structured_flow_model, tmp_path)
 
 
 @pytest.mark.parametrize("layer_mask", [[1, 1, 0], [0, 1, 1], [1, 0, 1]])
@@ -200,7 +200,7 @@ def test_mask_with_layer_array(
 
     unstructured_flow_model.mask_all_packages(mask)
 
-    assert_model_can_run(unstructured_flow_model, "disv", tmp_path)
+    assert_model_can_run(unstructured_flow_model, tmp_path)
 
 
 @pytest.mark.parametrize("mask_cell", [[1, 1], [1, 33]])
@@ -231,7 +231,7 @@ def test_mask_unstructured(
     assert unique[0] == inactivity_marker
     assert counts[0] == 1
     assert counts[1] == cell_count - 1
-    assert_model_can_run(unstructured_flow_model, "disv", tmp_path)
+    assert_model_can_run(unstructured_flow_model, tmp_path)
 
 
 def test_mask_with_time_coordinate(
@@ -299,4 +299,4 @@ def test_mask_structured(
     assert unique[0] == inactivity_marker
     assert counts[0] == len(mask_cells)
     assert counts[1] == cell_count - len(mask_cells)
-    assert_model_can_run(structured_flow_model, "dis", tmp_path)
+    assert_model_can_run(structured_flow_model, tmp_path)

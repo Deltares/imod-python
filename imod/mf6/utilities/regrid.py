@@ -27,6 +27,7 @@ from imod.typing.grid import (
     GridDataArray,
     GridDataset,
     get_grid_geometry_hash,
+    is_unstructured,
     ones_like,
 )
 from imod.util.regrid_method_type import (
@@ -128,19 +129,21 @@ class RegridderWeightsCache:
         self.weights_cache.pop(keys[0])
 
 
-def assign_coord_if_present(
-    coordname: str, target_grid: GridDataArray, maybe_has_coords_attr: Any
-):
+def handle_extra_coords(coordname: str, target_grid: GridDataArray, variable_data: Any):
     """
-    If ``maybe_has_coords`` has a ``coords`` attribute and if coordname in
-    target_grid, copy coord.
+    If ``variable_data`` has a ``coords`` attribute and if ``coordname`` in
+    ``target_grid``, copy coord. If ``coordname`` not in ``target_grid``, but in
+    ``variable_data``, remove it.
     """
-    if coordname in target_grid.coords:
-        if coordname in target_grid.coords and hasattr(maybe_has_coords_attr, "coords"):
-            maybe_has_coords_attr = maybe_has_coords_attr.assign_coords(
+    if hasattr(variable_data, "coords"):
+        if coordname in target_grid.coords:
+            return variable_data.assign_coords(
                 {coordname: target_grid.coords[coordname].values[()]}
             )
-    return maybe_has_coords_attr
+        elif coordname in variable_data.coords:
+            return variable_data.drop_vars(coordname)
+
+    return variable_data
 
 
 def _regrid_array(
@@ -235,10 +238,10 @@ def _regrid_package_data(
             target_grid,
         )
         # set dx and dy if present in target_grid
-        new_package_data[varname] = assign_coord_if_present(
+        new_package_data[varname] = handle_extra_coords(
             "dx", target_grid, new_package_data[varname]
         )
-        new_package_data[varname] = assign_coord_if_present(
+        new_package_data[varname] = handle_extra_coords(
             "dy", target_grid, new_package_data[varname]
         )
     return new_package_data
@@ -274,6 +277,7 @@ def _regrid_like(
     target_grid: GridDataArray,
     regrid_cache: RegridderWeightsCache,
     regridder_types: Optional[RegridMethodType] = None,
+    as_pkg_type: Optional[type[IRegridPackage]] = None,
 ) -> IPackage:
     """
     Creates a package of the same type as this package, based on another
@@ -288,7 +292,9 @@ def _regrid_like(
 
     Examples
     --------
-    To regrid the npf package with a non-default method for the k-field, call regrid_like with these arguments:
+
+    To regrid the npf package with a non-default method for the k-field, call
+    regrid_like with these arguments:
 
     >>> regridder_types = imod.mf6.regrid.NodePropertyFlowRegridMethod(k=(imod.RegridderType.OVERLAP, "mean"))
     >>> new_npf = npf.regrid_like(like,  RegridderWeightsCache, regridder_types)
@@ -298,23 +304,34 @@ def _regrid_like(
     package: IRegridPackage:
         package to regrid
     target_grid: xr.DataArray or xu.UgridDataArray
-        a grid defined over the same discretization as the one we want to regrid the package to
+        a grid defined using the same discretization as the one we want to regrid
+        the package to
     regrid_cache: RegridderWeightsCache
-        stores regridder weights for different regridders. Can be used to speed up regridding,
-        if the same regridders are used several times for regridding different arrays.
+        stores regridder weights for different regridders. Can be used to speed
+        up regridding, if the same regridders are used several times for
+        regridding different arrays.
     regridder_types: RegridMethodType, optional
-        dictionary mapping arraynames (str) to a tuple of regrid type (a specialization class of BaseRegridder) and function name (str)
-        this dictionary can be used to override the default mapping method.
+        dictionary mapping arraynames (str) to a tuple of regrid type (a
+        specialization class of BaseRegridder) and function name (str) this
+        dictionary can be used to override the default mapping method.
+    as_pkg_type: RegridPackageType, optional
+        Package to initiate new package as. Is used to regrid
+        StructuredDiscretization to VerticesDiscretization.
 
     Returns
     -------
-    a package with the same options as this package, and with all the data-arrays regridded to another discretization,
-    similar to the one used in input argument "target_grid"
+
+    a package with the same options as this package, and with all the
+    data-arrays regridded to another discretization, similar to the one used in
+    input argument "target_grid"
     """
     if not hasattr(package, "_regrid_method"):
         raise NotImplementedError(
             f"Package {type(package).__name__} does not support regridding"
         )
+
+    if as_pkg_type is None:
+        as_pkg_type = package.__class__
 
     if hasattr(package, "auxiliary_data_fields"):
         remove_expanded_auxiliary_variables_from_dataset(package)
@@ -334,7 +351,7 @@ def _regrid_like(
     if hasattr(package, "auxiliary_data_fields"):
         expand_transient_auxiliary_variables(package)
 
-    return package.__class__(**new_package_data)
+    return as_pkg_type(**new_package_data)
 
 
 @typedispatch  # type: ignore[no-redef]
@@ -345,31 +362,43 @@ def _regrid_like(
     regrid_cache: Optional[RegridderWeightsCache] = None,
 ) -> IModel:
     """
-    Creates a model by regridding the packages of this model to another discretization.
-    It regrids all the arrays in the package using the default regridding methods.
-    At the moment only regridding to a different planar grid is supported, meaning
-    ``target_grid`` has different ``"x"`` and ``"y"`` or different ``cell2d`` coords.
+    Creates a model by regridding the packages of this model to another
+    discretization. It regrids all the arrays in the package using the default
+    regridding methods. At the moment only regridding to a different planar grid
+    is supported, meaning ``target_grid`` has different ``"x"`` and ``"y"`` or
+    different ``cell2d`` coords.
 
     Parameters
     ----------
     target_grid: xr.DataArray or xu.UgridDataArray
-        a grid defined over the same discretization as the one we want to regrid the package to
+        a grid defined using the same discretization as the one we want to
+        regrid the package to
     validate: bool
         set to true to validate the regridded packages
     regrid_cache: RegridderWeightsCache, optional
-        stores regridder weights for different regridders. Can be used to speed up regridding,
-        if the same regridders are used several times for regridding different arrays.
+        stores regridder weights for different regridders. Can be used to speed
+        up regridding, if the same regridders are used several times for
+        regridding different arrays.
 
     Returns
     -------
-    a model with similar packages to the input model, and with all the data-arrays regridded to another discretization,
-    similar to the one used in input argument "target_grid"
+
+    a model with similar packages to the input model, and with all the
+    data-arrays regridded to another discretization, similar to the one used in
+    input argument "target_grid"
     """
     supported, error_with_object_name = model.is_regridding_supported()
     if not supported:
         raise ValueError(
             f"regridding this model cannot be done due to the presence of package {error_with_object_name}"
         )
+    diskey = model._get_diskey()
+    dis = model[diskey]
+    if is_unstructured(dis["idomain"]) and not is_unstructured(target_grid):
+        raise NotImplementedError(
+            "Regridding unstructured model to a structured grid not supported."
+        )
+
     new_model = model.__class__()
     if regrid_cache is None:
         regrid_cache = RegridderWeightsCache()
@@ -383,6 +412,8 @@ def _regrid_like(
 
     methods = _get_unique_regridder_types(model)
     output_domain = _get_regridding_domain(model, target_grid, regrid_cache, methods)
+    output_domain = handle_extra_coords("dx", target_grid, output_domain)
+    output_domain = handle_extra_coords("dy", target_grid, output_domain)
     new_model.mask_all_packages(output_domain)
     new_model.purge_empty_packages()
     if validate:

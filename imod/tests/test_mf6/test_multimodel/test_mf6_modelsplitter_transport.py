@@ -115,7 +115,7 @@ def test_split_flow_and_transport_model(
             .values
         ) == ["chd", "rch", "well"]
 
-    assert_simulation_can_run(new_simulation, "dis", tmp_path)
+    assert_simulation_can_run(new_simulation, tmp_path)
 
 
 @pytest.mark.usefixtures("flow_transport_simulation")
