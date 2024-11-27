@@ -13,11 +13,9 @@ from imod.msw.regrid.regrid_schemes import SprinklingRegridMethod
 from imod.typing import IntArray
 
 
-def _ravel_per_subunit(
-    da: xr.DataArray, well_row: np.ndarray, well_column: np.ndarray
-) -> np.ndarray:
+def _ravel_per_subunit(da: xr.DataArray) -> np.ndarray:
     # per defined well element, all subunits
-    array_out = da.to_numpy()[:, well_row, well_column].ravel()
+    array_out = da.to_numpy().ravel()
     # per defined well element, per defined subunits
     return array_out[np.isfinite(array_out)]
 
@@ -94,17 +92,15 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
         well_column = well_cellid.sel(dim_cellid="column").data - 1
 
         max_rate_per_svat = self.dataset["max_abstraction_groundwater"].where(svat > 0)
-        layer_per_svat = xr.full_like(max_rate_per_svat, np.nan)
-        layer_per_svat.values[:, well_row, well_column] = well_layer
+        well_layer_per_svat = xr.full_like(max_rate_per_svat, np.nan)
+        well_layer_per_svat.values[:, well_row, well_column] = well_layer
 
-        is_active_per_svat = max_rate_per_svat > 0
+        is_active_per_svat = (max_rate_per_svat > 0) & well_layer_per_svat.notnull()
 
-        layer_source = _ravel_per_subunit(
-            layer_per_svat.where(is_active_per_svat)
-        ).astype(dtype=np.int32)
-        svat_source_target = _ravel_per_subunit(svat.where(is_active_per_svat)).astype(
-            dtype=np.int32
-        )
+        layer_active = well_layer_per_svat.where(is_active_per_svat)
+        layer_source = _ravel_per_subunit(layer_active).astype(dtype=np.int32)
+        svat_active = svat.where(is_active_per_svat)
+        svat_source_target = _ravel_per_subunit(svat_active).astype(dtype=np.int32)
 
         data_dict = {
             "svat": svat_source_target,
@@ -113,9 +109,8 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
         }
 
         for var in self._with_subunit:
-            array = self.dataset[var].where(is_active_per_svat).to_numpy()
-            array = array[np.isfinite(array)]
-            data_dict[var] = array
+            data_with_well = self.dataset[var].where(is_active_per_svat)
+            data_dict[var] = _ravel_per_subunit(data_with_well)
 
         for var in self._to_fill:
             data_dict[var] = ""
