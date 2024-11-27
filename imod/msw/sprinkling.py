@@ -9,8 +9,9 @@ from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
+from imod.msw.utilities.common import concat_imod5
 from imod.msw.regrid.regrid_schemes import SprinklingRegridMethod
-from imod.typing import IntArray
+from imod.typing import IntArray, GridDataDict
 
 
 class Sprinkling(MetaSwapPackage, IRegridPackage):
@@ -112,3 +113,11 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
         self._check_range(dataframe)
 
         return self.write_dataframe_fixed_width(file, dataframe)
+
+
+    @classmethod
+    def from_imod5_data(cls, imod5_data: dict[str, GridDataDict]) -> "Sprinkling":
+        cap_data = imod5_data["cap"]
+        data = {}
+
+        
