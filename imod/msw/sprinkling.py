@@ -194,6 +194,15 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
             capacity is already defined in the point data. This is an ``n:1``
             mapping: multiple grid cells can map to one well.
 
+        Parameters
+        ----------
+        imod5_data : dict
+            iMOD5 data as returned by
+            :func:`imod.formats.prj.open_projectfile_data`
+
+        Returns
+        -------
+        Sprinkling package
         """
         cap_data = imod5_data["cap"]
         if isinstance(cap_data["artificial_recharge_layer"], pd.DataFrame):
