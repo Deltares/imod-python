@@ -75,7 +75,7 @@ def _well_from_imod5_cap_grid_data(cap_data: GridDataDict) -> dict[str, np.ndarr
 
     from_groundwater = (type != 0).to_numpy()
     coords = type.coords
-    y_grid, x_grid = np.meshgrid(coords["y"].to_numpy(), coords["x"].to_numpy())
+    x_grid, y_grid = np.meshgrid(coords["x"].to_numpy(), coords["y"].to_numpy())
 
     data = {}
     data["layer"] = layer.data[from_groundwater]

@@ -1176,3 +1176,25 @@ def test_logmessage_for_missing_filter_settings(
             in log
         )
         assert message_required == message_present
+
+
+def test_from_imod5_cap_data__grid(cap_data_sprinkling_grid):
+    # Arrange
+    expected_layer = np.array([2, 1, 2, 1, 2, 1])
+    expected_y = np.array([3.0, 3.0, 2.0, 2.0, 1.0, 1.0])
+    expected_x = np.array([2.0, 3.0, 2.0, 3.0, 2.0, 3.0])
+
+    # Act
+    well = LayeredWell.from_imod5_cap_data(cap_data_sprinkling_grid)
+
+    # Assert
+    ds = well.dataset
+    np.testing.assert_equal(ds["rate"].to_numpy(), 0.0)
+    np.testing.assert_array_equal(ds["layer"].to_numpy(), expected_layer)
+    np.testing.assert_array_equal(ds["x"].to_numpy(), expected_x)
+    np.testing.assert_array_equal(ds["y"].to_numpy(), expected_y)
+
+
+def test_from_imod5_cap_data__points(cap_data_sprinkling_points):
+    with pytest.raises(NotImplementedError):
+        LayeredWell.from_imod5_cap_data(cap_data_sprinkling_points)
