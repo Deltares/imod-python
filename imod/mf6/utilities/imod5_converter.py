@@ -1,8 +1,10 @@
 from typing import Union
 
 import numpy as np
+import pandas as pd
 import xarray as xr
 
+from imod.typing import GridDataDict, Imod5DataDict
 from imod.typing.grid import full_like
 
 
@@ -48,3 +50,72 @@ def fill_missing_layers(
     """
     layer = full.coords["layer"]
     return source.reindex(layer=layer, fill_value=fillvalue)
+
+
+def _well_from_imod5_cap_point_data(cap_data: GridDataDict) -> GridDataDict:
+    raise NotImplementedError(
+        "Assigning sprinkling wells with an IPF file is not supported, please specify them as IDF."
+    )
+    return {}
+
+
+def _well_from_imod5_cap_grid_data(cap_data: GridDataDict) -> dict[str, np.ndarray]:
+    drop_layer_kwargs = {
+        "layer": 0,
+        "drop": True,
+        "missing_dims": "ignore",
+    }
+    type = cap_data["artificial_recharge"].isel(**drop_layer_kwargs).compute()
+    layer = (
+        cap_data["artificial_recharge_layer"]
+        .isel(**drop_layer_kwargs)
+        .astype(int)
+        .compute()
+    )
+
+    from_groundwater = (type != 0).to_numpy()
+    coords = type.coords
+    y_grid, x_grid = np.meshgrid(coords["y"].to_numpy(), coords["x"].to_numpy())
+
+    data = {}
+    data["layer"] = layer.data[from_groundwater]
+    data["y"] = y_grid[from_groundwater]
+    data["x"] = x_grid[from_groundwater]
+    data["rate"] = np.zeros_like(data["x"])
+
+    return data
+
+
+def well_from_imod5_cap_data(imod5_data: Imod5DataDict) -> GridDataDict:
+    """
+    Abstraction data for sprinkling is defined in iMOD5 either with grids (IDF)
+    or points (IPF) combined with a grid. Depending on the type, the function does
+    different conversions
+
+    - grids (IDF)
+        The ``"artifical_recharge_layer"`` variable was defined as grid
+        (IDF), this grid defines in which layer a groundwater abstraction
+        well should be placed. The ``"artificial_recharge"`` grid contains
+        types which point to the type of abstraction:
+            * 0: no abstraction
+            * 1: groundwater abstraction
+            * 2: surfacewater abstraction
+        The ``"artificial_recharge_capacity"`` grid/constant defines the
+        capacity of each groundwater or surfacewater abstraction. This is an
+        ``1:1`` mapping: Each grid cell maps to a separate well.
+
+    - points with grid (IPF & IDF)
+        The ``"artifical_recharge_layer"`` variable was defined as point
+        data (IPF), this table contains wellids with an abstraction capacity
+        and layer. The ``"artificial_recharge"`` grid contains a mapping of
+        grid cells to wellids in the point data. The
+        ``"artificial_recharge_capacity"`` is ignored as the abstraction
+        capacity is already defined in the point data. This is an ``n:1``
+        mapping: multiple grid cells can map to one well.
+    """
+    cap_data = imod5_data["cap"]
+
+    if isinstance(cap_data["artificial_recharge_layer"], pd.DataFrame):
+        return _well_from_imod5_cap_point_data(cap_data)
+    else:
+        return _well_from_imod5_cap_grid_data(cap_data)
