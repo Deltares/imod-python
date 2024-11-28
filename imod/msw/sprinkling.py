@@ -11,7 +11,7 @@ from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import SprinklingRegridMethod
 from imod.msw.utilities.common import concat_imod5
-from imod.typing import Imod5DataDict, IntArray, GridDataDict
+from imod.typing import GridDataDict, Imod5DataDict, IntArray
 from imod.typing.grid import zeros_like
 
 
@@ -21,11 +21,13 @@ def _ravel_per_subunit(da: xr.DataArray) -> np.ndarray:
     # per defined well element, per defined subunits
     return array_out[np.isfinite(array_out)]
 
+
 def _sprinkling_data_from_imod5_ipf(cap_data: GridDataDict) -> GridDataDict:
     raise NotImplementedError(
         "Assigning sprinkling wells with an IPF file is not supported, please specify them as IDF."
     )
     return {}
+
 
 def _sprinkling_data_from_imod5_grid(cap_data: GridDataDict) -> GridDataDict:
     drop_layer_kwargs = {
@@ -172,12 +174,12 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
         Import sprinkling data from imod5 data. Abstraction data for sprinkling
         is defined in iMOD5 either with grids (IDF) or points (IPF) combined
         with a grid. Depending on the type, the method does different conversions:
-        
+
         - grids (IDF)
             The ``"artifical_recharge_layer"`` variable was defined as grid
             (IDF), this grid defines in which layer a groundwater abstraction
             well should be placed. The ``"artificial_recharge"`` grid contains
-            types which point to the type of abstraction: 
+            types which point to the type of abstraction:
                 * 0: no abstraction
                 * 1: groundwater abstraction
                 * 2: surfacewater abstraction
