@@ -11,7 +11,7 @@ from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import SprinklingRegridMethod
 from imod.msw.utilities.common import concat_imod5
-from imod.typing import Imod5DataDict, IntArray
+from imod.typing import Imod5DataDict, IntArray, GridDataDict
 from imod.typing.grid import zeros_like
 
 
@@ -20,6 +20,47 @@ def _ravel_per_subunit(da: xr.DataArray) -> np.ndarray:
     array_out = da.to_numpy().ravel()
     # per defined well element, per defined subunits
     return array_out[np.isfinite(array_out)]
+
+def _sprinkling_data_from_imod5_ipf(cap_data: GridDataDict) -> GridDataDict:
+    raise NotImplementedError(
+        "Assigning sprinkling wells with an IPF file is not supported, please specify them as IDF."
+    )
+    return {}
+
+def _sprinkling_data_from_imod5_grid(cap_data: GridDataDict) -> GridDataDict:
+    drop_layer_kwargs = {
+        "layer": 0,
+        "drop": True,
+        "missing_dims": "ignore",
+    }
+    type = cap_data["artificial_recharge"].isel(**drop_layer_kwargs)
+    capacity = cap_data["artificial_recharge_capacity"].isel(**drop_layer_kwargs)
+
+    from_groundwater = type == 1
+    from_surfacewater = type == 2
+    is_active = type != 0
+
+    zero_where_active = zeros_like(type).where(is_active)
+
+    # Add zero where active, to have active cells set to 0.0.
+    max_abstraction_groundwater_rural = (
+        capacity.where(from_groundwater) + zero_where_active
+    )
+    max_abstraction_surfacewater_rural = (
+        capacity.where(from_surfacewater) + zero_where_active
+    )
+
+    # No sprinkling for urban environments
+    max_abstraction_urban = zero_where_active
+
+    data = {}
+    data["max_abstraction_groundwater"] = concat_imod5(
+        max_abstraction_groundwater_rural, max_abstraction_urban
+    )
+    data["max_abstraction_surfacewater"] = concat_imod5(
+        max_abstraction_surfacewater_rural, max_abstraction_urban
+    )
+    return data
 
 
 class Sprinkling(MetaSwapPackage, IRegridPackage):
@@ -127,29 +168,37 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
 
     @classmethod
     def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "Sprinkling":
+        """
+        Import sprinkling data from imod5 data. Abstraction data for sprinkling
+        is defined in iMOD5 either with grids (IDF) or points (IPF) combined
+        with a grid. Depending on the type, the method does different conversions:
+        
+        - grids (IDF)
+            The ``"artifical_recharge_layer"`` variable was defined as grid
+            (IDF), this grid defines in which layer a groundwater abstraction
+            well should be placed. The ``"artificial_recharge"`` grid contains
+            types which point to the type of abstraction: 
+                * 0: no abstraction
+                * 1: groundwater abstraction
+                * 2: surfacewater abstraction
+            The ``"artificial_recharge_capacity"`` grid/constant defines the
+            capacity of each groundwater or surfacewater abstraction. This is an
+            ``1:1`` mapping: Each grid cell maps to a separate well.
+
+        - points with grid (IPF & IDF)
+            The ``"artifical_recharge_layer"`` variable was defined as point
+            data (IPF), this table contains wellids with an abstraction capacity
+            and layer. The ``"artificial_recharge"`` grid contains a mapping of
+            grid cells to wellids in the point data. The
+            ``"artificial_recharge_capacity"`` is ignored as the abstraction
+            capacity is already defined in the point data. This is an ``n:1``
+            mapping: multiple grid cells can map to one well.
+
+        """
         cap_data = imod5_data["cap"]
         if isinstance(cap_data["artificial_recharge_layer"], pd.DataFrame):
-            raise NotImplementedError(
-                "Assigning sprinkling wells with an IPF file is not supported, please specify them as IDF."
-            )
-        drop_layer_kwargs = {
-            "layer": 0,
-            "drop": True,
-            "missing_dims": "ignore",
-        }
-        type = cap_data["artificial_recharge"].isel(**drop_layer_kwargs)
-        capacity = cap_data["artificial_recharge_capacity"].isel(**drop_layer_kwargs)
-        max_abstraction_groundwater_rural = capacity.where(type == 1)
-        max_abstraction_surfacewater_rural = capacity.where(type == 2).fillna(0.0)
-
-        max_abstraction_urban = zeros_like(type)
-
-        data = {}
-        data["max_abstraction_groundwater"] = concat_imod5(
-            max_abstraction_groundwater_rural, max_abstraction_urban
-        )
-        data["max_abstraction_surfacewater"] = concat_imod5(
-            max_abstraction_surfacewater_rural, max_abstraction_urban
-        )
+            data = _sprinkling_data_from_imod5_ipf(cap_data)
+        else:
+            data = _sprinkling_data_from_imod5_grid(cap_data)
 
         return cls(**data)
