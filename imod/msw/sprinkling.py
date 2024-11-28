@@ -45,11 +45,11 @@ def _sprinkling_data_from_imod5_grid(cap_data: GridDataDict) -> GridDataDict:
     zero_where_active = zeros_like(type).where(is_active)
 
     # Add zero where active, to have active cells set to 0.0.
-    max_abstraction_groundwater_rural = (
-        capacity.where(from_groundwater) + zero_where_active
+    max_abstraction_groundwater_rural = zero_where_active.where(
+        ~from_groundwater, capacity
     )
-    max_abstraction_surfacewater_rural = (
-        capacity.where(from_surfacewater) + zero_where_active
+    max_abstraction_surfacewater_rural = zero_where_active.where(
+        ~from_surfacewater, capacity
     )
 
     # No sprinkling for urban environments
