@@ -198,9 +198,11 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
 
         Parameters
         ----------
-        imod5_data : dict
-            iMOD5 data as returned by
-            :func:`imod.formats.prj.open_projectfile_data`
+        imod5_data: dict[str, dict[str, GridDataArray]]
+            dictionary containing the arrays mentioned in the project file as
+            xarray datasets, under the key of the package type to which it
+            belongs, as returned by
+            :func:`imod.formats.prj.open_projectfile_data`.
 
         Returns
         -------
