@@ -2,6 +2,7 @@ import tempfile
 from pathlib import Path
 
 import numpy as np
+import pytest
 import xarray as xr
 from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
@@ -269,3 +270,40 @@ def test_simple_model_1_subunit(fixed_format_parser):
     )
     assert_equal(results["layer"], np.array([3, 2]))
     assert_equal(results["svat_groundwater"], np.array([1, 2]))
+
+
+def test_sprinkling_from_imod5_data__points(cap_data_sprinkling_points):
+    with pytest.raises(NotImplementedError):
+        msw.Sprinkling.from_imod5_data(cap_data_sprinkling_points)
+
+
+def test_sprinkling_from_imod5_data__grid(cap_data_sprinkling_grid):
+    # Arrange
+    # fmt: off
+    np.nan = nan
+    expected_gw_abstraction = np.array(
+    [[nan, 25., 0.],
+     [nan, 25., 0.],
+     [nan, 25., 0.]]
+    )
+    expected_sw_abstraction = np.array(
+    [[nan, 0., 25.],
+     [nan, 0., 25.],
+     [nan, 0., 25.]]
+    )
+    # fmt: on
+
+    # Act
+    sprinkling = msw.Sprinkling.from_imod5_data(cap_data_sprinkling_grid)
+
+    # Assert
+    assert isinstance(sprinkling, msw.Sprinkling)
+    ds = sprinkling.dataset
+    assert (ds.sel(subunit=1) == 0).all()
+    rural_ds = ds.sel(subunit=0)
+    np.testing.assert_array_equal(
+        rural_ds["max_abstraction_groundwater"].to_numpy(), expected_gw_abstraction
+    )
+    np.testing.assert_array_equal(
+        rural_ds["max_abstraction_surfacewater"].to_numpy(), expected_sw_abstraction
+    )

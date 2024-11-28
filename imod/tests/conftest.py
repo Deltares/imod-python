@@ -22,6 +22,10 @@ from .fixtures.flow_basic_unstructured_fixture import (
 )
 from .fixtures.flow_example_fixture import imodflow_model
 from .fixtures.flow_transport_simulation_fixture import flow_transport_simulation
+from .fixtures.imod5_cap_data import (
+    cap_data_sprinkling_grid,
+    cap_data_sprinkling_points,
+)
 from .fixtures.imod5_well_data import (
     well_duplication_import_prj,
     well_mixed_ipfs,
