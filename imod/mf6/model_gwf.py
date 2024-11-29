@@ -331,7 +331,7 @@ class GroundwaterFlowModel(Modflow6Model):
                 )
 
         if "cap" in imod5_keys:
-            result["msw-sprinkling"] = LayeredWell.from_imod5_cap_data(imod5_data) # type: ignore
+            result["msw-sprinkling"] = LayeredWell.from_imod5_cap_data(imod5_data)  # type: ignore
 
         # import ghb's
         ghb_keys = [key for key in imod5_keys if key[0:3] == "ghb"]
