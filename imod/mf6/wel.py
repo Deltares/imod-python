@@ -1337,7 +1337,7 @@ class LayeredWell(GridAgnosticWell):
             :func:`imod.formats.prj.open_projectfile_data`.
         """
         data = well_from_imod5_cap_data(imod5_data)
-        return cls(**data)
+        return cls(**data)  # type: ignore
 
 
 class WellDisStructured(DisStructuredBoundaryCondition):

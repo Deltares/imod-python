@@ -1,10 +1,10 @@
-from typing import Union
+from typing import Union, cast
 
 import numpy as np
 import pandas as pd
 import xarray as xr
 
-from imod.typing import GridDataDict, Imod5DataDict
+from imod.typing import GridDataDict, Imod5DataDict, SelSettingsType
 from imod.typing.grid import full_like
 
 
@@ -52,7 +52,7 @@ def fill_missing_layers(
     return source.reindex(layer=layer, fill_value=fillvalue)
 
 
-def _well_from_imod5_cap_point_data(cap_data: GridDataDict) -> GridDataDict:
+def _well_from_imod5_cap_point_data(cap_data: GridDataDict) -> dict[str, np.ndarray]:
     raise NotImplementedError(
         "Assigning sprinkling wells with an IPF file is not supported, please specify them as IDF."
     )
@@ -60,7 +60,7 @@ def _well_from_imod5_cap_point_data(cap_data: GridDataDict) -> GridDataDict:
 
 
 def _well_from_imod5_cap_grid_data(cap_data: GridDataDict) -> dict[str, np.ndarray]:
-    drop_layer_kwargs = {
+    drop_layer_kwargs: SelSettingsType = {
         "layer": 0,
         "drop": True,
         "missing_dims": "ignore",
@@ -86,7 +86,7 @@ def _well_from_imod5_cap_grid_data(cap_data: GridDataDict) -> dict[str, np.ndarr
     return data
 
 
-def well_from_imod5_cap_data(imod5_data: Imod5DataDict) -> GridDataDict:
+def well_from_imod5_cap_data(imod5_data: Imod5DataDict) -> dict[str, np.ndarray]:
     """
     Abstraction data for sprinkling is defined in iMOD5 either with grids (IDF)
     or points (IPF) combined with a grid. Depending on the type, the function does
@@ -113,7 +113,7 @@ def well_from_imod5_cap_data(imod5_data: Imod5DataDict) -> GridDataDict:
         capacity is already defined in the point data. This is an ``n:1``
         mapping: multiple grid cells can map to one well.
     """
-    cap_data = imod5_data["cap"]
+    cap_data = cast(GridDataDict, imod5_data["cap"])
 
     if isinstance(cap_data["artificial_recharge_layer"], pd.DataFrame):
         return _well_from_imod5_cap_point_data(cap_data)

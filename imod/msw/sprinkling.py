@@ -1,4 +1,4 @@
-from typing import TextIO
+from typing import TextIO, cast
 
 import numpy as np
 import pandas as pd
@@ -11,7 +11,7 @@ from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import SprinklingRegridMethod
 from imod.msw.utilities.common import concat_imod5
-from imod.typing import GridDataDict, Imod5DataDict, IntArray
+from imod.typing import GridDataDict, Imod5DataDict, IntArray, SelSettingsType
 from imod.typing.grid import zeros_like
 
 
@@ -30,7 +30,7 @@ def _sprinkling_data_from_imod5_ipf(cap_data: GridDataDict) -> GridDataDict:
 
 
 def _sprinkling_data_from_imod5_grid(cap_data: GridDataDict) -> GridDataDict:
-    drop_layer_kwargs = {
+    drop_layer_kwargs: SelSettingsType = {
         "layer": 0,
         "drop": True,
         "missing_dims": "ignore",
@@ -208,7 +208,7 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
         -------
         Sprinkling package
         """
-        cap_data = imod5_data["cap"]
+        cap_data = cast(GridDataDict, imod5_data["cap"])
         if isinstance(cap_data["artificial_recharge_layer"], pd.DataFrame):
             data = _sprinkling_data_from_imod5_ipf(cap_data)
         else:
