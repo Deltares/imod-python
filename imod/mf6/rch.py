@@ -218,7 +218,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
             # create an array indicating in which cells rch is active
             is_rch_cell = allocate_rch_cells(
                 ALLOCATION_OPTION.at_first_active,
-                new_idomain == 1,
+                new_idomain > 0,
                 planar_rate_regridded,
             )
 
@@ -228,6 +228,23 @@ class Recharge(BoundaryCondition, IRegridPackage):
             new_package_data["rate"] = rch_rate
 
         return Recharge(**new_package_data, validate=True, fixed_cell=False)
+
+    @classmethod
+    def from_imod5_cap_data(
+        cls,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        target_dis: StructuredDiscretization,
+    ) -> "Recharge":
+        """
+        Construct an rch-package from iMOD5 data in the CAP package, loaded with
+        the :func:`imod.formats.prj.open_projectfile_data` function.
+        """
+        cap_data = imod5_data["cap"]
+        new_idomain = target_dis.dataset["idomain"]
+
+        # Find which cells are active, basically same logic as in
+        # msw.GridData.from_imod5_data. Maybe cache that somewhere?
+
 
     @classmethod
     def get_regrid_methods(cls) -> RechargeRegridMethod:
