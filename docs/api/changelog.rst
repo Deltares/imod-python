@@ -36,6 +36,9 @@ Changed
   ``downward_resistance`` now require a ``subunit`` coordinate.
 - Variables ``max_abstraction_groundwater`` and ``max_abstraction_surfacewater``
   in :class:`imod.msw.Sprinkling` now needs to have a subunit coordinate.
+- If ``"cap"`` package present in ``imod5_data``,
+  :meth:`imod.mf6.GroundwaterFlowModel.from_imod5_data` now automatically adds a
+  well for metaswap sprinkling named ``"msw-sprinkling"``
 
 
 [0.18.1] - 2024-11-20
