@@ -1,10 +1,9 @@
 import numpy as np
 import pandas as pd
+import pytest
 import xarray as xr
 
 import imod
-
-import pytest
 
 
 def test_convert_pointwaterhead_freshwaterhead_scalar():
