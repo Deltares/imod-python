@@ -1,13 +1,16 @@
 import collections
 from copy import copy
 from pathlib import Path
-from typing import Optional, Tuple, Union
+from typing import Any, Optional, Tuple, Union
 
 import jinja2
 import numpy as np
 
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.mf6_wel_adapter import Mf6Wel
+from imod.mf6.regrid.regrid_schemes import (
+    RegridMethodType,
+)
 from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.msw.coupler_mapping import CouplerMapping
 from imod.msw.grid_data import GridData
@@ -20,11 +23,15 @@ from imod.msw.initial_conditions import (
     InitialConditionsSavedState,
 )
 from imod.msw.landuse import LanduseOptions
-from imod.msw.meteo_grid import MeteoGrid
+from imod.msw.meteo_grid import MeteoGrid, MeteoGridCopy
 from imod.msw.meteo_mapping import EvapotranspirationMapping, PrecipitationMapping
 from imod.msw.output_control import TimeOutputControl
+from imod.msw.ponding import Ponding
 from imod.msw.timeutil import to_metaswap_timeformat
+from imod.msw.utilities.common import find_in_file_list
+from imod.msw.utilities.parse import read_para_sim
 from imod.msw.vegetation import AnnualCropFactors
+from imod.typing import Imod5DataDict
 from imod.util.regrid_method_type import RegridderType
 
 REQUIRED_PACKAGES = (
@@ -88,6 +95,7 @@ class MetaSwapModel(Model):
     ----------
     unsaturated_database: Path-like or str
         Path to the MetaSWAP soil physical database folder.
+    settings: dict
     """
 
     _pkg_id = "model"
@@ -99,10 +107,16 @@ class MetaSwapModel(Model):
         "{%endfor%}"
     )
 
-    def __init__(self, unsaturated_database):
+    def __init__(
+        self, unsaturated_database: Path | str, settings: dict[str, Any] = None
+    ):
         super().__init__()
 
-        self.simulation_settings = copy(DEFAULT_SETTINGS)
+        if settings is None:
+            self.simulation_settings = copy(DEFAULT_SETTINGS)
+        else:
+            self.simulation_settings = settings
+
         self.simulation_settings["unsa_svat_path"] = (
             self._render_unsaturated_database_path(unsaturated_database)
         )
@@ -282,3 +296,35 @@ class MetaSwapModel(Model):
             regridded_model[mod2svat_name] = CouplerMapping()
 
         return regridded_model
+
+    @classmethod
+    def from_imod5_data(
+        cls,
+        imod5_data: Imod5DataDict,
+        target_dis: StructuredDiscretization,
+        regridder_types: Optional[RegridMethodType] = None,
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
+    ):
+        extra_paths = imod5_data["extra"]["paths"]
+        path_to_parasim = find_in_file_list("para_sim.inp", extra_paths)
+        parasim_settings = read_para_sim(path_to_parasim)
+
+        model = cls(parasim_settings["unsat_svat_path"], parasim_settings)
+
+        model["grid"] = GridData.from_imod5_data(
+            imod5_data, target_dis, regridder_types, regrid_cache
+        )
+        model["infiltration"] = Infiltration.from_imod5_data(imod5_data)
+        model["ponding"] = Ponding.from_imod5_data(imod5_data)
+        # model["sprinkling"] = Sprinkling.from_imod5_data(imod5_data)
+        model["meteo_grid"] = MeteoGridCopy.from_imod5_data(imod5_data)
+        model["prec_mapping"] = PrecipitationMapping.from_imod5_data(imod5_data)
+        model["evt_mapping"] = EvapotranspirationMapping.from_imod5_data(imod5_data)
+        model["idf_mapping"] = IdfMapping(model["grid"]["area"], np.nan)
+
+        model["coupling"] = CouplerMapping()
+
+        # TODO:
+        # Add CopyFiles package here
+
+        return model
