@@ -28,7 +28,7 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
-from imod.typing import Imod5DataDict, GridDataDict, GridDataArray
+from imod.typing import GridDataArray, GridDataDict, Imod5DataDict
 from imod.typing.grid import (
     enforce_dim_order,
     is_planar_grid,
@@ -250,7 +250,11 @@ class Recharge(BoundaryCondition, IRegridPackage):
         active, _ = is_msw_active_cell(target_dis, cap_data, msw_area)
 
         data = {}
-        data["rate"] = xr.DataArray(0.0).where(active)
+        layer_da = xr.full_like(
+            target_dis.dataset.coords["layer"], np.nan, dtype=np.float64
+        )
+        layer_da.loc[{"layer": 1}] = 0.0
+        data["rate"] = layer_da.where(active)
 
         return cls(**data, validate=True, fixed_cell=False)
 
