@@ -242,7 +242,9 @@ class Recharge(BoundaryCondition, IRegridPackage):
     ) -> "Recharge":
         """
         Construct an rch-package from iMOD5 data in the CAP package, loaded with
-        the :func:`imod.formats.prj.open_projectfile_data` function.
+        the :func:`imod.formats.prj.open_projectfile_data` function. Package is
+        used to couple MODFLOW6 to MetaSWAP models. Active cells will have a
+        recharge rate of 0.0.
         """
         cap_data = cast(GridDataDict, imod5_data["cap"])
 
