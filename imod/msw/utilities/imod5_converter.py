@@ -1,5 +1,3 @@
-from functools import lru_cache
-
 from imod.logging import LogLevel, logger
 from imod.mf6 import StructuredDiscretization
 from imod.msw.utilities.common import concat_imod5
@@ -11,20 +9,10 @@ from imod.util.spatial import get_cell_area
 def get_cell_area_from_imod5_data(
     imod5_cap: GridDataDict,
 ) -> GridDataArray:
-    # Unpack grids and call into private function, so that only 2 grids have to
-    # be cached.
+    # area's per type of svats
+    mf6_area = get_cell_area(imod5_cap["wetted_area"])
     wetted_area = imod5_cap["wetted_area"]
     urban_area = imod5_cap["urban_area"]
-    return _get_cell_area_from_imod5_data(wetted_area, urban_area)
-
-
-@lru_cache(maxsize=2)
-def _get_cell_area_from_imod5_data(
-    wetted_area: GridDataArray, urban_area: GridDataArray
-) -> GridDataArray:
-    # area's per type of svats
-    mf6_area = get_cell_area(wetted_area)
-
     rural_area = mf6_area - (wetted_area + urban_area)
     if (wetted_area > mf6_area).any():
         logger.log(
