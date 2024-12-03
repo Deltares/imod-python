@@ -280,7 +280,6 @@ def test_sprinkling_from_imod5_data__points(cap_data_sprinkling_points):
 def test_sprinkling_from_imod5_data__grid(cap_data_sprinkling_grid):
     # Arrange
     # fmt: off
-    np.nan = nan
     expected_gw_abstraction = np.array(
     [[nan, 25., 0.],
      [nan, 25., 0.],
