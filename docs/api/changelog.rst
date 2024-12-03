@@ -29,6 +29,9 @@ Fixed
   ``NotImplementedError`` when attempting to regrid an unstructured model to a
   structured grid.
 - :class:`imod.msw.Sprinkling` now correctly writes source svats to scap_svat.inp file.
+- :func:`imod.evaluate.calculate_gxg`, upon providing a head dataarray chunked
+  over time, will no longer error with ``ValueError: Object has inconsistent
+  chunks along dimension bimonth. This can be fixed by calling unify_chunks().``
 
 
 Changed

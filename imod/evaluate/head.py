@@ -118,7 +118,7 @@ def _calculate_gxg(
     # First compute LG3 and HG3 per hydrological year, then compute the mean over the total.
     if gxg_data.chunks is not None:
         # If data is lazily loaded/chunked, process data of one year at a time.
-        gxg_data = gxg_data.chunk({"hydroyear": 1})
+        gxg_data = gxg_data.chunk({"hydroyear": 1, "bimonth": -1})
         lg3 = xr.map_blocks(lowest3_mean, gxg_data, template=gxg_data.isel(bimonth=0))
         hg3 = xr.map_blocks(highest3_mean, gxg_data, template=gxg_data.isel(bimonth=0))
     else:
