@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pytest
 import xarray as xr
 
 import imod
@@ -33,7 +34,8 @@ def test_convert_pointwaterhead_freshwaterhead_da():
     assert fwh.equals(fwh2.round(5))
 
 
-def test_calculate_gxg():
+@pytest.mark.parametrize("chunk", [False, True])
+def test_calculate_gxg(chunk: bool):
     data = (np.ones((1, 2, 49)) * np.arange(49)).T
     coords = {
         "time": pd.date_range("2000-04-01", periods=49, freq="SMS"),
@@ -42,6 +44,8 @@ def test_calculate_gxg():
     }
     dims = ("time", "y", "x")
     da = xr.DataArray(data, coords, dims)
+    if chunk:
+        da = da.chunk({"time": 1})
 
     coords_ref = {"y": [0.5, 1.5], "x": [0.5]}
     dims_ref = ("y", "x")
@@ -59,7 +63,8 @@ def test_calculate_gxg():
     assert gxg["ghg"].round(5).equals(0 - ghg_ref)
 
 
-def test_calculate_gxg_nan():
+@pytest.mark.parametrize("chunk", [False, True])
+def test_calculate_gxg_nan(chunk: bool):
     data = (np.ones((1, 2, 49)) * np.arange(49)).T
     # This invalidates the second year: it no longer forms a complete
     # "hydrological year" with 24 entries.
@@ -72,6 +77,8 @@ def test_calculate_gxg_nan():
     }
     dims = ("time", "y", "x")
     da = xr.DataArray(data, coords, dims)
+    if chunk:
+        da = da.chunk({"time": 1})
 
     coords_ref = {"y": [0.5, 1.5], "x": [0.5]}
     dims_ref = ("y", "x")
