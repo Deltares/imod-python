@@ -17,6 +17,8 @@ Added
 - :meth:`imod.mf6.LayeredWell.from_imod5_cap_data` to construct a
   :class:`imod.mf6.LayeredWell` package from iMOD5 data in the CAP package (for
   MetaSWAP). Currently only griddata (IDF) is supported.
+- :meth:`imod.mf6.Recharge.from_imod5_cap_data` to construct a recharge package
+  for coupling a MODFLOW6 model to MetaSWAP.
 
 Fixed
 ~~~~~

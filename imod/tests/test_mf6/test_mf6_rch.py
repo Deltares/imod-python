@@ -455,3 +455,30 @@ def test_non_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     )
     assert rendered_rch.count("begin period") == 3
     assert "maxbound 33856" in rendered_rch
+
+
+@pytest.mark.usefixtures("imod5_dataset")
+def test_from_imod5_cap_data(imod5_dataset):
+    # Arrange
+    data = deepcopy(imod5_dataset[0])
+    target_discretization = StructuredDiscretization.from_imod5_data(data)
+    data["cap"] = {}
+    msw_bound = data["bnd"]["ibound"].isel(layer=0, drop=True)
+    data["cap"]["boundary"] = msw_bound
+    data["cap"]["wetted_area"] = xr.ones_like(msw_bound) * 100
+    data["cap"]["urban_area"] = xr.ones_like(msw_bound) * 200
+    # Set to total cellsize, cell needs to be deactivated.
+    data["cap"]["wetted_area"][100, 100] = 625.0
+    # Set to zero, cell needs to be deactivated.
+    data["cap"]["urban_area"][100, 100] = 0.0
+    # Act
+    rch = imod.mf6.Recharge.from_imod5_cap_data(data, target_discretization)
+    rate = rch.dataset["rate"]
+    # Assert
+    np.testing.assert_array_equal(np.unique(rate), np.array([0.0, np.nan]))
+    # Boundaries inactive in MetaSWAP
+    assert np.isnan(rate[0, :, 0]).all()
+    assert np.isnan(rate[0, :, -1]).all()
+    assert np.isnan(rate[0, 0, :]).all()
+    assert np.isnan(rate[0, -1, :]).all()
+    assert np.isnan(rate[:, 100, 100]).all()
