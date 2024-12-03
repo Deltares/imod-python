@@ -36,7 +36,7 @@ class CopyFiles(MetaSwapPackage):
         paths_filtered = [
             str(p) for p in paths_unpacked if p.name.lower() not in files_to_filter
         ]
-        paths_filtered_away = paths_unpacked - set(paths_filtered)
+        paths_filtered_away = {str(p) for p in paths_unpacked} - set(paths_filtered)
         if paths_filtered_away:
             log_message = _LOG_MESSAGE_TEMPLATE.format(filtered=paths_filtered_away)
             logger.log(
