@@ -14,6 +14,8 @@ Added
 
 - :class:`imod.msw.MeteoGridCopy` to copy existing `mete_grid.inp` files, so
   ASCII grids in large existing meteo databases do not have to be read.
+- :class:`imod.msw.CopyFiles` to copy settings and lookup tables in existing
+  ``.inp`` files.
 - :meth:`imod.mf6.Recharge.from_imod5_cap_data` to construct a recharge package
   for coupling a MODFLOW6 model to MetaSWAP.
 
