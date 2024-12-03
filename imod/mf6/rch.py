@@ -1,7 +1,8 @@
 from copy import deepcopy
-from typing import Optional
+from typing import Optional, cast
 
 import numpy as np
+import xarray as xr
 
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
@@ -11,6 +12,10 @@ from imod.mf6.regrid.regrid_schemes import RechargeRegridMethod
 from imod.mf6.utilities.imod5_converter import convert_unit_rch_rate
 from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
+from imod.msw.utilities.imod5_converter import (
+    get_cell_area_from_imod5_data,
+    is_msw_active_cell,
+)
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_rch_cells
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -23,7 +28,7 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
-from imod.typing import GridDataArray
+from imod.typing import GridDataArray, GridDataDict, Imod5DataDict
 from imod.typing.grid import (
     enforce_dim_order,
     is_planar_grid,
@@ -218,7 +223,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
             # create an array indicating in which cells rch is active
             is_rch_cell = allocate_rch_cells(
                 ALLOCATION_OPTION.at_first_active,
-                new_idomain == 1,
+                new_idomain > 0,
                 planar_rate_regridded,
             )
 
@@ -227,7 +232,33 @@ class Recharge(BoundaryCondition, IRegridPackage):
             rch_rate = enforce_dim_order(rch_rate)
             new_package_data["rate"] = rch_rate
 
-        return Recharge(**new_package_data, validate=True, fixed_cell=False)
+        return cls(**new_package_data, validate=True, fixed_cell=False)
+
+    @classmethod
+    def from_imod5_cap_data(
+        cls,
+        imod5_data: Imod5DataDict,
+        target_dis: StructuredDiscretization,
+    ) -> "Recharge":
+        """
+        Construct an rch-package from iMOD5 data in the CAP package, loaded with
+        the :func:`imod.formats.prj.open_projectfile_data` function. Package is
+        used to couple MODFLOW6 to MetaSWAP models. Active cells will have a
+        recharge rate of 0.0.
+        """
+        cap_data = cast(GridDataDict, imod5_data["cap"])
+
+        msw_area = get_cell_area_from_imod5_data(cap_data)
+        active, _ = is_msw_active_cell(target_dis, cap_data, msw_area)
+
+        data = {}
+        layer_da = xr.full_like(
+            target_dis.dataset.coords["layer"], np.nan, dtype=np.float64
+        )
+        layer_da.loc[{"layer": 1}] = 0.0
+        data["rate"] = layer_da.where(active)
+
+        return cls(**data, validate=True, fixed_cell=False)
 
     @classmethod
     def get_regrid_methods(cls) -> RechargeRegridMethod:

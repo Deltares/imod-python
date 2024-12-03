@@ -2,7 +2,7 @@
 Module to define type aliases.
 """
 
-from typing import TYPE_CHECKING, TypeAlias, TypeVar, Union
+from typing import TYPE_CHECKING, Literal, TypeAlias, TypedDict, TypeVar, Union
 
 import numpy as np
 import xarray as xr
@@ -18,6 +18,12 @@ ScalarAsDataset: TypeAlias = Union[xr.Dataset, xu.UgridDataset]
 UnstructuredData: TypeAlias = Union[xu.UgridDataset, xu.UgridDataArray]
 FloatArray: TypeAlias = NDArray[np.floating]
 IntArray: TypeAlias = NDArray[np.int_]
+
+
+class SelSettingsType(TypedDict, total=False):
+    layer: int
+    drop: bool
+    missing_dims: Literal["raise", "warn", "ignore"]
 
 
 # Types for optional dependencies.

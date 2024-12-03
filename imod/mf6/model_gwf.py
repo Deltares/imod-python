@@ -303,9 +303,9 @@ class GroundwaterFlowModel(Modflow6Model):
             )
 
         # now import the non-singleton packages'
+        imod5_keys = list(imod5_data.keys())
 
         # import wells
-        imod5_keys = list(imod5_data.keys())
         wel_keys = [key for key in imod5_keys if key[0:3] == "wel"]
         for wel_key in wel_keys:
             wel_key_truncated = wel_key[:16]
@@ -330,8 +330,11 @@ class GroundwaterFlowModel(Modflow6Model):
                     wel_key, imod5_data, times
                 )
 
+        if "cap" in imod5_keys:
+            result["msw-sprinkling"] = LayeredWell.from_imod5_cap_data(imod5_data)  # type: ignore
+            result["msw-rch"] = Recharge.from_imod5_cap_data(imod5_data)  # type: ignore
+
         # import ghb's
-        imod5_keys = list(imod5_data.keys())
         ghb_keys = [key for key in imod5_keys if key[0:3] == "ghb"]
         for ghb_key in ghb_keys:
             ghb_pkg = GeneralHeadBoundary.from_imod5_data(
