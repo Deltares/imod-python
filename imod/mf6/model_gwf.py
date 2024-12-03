@@ -330,6 +330,9 @@ class GroundwaterFlowModel(Modflow6Model):
                     wel_key, imod5_data, times
                 )
 
+        if "cap" in imod5_keys:
+            result["msw-rch"] = Recharge.from_imod5_cap_data(imod5_data)  # type: ignore
+
         # import ghb's
         imod5_keys = list(imod5_data.keys())
         ghb_keys = [key for key in imod5_keys if key[0:3] == "ghb"]
