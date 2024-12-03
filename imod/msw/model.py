@@ -27,6 +27,7 @@ from imod.msw.meteo_grid import MeteoGrid, MeteoGridCopy
 from imod.msw.meteo_mapping import EvapotranspirationMapping, PrecipitationMapping
 from imod.msw.output_control import TimeOutputControl
 from imod.msw.ponding import Ponding
+from imod.msw.sprinkling import Sprinkling
 from imod.msw.timeutil import to_metaswap_timeformat
 from imod.msw.utilities.common import find_in_file_list
 from imod.msw.utilities.parse import read_para_sim
@@ -316,15 +317,13 @@ class MetaSwapModel(Model):
         )
         model["infiltration"] = Infiltration.from_imod5_data(imod5_data)
         model["ponding"] = Ponding.from_imod5_data(imod5_data)
-        # model["sprinkling"] = Sprinkling.from_imod5_data(imod5_data)
+        model["sprinkling"] = Sprinkling.from_imod5_data(imod5_data)
         model["meteo_grid"] = MeteoGridCopy.from_imod5_data(imod5_data)
         model["prec_mapping"] = PrecipitationMapping.from_imod5_data(imod5_data)
         model["evt_mapping"] = EvapotranspirationMapping.from_imod5_data(imod5_data)
         model["idf_mapping"] = IdfMapping(model["grid"]["area"], np.nan)
 
         model["coupling"] = CouplerMapping()
-
-        # TODO:
-        # Add CopyFiles package here
+        #model["extra_files"] = CopyFiles.from_imod5_data(imod5_data)
 
         return model
