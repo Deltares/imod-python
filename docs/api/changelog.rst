@@ -14,6 +14,8 @@ Added
 
 - :class:`imod.msw.MeteoGridCopy` to copy existing `mete_grid.inp` files, so
   ASCII grids in large existing meteo databases do not have to be read.
+- :class:`imod.msw.CopyFiles` to copy settings and lookup tables in existing
+  ``.inp`` files.
 - :meth:`imod.mf6.LayeredWell.from_imod5_cap_data` to construct a
   :class:`imod.mf6.LayeredWell` package from iMOD5 data in the CAP package (for
   MetaSWAP). Currently only griddata (IDF) is supported.
