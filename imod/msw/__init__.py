@@ -1,4 +1,4 @@
-from imod.msw.copy_files import CopyFiles
+from imod.msw.copy_files import FileCopier
 from imod.msw.coupler_mapping import CouplerMapping
 from imod.msw.grid_data import GridData
 from imod.msw.idf_mapping import IdfMapping
