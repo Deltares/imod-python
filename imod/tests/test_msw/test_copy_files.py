@@ -3,7 +3,7 @@ from pytest_cases import parametrize_with_cases
 from imod.msw.copy_files import CopyFiles
 
 
-def setup_src_files(directory, filenames):
+def write_test_files(directory, filenames):
     paths = [directory / filename for filename in filenames]
     for p in paths:
         with open(p, mode="w") as f:
@@ -18,7 +18,7 @@ def case_simple_files(tmp_path_factory):
         "b.inp",
         "c.inp",
     ]
-    return setup_src_files(directory, filenames)
+    return write_test_files(directory, filenames)
 
 
 def case_imod5_extra_files(tmp_path_factory):
@@ -32,7 +32,7 @@ def case_imod5_extra_files(tmp_path_factory):
         "svat2precgrid.inp",
         "svat2etrefgrid.inp",
     ]
-    return setup_src_files(directory, filenames)
+    return write_test_files(directory, filenames)
 
 
 @parametrize_with_cases("src_files", cases=".")
