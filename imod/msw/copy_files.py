@@ -33,17 +33,17 @@ class FileCopier(MetaSwapPackage):
             "svat2precgrid.inp",
             "svat2etrefgrid.inp",
         )
-        paths_filtered = [
+        paths_included = [
             str(p) for p in paths_unpacked if p.name.lower() not in files_to_filter
         ]
-        paths_filtered_away = {str(p) for p in paths_unpacked} - set(paths_filtered)
-        if paths_filtered_away:
-            log_message = _LOG_MESSAGE_TEMPLATE.format(filtered=paths_filtered_away)
+        paths_excluded = {str(p) for p in paths_unpacked} - set(paths_included)
+        if paths_excluded:
+            log_message = _LOG_MESSAGE_TEMPLATE.format(filtered=paths_excluded)
             logger.log(
                 loglevel=LogLevel.INFO,
                 message=log_message,
             )
-        return cls(paths_filtered)
+        return cls(paths_included)
 
     def write(self, directory: str | Path, *_):
         directory = Path(directory)
