@@ -321,7 +321,8 @@ class MetaSwapModel(Model):
         model["meteo_grid"] = MeteoGridCopy.from_imod5_data(imod5_data)
         model["prec_mapping"] = PrecipitationMapping.from_imod5_data(imod5_data)
         model["evt_mapping"] = EvapotranspirationMapping.from_imod5_data(imod5_data)
-        model["idf_mapping"] = IdfMapping(model["grid"]["area"], np.nan)
+        area = model["grid"]["area"].isel(subunit=0, drop=True)
+        model["idf_mapping"] = IdfMapping(area, -9999.0)
 
         model["coupling"] = CouplerMapping()
         #model["extra_files"] = CopyFiles.from_imod5_data(imod5_data)
