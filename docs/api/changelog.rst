@@ -16,6 +16,9 @@ Added
   ASCII grids in large existing meteo databases do not have to be read.
 - :class:`imod.msw.CopyFiles` to copy settings and lookup tables in existing
   ``.inp`` files.
+- :meth:`imod.mf6.LayeredWell.from_imod5_cap_data` to construct a
+  :class:`imod.mf6.LayeredWell` package from iMOD5 data in the CAP package (for
+  MetaSWAP). Currently only griddata (IDF) is supported.
 - :meth:`imod.mf6.Recharge.from_imod5_cap_data` to construct a recharge package
   for coupling a MODFLOW6 model to MetaSWAP.
 
@@ -28,6 +31,9 @@ Fixed
   ``NotImplementedError`` when attempting to regrid an unstructured model to a
   structured grid.
 - :class:`imod.msw.Sprinkling` now correctly writes source svats to scap_svat.inp file.
+- :func:`imod.evaluate.calculate_gxg`, upon providing a head dataarray chunked
+  over time, will no longer error with ``ValueError: Object has inconsistent
+  chunks along dimension bimonth. This can be fixed by calling unify_chunks().``
 
 
 Changed
@@ -37,6 +43,9 @@ Changed
   ``downward_resistance`` now require a ``subunit`` coordinate.
 - Variables ``max_abstraction_groundwater`` and ``max_abstraction_surfacewater``
   in :class:`imod.msw.Sprinkling` now needs to have a subunit coordinate.
+- If ``"cap"`` package present in ``imod5_data``,
+  :meth:`imod.mf6.GroundwaterFlowModel.from_imod5_data` now automatically adds a
+  well for metaswap sprinkling named ``"msw-sprinkling"``
 
 
 [0.18.1] - 2024-11-20
