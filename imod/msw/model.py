@@ -1,7 +1,7 @@
 import collections
 from copy import copy
 from pathlib import Path
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Optional, Tuple, Union, cast
 
 import jinja2
 import numpy as np
@@ -12,6 +12,7 @@ from imod.mf6.regrid.regrid_schemes import (
     RegridMethodType,
 )
 from imod.mf6.utilities.regrid import RegridderWeightsCache
+from imod.msw.copy_files import FileCopier
 from imod.msw.coupler_mapping import CouplerMapping
 from imod.msw.grid_data import GridData
 from imod.msw.idf_mapping import IdfMapping
@@ -109,7 +110,9 @@ class MetaSwapModel(Model):
     )
 
     def __init__(
-        self, unsaturated_database: Path | str, settings: dict[str, Any] = None
+        self,
+        unsaturated_database: Path | str,
+        settings: Optional[dict[str, Any]] = None,
     ):
         super().__init__()
 
@@ -273,7 +276,7 @@ class MetaSwapModel(Model):
         regrid_context: Optional[RegridderWeightsCache] = None,
         regridder_types: Optional[dict[str, Tuple[RegridderType, str]]] = None,
     ) -> "MetaSwapModel":
-        unsat_database = self.simulation_settings["unsa_svat_path"]
+        unsat_database = cast(str, self.simulation_settings["unsa_svat_path"])
         regridded_model = MetaSwapModel(unsat_database)
 
         target_grid = mf6_regridded_dis["idomain"]
@@ -306,11 +309,12 @@ class MetaSwapModel(Model):
         regridder_types: Optional[RegridMethodType] = None,
         regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
     ):
-        extra_paths = imod5_data["extra"]["paths"]
+        extra_paths = cast(list[str], imod5_data["extra"]["paths"])
         path_to_parasim = find_in_file_list("para_sim.inp", extra_paths)
         parasim_settings = read_para_sim(path_to_parasim)
+        unsat_svat_path = cast(str, parasim_settings["unsat_svat_path"])
 
-        model = cls(parasim_settings["unsat_svat_path"], parasim_settings)
+        model = cls(unsat_svat_path, parasim_settings)
 
         model["grid"] = GridData.from_imod5_data(
             imod5_data, target_dis, regridder_types, regrid_cache
@@ -323,8 +327,7 @@ class MetaSwapModel(Model):
         model["evt_mapping"] = EvapotranspirationMapping.from_imod5_data(imod5_data)
         area = model["grid"]["area"].isel(subunit=0, drop=True)
         model["idf_mapping"] = IdfMapping(area, -9999.0)
-
         model["coupling"] = CouplerMapping()
-        #model["extra_files"] = CopyFiles.from_imod5_data(imod5_data)
+        model["extra_files"] = FileCopier.from_imod5_data(imod5_data)
 
         return model

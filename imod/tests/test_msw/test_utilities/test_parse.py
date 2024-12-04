@@ -1,6 +1,6 @@
 from pytest_cases import parametrize_with_cases
 
-from imod.msw.utilities.parse import _try_parsing_string_to_value
+from imod.msw.utilities.parse import _try_parsing_string_to_number
 
 
 class ParseCases:
@@ -23,6 +23,6 @@ class ParseCases:
 @parametrize_with_cases(["s", "expected_type"], cases=ParseCases)
 def test_try_parsing_string_to_value(s, expected_type):
     # Act
-    parsed = _try_parsing_string_to_value(s)
+    parsed = _try_parsing_string_to_number(s)
     # Assert
     assert type(parsed) is expected_type
