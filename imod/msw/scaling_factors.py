@@ -1,7 +1,12 @@
+from typing import cast
+
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import ScalingRegridMethod
+from imod.msw.utilities.common import concat_imod5
+from imod.typing import GridDataDict, Imod5DataDict
+from imod.typing.grid import ones_like
 
 
 class ScalingFactors(MetaSwapPackage, IRegridPackage):
@@ -76,3 +81,24 @@ class ScalingFactors(MetaSwapPackage, IRegridPackage):
         self.dataset["depth_perched_water_table"] = depth_perched_water_table
 
         self._pkgcheck()
+
+    @classmethod
+    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "ScalingFactors":
+        """
+        Import ScalingFactors from iMOD5 data. Pressure head factor is set to
+        one for all factors, as well as all factors for urban areas.
+        """
+        cap_data = cast(GridDataDict, imod5_data["cap"])
+        grid_ones = ones_like(cap_data["boundary"])
+
+        data = {}
+        data["scale_soil_moisture"] = concat_imod5(
+            cap_data["soil_moisture_fraction"], grid_ones
+        )
+        data["scale_hydraulic_conductivity"] = concat_imod5(
+            cap_data["conductivitiy_factor"], grid_ones
+        )
+        data["scale_pressure_head"] = concat_imod5(grid_ones, grid_ones)
+        data["depth_perched_water_table"] = cap_data["perched_water_table_level"]
+
+        return cls(**data)
