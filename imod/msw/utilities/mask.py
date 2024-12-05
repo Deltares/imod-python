@@ -10,8 +10,18 @@ class MetaSwapActive:
     all: GridDataArray
     per_subunit: GridDataArray
 
-
 def mask_and_broadcast_grid_data(
+        grid_data: GridDataDict, 
+        msw_active: MetaSwapActive
+    ) -> GridDataDict:
+    """
+    Mask and broadcast grid data, 
+    """
+    return {
+        key: _mask_spatial_var(grid, msw_active.all) for key, grid in grid_data.items()
+    }
+
+def mask_package_data(
         package: MetaSwapPackage, 
         grid_data: GridDataDict, 
         msw_active: MetaSwapActive
@@ -30,7 +40,7 @@ def mask_and_broadcast_grid_data(
         for key, grid in grid_data.items()
     }
 
-def _mask_spatial_var(self, da: GridDataArray, active: GridDataArray) -> GridDataArray:
+def _mask_spatial_var(da: GridDataArray, active: GridDataArray) -> GridDataArray:
     if issubclass(da.dtype.type, numbers.Integral):
         return da.where(active, other=0)
     elif issubclass(da.dtype.type, numbers.Real):
