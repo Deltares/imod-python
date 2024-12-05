@@ -1,6 +1,7 @@
 from imod.logging import LogLevel, logger
 from imod.mf6 import StructuredDiscretization
 from imod.msw.utilities.common import concat_imod5
+from imod.msw.utilities.mask import MetaSwapActive
 from imod.typing import GridDataArray, GridDataDict
 from imod.typing.grid import ones_like
 from imod.util.spatial import get_cell_area
@@ -63,7 +64,7 @@ def is_msw_active_cell(
     target_dis: StructuredDiscretization,
     imod5_cap: GridDataDict,
     msw_area: GridDataArray,
-) -> tuple[GridDataArray, GridDataArray]:
+) -> MetaSwapActive:
     """
     Return grid of cells that are active in the coupled computation, based on
     following criteria:
@@ -84,4 +85,4 @@ def is_msw_active_cell(
         (imod5_cap["boundary"] == 1) & (msw_area > 0) & (mf6_top_active >= 1)
     )
     active = subunit_active.any(dim="subunit")
-    return active, subunit_active
+    return MetaSwapActive(active, subunit_active)
