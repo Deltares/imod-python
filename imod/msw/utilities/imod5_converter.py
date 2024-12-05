@@ -10,7 +10,7 @@ def get_cell_area_from_imod5_data(
     imod5_cap: GridDataDict,
 ) -> GridDataArray:
     # area's per type of svats
-    mf6_area = get_cell_area(imod5_cap["wetted_area"])
+    mf6_area = get_cell_area(imod5_cap["boundary"])
     wetted_area = imod5_cap["wetted_area"]
     urban_area = imod5_cap["urban_area"]
     rural_area = mf6_area - (wetted_area + urban_area)
