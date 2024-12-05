@@ -120,7 +120,7 @@ class Infiltration(MetaSwapPackage, IRegridPackage):
         data = deactivate_small_resistances_in_data(data)
 
         like = data["downward_resistance"].isel(subunit=0, drop=True)
-        data["bottom_resistance"] = ones_like(like)
+        data["bottom_resistance"] = ones_like(like) * -9999.0
         data["extra_storage_coefficient"] = ones_like(like)
 
         return cls(**data)
