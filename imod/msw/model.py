@@ -27,7 +27,6 @@ from imod.msw.meteo_grid import MeteoGrid, MeteoGridCopy
 from imod.msw.meteo_mapping import EvapotranspirationMapping, PrecipitationMapping
 from imod.msw.output_control import TimeOutputControl
 from imod.msw.ponding import Ponding
-from imod.msw.scaling_factors import ScalingFactors
 from imod.msw.sprinkling import Sprinkling
 from imod.msw.timeutil import to_metaswap_timeformat
 from imod.msw.utilities.common import find_in_file_list
@@ -351,8 +350,12 @@ class MetaSwapModel(Model):
             }
         }
         model = cls(unsa_svat_path, parasim_settings)
-        model["grid"], msw_active = GridData.from_imod5_data(imod5_cap_no_layer, target_dis)
-        cap_data_masked = mask_and_broadcast_grid_data(imod5_cap_no_layer["cap"], msw_active)
+        model["grid"], msw_active = GridData.from_imod5_data(
+            imod5_cap_no_layer, target_dis
+        )
+        cap_data_masked = mask_and_broadcast_grid_data(
+            imod5_cap_no_layer["cap"], msw_active
+        )
         imod5_masked = {"cap": cap_data_masked, "extra": {"paths": extra_paths}}
         model["infiltration"] = Infiltration.from_imod5_data(imod5_masked)
         model["ponding"] = Ponding.from_imod5_data(imod5_masked)

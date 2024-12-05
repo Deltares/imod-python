@@ -12,7 +12,7 @@ from imod.msw.utilities.imod5_converter import (
     get_rootzone_depth_from_imod5_data,
     is_msw_active_cell,
 )
-from imod.msw.utilities.mask import mask_package_data, MetaSwapActive
+from imod.msw.utilities.mask import MetaSwapActive, mask_package_data
 from imod.typing import GridDataDict
 from imod.util.spatial import get_cell_area, spatial_reference
 
