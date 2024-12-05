@@ -15,7 +15,7 @@ def mask_and_broadcast_grid_data(
         package: MetaSwapPackage, 
         grid_data: GridDataDict, 
         msw_active: MetaSwapActive
-    ):
+    ) -> GridDataDict:
     """
     Mask and broadcast grid data, carefully mask per subunit if variable needs
     to contain subunits.
