@@ -6,6 +6,7 @@ from typing import Any, Optional, Tuple, Union, cast
 
 import jinja2
 import numpy as np
+import xarray as xr
 
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.mf6_wel_adapter import Mf6Wel
@@ -233,6 +234,7 @@ class MetaSwapModel(Model):
         directory: Union[str, Path],
         mf6_dis: StructuredDiscretization,
         mf6_wel: Mf6Wel,
+        validate: bool = True,
     ):
         """
         Write packages and simulation settings (para_sim.inp).
@@ -244,9 +246,10 @@ class MetaSwapModel(Model):
         """
 
         # Model checks
-        self._check_required_packages()
-        self._check_vegetation_indices_in_annual_crop_factors()
-        self._check_landuse_indices_in_lookup_options()
+        if validate:
+            self._check_required_packages()
+            self._check_vegetation_indices_in_annual_crop_factors()
+            self._check_landuse_indices_in_lookup_options()
 
         # Force to Path
         directory = Path(directory)
@@ -273,6 +276,7 @@ class MetaSwapModel(Model):
 
         # write package contents
         for pkgname in self:
+            print(pkgname)
             self[pkgname].write(directory, index, svat, mf6_dis, mf6_wel)
 
     def regrid_like(
@@ -346,7 +350,7 @@ class MetaSwapModel(Model):
             }
         }
         model = cls(unsa_svat_path, parasim_settings)
-        model["grid"] = GridData.from_imod5_data(imod5_cap_no_layer, target_dis)
+        model["grid"], msw_active = GridData.from_imod5_data(imod5_cap_no_layer, target_dis)
         active = model["grid"].dataset["active"]
         # Mask grid cells and broadcast scalars to grid
         imod5_cap_masked: Imod5DataDict = {
@@ -369,6 +373,7 @@ class MetaSwapModel(Model):
         model["coupling"] = CouplerMapping()
         model["extra_files"] = FileCopier.from_imod5_data(imod5_cap_masked)
 
-        model["time_oc"] = TimeOutputControl(times)
+        times_da = xr.DataArray(times, coords={"time": times}, dims=("time",))
+        model["time_oc"] = TimeOutputControl(times_da)
 
         return model
