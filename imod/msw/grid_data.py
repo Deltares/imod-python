@@ -18,6 +18,7 @@ from imod.msw.utilities.imod5_converter import (
     get_rootzone_depth_from_imod5_data,
     is_msw_active_cell,
 )
+from imod.msw.utilities.mask import mask_and_broadcast_grid_data, MetaSwapActive
 from imod.typing import GridDataDict
 from imod.util.spatial import get_cell_area, spatial_reference
 
@@ -131,9 +132,7 @@ class GridData(MetaSwapPackage, IRegridPackage):
         cls,
         imod5_data: dict[str, GridDataDict],
         target_dis: StructuredDiscretization,
-        regridder_types: Optional[RegridMethodType] = None,
-        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
-    ) -> "GridData":
+    ) -> tuple["GridData", MetaSwapActive]:
         # Get iMOD5 capillary zone data
         imod5_cap = imod5_data["cap"]
 
@@ -144,15 +143,7 @@ class GridData(MetaSwapPackage, IRegridPackage):
         data["surface_elevation"] = imod5_cap["surface_elevation"]
         data["soil_physical_unit"] = imod5_cap["soil_physical_unit"]
 
-        active, subunit_active = is_msw_active_cell(target_dis, imod5_cap, data["area"])
-
-        data_active = {
-            key: (
-                griddata.where(subunit_active)
-                if key in cls._with_subunit
-                else griddata.where(active)
-            )
-            for key, griddata in data.items()
-        }
-        data_active["active"] = active
-        return cls(**data_active)
+        msw_active = is_msw_active_cell(target_dis, imod5_cap, data["area"])
+        data_active = mask_and_broadcast_grid_data(cls, data, msw_active)
+        data_active["active"] = msw_active.all
+        return cls(**data_active), msw_active
