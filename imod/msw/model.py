@@ -330,9 +330,9 @@ class MetaSwapModel(Model):
         extra_paths = cast(list[str], imod5_data["extra"]["paths"])
         path_to_parasim = find_in_file_list("para_sim.inp", extra_paths)
         parasim_settings = read_para_sim(path_to_parasim)
-        unsat_svat_path = cast(str, parasim_settings["unsat_svat_path"])
+        unsa_svat_path = cast(str, parasim_settings["unsa_svat_path"])
 
-        model = cls(unsat_svat_path, parasim_settings)
+        model = cls(unsa_svat_path, parasim_settings)
 
         model["grid"] = GridData.from_imod5_data(imod5_data, target_dis)
         model["infiltration"] = Infiltration.from_imod5_data(imod5_data)
