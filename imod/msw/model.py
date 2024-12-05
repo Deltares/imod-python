@@ -26,12 +26,13 @@ from imod.msw.meteo_grid import MeteoGrid, MeteoGridCopy
 from imod.msw.meteo_mapping import EvapotranspirationMapping, PrecipitationMapping
 from imod.msw.output_control import TimeOutputControl
 from imod.msw.ponding import Ponding
+from imod.msw.scaling_factors import ScalingFactors
 from imod.msw.sprinkling import Sprinkling
 from imod.msw.timeutil import to_metaswap_timeformat
 from imod.msw.utilities.common import find_in_file_list
 from imod.msw.utilities.parse import read_para_sim
 from imod.msw.vegetation import AnnualCropFactors
-from imod.typing import Imod5DataDict
+from imod.typing import Imod5DataDict, SelSettingsType
 from imod.util.regrid_method_type import RegridderType
 
 REQUIRED_PACKAGES = (
@@ -74,6 +75,12 @@ DEFAULT_SETTINGS = {
     "tdbgsm": 91.0,
     "tdedsm": 270.0,
     "clocktime": 0,
+}
+
+_DROP_LAYER_KWARGS: SelSettingsType = {
+    "layer": 0,
+    "drop": True,
+    "missing_dims": "ignore",
 }
 
 
@@ -331,21 +338,36 @@ class MetaSwapModel(Model):
         path_to_parasim = find_in_file_list("para_sim.inp", extra_paths)
         parasim_settings = read_para_sim(path_to_parasim)
         unsa_svat_path = cast(str, parasim_settings["unsa_svat_path"])
-
+        # Drop layer coord
+        imod5_cap_no_layer: Imod5DataDict = {
+            "cap": {
+                key: da.isel(**_DROP_LAYER_KWARGS).compute()
+                for key, da in imod5_data["cap"].items()
+            }
+        }
         model = cls(unsa_svat_path, parasim_settings)
-
-        model["grid"] = GridData.from_imod5_data(imod5_data, target_dis)
-        model["infiltration"] = Infiltration.from_imod5_data(imod5_data)
-        model["ponding"] = Ponding.from_imod5_data(imod5_data)
-        model["sprinkling"] = Sprinkling.from_imod5_data(imod5_data)
-        model["meteo_grid"] = MeteoGridCopy.from_imod5_data(imod5_data)
-        model["prec_mapping"] = PrecipitationMapping.from_imod5_data(imod5_data)
-        model["evt_mapping"] = EvapotranspirationMapping.from_imod5_data(imod5_data)
-        # model["scaling_factor"] = ScalingFactors.from_imod5_data(imod5_data)
+        model["grid"] = GridData.from_imod5_data(imod5_cap_no_layer, target_dis)
+        active = model["grid"].dataset["active"]
+        # Mask grid cells and broadcast scalars to grid
+        imod5_cap_masked: Imod5DataDict = {
+            "cap": {
+                key: da.where(active) for key, da in imod5_cap_no_layer["cap"].items()
+            },
+            "extra": {"paths": extra_paths},
+        }
+        model["infiltration"] = Infiltration.from_imod5_data(imod5_cap_masked)
+        model["ponding"] = Ponding.from_imod5_data(imod5_cap_masked)
+        model["sprinkling"] = Sprinkling.from_imod5_data(imod5_cap_masked)
+        model["meteo_grid"] = MeteoGridCopy.from_imod5_data(imod5_cap_masked)
+        model["prec_mapping"] = PrecipitationMapping.from_imod5_data(imod5_cap_masked)
+        model["evt_mapping"] = EvapotranspirationMapping.from_imod5_data(
+            imod5_cap_masked
+        )
+        model["scaling_factor"] = ScalingFactors.from_imod5_data(imod5_cap_masked)
         area = model["grid"]["area"].isel(subunit=0, drop=True)
         model["idf_mapping"] = IdfMapping(area, -9999.0)
         model["coupling"] = CouplerMapping()
-        model["extra_files"] = FileCopier.from_imod5_data(imod5_data)
+        model["extra_files"] = FileCopier.from_imod5_data(imod5_cap_masked)
 
         model["time_oc"] = TimeOutputControl(times)
 
