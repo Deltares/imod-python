@@ -1,7 +1,7 @@
 import collections
 from copy import copy
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 from typing import Any, Optional, Tuple, Union, cast
 
 import jinja2
@@ -9,9 +9,6 @@ import numpy as np
 
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.mf6_wel_adapter import Mf6Wel
-from imod.mf6.regrid.regrid_schemes import (
-    RegridMethodType,
-)
 from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.msw.copy_files import FileCopier
 from imod.msw.coupler_mapping import CouplerMapping
@@ -29,7 +26,6 @@ from imod.msw.meteo_grid import MeteoGrid, MeteoGridCopy
 from imod.msw.meteo_mapping import EvapotranspirationMapping, PrecipitationMapping
 from imod.msw.output_control import TimeOutputControl
 from imod.msw.ponding import Ponding
-from imod.msw.scaling_factors import ScalingFactors
 from imod.msw.sprinkling import Sprinkling
 from imod.msw.timeutil import to_metaswap_timeformat
 from imod.msw.utilities.common import find_in_file_list
@@ -313,7 +309,7 @@ class MetaSwapModel(Model):
         """
         Construct a MetaSWAP model from iMOD5 data in the CAP package, loaded
         with the :func:`imod.formats.prj.open_projectfile_data` function.
-        
+
         Parameters
         ----------
         imod5_data: dict
@@ -324,8 +320,8 @@ class MetaSwapModel(Model):
             inactive in MetaSWAP as well.
         times: list[datetime]
             List of datetimes, will be used to set the output control times.
-            Is also used to infer the starttime of the simulation. 
-        
+            Is also used to infer the starttime of the simulation.
+
         Returns
         -------
         MetaSwapModel
@@ -338,16 +334,14 @@ class MetaSwapModel(Model):
 
         model = cls(unsat_svat_path, parasim_settings)
 
-        model["grid"] = GridData.from_imod5_data(
-            imod5_data, target_dis
-        )
+        model["grid"] = GridData.from_imod5_data(imod5_data, target_dis)
         model["infiltration"] = Infiltration.from_imod5_data(imod5_data)
         model["ponding"] = Ponding.from_imod5_data(imod5_data)
         model["sprinkling"] = Sprinkling.from_imod5_data(imod5_data)
         model["meteo_grid"] = MeteoGridCopy.from_imod5_data(imod5_data)
         model["prec_mapping"] = PrecipitationMapping.from_imod5_data(imod5_data)
         model["evt_mapping"] = EvapotranspirationMapping.from_imod5_data(imod5_data)
-        #model["scaling_factor"] = ScalingFactors.from_imod5_data(imod5_data)
+        # model["scaling_factor"] = ScalingFactors.from_imod5_data(imod5_data)
         area = model["grid"]["area"].isel(subunit=0, drop=True)
         model["idf_mapping"] = IdfMapping(area, -9999.0)
         model["coupling"] = CouplerMapping()
