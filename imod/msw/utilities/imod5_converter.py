@@ -44,7 +44,7 @@ def get_landuse_from_imod5_data(
     rural_landuse = imod5_cap["landuse"]
     # Urban landuse = 18
     urban_landuse = ones_like(rural_landuse) * 18
-    return concat_imod5(rural_landuse, urban_landuse)
+    return concat_imod5(rural_landuse, urban_landuse).astype(int)
 
 
 def get_rootzone_depth_from_imod5_data(
