@@ -15,46 +15,15 @@ from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.msw import MeteoGrid, MeteoGridCopy
 
 
-def setup_meteo_grid():
-    x = [1.0, 2.0, 3.0]
-    y = [1.0, 2.0, 3.0]
-    time = pd.date_range(start="2000-01-01", end="2000-01-02", freq="D")
+def test_meteo_grid_init(meteo_grids):
+    meteo_grids = MeteoGrid(*meteo_grids)
 
-    dx = 1.0
-    dy = -1.0
-    # fmt: off
-    precipitation = xr.DataArray(
-        np.array(
-            [
-                [[1.0, 1.0, 1.0],
-                 [nan, nan, nan],
-                 [1.0, 1.0, 1.0]],
-
-                [[2.0, 2.0, 1.0],
-                 [nan, nan, nan],
-                 [1.0, 2.0, 1.0]],
-            ]
-        ),
-        dims=("time", "y", "x"),
-        coords={"time": time, "y": y, "x": x, "dx": dx, "dy": dy}
-    )
-
-    evapotranspiration = xr.DataArray(
-        np.array(
-            [1.0, 3.0]
-        ),
-        dims=("time",),
-        coords={"time": time}
-    )
-    # fmt: on
-
-    meteo_grid = MeteoGrid(precipitation, evapotranspiration)
-
-    return meteo_grid
+    assert meteo_grids.dataset["precipitation"].dims == ("time", "y", "x")
+    assert meteo_grids.dataset["evapotranspiration"].dims == ("time",)
 
 
-def test_meteo_grid():
-    meteo_grid = setup_meteo_grid()
+def test_meteo_grid_write(meteo_grids):
+    meteo_grid = MeteoGrid(*meteo_grids)
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
@@ -83,29 +52,8 @@ def test_meteo_grid():
     assert gridnames == expected_filenames
 
 
-def test_meteo_no_time_grid():
-    x = [1.0, 2.0, 3.0]
-    y = [1.0, 2.0, 3.0]
-    time = pd.date_range(start="2000-01-01", end="2000-01-02", freq="D")
-
-    dx = 1.0
-    dy = -1.0
-    # fmt: off
-    precipitation = xr.DataArray(
-        np.array(
-            [
-                [[1.0, 1.0, 1.0],
-                 [nan, nan, nan],
-                 [1.0, 1.0, 1.0]],
-
-                [[2.0, 2.0, 1.0],
-                 [nan, nan, nan],
-                 [1.0, 2.0, 1.0]],
-            ]
-        ),
-        dims=("time", "y", "x"),
-        coords={"time": time, "y": y, "x": x, "dx": dx, "dy": dy}
-    )
+def test_meteo_no_time_grid(meteo_grids):
+    precipitation, _ = meteo_grids
 
     evapotranspiration = 3.0
     # fmt: on
@@ -114,8 +62,8 @@ def test_meteo_no_time_grid():
         MeteoGrid(precipitation, evapotranspiration)
 
 
-def test_regrid_meteo(simple_2d_grid_with_subunits):
-    meteo = setup_meteo_grid()
+def test_regrid_meteo(meteo_grids, simple_2d_grid_with_subunits):
+    meteo = MeteoGrid(*meteo_grids)
     new_grid = simple_2d_grid_with_subunits
 
     regrid_context = RegridderWeightsCache()
@@ -126,9 +74,9 @@ def test_regrid_meteo(simple_2d_grid_with_subunits):
     assert np.all(regridded_ponding.dataset["y"].values == new_grid["y"].values)
 
 
-def test_meteogridcopy_write():
+def test_meteogridcopy_write(meteo_grids):
     # Arrange
-    meteo_grid = setup_meteo_grid()
+    meteo_grid = MeteoGrid(*meteo_grids)
 
     with tempfile.TemporaryDirectory() as output_dir:
         grid_dir = Path(output_dir) / "grid"
@@ -144,8 +92,8 @@ def test_meteogridcopy_write():
         assert filecmp.cmp(grid_dir / "mete_grid.inp", copy_dir / "mete_grid.inp")
 
 
-def test_meteogridcopy_from_imod5():
-    meteo_grid = setup_meteo_grid()
+def test_meteogridcopy_from_imod5(meteo_grids):
+    meteo_grid = MeteoGrid(*meteo_grids)
 
     with tempfile.TemporaryDirectory() as output_dir:
         grid_dir = Path(output_dir) / "grid"
