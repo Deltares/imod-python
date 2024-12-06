@@ -1,11 +1,14 @@
-import pandas as pd
-import xarray as xr
 import numpy as np
-from numpy import nan
+import pandas as pd
 import pytest
+import xarray as xr
+from numpy import nan
+
+from imod.typing import GridDataArray
+
 
 @pytest.fixture(scope="function")
-def meteo_grids():
+def meteo_grids() -> tuple[GridDataArray, GridDataArray]:
     x = [1.0, 2.0, 3.0]
     y = [1.0, 2.0, 3.0]
     time = pd.date_range(start="2000-01-01", end="2000-01-02", freq="D")
