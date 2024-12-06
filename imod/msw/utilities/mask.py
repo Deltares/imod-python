@@ -23,7 +23,7 @@ def mask_and_broadcast_grid_data(
 
 
 def mask_package_data(
-    package: MetaSwapPackage, grid_data: GridDataDict, msw_active: MetaSwapActive
+    package: type[MetaSwapPackage], grid_data: GridDataDict, msw_active: MetaSwapActive
 ) -> GridDataDict:
     """
     Mask and broadcast grid data, carefully mask per subunit if variable needs
