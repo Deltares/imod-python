@@ -1,3 +1,4 @@
+from copy import copy
 from pathlib import Path
 
 import pytest
@@ -6,6 +7,8 @@ from numpy.testing import assert_almost_equal, assert_equal
 
 from imod import mf6, msw
 from imod.mf6.utilities.regrid import RegridderWeightsCache
+from imod.msw.model import DEFAULT_SETTINGS
+from imod.typing import GridDataArray, Imod5DataDict
 
 
 def test_msw_model_write(msw_model, coupled_mf6_model, coupled_mf6wel, tmp_path):
@@ -138,3 +141,110 @@ def test_coupled_model_regrid(msw_model, coupled_mf6_model, tmp_path):
     )
 
     regridded_msw_model.write(tmp_path, mf6_discretization, regridded_mf6_wel)
+
+
+def setup_written_meteo_grids(
+    meteo_grids: tuple[GridDataArray], tmp_path: Path
+) -> Path:
+    precipitation, _ = meteo_grids
+    meteo_grid = msw.MeteoGrid(precipitation, precipitation)
+    grid_dir = tmp_path / "grid"
+    grid_dir.mkdir(exist_ok=True, parents=True)
+    meteo_grid.write(grid_dir)
+    return grid_dir
+
+
+def setup_parasim_inp(directory: Path):
+    settings = copy(DEFAULT_SETTINGS)
+    settings["iybg"] = 2000
+    settings["tdbg"] = 200.45
+    settings["unsa_svat_path"] = str(directory)
+
+    filename = directory / "para_sim.inp"
+    with open(filename, "w") as f:
+        rendered = msw.MetaSwapModel._template.render(settings=settings)
+        f.write(rendered)
+    return filename
+
+
+def write_test_files(directory: Path, filenames: list[str]) -> list[Path]:
+    paths = [directory / filename for filename in filenames]
+    for p in paths:
+        with open(p, mode="w") as f:
+            f.write("test")
+    return paths
+
+
+def setup_extra_files(meteo_grids: tuple[GridDataArray], directory: Path):
+    grid_dir = setup_written_meteo_grids(meteo_grids, directory)
+    setup_parasim_inp(grid_dir)
+    write_test_files(grid_dir, ["a.inp", "b.inp"])
+    return {
+        "paths": [
+            [str(grid_dir / fn)]
+            for fn in ["a.inp", "mete_grid.inp", "para_sim.inp", "b.inp"]
+        ]
+    }
+
+
+def test_import_from_imod5(
+    imod5_cap_data: Imod5DataDict,
+    meteo_grids: tuple[GridDataArray],
+    coupled_mf6_model: mf6.Modflow6Simulation,
+    tmp_path: Path,
+):
+    # Arrange
+    imod5_cap_data["extra"] = setup_extra_files(meteo_grids, tmp_path)
+    times = coupled_mf6_model["time_discretization"].dataset.coords["time"]
+    dis_pkg = coupled_mf6_model["GWF_1"]["dis"]
+    # Act
+    model = msw.MetaSwapModel.from_imod5_data(imod5_cap_data, dis_pkg, times)
+    # Assert
+    grid_packages = {
+        "grid",
+        "infiltration",
+        "ponding",
+        "sprinkling",
+        "idf_mapping",
+    }
+    expected_keys = grid_packages | {
+        "meteo_grid",
+        "prec_mapping",
+        "evt_mapping",
+        "coupling",
+        "extra_files",
+        "time_oc",
+    }
+    missing_keys = expected_keys - set(model.keys())
+    assert not missing_keys
+    for pkgname in grid_packages:
+        # Test if all grid packages broadcasted to grid.
+        missing_dims = {"y", "x"} - set(model[pkgname].dataset.dims.keys())
+        assert not missing_dims
+    assert "time" in model["time_oc"].dataset.dims.keys()
+    assert len(model["meteo_grid"].dataset.dims) == 0
+
+
+def test_import_from_imod5_and_write(
+    imod5_cap_data: Imod5DataDict,
+    meteo_grids: tuple[GridDataArray],
+    coupled_mf6_model: mf6.Modflow6Simulation,
+    tmp_path: Path,
+):
+    # Arrange
+    imod5_cap_data["extra"] = setup_extra_files(meteo_grids, tmp_path)
+    times = coupled_mf6_model["time_discretization"].dataset.coords["time"]
+    dis_pkg = coupled_mf6_model["GWF_1"]["dis"]
+    npf_pkg = coupled_mf6_model["GWF_1"]["npf"]
+    active = dis_pkg["idomain"] == 1
+    modeldir = tmp_path / "modeldir"
+    # Act
+    model = msw.MetaSwapModel.from_imod5_data(imod5_cap_data, dis_pkg, times)
+    well_pkg = mf6.LayeredWell.from_imod5_cap_data(imod5_cap_data)
+    mf6_wel_pkg = well_pkg.to_mf6_pkg(
+        active, dis_pkg["top"], dis_pkg["bottom"], npf_pkg["k"]
+    )
+    model.write(modeldir, dis_pkg, mf6_wel_pkg, validate=False)
+
+    # Assert
+    assert len(list(modeldir.rglob(r"*.inp"))) == 13
