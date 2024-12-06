@@ -33,7 +33,7 @@ from imod.msw.utilities.common import find_in_file_list
 from imod.msw.utilities.mask import mask_and_broadcast_grid_data
 from imod.msw.utilities.parse import read_para_sim
 from imod.msw.vegetation import AnnualCropFactors
-from imod.typing import Imod5DataDict, SelSettingsType
+from imod.typing import GridDataDict, Imod5DataDict, SelSettingsType
 from imod.util.regrid_method_type import RegridderType
 
 REQUIRED_PACKAGES = (
@@ -343,10 +343,11 @@ class MetaSwapModel(Model):
         parasim_settings = read_para_sim(path_to_parasim)
         unsa_svat_path = cast(str, parasim_settings["unsa_svat_path"])
         # Drop layer coord
+        cap_data = cast(GridDataDict, imod5_data["cap"])
         imod5_cap_no_layer: Imod5DataDict = {
             "cap": {
                 key: da.isel(**_DROP_LAYER_KWARGS).compute()
-                for key, da in imod5_data["cap"].items()
+                for key, da in cap_data.items()
             }
         }
         model = cls(unsa_svat_path, parasim_settings)
