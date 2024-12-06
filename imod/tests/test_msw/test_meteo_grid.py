@@ -7,8 +7,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
-import xarray as xr
-from numpy import nan
 from numpy.testing import assert_equal
 
 from imod.mf6.utilities.regrid import RegridderWeightsCache
@@ -74,14 +72,17 @@ def test_regrid_meteo(meteo_grids, simple_2d_grid_with_subunits):
     assert np.all(regridded_ponding.dataset["y"].values == new_grid["y"].values)
 
 
-def test_meteogridcopy_write(meteo_grids, tmp_path):
-    # Arrange
+def setup_written_meteo_grids(meteo_grids, tmp_path) -> Path:
     meteo_grid = MeteoGrid(*meteo_grids)
-
     grid_dir = tmp_path / "grid"
     grid_dir.mkdir(exist_ok=True, parents=True)
     meteo_grid.write(grid_dir)
+    return grid_dir
 
+
+def test_meteogridcopy_write(meteo_grids, tmp_path):
+    # Arrange
+    grid_dir = setup_written_meteo_grids(meteo_grids, tmp_path)
     meteo_grid_copy = MeteoGridCopy(grid_dir / "mete_grid.inp")
     copy_dir = tmp_path / "copied"
     copy_dir.mkdir(exist_ok=True, parents=True)
@@ -92,12 +93,8 @@ def test_meteogridcopy_write(meteo_grids, tmp_path):
 
 
 def test_meteogridcopy_from_imod5(meteo_grids, tmp_path):
-    meteo_grid = MeteoGrid(*meteo_grids)
-
-    grid_dir = tmp_path / "grid"
-    grid_dir.mkdir(exist_ok=True, parents=True)
-    meteo_grid.write(grid_dir)
-
+    # Arrange
+    grid_dir = setup_written_meteo_grids(meteo_grids, tmp_path)
     imod5_data = {}
     imod5_data["extra"] = {}
     imod5_data["extra"]["paths"] = [
@@ -105,7 +102,6 @@ def test_meteogridcopy_from_imod5(meteo_grids, tmp_path):
         [(grid_dir / "mete_grid.inp").resolve()],
         ["bar"],
     ]
-
     meteo_grid_copy = MeteoGridCopy.from_imod5_data(imod5_data)
     copy_dir = tmp_path / "copied"
     copy_dir.mkdir(exist_ok=True, parents=True)
