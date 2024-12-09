@@ -11,18 +11,18 @@ class MetaSwapActive:
     per_subunit: GridDataArray
 
 
-def mask_and_broadcast_grid_data(
-    grid_data: GridDataDict, msw_active: MetaSwapActive
+def mask_and_broadcast_cap_data(
+    cap_data: GridDataDict, msw_active: MetaSwapActive
 ) -> GridDataDict:
     """
-    Mask and broadcast grid data,
+    Mask and broadcast cap data, always mask with "all" of MetaSwapActive.
     """
     return {
-        key: _mask_spatial_var(grid, msw_active.all) for key, grid in grid_data.items()
+        key: _mask_spatial_var(grid, msw_active.all) for key, grid in cap_data.items()
     }
 
 
-def mask_package_data(
+def mask_and_broadcast_pkg_data(
     package: type[MetaSwapPackage], grid_data: GridDataDict, msw_active: MetaSwapActive
 ) -> GridDataDict:
     """

@@ -30,7 +30,7 @@ from imod.msw.ponding import Ponding
 from imod.msw.sprinkling import Sprinkling
 from imod.msw.timeutil import to_metaswap_timeformat
 from imod.msw.utilities.common import find_in_file_list
-from imod.msw.utilities.mask import mask_and_broadcast_grid_data
+from imod.msw.utilities.mask import mask_and_broadcast_cap_data
 from imod.msw.utilities.parse import read_para_sim
 from imod.msw.utilities.select import drop_layer_dim_cap_data
 from imod.msw.vegetation import AnnualCropFactors
@@ -343,7 +343,7 @@ class MetaSwapModel(Model):
         model["grid"], msw_active = GridData.from_imod5_data(
             imod5_cap_no_layer, target_dis
         )
-        cap_data_masked = mask_and_broadcast_grid_data(
+        cap_data_masked = mask_and_broadcast_cap_data(
             imod5_cap_no_layer["cap"], msw_active
         )
         imod5_masked: Imod5DataDict = {

@@ -12,7 +12,7 @@ from imod.msw.utilities.imod5_converter import (
     get_rootzone_depth_from_imod5_data,
     is_msw_active_cell,
 )
-from imod.msw.utilities.mask import MetaSwapActive, mask_package_data
+from imod.msw.utilities.mask import MetaSwapActive, mask_and_broadcast_pkg_data
 from imod.typing import Imod5DataDict
 from imod.util.spatial import get_cell_area, spatial_reference
 
@@ -138,6 +138,6 @@ class GridData(MetaSwapPackage, IRegridPackage):
         data["soil_physical_unit"] = imod5_cap["soil_physical_unit"].astype(int)
 
         msw_active = is_msw_active_cell(target_dis, imod5_cap, data["area"])
-        data_active = mask_package_data(cls, data, msw_active)
+        data_active = mask_and_broadcast_pkg_data(cls, data, msw_active)
         data_active["active"] = msw_active.all
         return cls(**data_active), msw_active
