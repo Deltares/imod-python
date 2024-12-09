@@ -1,4 +1,5 @@
 from textwrap import dedent
+from typing import cast
 
 import xarray as xr
 
@@ -8,7 +9,7 @@ from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import InfiltrationRegridMethod
 from imod.msw.utilities.common import concat_imod5
-from imod.typing import GridDataDict
+from imod.typing import GridDataDict, Imod5DataDict
 from imod.typing.grid import ones_like
 
 
@@ -101,8 +102,8 @@ class Infiltration(MetaSwapPackage, IRegridPackage):
         self._pkgcheck()
 
     @classmethod
-    def from_imod5_data(cls, imod5_data: dict[str, GridDataDict]) -> "Infiltration":
-        cap_data = imod5_data["cap"]
+    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "Infiltration":
+        cap_data = cast(GridDataDict, imod5_data["cap"])
         data = {}
         # Use runon resistance as downward resistance, and runoff for downward
         # resistance

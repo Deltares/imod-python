@@ -344,7 +344,7 @@ class MetaSwapModel(Model):
         unsa_svat_path = cast(str, parasim_settings["unsa_svat_path"])
         # Drop layer coord
         cap_data = cast(GridDataDict, imod5_data["cap"])
-        imod5_cap_no_layer: Imod5DataDict = {
+        imod5_cap_no_layer: dict[str, GridDataDict] = {
             "cap": {
                 key: da.isel(**_DROP_LAYER_KWARGS).compute()
                 for key, da in cap_data.items()
@@ -357,7 +357,10 @@ class MetaSwapModel(Model):
         cap_data_masked = mask_and_broadcast_grid_data(
             imod5_cap_no_layer["cap"], msw_active
         )
-        imod5_masked = {"cap": cap_data_masked, "extra": {"paths": extra_paths}}
+        imod5_masked: Imod5DataDict = {
+            "cap": cap_data_masked,
+            "extra": {"paths": extra_paths},
+        }
         model["infiltration"] = Infiltration.from_imod5_data(imod5_masked)
         model["ponding"] = Ponding.from_imod5_data(imod5_masked)
         model["sprinkling"] = Sprinkling.from_imod5_data(imod5_masked)
