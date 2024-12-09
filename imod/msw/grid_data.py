@@ -13,7 +13,7 @@ from imod.msw.utilities.imod5_converter import (
     is_msw_active_cell,
 )
 from imod.msw.utilities.mask import MetaSwapActive, mask_package_data
-from imod.typing import GridDataDict
+from imod.typing import Imod5DataDict
 from imod.util.spatial import get_cell_area, spatial_reference
 
 
@@ -124,7 +124,7 @@ class GridData(MetaSwapPackage, IRegridPackage):
     @classmethod
     def from_imod5_data(
         cls,
-        imod5_data: dict[str, GridDataDict],
+        imod5_data: Imod5DataDict,
         target_dis: StructuredDiscretization,
     ) -> tuple["GridData", MetaSwapActive]:
         # Get iMOD5 capillary zone data

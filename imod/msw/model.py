@@ -32,8 +32,9 @@ from imod.msw.timeutil import to_metaswap_timeformat
 from imod.msw.utilities.common import find_in_file_list
 from imod.msw.utilities.mask import mask_and_broadcast_grid_data
 from imod.msw.utilities.parse import read_para_sim
+from imod.msw.utilities.select import drop_layer_dim_cap_data
 from imod.msw.vegetation import AnnualCropFactors
-from imod.typing import GridDataDict, Imod5DataDict, SelSettingsType
+from imod.typing import Imod5DataDict
 from imod.util.regrid_method_type import RegridderType
 
 REQUIRED_PACKAGES = (
@@ -76,12 +77,6 @@ DEFAULT_SETTINGS = {
     "tdbgsm": 91.0,
     "tdedsm": 270.0,
     "clocktime": 0,
-}
-
-_DROP_LAYER_KWARGS: SelSettingsType = {
-    "layer": 0,
-    "drop": True,
-    "missing_dims": "ignore",
 }
 
 
@@ -343,13 +338,7 @@ class MetaSwapModel(Model):
         parasim_settings = read_para_sim(path_to_parasim)
         unsa_svat_path = cast(str, parasim_settings["unsa_svat_path"])
         # Drop layer coord
-        cap_data = imod5_data["cap"]
-        imod5_cap_no_layer: dict[str, GridDataDict] = {
-            "cap": {
-                key: da.isel(**_DROP_LAYER_KWARGS).compute()
-                for key, da in cap_data.items()
-            }
-        }
+        imod5_cap_no_layer = drop_layer_dim_cap_data(imod5_data)
         model = cls(unsa_svat_path, parasim_settings)
         model["grid"], msw_active = GridData.from_imod5_data(
             imod5_cap_no_layer, target_dis
