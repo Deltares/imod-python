@@ -1,7 +1,7 @@
 import csv
 from pathlib import Path
 from shutil import copyfile
-from typing import Optional, Union, cast
+from typing import Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -223,7 +223,7 @@ class MeteoGridCopy(MetaSwapPackage, IRegridPackage):
 
     @classmethod
     def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "MeteoGridCopy":
-        paths = cast(list[str], imod5_data["extra"]["paths"])
+        paths = imod5_data["extra"]["paths"]
         filepath = find_in_file_list(cls._file_name, paths)
 
         return cls(filepath)
