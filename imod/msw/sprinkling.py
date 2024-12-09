@@ -1,4 +1,4 @@
-from typing import TextIO, cast
+from typing import TextIO
 
 import numpy as np
 import pandas as pd
@@ -208,7 +208,7 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
         -------
         Sprinkling package
         """
-        cap_data = cast(GridDataDict, imod5_data["cap"])
+        cap_data = imod5_data["cap"]
         if isinstance(cap_data["artificial_recharge_layer"], pd.DataFrame):
             data = _sprinkling_data_from_imod5_ipf(cap_data)
         else:

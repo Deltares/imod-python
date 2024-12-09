@@ -338,12 +338,12 @@ class MetaSwapModel(Model):
         MetaSwapModel
             MetaSWAP model imported from imod5 data.
         """
-        extra_paths = cast(list[str], imod5_data["extra"]["paths"])
+        extra_paths = imod5_data["extra"]["paths"]
         path_to_parasim = find_in_file_list("para_sim.inp", extra_paths)
         parasim_settings = read_para_sim(path_to_parasim)
         unsa_svat_path = cast(str, parasim_settings["unsa_svat_path"])
         # Drop layer coord
-        cap_data = cast(GridDataDict, imod5_data["cap"])
+        cap_data = imod5_data["cap"]
         imod5_cap_no_layer: dict[str, GridDataDict] = {
             "cap": {
                 key: da.isel(**_DROP_LAYER_KWARGS).compute()

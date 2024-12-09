@@ -1,5 +1,4 @@
 from textwrap import dedent
-from typing import cast
 
 import xarray as xr
 
@@ -103,7 +102,7 @@ class Infiltration(MetaSwapPackage, IRegridPackage):
 
     @classmethod
     def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "Infiltration":
-        cap_data = cast(GridDataDict, imod5_data["cap"])
+        cap_data = imod5_data["cap"]
         data = {}
         # Use runon resistance as downward resistance, and runoff for downward
         # resistance

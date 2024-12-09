@@ -1,4 +1,4 @@
-from typing import Any, TextIO, cast
+from typing import Any, TextIO
 
 import pandas as pd
 import xarray as xr
@@ -8,7 +8,7 @@ from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import DataDictType, MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import PondingRegridMethod
 from imod.msw.utilities.common import concat_imod5
-from imod.typing import GridDataDict, Imod5DataDict, IntArray
+from imod.typing import Imod5DataDict, IntArray
 
 
 class Ponding(MetaSwapPackage, IRegridPackage):
@@ -77,7 +77,7 @@ class Ponding(MetaSwapPackage, IRegridPackage):
         """
         Concatenate ponding depths along subunits
         """
-        cap_data = cast(GridDataDict, imod5_data["cap"])
+        cap_data = imod5_data["cap"]
         data = {}
         for key in cls._with_subunit:
             data_ls = [cap_data[f"{landuse}_{key}"] for landuse in ["rural", "urban"]]

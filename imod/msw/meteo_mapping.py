@@ -1,7 +1,7 @@
 from copy import deepcopy
 from pathlib import Path
 from textwrap import dedent
-from typing import Any, Optional, TextIO, cast
+from typing import Any, Optional, TextIO
 
 import numpy as np
 import pandas as pd
@@ -58,7 +58,7 @@ def open_first_meteo_grid(mete_grid_path: str | Path, column_nr: int) -> xr.Data
 
 
 def open_first_meteo_grid_from_imod5_data(imod5_data: Imod5DataDict, column_nr: int):
-    paths = cast(list[str], imod5_data["extra"]["paths"])
+    paths = imod5_data["extra"]["paths"]
     metegrid_path = find_in_file_list("mete_grid.inp", paths)
     return open_first_meteo_grid(metegrid_path, column_nr=column_nr)
 
