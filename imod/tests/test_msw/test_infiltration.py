@@ -283,11 +283,11 @@ def test_from_imod5_data(data_infiltration):
     imod5_data = {"cap": cap_data}
     actual_pkg = Infiltration.from_imod5_data(imod5_data)
 
-    ones_vars = ["bottom_resistance", "extra_storage_coefficient"]
-    expected = expected_pkg.dataset.drop_vars(ones_vars)
-    actual = actual_pkg.dataset.drop_vars(ones_vars)
+    hardcoded_vars = {"bottom_resistance": -9999.0, "extra_storage_coefficient": 1.0}
+    expected = expected_pkg.dataset.drop_vars(hardcoded_vars.keys())
+    actual = actual_pkg.dataset.drop_vars(hardcoded_vars.keys())
 
     xr.testing.assert_equal(actual, expected)
 
-    for var in ones_vars:
-        assert (actual_pkg.dataset[var] == 1.0).all()
+    for var, value in hardcoded_vars.items():
+        assert (actual_pkg.dataset[var] == value).all()
