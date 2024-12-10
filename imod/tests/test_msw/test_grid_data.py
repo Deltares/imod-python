@@ -461,7 +461,7 @@ def test_from_imod5_data(grid_data_dict: dict[str, xr.DataArray]):
     # Dis only needed for idomain
     dis = StructuredDiscretization(top, top - 0.1, idomain, validate=False)
 
-    griddata = GridData.from_imod5_data(imod5_data, target_dis=dis)
+    griddata, _ = GridData.from_imod5_data(imod5_data, target_dis=dis)
     expected_rootzone_depth = cap_data["rootzone_thickness"] * 0.01
     xr.testing.assert_allclose(
         expected_rootzone_depth, griddata["rootzone_depth"].sel(subunit=0, drop=True)
