@@ -23,6 +23,10 @@ Added
   for coupling a MODFLOW6 model to MetaSWAP.
 - :meth:`imod.msw.MetaSwapModel.from_imod5_data` to construct a MetaSWAP model
   from data in an iMOD5 projectfile.
+- :meth:`imod.msw.MetaSwapModel.write` has a ``validate`` argument, which can be
+  used to turn off validation upon writing, use at your own risk!
+- :class:`imod.msw.MetaSwapModel` got ``settings`` argument to set simulation
+  settings.
 
 Fixed
 ~~~~~

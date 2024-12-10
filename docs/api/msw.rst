@@ -40,4 +40,5 @@ MetaSWAP
     CouplerMapping
 
     MetaSwapModel
+    MetaSwapModel.write
     MetaSwapModel.from_imod5_data
