@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 import xarray as xr
 from numpy.testing import assert_almost_equal, assert_equal
+from pytest_cases import parametrize_with_cases
 
 from imod import mf6, msw
 from imod.mf6.utilities.regrid import RegridderWeightsCache
@@ -187,18 +188,58 @@ def setup_extra_files(meteo_grids: tuple[GridDataArray], directory: Path):
     }
 
 
+class Imod5DataCases:
+    def case_grid(self, imod5_cap_data: Imod5DataDict) -> tuple[Imod5DataDict, bool]:
+        has_scaling_factor = True
+        return imod5_cap_data, has_scaling_factor
+
+    def case_no_scaling_factors(
+        self, imod5_cap_data: Imod5DataDict
+    ) -> tuple[Imod5DataDict, bool]:
+        has_scaling_factor = False
+        cap_data = imod5_cap_data["cap"]
+        # open_projectfile_data adds layer kwargs to constants
+        layer_kwargs = {"coords": {"layer": [1]}, "dims": ("layer",)}
+        cap_data["perched_water_table_level"] = xr.DataArray([-9999.0], **layer_kwargs)
+        cap_data["soil_moisture_fraction"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["conductivitiy_factor"] = xr.DataArray([1.0], **layer_kwargs)
+        return imod5_cap_data, has_scaling_factor
+
+    def case_constants(
+        self, imod5_cap_data: Imod5DataDict
+    ) -> tuple[Imod5DataDict, bool]:
+        has_scaling_factor = False
+        cap_data = imod5_cap_data["cap"]
+        # open_projectfile_data adds layer kwargs to constants
+        layer_kwargs = {"coords": {"layer": [1]}, "dims": ("layer",)}
+        cap_data["perched_water_table_level"] = xr.DataArray([-9999.0], **layer_kwargs)
+        cap_data["soil_moisture_fraction"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["conductivitiy_factor"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["urban_ponding_depth"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["rural_ponding_depth"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["urban_runoff_resistance"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["rural_runoff_resistance"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["urban_runon_resistance"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["rural_runon_resistance"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["urban_infiltration_capacity"] = xr.DataArray([1.0], **layer_kwargs)
+        cap_data["rural_infiltration_capacity"] = xr.DataArray([1.0], **layer_kwargs)
+        return imod5_cap_data, has_scaling_factor
+
+
+@parametrize_with_cases("imod5_data, has_scaling_factor", cases=Imod5DataCases)
 def test_import_from_imod5(
-    imod5_cap_data: Imod5DataDict,
+    imod5_data: Imod5DataDict,
+    has_scaling_factor: bool,
     meteo_grids: tuple[GridDataArray],
     coupled_mf6_model: mf6.Modflow6Simulation,
     tmp_path: Path,
 ):
     # Arrange
-    imod5_cap_data["extra"] = setup_extra_files(meteo_grids, tmp_path)
+    imod5_data["extra"] = setup_extra_files(meteo_grids, tmp_path)
     times = coupled_mf6_model["time_discretization"].dataset.coords["time"]
     dis_pkg = coupled_mf6_model["GWF_1"]["dis"]
     # Act
-    model = msw.MetaSwapModel.from_imod5_data(imod5_cap_data, dis_pkg, times)
+    model = msw.MetaSwapModel.from_imod5_data(imod5_data, dis_pkg, times)
     # Assert
     grid_packages = {
         "grid",
@@ -223,28 +264,34 @@ def test_import_from_imod5(
         assert not missing_dims
     assert "time" in model["time_oc"].dataset.dims.keys()
     assert len(model["meteo_grid"].dataset.dims) == 0
+    assert ("scaling_factor" in model.keys()) == has_scaling_factor
 
 
+@parametrize_with_cases("imod5_data, has_scaling_factor", cases=Imod5DataCases)
 def test_import_from_imod5_and_write(
-    imod5_cap_data: Imod5DataDict,
+    imod5_data: Imod5DataDict,
+    has_scaling_factor: bool,
     meteo_grids: tuple[GridDataArray],
     coupled_mf6_model: mf6.Modflow6Simulation,
     tmp_path: Path,
 ):
     # Arrange
-    imod5_cap_data["extra"] = setup_extra_files(meteo_grids, tmp_path)
+    imod5_data["extra"] = setup_extra_files(meteo_grids, tmp_path)
     times = coupled_mf6_model["time_discretization"].dataset.coords["time"]
     dis_pkg = coupled_mf6_model["GWF_1"]["dis"]
     npf_pkg = coupled_mf6_model["GWF_1"]["npf"]
     active = dis_pkg["idomain"] == 1
     modeldir = tmp_path / "modeldir"
     # Act
-    model = msw.MetaSwapModel.from_imod5_data(imod5_cap_data, dis_pkg, times)
-    well_pkg = mf6.LayeredWell.from_imod5_cap_data(imod5_cap_data)
+    model = msw.MetaSwapModel.from_imod5_data(imod5_data, dis_pkg, times)
+    well_pkg = mf6.LayeredWell.from_imod5_cap_data(imod5_data)
     mf6_wel_pkg = well_pkg.to_mf6_pkg(
         active, dis_pkg["top"], dis_pkg["bottom"], npf_pkg["k"]
     )
     model.write(modeldir, dis_pkg, mf6_wel_pkg, validate=False)
 
     # Assert
-    assert len(list(modeldir.rglob(r"*.inp"))) == 13
+    expected_n_files = 13
+    if has_scaling_factor:
+        expected_n_files += 1
+    assert len(list(modeldir.rglob(r"*.inp"))) == expected_n_files

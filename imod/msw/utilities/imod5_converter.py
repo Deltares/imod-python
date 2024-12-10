@@ -1,3 +1,5 @@
+from xarray.core.utils import is_scalar
+
 from imod.logging import LogLevel, logger
 from imod.mf6 import StructuredDiscretization
 from imod.msw.utilities.common import concat_imod5
@@ -86,3 +88,32 @@ def is_msw_active_cell(
     )
     active = subunit_active.any(dim="subunit")
     return MetaSwapActive(active, subunit_active)
+
+
+def _is_equal_scalar_value(da, value):
+    """
+    Helper function to guarantee that the check in ``has_active_scaling_factor``
+    can shortcut after is_scalar returns False.
+    """
+    return da.to_numpy()[()] == value
+
+
+def has_active_scaling_factor(imod5_cap: GridDataDict):
+    """
+    Check if scaling factor grids are active. Carefully checks if data is
+    provided as constant (scalar) and if it matches an inactivity value. The
+    function shortcuts if data is provided as constant.
+    """
+    variable_inactive_mapping = {
+        "perched_water_table_level": -9999.0,
+        "soil_moisture_fraction": 1.0,
+        "conductivitiy_factor": 1.0,
+    }
+    scaling_factor_inactive = True
+    for var, inactive_value in variable_inactive_mapping.items():
+        da = imod5_cap[var]
+        scaling_factor_inactive &= is_scalar(da) and _is_equal_scalar_value(
+            da, inactive_value
+        )
+
+    return not scaling_factor_inactive
