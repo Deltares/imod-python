@@ -7,10 +7,15 @@ MetaSWAP
     :toctree: generated/msw
 
     GridData
+    GridData.from_imod5_data
     Infiltration
+    Infiltration.from_imod5_data
     Ponding
+    Ponding.from_imod5_data
     ScalingFactors
+    ScalingFactors.from_imod5_data
     Sprinkling
+    Sprinkling.from_imod5_data
 
     IdfMapping
     TimeOutputControl
@@ -25,9 +30,14 @@ MetaSWAP
     AnnualCropFactors
 
     MeteoGrid
+    MeteoGridCopy
+    MeteoGridCopy.from_imod5_data
     EvapotranspirationMapping
+    EvapotranspirationMapping.from_imod5_data
     PrecipitationMapping
+    PrecipitationMapping.from_imod5_data
 
     CouplerMapping
 
     MetaSwapModel
+    MetaSwapModel.from_imod5_data
