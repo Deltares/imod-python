@@ -130,11 +130,11 @@ class GridData(MetaSwapPackage, IRegridPackage):
         """
         Construct a MetaSWAP GridData package from iMOD5 data in the CAP
         package, loaded with the :func:`imod.formats.prj.open_projectfile_data`
-        function. 
+        function.
 
         Method does the following things:
         - Computes rural area from the wetted area and urban area grids.
-        - Sets a second subunit for urban landuse (== 18). 
+        - Sets a second subunit for urban landuse (== 18).
         - Rootzone depth is converted from cm's to m's.
         - Determines where MetaSWAP should be active based on area grids,
           boundary grid, and MODFLOW6 idomain.
