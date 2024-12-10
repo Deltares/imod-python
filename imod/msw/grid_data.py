@@ -127,7 +127,34 @@ class GridData(MetaSwapPackage, IRegridPackage):
         imod5_data: Imod5DataDict,
         target_dis: StructuredDiscretization,
     ) -> tuple["GridData", MetaSwapActive]:
-        # Get iMOD5 capillary zone data
+        """
+        Construct a MetaSWAP GridData package from iMOD5 data in the CAP
+        package, loaded with the :func:`imod.formats.prj.open_projectfile_data`
+        function. 
+
+        Method does the following things:
+        - Computes rural area from the wetted area and urban area grids.
+        - Sets a second subunit for urban landuse (== 18). 
+        - Rootzone depth is converted from cm's to m's.
+        - Determines where MetaSWAP should be active based on area grids,
+          boundary grid, and MODFLOW6 idomain.
+
+        Parameters
+        ----------
+        imod5_data: Imod5DataDict
+            iMOD5 data as returned by
+            :func:`imod.formats.prj.open_projectfile_data`
+        target_dis: imod.mf6.StructuredDiscretization
+            MODFLOW6 discretization to couple the MetaSWAP model to.
+
+        Returns
+        -------
+        imod.msw.GridData
+            GridData package
+        MetaSwapActive
+            Dataclass containing where MetaSwAP is active, per subunit, as well
+            as aggregated over subunits.
+        """
         imod5_cap = imod5_data["cap"]
 
         data = {}
