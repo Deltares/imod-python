@@ -3,8 +3,8 @@ iMOD5 backwards compatibility
 
 iMOD Python tries to be as backwards compatible with iMOD5 as our resources
 allow. Below you can find tables with the status of support for important iMOD5
-features. If you miss an important feature in the table, [feel free to open an
-issue on our issueboard](https://github.com/Deltares/imod-python/issues).
+features. If you miss an important feature in the table, `feel free to open an
+issue on our issueboard <https://github.com/Deltares/imod-python/issues>`_.
 
 Files
 -----
