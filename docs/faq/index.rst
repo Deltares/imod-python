@@ -18,3 +18,4 @@ brings its own complexities. Consequently, this Frequently Asked Questions
    python
    modeling
    known-issues
+   imod5_backwards_compatibility

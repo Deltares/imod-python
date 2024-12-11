@@ -1,0 +1,120 @@
+iMOD5 backwards compatibility
+=============================
+
+iMOD Python tries to be as backwards compatible with iMOD5 as our resources
+allow. Below you can find tables with the status of support for important iMOD5
+features. If you miss an important feature in the table, [feel free to open an
+issue on our issueboard](https://github.com/Deltares/imod-python/issues).
+
+Files
+-----
+
+iMOD5 files:
+
+.. csv-table::
+   :header-rows: 1
+
+    iMOD5 file,iMOD Python function
+    Open projectfile data (.prj),":func:`imod.formats.prj.open_projectfile_data`, :func:`imod.formats.prj.read_projectfile`"
+    Open runfile data (.run),-
+    Open point data (.ipf),:func:`imod.formats.ipf.read`
+    Save point data (.ipf),:func:`imod.formats.ipf.save`
+    Open raster data (.idf),:func:`imod.formats.idf.open`
+    Save raster data (.idf),:func:`imod.formats.idf.save`
+    Open vector data: 2D & 3D (.gen),:func:`imod.formats.gen.read`
+    Save vector data (.gen),:func:`imod.formats.gen.write`
+    Open 1D network data (.isg),-
+
+MODFLOW6
+--------
+
+iMOD5 MODFLOW6 features:
+
+.. csv-table::
+   :header-rows: 1
+
+    iMOD5 functionality,iMOD Python function/method
+    Model from iMOD5 data,:meth:`imod.mf6.Modflow6Simulation.from_imod5_data`
+    Regrid model,:meth:`imod.mf6.Modflow6Simulation.regrid_like`
+    Clip model,:meth:`imod.mf6.Modflow6Simulation.clip_box`
+    BND/TOP/BOT: Import from grid (IDF),:meth:`imod.mf6.StructuredDiscretization.from_imod5_data`
+    BND/TOP/BOT: Align iMOD5 input grids,:meth:`imod.mf6.StructuredDiscretization.from_imod5_data`
+    BND: IBOUND to IDOMAIN,:meth:`imod.mf6.StructuredDiscretization.from_imod5_data`
+    BND/TOP/BOT: Regrid,:meth:`imod.mf6.StructuredDiscretization.regrid_like`
+    BND/TOP/BOT: Clip,:meth:`imod.mf6.StructuredDiscretization.clip_box`
+    BND/SHD: set constant heads starting head (IBOUND = -1),:meth:`imod.mf6.ConstantHead.from_imod5_shd_data`
+    BND/CHD: set constant heads (IBOUND = -1),:meth:`imod.mf6.ConstantHead.from_imod5_data`
+    KDW/VCW/KVV/THK: Quasi-3D permeability from grid (IDF),-
+    KHV/KVA: 3D permeability from grid (IDF),:meth:`imod.mf6.NodePropertyFlow.from_imod5_data`
+    ANI: Set horizontal anistropy ,:meth:`imod.mf6.NodePropertyFlow.from_imod5_data`
+    KHV/KVA/ANI: Align iMOD5 input grids,:meth:`imod.mf6.NodePropertyFlow.from_imod5_data`
+    KHV/KVA/ANI: Regrid,:meth:`imod.mf6.NodePropertyFlow.regrid_like`
+    KHV/KVA/ANI: Clip,:meth:`imod.mf6.NodePropertyFlow.clip_box`
+    STO/SPY: From grid (IDF),:meth:`imod.mf6.StorageCoefficient.from_imod5_data`
+    STO/SPY: Regrid,:meth:`imod.mf6.StorageCoefficient.regrid_like`
+    STO/SPY: Clip,:meth:`imod.mf6.StorageCoefficient.clip_box`
+    RCH: From grid (IDF),:meth:`imod.mf6.Recharge.from_imod5_data`
+    RCH: Regrid,:meth:`imod.mf6.Recharge.regrid_like`
+    RCH: Clip,:meth:`imod.mf6.Recharge.clip_box`
+    CHD: From grid (IDF),:meth:`imod.mf6.ConstantHead.from_imod5_data`
+    CHD: Regrid,:meth:`imod.mf6.ConstantHead.regrid_like`
+    CHD: Clip,:meth:`imod.mf6.ConstantHead.clip_box`
+    GHB: Auto placement (IDEFLAYER),":meth:`imod.mf6.GeneralHeadBoundary.from_imod5_data`, :func:`imod.prepare.allocate_ghb_cells`"
+    GHB: Distribute conductances (DISTRCOND),":meth:`imod.mf6.GeneralHeadBoundary.from_imod5_data`, :func:`imod.prepare.distribute_ghb_conductance`"
+    GHB: Cleanup,":meth:`imod.mf6.GeneralHeadBoundary.cleanup`, :func:`imod.prepare.cleanup_ghb`"
+    GHB: From grid (IDF),:meth:`imod.mf6.GeneralHeadBoundary.from_imod5_data`
+    GHB: Align iMOD5 input grids ,:meth:`imod.mf6.GeneralHeadBoundary.from_imod5_data`
+    GHB: Regrid,:meth:`imod.mf6.GeneralHeadBoundary.regrid_like`
+    GHB: Clip,:meth:`imod.mf6.GeneralHeadBoundary.clip_box`
+    DRN: Auto placement (IDEFLAYER),":meth:`imod.mf6.Drainage.from_imod5_data`, :func:`imod.prepare.allocate_drn_cells`"
+    DRN: Distribute conductances (DISTRCOND),":meth:`imod.mf6.Drainage.from_imod5_data`, :func:`imod.prepare.distribute_drn_conductance`"
+    DRN: Cleanup,":meth:`imod.mf6.Drainage.cleanup`, :func:`imod.prepare.cleanup_drn`"
+    DRN: From grid (IDF),:meth:`imod.mf6.Drainage.from_imod5_data`
+    DRN: Align iMOD5 input grids ,:meth:`imod.mf6.Drainage.from_imod5_data`
+    DRN: Regrid,:meth:`imod.mf6.Drainage.regrid_like`
+    DRN: Clip,:meth:`imod.mf6.Drainage.clip_box`
+    RIV: Infiltration factors (IFF),":meth:`imod.mf6.River.from_imod5_data`, :meth:`imod.mf6.River.split_conductance`"
+    RIV: Auto placement (IDEFLAYER),":meth:`imod.mf6.River.from_imod5_data`, :func:`imod.prepare.allocate_riv_cells`"
+    RIV: Distribute conductances (DISTRCOND),":meth:`imod.mf6.River.from_imod5_data`, :func:`imod.prepare.distribute_riv_conductance`"
+    RIV: Cleanup,":meth:`imod.mf6.River.cleanup`, :func:`imod.prepare.cleanup_riv`"
+    RIV: From grid (IDF),:meth:`imod.mf6.River.from_imod5_data`
+    RIV: Align iMOD5 input grids ,:meth:`imod.mf6.River.from_imod5_data`
+    RIV: Regrid,:meth:`imod.mf6.River.regrid_like`
+    RIV: Clip,:meth:`imod.mf6.River.clip_box`
+    ISG/SFT: From 1D network (ISG),-
+    SFR: From 1D network (ISG),-
+    HFB: From 2D vector (GEN),:meth:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data`
+    HFB: From 3D vector (GEN),:meth:`imod.mf6.HorizontalFlowBarrierResistance.from_imod5_data`
+    HFB: Snap vector to grid edges,":meth:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg`, :meth:`imod.mf6.HorizontalFlowBarrierResistance.to_mf6_pkg`"
+    "HFB: Auto placement, account for not fully penetrating barriers",:meth:`imod.mf6.HorizontalFlowBarrierResistance.to_mf6_pkg`
+    HFB: Clip,":meth:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance.clip_box`, :meth:`imod.mf6.HorizontalFlowBarrierResistance.clip_box`"
+    HFB: Cleanup,-
+    WEL: From point data with timeseries (IPF),":meth:`imod.mf6.LayeredWell.from_imod5_data`, :meth:`imod.mf6.Well.from_imod5_data`"
+    WEL: Auto placement,":meth:`imod.mf6.LayeredWell.to_mf6_pkg`, :meth:`imod.mf6.Well.to_mf6_pkg`"
+    WEL: Cleanup,":meth:`imod.mf6.Well.cleanup`, :func:`imod.prepare.cleanup_wel`"
+    WEL: Clip,":meth:`imod.mf6.LayeredWell.clip_box`, :meth:`imod.mf6.Well.clip_box`"
+
+MetaSWAP
+--------
+
+The following iMOD5 MetaSWAP features are supported:
+
+.. csv-table::
+   :header-rows: 1
+
+    iMOD5 functionality,iMOD Python function/method
+    CAP: MetaSWAP Model,:meth:`imod.msw.MetaSwapModel.from_imod5_data`
+    CAP: Grid Data (area_svat.inp),:meth:`imod.msw.GridData.from_imod5_data`
+    CAP: Ponding (svat2swnr_roff.inp),:meth:`imod.msw.Ponding.from_imod5_data`
+    CAP: Infiltration (infi_svat.inp),:meth:`imod.msw.Infiltration.from_imod5_data`
+    CAP: Perched Water Table (uscl_svat.inp),:meth:`imod.msw.ScalingFactors.from_imod5_data`
+    CAP: Scaling factors (uscl_svat.inp),:meth:`imod.msw.ScalingFactors.from_imod5_data`
+    CAP: Stage-steered drainage,-
+    CAP: Meteogrids (mete_grid.inp),":meth:`imod.msw.MeteoGridCopy.from_imod5_data`, :meth:`imod.msw.PrecipitationMapping.from_imod5_data`, :meth:`imod.msw.Evapotranspirationmapping.from_imod5_data`"
+    CAP: Meteostations (mete_stat.inp),-
+    CAP: Sprinkling (scap_svat.inp),:meth:`imod.msw.Sprinkling.from_imod5_data`
+    CAP: Sprinkling wells grid (IDF),:meth:`imod.mf6.LayeredWell.from_imod5_cap_data`
+    CAP: Sprinkling wells points (IPF),-
+    CAP: Align iMOD5 input grids,-
+    CAP: Regrid model,:meth:`imod.msw.MetaSwapModel.regrid_like`
+    CAP: Clip model,-
