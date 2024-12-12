@@ -28,9 +28,11 @@ def read_para_sim(file: Path | str) -> dict[str, ScalarType]:
         lines = f.readlines()
         out = {}
         for line in lines:
-            ll = line[0 : line.find("!")].split("=")
-            if len(ll) > 1:
-                key = ll[0].strip()
-                value = _try_parsing_string_to_number(ll[1].strip())
+            # Strip comments starting with "!" and split keys from values at the
+            # equals sign.
+            key_values = line[0 : line.find("!")].split("=")
+            if len(key_values) > 1:
+                key = key_values[0].strip()
+                value = _try_parsing_string_to_number(key_values[1].strip())
                 out[key] = value
     return out
