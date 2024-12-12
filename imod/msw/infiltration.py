@@ -103,6 +103,27 @@ class Infiltration(MetaSwapPackage, IRegridPackage):
 
     @classmethod
     def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "Infiltration":
+        """
+        Construct a MetaSWAP Infiltration package from iMOD5 data in the CAP
+        package, loaded with the :func:`imod.formats.prj.open_projectfile_data`
+        function.
+
+        Concatenates infiltration_capacity, runon_resistance, and
+        runoff_resistance along the subunit dimension. 0 = rural landuse, 1 =
+        urban landuse. Resistances smaller than 5 days are deactivated for
+        transparency, as MetaSWAP also does this internally.
+
+        Parameters
+        ----------
+        imod5_data: Imod5DataDict
+            iMOD5 data as returned by
+            :func:`imod.formats.prj.open_projectfile_data`
+        
+        Returns
+        -------
+        imod.msw.Infiltration
+        """
+
         cap_data = imod5_data["cap"]
         data = {}
         # Use runon resistance as downward resistance, and runoff for downward

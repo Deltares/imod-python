@@ -178,10 +178,24 @@ class PrecipitationMapping(MeteoMapping):
     @classmethod
     def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "PrecipitationMapping":
         """
-        Construct precipitation mapping from imod5 data. Opens first ascii grid
-        in mete_grid.inp, which is used to construct mappings to svats. The
-        grids should not change in dimension over time. No checks are done
-        whether cells switch from inactive to active or vice versa.
+        Construct a MetaSWAP PrecipitationMapping package from iMOD5 data in the
+        CAP package, loaded with the
+        :func:`imod.formats.prj.open_projectfile_data` function.
+        
+        Opens first ascii grid in mete_grid.inp, which is used to construct
+        mappings to svats. The grids should not change in dimension over time.
+        No checks are done whether cells switch from inactive to active or vice
+        versa.
+
+        Parameters
+        ----------
+        imod5_data: Imod5DataDict
+            iMOD5 data as returned by
+            :func:`imod.formats.prj.open_projectfile_data`
+        
+        Returns
+        -------
+        imod.msw.PrecipitationMapping
         """
         column_nr = 2
         meteo_grid = open_first_meteo_grid_from_imod5_data(imod5_data, column_nr)
@@ -222,10 +236,24 @@ class EvapotranspirationMapping(MeteoMapping):
     @classmethod
     def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "EvapotranspirationMapping":
         """
-        Construct evapotranspiration mapping from imod5 data. Opens first ascii
-        grid in mete_grid.inp, which is used to construct mappings to svats. The
-        grids should not change in dimension over time. No checks are done
-        whether cells switch from inactive to active or vice versa.
+        Construct a MetaSWAP EvapotranspirationMapping package from iMOD5 data
+        in the CAP package, loaded with the
+        :func:`imod.formats.prj.open_projectfile_data` function.
+        
+        Opens first ascii grid in mete_grid.inp, which is used to construct
+        mappings to svats. The grids should not change in dimension over time.
+        No checks are done whether cells switch from inactive to active or vice
+        versa.
+
+        Parameters
+        ----------
+        imod5_data: Imod5DataDict
+            iMOD5 data as returned by
+            :func:`imod.formats.prj.open_projectfile_data`
+        
+        Returns
+        -------
+        imod.msw.EvapotranspirationMapping
         """
         column_nr = 3
         meteo_grid = open_first_meteo_grid_from_imod5_data(imod5_data, column_nr)

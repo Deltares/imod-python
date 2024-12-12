@@ -83,8 +83,23 @@ class ScalingFactors(MetaSwapPackage, IRegridPackage):
     @classmethod
     def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "ScalingFactors":
         """
-        Import ScalingFactors from iMOD5 data. Pressure head factor is set to
-        one for all factors, as well as all factors for urban areas.
+        Construct a MetaSWAP Ponding package from iMOD5 data in the CAP
+        package, loaded with the :func:`imod.formats.prj.open_projectfile_data`
+        function.
+
+        Pressure head factor is set to one for all subunits. All urban areas
+        (subunit=1) are also set to one for all variables, except the perced
+        water table level.
+        
+        Parameters
+        ----------
+        imod5_data: Imod5DataDict
+            iMOD5 data as returned by
+            :func:`imod.formats.prj.open_projectfile_data`
+        
+        Returns
+        -------
+        imod.msw.ScalingFactors
         """
         cap_data = imod5_data["cap"]
         grid_ones = ones_like(cap_data["boundary"])

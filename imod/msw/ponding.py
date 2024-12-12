@@ -75,7 +75,23 @@ class Ponding(MetaSwapPackage, IRegridPackage):
     @classmethod
     def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "Ponding":
         """
-        Concatenate ponding depths along subunits
+        Construct a MetaSWAP Ponding package from iMOD5 data in the CAP
+        package, loaded with the :func:`imod.formats.prj.open_projectfile_data`
+        function.
+
+        Method concatenates ponding depths, runon resistance, and runoff
+        resistance along two subunits. Subunit 0 for rural, and 1 for urban
+        landuse.
+
+        Parameters
+        ----------
+        imod5_data: Imod5DataDict
+            iMOD5 data as returned by
+            :func:`imod.formats.prj.open_projectfile_data`
+        
+        Returns
+        -------
+        imod.msw.Ponding
         """
         cap_data = imod5_data["cap"]
         data = {}

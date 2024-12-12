@@ -226,6 +226,22 @@ class MeteoGridCopy(MetaSwapPackage, IRegridPackage):
 
     @classmethod
     def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "MeteoGridCopy":
+        """
+        Construct a MetaSWAP MeteoGridCopy package from iMOD5 data in the CAP
+        package, loaded with the :func:`imod.formats.prj.open_projectfile_data`
+        function.
+
+        Parameters
+        ----------
+        imod5_data: Imod5DataDict
+            iMOD5 data as returned by
+            :func:`imod.formats.prj.open_projectfile_data`
+        
+        Returns
+        -------
+        imod.msw.MeteoGridCopy
+        """
+
         paths = imod5_data["extra"]["paths"]
         filepath = find_in_file_list(cls._file_name, paths)
 
