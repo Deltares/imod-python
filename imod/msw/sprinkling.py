@@ -180,9 +180,11 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
             (IDF), this grid defines in which layer a groundwater abstraction
             well should be placed. The ``"artificial_recharge"`` grid contains
             types which point to the type of abstraction:
+
                 * 0: no abstraction
                 * 1: groundwater abstraction
                 * 2: surfacewater abstraction
+
             The ``"artificial_recharge_capacity"`` grid/constant defines the
             capacity of each groundwater or surfacewater abstraction. This is an
             ``1:1`` mapping: Each grid cell maps to a separate well.

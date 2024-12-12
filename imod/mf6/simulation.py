@@ -1361,11 +1361,13 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         times:  list[datetime]
             time discretization of the model to be imported. This is used for
             the following:
+
                 * Times of wells with associated timeseries are resampled to these times
                 * Start and end times in the list are used to repeat the stresses
                   of periodic data (e.g. river stages in iMOD5 for "summer", "winter")
                 * The simulation is discretized to these times, using
                   :meth:`imod.mf6.Modflow6Simulation.create_time_discretization`
+
         allocation_options: SimulationAllocationOptions, optional
             object containing the allocation options per package type. If you
             want a specific package to have a different allocation option, then

@@ -218,9 +218,11 @@ class GroundwaterFlowModel(Modflow6Model):
         times: list[datetime]
             Time discretization of the simulation. These times are used for the
             following:
-               * Times of wells with associated timeseries are resampled to these times
-               * Start- and end times in the list are used to repeat the stresses
-                 of periodic data (e.g. river stages in iMOD5 for "summer", "winter")
+
+                * Times of wells with associated timeseries are resampled to these times
+                * Start- and end times in the list are used to repeat the stresses
+                  of periodic data (e.g. river stages in iMOD5 for "summer", "winter")
+
         allocation_options: SimulationAllocationOptions
             object containing the allocation options per package type.
             If you want a package to have a different allocation option,
