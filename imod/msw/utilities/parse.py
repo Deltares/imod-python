@@ -13,13 +13,14 @@ def _try_parsing_string_to_number(s: str) -> ScalarType:
     "a" -> "a"
     """
     try:
-        value: ScalarType = int(s)
+        return int(s)
     except ValueError:
-        try:
-            value = float(s)
-        except ValueError:
-            value = s
-    return value
+        pass
+    try:
+        return float(s)
+    except ValueError:
+        pass
+    return s
 
 
 def read_para_sim(file: Path | str) -> dict[str, ScalarType]:
