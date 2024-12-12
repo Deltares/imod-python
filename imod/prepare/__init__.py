@@ -43,6 +43,8 @@ from imod.prepare.spatial import (
 from imod.prepare.topsystem import (
     ALLOCATION_OPTION,
     DISTRIBUTING_OPTION,
+    SimulationAllocationOptions,
+    SimulationDistributingOptions,
     allocate_drn_cells,
     allocate_ghb_cells,
     allocate_rch_cells,
@@ -52,8 +54,6 @@ from imod.prepare.topsystem import (
     distribute_drn_conductance,
     distribute_ghb_conductance,
     distribute_riv_conductance,
-    SimulationAllocationOptions,
-    SimulationDistributingOptions,
 )
 from imod.prepare.voxelize import Voxelizer
 from imod.prepare.wells import assign_wells
