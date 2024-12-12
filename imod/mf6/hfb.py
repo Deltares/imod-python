@@ -1,5 +1,6 @@
 import abc
 import copy
+import json
 import textwrap
 import typing
 from copy import deepcopy
@@ -445,6 +446,27 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         super().__init__(dict_dataset)
         self.line_data = geometry
 
+    def __deepcopy__(self, memo):
+        # There is an issue with deepcopy and the GeoDataFrame geometry.
+        # The GeoDataFrame is stored in the dataset as an ExtensionArray.
+        # For some reason this object causes an infinite recursion when being deep copied.
+        # Therefor in this method the geometry is copied separately to the cloned object
+
+        ds_vars = list(self.dataset.keys())
+        for var in self._get_variable_names_for_gdf():
+            ds_vars.remove(var)
+
+        cls = type(self)
+        new = cls._from_dataset(copy.deepcopy(self.dataset[ds_vars]))
+        new.line_data = gpd.GeoDataFrame(
+            copy.deepcopy(
+                self.dataset[self._get_variable_names_for_gdf()].to_dataframe()
+            ),
+            geometry="geometry",
+        )
+
+        return new
+
     def _get_variable_names_for_gdf(self) -> list[str]:
         return [
             self._get_variable_name(),
@@ -472,13 +494,20 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             package, first convert to a Modflow6 package by calling pkg.to_mf6_pkg()"""
         )
 
+    def to_netcdf(self, *args, **kwargs):
+        new = deepcopy(self)
+        # kwargs.update({"encoding": self._netcdf_encoding()})
+        new.dataset["geometry"] = new.line_data.to_json()
+        new.dataset.to_netcdf(*args, **kwargs)
+
     def _netcdf_encoding(self):
         return {"geometry": {"dtype": "str"}}
 
     @classmethod
     def from_file(cls, path, **kwargs):
         instance = super().from_file(path, **kwargs)
-        instance.dataset["geometry"] = shapely.wkt.loads(instance.dataset["geometry"])
+        geometry = json.loads(instance.dataset["geometry"].values.item())
+        instance.line_data = gpd.GeoDataFrame.from_features(geometry)
 
         return instance
 
