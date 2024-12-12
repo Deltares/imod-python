@@ -125,7 +125,7 @@ toolz = "*"
 tqdm = "*"
 twine = "*"
 vtk = { version = ">=9.0", build = "*qt*" }
-xarray = ">=2023.08.0,!=2024.10.0" # Skip version 2024.10.0 due to failing tests
+xarray = ">=2023.08.0"
 xugrid = ">=0.11.0"
 zarr = "*"
 
