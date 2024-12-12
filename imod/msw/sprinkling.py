@@ -1,4 +1,4 @@
-from typing import TextIO, cast
+from typing import TextIO
 
 import numpy as np
 import pandas as pd
@@ -180,9 +180,11 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
             (IDF), this grid defines in which layer a groundwater abstraction
             well should be placed. The ``"artificial_recharge"`` grid contains
             types which point to the type of abstraction:
+
                 * 0: no abstraction
                 * 1: groundwater abstraction
                 * 2: surfacewater abstraction
+
             The ``"artificial_recharge_capacity"`` grid/constant defines the
             capacity of each groundwater or surfacewater abstraction. This is an
             ``1:1`` mapping: Each grid cell maps to a separate well.
@@ -208,7 +210,7 @@ class Sprinkling(MetaSwapPackage, IRegridPackage):
         -------
         Sprinkling package
         """
-        cap_data = cast(GridDataDict, imod5_data["cap"])
+        cap_data = imod5_data["cap"]
         if isinstance(cap_data["artificial_recharge_layer"], pd.DataFrame):
             data = _sprinkling_data_from_imod5_ipf(cap_data)
         else:

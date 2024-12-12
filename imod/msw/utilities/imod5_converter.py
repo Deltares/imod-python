@@ -1,6 +1,9 @@
+from xarray.core.utils import is_scalar
+
 from imod.logging import LogLevel, logger
 from imod.mf6 import StructuredDiscretization
 from imod.msw.utilities.common import concat_imod5
+from imod.msw.utilities.mask import MaskValues, MetaSwapActive
 from imod.typing import GridDataArray, GridDataDict
 from imod.typing.grid import ones_like
 from imod.util.spatial import get_cell_area
@@ -10,7 +13,7 @@ def get_cell_area_from_imod5_data(
     imod5_cap: GridDataDict,
 ) -> GridDataArray:
     # area's per type of svats
-    mf6_area = get_cell_area(imod5_cap["wetted_area"])
+    mf6_area = get_cell_area(imod5_cap["boundary"])
     wetted_area = imod5_cap["wetted_area"]
     urban_area = imod5_cap["urban_area"]
     rural_area = mf6_area - (wetted_area + urban_area)
@@ -43,7 +46,7 @@ def get_landuse_from_imod5_data(
     rural_landuse = imod5_cap["landuse"]
     # Urban landuse = 18
     urban_landuse = ones_like(rural_landuse) * 18
-    return concat_imod5(rural_landuse, urban_landuse)
+    return concat_imod5(rural_landuse, urban_landuse).astype(int)
 
 
 def get_rootzone_depth_from_imod5_data(
@@ -63,7 +66,7 @@ def is_msw_active_cell(
     target_dis: StructuredDiscretization,
     imod5_cap: GridDataDict,
     msw_area: GridDataArray,
-) -> tuple[GridDataArray, GridDataArray]:
+) -> MetaSwapActive:
     """
     Return grid of cells that are active in the coupled computation, based on
     following criteria:
@@ -84,4 +87,33 @@ def is_msw_active_cell(
         (imod5_cap["boundary"] == 1) & (msw_area > 0) & (mf6_top_active >= 1)
     )
     active = subunit_active.any(dim="subunit")
-    return active, subunit_active
+    return MetaSwapActive(active, subunit_active)
+
+
+def _is_equal_scalar_value(da, value):
+    """
+    Helper function to guarantee that the check in ``has_active_scaling_factor``
+    can shortcut after is_scalar returns False.
+    """
+    return da.to_numpy()[()] == value
+
+
+def has_active_scaling_factor(imod5_cap: GridDataDict):
+    """
+    Check if scaling factor grids are active. Carefully checks if data is
+    provided as constant (scalar) and if it matches an inactivity value. The
+    function shortcuts if data is provided as constant.
+    """
+    variable_inactive_mapping = {
+        "perched_water_table_level": MaskValues.default,
+        "soil_moisture_fraction": 1.0,
+        "conductivitiy_factor": 1.0,
+    }
+    scaling_factor_inactive = True
+    for var, inactive_value in variable_inactive_mapping.items():
+        da = imod5_cap[var]
+        scaling_factor_inactive &= is_scalar(da) and _is_equal_scalar_value(
+            da, inactive_value
+        )
+
+    return not scaling_factor_inactive

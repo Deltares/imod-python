@@ -1,7 +1,7 @@
 import csv
 from pathlib import Path
 from shutil import copyfile
-from typing import Optional, Union, cast
+from typing import Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -13,6 +13,7 @@ from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import MeteoGridRegridMethod
 from imod.msw.timeutil import to_metaswap_timeformat
 from imod.msw.utilities.common import find_in_file_list
+from imod.msw.utilities.mask import MaskValues
 from imod.typing import Imod5DataDict
 from imod.util.regrid_method_type import EmptyRegridMethod, RegridMethodType
 
@@ -176,7 +177,9 @@ class MeteoGrid(MetaSwapPackage, IRegridPackage):
                 path = (directory / self._meteo_dirname / str(varname)).with_suffix(
                     ".asc"
                 )
-                imod.rasterio.save(path, self.dataset[str(varname)], nodata=-9999.0)
+                imod.rasterio.save(
+                    path, self.dataset[str(varname)], nodata=MaskValues.default
+                )
 
     def _pkgcheck(self):
         for varname in self.dataset.data_vars:
@@ -223,7 +226,7 @@ class MeteoGridCopy(MetaSwapPackage, IRegridPackage):
 
     @classmethod
     def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "MeteoGridCopy":
-        paths = cast(list[str], imod5_data["extra"]["paths"])
+        paths = imod5_data["extra"]["paths"]
         filepath = find_in_file_list(cls._file_name, paths)
 
         return cls(filepath)

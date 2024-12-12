@@ -249,7 +249,8 @@ class Recharge(BoundaryCondition, IRegridPackage):
         cap_data = cast(GridDataDict, imod5_data["cap"])
 
         msw_area = get_cell_area_from_imod5_data(cap_data)
-        active, _ = is_msw_active_cell(target_dis, cap_data, msw_area)
+        msw_active = is_msw_active_cell(target_dis, cap_data, msw_area)
+        active = msw_active.all
 
         data = {}
         layer_da = xr.full_like(
