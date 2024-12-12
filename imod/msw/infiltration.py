@@ -8,6 +8,7 @@ from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import InfiltrationRegridMethod
 from imod.msw.utilities.common import concat_imod5
+from imod.msw.utilities.mask import MaskValues
 from imod.typing import GridDataDict, Imod5DataDict
 from imod.typing.grid import ones_like
 
@@ -28,7 +29,7 @@ def deactivate_small_resistances_in_data(data: GridDataDict):
                 message=message.format(var=var),
                 additional_depth=1,
             )
-            data[var] = data[var].where(~to_deactivate, -9999.0)
+            data[var] = data[var].where(~to_deactivate, MaskValues.default)
     return data
 
 
@@ -120,7 +121,7 @@ class Infiltration(MetaSwapPackage, IRegridPackage):
         data = deactivate_small_resistances_in_data(data)
 
         like = data["downward_resistance"].isel(subunit=0, drop=True)
-        data["bottom_resistance"] = ones_like(like) * -9999.0
+        data["bottom_resistance"] = ones_like(like) * MaskValues.default
         data["extra_storage_coefficient"] = ones_like(like)
 
         return cls(**data)

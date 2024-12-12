@@ -11,6 +11,15 @@ class MetaSwapActive:
     per_subunit: GridDataArray
 
 
+@dataclass
+class MaskValues:
+    """Stores sentinel values for nodata. Most cases use -9999.0, but exceptions
+    can be added here."""
+
+    default = -9999.0
+    integer = 0
+
+
 def mask_and_broadcast_cap_data(
     cap_data: GridDataDict, msw_active: MetaSwapActive
 ) -> GridDataDict:
@@ -42,7 +51,7 @@ def mask_and_broadcast_pkg_data(
 
 def _mask_spatial_var(da: GridDataArray, active: GridDataArray) -> GridDataArray:
     if issubclass(da.dtype.type, numbers.Integral):
-        return da.where(active, other=0)
+        return da.where(active, other=MaskValues.integer)
     elif issubclass(da.dtype.type, numbers.Real):
         return da.where(active)
     else:
