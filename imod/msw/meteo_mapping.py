@@ -181,7 +181,7 @@ class PrecipitationMapping(MeteoMapping):
         Construct a MetaSWAP PrecipitationMapping package from iMOD5 data in the
         CAP package, loaded with the
         :func:`imod.formats.prj.open_projectfile_data` function.
-        
+
         Opens first ascii grid in mete_grid.inp, which is used to construct
         mappings to svats. The grids should not change in dimension over time.
         No checks are done whether cells switch from inactive to active or vice
@@ -192,7 +192,7 @@ class PrecipitationMapping(MeteoMapping):
         imod5_data: Imod5DataDict
             iMOD5 data as returned by
             :func:`imod.formats.prj.open_projectfile_data`
-        
+
         Returns
         -------
         imod.msw.PrecipitationMapping
@@ -239,7 +239,7 @@ class EvapotranspirationMapping(MeteoMapping):
         Construct a MetaSWAP EvapotranspirationMapping package from iMOD5 data
         in the CAP package, loaded with the
         :func:`imod.formats.prj.open_projectfile_data` function.
-        
+
         Opens first ascii grid in mete_grid.inp, which is used to construct
         mappings to svats. The grids should not change in dimension over time.
         No checks are done whether cells switch from inactive to active or vice
@@ -250,7 +250,7 @@ class EvapotranspirationMapping(MeteoMapping):
         imod5_data: Imod5DataDict
             iMOD5 data as returned by
             :func:`imod.formats.prj.open_projectfile_data`
-        
+
         Returns
         -------
         imod.msw.EvapotranspirationMapping

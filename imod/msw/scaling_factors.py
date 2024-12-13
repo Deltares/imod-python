@@ -90,13 +90,13 @@ class ScalingFactors(MetaSwapPackage, IRegridPackage):
         Pressure head factor is set to one for all subunits. All urban areas
         (subunit=1) are also set to one for all variables, except the perced
         water table level.
-        
+
         Parameters
         ----------
         imod5_data: Imod5DataDict
             iMOD5 data as returned by
             :func:`imod.formats.prj.open_projectfile_data`
-        
+
         Returns
         -------
         imod.msw.ScalingFactors

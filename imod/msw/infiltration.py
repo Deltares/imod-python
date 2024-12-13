@@ -118,7 +118,7 @@ class Infiltration(MetaSwapPackage, IRegridPackage):
         imod5_data: Imod5DataDict
             iMOD5 data as returned by
             :func:`imod.formats.prj.open_projectfile_data`
-        
+
         Returns
         -------
         imod.msw.Infiltration
