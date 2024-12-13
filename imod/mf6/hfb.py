@@ -496,7 +496,6 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
     def to_netcdf(self, *args, **kwargs):
         new = deepcopy(self)
-        # kwargs.update({"encoding": self._netcdf_encoding()})
         new.dataset["geometry"] = new.line_data.to_json()
         new.dataset.to_netcdf(*args, **kwargs)
 
