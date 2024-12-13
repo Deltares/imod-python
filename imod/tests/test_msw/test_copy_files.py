@@ -66,4 +66,4 @@ def test_from_imod5_data(src_files):
     # Act
     copyfiles = FileCopier.from_imod5_data(imod5_data)
     # Assert
-    len(copyfiles.dataset["paths"]) == 3
+    assert len(copyfiles.dataset["paths"]) == 3
