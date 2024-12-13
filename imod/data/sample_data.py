@@ -46,6 +46,8 @@ REGISTRY = load_pooch_registry(REGISTRY)
 
 
 def twri_output(path: Union[str, Path]) -> None:
+    # Unzips TWRI output to ``path``. Has a race condition when executed
+    # multiple times with the same path.
     lock = FileLock(REGISTRY.path / "ex01-twri-output.zip.lock")
     with lock:
         _ = REGISTRY.fetch("ex01-twri-output.zip", processor=Unzip(extract_dir=path))
@@ -63,8 +65,9 @@ def hondsrug_layermodel() -> xr.Dataset:
     lock = FileLock(REGISTRY.path / "hondsrug-layermodel.nc.lock")
     with lock:
         fname = REGISTRY.fetch("hondsrug-layermodel.nc")
+        hondsrug_layermodel = xr.open_dataset(fname)
 
-    return xr.open_dataset(fname)
+    return hondsrug_layermodel
 
 
 def hondsrug_meteorology() -> xr.Dataset:
@@ -275,3 +278,18 @@ def colleagues_river_data(path: Union[str, Path]):
         x_preserve | y_preserve, riv_bot_da + 0.15
     )
     return riv_ds
+
+
+def tutorial_03(path: Path | str) -> None:
+    """
+    Starting dataset for tutorial 3 in the iMOD Documentation.
+    """
+    # Unzips tutorial content to ``path``. Has a race condition when executed
+    # multiple times with the same path.
+    path = Path(path)
+    filename = "iMOD-Documentation-tutorial_03.zip"
+    lock = FileLock(REGISTRY.path / f"{filename}.lock")
+    with lock:
+        _ = REGISTRY.fetch(filename, processor=Unzip(extract_dir=path))
+
+    return path / "tutorial_03" / "GWF_model_Hondsrug.prj"

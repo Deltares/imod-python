@@ -27,10 +27,15 @@ Added
   used to turn off validation upon writing, use at your own risk!
 - :class:`imod.msw.MetaSwapModel` got ``settings`` argument to set simulation
   settings.
+- :func:`imod.data.tutorial_03` to load data for the iMOD Documentation
+  tutorial.
 
 Fixed
 ~~~~~
 
+- Fixed bug were :class:`HorizontalFlowBarrierResistance`, 
+  :class:`HorizontalFlowBarrierSingleLayerResistance` and other HFB packages could not 
+  be dumped, clipped, or copied with xarray >= 2024.10.0.
 - :meth:`imod.mf6.Modflow6Simulation.regrid_like` can now regrid a structured
   model to an unstructured grid.
 - :meth:`imod.mf6.Modflow6Simulation.regrid_like` throws a
