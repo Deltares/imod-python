@@ -130,10 +130,11 @@ def test_clip_by_grid_with_line_data_package__structured(
     # Assert
     with pytest.raises(AssertionError):
         assert_geometries_equal(
-            hfb_clipped["geometry"].item(), horizontal_flow_barrier["geometry"].item()
+            hfb_clipped["geometry"].values.item(),
+            horizontal_flow_barrier["geometry"].values.item(),
         )
 
-    x, y = hfb_clipped["geometry"].item().xy
+    x, y = hfb_clipped["geometry"].values.item().xy
     np.testing.assert_allclose(x, np.array([90.0, 40.0, 0.0]))
     np.testing.assert_allclose(y, np.array([58.75, 40.0, 0.0]))
 
@@ -152,10 +153,11 @@ def test_clip_by_grid_with_line_data_package__unstructured(
     # Assert
     with pytest.raises(AssertionError):
         assert_geometries_equal(
-            hfb_clipped["geometry"].item(), horizontal_flow_barrier["geometry"].item()
+            hfb_clipped["geometry"].values.item(),
+            horizontal_flow_barrier["geometry"].values.item(),
         )
 
-    x, y = hfb_clipped["geometry"].item().xy
+    x, y = hfb_clipped["geometry"].values.item().xy
     np.testing.assert_allclose(x, np.array([90.0, 40.0, 0.0]))
     np.testing.assert_allclose(y, np.array([58.75, 40.0, 0.0]))
 

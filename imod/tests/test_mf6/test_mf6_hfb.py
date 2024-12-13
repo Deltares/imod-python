@@ -897,3 +897,24 @@ def test_extract_hfb_bounds_from_dataframe__fails():
 
     with pytest.raises(TypeError):
         _extract_mean_hfb_bounds_from_dataframe(gdf_polygons)
+
+
+def test_custom_deepcopy():
+    # Arrange
+    barrier_y = [11.0, 5.0, -1.0]
+    barrier_x = [5.0, 5.0, 5.0]
+
+    geometry = gpd.GeoDataFrame(
+        geometry=[linestrings(barrier_x, barrier_y)],
+        data={
+            "resistance": [1200.0],
+            "layer": [1],
+        },
+    )
+    hfb = HorizontalFlowBarrierResistance(geometry)
+
+    # Act
+    hfb_copy = deepcopy(hfb)
+
+    # Assert
+    assert hfb_copy.dataset.identical(hfb.dataset)

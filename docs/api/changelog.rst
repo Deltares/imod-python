@@ -12,6 +12,9 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Fixed
 ~~~~~
 
+- Fixed bug were :class:`HorizontalFlowBarrierResistance`, 
+  :class:`HorizontalFlowBarrierSingleLayerResistance` and other HFB packages could not 
+  be dumped, clipped, or copied with xarray >= 2024.10.0.
 - :meth:`imod.mf6.Modflow6Simulation.regrid_like` can now regrid a structured
   model to an unstructured grid.
 - :meth:`imod.mf6.Modflow6Simulation.regrid_like` throws a
