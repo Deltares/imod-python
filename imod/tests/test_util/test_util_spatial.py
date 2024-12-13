@@ -316,8 +316,6 @@ def test_gdal_compliant_grid():
 
 
 def test_gdal_compliant_grid_crs(tmpdir):
-    import rioxarray
-
     # Arrange
     data = np.ones((2, 3))
     # explicit dx dy, equidistant
@@ -330,19 +328,22 @@ def test_gdal_compliant_grid_crs(tmpdir):
     dims = ("y", "x")
     da = xr.DataArray(data, coords, dims)
 
+    crs = "EPSG:28992"
+
     # Act
-    da_compliant = imod.util.spatial.gdal_compliant_grid(da, crs="EPSG:28992")
+    da_compliant = imod.util.spatial.gdal_compliant_grid(da, crs=crs)
 
     # Assert
     assert "spatial_ref" in da_compliant.coords
 
     # Test saving to netcdf, reading with rasterio again to test if crs
     # understood.
-    da_compliant.to_netcdf(tmpdir / "gdal_accepted_grid.nc")
+    file = tmpdir / "gdal_accepted_grid.nc"
+    da_compliant.to_netcdf(file)
     da_compliant.close()
 
-    da_read = rioxarray.open_rasterio(str(tmpdir / "gdal_accepted_grid.nc"))
-    assert da_read.rio.crs == "EPSG:28992"
+    da_read = xr.open_dataset(file, decode_coords="all")
+    assert da_read.rio.crs == crs
 
 
 def test_gdal_compliant_grid_error_dims():
