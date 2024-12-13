@@ -56,7 +56,6 @@ def _well_from_imod5_cap_point_data(cap_data: GridDataDict) -> dict[str, np.ndar
     raise NotImplementedError(
         "Assigning sprinkling wells with an IPF file is not supported, please specify them as IDF."
     )
-    return {}
 
 
 def _well_from_imod5_cap_grid_data(cap_data: GridDataDict) -> dict[str, np.ndarray]:

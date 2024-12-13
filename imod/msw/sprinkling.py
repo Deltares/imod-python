@@ -26,7 +26,6 @@ def _sprinkling_data_from_imod5_ipf(cap_data: GridDataDict) -> GridDataDict:
     raise NotImplementedError(
         "Assigning sprinkling wells with an IPF file is not supported, please specify them as IDF."
     )
-    return {}
 
 
 def _sprinkling_data_from_imod5_grid(cap_data: GridDataDict) -> GridDataDict:
