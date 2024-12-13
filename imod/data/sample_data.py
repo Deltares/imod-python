@@ -275,3 +275,16 @@ def colleagues_river_data(path: Union[str, Path]):
         x_preserve | y_preserve, riv_bot_da + 0.15
     )
     return riv_ds
+
+
+def tutorial_03(path: Path | str) -> None:
+    """
+    Starting dataset for tutorial 3 in the iMOD Documentation.
+    """
+    path = Path(path)
+    filename = "iMOD-Documentation-tutorial_03.zip"
+    lock = FileLock(REGISTRY.path / f"{filename}.lock")
+    with lock:
+        _ = REGISTRY.fetch(filename, processor=Unzip(extract_dir=path))
+
+    return path / "tutorial_03" / "GWF_model_Hondsrug.prj"
