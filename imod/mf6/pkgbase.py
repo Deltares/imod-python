@@ -27,7 +27,7 @@ def _is_scalar_nan(da: GridDataArray):
     """
     scalar_data: bool = is_scalar(da)
     if scalar_data:
-        stripped_value = da.values[()]
+        stripped_value = da.to_numpy()[()]
         return isinstance(stripped_value, numbers.Real) and np.isnan(stripped_value)  # type: ignore[call-overload]
     return False
 
