@@ -107,6 +107,7 @@ Flow Packages
     HorizontalFlowBarrierResistance.clip_box
     LayeredWell
     LayeredWell.from_imod5_data
+    LayeredWell.from_imod5_cap_data
     LayeredWell.mask
     LayeredWell.regrid_like
     LayeredWell.to_mf6_pkg

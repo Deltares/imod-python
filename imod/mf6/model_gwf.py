@@ -218,9 +218,11 @@ class GroundwaterFlowModel(Modflow6Model):
         times: list[datetime]
             Time discretization of the simulation. These times are used for the
             following:
-               * Times of wells with associated timeseries are resampled to these times
-               * Start- and end times in the list are used to repeat the stresses
-                 of periodic data (e.g. river stages in iMOD5 for "summer", "winter")
+
+                * Times of wells with associated timeseries are resampled to these times
+                * Start- and end times in the list are used to repeat the stresses
+                  of periodic data (e.g. river stages in iMOD5 for "summer", "winter")
+
         allocation_options: SimulationAllocationOptions
             object containing the allocation options per package type.
             If you want a package to have a different allocation option,
@@ -303,9 +305,9 @@ class GroundwaterFlowModel(Modflow6Model):
             )
 
         # now import the non-singleton packages'
+        imod5_keys = list(imod5_data.keys())
 
         # import wells
-        imod5_keys = list(imod5_data.keys())
         wel_keys = [key for key in imod5_keys if key[0:3] == "wel"]
         for wel_key in wel_keys:
             wel_key_truncated = wel_key[:16]
@@ -330,8 +332,11 @@ class GroundwaterFlowModel(Modflow6Model):
                     wel_key, imod5_data, times
                 )
 
+        if "cap" in imod5_keys:
+            result["msw-sprinkling"] = LayeredWell.from_imod5_cap_data(imod5_data)  # type: ignore
+            result["msw-rch"] = Recharge.from_imod5_cap_data(imod5_data)  # type: ignore
+
         # import ghb's
-        imod5_keys = list(imod5_data.keys())
         ghb_keys = [key for key in imod5_keys if key[0:3] == "ghb"]
         for ghb_key in ghb_keys:
             ghb_pkg = GeneralHeadBoundary.from_imod5_data(

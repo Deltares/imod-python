@@ -30,6 +30,7 @@ from imod.mf6.mf6_wel_adapter import Mf6Wel, concat_indices_to_cellid
 from imod.mf6.package import Package
 from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.utilities.grid import broadcast_to_full_domain
+from imod.mf6.utilities.imod5_converter import well_from_imod5_cap_data
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.validation_context import ValidationContext
 from imod.mf6.write_context import WriteContext
@@ -44,7 +45,7 @@ from imod.schemata import (
     ValidationError,
 )
 from imod.select.points import points_indices, points_values
-from imod.typing import GridDataArray
+from imod.typing import GridDataArray, Imod5DataDict
 from imod.typing.grid import is_spatial_grid, ones_like
 from imod.util.expand_repetitions import resample_timeseries
 from imod.util.structured import values_within_range
@@ -1297,6 +1298,48 @@ class LayeredWell(GridAgnosticWell):
             )
             logger.log(loglevel=LogLevel.ERROR, message=log_msg, additional_depth=2)
             raise ValueError(log_msg)
+
+    @classmethod
+    def from_imod5_cap_data(cls, imod5_data: Imod5DataDict):
+        """
+        Create LayeredWell from imod5_data in "cap" package. Abstraction data
+        for sprinkling is defined in iMOD5 either with grids (IDF) or points
+        (IPF) combined with a grid. Depending on the type, the function does
+        different conversions
+
+        - grids (IDF)
+            The ``"artifical_recharge_layer"`` variable was defined as grid
+            (IDF), this grid defines in which layer a groundwater abstraction
+            well should be placed. The ``"artificial_recharge"`` grid contains
+            types which point to the type of abstraction:
+
+                * 0: no abstraction
+                * 1: groundwater abstraction
+                * 2: surfacewater abstraction
+
+            The ``"artificial_recharge_capacity"`` grid/constant defines the
+            capacity of each groundwater or surfacewater abstraction. This is an
+            ``1:1`` mapping: Each grid cell maps to a separate well.
+
+        - points with grid (IPF & IDF)
+            The ``"artifical_recharge_layer"`` variable was defined as point
+            data (IPF), this table contains wellids with an abstraction capacity
+            and layer. The ``"artificial_recharge"`` grid contains a mapping of
+            grid cells to wellids in the point data. The
+            ``"artificial_recharge_capacity"`` is ignored as the abstraction
+            capacity is already defined in the point data. This is an ``n:1``
+            mapping: multiple grid cells can map to one well.
+
+        Parameters
+        ----------
+        imod5_data: dict[str, dict[str, GridDataArray]]
+            dictionary containing the arrays mentioned in the project file as
+            xarray datasets, under the key of the package type to which it
+            belongs, as returned by
+            :func:`imod.formats.prj.open_projectfile_data`.
+        """
+        data = well_from_imod5_cap_data(imod5_data)
+        return cls(**data)  # type: ignore
 
 
 class WellDisStructured(DisStructuredBoundaryCondition):

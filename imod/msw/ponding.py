@@ -7,7 +7,8 @@ from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import DataDictType, MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import PondingRegridMethod
-from imod.typing import IntArray
+from imod.msw.utilities.common import concat_imod5
+from imod.typing import Imod5DataDict, IntArray
 
 
 class Ponding(MetaSwapPackage, IRegridPackage):
@@ -70,3 +71,32 @@ class Ponding(MetaSwapPackage, IRegridPackage):
         self._check_range(dataframe)
 
         return self.write_dataframe_fixed_width(file, dataframe)
+
+    @classmethod
+    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "Ponding":
+        """
+        Construct a MetaSWAP Ponding package from iMOD5 data in the CAP
+        package, loaded with the :func:`imod.formats.prj.open_projectfile_data`
+        function.
+
+        Method concatenates ponding depths, runon resistance, and runoff
+        resistance along two subunits. Subunit 0 for rural, and 1 for urban
+        landuse.
+
+        Parameters
+        ----------
+        imod5_data: Imod5DataDict
+            iMOD5 data as returned by
+            :func:`imod.formats.prj.open_projectfile_data`
+
+        Returns
+        -------
+        imod.msw.Ponding
+        """
+        cap_data = imod5_data["cap"]
+        data = {}
+        for key in cls._with_subunit:
+            data_ls = [cap_data[f"{landuse}_{key}"] for landuse in ["rural", "urban"]]
+            data[key] = concat_imod5(*data_ls)
+
+        return cls(**data)
