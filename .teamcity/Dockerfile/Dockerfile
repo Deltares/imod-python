@@ -3,7 +3,7 @@
 FROM mcr.microsoft.com/windows/server:ltsc2022
 LABEL maintainer="sunny.titus@deltares.nl"
 
-ARG PIXI_VERSION=v0.34.0
+ARG PIXI_VERSION=v0.39.2
 
 ## Setup user
 USER "NT Authority\System"
