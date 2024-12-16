@@ -5,6 +5,7 @@ from typing import Any, Mapping, Optional
 
 import numpy as np
 import xarray as xr
+from xarray.core.utils import is_scalar
 import xugrid as xu
 
 import imod
@@ -18,6 +19,16 @@ from imod.typing.grid import (
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 EXCHANGE_PACKAGES = ("gwfgwf", "gwfgwt", "gwtgwt")
+
+def _is_scalar_nan(da: GridDataArray):
+    """
+    Test if is_scalar_nan, carefully avoid loading grids in memory
+    """
+    if is_scalar(da):
+        stripped_value = da.values[()]
+        return isinstance(stripped_value, numbers.Real) and np.isnan(stripped_value)  # type: ignore[call-overload]
+    return False
+
 
 
 class PackageBase(IPackageBase, abc.ABC):
@@ -161,11 +172,14 @@ class PackageBase(IPackageBase, abc.ABC):
         if dataset.ugrid_roles.topology:
             dataset = xu.UgridDataset(dataset)
             dataset = imod.util.spatial.from_mdal_compliant_ugrid2d(dataset)
+            # Drop node dim, as we don't need in the UgridDataset (it will be
+            # preserved in the ``grid`` property, so topology stays intact!)
+            node_dim = dataset.grid.node_dimension
+            dataset = dataset.drop_dims(node_dim)
 
         # Replace NaNs by None
         for key, value in dataset.items():
-            stripped_value = value.values[()]
-            if isinstance(stripped_value, numbers.Real) and np.isnan(stripped_value):  # type: ignore[call-overload]
+            if _is_scalar_nan(value):
                 dataset[key] = None
 
         return cls._from_dataset(dataset)
