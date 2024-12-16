@@ -911,10 +911,33 @@ def test_custom_deepcopy():
             "layer": [1],
         },
     )
-    hfb = HorizontalFlowBarrierResistance(geometry)
+    hfb = SingleLayerHorizontalFlowBarrierResistance(geometry)
 
     # Act
     hfb_copy = deepcopy(hfb)
 
     # Assert
     assert hfb_copy.dataset.identical(hfb.dataset)
+
+
+def test_clip_box():
+    # Arrange
+    barrier_y = [11.0, 5.0, -1.0]
+    barrier_x = [5.0, 5.0, 5.0]
+
+    geometry = gpd.GeoDataFrame(
+        geometry=[linestrings(barrier_x, barrier_y)],
+        data={
+            "resistance": [1200.0],
+            "layer": [1],
+        },
+    )
+    hfb = SingleLayerHorizontalFlowBarrierResistance(geometry)
+
+    # Act
+    hfb_clipped = hfb.clip_box(y_max=7.0)
+
+    # Assert
+    # HFB currently not clipped but copied
+    # FUTURE: Line data might be clipped in the future.
+    assert hfb_clipped.dataset.identical(hfb.dataset)
