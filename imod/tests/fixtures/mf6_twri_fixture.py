@@ -1,7 +1,9 @@
+import geopandas as gpd
 import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+from shapely import linestrings
 
 import imod
 from imod.typing.grid import zeros_like
@@ -229,6 +231,28 @@ def transient_twri_model():
     simulation.create_time_discretization(
         additional_times=pd.date_range("2000-01-01", " 2000-01-31")
     )
+    return simulation
+
+
+@pytest.fixture(scope="function")
+def twri_model_hfb():
+    """Returns steady-state confined model."""
+    simulation = make_twri_model()
+    gwf_model = simulation["GWF_1"]
+
+    barrier_y = [150_000.0, 50_000.0, 0.0]
+    barrier_x = [50_000.0, 50_000.0, 50_000.0]
+
+    geometry = gpd.GeoDataFrame(
+        geometry=[linestrings(barrier_x, barrier_y)],
+        data={
+            "resistance": [1200.0],
+            "layer": [1],
+        },
+    )
+
+    gwf_model["hfb"] = imod.mf6.SingleLayerHorizontalFlowBarrierResistance(geometry)
+
     return simulation
 
 
