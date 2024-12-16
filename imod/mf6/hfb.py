@@ -19,7 +19,10 @@ from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
-from imod.mf6.utilities.clip import clip_line_gdf_by_grid
+from imod.mf6.utilities.clip import (
+    clip_line_gdf_by_bounding_polygon,
+    clip_line_gdf_by_grid,
+)
 from imod.mf6.utilities.grid import broadcast_to_full_domain
 from imod.mf6.utilities.hfb import (
     _create_zlinestring_from_bound_df,
@@ -797,7 +800,24 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         -------
         sliced : Package
         """
-        return deepcopy(self)
+        new = deepcopy(self)
+
+        if x_min or x_max or y_min or y_max:
+            # Create bounding polygon
+            line_minx, line_miny, line_maxx, line_maxy = self.line_data.total_bounds
+            # Use pandas clip, as it gracefully deals with lower=None and upper=None
+            x_min, x_max = pd.Series([line_minx, line_maxx]).clip(
+                lower=x_min, upper=x_max
+            )
+            y_min, y_max = pd.Series([line_miny, line_maxy]).clip(
+                lower=y_min, upper=y_max
+            )
+            bbox = shapely.box(x_min, y_min, x_max, y_max)
+            bounding_gdf = gpd.GeoDataFrame([0], geometry=[bbox])
+            new.line_data = clip_line_gdf_by_bounding_polygon(
+                self.line_data, bounding_gdf
+            )
+        return new
 
     def mask(self, _) -> Package:
         """

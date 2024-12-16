@@ -934,10 +934,23 @@ def test_clip_box():
     )
     hfb = SingleLayerHorizontalFlowBarrierResistance(geometry)
 
-    # Act
-    hfb_clipped = hfb.clip_box(y_max=7.0)
-
-    # Assert
-    # HFB currently not clipped but copied
-    # FUTURE: Line data might be clipped in the future.
+    # Case 1: No clipping, should deepcopy datasets identical
+    hfb_clipped = hfb.clip_box()
     assert hfb_clipped.dataset.identical(hfb.dataset)
+
+    # Case 2: Clip in y-direction
+    hfb_clipped = hfb.clip_box(y_max=7.0)
+    hfb_clipped.dataset.coords["parts"]
+    assert hfb_clipped.dataset.coords["parts"].isin([0, 1]).all()
+    np.testing.assert_equal(
+        hfb_clipped.line_data.total_bounds, np.array([5.0, -1.0, 5.0, 7.0])
+    )
+
+    # Case 3: y_min and y_max equal, dataframe consisting of 1 empty element
+    hfb_clipped = hfb.clip_box(y_min=7.0, y_max=7.0)
+    assert hfb_clipped.line_data.shape == (1, 3)
+    assert hfb_clipped.line_data.is_empty[0, 0]
+
+    # Case 4: y_max outside range, entirely empty geodataframe
+    hfb_clipped = hfb.clip_box(y_max=-2.0)
+    assert hfb_clipped.line_data.empty

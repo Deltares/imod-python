@@ -134,13 +134,9 @@ def _clip_linestring(
     return clipped_line_data
 
 
-def clip_line_gdf_by_grid(
-    gdf: GeoDataFrameType, active: GridDataArray
+def clip_line_gdf_by_bounding_polygon(
+    gdf: GeoDataFrameType, bounding_gdf: GeoDataFrameType
 ) -> GeoDataFrameType:
-    """Clip GeoDataFrame by bounding polygon of grid"""
-    # Clip line with polygon
-    bounding_gdf = bounding_polygon(active)
-
     if (shapely.get_type_id(gdf.geometry) == shapely.GeometryType.POLYGON).any():
         # Shapely returns z linestrings when clipping our vertical z polygons.
         # To work around this convert polygons to zlinestrings to clip.
@@ -150,3 +146,12 @@ def clip_line_gdf_by_grid(
         return clipped_hfb_zlinestrings_to_zpolygons(clipped_linestrings)
     else:
         return _clip_linestring(gdf, bounding_gdf)
+
+
+def clip_line_gdf_by_grid(
+    gdf: GeoDataFrameType, active: GridDataArray
+) -> GeoDataFrameType:
+    """Clip GeoDataFrame by bounding polygon of grid"""
+    # Clip line with polygon
+    bounding_gdf = bounding_polygon(active)
+    return clip_line_gdf_by_bounding_polygon(gdf, bounding_gdf)
