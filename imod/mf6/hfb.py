@@ -1,5 +1,4 @@
 import abc
-import copy
 import json
 import textwrap
 import typing
@@ -457,11 +456,9 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             ds_vars.remove(var)
 
         cls = type(self)
-        new = cls._from_dataset(copy.deepcopy(self.dataset[ds_vars]))
+        new = cls._from_dataset(deepcopy(self.dataset[ds_vars]))
         new.line_data = gpd.GeoDataFrame(
-            copy.deepcopy(
-                self.dataset[self._get_variable_names_for_gdf()].to_dataframe()
-            ),
+            deepcopy(self.dataset[self._get_variable_names_for_gdf()].to_dataframe()),
             geometry="geometry",
         )
 
@@ -804,10 +801,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         -------
         sliced : Package
         """
-        cls = type(self)
-        new = cls._from_dataset(copy.deepcopy(self.dataset))
-        new.line_data = self.line_data
-        return new
+        return deepcopy(self)
 
     def mask(self, _) -> Package:
         """
