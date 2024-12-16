@@ -176,7 +176,7 @@ class PackageBase(IPackageBase, abc.ABC):
             # Drop node dim, as we don't need in the UgridDataset (it will be
             # preserved in the ``grid`` property, so topology stays intact!)
             node_dim = dataset.grid.node_dimension
-            dataset = dataset.drop_dims(node_dim)
+            dataset = dataset.drop_dims(node_dim, errors="ignore")
 
         # Replace NaNs by None
         for key, value in dataset.items():
