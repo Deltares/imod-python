@@ -1,7 +1,7 @@
 import abc
 import numbers
 import pathlib
-from typing import Mapping
+from typing import Any, Mapping, Optional
 
 import numpy as np
 import xarray as xr
@@ -9,7 +9,12 @@ import xugrid as xu
 
 import imod
 from imod.mf6.interfaces.ipackagebase import IPackageBase
-from imod.typing.grid import GridDataArray, GridDataset, merge_with_dictionary
+from imod.typing.grid import (
+    GridDataArray,
+    GridDataset,
+    is_spatial_grid,
+    merge_with_dictionary,
+)
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 EXCHANGE_PACKAGES = ("gwfgwf", "gwfgwt", "gwtgwt")
@@ -48,15 +53,48 @@ class PackageBase(IPackageBase, abc.ABC):
     def __setitem__(self, key, value):
         self.dataset.__setitem__(key, value)
 
-    def to_netcdf(self, *args, **kwargs):
+    def to_netcdf(
+        self, *args, mdal_compliant: bool = False, crs: Optional[Any] = None, **kwargs
+    ):
         """
 
-        Write dataset contents to a netCDF file.
-        Custom encoding rules can be provided on package level by overriding the _netcdf_encoding in the package
+        Write dataset contents to a netCDF file. Custom encoding rules can be
+        provided on package level by overriding the _netcdf_encoding in the
+        package
+
+        Parameters
+        ----------
+        *args:
+            Will be passed on to ``xr.Dataset.to_netcdf`` or
+            ``xu.UgridDataset.to_netcdf``.
+        mdal_compliant: bool, optional
+            Convert data with
+            :func:`imod.prepare.spatial.mdal_compliant_ugrid2d` to MDAL
+            compliant unstructured grids. Defaults to False.
+        crs: Any, optional
+            Anything accepted by rasterio.crs.CRS.from_user_input
+            Requires ``rioxarray`` installed.
+        **kwargs:
+            Will be passed on to ``xr.Dataset.to_netcdf`` or
+            ``xu.UgridDataset.to_netcdf``.
 
         """
         kwargs.update({"encoding": self._netcdf_encoding()})
-        self.dataset.to_netcdf(*args, **kwargs)
+
+        dataset = self.dataset
+        if isinstance(dataset, xu.UgridDataset):
+            if mdal_compliant:
+                dataset = dataset.ugrid.to_dataset()
+                mdal_dataset = imod.util.spatial.mdal_compliant_ugrid2d(
+                    dataset, crs=crs
+                )
+                mdal_dataset.to_netcdf(*args, **kwargs)
+            else:
+                dataset.ugrid.to_netcdf(*args, **kwargs)
+        else:
+            if is_spatial_grid(dataset):
+                dataset = imod.util.spatial.gdal_compliant_grid(dataset, crs=crs)
+            dataset.to_netcdf(*args, **kwargs)
 
     def _netcdf_encoding(self):
         """
