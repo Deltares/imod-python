@@ -5,8 +5,8 @@ from typing import Any, Mapping, Optional
 
 import numpy as np
 import xarray as xr
-from xarray.core.utils import is_scalar
 import xugrid as xu
+from xarray.core.utils import is_scalar
 
 import imod
 from imod.mf6.interfaces.ipackagebase import IPackageBase
@@ -20,6 +20,7 @@ from imod.typing.grid import (
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 EXCHANGE_PACKAGES = ("gwfgwf", "gwfgwt", "gwtgwt")
 
+
 def _is_scalar_nan(da: GridDataArray):
     """
     Test if is_scalar_nan, carefully avoid loading grids in memory
@@ -28,7 +29,6 @@ def _is_scalar_nan(da: GridDataArray):
         stripped_value = da.values[()]
         return isinstance(stripped_value, numbers.Real) and np.isnan(stripped_value)  # type: ignore[call-overload]
     return False
-
 
 
 class PackageBase(IPackageBase, abc.ABC):
