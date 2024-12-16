@@ -26,7 +26,7 @@ To build the image:
 .. code-block:: console
 
   docker context use desktop-windows  
-  docker build -t windows-pixi:34.0 . -m 2GB  
+  docker build -t windows-pixi:v0.34.0 . -m 2GB  
 
 The image tag is not randomly chosen. It matches the Pixi version shipped with the image. So make sure the tag equals the version inside the dockerfile.
 
@@ -54,8 +54,8 @@ After you connected to the registry you can tag and push your image:
 
 .. code-block:: console
 
-    docker tag windows-pixi:34.0 containers.deltares.nl/hydrology_product_line_imod/windows-pixi:34.0
-    docker push containers.deltares.nl/hydrology_product_line_imod/windows-pixi:34.0
+    docker tag windows-pixi:v0.34.0 containers.deltares.nl/hydrology_product_line_imod/windows-pixi:v0.34.0
+    docker push containers.deltares.nl/hydrology_product_line_imod/windows-pixi:v0.34.0
 
 Again, make sure the tags match the ``PIXI_VERSION`` inside the dockerfile.
 
