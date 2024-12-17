@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from typing import TYPE_CHECKING, Optional
 
 import numpy as np
+import pandas as pd
 import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
@@ -18,6 +20,14 @@ from imod.mf6.utilities.hfb import (
 from imod.typing import GeoDataFrameType, GridDataArray
 from imod.typing.grid import bounding_polygon, is_spatial_grid
 from imod.util.imports import MissingOptionalModule
+
+if TYPE_CHECKING:
+    import geopandas as gpd
+else:
+    try:
+        import geopandas as gpd
+    except ImportError:
+        gpd = MissingOptionalModule("geopandas")
 
 try:
     import shapely
@@ -155,3 +165,19 @@ def clip_line_gdf_by_grid(
     # Clip line with polygon
     bounding_gdf = bounding_polygon(active)
     return clip_line_gdf_by_bounding_polygon(gdf, bounding_gdf)
+
+
+def bounding_polygon_from_line_data_and_clip_box(
+    line_data: GeoDataFrameType,
+    x_min: Optional[float] = None,
+    x_max: Optional[float] = None,
+    y_min: Optional[float] = None,
+    y_max: Optional[float] = None,
+) -> GeoDataFrameType:
+    line_minx, line_miny, line_maxx, line_maxy = line_data.total_bounds
+    # Use pandas clip, as it gracefully deals with lower=None and upper=None
+    x_min, x_max = pd.Series([line_minx, line_maxx]).clip(lower=x_min, upper=x_max)
+    y_min, y_max = pd.Series([line_miny, line_maxy]).clip(lower=y_min, upper=y_max)
+    bbox = shapely.box(x_min, y_min, x_max, y_max)
+    dummy_value = 0
+    return gpd.GeoDataFrame([dummy_value], geometry=[bbox])

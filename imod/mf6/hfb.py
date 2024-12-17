@@ -20,6 +20,7 @@ from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
 from imod.mf6.utilities.clip import (
+    bounding_polygon_from_line_data_and_clip_box,
     clip_line_gdf_by_bounding_polygon,
     clip_line_gdf_by_grid,
 )
@@ -808,16 +809,9 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
         if x_min or x_max or y_min or y_max:
             # Create bounding polygon
-            line_minx, line_miny, line_maxx, line_maxy = self.line_data.total_bounds
-            # Use pandas clip, as it gracefully deals with lower=None and upper=None
-            x_min, x_max = pd.Series([line_minx, line_maxx]).clip(
-                lower=x_min, upper=x_max
+            bounding_gdf = bounding_polygon_from_line_data_and_clip_box(
+                self.line_data, x_min, x_max, y_min, y_max
             )
-            y_min, y_max = pd.Series([line_miny, line_maxy]).clip(
-                lower=y_min, upper=y_max
-            )
-            bbox = shapely.box(x_min, y_min, x_max, y_max)
-            bounding_gdf = gpd.GeoDataFrame([0], geometry=[bbox])
             new.line_data = clip_line_gdf_by_bounding_polygon(
                 self.line_data, bounding_gdf
             )
