@@ -58,6 +58,20 @@ def make_layer_geometry(resistance, layer):
     return geometry
 
 
+def make_layer_geometry__outside_domain(resistance, layer):
+    barrier_y = [11.0, 5.0, -1.0]
+    barrier_x = [-9990.0, -9990.0, -9990.0]
+
+    geometry = gpd.GeoDataFrame(
+        geometry=[shapely.linestrings(barrier_x, barrier_y)],
+        data={
+            "resistance": [resistance],
+            "layer": [layer],
+        },
+    )
+    return geometry
+
+
 def make_depth_geometry(resistance, top, bot):
     barrier_y = [11.0, 5.0, -1.0]
     barrier_x = [5.0, 5.0, 5.0]
@@ -227,4 +241,30 @@ def test_merge_mixed_hfbs__multiple_layer(modellayers):
     assert mf6_hfb["cell_id"].shape == (18,)
     assert np.all(np.unique(mf6_hfb["layer"]) == np.array([1, 2, 3]))
     expected_resistance = 2 * single_resistance
+    assert (expected_resistance == 1 / mf6_hfb["hydraulic_characteristic"]).all()
+
+
+@pytest.mark.parametrize("strict_hfb_validation", [True, False])
+def test_merge_with_inactive_domain__to_pkg_single_layer(modellayers_single_layer, strict_hfb_validation):
+    # Arrange
+    single_resistance = 400.0
+
+    geometry = make_layer_geometry(single_resistance, 1)
+    modellayers_single_layer["idomain"] = xr.zeros_like(modellayers_single_layer["idomain"], dtype=int)
+
+    hfb_ls = [
+        SingleLayerHorizontalFlowBarrierResistance(geometry),
+        SingleLayerHorizontalFlowBarrierResistance(geometry),
+    ]
+
+    # Act
+    if strict_hfb_validation:
+        pytest.xfail("Test expected to fail for hfb in inactive domain")
+    
+    mf6_hfb = merge_hfb_packages(hfb_ls, strict_hfb_validation=strict_hfb_validation, **modellayers_single_layer)
+
+    # Assert
+    assert mf6_hfb["cell_id"].shape == (6,)
+    assert (mf6_hfb["layer"] == 1).all()
+    expected_resistance = single_resistance
     assert (expected_resistance == 1 / mf6_hfb["hydraulic_characteristic"]).all()
