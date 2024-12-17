@@ -81,6 +81,7 @@ from .fixtures.mf6_twri_fixture import (
     transient_unconfined_twri_model,
     transient_unconfined_twri_result,
     twri_model,
+    twri_model_hfb,
     twri_result,
 )
 from .fixtures.mf6_welltest_fixture import (

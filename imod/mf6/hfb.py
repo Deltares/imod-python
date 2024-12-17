@@ -4,7 +4,7 @@ import textwrap
 import typing
 from copy import deepcopy
 from enum import Enum
-from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
 
 import cftime
 import numpy as np
@@ -494,7 +494,11 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             package, first convert to a Modflow6 package by calling pkg.to_mf6_pkg()"""
         )
 
-    def to_netcdf(self, *args, **kwargs):
+    def to_netcdf(
+        self, *args, mdal_compliant: bool = False, crs: Optional[Any] = None, **kwargs
+    ):
+        kwargs.update({"encoding": self._netcdf_encoding()})
+
         new = deepcopy(self)
         new.dataset["geometry"] = new.line_data.to_json()
         new.dataset.to_netcdf(*args, **kwargs)

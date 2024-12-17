@@ -36,7 +36,6 @@ from imod.mf6.wel import GridAgnosticWell
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray
-from imod.typing.grid import is_spatial_grid
 
 HFB_PKGNAME = "hfb_merged"
 SUGGESTION_TEXT = (
@@ -465,20 +464,9 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
         for pkgname, pkg in self.items():
             pkg_path = f"{pkgname}.nc"
             toml_content[type(pkg).__name__][pkgname] = pkg_path
-            dataset = pkg.dataset
-            if isinstance(dataset, xu.UgridDataset):
-                if mdal_compliant:
-                    dataset = dataset.ugrid.to_dataset()
-                    mdal_dataset = imod.util.spatial.mdal_compliant_ugrid2d(
-                        dataset, crs=crs
-                    )
-                    mdal_dataset.to_netcdf(modeldirectory / pkg_path)
-                else:
-                    dataset.ugrid.to_netcdf(modeldirectory / pkg_path)
-            else:
-                if is_spatial_grid(dataset):
-                    dataset = imod.util.spatial.gdal_compliant_grid(dataset, crs=crs)
-                dataset.to_netcdf(modeldirectory / pkg_path)
+            pkg.to_netcdf(
+                modeldirectory / pkg_path, crs=crs, mdal_compliant=mdal_compliant
+            )
 
         toml_path = modeldirectory / f"{modelname}.toml"
         with open(toml_path, "wb") as f:
