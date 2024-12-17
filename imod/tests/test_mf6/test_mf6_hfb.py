@@ -7,6 +7,7 @@ import pytest
 import xarray as xr
 import xugrid as xu
 from numpy.testing import assert_array_equal
+from pytest_cases import parametrize_with_cases
 from shapely import Polygon, get_coordinates, linestrings
 
 from imod.mf6 import (
@@ -934,10 +935,92 @@ def test_clip_box():
     )
     hfb = SingleLayerHorizontalFlowBarrierResistance(geometry)
 
-    # Act
+    # Case 1: No clipping, should deepcopy datasets identical
+    hfb_clipped = hfb.clip_box()
+    assert hfb_clipped.dataset.identical(hfb.dataset)
+
+    # Case 2: Clip in y-direction
     hfb_clipped = hfb.clip_box(y_max=7.0)
+    hfb_clipped.dataset.coords["parts"]
+    assert hfb_clipped.dataset.coords["parts"].isin([0, 1]).all()
+    np.testing.assert_equal(
+        hfb_clipped.line_data.total_bounds, np.array([5.0, -1.0, 5.0, 7.0])
+    )
+
+    # Case 3: y_min and y_max equal, dataframe consisting of 1 empty element
+    hfb_clipped = hfb.clip_box(y_min=7.0, y_max=7.0)
+    assert hfb_clipped.line_data.shape == (1, 3)
+    assert hfb_clipped.line_data.is_empty[0, 0]
+
+    # Case 4: y_max outside range, entirely empty geodataframe
+    hfb_clipped = hfb.clip_box(y_max=-2.0)
+    assert hfb_clipped.line_data.empty
+
+
+class HfbCases:
+    def case_vertical(self):
+        barrier_y = [11.0, 5.0, -1.0]
+        barrier_x = [5.0, 5.0, 5.0]
+
+        geometry = gpd.GeoDataFrame(
+            geometry=[linestrings(barrier_x, barrier_y)],
+            data={
+                "resistance": [1200.0],
+                "layer": [1],
+            },
+        )
+        expected_y = np.array([6.0, 4.0, 2.0, 0.0])
+        return geometry, expected_y
+
+    def case_horizontal(self):
+        barrier_y = [5.0, 5.0, 5.0]
+        barrier_x = [11.0, 5.0, -1.0]
+
+        geometry = gpd.GeoDataFrame(
+            geometry=[linestrings(barrier_x, barrier_y)],
+            data={
+                "resistance": [1200.0],
+                "layer": [1],
+            },
+        )
+        expected_y = np.array([6.0, 6.0, 6.0, 6.0, 6.0, 6.0])
+        return geometry, expected_y
+
+    def case_diagonal(self):
+        barrier_y = [11.0, 5.0, -1.0]
+        barrier_x = [11.0, 5.0, -1.0]
+
+        geometry = gpd.GeoDataFrame(
+            geometry=[linestrings(barrier_x, barrier_y)],
+            data={
+                "resistance": [1200.0],
+                "layer": [1],
+            },
+        )
+        expected_y = np.array([6.0, 6.0, 4.0, 4.0, 2.0, 2.0, 0.0])
+        return geometry, expected_y
+
+
+@parametrize_with_cases("hfb_case, expected_y", cases=HfbCases)
+def test_clipbox_and_to_mf6_pkg(structured_flow_model, hfb_case, expected_y):
+    # Arrange
+    dis = structured_flow_model["dis"]
+    top, bottom, idomain = (
+        dis["top"],
+        dis["bottom"],
+        dis["idomain"],
+    )
+    k = xr.ones_like(idomain)
+
+    hfb = SingleLayerHorizontalFlowBarrierResistance(hfb_case)
+    y_max = 7.0
+
+    # Act
+    hfb_clipped = hfb.clip_box(y_max=y_max)
+    mf6_hfb = hfb_clipped.to_mf6_pkg(idomain, top, bottom, k)
 
     # Assert
-    # HFB currently not clipped but copied
-    # FUTURE: Line data might be clipped in the future.
-    assert hfb_clipped.dataset.identical(hfb.dataset)
+    actual_y = idomain.coords["y"].values[mf6_hfb["cell_id1"][0] - 1]
+
+    assert np.all(actual_y <= y_max)
+    np.testing.assert_equal(expected_y, actual_y)

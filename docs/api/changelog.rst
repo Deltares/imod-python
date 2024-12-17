@@ -33,6 +33,9 @@ Added
 Fixed
 ~~~~~
 
+- Fixed bug where :meth:`HorizontalFlowBarrierResistance.clip_box`,
+  :meth:`HorizontalFlowBarrierSingleLayerResistance.clip_box` methods only
+  returned deepcopy instead of actually clipping the line geometries.
 - Fixed bug where :class:`HorizontalFlowBarrierResistance`, 
   :class:`HorizontalFlowBarrierSingleLayerResistance` and other HFB packages could not 
   be clipped or copied with xarray >= 2024.10.0.
