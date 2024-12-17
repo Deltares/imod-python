@@ -33,9 +33,13 @@ Added
 Fixed
 ~~~~~
 
-- Fixed bug were :class:`HorizontalFlowBarrierResistance`, 
+- Fixed bug where :class:`HorizontalFlowBarrierResistance`, 
   :class:`HorizontalFlowBarrierSingleLayerResistance` and other HFB packages could not 
-  be dumped, clipped, or copied with xarray >= 2024.10.0.
+  be clipped or copied with xarray >= 2024.10.0.
+- Fixed crash upon calling :meth:`imod.mf6.GroundwaterFlowModel.dump`, when a
+  :class:`HorizontalFlowBarrierResistance`,
+  :class:`HorizontalFlowBarrierSingleLayerResistance` or other HFB package was
+  assigned to the model.
 - :meth:`imod.mf6.Modflow6Simulation.regrid_like` can now regrid a structured
   model to an unstructured grid.
 - :meth:`imod.mf6.Modflow6Simulation.regrid_like` throws a
