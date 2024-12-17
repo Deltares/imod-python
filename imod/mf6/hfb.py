@@ -14,7 +14,7 @@ import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
 
-from imod.logging import init_log_decorator
+from imod.logging import LogLevel, init_log_decorator, logger
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
@@ -26,7 +26,8 @@ from imod.mf6.utilities.hfb import (
     _extract_hfb_bounds_from_zpolygons,
     _prepare_index_names,
 )
-from imod.schemata import EmptyIndexesSchema, MaxNUniqueValuesSchema
+from imod.mf6.validation_context import ValidationContext
+from imod.schemata import EmptyIndexesSchema, MaxNUniqueValuesSchema, ValidationError
 from imod.typing import GeoDataFrameType, GridDataArray, LineStringType
 from imod.typing.grid import as_ugrid_dataarray
 from imod.util.imports import MissingOptionalModule
@@ -47,6 +48,16 @@ else:
         import shapely
     except ImportError:
         shapely = MissingOptionalModule("shapely")
+
+NO_BARRIER_MSG = textwrap.dedent(
+    """
+    No barriers could be assigned to cell edges,
+    this is caused by either one of the following:
+    \t- Barriers fall completely outside the model grid
+    \t- Barriers were assigned to the edge of the model domain
+    \t- Barriers were assigned to edges of inactive cells
+    """
+)
 
 
 @typedispatch
@@ -522,6 +533,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         top: GridDataArray,
         bottom: GridDataArray,
         k: GridDataArray,
+        strict_hfb_validation: bool = True,
     ) -> xr.Dataset:
         """
         Method does the following
@@ -557,17 +569,14 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         )
 
         if (barrier_values.size == 0) | np.isnan(barrier_values).all():
-            raise ValueError(
-                textwrap.dedent(
-                    """
-                    No barriers could be assigned to cell edges,
-                    this is caused by either one of the following:
-                    \t- Barriers fall completely outside the model grid
-                    \t- Barriers were assigned to the edge of the model domain
-                    \t- Barriers were assigned to edges of inactive cells
-                    """
-                )
+            loglevel = LogLevel.ERROR if strict_hfb_validation else LogLevel.WARNING
+            logger.log(
+                loglevel=loglevel,
+                message=NO_BARRIER_MSG,
+                additional_depth=0,
             )
+            if strict_hfb_validation:
+                raise ValidationError(NO_BARRIER_MSG)
 
         return to_connected_cells_dataset(
             idomain,
@@ -580,7 +589,9 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             },
         )
 
-    def _to_mf6_pkg(self, barrier_dataset: xr.Dataset) -> Mf6HorizontalFlowBarrier:
+    def _barrier_dataset_to_mf6_pkg(
+        self, barrier_dataset: xr.Dataset
+    ) -> Mf6HorizontalFlowBarrier:
         """
         Internal method, which does the following
         - final coordinate cleanup of barrier dataset
@@ -600,12 +611,27 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         barrier_dataset = _prepare_barrier_dataset_for_mf6_adapter(barrier_dataset)
         return Mf6HorizontalFlowBarrier(**barrier_dataset.data_vars)
 
+    def _to_mf6_pkg(
+        self,
+        idomain: GridDataArray,
+        top: GridDataArray,
+        bottom: GridDataArray,
+        k: GridDataArray,
+        validation_context: ValidationContext,
+    ) -> Mf6HorizontalFlowBarrier:
+        barrier_dataset = self._to_connected_cells_dataset(
+            idomain, top, bottom, k, validation_context.strict_hfb_validation
+        )
+        return self._barrier_dataset_to_mf6_pkg(barrier_dataset)
+
     def to_mf6_pkg(
         self,
         idomain: GridDataArray,
         top: GridDataArray,
         bottom: GridDataArray,
         k: GridDataArray,
+        validate=True,
+        strict_hfb_validation=True,
     ) -> Mf6HorizontalFlowBarrier:
         """
         Write package to Modflow 6 package.
@@ -624,14 +650,21 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             Grid with bottom of model layers.
         k: GridDataArray
             Grid with hydraulic conductivities.
+        validate: bool
+            Validate HorizontalFlowBarrier upon calling this method.
+        strict_hfb_validation: bool
+            Turn on strict horizontal flow barrier validation.
 
         Returns
         -------
         Mf6HorizontalFlowBarrier
             Low level representation of the HFB package as MODFLOW 6 expects it.
         """
-        barrier_dataset = self._to_connected_cells_dataset(idomain, top, bottom, k)
-        return self._to_mf6_pkg(barrier_dataset)
+        validation_context = ValidationContext(
+            validate=validate, strict_hfb_validation=strict_hfb_validation
+        )
+
+        return self._to_mf6_pkg(idomain, top, bottom, k, validation_context)
 
     def is_empty(self) -> bool:
         if super().is_empty():

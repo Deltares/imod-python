@@ -21,6 +21,7 @@ def merge_hfb_packages(
     top: GridDataArray,
     bottom: GridDataArray,
     k: GridDataArray,
+    strict_hfb_validation: bool = True,
 ) -> Mf6HorizontalFlowBarrier:
     """
     Merges HorizontalFlowBarrier packages into single package as MODFLOW 6
@@ -40,10 +41,13 @@ def merge_hfb_packages(
         Grid with bottom of model layers.
     k: GridDataArray
         Grid with hydraulic conductivities.
+    strict_hfb_validation: bool
+        Turn on strict horizontal flow barrier validation.
     """
 
     barrier_ls = [
-        hfb._to_connected_cells_dataset(idomain, top, bottom, k) for hfb in hfb_ls
+        hfb._to_connected_cells_dataset(idomain, top, bottom, k, strict_hfb_validation)
+        for hfb in hfb_ls
     ]
     barrier_dataset = xr.concat(barrier_ls, dim="cell_id")
 
