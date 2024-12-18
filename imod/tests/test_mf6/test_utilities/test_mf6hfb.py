@@ -245,17 +245,22 @@ def test_merge_mixed_hfbs__multiple_layer(modellayers):
 
 
 @pytest.mark.parametrize("strict_hfb_validation", [True, False])
-def test_merge_in_inactive_domain(
-    modellayers, strict_hfb_validation
+@pytest.mark.parametrize("inactive_value", [0, -1])
+def test_merge__middle_layer_inactive_domain(
+    modellayers, strict_hfb_validation, inactive_value
 ):
+    """
+    Test where middle layer is deactivated, HFB assigned to that layer should be
+    ignored.
+    """
     # Arrange
     single_resistance = 400.0
 
-    modellayers["idomain"].loc[1, :, :] = 1
+    modellayers["idomain"].loc[2, :, :] = inactive_value
 
     hfb_ls = [
-        make_layer_geometry(single_resistance, 1),
-        make_layer_geometry(single_resistance, 2),
+        SingleLayerHorizontalFlowBarrierResistance(make_layer_geometry(single_resistance, 1)),
+        SingleLayerHorizontalFlowBarrierResistance(make_layer_geometry(single_resistance, 2)),
     ]
 
     # Act
