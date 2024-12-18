@@ -8,7 +8,8 @@
 
 # -- Path setup --------------------------------------------------------------
 
-
+import os
+import subprocess
 from importlib.metadata import distribution
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -126,6 +127,20 @@ html_context = {"default_mode": "light"}
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
+version_or_name = subprocess.run(
+    "git symbolic-ref -q --short HEAD || git describe --tags --exact-match",
+    capture_output=True,
+    shell=True,
+    text=True,
+).stdout.strip()
+
+env = os.environ
+json_url = (
+    "https://deltares.github.io/imod-python/_static/switcher.json"
+    if "JSON_URL" not in env
+    else env["JSON_URL"]
+)
+
 html_theme_options = {
     "navbar_align": "content",
     "icon_links": [
@@ -146,6 +161,13 @@ html_theme_options = {
         "image_light": "imod-python-logo-light.svg",
         "image_dark": "imod-python-logo-dark.svg",
     },
+    "switcher": {
+        "json_url": json_url,
+        "version_match": version_or_name,
+    },
+    "navbar_end": ["theme-switcher", "navbar-icon-links", "version-switcher"],
+    "show_version_warning_banner": True,
+    "check_switcher": False,
 }
 
 # Custom sidebar templates, must be a dictionary that maps document names

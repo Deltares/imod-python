@@ -137,6 +137,12 @@ ipykernel = "*"
 ipython = "*"
 jupyter = "*"
 
+[feature.docs.dependencies]
+GitPython = "*"
+jinja2 = "*"
+python = "3.11.*"
+packaging = "*"
+
 [feature.pixi-update.dependencies]
 pip = "*"
 pixi-diff-to-markdown = "*"
@@ -171,3 +177,4 @@ py310 = { features = ["py310", "py_common"], no-default-feature = true }
 py311 = { features = ["py311", "py_common"], no-default-feature = true }
 py312 = { features = ["py312", "py_common"], no-default-feature = true }
 pixi-update = { features = ["pixi-update"], no-default-feature = true }
+docs = { features = ["docs"], no-default-feature = true }
