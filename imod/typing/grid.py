@@ -242,7 +242,7 @@ def bounding_polygon(active: xr.DataArray) -> GeoDataFrameType:
     to_polygonize = active.where(active, other=np.nan)
     polygons_gdf = _polygonize(to_polygonize)
     # Filter polygons with inactive values (NaN)
-    is_active_polygon = polygons_gdf["value"] == 1.0
+    is_active_polygon = polygons_gdf["value"] > 0
     return polygons_gdf.loc[is_active_polygon]
 
 

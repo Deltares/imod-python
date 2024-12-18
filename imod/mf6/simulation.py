@@ -1419,6 +1419,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         simulation = Modflow6Simulation("imported_simulation")
         simulation._validation_context.strict_well_validation = False
+        simulation._validation_context.strict_hfb_validation = False
 
         # import GWF model,
         groundwaterFlowModel = GroundwaterFlowModel.from_imod5_data(

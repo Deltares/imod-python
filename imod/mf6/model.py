@@ -344,7 +344,7 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
             ``ValidationError``.
         """
         write_context = WriteContext(Path(directory), use_binary, use_absolute_paths)
-        validate_context = ValidationContext(validate, validate)
+        validate_context = ValidationContext(validate, validate, validate)
 
         status_info = self._write(
             modelname, globaltimes, write_context, validate_context
@@ -410,7 +410,14 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                 pkg_name = HFB_PKGNAME
                 top, bottom, idomain = self._get_domain_geometry()
                 k = self._get_k()
-                mf6_hfb_pkg = merge_hfb_packages(mf6_hfb_ls, idomain, top, bottom, k)
+                mf6_hfb_pkg = merge_hfb_packages(
+                    mf6_hfb_ls,
+                    idomain,
+                    top,
+                    bottom,
+                    k,
+                    validate_context.strict_hfb_validation,
+                )
                 mf6_hfb_pkg._write(
                     pkgname=pkg_name,
                     globaltimes=globaltimes,
