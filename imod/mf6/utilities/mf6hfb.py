@@ -10,6 +10,10 @@ from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.typing import GridDataArray
 
 
+def create_empty_da(dims: tuple[str, str, str]) -> xr.DataArray:
+    return xr.DataArray([[[], []], [[], []]], dims=dims)
+
+
 def inverse_sum(a: xr.Dataset) -> xr.Dataset:
     """Sum of the inverse"""
     return (1 / a).sum()
@@ -51,8 +55,10 @@ def merge_hfb_packages(
     ]
     barrier_dataset = xr.concat(barrier_ls, dim="cell_id")
     # Catch entirely empty case
+    mf6_hfb_dims = ("cell_dims1", "cell_dims2", "cell_id")
     if len(barrier_dataset.coords["cell_id"]) == 0:
-        empty_data_vars = (4 * [[]])
+        empty_da = create_empty_da(mf6_hfb_dims)
+        empty_data_vars = 4 * [empty_da]
         return Mf6HorizontalFlowBarrier(*empty_data_vars)
 
     # xarray GroupbyDataset doesn't allow reducing with different methods per variable.
@@ -64,7 +70,7 @@ def merge_hfb_packages(
         "cell_id"
     ).map(inverse_sum)
     # Force correct dim order
-    cell_id_merged = cell_id_merged.transpose("cell_dims1", "cell_dims2", "cell_id")
+    cell_id_merged = cell_id_merged.transpose(*mf6_hfb_dims)
     # Merge datasets into one
     barrier_dataset_merged = xr.merge([cell_id_merged, hc_merged], join="exact")
     # Set leftover options

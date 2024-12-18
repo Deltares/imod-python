@@ -276,7 +276,7 @@ def test_merge__middle_layer_inactive_domain(
     )
 
     # Assert
-    assert mf6_hfb["cell_id"].shape == (6,)
+    assert mf6_hfb.dataset.coords["cell_id"].shape == (6,)
     assert (mf6_hfb["layer"] == 1).all()
     expected_resistance = single_resistance
     assert (expected_resistance == 1 / mf6_hfb["hydraulic_characteristic"]).all()
@@ -288,13 +288,15 @@ def test_merge__single_layer_inactive_domain(
     modellayers_single_layer, strict_hfb_validation, inactive_value
 ):
     """
-    Test where middle layer is deactivated, HFB assigned to that layer should be
+    Test with single inactive layer, HFB assigned to that layer should be
     ignored.
     """
     # Arrange
     single_resistance = 400.0
 
-    modellayers_single_layer["idomain"] = xr.zeros_like(modellayers_single_layer["idomain"], dtype=int)
+    modellayers_single_layer["idomain"] = xr.full_like(
+        modellayers_single_layer["idomain"], fill_value=inactive_value, dtype=int
+    )
 
     hfb_ls = [
         SingleLayerHorizontalFlowBarrierResistance(
@@ -314,4 +316,4 @@ def test_merge__single_layer_inactive_domain(
     )
 
     # Assert
-    assert mf6_hfb.dataset.sizes["cell_id1"] == 0
+    assert mf6_hfb.dataset.coords["cell_id"].shape == (0,)
