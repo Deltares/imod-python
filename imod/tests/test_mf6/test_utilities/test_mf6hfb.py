@@ -259,8 +259,12 @@ def test_merge__middle_layer_inactive_domain(
     modellayers["idomain"].loc[2, :, :] = inactive_value
 
     hfb_ls = [
-        SingleLayerHorizontalFlowBarrierResistance(make_layer_geometry(single_resistance, 1)),
-        SingleLayerHorizontalFlowBarrierResistance(make_layer_geometry(single_resistance, 2)),
+        SingleLayerHorizontalFlowBarrierResistance(
+            make_layer_geometry(single_resistance, 1)
+        ),
+        SingleLayerHorizontalFlowBarrierResistance(
+            make_layer_geometry(single_resistance, 2)
+        ),
     ]
 
     # Act
