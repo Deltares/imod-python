@@ -19,7 +19,11 @@ from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
-from imod.mf6.utilities.clip import clip_line_gdf_by_grid
+from imod.mf6.utilities.clip import (
+    bounding_polygon_from_line_data_and_clip_box,
+    clip_line_gdf_by_bounding_polygon,
+    clip_line_gdf_by_grid,
+)
 from imod.mf6.utilities.grid import broadcast_to_full_domain
 from imod.mf6.utilities.hfb import (
     _create_zlinestring_from_bound_df,
@@ -834,7 +838,17 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         -------
         sliced : Package
         """
-        return deepcopy(self)
+        new = deepcopy(self)
+
+        if x_min or x_max or y_min or y_max:
+            # Create bounding polygon
+            bounding_gdf = bounding_polygon_from_line_data_and_clip_box(
+                self.line_data, x_min, x_max, y_min, y_max
+            )
+            new.line_data = clip_line_gdf_by_bounding_polygon(
+                self.line_data, bounding_gdf
+            )
+        return new
 
     def mask(self, _) -> Package:
         """
