@@ -862,15 +862,21 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             linestring = _create_zlinestring_from_bound_df(lower)
             barrier_dataframe["geometry"] = linestring["geometry"]
         # Clip barriers outside domain
-        barrier_dataframe = clip_line_gdf_by_grid(
-            barrier_dataframe, idomain.sel(layer=1)
-        )
+        if has_layer:
+            layer = barrier_dataframe["layer"].unique()
+            idomain_selected = idomain.sel(layer=layer)
+        else:
+            idomain_selected = idomain
+        active = idomain_selected.max("layer") > 0
+        barrier_dataframe = clip_line_gdf_by_grid(barrier_dataframe, active)
+        if barrier_dataframe.is_empty():
+            return xu.UgridDataset(), np.array()
         # Prepare variable names and methods for aggregation
         vardict_agg = {"line_index": "first", variable_name: "sum"}
         if has_layer:
             vardict_agg["layer"] = "first"
         # Create grid from structured
-        grid2d = as_ugrid_dataarray(idomain.sel(layer=1)).grid
+        grid2d = as_ugrid_dataarray(active).grid
 
         return _snap_to_grid_and_aggregate(barrier_dataframe, grid2d, vardict_agg)
 
