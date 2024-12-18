@@ -3,6 +3,7 @@ import numpy as np
 import pytest
 import shapely
 import xarray as xr
+from pytest_cases import parametrize_with_cases
 
 from imod.mf6.hfb import (
     HorizontalFlowBarrierResistance,
@@ -282,10 +283,38 @@ def test_merge__middle_layer_inactive_domain(
     assert (expected_resistance == 1 / mf6_hfb["hydraulic_characteristic"]).all()
 
 
+class InactivityLabelCases:
+    """
+    Labels which will be set to inactive, and expected n_cellids
+    """
+
+    all = slice(None, None)
+
+    def case_all(self):
+        return (self.all, self.all, self.all), 0
+
+    def case_half_left(self):
+        return (self.all, self.all, slice(None, 5.0)), 0
+
+    def case_half_right(self):
+        return (self.all, self.all, slice(5.0, None)), 0
+
+    def case_strip_left(self):
+        return (self.all, self.all, slice(None, 1.0)), 6
+
+    def case_strip_right(self):
+        return (self.all, self.all, slice(9.0, None)), 6
+
+
+@parametrize_with_cases("inactive_labels, n_cellids", cases=InactivityLabelCases)
 @pytest.mark.parametrize("strict_hfb_validation", [True, False])
 @pytest.mark.parametrize("inactive_value", [0, -1])
 def test_merge__single_layer_inactive_domain(
-    modellayers_single_layer, strict_hfb_validation, inactive_value
+    modellayers_single_layer,
+    strict_hfb_validation,
+    inactive_value,
+    inactive_labels,
+    n_cellids,
 ):
     """
     Test with single inactive layer, HFB assigned to that layer should be
@@ -294,9 +323,7 @@ def test_merge__single_layer_inactive_domain(
     # Arrange
     single_resistance = 400.0
 
-    modellayers_single_layer["idomain"] = xr.full_like(
-        modellayers_single_layer["idomain"], fill_value=inactive_value, dtype=int
-    )
+    modellayers_single_layer["idomain"].loc[inactive_labels] = inactive_value
 
     hfb_ls = [
         SingleLayerHorizontalFlowBarrierResistance(
@@ -308,12 +335,12 @@ def test_merge__single_layer_inactive_domain(
     ]
 
     # Act
-    if strict_hfb_validation:
-        pytest.xfail("Test expected to fail for hfb in inactive domain")
+    if strict_hfb_validation and n_cellids == 0:
+        pytest.xfail("Strict hfb validation and no cellids could be allocated")
 
     mf6_hfb = merge_hfb_packages(
         hfb_ls, strict_hfb_validation=strict_hfb_validation, **modellayers_single_layer
     )
 
     # Assert
-    assert mf6_hfb.dataset.coords["cell_id"].shape == (0,)
+    assert mf6_hfb.dataset.coords["cell_id"].shape == (n_cellids,)
