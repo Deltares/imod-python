@@ -50,6 +50,10 @@ def merge_hfb_packages(
         for hfb in hfb_ls
     ]
     barrier_dataset = xr.concat(barrier_ls, dim="cell_id")
+    # Catch entirely empty case
+    if len(barrier_dataset.coords["cell_id"]) == 0:
+        empty_data_vars = (4 * [[]])
+        return Mf6HorizontalFlowBarrier(*empty_data_vars)
 
     # xarray GroupbyDataset doesn't allow reducing with different methods per variable.
     # Therefore groupby twice: once for cell_id, once for hydraulic_characteristic.
