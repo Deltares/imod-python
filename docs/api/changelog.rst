@@ -61,6 +61,10 @@ Changed
 - If ``"cap"`` package present in ``imod5_data``,
   :meth:`imod.mf6.GroundwaterFlowModel.from_imod5_data` now automatically adds a
   well for metaswap sprinkling named ``"msw-sprinkling"``
+- Less strict validation for :class:`HorizontalFlowBarrierResistance`,
+  :class:`HorizontalFlowBarrierSingleLayerResistance` and other HFB packages for
+  simulations which are imported with
+  :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`
 
 
 [0.18.1] - 2024-11-20
