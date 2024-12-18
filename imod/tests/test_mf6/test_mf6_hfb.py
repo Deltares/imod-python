@@ -550,7 +550,9 @@ def test_to_mf6_remove_invalid_edges(
     if strict_hfb_validation and (expected_number_barriers == 0):
         pytest.xfail("Test expected to fail if expected number barriers = 0")
 
-    _ = hfb.to_mf6_pkg(idomain, top, bottom, k, strict_hfb_validation=strict_hfb_validation)
+    _ = hfb.to_mf6_pkg(
+        idomain, top, bottom, k, strict_hfb_validation=strict_hfb_validation
+    )
 
     # Assert.
     _, args = mf6_flow_barrier_mock.call_args
