@@ -280,3 +280,38 @@ def test_merge__middle_layer_inactive_domain(
     assert (mf6_hfb["layer"] == 1).all()
     expected_resistance = single_resistance
     assert (expected_resistance == 1 / mf6_hfb["hydraulic_characteristic"]).all()
+
+
+@pytest.mark.parametrize("strict_hfb_validation", [True, False])
+@pytest.mark.parametrize("inactive_value", [0, -1])
+def test_merge__single_layer_inactive_domain(
+    modellayers_single_layer, strict_hfb_validation, inactive_value
+):
+    """
+    Test where middle layer is deactivated, HFB assigned to that layer should be
+    ignored.
+    """
+    # Arrange
+    single_resistance = 400.0
+
+    modellayers_single_layer["idomain"] = xr.zeros_like(modellayers_single_layer["idomain"], dtype=int)
+
+    hfb_ls = [
+        SingleLayerHorizontalFlowBarrierResistance(
+            make_layer_geometry(single_resistance, 1)
+        ),
+        SingleLayerHorizontalFlowBarrierResistance(
+            make_layer_geometry(single_resistance, 1)
+        ),
+    ]
+
+    # Act
+    if strict_hfb_validation:
+        pytest.xfail("Test expected to fail for hfb in inactive domain")
+
+    mf6_hfb = merge_hfb_packages(
+        hfb_ls, strict_hfb_validation=strict_hfb_validation, **modellayers_single_layer
+    )
+
+    # Assert
+    assert mf6_hfb.dataset.sizes["cell_id1"] == 0
