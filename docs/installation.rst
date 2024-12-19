@@ -174,7 +174,9 @@ With pixi you can install the latest development version of imod::
   cd imod-python
   pixi run install
 
-This contains an interactive environment with Jupyter:
+This will install the exact python installation the iMOD Python developers work
+with, so it is very likely to work (otherwise we couldn't do our work!). This
+contains an interactive environment with Jupyter::
 
   pixi shell -e interactive
 
