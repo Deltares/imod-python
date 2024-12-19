@@ -2,9 +2,43 @@ iMOD5 backwards compatibility
 =============================
 
 iMOD Python tries to be as backwards compatible with iMOD5 as our resources
-allow. Below you can find tables with the status of support for important iMOD5
-features. If you miss an important feature in the table, `feel free to open an
-issue on our issueboard <https://github.com/Deltares/imod-python/issues>`_.
+allow. Below you can find some known issues, notes, and more detailed tables
+with the status of support for important iMOD5 features. If you miss an
+important feature or run into any issues, `feel free to open an issue on our
+issueboard <https://github.com/Deltares/imod-python/issues>`_.
+
+Known issues
+------------
+
+- Constants are only supported for the CAP package. For other packages, the
+  constants will cause an error.
+- ISG files cannot be read directly. The workaround is to rasterize the ISG
+  files to IDF files using the iMOD5 BATCH function ISGGRID.
+- MetaSWAP sprinkling wells defined as IPF files are not supported.
+- MetaSWAP's "flexible drainage" ("Peilgestuurde drainage" in Dutch) is not
+  supported.
+- IPEST is not supported.
+
+Notes
+-----
+
+- if STO package in projectfile is absent, an error is thrown when trying to write
+  the :class:`imod.mf6.Modflow6Simulation` object to disk. This is due to the
+  fact that the STO package is mandatory in iMOD Python. A workaround is to add a
+  :class:`imod.mf6.StorageCoefficient` package to the projectfile before calling
+  :meth:`imod.mf6.Modflow6Simulation.write`.
+- When importing models with the ANI package, make sure to activate the "XT3D"
+  in the NodePropertyFlow package of the model.
+- Solver settings (PCG) are NOT imported from iMOD5, instead a solver settings
+  preset from MODFLOW6 ("Moderate") is set. This is because the solvers between
+  iMODLFOW and MODFLOW6 are different. You are advised to test settings
+  yourself.
+- The imported iMOD5 discretization for the model is created by taking the
+  smallest grid and finest resolution amongst the TOP, BOT, and BND grids. This
+  differs from iMOD5, where the first BND grid is used as target grid. All input
+  grids are regridded towards this target grid. Therefore, be careful when you
+  have a very fine resolution in one of these packages.
+
 
 Files
 -----
