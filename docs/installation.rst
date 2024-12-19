@@ -26,7 +26,7 @@ Install with pip::
 Install beta release
 ^^^^^^^^^^^^^^^^^^^^
 
-To install betarelease::
+To install a beta release with pixi::
 
   pixi add imod=1.0.0b0
 
@@ -117,13 +117,10 @@ if you run ``pixi update`` or change the ``pixi.toml`` file. Both the
 ``pixi.toml`` as well as the ``pixi.lock`` are required to fully reproduce an
 environment. 
 
-You can activate your environment using::
+You can start your favorite editor, e.g. VSCode, in this environment directly by
+running::
 
-  pixi shell
-
-You can start your favorite editor, e.g. VSCode in this environment::
-
-  code
+  pixi run code
 
 Installing with conda
 ^^^^^^^^^^^^^^^^^^^^^
@@ -174,9 +171,9 @@ With pixi you can install the latest development version of imod::
   cd imod-python
   pixi run install
 
-This will install the exact python installation the iMOD Python developers work
-with, so it is very likely to work (otherwise we couldn't do our work!). This
-contains an interactive environment with Jupyter::
+This will install the same python installation the iMOD Python developers work
+with, so it should work (otherwise we couldn't do our work!). This contains an
+interactive environment with Jupyter::
 
   pixi shell -e interactive
 
