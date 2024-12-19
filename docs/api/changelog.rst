@@ -52,6 +52,7 @@ Fixed
 - :func:`imod.evaluate.calculate_gxg`, upon providing a head dataarray chunked
   over time, will no longer error with ``ValueError: Object has inconsistent
   chunks along dimension bimonth. This can be fixed by calling unify_chunks().``
+- Improved performance of regridding package data.
 
 
 Changed
