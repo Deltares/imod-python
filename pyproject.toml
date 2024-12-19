@@ -6,8 +6,8 @@ build-backend = "hatchling.build"
 name = "imod"
 dynamic = ["version"]
 requires-python = ">=3.10"
-authors = [{ name = "Deltares", email = "huite.bootsma@deltares.nl" }, ]
-maintainers = [{ name = "Deltares", email = "huite.bootsma@deltares.nl" }]
+authors = [{ name = "Deltares", email = "imod.info@deltares.nl" }, ]
+maintainers = [{ name = "Deltares", email = "imod.info@deltares.nl" }]
 description = "Make massive MODFLOW models!"
 readme = "README.rst"
 license = { file = "LICENSE" }

@@ -21,7 +21,7 @@ from sphinx_gallery.sorting import FileNameSortKey
 
 project = "iMOD Python"
 copyright = "Deltares"
-author = "Martijn Visser, Huite Bootsma"
+author = "iMOD development team"
 
 # The full version, including alpha/beta/rc tags
 release = distribution("imod").version
