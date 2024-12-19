@@ -87,6 +87,22 @@ def get_packages(simulation: Modflow6Simulation) -> dict[str, Package]:
     }
 
 
+def validate_version(version_saved: str) -> None:
+    if version_saved and version_saved["imod-python"] != imod.__version__:
+        warnings.warn(
+            "iMOD Python version in current environment different from version with which simulation was dumped."
+            f" Environment version: {imod.__version__}, version dumped simulation: imod-python {version_saved['imod-python']}"
+            " Versions might be incompatible.",
+            UserWarning,
+        )
+    elif not version_saved:
+        warnings.warn(
+            "No version information found in dumped simulation. "
+            "Versions might be incompatible.",
+            UserWarning,
+        )
+
+
 class Modflow6Simulation(collections.UserDict, ISimulation):
     def _initialize_template(self):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
@@ -921,14 +937,8 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         with open(toml_path, "rb") as f:
             toml_content = tomli.load(f)
 
-        version_saved = toml_content.pop("version")
-        if version_saved["imod-python"] != imod.__version__:
-            warnings.warn(
-                "iMOD Python version in current environment different from version with which simulation was dumped."
-                f" Environment version: {imod.__version__}, version dumped simulation: imod-python {version_saved['imod-python']}"
-                " Versions might be incompatible.",
-                UserWarning,
-            )
+        version_saved = toml_content.pop("version", None)
+        validate_version(version_saved)
 
         simulation = Modflow6Simulation(name=toml_path.stem)
         for key, entry in toml_content.items():

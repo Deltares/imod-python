@@ -87,7 +87,7 @@ def test_dump_version_number__version_written(twri_model, tmpdir_factory):
 
 
 @pytest.mark.usefixtures("twri_model")
-def test_dump_version_number__warning_thrown(twri_model, tmpdir_factory):
+def test_dump_version_number__version_incompatible(twri_model, tmpdir_factory):
     """
     Tested if a warning is thrown when there is a mismatch between version
     numbers of saved model and current iMOD Python version.
@@ -104,7 +104,29 @@ def test_dump_version_number__warning_thrown(twri_model, tmpdir_factory):
     with open(toml_path_adapted, "wb") as f:
         tomli_w.dump(toml_content, f)
     # Act
-    with pytest.warns(UserWarning):
+    with pytest.warns(UserWarning, match="0.0.0"):
+        imod.mf6.Modflow6Simulation.from_file(toml_path_adapted)
+
+
+@pytest.mark.usefixtures("twri_model")
+def test_dump_version_number__no_version(twri_model, tmpdir_factory):
+    """
+    Tested if a warning is thrown when there is a mismatch between version
+    numbers of saved model and current iMOD Python version.
+    """
+    # Arrange
+    tmp_path = tmpdir_factory.mktemp("twri")
+    twri_model.dump(tmp_path)
+    toml_path = tmp_path / f"{twri_model.name}.toml"
+    with open(toml_path, "rb") as f:
+        toml_content = tomli.load(f)
+    toml_content.pop("version")
+
+    toml_path_adapted = tmp_path / f"{twri_model.name}_adapted.toml"
+    with open(toml_path_adapted, "wb") as f:
+        tomli_w.dump(toml_content, f)
+    # Act
+    with pytest.warns(UserWarning, match="No version information"):
         imod.mf6.Modflow6Simulation.from_file(toml_path_adapted)
 
 
