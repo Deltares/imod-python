@@ -161,13 +161,14 @@ def _regrid_array(
     - None
     """
 
-    # skip regridding for arrays with no valid values (such as "None")
-    if not _is_valid(da.values[()]):
+    # skip regridding for scalar arrays with no valid values (such as "None")
+    scalar_da: bool = is_scalar(da)
+    if scalar_da and not _is_valid(da.values[()]):
         return None
 
     # the dataarray might be a scalar. If it is, then it does not need regridding.
-    if is_scalar(da):
-        return da.values[()]  # type: ignore [attr-defined]
+    if scalar_da:
+        return da.values[()]
 
     if isinstance(da, xr.DataArray):
         coords = da.coords

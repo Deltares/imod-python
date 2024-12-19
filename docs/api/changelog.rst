@@ -56,6 +56,7 @@ Fixed
 - :func:`imod.evaluate.calculate_gxg`, upon providing a head dataarray chunked
   over time, will no longer error with ``ValueError: Object has inconsistent
   chunks along dimension bimonth. This can be fixed by calling unify_chunks().``
+- Improved performance of regridding package data.
 
 
 Changed
@@ -72,7 +73,12 @@ Changed
   :class:`HorizontalFlowBarrierSingleLayerResistance` and other HFB packages for
   simulations which are imported with
   :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`
-
+- DeprecationWarning thrown upon initializing :class:`imod.prepare.Regridder`.
+  We plan to remove this object in the final 1.0 release. `Use the xugrid
+  regridder to regrid individual grids instead.
+  <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_ To
+  regrid entire MODFLOW6 packages or simulations, `see the user guide here.
+  <https://deltares.github.io/imod-python/user_guide/regridding.html>`_.
 
 [0.18.1] - 2024-11-20
 ---------------------
