@@ -25,6 +25,8 @@ values from the source array (src), and pass it on to the aggregation method.
 The single aggregated value is then filled into the destination array (dst).
 """
 
+import textwrap
+import warnings
 from collections import namedtuple
 from typing import List, Sequence
 
@@ -296,6 +298,16 @@ def _nd_regrid(src, dst, src_coords, dst_coords, iter_regrid, use_relative_weigh
     return iter_dst.reshape(dst.shape)
 
 
+WARNING_MSG = textwrap.dedent(
+    """{name} is deprecated and will be removed in the
+    final v1.0 release. Use the regridder in xugrid instead. To regrid a single
+    array, see:
+    https://deltares.github.io/xugrid/examples/regridder_overview.html. To
+    regrid Modflow6 packages or entire simulations, see the user guide:
+    https://deltares.github.io/imod-python/user-guide/08-regridding.html."""
+)
+
+
 class Regridder(object):
     """
     Object to repeatedly regrid similar objects. Compiles once on first call,
@@ -368,6 +380,11 @@ class Regridder(object):
     def __init__(
         self, method, ndim_regrid=None, use_relative_weights=False, extra_overlap=0
     ):
+        warnings.warn(
+            WARNING_MSG.format(name=self.__class__.__name__),
+            DeprecationWarning,
+        )
+
         _method = common._get_method(method, common.METHODS)
         self.method = _method
         self.ndim_regrid = ndim_regrid
