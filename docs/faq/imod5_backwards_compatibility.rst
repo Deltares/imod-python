@@ -15,16 +15,16 @@ Known issues
 - ISG files cannot be read directly. The workaround is to rasterize the ISG
   files to IDF files using the iMOD5 BATCH function ISGGRID.
 - MetaSWAP sprinkling wells defined as IPF files are not supported.
-- MetaSWAP's "flexible drainage" ("Peilgestuurde drainage" in Dutch) not
+- MetaSWAP's "flexible drainage" ("Peilgestuurde drainage" in Dutch) is not
   supported.
 - IPEST is not supported.
 
 Notes
 -----
 
-- if STO package in projectfile is absent, error is thrown when trying to write
+- if STO package in projectfile is absent, an error is thrown when trying to write
   the :class:`imod.mf6.Modflow6Simulation` object to disk. This is due to the
-  fact that the STO package is mandatory in MODFLOW6. A workaround is to add a
+  fact that the STO package is mandatory in iMOD Python. A workaround is to add a
   :class:`imod.mf6.StorageCoefficient` package to the projectfile before calling
   :meth:`imod.mf6.Modflow6Simulation.write`.
 - When importing models with the ANI package, make sure to activate the "XT3D"
@@ -33,7 +33,7 @@ Notes
   preset from MODFLOW6 ("Moderate") is set. This is because the solvers between
   iMODLFOW and MODFLOW6 are different. You are advised to test settings
   yourself.
-- The imported imod5 discretization for the model is created by taking the
+- The imported iMOD5 discretization for the model is created by taking the
   smallest grid and finest resolution amongst the TOP, BOT, and BND grids. This
   differs from iMOD5, where the first BND grid is used as target grid. All input
   grids are regridded towards this target grid. Therefore, be careful when you
