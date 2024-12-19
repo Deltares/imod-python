@@ -2,7 +2,7 @@
 name = "imod-python"
 version = "1.0.0b0"
 description = "Make massive MODFLOW models"
-authors = ["Deltares <huite.bootsma@deltares.nl>"]
+authors = ["Deltares <imod.info@deltares.nl>"]
 channels = ["conda-forge"]
 platforms = ["win-64", "linux-64", "osx-arm64", "osx-64"]
 license = "MIT"
