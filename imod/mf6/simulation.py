@@ -924,7 +924,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         version_saved = toml_content.pop("version")
         if version_saved["imod-python"] != imod.__version__:
             warnings.warn(
-                f"Version mismatch: imod-python {imod.__version__} != imod-python {version_saved['imod-python']}",
+                "iMOD Python version in current environment different from version with which simulation was dumped."
+                f" Environment version: {imod.__version__}, version dumped simulation: imod-python {version_saved['imod-python']}"
+                " Versions might be incompatible.",
                 UserWarning,
             )
 
