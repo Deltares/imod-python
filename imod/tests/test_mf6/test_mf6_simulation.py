@@ -1,6 +1,5 @@
 import os
 import re
-import sys
 import textwrap
 from copy import deepcopy
 from datetime import datetime
@@ -13,6 +12,8 @@ import numpy as np
 import pandas as pd
 import pytest
 import rasterio
+import tomli
+import tomli_w
 import xarray as xr
 import xugrid as xu
 
@@ -73,6 +74,41 @@ def test_circle_roundtrip(circle_model, tmpdir_factory):
 
 
 @pytest.mark.usefixtures("twri_model")
+def test_dump_version_number__version_written(twri_model, tmpdir_factory):
+    # Arrange
+    tmp_path = tmpdir_factory.mktemp("twri")
+    # Act
+    twri_model.dump(tmp_path)
+    # Assert
+    toml_path = tmp_path / f"{twri_model.name}.toml"
+    with open(toml_path, "rb") as f:
+        toml_content = tomli.load(f)
+    assert toml_content["version"]["imod-python"] == imod.__version__
+
+
+@pytest.mark.usefixtures("twri_model")
+def test_dump_version_number__warning_thrown(twri_model, tmpdir_factory):
+    """
+    Tested if a warning is thrown when there is a mismatch between version
+    numbers of saved model and current iMOD Python version.
+    """
+    # Arrange
+    tmp_path = tmpdir_factory.mktemp("twri")
+    twri_model.dump(tmp_path)
+    toml_path = tmp_path / f"{twri_model.name}.toml"
+    with open(toml_path, "rb") as f:
+        toml_content = tomli.load(f)
+    toml_content["version"]["imod-python"] = "0.0.0"
+
+    toml_path_adapted = tmp_path / f"{twri_model.name}_adapted.toml"
+    with open(toml_path_adapted, "wb") as f:
+        tomli_w.dump(toml_content, f)
+    # Act
+    with pytest.warns(UserWarning):
+        imod.mf6.Modflow6Simulation.from_file(toml_path_adapted)
+
+
+@pytest.mark.usefixtures("twri_model")
 def test_twri_gdal(twri_model, tmpdir_factory):
     """
     Test of dumping a structured model with a CRS results in the necessary
@@ -107,7 +143,6 @@ def test_twri_disv_mdal_compliant_semi_roundtrip(twri_disv_model, tmpdir_factory
 
 
 @pytest.mark.usefixtures("circle_model")
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_open_head(circle_model, tmp_path):
     simulation = circle_model
 
@@ -136,7 +171,6 @@ def test_simulation_open_head(circle_model, tmp_path):
 
 
 @pytest.mark.usefixtures("circle_model")
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_open_head_relative_path(circle_model, tmp_path):
     simulation = circle_model
 
@@ -157,7 +191,6 @@ def test_simulation_open_head_relative_path(circle_model, tmp_path):
 
 
 @pytest.mark.usefixtures("circle_model")
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_open_flow_budget(circle_model, tmp_path):
     simulation = circle_model
 
@@ -197,7 +230,6 @@ def test_write_circle_model_twice(circle_model, tmp_path):
 
 
 @pytest.mark.usefixtures("circle_model")
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_open_concentration_fail(circle_model, tmp_path):
     """No transport model is assigned, so should throw error when opening concentrations"""
     simulation = circle_model

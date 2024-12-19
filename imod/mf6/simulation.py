@@ -871,6 +871,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         directory.mkdir(parents=True, exist_ok=True)
 
         toml_content: DefaultDict[str, dict] = collections.defaultdict(dict)
+        # Dump version number
+        toml_content["version"] = {"imod-python": imod.__version__}
+        # Dump models and exchanges
         for key, value in self.items():
             cls_name = type(value).__name__
             if isinstance(value, Modflow6Model):
@@ -917,6 +920,13 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         toml_path = pathlib.Path(toml_path)
         with open(toml_path, "rb") as f:
             toml_content = tomli.load(f)
+
+        version_saved = toml_content.pop("version")
+        if version_saved["imod-python"] != imod.__version__:
+            warnings.warn(
+                f"Version mismatch: imod-python {imod.__version__} != imod-python {version_saved['imod-python']}",
+                UserWarning,
+            )
 
         simulation = Modflow6Simulation(name=toml_path.stem)
         for key, entry in toml_content.items():
