@@ -299,7 +299,7 @@ def _nd_regrid(src, dst, src_coords, dst_coords, iter_regrid, use_relative_weigh
 
 
 WARNING_MSG = textwrap.dedent(
-    """{name} is deprecated and will be removed in the
+    """{name} is deprecated and we plan to remove it in the
     final v1.0 release. Use the regridder in xugrid instead. To regrid a single
     array, see:
     https://deltares.github.io/xugrid/examples/regridder_overview.html. To

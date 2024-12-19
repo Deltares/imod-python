@@ -69,7 +69,7 @@ Changed
   simulations which are imported with
   :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`
 - DeprecationWarning thrown upon initializing :class:`imod.prepare.Regridder`.
-  This object will be removed in the final 1.0 release. `Use the xugrid
+  We plan to remove this object in the final 1.0 release. `Use the xugrid
   regridder to regrid individual grids instead.
   <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_ To
   regrid entire MODFLOW6 packages or simulations, `see the user guide here.
