@@ -18,7 +18,7 @@ import xugrid as xu
 from jinja2 import Template
 
 import imod
-from imod.logging import standard_log_decorator
+from imod.logging import LogLevel, logger, standard_log_decorator
 from imod.mf6.drn import Drainage
 from imod.mf6.ghb import GeneralHeadBoundary
 from imod.mf6.hfb import HorizontalFlowBarrierBase
@@ -418,11 +418,15 @@ class Modflow6Model(collections.UserDict, IModel, abc.ABC):
                     k,
                     validate_context.strict_hfb_validation,
                 )
-                mf6_hfb_pkg._write(
-                    pkgname=pkg_name,
-                    globaltimes=globaltimes,
-                    write_context=pkg_write_context,
-                )
+                if len(mf6_hfb_pkg["cell_id"]) > 0:
+                    mf6_hfb_pkg._write(
+                        pkgname=pkg_name,
+                        globaltimes=globaltimes,
+                        write_context=pkg_write_context,
+                    )
+                else:
+                    message = "No HorizontalFlowBarriers could be snapped to grids."
+                    logger.log(LogLevel.WARNING, message)
             except Exception as e:
                 raise type(e)(f"{e}\nError occured while writing {pkg_name}")
 
