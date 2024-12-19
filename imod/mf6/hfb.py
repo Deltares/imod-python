@@ -33,7 +33,7 @@ from imod.mf6.utilities.hfb import (
 from imod.mf6.validation_context import ValidationContext
 from imod.schemata import EmptyIndexesSchema, MaxNUniqueValuesSchema, ValidationError
 from imod.typing import GeoDataFrameType, GridDataArray, LineStringType
-from imod.typing.grid import as_ugrid_dataarray
+from imod.typing.grid import as_ugrid_dataarray, ones_like
 from imod.util.imports import MissingOptionalModule
 
 if TYPE_CHECKING:
@@ -876,7 +876,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             linestring = _create_zlinestring_from_bound_df(lower)
             barrier_dataframe["geometry"] = linestring["geometry"]
         # Clip barriers outside domain
-        active = xr.ones_like(idomain.sel(layer=1, drop=True))
+        active = ones_like(idomain.sel(layer=1, drop=True))
         barrier_dataframe = clip_line_gdf_by_grid(barrier_dataframe, active)
         # Prepare variable names and methods for aggregation
         vardict_agg = {"line_index": "first", variable_name: "sum"}
