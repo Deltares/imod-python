@@ -19,7 +19,7 @@ iMOD5 Backwards compatibility
 -----------------------------
 
 For a detailed description of known issues with iMOD5 backwards compatibility,
-see :doc:`imod5-backwards-compatibility`.
+see :doc:`imod5_backwards_compatibility`.
 
 
 Python versions

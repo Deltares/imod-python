@@ -143,7 +143,7 @@ An overview of the support for iMOD5's MetaSWAP features:
     *Model*,``para_sim.inp``,From grids (IDF),:meth:`imod.msw.MetaSwapModel.from_imod5_data`
     *Model*,,Regrid,:meth:`imod.msw.MetaSwapModel.regrid_like`
     *Model*,,Clip,
-    *Model*,``mod2svat.inp``,Coupling,":meth:`imod.msw.MetaSwapModel.from_imod5_data`, :class:`imod.msw.Coupling`"
+    *Model*,``mod2svat.inp``,Coupling,":meth:`imod.msw.MetaSwapModel.from_imod5_data`, :class:`imod.msw.CouplerMapping`"
     *Model*,``idf_svat.ipn``,IDF output,":meth:`imod.msw.MetaSwapModel.from_imod5_data`, :class:`imod.msw.IdfMapping`"
     CAP,``area_svat.inp``,Grid Data,:meth:`imod.msw.GridData.from_imod5_data`
     CAP,``svat2swnr_roff.inp``,Ponding,:meth:`imod.msw.Ponding.from_imod5_data`
@@ -151,7 +151,7 @@ An overview of the support for iMOD5's MetaSWAP features:
     CAP,``uscl_svat.inp``,Perched Water Table,:meth:`imod.msw.ScalingFactors.from_imod5_data`
     CAP,``uscl_svat.inp``,Scaling factors,:meth:`imod.msw.ScalingFactors.from_imod5_data`
     CAP,,Stage-steered drainage,
-    CAP,``mete_grid.inp``,Meteogrids,":meth:`imod.msw.MeteoGridCopy.from_imod5_data`, :meth:`imod.msw.PrecipitationMapping.from_imod5_data`, :meth:`imod.msw.Evapotranspirationmapping.from_imod5_data`"
+    CAP,``mete_grid.inp``,Meteogrids,":meth:`imod.msw.MeteoGridCopy.from_imod5_data`, :meth:`imod.msw.PrecipitationMapping.from_imod5_data`, :meth:`imod.msw.EvapotranspirationMapping.from_imod5_data`"
     CAP,``mete_stat.inp``,Meteostations,
     CAP,``scap_svat.inp``,Sprinkling,:meth:`imod.msw.Sprinkling.from_imod5_data`
     CAP,,Sprinkling wells grid (IDF),:meth:`imod.mf6.LayeredWell.from_imod5_cap_data`
