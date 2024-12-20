@@ -42,3 +42,4 @@ MetaSWAP
     MetaSwapModel
     MetaSwapModel.write
     MetaSwapModel.from_imod5_data
+    MetaSwapModel.regrid_like
