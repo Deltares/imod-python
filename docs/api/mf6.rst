@@ -12,6 +12,7 @@ Read Output
     open_hds
     open_cbc
     read_cbc_headers
+    open_dvs
 
 Model objects & methods
 -----------------------
@@ -124,6 +125,7 @@ Flow Packages
     NodePropertyFlow.clip_box
     Recharge
     Recharge.from_imod5_data
+    Recharge.from_imod5_cap_data
     Recharge.mask
     Recharge.regrid_like
     Recharge.clip_box

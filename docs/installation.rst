@@ -28,15 +28,15 @@ Install beta release
 
 To install a beta release with pixi::
 
-  pixi add imod=1.0.0b0
+  pixi add imod=1.0.0rc0
 
 Or with conda::
 
-  conda install imod=1.0.0b0
+  conda install imod=1.0.0rc0
 
 Or with pip::
 
-  pip install --pre imod=1.0.0b0
+  pip install --pre imod=1.0.0rc0
 
 
 Which Python?
