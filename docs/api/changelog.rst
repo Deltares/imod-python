@@ -29,6 +29,7 @@ Added
   settings.
 - :func:`imod.data.tutorial_03` to load data for the iMOD Documentation
   tutorial.
+- :meth:`imod.mf6.Modflow6Simulation.dump` now saves iMOD Python version number.
 
 Fixed
 ~~~~~

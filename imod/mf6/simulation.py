@@ -21,7 +21,7 @@ import xugrid as xu
 import imod
 import imod.logging
 import imod.mf6.exchangebase
-from imod.logging import standard_log_decorator
+from imod.logging import LogLevel, logger, standard_log_decorator
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwfgwt import GWFGWT
 from imod.mf6.gwtgwt import GWTGWT
@@ -85,6 +85,22 @@ def get_packages(simulation: Modflow6Simulation) -> dict[str, Package]:
         for pkg_name, pkg in simulation.items()
         if isinstance(pkg, Package)
     }
+
+
+def log_versions(version_saved: Optional[dict[str, str]]) -> None:
+    logger.log(
+        LogLevel.INFO, f"iMOD Python version in current environment: {imod.__version__}"
+    )
+    if version_saved:
+        version_msg = (
+            f"iMOD Python version in dumped simulation: {version_saved['imod-python']}"
+        )
+    else:
+        version_msg = "No iMOD Python version information found in dumped simulation."
+    logger.log(
+        LogLevel.INFO,
+        version_msg,
+    )
 
 
 class Modflow6Simulation(collections.UserDict, ISimulation):
@@ -871,6 +887,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         directory.mkdir(parents=True, exist_ok=True)
 
         toml_content: DefaultDict[str, dict] = collections.defaultdict(dict)
+        # Dump version number
+        toml_content["version"] = {"imod-python": imod.__version__}
+        # Dump models and exchanges
         for key, value in self.items():
             cls_name = type(value).__name__
             if isinstance(value, Modflow6Model):
@@ -917,6 +936,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         toml_path = pathlib.Path(toml_path)
         with open(toml_path, "rb") as f:
             toml_content = tomli.load(f)
+
+        version_saved = toml_content.pop("version", None)
+        log_versions(version_saved)
 
         simulation = Modflow6Simulation(name=toml_path.stem)
         for key, entry in toml_content.items():
