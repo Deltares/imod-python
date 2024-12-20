@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 import textwrap
 from copy import deepcopy
 from datetime import datetime
@@ -7,7 +8,6 @@ from filecmp import dircmp
 from pathlib import Path
 from unittest import mock
 from unittest.mock import MagicMock
-import sys
 
 import numpy as np
 import pandas as pd
@@ -19,7 +19,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-from imod.logging import LogLevel, LoggerType
+from imod.logging import LoggerType, LogLevel
 from imod.mf6 import LayeredWell, Well
 from imod.mf6.model import Modflow6Model
 from imod.mf6.multimodel.modelsplitter import PartitionInfo
@@ -121,6 +121,7 @@ def test_from_file_version_logged__version_in_dumped(twri_model, tmpdir_factory)
         log = log_file.read()
         assert f"iMOD Python version in current environment: {imod.__version__}" in log
         assert "iMOD Python version in dumped simulation: 0.0.0" in log
+
 
 @pytest.mark.usefixtures("twri_model")
 def test_from_file_version_logged__no_version_in_dumped(twri_model, tmpdir_factory):
