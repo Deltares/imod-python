@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.msw.sprinkling &#8212; iMOD Python 0.18.1 documentation</title>
+    <title>imod.msw.sprinkling &#8212; iMOD Python 1.0.0b0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="../../../_static/documentation_options.js?v=1e56ff10"></script>
+    <script src="../../../_static/documentation_options.js?v=ada814e5"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/msw/sprinkling';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.18.1.dev" />
+  <meta name="docsearch:version" content="1.0.0b0.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 0.18.1 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 0.18.1 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0b0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0b0 documentation - Home"/>
   
   
 </a></div>
@@ -432,7 +432,58 @@
 <span class="kn">from</span> <span class="nn">imod.msw.fixed_format</span> <span class="kn">import</span> <span class="n">VariableMetaData</span>
 <span class="kn">from</span> <span class="nn">imod.msw.pkgbase</span> <span class="kn">import</span> <span class="n">MetaSwapPackage</span>
 <span class="kn">from</span> <span class="nn">imod.msw.regrid.regrid_schemes</span> <span class="kn">import</span> <span class="n">SprinklingRegridMethod</span>
-<span class="kn">from</span> <span class="nn">imod.typing</span> <span class="kn">import</span> <span class="n">IntArray</span>
+<span class="kn">from</span> <span class="nn">imod.msw.utilities.common</span> <span class="kn">import</span> <span class="n">concat_imod5</span>
+<span class="kn">from</span> <span class="nn">imod.typing</span> <span class="kn">import</span> <span class="n">GridDataDict</span><span class="p">,</span> <span class="n">Imod5DataDict</span><span class="p">,</span> <span class="n">IntArray</span><span class="p">,</span> <span class="n">SelSettingsType</span>
+<span class="kn">from</span> <span class="nn">imod.typing.grid</span> <span class="kn">import</span> <span class="n">zeros_like</span>
+
+
+<span class="k">def</span> <span class="nf">_ravel_per_subunit</span><span class="p">(</span><span class="n">da</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="c1"># per defined well element, all subunits</span>
+    <span class="n">array_out</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="c1"># per defined well element, per defined subunits</span>
+    <span class="k">return</span> <span class="n">array_out</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">array_out</span><span class="p">)]</span>
+
+
+<span class="k">def</span> <span class="nf">_sprinkling_data_from_imod5_ipf</span><span class="p">(</span><span class="n">cap_data</span><span class="p">:</span> <span class="n">GridDataDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataDict</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+        <span class="s2">&quot;Assigning sprinkling wells with an IPF file is not supported, please specify them as IDF.&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_sprinkling_data_from_imod5_grid</span><span class="p">(</span><span class="n">cap_data</span><span class="p">:</span> <span class="n">GridDataDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridDataDict</span><span class="p">:</span>
+    <span class="n">drop_layer_kwargs</span><span class="p">:</span> <span class="n">SelSettingsType</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;drop&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;missing_dims&quot;</span><span class="p">:</span> <span class="s2">&quot;ignore&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="nb">type</span> <span class="o">=</span> <span class="n">cap_data</span><span class="p">[</span><span class="s2">&quot;artificial_recharge&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="o">**</span><span class="n">drop_layer_kwargs</span><span class="p">)</span>
+    <span class="n">capacity</span> <span class="o">=</span> <span class="n">cap_data</span><span class="p">[</span><span class="s2">&quot;artificial_recharge_capacity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="o">**</span><span class="n">drop_layer_kwargs</span><span class="p">)</span>
+
+    <span class="n">from_groundwater</span> <span class="o">=</span> <span class="nb">type</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="n">from_surfacewater</span> <span class="o">=</span> <span class="nb">type</span> <span class="o">==</span> <span class="mi">2</span>
+    <span class="n">is_active</span> <span class="o">=</span> <span class="nb">type</span> <span class="o">!=</span> <span class="mi">0</span>
+
+    <span class="n">zero_where_active</span> <span class="o">=</span> <span class="n">zeros_like</span><span class="p">(</span><span class="nb">type</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">is_active</span><span class="p">)</span>
+
+    <span class="c1"># Add zero where active, to have active cells set to 0.0.</span>
+    <span class="n">max_abstraction_groundwater_rural</span> <span class="o">=</span> <span class="n">zero_where_active</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="o">~</span><span class="n">from_groundwater</span><span class="p">,</span> <span class="n">capacity</span>
+    <span class="p">)</span>
+    <span class="n">max_abstraction_surfacewater_rural</span> <span class="o">=</span> <span class="n">zero_where_active</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="o">~</span><span class="n">from_surfacewater</span><span class="p">,</span> <span class="n">capacity</span>
+    <span class="p">)</span>
+
+    <span class="c1"># No sprinkling for urban environments</span>
+    <span class="n">max_abstraction_urban</span> <span class="o">=</span> <span class="n">zero_where_active</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;max_abstraction_groundwater&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">concat_imod5</span><span class="p">(</span>
+        <span class="n">max_abstraction_groundwater_rural</span><span class="p">,</span> <span class="n">max_abstraction_urban</span>
+    <span class="p">)</span>
+    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;max_abstraction_surfacewater&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">concat_imod5</span><span class="p">(</span>
+        <span class="n">max_abstraction_surfacewater_rural</span><span class="p">,</span> <span class="n">max_abstraction_urban</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span>
 
 
 <div class="viewcode-block" id="Sprinkling">
@@ -461,21 +512,20 @@
         <span class="s2">&quot;max_abstraction_surfacewater_mm_d&quot;</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
         <span class="s2">&quot;max_abstraction_groundwater&quot;</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1e9</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
         <span class="s2">&quot;max_abstraction_surfacewater&quot;</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1e9</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
-        <span class="s2">&quot;svat_groundwater&quot;</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
+        <span class="s2">&quot;svat_groundwater&quot;</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">99999999</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
         <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">9999</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
         <span class="s2">&quot;trajectory&quot;</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
     <span class="p">}</span>
 
-    <span class="n">_with_subunit</span> <span class="o">=</span> <span class="p">()</span>
-    <span class="n">_without_subunit</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">_with_subunit</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;max_abstraction_groundwater&quot;</span><span class="p">,</span>
         <span class="s2">&quot;max_abstraction_surfacewater&quot;</span><span class="p">,</span>
     <span class="p">)</span>
+    <span class="n">_without_subunit</span> <span class="o">=</span> <span class="p">()</span>
 
     <span class="n">_to_fill</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;max_abstraction_groundwater_mm_d&quot;</span><span class="p">,</span>
         <span class="s2">&quot;max_abstraction_surfacewater_mm_d&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;svat_groundwater&quot;</span><span class="p">,</span>
         <span class="s2">&quot;trajectory&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -507,27 +557,31 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;well not of type &#39;Mf6Wel&#39;, got &#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">mf6_well</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
 
         <span class="n">well_cellid</span> <span class="o">=</span> <span class="n">mf6_well</span><span class="p">[</span><span class="s2">&quot;cellid&quot;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">well_cellid</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;dim_cellid&quot;</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Coupling to unstructured grids is not supported.&quot;</span><span class="p">)</span>
 
         <span class="n">well_layer</span> <span class="o">=</span> <span class="n">well_cellid</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">dim_cellid</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
         <span class="n">well_row</span> <span class="o">=</span> <span class="n">well_cellid</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">dim_cellid</span><span class="o">=</span><span class="s2">&quot;row&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span> <span class="o">-</span> <span class="mi">1</span>
         <span class="n">well_column</span> <span class="o">=</span> <span class="n">well_cellid</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">dim_cellid</span><span class="o">=</span><span class="s2">&quot;column&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span> <span class="o">-</span> <span class="mi">1</span>
 
-        <span class="n">n_subunit</span> <span class="o">=</span> <span class="n">svat</span><span class="p">[</span><span class="s2">&quot;subunit&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">max_rate_per_svat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;max_abstraction_groundwater&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">svat</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">well_layer_per_svat</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">max_rate_per_svat</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="n">well_layer_per_svat</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span> <span class="n">well_row</span><span class="p">,</span> <span class="n">well_column</span><span class="p">]</span> <span class="o">=</span> <span class="n">well_layer</span>
 
-        <span class="n">well_svat</span> <span class="o">=</span> <span class="n">svat</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="n">well_row</span><span class="p">,</span> <span class="n">well_column</span><span class="p">]</span>
-        <span class="n">well_active</span> <span class="o">=</span> <span class="n">well_svat</span> <span class="o">!=</span> <span class="mi">0</span>
+        <span class="n">is_active_per_svat</span> <span class="o">=</span> <span class="p">(</span><span class="n">max_rate_per_svat</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">well_layer_per_svat</span><span class="o">.</span><span class="n">notnull</span><span class="p">()</span>
 
-        <span class="c1"># Tile well_layers for each subunit</span>
-        <span class="n">layer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">well_layer</span><span class="p">,</span> <span class="p">(</span><span class="n">n_subunit</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">layer_active</span> <span class="o">=</span> <span class="n">well_layer_per_svat</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">is_active_per_svat</span><span class="p">)</span>
+        <span class="n">layer_source</span> <span class="o">=</span> <span class="n">_ravel_per_subunit</span><span class="p">(</span><span class="n">layer_active</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+        <span class="n">svat_active</span> <span class="o">=</span> <span class="n">svat</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">is_active_per_svat</span><span class="p">)</span>
+        <span class="n">svat_source_target</span> <span class="o">=</span> <span class="n">_ravel_per_subunit</span><span class="p">(</span><span class="n">svat_active</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
 
-        <span class="n">data_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;svat&quot;</span><span class="p">:</span> <span class="n">well_svat</span><span class="p">[</span><span class="n">well_active</span><span class="p">],</span> <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">layer</span><span class="p">[</span><span class="n">well_active</span><span class="p">]}</span>
+        <span class="n">data_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;svat&quot;</span><span class="p">:</span> <span class="n">svat_source_target</span><span class="p">,</span>
+            <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">layer_source</span><span class="p">,</span>
+            <span class="s2">&quot;svat_groundwater&quot;</span><span class="p">:</span> <span class="n">svat_source_target</span><span class="p">,</span>
+        <span class="p">}</span>
 
-        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_without_subunit</span><span class="p">:</span>
-            <span class="n">well_arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">well_row</span><span class="p">,</span> <span class="n">well_column</span><span class="p">]</span>
-            <span class="n">well_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">well_arr</span><span class="p">,</span> <span class="p">(</span><span class="n">n_subunit</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-            <span class="n">data_dict</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">well_arr</span><span class="p">[</span><span class="n">well_active</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_subunit</span><span class="p">:</span>
+            <span class="n">data_with_well</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">is_active_per_svat</span><span class="p">)</span>
+            <span class="n">data_dict</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">_ravel_per_subunit</span><span class="p">(</span><span class="n">data_with_well</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_fill</span><span class="p">:</span>
             <span class="n">data_dict</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -538,7 +592,60 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_range</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_dataframe_fixed_width</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_dataframe_fixed_width</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Sprinkling.from_imod5_data">
+<a class="viewcode-back" href="../../../api/generated/msw/imod.msw.Sprinkling.from_imod5_data.html#imod.msw.Sprinkling.from_imod5_data">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_imod5_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">imod5_data</span><span class="p">:</span> <span class="n">Imod5DataDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Sprinkling&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Import sprinkling data from imod5 data. Abstraction data for sprinkling</span>
+<span class="sd">        is defined in iMOD5 either with grids (IDF) or points (IPF) combined</span>
+<span class="sd">        with a grid. Depending on the type, the method does different conversions:</span>
+
+<span class="sd">        - grids (IDF)</span>
+<span class="sd">            The ``&quot;artifical_recharge_layer&quot;`` variable was defined as grid</span>
+<span class="sd">            (IDF), this grid defines in which layer a groundwater abstraction</span>
+<span class="sd">            well should be placed. The ``&quot;artificial_recharge&quot;`` grid contains</span>
+<span class="sd">            types which point to the type of abstraction:</span>
+
+<span class="sd">                * 0: no abstraction</span>
+<span class="sd">                * 1: groundwater abstraction</span>
+<span class="sd">                * 2: surfacewater abstraction</span>
+
+<span class="sd">            The ``&quot;artificial_recharge_capacity&quot;`` grid/constant defines the</span>
+<span class="sd">            capacity of each groundwater or surfacewater abstraction. This is an</span>
+<span class="sd">            ``1:1`` mapping: Each grid cell maps to a separate well.</span>
+
+<span class="sd">        - points with grid (IPF &amp; IDF)</span>
+<span class="sd">            The ``&quot;artifical_recharge_layer&quot;`` variable was defined as point</span>
+<span class="sd">            data (IPF), this table contains wellids with an abstraction capacity</span>
+<span class="sd">            and layer. The ``&quot;artificial_recharge&quot;`` grid contains a mapping of</span>
+<span class="sd">            grid cells to wellids in the point data. The</span>
+<span class="sd">            ``&quot;artificial_recharge_capacity&quot;`` is ignored as the abstraction</span>
+<span class="sd">            capacity is already defined in the point data. This is an ``n:1``</span>
+<span class="sd">            mapping: multiple grid cells can map to one well.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        imod5_data: dict[str, dict[str, GridDataArray]]</span>
+<span class="sd">            dictionary containing the arrays mentioned in the project file as</span>
+<span class="sd">            xarray datasets, under the key of the package type to which it</span>
+<span class="sd">            belongs, as returned by</span>
+<span class="sd">            :func:`imod.formats.prj.open_projectfile_data`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Sprinkling package</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cap_data</span> <span class="o">=</span> <span class="n">imod5_data</span><span class="p">[</span><span class="s2">&quot;cap&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cap_data</span><span class="p">[</span><span class="s2">&quot;artificial_recharge_layer&quot;</span><span class="p">],</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">_sprinkling_data_from_imod5_ipf</span><span class="p">(</span><span class="n">cap_data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">_sprinkling_data_from_imod5_grid</span><span class="p">(</span><span class="n">cap_data</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span></div>
+</div>
 
 </pre></div>
 

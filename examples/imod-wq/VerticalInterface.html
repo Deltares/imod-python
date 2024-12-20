@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Vertical Interface &#8212; iMOD Python 0.18.1 documentation</title>
+    <title>Vertical Interface &#8212; iMOD Python 1.0.0b0 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="../../_static/documentation_options.js?v=1e56ff10"></script>
+    <script src="../../_static/documentation_options.js?v=ada814e5"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'examples/imod-wq/VerticalInterface';</script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="Saltwater Pocket" href="SaltwaterPocket.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.18.1.dev" />
+  <meta name="docsearch:version" content="1.0.0b0.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 0.18.1 documentation - Home"/>
-    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 0.18.1 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0b0 documentation - Home"/>
+    <img src="../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0b0 documentation - Home"/>
   
   
 </a></div>
@@ -555,7 +555,7 @@ The model is a 2D cross-section, hence <code class="docutils literal notranslate
 <span class="n">bnd</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_VerticalInterface_001.png" srcset="../../_images/sphx_glr_VerticalInterface_001.png" alt="y = 0.5, dx = 1.0, dy = -1.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x00000289BA0691D0&gt;
+<img src="../../_images/sphx_glr_VerticalInterface_001.png" srcset="../../_images/sphx_glr_VerticalInterface_001.png" alt="y = 0.5, dx = 1.0, dy = -1.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x000001D9A5E8D090&gt;
 </pre></div>
 </div>
 <p>Define the icbund, which sets which cells
@@ -575,7 +575,7 @@ that is: <code class="docutils literal notranslate"><span class="pre">bnd[index]
 <span class="n">bnd</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;layer&quot;</span><span class="p">,</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_VerticalInterface_002.png" srcset="../../_images/sphx_glr_VerticalInterface_002.png" alt="y = 0.5, dx = 1.0, dy = -1.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x00000289ADD4AE50&gt;
+<img src="../../_images/sphx_glr_VerticalInterface_002.png" srcset="../../_images/sphx_glr_VerticalInterface_002.png" alt="y = 0.5, dx = 1.0, dy = -1.0" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh object at 0x000001D9A5E04D50&gt;
 </pre></div>
 </div>
 <p>Define WEL data</p>
@@ -673,7 +673,7 @@ plot results as follows:</p>
 <span class="n">conc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">levels</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">yincrease</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.187 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.172 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-examples-imod-wq-verticalinterface-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/1e337ba494f36953d64292ebd502fc8b/VerticalInterface.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">VerticalInterface.ipynb</span></code></a></p>

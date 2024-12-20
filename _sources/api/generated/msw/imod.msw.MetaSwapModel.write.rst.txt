@@ -1,0 +1,6 @@
+﻿imod.msw.MetaSwapModel.write
+============================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: MetaSwapModel.write

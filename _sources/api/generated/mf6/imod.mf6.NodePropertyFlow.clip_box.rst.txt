@@ -1,0 +1,6 @@
+﻿imod.mf6.NodePropertyFlow.clip\_box
+===================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: NodePropertyFlow.clip_box

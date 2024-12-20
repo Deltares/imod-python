@@ -18,6 +18,7 @@
       ~Recharge.clip_box
       ~Recharge.copy
       ~Recharge.from_file
+      ~Recharge.from_imod5_cap_data
       ~Recharge.from_imod5_data
       ~Recharge.get_non_grid_data
       ~Recharge.get_period_varnames

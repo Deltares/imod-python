@@ -1,0 +1,6 @@
+﻿imod.msw.Ponding.from\_imod5\_data
+==================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: Ponding.from_imod5_data

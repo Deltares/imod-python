@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.msw.infiltration &#8212; iMOD Python 0.18.1 documentation</title>
+    <title>imod.msw.infiltration &#8212; iMOD Python 1.0.0b0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="../../../_static/documentation_options.js?v=1e56ff10"></script>
+    <script src="../../../_static/documentation_options.js?v=ada814e5"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/msw/infiltration';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.18.1.dev" />
+  <meta name="docsearch:version" content="1.0.0b0.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 0.18.1 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 0.18.1 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0b0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0b0 documentation - Home"/>
   
   
 </a></div>
@@ -420,12 +420,39 @@
                 <article class="bd-article">
                   
   <h1>Source code for imod.msw.infiltration</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span></span><span class="kn">from</span> <span class="nn">textwrap</span> <span class="kn">import</span> <span class="n">dedent</span>
 
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+<span class="kn">from</span> <span class="nn">imod.logging</span> <span class="kn">import</span> <span class="n">LogLevel</span><span class="p">,</span> <span class="n">logger</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.interfaces.iregridpackage</span> <span class="kn">import</span> <span class="n">IRegridPackage</span>
 <span class="kn">from</span> <span class="nn">imod.msw.fixed_format</span> <span class="kn">import</span> <span class="n">VariableMetaData</span>
 <span class="kn">from</span> <span class="nn">imod.msw.pkgbase</span> <span class="kn">import</span> <span class="n">MetaSwapPackage</span>
 <span class="kn">from</span> <span class="nn">imod.msw.regrid.regrid_schemes</span> <span class="kn">import</span> <span class="n">InfiltrationRegridMethod</span>
+<span class="kn">from</span> <span class="nn">imod.msw.utilities.common</span> <span class="kn">import</span> <span class="n">concat_imod5</span>
+<span class="kn">from</span> <span class="nn">imod.msw.utilities.mask</span> <span class="kn">import</span> <span class="n">MaskValues</span>
+<span class="kn">from</span> <span class="nn">imod.typing</span> <span class="kn">import</span> <span class="n">GridDataDict</span><span class="p">,</span> <span class="n">Imod5DataDict</span>
+<span class="kn">from</span> <span class="nn">imod.typing.grid</span> <span class="kn">import</span> <span class="n">ones_like</span>
+
+
+<span class="k">def</span> <span class="nf">deactivate_small_resistances_in_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">GridDataDict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Deactivate cells where resistance smaller than 5 days are set to</span>
+<span class="sd">    -9999.0.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">dedent</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;Detected cells with resistances smaller than 5.0 in </span><span class="si">{var}</span><span class="s2">, set</span>
+<span class="s2">    to inactive&quot;&quot;&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;downward_resistance&quot;</span><span class="p">,</span> <span class="s2">&quot;upward_resistance&quot;</span><span class="p">]:</span>
+        <span class="n">to_deactivate</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">5.0</span>
+        <span class="k">if</span> <span class="n">to_deactivate</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                <span class="n">loglevel</span><span class="o">=</span><span class="n">LogLevel</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span>
+                <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var</span><span class="o">=</span><span class="n">var</span><span class="p">),</span>
+                <span class="n">additional_depth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">to_deactivate</span><span class="p">,</span> <span class="n">MaskValues</span><span class="o">.</span><span class="n">default</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span>
 
 
 <div class="viewcode-block" id="Infiltration">
@@ -443,11 +470,11 @@
 <span class="sd">        a subunit coordinate to describe different land uses.</span>
 <span class="sd">    downward_resistance: array of floats (xr.DataArray)</span>
 <span class="sd">        Describes the downward resisitance of SVAT units. Set to -9999.0 to make</span>
-<span class="sd">        MetaSWAP ignore this resistance. This array must not have a subunit</span>
+<span class="sd">        MetaSWAP ignore this resistance. This array must have a subunit</span>
 <span class="sd">        coordinate.</span>
 <span class="sd">    upward_resistance: array of floats (xr.DataArray)</span>
 <span class="sd">        Describes the upward resistance of SVAT units. Set to -9999.0 to make</span>
-<span class="sd">        MetaSWAP ignore this resistance. This array must not have a subunit</span>
+<span class="sd">        MetaSWAP ignore this resistance. This array must have a subunit</span>
 <span class="sd">        coordinate.</span>
 <span class="sd">    bottom_resistance: array of floats (xr.DataArray)</span>
 <span class="sd">        Describes the infiltration capacity of SVAT units. Set to -9999.0 to</span>
@@ -456,9 +483,6 @@
 <span class="sd">    extra_storage_coefficient: array of floats (xr.DataArray)</span>
 <span class="sd">        Extra storage coefficient of phreatic layer. This array must not have a</span>
 <span class="sd">        subunit coordinate.</span>
-<span class="sd">    active: array of bools (xr.DataArray)</span>
-<span class="sd">        Describes whether SVAT units are active or not. This array must not have</span>
-<span class="sd">        a subunit coordinate.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_file_name</span> <span class="o">=</span> <span class="s2">&quot;infi_svat.inp&quot;</span>
@@ -471,10 +495,12 @@
         <span class="s2">&quot;extra_storage_coefficient&quot;</span><span class="p">:</span> <span class="n">VariableMetaData</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
     <span class="p">}</span>
 
-    <span class="n">_with_subunit</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;infiltration_capacity&quot;</span><span class="p">,)</span>
-    <span class="n">_without_subunit</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">_with_subunit</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;infiltration_capacity&quot;</span><span class="p">,</span>
         <span class="s2">&quot;downward_resistance&quot;</span><span class="p">,</span>
         <span class="s2">&quot;upward_resistance&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">_without_subunit</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;bottom_resistance&quot;</span><span class="p">,</span>
         <span class="s2">&quot;extra_storage_coefficient&quot;</span><span class="p">,</span>
     <span class="p">)</span>
@@ -500,6 +526,55 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;extra_storage_coefficient&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">extra_storage_coefficient</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_pkgcheck</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Infiltration.from_imod5_data">
+<a class="viewcode-back" href="../../../api/generated/msw/imod.msw.Infiltration.from_imod5_data.html#imod.msw.Infiltration.from_imod5_data">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_imod5_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">imod5_data</span><span class="p">:</span> <span class="n">Imod5DataDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Infiltration&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construct a MetaSWAP Infiltration package from iMOD5 data in the CAP</span>
+<span class="sd">        package, loaded with the :func:`imod.formats.prj.open_projectfile_data`</span>
+<span class="sd">        function.</span>
+
+<span class="sd">        Concatenates infiltration_capacity, runon_resistance, and</span>
+<span class="sd">        runoff_resistance along the subunit dimension. 0 = rural landuse, 1 =</span>
+<span class="sd">        urban landuse. Resistances smaller than 5 days are deactivated for</span>
+<span class="sd">        transparency, as MetaSWAP also does this internally.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        imod5_data: Imod5DataDict</span>
+<span class="sd">            iMOD5 data as returned by</span>
+<span class="sd">            :func:`imod.formats.prj.open_projectfile_data`</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        imod.msw.Infiltration</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">cap_data</span> <span class="o">=</span> <span class="n">imod5_data</span><span class="p">[</span><span class="s2">&quot;cap&quot;</span><span class="p">]</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># Use runon resistance as downward resistance, and runoff for downward</span>
+        <span class="c1"># resistance</span>
+        <span class="n">key_mapping</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;infiltration_capacity&quot;</span><span class="p">:</span> <span class="s2">&quot;infiltration_capacity&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;downward_resistance&quot;</span><span class="p">:</span> <span class="s2">&quot;runon_resistance&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;upward_resistance&quot;</span><span class="p">:</span> <span class="s2">&quot;runoff_resistance&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">var_rename</span><span class="p">,</span> <span class="n">var_key</span> <span class="ow">in</span> <span class="n">key_mapping</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">data_ls</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">cap_data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">landuse</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">var_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">landuse</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;rural&quot;</span><span class="p">,</span> <span class="s2">&quot;urban&quot;</span><span class="p">]</span>
+            <span class="p">]</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">var_rename</span><span class="p">]</span> <span class="o">=</span> <span class="n">concat_imod5</span><span class="p">(</span><span class="o">*</span><span class="n">data_ls</span><span class="p">)</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">deactivate_small_resistances_in_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="n">like</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;downward_resistance&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">subunit</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;bottom_resistance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ones_like</span><span class="p">(</span><span class="n">like</span><span class="p">)</span> <span class="o">*</span> <span class="n">MaskValues</span><span class="o">.</span><span class="n">default</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;extra_storage_coefficient&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ones_like</span><span class="p">(</span><span class="n">like</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span></div>
 </div>
 
 </pre></div>

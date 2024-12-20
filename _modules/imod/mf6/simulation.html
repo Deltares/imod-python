@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.simulation &#8212; iMOD Python 0.18.1 documentation</title>
+    <title>imod.mf6.simulation &#8212; iMOD Python 1.0.0b0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="../../../_static/documentation_options.js?v=1e56ff10"></script>
+    <script src="../../../_static/documentation_options.js?v=ada814e5"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/mf6/simulation';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.18.1.dev" />
+  <meta name="docsearch:version" content="1.0.0b0.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 0.18.1 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 0.18.1 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0b0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0b0 documentation - Home"/>
   
   
 </a></div>
@@ -443,7 +443,7 @@
 <span class="kn">import</span> <span class="nn">imod</span>
 <span class="kn">import</span> <span class="nn">imod.logging</span>
 <span class="kn">import</span> <span class="nn">imod.mf6.exchangebase</span>
-<span class="kn">from</span> <span class="nn">imod.logging</span> <span class="kn">import</span> <span class="n">standard_log_decorator</span>
+<span class="kn">from</span> <span class="nn">imod.logging</span> <span class="kn">import</span> <span class="n">LogLevel</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">standard_log_decorator</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.gwfgwf</span> <span class="kn">import</span> <span class="n">GWFGWF</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.gwfgwt</span> <span class="kn">import</span> <span class="n">GWFGWT</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.gwtgwt</span> <span class="kn">import</span> <span class="n">GWTGWT</span>
@@ -507,6 +507,22 @@
         <span class="k">for</span> <span class="n">pkg_name</span><span class="p">,</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="n">simulation</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pkg</span><span class="p">,</span> <span class="n">Package</span><span class="p">)</span>
     <span class="p">}</span>
+
+
+<span class="k">def</span> <span class="nf">log_versions</span><span class="p">(</span><span class="n">version_saved</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+        <span class="n">LogLevel</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;iMOD Python version in current environment: </span><span class="si">{</span><span class="n">imod</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">version_saved</span><span class="p">:</span>
+        <span class="n">version_msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;iMOD Python version in dumped simulation: </span><span class="si">{</span><span class="n">version_saved</span><span class="p">[</span><span class="s1">&#39;imod-python&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">version_msg</span> <span class="o">=</span> <span class="s2">&quot;No iMOD Python version information found in dumped simulation.&quot;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+        <span class="n">LogLevel</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+        <span class="n">version_msg</span><span class="p">,</span>
+    <span class="p">)</span>
 
 
 <div class="viewcode-block" id="Modflow6Simulation">
@@ -1321,6 +1337,9 @@
         <span class="n">directory</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="n">toml_content</span><span class="p">:</span> <span class="n">DefaultDict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+        <span class="c1"># Dump version number</span>
+        <span class="n">toml_content</span><span class="p">[</span><span class="s2">&quot;version&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;imod-python&quot;</span><span class="p">:</span> <span class="n">imod</span><span class="o">.</span><span class="n">__version__</span><span class="p">}</span>
+        <span class="c1"># Dump models and exchanges</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">cls_name</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Modflow6Model</span><span class="p">):</span>
@@ -1368,6 +1387,9 @@
         <span class="n">toml_path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">toml_path</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">toml_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">toml_content</span> <span class="o">=</span> <span class="n">tomli</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="n">version_saved</span> <span class="o">=</span> <span class="n">toml_content</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;version&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">log_versions</span><span class="p">(</span><span class="n">version_saved</span><span class="p">)</span>
 
         <span class="n">simulation</span> <span class="o">=</span> <span class="n">Modflow6Simulation</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">toml_path</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">toml_content</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -1823,11 +1845,13 @@
 <span class="sd">        times:  list[datetime]</span>
 <span class="sd">            time discretization of the model to be imported. This is used for</span>
 <span class="sd">            the following:</span>
+
 <span class="sd">                * Times of wells with associated timeseries are resampled to these times</span>
 <span class="sd">                * Start and end times in the list are used to repeat the stresses</span>
 <span class="sd">                  of periodic data (e.g. river stages in iMOD5 for &quot;summer&quot;, &quot;winter&quot;)</span>
 <span class="sd">                * The simulation is discretized to these times, using</span>
 <span class="sd">                  :meth:`imod.mf6.Modflow6Simulation.create_time_discretization`</span>
+
 <span class="sd">        allocation_options: SimulationAllocationOptions, optional</span>
 <span class="sd">            object containing the allocation options per package type. If you</span>
 <span class="sd">            want a specific package to have a different allocation option, then</span>
@@ -1879,6 +1903,7 @@
 
         <span class="n">simulation</span> <span class="o">=</span> <span class="n">Modflow6Simulation</span><span class="p">(</span><span class="s2">&quot;imported_simulation&quot;</span><span class="p">)</span>
         <span class="n">simulation</span><span class="o">.</span><span class="n">_validation_context</span><span class="o">.</span><span class="n">strict_well_validation</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">simulation</span><span class="o">.</span><span class="n">_validation_context</span><span class="o">.</span><span class="n">strict_hfb_validation</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="c1"># import GWF model,</span>
         <span class="n">groundwaterFlowModel</span> <span class="o">=</span> <span class="n">GroundwaterFlowModel</span><span class="o">.</span><span class="n">from_imod5_data</span><span class="p">(</span>

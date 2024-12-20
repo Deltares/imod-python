@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.dis &#8212; iMOD Python 0.18.1 documentation</title>
+    <title>imod.mf6.dis &#8212; iMOD Python 1.0.0b0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="../../../_static/documentation_options.js?v=1e56ff10"></script>
+    <script src="../../../_static/documentation_options.js?v=ada814e5"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/mf6/dis';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.18.1.dev" />
+  <meta name="docsearch:version" content="1.0.0b0.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 0.18.1 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 0.18.1 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0b0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0b0 documentation - Home"/>
   
   
 </a></div>
@@ -422,12 +422,13 @@
   <h1>Source code for imod.mf6.dis</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">pathlib</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">import</span> <span class="nn">imod</span>
 <span class="kn">from</span> <span class="nn">imod.logging</span> <span class="kn">import</span> <span class="n">init_log_decorator</span><span class="p">,</span> <span class="n">standard_log_decorator</span>
+<span class="kn">from</span> <span class="nn">imod.mf6.disv</span> <span class="kn">import</span> <span class="n">VerticesDiscretization</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.interfaces.imaskingsettings</span> <span class="kn">import</span> <span class="n">IMaskingSettings</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.interfaces.iregridpackage</span> <span class="kn">import</span> <span class="n">IRegridPackage</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.package</span> <span class="kn">import</span> <span class="n">Package</span>
@@ -436,6 +437,7 @@
 <span class="kn">from</span> <span class="nn">imod.mf6.utilities.imod5_converter</span> <span class="kn">import</span> <span class="n">convert_ibound_to_idomain</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.utilities.regrid</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">RegridderWeightsCache</span><span class="p">,</span>
+    <span class="n">_regrid_like</span><span class="p">,</span>
     <span class="n">_regrid_package_data</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">imod.mf6.validation</span> <span class="kn">import</span> <span class="n">DisBottomSchema</span>
@@ -450,7 +452,7 @@
     <span class="n">UniqueValuesSchema</span><span class="p">,</span>
     <span class="n">ValidationError</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">imod.typing.grid</span> <span class="kn">import</span> <span class="n">GridDataArray</span>
+<span class="kn">from</span> <span class="nn">imod.typing.grid</span> <span class="kn">import</span> <span class="n">GridDataArray</span><span class="p">,</span> <span class="n">is_unstructured</span>
 
 
 <div class="viewcode-block" id="StructuredDiscretization">
@@ -584,6 +586,8 @@
 
         <span class="k">return</span> <span class="n">errors</span>
 
+<div class="viewcode-block" id="StructuredDiscretization.from_imod5_data">
+<a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.StructuredDiscretization.from_imod5_data.html#imod.mf6.StructuredDiscretization.from_imod5_data">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="nd">@standard_log_decorator</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">from_imod5_data</span><span class="p">(</span>
@@ -656,11 +660,66 @@
         <span class="c1"># Assume iMOD5 data provided as fully 3D and not Quasi-3D</span>
         <span class="n">new_package_data</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_package_data</span><span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">new_package_data</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">new_package_data</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_regrid_methods</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DiscretizationRegridMethod</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_regrid_method</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_regrid_method</span><span class="p">)</span>
+
+<div class="viewcode-block" id="StructuredDiscretization.regrid_like">
+<a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.StructuredDiscretization.regrid_like.html#imod.mf6.StructuredDiscretization.regrid_like">[docs]</a>
+    <span class="k">def</span> <span class="nf">regrid_like</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">target_grid</span><span class="p">:</span> <span class="n">GridDataArray</span><span class="p">,</span>
+        <span class="n">regrid_cache</span><span class="p">:</span> <span class="n">RegridderWeightsCache</span><span class="p">,</span>
+        <span class="n">regridder_types</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RegridMethodType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;StructuredDiscretization&quot;</span><span class="p">,</span> <span class="n">VerticesDiscretization</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Regrid discretization package. Creates a StructuredDiscretization, or</span>
+<span class="sd">        VerticesDiscretization package, based on type of target_grid. It regrids</span>
+<span class="sd">        all the arrays in this package to the desired discretization, and leaves</span>
+<span class="sd">        the options unmodified.</span>
+
+<span class="sd">        The default regridding methods are specified in the ``_regrid_method``</span>
+<span class="sd">        attribute of the package. These defaults can be overridden using the</span>
+<span class="sd">        input parameters of this function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        target_grid: xr.DataArray or xu.UgridDataArray</span>
+<span class="sd">            a grid defined using the same discretization as the one we want to</span>
+<span class="sd">            regrid the package to.</span>
+<span class="sd">        regrid_cache: RegridderWeightsCache, optional</span>
+<span class="sd">            stores regridder weights for different regridders. Can be used to</span>
+<span class="sd">            speed up regridding, if the same regridders are used several times</span>
+<span class="sd">            for regridding different arrays.</span>
+<span class="sd">        regridder_types: RegridMethodType, optional</span>
+<span class="sd">            dictionary mapping arraynames (str) to a tuple of regrid type (a</span>
+<span class="sd">            specialization class of BaseRegridder) and function name (str) this</span>
+<span class="sd">            dictionary can be used to override the default mapping method.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        StructuredDiscretization or VerticesDiscretization</span>
+<span class="sd">            Depending on type of target_grid. A package with the same options as</span>
+<span class="sd">            this package, and with all the data-arrays regridded to another</span>
+<span class="sd">            discretization, similar to the one used in input argument &quot;target_grid&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">as_pkg_type</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">is_unstructured</span><span class="p">(</span><span class="n">target_grid</span><span class="p">):</span>
+            <span class="n">as_pkg_type</span> <span class="o">=</span> <span class="n">VerticesDiscretization</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">_regrid_like</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span> <span class="n">target_grid</span><span class="p">,</span> <span class="n">regrid_cache</span><span class="p">,</span> <span class="n">regridder_types</span><span class="p">,</span> <span class="n">as_pkg_type</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">e</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;package could not be regridded.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+</div>
 
 </pre></div>
 

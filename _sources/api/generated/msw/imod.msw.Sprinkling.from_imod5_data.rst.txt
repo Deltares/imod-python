@@ -1,0 +1,6 @@
+﻿imod.msw.Sprinkling.from\_imod5\_data
+=====================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: Sprinkling.from_imod5_data

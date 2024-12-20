@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**02:01.093** total execution time for 9 files **from user-guide**:
+**02:06.974** total execution time for 9 files **from user-guide**:
 
 .. container::
 
@@ -33,25 +33,25 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_user-guide_08-regridding.py` (``08-regridding.py``)
-     - 01:35.484
+     - 01:38.769
      - 0.0
    * - :ref:`sphx_glr_user-guide_09-topsystem.py` (``09-topsystem.py``)
-     - 00:10.272
+     - 00:11.157
      - 0.0
    * - :ref:`sphx_glr_user-guide_01-raster-data.py` (``01-raster-data.py``)
-     - 00:07.335
+     - 00:07.715
      - 0.0
    * - :ref:`sphx_glr_user-guide_06-lazy-evaluation.py` (``06-lazy-evaluation.py``)
-     - 00:03.390
+     - 00:04.020
      - 0.0
    * - :ref:`sphx_glr_user-guide_10-cleanup.py` (``10-cleanup.py``)
-     - 00:03.037
+     - 00:03.338
      - 0.0
    * - :ref:`sphx_glr_user-guide_02-vector-data.py` (``02-vector-data.py``)
-     - 00:01.498
+     - 00:01.865
      - 0.0
    * - :ref:`sphx_glr_user-guide_07-time-discretization.py` (``07-time-discretization.py``)
-     - 00:00.078
+     - 00:00.109
      - 0.0
    * - :ref:`sphx_glr_user-guide_03-timeseries-data.py` (``03-timeseries-data.py``)
      - 00:00.000

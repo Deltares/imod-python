@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.riv &#8212; iMOD Python 0.18.1 documentation</title>
+    <title>imod.mf6.riv &#8212; iMOD Python 1.0.0b0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="../../../_static/documentation_options.js?v=1e56ff10"></script>
+    <script src="../../../_static/documentation_options.js?v=ada814e5"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/mf6/riv';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.18.1.dev" />
+  <meta name="docsearch:version" content="1.0.0b0.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 0.18.1 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 0.18.1 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0b0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0b0 documentation - Home"/>
   
   
 </a></div>
@@ -840,6 +840,8 @@
         <span class="n">drainage</span><span class="o">.</span><span class="n">mask</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">drainage</span>
 
+<div class="viewcode-block" id="River.split_conductance">
+<a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.River.split_conductance.html#imod.mf6.River.split_conductance">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">split_conductance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">conductance</span><span class="p">,</span> <span class="n">infiltration_factor</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -898,7 +900,8 @@
         <span class="c1"># clean up the packages</span>
         <span class="n">drainage_conductance</span> <span class="o">=</span> <span class="n">drainage_conductance</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">drainage_conductance</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">river_conductance</span> <span class="o">=</span> <span class="n">river_conductance</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">river_conductance</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">drainage_conductance</span><span class="p">,</span> <span class="n">river_conductance</span>
+        <span class="k">return</span> <span class="n">drainage_conductance</span><span class="p">,</span> <span class="n">river_conductance</span></div>
+
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_regrid_methods</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RiverRegridMethod</span><span class="p">:</span>

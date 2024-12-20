@@ -1,0 +1,30 @@
+﻿imod.prepare.SimulationAllocationOptions
+========================================
+
+.. currentmodule:: imod.prepare
+
+.. autoclass:: SimulationAllocationOptions
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SimulationAllocationOptions.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~SimulationAllocationOptions.drn
+      ~SimulationAllocationOptions.ghb
+      ~SimulationAllocationOptions.riv
+   
+   

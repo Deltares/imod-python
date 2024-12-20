@@ -1,0 +1,6 @@
+﻿imod.mf6.Evapotranspiration.clip\_box
+=====================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: Evapotranspiration.clip_box

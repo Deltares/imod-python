@@ -6,6 +6,81 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[1.0.0b0] - 2024-12-20
+----------------------
+
+Added
+~~~~~
+
+- :class:`imod.msw.MeteoGridCopy` to copy existing `mete_grid.inp` files, so
+  ASCII grids in large existing meteo databases do not have to be read.
+- :class:`imod.msw.CopyFiles` to copy settings and lookup tables in existing
+  ``.inp`` files.
+- :meth:`imod.mf6.LayeredWell.from_imod5_cap_data` to construct a
+  :class:`imod.mf6.LayeredWell` package from iMOD5 data in the CAP package (for
+  MetaSWAP). Currently only griddata (IDF) is supported.
+- :meth:`imod.mf6.Recharge.from_imod5_cap_data` to construct a recharge package
+  for coupling a MODFLOW6 model to MetaSWAP.
+- :meth:`imod.msw.MetaSwapModel.from_imod5_data` to construct a MetaSWAP model
+  from data in an iMOD5 projectfile.
+- :meth:`imod.msw.MetaSwapModel.write` has a ``validate`` argument, which can be
+  used to turn off validation upon writing, use at your own risk!
+- :class:`imod.msw.MetaSwapModel` got ``settings`` argument to set simulation
+  settings.
+- :func:`imod.data.tutorial_03` to load data for the iMOD Documentation
+  tutorial.
+- :meth:`imod.mf6.Modflow6Simulation.dump` now saves iMOD Python version number.
+
+Fixed
+~~~~~
+
+- Fixed bug where :class:`HorizontalFlowBarrierResistance`,
+  :class:`HorizontalFlowBarrierSingleLayerResistance` and other HFB packages
+  could not be allocated to cell edges when idomain in layer 1 was largely
+  inactive.
+- Fixed bug where :meth:`HorizontalFlowBarrierResistance.clip_box`,
+  :meth:`HorizontalFlowBarrierSingleLayerResistance.clip_box` methods only
+  returned deepcopy instead of actually clipping the line geometries.
+- Fixed bug where :class:`HorizontalFlowBarrierResistance`, 
+  :class:`HorizontalFlowBarrierSingleLayerResistance` and other HFB packages could not 
+  be clipped or copied with xarray >= 2024.10.0.
+- Fixed crash upon calling :meth:`imod.mf6.GroundwaterFlowModel.dump`, when a
+  :class:`HorizontalFlowBarrierResistance`,
+  :class:`HorizontalFlowBarrierSingleLayerResistance` or other HFB package was
+  assigned to the model.
+- :meth:`imod.mf6.Modflow6Simulation.regrid_like` can now regrid a structured
+  model to an unstructured grid.
+- :meth:`imod.mf6.Modflow6Simulation.regrid_like` throws a
+  ``NotImplementedError`` when attempting to regrid an unstructured model to a
+  structured grid.
+- :class:`imod.msw.Sprinkling` now correctly writes source svats to scap_svat.inp file.
+- :func:`imod.evaluate.calculate_gxg`, upon providing a head dataarray chunked
+  over time, will no longer error with ``ValueError: Object has inconsistent
+  chunks along dimension bimonth. This can be fixed by calling unify_chunks().``
+- Improved performance of regridding package data.
+
+
+Changed
+~~~~~~~
+
+- :class:`imod.msw.Infiltration`'s variables ``upward_resistance`` and
+  ``downward_resistance`` now require a ``subunit`` coordinate.
+- Variables ``max_abstraction_groundwater`` and ``max_abstraction_surfacewater``
+  in :class:`imod.msw.Sprinkling` now needs to have a subunit coordinate.
+- If ``"cap"`` package present in ``imod5_data``,
+  :meth:`imod.mf6.GroundwaterFlowModel.from_imod5_data` now automatically adds a
+  well for metaswap sprinkling named ``"msw-sprinkling"``
+- Less strict validation for :class:`HorizontalFlowBarrierResistance`,
+  :class:`HorizontalFlowBarrierSingleLayerResistance` and other HFB packages for
+  simulations which are imported with
+  :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`
+- DeprecationWarning thrown upon initializing :class:`imod.prepare.Regridder`.
+  We plan to remove this object in the final 1.0 release. `Use the xugrid
+  regridder to regrid individual grids instead.
+  <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_ To
+  regrid entire MODFLOW6 packages or simulations, `see the user guide here.
+  <https://deltares.github.io/imod-python/user_guide/regridding.html>`_.
+
 [0.18.1] - 2024-11-20
 ---------------------
 

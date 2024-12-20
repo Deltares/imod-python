@@ -1,0 +1,6 @@
+﻿imod.mf6.Well.clip\_box
+=======================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: Well.clip_box

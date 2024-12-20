@@ -1,0 +1,6 @@
+﻿imod.mf6.LayeredWell.clip\_box
+==============================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: LayeredWell.clip_box

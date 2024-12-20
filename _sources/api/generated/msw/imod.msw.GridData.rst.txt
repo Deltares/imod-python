@@ -14,6 +14,7 @@
    .. autosummary::
    
       ~GridData.__init__
+      ~GridData.from_imod5_data
       ~GridData.generate_index_array
       ~GridData.get_non_grid_data
       ~GridData.get_regrid_methods

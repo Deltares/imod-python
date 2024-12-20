@@ -1,0 +1,30 @@
+﻿imod.prepare.SimulationDistributingOptions
+==========================================
+
+.. currentmodule:: imod.prepare
+
+.. autoclass:: SimulationDistributingOptions
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SimulationDistributingOptions.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~SimulationDistributingOptions.drn
+      ~SimulationDistributingOptions.ghb
+      ~SimulationDistributingOptions.riv
+   
+   

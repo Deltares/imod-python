@@ -1,0 +1,6 @@
+﻿imod.msw.MetaSwapModel.from\_imod5\_data
+========================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: MetaSwapModel.from_imod5_data

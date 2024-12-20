@@ -1,0 +1,6 @@
+﻿imod.msw.ScalingFactors.from\_imod5\_data
+=========================================
+
+.. currentmodule:: imod.msw
+
+.. automethod:: ScalingFactors.from_imod5_data

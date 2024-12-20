@@ -16,6 +16,7 @@
       ~MetaSwapModel.__init__
       ~MetaSwapModel.clear
       ~MetaSwapModel.copy
+      ~MetaSwapModel.from_imod5_data
       ~MetaSwapModel.fromkeys
       ~MetaSwapModel.get
       ~MetaSwapModel.items

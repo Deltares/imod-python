@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Installing &#8212; iMOD Python 0.18.1 documentation</title>
+    <title>Installing &#8212; iMOD Python 1.0.0b0 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="_static/documentation_options.js?v=1e56ff10"></script>
+    <script src="_static/documentation_options.js?v=ada814e5"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'installation';</script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="iMOD Python: make massive MODFLOW models" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.18.1.dev" />
+  <meta name="docsearch:version" content="1.0.0b0.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 0.18.1 documentation - Home"/>
-    <img src="_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 0.18.1 documentation - Home"/>
+    <img src="_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0b0 documentation - Home"/>
+    <img src="_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0b0 documentation - Home"/>
   
   
 </a></div>
@@ -432,9 +432,45 @@
                   
   <section id="installing">
 <h1>Installing<a class="headerlink" href="#installing" title="Link to this heading">#</a></h1>
+<section id="tl-dr">
+<h2>TL;DR<a class="headerlink" href="#tl-dr" title="Link to this heading">#</a></h2>
+<p>This is for people who are in a hurry and just want to get started. We advice
+you to read the full documentation below if you are new to Python or the Python
+packaging ecosystem.</p>
+<section id="regular-install">
+<h3>Regular install<a class="headerlink" href="#regular-install" title="Link to this heading">#</a></h3>
+<p>Install with pixi:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">add</span> <span class="n">imod</span>
+</pre></div>
+</div>
+<p>Install with conda:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="n">imod</span>
+</pre></div>
+</div>
+<p>Install with pip:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">imod</span>
+</pre></div>
+</div>
+</section>
+<section id="install-beta-release">
+<h3>Install beta release<a class="headerlink" href="#install-beta-release" title="Link to this heading">#</a></h3>
+<p>To install a beta release with pixi:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">add</span> <span class="n">imod</span><span class="o">=</span><span class="mf">1.0.0</span><span class="n">b0</span>
+</pre></div>
+</div>
+<p>Or with conda:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="n">imod</span><span class="o">=</span><span class="mf">1.0.0</span><span class="n">b0</span>
+</pre></div>
+</div>
+<p>Or with pip:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">pre</span> <span class="n">imod</span><span class="o">=</span><span class="mf">1.0.0</span><span class="n">b0</span>
+</pre></div>
+</div>
+</section>
+</section>
 <section id="which-python">
 <h2>Which Python?<a class="headerlink" href="#which-python" title="Link to this heading">#</a></h2>
-<p>You’ll need <strong>Python 3.10 or greater</strong>.</p>
+<p>You’ll need <strong>Python 3.10, 3.11, or 3.12</strong>.</p>
 <p>The recommended way to install Python depends on your experience: Are you new to
 the Python packaging ecosystem or already got experience with it? If you already
 know what <code class="docutils literal notranslate"><span class="pre">conda</span></code> and <code class="docutils literal notranslate"><span class="pre">pip</span></code> are, and are able to install tedious packages
@@ -466,6 +502,100 @@ for “commercial use”, especially if you work in a large organization.</p></l
 <p>Installing Pixi/Mambaforge/Miniforge/Miniconda does not require administrative
 rights to your computer and doesn’t interfere with any other Python
 installations in your system.</p>
+</section>
+</section>
+<section id="ways-to-install-imod-python">
+<h2>Ways to install iMOD Python<a class="headerlink" href="#ways-to-install-imod-python" title="Link to this heading">#</a></h2>
+<section id="installing-with-deltaforge">
+<span id="install-deltaforge"></span><h3>Installing with Deltaforge<a class="headerlink" href="#installing-with-deltaforge" title="Link to this heading">#</a></h3>
+<p>Deltaforge is an installer of Deltares python packages, including iMOD Python,
+and their dependencies. This makes it possible to install iMOD Python without
+much knowledge about the Python package management system. The download links
+are listed <a class="reference external" href="https://deltares.github.io/deltaforge/index.html#where">here.</a>
+Users new to the python package ecosystem are recommended to install iMOD Python
+using Deltaforge.</p>
+</section>
+<section id="installing-with-pixi">
+<h3>Installing with pixi<a class="headerlink" href="#installing-with-pixi" title="Link to this heading">#</a></h3>
+<p>Pixi supports creating reproducible projects, where all dependencies’ versions
+in an environment are stored in a textfile, the “lockfile”. On top of that, it
+is faster than other package managers. Installing with pixi is fast and easy:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">init</span> <span class="n">my_project</span>
+<span class="n">cd</span> <span class="n">my_project</span>
+<span class="n">pixi</span> <span class="n">add</span> <span class="n">imod</span>
+</pre></div>
+</div>
+<p>These commands create a <code class="docutils literal notranslate"><span class="pre">pixi.toml</span></code> and a <code class="docutils literal notranslate"><span class="pre">pixi.lock</span></code>. The <code class="docutils literal notranslate"><span class="pre">pixi.toml</span></code>
+contains the dependencies of your project. If you followed the commands above,
+the only dependency present in the toml should be <code class="docutils literal notranslate"><span class="pre">imod</span></code>. The <code class="docutils literal notranslate"><span class="pre">pixi.lock</span></code> is
+a textfile that captures the environment in a specific state, so all
+dependencies, with their dependencies and so on, with exact version numbers.
+This is very useful, as it allows you to get the exact same environment on a
+different machine, by just copying two textfiles. The lockfile will be updated
+if you run <code class="docutils literal notranslate"><span class="pre">pixi</span> <span class="pre">update</span></code> or change the <code class="docutils literal notranslate"><span class="pre">pixi.toml</span></code> file. Both the
+<code class="docutils literal notranslate"><span class="pre">pixi.toml</span></code> as well as the <code class="docutils literal notranslate"><span class="pre">pixi.lock</span></code> are required to fully reproduce an
+environment.</p>
+<p>You can start your favorite editor, e.g. VSCode, in this environment directly by
+running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">run</span> <span class="n">code</span>
+</pre></div>
+</div>
+</section>
+<section id="installing-with-conda">
+<h3>Installing with conda<a class="headerlink" href="#installing-with-conda" title="Link to this heading">#</a></h3>
+<p>Alternatively, you can also use the <a class="reference external" href="https://docs.conda.io/en/latest/">conda package manager</a>. We advice to
+install <code class="docutils literal notranslate"><span class="pre">imod</span></code> in a seperate <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment, as you can simply delete
+these in case they break. Not doing so will install imod and its dependencies in
+your base environment, which requires a reinstall of Miniforge in case this
+environment breaks:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">imodenv</span>
+<span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">n</span> <span class="n">imodenv</span> <span class="n">imod</span> <span class="o">--</span><span class="n">channel</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">conda</span></code> will automatically find the appropriate versions of the dependencies
+and in this case install them in the <code class="docutils literal notranslate"><span class="pre">imodenv</span></code> environment. Installing with
+conda will automatically download <em>all</em> optional dependencies, and
+enable all functionality.</p>
+<p>To run scripts using <code class="docutils literal notranslate"><span class="pre">imod</span></code>, you first have to activate the <code class="docutils literal notranslate"><span class="pre">imodenv</span></code>
+environment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">activate</span> <span class="n">imodenv</span>
+</pre></div>
+</div>
+<p>You can start your favorite editor, e.g. VSCode in this environment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">code</span>
+</pre></div>
+</div>
+</section>
+<section id="installing-with-pip">
+<h3>Installing with pip<a class="headerlink" href="#installing-with-pip" title="Link to this heading">#</a></h3>
+<p>Finally, you can also use the <a class="reference external" href="https://pypi.org/project/pip/">pip package manager</a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">imod</span>
+</pre></div>
+</div>
+<p>Unlike installing with conda, installing with pip will not install
+all optional dependencies. This results in a far smaller installation, but
+it means that not all functionality is directly available.</p>
+<p>Refer to <a class="reference internal" href="faq/python.html"><span class="doc">Installing Python and packages</span></a> in the FAQ section for background
+information on <code class="docutils literal notranslate"><span class="pre">conda</span></code>, and <code class="docutils literal notranslate"><span class="pre">pip</span></code>.</p>
+</section>
+<section id="installing-the-latest-development-version">
+<h3>Installing the latest development version<a class="headerlink" href="#installing-the-latest-development-version" title="Link to this heading">#</a></h3>
+<p>With pixi you can install the latest development version of imod:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">Deltares</span><span class="o">/</span><span class="n">imod</span><span class="o">-</span><span class="n">python</span><span class="o">.</span><span class="n">git</span>
+<span class="n">cd</span> <span class="n">imod</span><span class="o">-</span><span class="n">python</span>
+<span class="n">pixi</span> <span class="n">run</span> <span class="n">install</span>
+</pre></div>
+</div>
+<p>This will install the same python installation the iMOD Python developers work
+with, so it should work (otherwise we couldn’t do our work!). This contains an
+interactive environment with Jupyter:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">shell</span> <span class="o">-</span><span class="n">e</span> <span class="n">interactive</span>
+</pre></div>
+</div>
+<p>Alternatively, you can use <code class="docutils literal notranslate"><span class="pre">pip</span></code> to install the latest source from GitHub:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">git</span><span class="o">+</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">Deltares</span><span class="o">/</span><span class="n">imod</span><span class="o">-</span><span class="n">python</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
 </section>
 </section>
 <section id="dependencies">
@@ -507,89 +637,6 @@ ecosystem. The most important dependencies are listed here.</p>
 <p>Installing all these dependencies requires around 2.5 gigabyte of space;
 Installing only the required dependencies (via pip) requires around 0.5
 gigabyte.</p>
-</section>
-<section id="ways-to-install-imod-python">
-<h2>Ways to install iMOD Python<a class="headerlink" href="#ways-to-install-imod-python" title="Link to this heading">#</a></h2>
-<section id="installing-with-deltaforge">
-<span id="install-deltaforge"></span><h3>Installing with Deltaforge<a class="headerlink" href="#installing-with-deltaforge" title="Link to this heading">#</a></h3>
-<p>Deltaforge is an installer of Deltares python packages, including iMOD Python,
-and their dependencies. This makes it possible to install iMOD Python without
-much knowledge about the Python package management system. The download links
-are listed <a class="reference external" href="https://deltares.github.io/deltaforge/index.html#where">here.</a>
-Users new to the python package ecosystem are recommended to install iMOD Python
-using Deltaforge.</p>
-</section>
-<section id="installing-with-pixi">
-<h3>Installing with pixi<a class="headerlink" href="#installing-with-pixi" title="Link to this heading">#</a></h3>
-<p>Pixi supports creating reproducible projects, where all dependencies’ versions
-in an environment are stored in a textfile, the “lockfile”. On top of that, it
-is faster than other package managers. Installing with pixi is fast and easy:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">init</span> <span class="n">my_project</span>
-<span class="n">cd</span> <span class="n">my_project</span>
-<span class="n">pixi</span> <span class="n">add</span> <span class="n">imod</span>
-</pre></div>
-</div>
-<p>You can activate your environment using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pixi</span> <span class="n">shell</span>
-</pre></div>
-</div>
-<p>These commands create a <code class="docutils literal notranslate"><span class="pre">pixi.toml</span></code> and a <code class="docutils literal notranslate"><span class="pre">pixi.lock</span></code>. The <code class="docutils literal notranslate"><span class="pre">pixi.toml</span></code>
-contains the dependencies of your project. If you followed the commands above,
-the only dependency present in the toml should be <code class="docutils literal notranslate"><span class="pre">imod</span></code>. The <code class="docutils literal notranslate"><span class="pre">pixi.lock</span></code> is
-a textfile that captures the environment in a specific state, so all
-dependencies, with their dependencies and so on, with exact version numbers.
-This is very useful, as it allows you to get the exact same environment on a
-different machine, by just copying two textfiles. The lockfile will be updated
-if you run <code class="docutils literal notranslate"><span class="pre">pixi</span> <span class="pre">update</span></code> or change the <code class="docutils literal notranslate"><span class="pre">pixi.toml</span></code> file. Both the
-<code class="docutils literal notranslate"><span class="pre">pixi.toml</span></code> as well as the <code class="docutils literal notranslate"><span class="pre">pixi.lock</span></code> are required to fully reproduce an
-environment.</p>
-</section>
-<section id="installing-with-conda">
-<h3>Installing with conda<a class="headerlink" href="#installing-with-conda" title="Link to this heading">#</a></h3>
-<p>Alternatively, you can also use the <a class="reference external" href="https://docs.conda.io/en/latest/">conda package manager</a>. We advice to
-install <code class="docutils literal notranslate"><span class="pre">imod</span></code> in a seperate <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment, as you can simply delete
-these in case they break. Not doing so will install imod and its dependencies in
-your base environment, which requires a reinstall of Miniforge in case this
-environment breaks:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">imodenv</span>
-<span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">n</span> <span class="n">imodenv</span> <span class="n">imod</span> <span class="o">--</span><span class="n">channel</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
-</pre></div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">conda</span></code> will automatically find the appropriate versions of the dependencies
-and in this case install them in the <code class="docutils literal notranslate"><span class="pre">imodenv</span></code> environment. Installing with
-conda will automatically download <em>all</em> optional dependencies, and
-enable all functionality.</p>
-<p>To run scripts using <code class="docutils literal notranslate"><span class="pre">imod</span></code>, you first have to activate the <code class="docutils literal notranslate"><span class="pre">imodenv</span></code>
-environment:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">activate</span> <span class="n">imodenv</span>
-</pre></div>
-</div>
-</section>
-<section id="installing-with-pip">
-<h3>Installing with pip<a class="headerlink" href="#installing-with-pip" title="Link to this heading">#</a></h3>
-<p>Finally, you can also use the <a class="reference external" href="https://pypi.org/project/pip/">pip package manager</a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">imod</span>
-</pre></div>
-</div>
-<p>Unlike installing with conda, installing with pip will not install
-all optional dependencies. This results in a far smaller installation, but
-it means that not all functionality is directly available.</p>
-<p>Refer to <a class="reference internal" href="faq/python.html"><span class="doc">Installing Python and packages</span></a> in the FAQ section for background
-information on <code class="docutils literal notranslate"><span class="pre">conda</span></code>, and <code class="docutils literal notranslate"><span class="pre">pip</span></code>.</p>
-</section>
-<section id="installing-the-latest-development-version">
-<h3>Installing the latest development version<a class="headerlink" href="#installing-the-latest-development-version" title="Link to this heading">#</a></h3>
-<p>You can use <code class="docutils literal notranslate"><span class="pre">pip</span></code> to install the latest source from GitHub:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">git</span><span class="o">+</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">Deltares</span><span class="o">/</span><span class="n">imod</span><span class="o">-</span><span class="n">python</span><span class="o">.</span><span class="n">git</span>
-</pre></div>
-</div>
-<p>Alternatively, you can clone the git repository locally and install from there:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">Deltares</span><span class="o">/</span><span class="n">imod</span><span class="o">-</span><span class="n">python</span><span class="o">.</span><span class="n">git</span>
-<span class="n">cd</span> <span class="n">imod</span><span class="o">-</span><span class="n">python</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="o">.</span>
-</pre></div>
-</div>
-</section>
 </section>
 </section>
 
@@ -640,12 +687,16 @@ information on <code class="docutils literal notranslate"><span class="pre">cond
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tl-dr">TL;DR</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#regular-install">Regular install</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#install-beta-release">Install beta release</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#which-python">Which Python?</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#new">New</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#experienced">Experienced</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencies">Dependencies</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ways-to-install-imod-python">Ways to install iMOD Python</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-with-deltaforge">Installing with Deltaforge</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-with-pixi">Installing with pixi</a></li>
@@ -654,6 +705,7 @@ information on <code class="docutils literal notranslate"><span class="pre">cond
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-the-latest-development-version">Installing the latest development version</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencies">Dependencies</a></li>
 </ul>
   </nav></div>
 

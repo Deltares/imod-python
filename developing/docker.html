@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Docker build image &#8212; iMOD Python 0.18.1 documentation</title>
+    <title>Docker build image &#8212; iMOD Python 1.0.0b0 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="../_static/documentation_options.js?v=1e56ff10"></script>
+    <script src="../_static/documentation_options.js?v=ada814e5"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'developing/docker';</script>
@@ -52,7 +52,7 @@
     <link rel="prev" title="How to release a new version" href="releasing.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.18.1.dev" />
+  <meta name="docsearch:version" content="1.0.0b0.dev" />
   </head>
   
   
@@ -116,8 +116,8 @@
     
     
     
-    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 0.18.1 documentation - Home"/>
-    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 0.18.1 documentation - Home"/>
+    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0b0 documentation - Home"/>
+    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0b0 documentation - Home"/>
   
   
 </a></div>
@@ -458,7 +458,7 @@ Furthermore we can also easily debug a failing build by running the container lo
 <span class="k">FROM</span><span class="w"> </span><span class="s">mcr.microsoft.com/windows/server:ltsc2022</span>
 <span class="k">LABEL</span><span class="w"> </span><span class="nv">maintainer</span><span class="o">=</span><span class="s2">&quot;sunny.titus@deltares.nl&quot;</span>
 
-<span class="k">ARG</span><span class="w"> </span><span class="nv">PIXI_VERSION</span><span class="o">=</span>v0.34.0
+<span class="k">ARG</span><span class="w"> </span><span class="nv">PIXI_VERSION</span><span class="o">=</span>v0.39.2
 
 <span class="c">## Setup user</span>
 <span class="k">USER</span><span class="w"> </span><span class="s">&quot;NT Authority\System&quot;</span>
@@ -492,7 +492,7 @@ Furthermore we can also easily debug a failing build by running the container lo
 Once installed open a console and navigate to the folder where the dockerfile resides.</p>
 <p>To build the image:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">docker context use desktop-windows</span>
-<span class="go">docker build -t windows-pixi:34.0 . -m 2GB</span>
+<span class="go">docker build -t windows-pixi:v0.34.0 . -m 2GB</span>
 </pre></div>
 </div>
 <p>The image tag is not randomly chosen. It matches the Pixi version shipped with the image. So make sure the tag equals the version inside the dockerfile.</p>
@@ -511,8 +511,8 @@ To connect you need your email address and your cli secret. The secret can be fo
 </pre></div>
 </div>
 <p>After you connected to the registry you can tag and push your image:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">docker tag windows-pixi:34.0 containers.deltares.nl/hydrology_product_line_imod/windows-pixi:34.0</span>
-<span class="go">docker push containers.deltares.nl/hydrology_product_line_imod/windows-pixi:34.0</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">docker tag windows-pixi:v0.34.0 containers.deltares.nl/hydrology_product_line_imod/windows-pixi:v0.34.0</span>
+<span class="go">docker push containers.deltares.nl/hydrology_product_line_imod/windows-pixi:v0.34.0</span>
 </pre></div>
 </div>
 <p>Again, make sure the tags match the <code class="docutils literal notranslate"><span class="pre">PIXI_VERSION</span></code> inside the dockerfile.</p>

@@ -1,0 +1,6 @@
+﻿imod.mf6.StorageCoefficient.clip\_box
+=====================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: StorageCoefficient.clip_box

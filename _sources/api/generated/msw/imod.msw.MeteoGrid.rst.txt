@@ -15,6 +15,7 @@
    
       ~MeteoGrid.__init__
       ~MeteoGrid.check_string_lengths
+      ~MeteoGrid.from_imod5_data
       ~MeteoGrid.get_non_grid_data
       ~MeteoGrid.get_regrid_methods
       ~MeteoGrid.is_regridding_supported

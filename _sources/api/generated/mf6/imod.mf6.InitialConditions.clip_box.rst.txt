@@ -1,0 +1,6 @@
+﻿imod.mf6.InitialConditions.clip\_box
+====================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: InitialConditions.clip_box

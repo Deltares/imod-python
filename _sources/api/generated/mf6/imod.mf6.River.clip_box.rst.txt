@@ -1,0 +1,6 @@
+﻿imod.mf6.River.clip\_box
+========================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: River.clip_box

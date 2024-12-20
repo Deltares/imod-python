@@ -1,0 +1,38 @@
+﻿imod.msw.MeteoGridCopy
+======================
+
+.. currentmodule:: imod.msw
+
+.. autoclass:: MeteoGridCopy
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MeteoGridCopy.__init__
+      ~MeteoGridCopy.from_imod5_data
+      ~MeteoGridCopy.get_non_grid_data
+      ~MeteoGridCopy.get_regrid_methods
+      ~MeteoGridCopy.is_regridding_supported
+      ~MeteoGridCopy.isel
+      ~MeteoGridCopy.regrid_like
+      ~MeteoGridCopy.sel
+      ~MeteoGridCopy.write
+      ~MeteoGridCopy.write_dataframe_fixed_width
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~MeteoGridCopy.auxiliary_data_fields
+      ~MeteoGridCopy.dataset
+   
+   

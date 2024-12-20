@@ -14,6 +14,7 @@
    .. autosummary::
    
       ~IdfMapping.__init__
+      ~IdfMapping.from_imod5_data
       ~IdfMapping.get_non_grid_data
       ~IdfMapping.get_output_settings
       ~IdfMapping.get_regrid_methods

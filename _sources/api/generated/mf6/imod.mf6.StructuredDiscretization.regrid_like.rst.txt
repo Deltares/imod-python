@@ -1,0 +1,6 @@
+﻿imod.mf6.StructuredDiscretization.regrid\_like
+==============================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: StructuredDiscretization.regrid_like

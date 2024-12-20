@@ -18,6 +18,7 @@
       ~LayeredWell.clip_box
       ~LayeredWell.copy
       ~LayeredWell.from_file
+      ~LayeredWell.from_imod5_cap_data
       ~LayeredWell.from_imod5_data
       ~LayeredWell.gather_filtered_well_ids
       ~LayeredWell.get_non_grid_data

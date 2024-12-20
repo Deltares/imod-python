@@ -1,0 +1,6 @@
+﻿imod.mf6.LayeredWell.from\_imod5\_cap\_data
+===========================================
+
+.. currentmodule:: imod.mf6
+
+.. automethod:: LayeredWell.from_imod5_cap_data

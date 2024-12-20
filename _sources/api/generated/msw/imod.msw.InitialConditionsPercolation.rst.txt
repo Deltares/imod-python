@@ -14,6 +14,7 @@
    .. autosummary::
    
       ~InitialConditionsPercolation.__init__
+      ~InitialConditionsPercolation.from_imod5_data
       ~InitialConditionsPercolation.get_non_grid_data
       ~InitialConditionsPercolation.get_regrid_methods
       ~InitialConditionsPercolation.is_regridding_supported

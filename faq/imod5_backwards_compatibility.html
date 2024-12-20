@@ -1,0 +1,1083 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>iMOD5 backwards compatibility &#8212; iMOD Python 1.0.0b0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+
+    <script src="../_static/documentation_options.js?v=ada814e5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'faq/imod5_backwards_compatibility';</script>
+    <script src="../_static/deltares.js?v=8d5578be"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Developing" href="../developing/index.html" />
+    <link rel="prev" title="Known Issues" href="known-issues.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="1.0.0b0.dev" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0b0 documentation - Home"/>
+    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0b0 documentation - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user-guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    FAQ
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../developing/index.html">
+    Developing
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-deltares fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Deltares</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user-guide/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    FAQ
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../developing/index.html">
+    Developing
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-deltares fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Deltares</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/imod-python" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fab fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="general.html">General Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how-do-i/index.html">How do I …</a></li>
+<li class="toctree-l1"><a class="reference internal" href="python.html">Installing Python and packages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modeling.html">Groundwater Modeling with iMOD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="known-issues.html">Known Issues</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">iMOD5 backwards compatibility</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">FAQ</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">iMOD5 backwards compatibility</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="imod5-backwards-compatibility">
+<h1>iMOD5 backwards compatibility<a class="headerlink" href="#imod5-backwards-compatibility" title="Link to this heading">#</a></h1>
+<p>iMOD Python tries to be as backwards compatible with iMOD5 as our resources
+allow. Below you can find some known issues, notes, and more detailed tables
+with the status of support for important iMOD5 features. If you miss an
+important feature or run into any issues, <a class="reference external" href="https://github.com/Deltares/imod-python/issues">feel free to open an issue on our
+issueboard</a>.</p>
+<section id="known-issues">
+<h2>Known issues<a class="headerlink" href="#known-issues" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Constants are only supported for the CAP package. For other packages, the
+constants will cause an error.</p></li>
+<li><p>ISG files cannot be read directly. The workaround is to rasterize the ISG
+files to IDF files using the iMOD5 BATCH function ISGGRID.</p></li>
+<li><p>MetaSWAP sprinkling wells defined as IPF files are not supported.</p></li>
+<li><p>MetaSWAP’s “flexible drainage” (“Peilgestuurde drainage” in Dutch) is not
+supported.</p></li>
+<li><p>IPEST is not supported.</p></li>
+</ul>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>if STO package in projectfile is absent, an error is thrown when trying to write
+the <a class="reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.html#imod.mf6.Modflow6Simulation" title="imod.mf6.Modflow6Simulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation</span></code></a> object to disk. This is due to the
+fact that the STO package is mandatory in iMOD Python. A workaround is to add a
+<a class="reference internal" href="../api/generated/mf6/imod.mf6.StorageCoefficient.html#imod.mf6.StorageCoefficient" title="imod.mf6.StorageCoefficient"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.StorageCoefficient</span></code></a> package to the projectfile before calling
+<a class="reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.write.html#imod.mf6.Modflow6Simulation.write" title="imod.mf6.Modflow6Simulation.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.write()</span></code></a>.</p></li>
+<li><p>When importing models with the ANI package, make sure to activate the “XT3D”
+in the NodePropertyFlow package of the model.</p></li>
+<li><p>Solver settings (PCG) are NOT imported from iMOD5, instead a solver settings
+preset from MODFLOW6 (“Moderate”) is set. This is because the solvers between
+iMODLFOW and MODFLOW6 are different. You are advised to test settings
+yourself.</p></li>
+<li><p>The imported iMOD5 discretization for the model is created by taking the
+smallest grid and finest resolution amongst the TOP, BOT, and BND grids. This
+differs from iMOD5, where the first BND grid is used as target grid. All input
+grids are regridded towards this target grid. Therefore, be careful when you
+have a very fine resolution in one of these packages.</p></li>
+</ul>
+</section>
+<section id="files">
+<h2>Files<a class="headerlink" href="#files" title="Link to this heading">#</a></h2>
+<p>Here an overview of iMOD5 files supported:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>iMOD5 file</p></th>
+<th class="head"><p>iMOD Python function</p></th>
+<th class="head"><p>Workaround</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Open projectfile data (.prj)</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a>, <a class="reference internal" href="../api/generated/io/imod.formats.prj.read_projectfile.html#imod.formats.prj.read_projectfile" title="imod.formats.prj.read_projectfile"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.read_projectfile()</span></code></a></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Open runfile data (.run)</p></td>
+<td></td>
+<td><p>Convert to <code class="docutils literal notranslate"><span class="pre">.prj</span></code> file with iMOD5 BATCH function RUNFILE</p></td>
+</tr>
+<tr class="row-even"><td><p>Open point data (.ipf)</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.ipf.read.html#imod.formats.ipf.read" title="imod.formats.ipf.read"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.ipf.read()</span></code></a></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Save point data (.ipf)</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.ipf.save.html#imod.formats.ipf.save" title="imod.formats.ipf.save"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.ipf.save()</span></code></a></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Open raster data (.idf)</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.idf.open.html#imod.formats.idf.open" title="imod.formats.idf.open"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.idf.open()</span></code></a></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Save raster data (.idf)</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.idf.save.html#imod.formats.idf.save" title="imod.formats.idf.save"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.idf.save()</span></code></a></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Open vector data: 2D &amp; 3D (.gen)</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.gen.read.html#imod.formats.gen.read" title="imod.formats.gen.read"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.gen.read()</span></code></a></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Save vector data (.gen)</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.gen.write.html#imod.formats.gen.write" title="imod.formats.gen.write"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.gen.write()</span></code></a></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Open 1D network data (.isg)</p></td>
+<td></td>
+<td><p>Rasterize to <code class="docutils literal notranslate"><span class="pre">.idf</span></code> files with iMOD5 BATCH function ISGGRID</p></td>
+</tr>
+<tr class="row-odd"><td><p>Open raster data (.asc)</p></td>
+<td><p><a class="reference internal" href="../api/generated/io/imod.formats.rasterio.open.html#imod.formats.rasterio.open" title="imod.formats.rasterio.open"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.rasterio.open()</span></code></a></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Open legend file (.leg)</p></td>
+<td><p><a class="reference internal" href="../api/generated/visualize/imod.visualize.read_imod_legend.html#imod.visualize.read_imod_legend" title="imod.visualize.read_imod_legend"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.visualize.read_imod_legend()</span></code></a></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="modflow6">
+<h2>MODFLOW6<a class="headerlink" href="#modflow6" title="Link to this heading">#</a></h2>
+<p>Here an overview of iMOD5 MODFLOW6 features:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>iMOD5 pkg</p></th>
+<th class="head"><p>functionality</p></th>
+<th class="head"><p>iMOD Python function/method</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><em>Model</em></p></td>
+<td><p>From iMOD5 data</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.from_imod5_data.html#imod.mf6.Modflow6Simulation.from_imod5_data" title="imod.mf6.Modflow6Simulation.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><em>Model</em></p></td>
+<td><p>Regrid</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.regrid_like.html#imod.mf6.Modflow6Simulation.regrid_like" title="imod.mf6.Modflow6Simulation.regrid_like"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.regrid_like()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p><em>Model</em></p></td>
+<td><p>Clip</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.clip_box.html#imod.mf6.Modflow6Simulation.clip_box" title="imod.mf6.Modflow6Simulation.clip_box"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.clip_box()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><em>Model</em></p></td>
+<td><p>Validate</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.write.html#imod.mf6.Modflow6Simulation.write" title="imod.mf6.Modflow6Simulation.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.write()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>BND</p></td>
+<td><p>IBOUND to IDOMAIN</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.StructuredDiscretization.from_imod5_data.html#imod.mf6.StructuredDiscretization.from_imod5_data" title="imod.mf6.StructuredDiscretization.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.StructuredDiscretization.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>BND, TOP, BOT</p></td>
+<td><p>Import from grid (IDF)</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.StructuredDiscretization.from_imod5_data.html#imod.mf6.StructuredDiscretization.from_imod5_data" title="imod.mf6.StructuredDiscretization.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.StructuredDiscretization.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>BND, TOP, BOT</p></td>
+<td><p>Align iMOD5 input grids</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.StructuredDiscretization.from_imod5_data.html#imod.mf6.StructuredDiscretization.from_imod5_data" title="imod.mf6.StructuredDiscretization.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.StructuredDiscretization.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>BND, TOP, BOT</p></td>
+<td><p>Regrid</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.StructuredDiscretization.regrid_like.html#imod.mf6.StructuredDiscretization.regrid_like" title="imod.mf6.StructuredDiscretization.regrid_like"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.StructuredDiscretization.regrid_like()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>BND, TOP, BOT</p></td>
+<td><p>Clip</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.StructuredDiscretization.clip_box.html#imod.mf6.StructuredDiscretization.clip_box" title="imod.mf6.StructuredDiscretization.clip_box"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.StructuredDiscretization.clip_box()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>BND, SHD</p></td>
+<td><p>set constant heads starting head (IBOUND = -1)</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.ConstantHead.from_imod5_shd_data.html#imod.mf6.ConstantHead.from_imod5_shd_data" title="imod.mf6.ConstantHead.from_imod5_shd_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.ConstantHead.from_imod5_shd_data()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>BND, CHD</p></td>
+<td><p>set constant heads (IBOUND = -1)</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.ConstantHead.from_imod5_data.html#imod.mf6.ConstantHead.from_imod5_data" title="imod.mf6.ConstantHead.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.ConstantHead.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>KDW, VCW, KVV, THK</p></td>
+<td><p>Quasi-3D permeability from grid (IDF)</p></td>
+<td><p>Quasi-3D is only supported by MODFLOW2005. MODFLOW6 requires fully 3D.</p></td>
+</tr>
+<tr class="row-even"><td><p>KHV, KVA</p></td>
+<td><p>3D permeability from grid (IDF)</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.NodePropertyFlow.from_imod5_data.html#imod.mf6.NodePropertyFlow.from_imod5_data" title="imod.mf6.NodePropertyFlow.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.NodePropertyFlow.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>ANI</p></td>
+<td><p>Set horizontal anistropy</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.NodePropertyFlow.from_imod5_data.html#imod.mf6.NodePropertyFlow.from_imod5_data" title="imod.mf6.NodePropertyFlow.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.NodePropertyFlow.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>KHV, KVA, ANI</p></td>
+<td><p>Align iMOD5 input grids</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.NodePropertyFlow.from_imod5_data.html#imod.mf6.NodePropertyFlow.from_imod5_data" title="imod.mf6.NodePropertyFlow.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.NodePropertyFlow.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>KHV, KVA, ANI</p></td>
+<td><p>Regrid</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.NodePropertyFlow.regrid_like.html#imod.mf6.NodePropertyFlow.regrid_like" title="imod.mf6.NodePropertyFlow.regrid_like"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.NodePropertyFlow.regrid_like()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>KHV, KVA, ANI</p></td>
+<td><p>Clip</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.NodePropertyFlow.clip_box.html#imod.mf6.NodePropertyFlow.clip_box" title="imod.mf6.NodePropertyFlow.clip_box"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.NodePropertyFlow.clip_box()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>STO, SPY</p></td>
+<td><p>From grid (IDF)</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.StorageCoefficient.from_imod5_data.html#imod.mf6.StorageCoefficient.from_imod5_data" title="imod.mf6.StorageCoefficient.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.StorageCoefficient.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>STO, SPY</p></td>
+<td><p>Regrid</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.StorageCoefficient.regrid_like.html#imod.mf6.StorageCoefficient.regrid_like" title="imod.mf6.StorageCoefficient.regrid_like"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.StorageCoefficient.regrid_like()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>STO, SPY</p></td>
+<td><p>Clip</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.StorageCoefficient.clip_box.html#imod.mf6.StorageCoefficient.clip_box" title="imod.mf6.StorageCoefficient.clip_box"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.StorageCoefficient.clip_box()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>RCH</p></td>
+<td><p>From grid (IDF)</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Recharge.from_imod5_data.html#imod.mf6.Recharge.from_imod5_data" title="imod.mf6.Recharge.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Recharge.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>RCH</p></td>
+<td><p>Regrid</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Recharge.regrid_like.html#imod.mf6.Recharge.regrid_like" title="imod.mf6.Recharge.regrid_like"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Recharge.regrid_like()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>RCH</p></td>
+<td><p>Clip</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Recharge.clip_box.html#imod.mf6.Recharge.clip_box" title="imod.mf6.Recharge.clip_box"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Recharge.clip_box()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>CHD</p></td>
+<td><p>From grid (IDF)</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.ConstantHead.from_imod5_data.html#imod.mf6.ConstantHead.from_imod5_data" title="imod.mf6.ConstantHead.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.ConstantHead.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>CHD</p></td>
+<td><p>Regrid</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.ConstantHead.regrid_like.html#imod.mf6.ConstantHead.regrid_like" title="imod.mf6.ConstantHead.regrid_like"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.ConstantHead.regrid_like()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>CHD</p></td>
+<td><p>Clip</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.ConstantHead.clip_box.html#imod.mf6.ConstantHead.clip_box" title="imod.mf6.ConstantHead.clip_box"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.ConstantHead.clip_box()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>GHB</p></td>
+<td><p>Auto placement (IDEFLAYER)</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.GeneralHeadBoundary.from_imod5_data.html#imod.mf6.GeneralHeadBoundary.from_imod5_data" title="imod.mf6.GeneralHeadBoundary.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.GeneralHeadBoundary.from_imod5_data()</span></code></a>, <a class="reference internal" href="../api/generated/prepare/imod.prepare.allocate_ghb_cells.html#imod.prepare.allocate_ghb_cells" title="imod.prepare.allocate_ghb_cells"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.prepare.allocate_ghb_cells()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>GHB</p></td>
+<td><p>Distribute conductances (DISTRCOND)</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.GeneralHeadBoundary.from_imod5_data.html#imod.mf6.GeneralHeadBoundary.from_imod5_data" title="imod.mf6.GeneralHeadBoundary.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.GeneralHeadBoundary.from_imod5_data()</span></code></a>, <a class="reference internal" href="../api/generated/prepare/imod.prepare.distribute_ghb_conductance.html#imod.prepare.distribute_ghb_conductance" title="imod.prepare.distribute_ghb_conductance"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.prepare.distribute_ghb_conductance()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>GHB</p></td>
+<td><p>Cleanup</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.GeneralHeadBoundary.cleanup.html#imod.mf6.GeneralHeadBoundary.cleanup" title="imod.mf6.GeneralHeadBoundary.cleanup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.GeneralHeadBoundary.cleanup()</span></code></a>, <a class="reference internal" href="../api/generated/prepare/imod.prepare.cleanup_ghb.html#imod.prepare.cleanup_ghb" title="imod.prepare.cleanup_ghb"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.prepare.cleanup_ghb()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>GHB</p></td>
+<td><p>From grid (IDF)</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.GeneralHeadBoundary.from_imod5_data.html#imod.mf6.GeneralHeadBoundary.from_imod5_data" title="imod.mf6.GeneralHeadBoundary.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.GeneralHeadBoundary.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>GHB</p></td>
+<td><p>Align iMOD5 input grids</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.GeneralHeadBoundary.from_imod5_data.html#imod.mf6.GeneralHeadBoundary.from_imod5_data" title="imod.mf6.GeneralHeadBoundary.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.GeneralHeadBoundary.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>GHB</p></td>
+<td><p>Regrid</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.GeneralHeadBoundary.regrid_like.html#imod.mf6.GeneralHeadBoundary.regrid_like" title="imod.mf6.GeneralHeadBoundary.regrid_like"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.GeneralHeadBoundary.regrid_like()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>GHB</p></td>
+<td><p>Clip</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.GeneralHeadBoundary.clip_box.html#imod.mf6.GeneralHeadBoundary.clip_box" title="imod.mf6.GeneralHeadBoundary.clip_box"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.GeneralHeadBoundary.clip_box()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>DRN</p></td>
+<td><p>Auto placement (IDEFLAYER)</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Drainage.from_imod5_data.html#imod.mf6.Drainage.from_imod5_data" title="imod.mf6.Drainage.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Drainage.from_imod5_data()</span></code></a>, <a class="reference internal" href="../api/generated/prepare/imod.prepare.allocate_drn_cells.html#imod.prepare.allocate_drn_cells" title="imod.prepare.allocate_drn_cells"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.prepare.allocate_drn_cells()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>DRN</p></td>
+<td><p>Distribute conductances (DISTRCOND)</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Drainage.from_imod5_data.html#imod.mf6.Drainage.from_imod5_data" title="imod.mf6.Drainage.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Drainage.from_imod5_data()</span></code></a>, <a class="reference internal" href="../api/generated/prepare/imod.prepare.distribute_drn_conductance.html#imod.prepare.distribute_drn_conductance" title="imod.prepare.distribute_drn_conductance"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.prepare.distribute_drn_conductance()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>DRN</p></td>
+<td><p>Cleanup</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Drainage.cleanup.html#imod.mf6.Drainage.cleanup" title="imod.mf6.Drainage.cleanup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Drainage.cleanup()</span></code></a>, <a class="reference internal" href="../api/generated/prepare/imod.prepare.cleanup_drn.html#imod.prepare.cleanup_drn" title="imod.prepare.cleanup_drn"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.prepare.cleanup_drn()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>DRN</p></td>
+<td><p>From grid (IDF)</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Drainage.from_imod5_data.html#imod.mf6.Drainage.from_imod5_data" title="imod.mf6.Drainage.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Drainage.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>DRN</p></td>
+<td><p>Align iMOD5 input grids</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Drainage.from_imod5_data.html#imod.mf6.Drainage.from_imod5_data" title="imod.mf6.Drainage.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Drainage.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>DRN</p></td>
+<td><p>Regrid</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Drainage.regrid_like.html#imod.mf6.Drainage.regrid_like" title="imod.mf6.Drainage.regrid_like"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Drainage.regrid_like()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>DRN</p></td>
+<td><p>Clip</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Drainage.clip_box.html#imod.mf6.Drainage.clip_box" title="imod.mf6.Drainage.clip_box"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Drainage.clip_box()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>RIV</p></td>
+<td><p>Infiltration factors (IFF)</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.River.from_imod5_data.html#imod.mf6.River.from_imod5_data" title="imod.mf6.River.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.River.from_imod5_data()</span></code></a>, <a class="reference internal" href="../api/generated/mf6/imod.mf6.River.split_conductance.html#imod.mf6.River.split_conductance" title="imod.mf6.River.split_conductance"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.River.split_conductance()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>RIV</p></td>
+<td><p>Auto placement (IDEFLAYER)</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.River.from_imod5_data.html#imod.mf6.River.from_imod5_data" title="imod.mf6.River.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.River.from_imod5_data()</span></code></a>, <a class="reference internal" href="../api/generated/prepare/imod.prepare.allocate_riv_cells.html#imod.prepare.allocate_riv_cells" title="imod.prepare.allocate_riv_cells"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.prepare.allocate_riv_cells()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>RIV</p></td>
+<td><p>Distribute conductances (DISTRCOND)</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.River.from_imod5_data.html#imod.mf6.River.from_imod5_data" title="imod.mf6.River.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.River.from_imod5_data()</span></code></a>, <a class="reference internal" href="../api/generated/prepare/imod.prepare.distribute_riv_conductance.html#imod.prepare.distribute_riv_conductance" title="imod.prepare.distribute_riv_conductance"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.prepare.distribute_riv_conductance()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>RIV</p></td>
+<td><p>Cleanup</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.River.cleanup.html#imod.mf6.River.cleanup" title="imod.mf6.River.cleanup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.River.cleanup()</span></code></a>, <a class="reference internal" href="../api/generated/prepare/imod.prepare.cleanup_riv.html#imod.prepare.cleanup_riv" title="imod.prepare.cleanup_riv"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.prepare.cleanup_riv()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>RIV</p></td>
+<td><p>From grid (IDF)</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.River.from_imod5_data.html#imod.mf6.River.from_imod5_data" title="imod.mf6.River.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.River.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>RIV</p></td>
+<td><p>Align iMOD5 input grids</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.River.from_imod5_data.html#imod.mf6.River.from_imod5_data" title="imod.mf6.River.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.River.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>RIV</p></td>
+<td><p>Regrid</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.River.regrid_like.html#imod.mf6.River.regrid_like" title="imod.mf6.River.regrid_like"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.River.regrid_like()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>RIV</p></td>
+<td><p>Clip</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.River.clip_box.html#imod.mf6.River.clip_box" title="imod.mf6.River.clip_box"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.River.clip_box()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>ISG, SFT</p></td>
+<td><p>From 1D network (ISG)</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>SFR</p></td>
+<td><p>From 1D network (ISG)</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>HFB</p></td>
+<td><p>From 2D vector (GEN)</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data.html#imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data" title="imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>HFB</p></td>
+<td><p>From 3D vector (GEN)</p></td>
+<td><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.HorizontalFlowBarrierResistance.from_imod5_data()</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>HFB</p></td>
+<td><p>Snap vector to grid edges</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg.html#imod.mf6.SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg" title="imod.mf6.SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg()</span></code></a>, <a class="reference internal" href="../api/generated/mf6/imod.mf6.HorizontalFlowBarrierResistance.to_mf6_pkg.html#imod.mf6.HorizontalFlowBarrierResistance.to_mf6_pkg" title="imod.mf6.HorizontalFlowBarrierResistance.to_mf6_pkg"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.HorizontalFlowBarrierResistance.to_mf6_pkg()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>HFB</p></td>
+<td><p>Auto placement, account for not fully penetrating barriers</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.HorizontalFlowBarrierResistance.to_mf6_pkg.html#imod.mf6.HorizontalFlowBarrierResistance.to_mf6_pkg" title="imod.mf6.HorizontalFlowBarrierResistance.to_mf6_pkg"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.HorizontalFlowBarrierResistance.to_mf6_pkg()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>HFB</p></td>
+<td><p>Clip</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.clip_box.html#imod.mf6.SingleLayerHorizontalFlowBarrierResistance.clip_box" title="imod.mf6.SingleLayerHorizontalFlowBarrierResistance.clip_box"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.SingleLayerHorizontalFlowBarrierResistance.clip_box()</span></code></a>, <a class="reference internal" href="../api/generated/mf6/imod.mf6.HorizontalFlowBarrierResistance.clip_box.html#imod.mf6.HorizontalFlowBarrierResistance.clip_box" title="imod.mf6.HorizontalFlowBarrierResistance.clip_box"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.HorizontalFlowBarrierResistance.clip_box()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>HFB</p></td>
+<td><p>Cleanup</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>WEL</p></td>
+<td><p>From point data with timeseries (IPF)</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.LayeredWell.from_imod5_data.html#imod.mf6.LayeredWell.from_imod5_data" title="imod.mf6.LayeredWell.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.LayeredWell.from_imod5_data()</span></code></a>, <a class="reference internal" href="../api/generated/mf6/imod.mf6.Well.from_imod5_data.html#imod.mf6.Well.from_imod5_data" title="imod.mf6.Well.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Well.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>WEL</p></td>
+<td><p>Auto placement</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.LayeredWell.to_mf6_pkg.html#imod.mf6.LayeredWell.to_mf6_pkg" title="imod.mf6.LayeredWell.to_mf6_pkg"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.LayeredWell.to_mf6_pkg()</span></code></a>, <a class="reference internal" href="../api/generated/mf6/imod.mf6.Well.to_mf6_pkg.html#imod.mf6.Well.to_mf6_pkg" title="imod.mf6.Well.to_mf6_pkg"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Well.to_mf6_pkg()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>WEL</p></td>
+<td><p>Cleanup</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Well.cleanup.html#imod.mf6.Well.cleanup" title="imod.mf6.Well.cleanup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Well.cleanup()</span></code></a>, <a class="reference internal" href="../api/generated/prepare/imod.prepare.cleanup_wel.html#imod.prepare.cleanup_wel" title="imod.prepare.cleanup_wel"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.prepare.cleanup_wel()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>WEL</p></td>
+<td><p>Clip</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.LayeredWell.clip_box.html#imod.mf6.LayeredWell.clip_box" title="imod.mf6.LayeredWell.clip_box"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.LayeredWell.clip_box()</span></code></a>, <a class="reference internal" href="../api/generated/mf6/imod.mf6.Well.clip_box.html#imod.mf6.Well.clip_box" title="imod.mf6.Well.clip_box"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Well.clip_box()</span></code></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="metaswap">
+<h2>MetaSWAP<a class="headerlink" href="#metaswap" title="Link to this heading">#</a></h2>
+<p>An overview of the support for iMOD5’s MetaSWAP features:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>iMOD5 pkg</p></th>
+<th class="head"><p>MetaSWAP file</p></th>
+<th class="head"><p>functionality</p></th>
+<th class="head"><p>iMOD Python function/method</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><em>Model</em></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">para_sim.inp</span></code></p></td>
+<td><p>From grids (IDF)</p></td>
+<td><p><a class="reference internal" href="../api/generated/msw/imod.msw.MetaSwapModel.from_imod5_data.html#imod.msw.MetaSwapModel.from_imod5_data" title="imod.msw.MetaSwapModel.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.msw.MetaSwapModel.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><em>Model</em></p></td>
+<td></td>
+<td><p>Regrid</p></td>
+<td><p><a class="reference internal" href="../api/generated/msw/imod.msw.MetaSwapModel.regrid_like.html#imod.msw.MetaSwapModel.regrid_like" title="imod.msw.MetaSwapModel.regrid_like"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.msw.MetaSwapModel.regrid_like()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p><em>Model</em></p></td>
+<td></td>
+<td><p>Clip</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><em>Model</em></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">mod2svat.inp</span></code></p></td>
+<td><p>Coupling</p></td>
+<td><p><a class="reference internal" href="../api/generated/msw/imod.msw.MetaSwapModel.from_imod5_data.html#imod.msw.MetaSwapModel.from_imod5_data" title="imod.msw.MetaSwapModel.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.msw.MetaSwapModel.from_imod5_data()</span></code></a>, <a class="reference internal" href="../api/generated/msw/imod.msw.CouplerMapping.html#imod.msw.CouplerMapping" title="imod.msw.CouplerMapping"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.msw.CouplerMapping</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p><em>Model</em></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">idf_svat.ipn</span></code></p></td>
+<td><p>IDF output</p></td>
+<td><p><a class="reference internal" href="../api/generated/msw/imod.msw.MetaSwapModel.from_imod5_data.html#imod.msw.MetaSwapModel.from_imod5_data" title="imod.msw.MetaSwapModel.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.msw.MetaSwapModel.from_imod5_data()</span></code></a>, <a class="reference internal" href="../api/generated/msw/imod.msw.IdfMapping.html#imod.msw.IdfMapping" title="imod.msw.IdfMapping"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.msw.IdfMapping</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>CAP</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">area_svat.inp</span></code></p></td>
+<td><p>Grid Data</p></td>
+<td><p><a class="reference internal" href="../api/generated/msw/imod.msw.GridData.from_imod5_data.html#imod.msw.GridData.from_imod5_data" title="imod.msw.GridData.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.msw.GridData.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>CAP</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">svat2swnr_roff.inp</span></code></p></td>
+<td><p>Ponding</p></td>
+<td><p><a class="reference internal" href="../api/generated/msw/imod.msw.Ponding.from_imod5_data.html#imod.msw.Ponding.from_imod5_data" title="imod.msw.Ponding.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.msw.Ponding.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>CAP</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">infi_svat.inp</span></code></p></td>
+<td><p>Infiltration</p></td>
+<td><p><a class="reference internal" href="../api/generated/msw/imod.msw.Infiltration.from_imod5_data.html#imod.msw.Infiltration.from_imod5_data" title="imod.msw.Infiltration.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.msw.Infiltration.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>CAP</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uscl_svat.inp</span></code></p></td>
+<td><p>Perched Water Table</p></td>
+<td><p><a class="reference internal" href="../api/generated/msw/imod.msw.ScalingFactors.from_imod5_data.html#imod.msw.ScalingFactors.from_imod5_data" title="imod.msw.ScalingFactors.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.msw.ScalingFactors.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>CAP</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uscl_svat.inp</span></code></p></td>
+<td><p>Scaling factors</p></td>
+<td><p><a class="reference internal" href="../api/generated/msw/imod.msw.ScalingFactors.from_imod5_data.html#imod.msw.ScalingFactors.from_imod5_data" title="imod.msw.ScalingFactors.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.msw.ScalingFactors.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>CAP</p></td>
+<td></td>
+<td><p>Stage-steered drainage</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>CAP</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">mete_grid.inp</span></code></p></td>
+<td><p>Meteogrids</p></td>
+<td><p><a class="reference internal" href="../api/generated/msw/imod.msw.MeteoGridCopy.from_imod5_data.html#imod.msw.MeteoGridCopy.from_imod5_data" title="imod.msw.MeteoGridCopy.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.msw.MeteoGridCopy.from_imod5_data()</span></code></a>, <a class="reference internal" href="../api/generated/msw/imod.msw.PrecipitationMapping.from_imod5_data.html#imod.msw.PrecipitationMapping.from_imod5_data" title="imod.msw.PrecipitationMapping.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.msw.PrecipitationMapping.from_imod5_data()</span></code></a>, <a class="reference internal" href="../api/generated/msw/imod.msw.EvapotranspirationMapping.from_imod5_data.html#imod.msw.EvapotranspirationMapping.from_imod5_data" title="imod.msw.EvapotranspirationMapping.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.msw.EvapotranspirationMapping.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>CAP</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">mete_stat.inp</span></code></p></td>
+<td><p>Meteostations</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>CAP</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">scap_svat.inp</span></code></p></td>
+<td><p>Sprinkling</p></td>
+<td><p><a class="reference internal" href="../api/generated/msw/imod.msw.Sprinkling.from_imod5_data.html#imod.msw.Sprinkling.from_imod5_data" title="imod.msw.Sprinkling.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.msw.Sprinkling.from_imod5_data()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>CAP</p></td>
+<td></td>
+<td><p>Sprinkling wells grid (IDF)</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.LayeredWell.from_imod5_cap_data.html#imod.mf6.LayeredWell.from_imod5_cap_data" title="imod.mf6.LayeredWell.from_imod5_cap_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.LayeredWell.from_imod5_cap_data()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>CAP</p></td>
+<td></td>
+<td><p>Sprinkling wells points (IPF)</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>CAP</p></td>
+<td></td>
+<td><p>Align iMOD5 input grids</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="postprocessing">
+<h2>Postprocessing<a class="headerlink" href="#postprocessing" title="Link to this heading">#</a></h2>
+<p>The following post-processing features are supported:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>iMOD5 functionality</p></th>
+<th class="head"><p>iMOD Python function/method</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Open heads</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.open_head.html#imod.mf6.Modflow6Simulation.open_head" title="imod.mf6.Modflow6Simulation.open_head"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.open_head()</span></code></a>, <a class="reference internal" href="../api/generated/mf6/imod.mf6.open_hds.html#imod.mf6.open_hds" title="imod.mf6.open_hds"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.open_hds()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Open budgets</p></td>
+<td><p><a class="reference internal" href="../api/generated/mf6/imod.mf6.Modflow6Simulation.open_flow_budget.html#imod.mf6.Modflow6Simulation.open_flow_budget" title="imod.mf6.Modflow6Simulation.open_flow_budget"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.open_flow_budget()</span></code></a>, <a class="reference internal" href="../api/generated/mf6/imod.mf6.open_cbc.html#imod.mf6.open_cbc" title="imod.mf6.open_cbc"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.open_cbc()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>Compute GXG</p></td>
+<td><p><a class="reference internal" href="../api/generated/evaluate/imod.evaluate.calculate_gxg.html#imod.evaluate.calculate_gxg" title="imod.evaluate.calculate_gxg"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.evaluate.calculate_gxg()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Compute waterbalance</p></td>
+<td><p><a class="reference internal" href="../api/generated/evaluate/imod.evaluate.facebudget.html#imod.evaluate.facebudget" title="imod.evaluate.facebudget"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.evaluate.facebudget()</span></code></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="visualization">
+<h2>Visualization<a class="headerlink" href="#visualization" title="Link to this heading">#</a></h2>
+<p>The following visualization features are supported. <a class="reference external" href="https://deltares.github.io/iMOD-Documentation/viewer.html">For interactively viewing
+your data, see our iMOD Viewer</a>.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>iMOD5 functionality</p></th>
+<th class="head"><p>iMOD Python function/method</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Plot cross-section</p></td>
+<td><p><a class="reference internal" href="../api/generated/visualize/imod.visualize.cross_section.html#imod.visualize.cross_section" title="imod.visualize.cross_section"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.visualize.cross_section()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Plot map</p></td>
+<td><p><a class="reference internal" href="../api/generated/visualize/imod.visualize.plot_map.html#imod.visualize.plot_map" title="imod.visualize.plot_map"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.visualize.plot_map()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>Quiverplot</p></td>
+<td><p><a class="reference internal" href="../api/generated/visualize/imod.visualize.quiver.html#imod.visualize.quiver" title="imod.visualize.quiver"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.visualize.quiver()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Streamplot</p></td>
+<td><p><a class="reference internal" href="../api/generated/visualize/imod.visualize.streamfunction.html#imod.visualize.streamfunction" title="imod.visualize.streamfunction"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.visualize.streamfunction()</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>Water balance</p></td>
+<td><p><a class="reference internal" href="../api/generated/visualize/imod.visualize.waterbalance_barchart.html#imod.visualize.waterbalance_barchart" title="imod.visualize.waterbalance_barchart"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.visualize.waterbalance_barchart()</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>3D plot</p></td>
+<td><p><a class="reference internal" href="../api/generated/visualize/imod.visualize.GridAnimation3D.html#imod.visualize.GridAnimation3D" title="imod.visualize.GridAnimation3D"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.visualize.GridAnimation3D</span></code></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="known-issues.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Known Issues</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../developing/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Developing</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#known-issues">Known issues</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notes">Notes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#files">Files</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modflow6">MODFLOW6</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metaswap">MetaSWAP</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#postprocessing">Postprocessing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualization">Visualization</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/faq/imod5_backwards_compatibility.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

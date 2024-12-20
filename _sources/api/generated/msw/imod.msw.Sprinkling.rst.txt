@@ -14,6 +14,7 @@
    .. autosummary::
    
       ~Sprinkling.__init__
+      ~Sprinkling.from_imod5_data
       ~Sprinkling.get_non_grid_data
       ~Sprinkling.get_regrid_methods
       ~Sprinkling.is_regridding_supported
