@@ -7,6 +7,7 @@ from filecmp import dircmp
 from pathlib import Path
 from unittest import mock
 from unittest.mock import MagicMock
+import sys
 
 import numpy as np
 import pandas as pd
@@ -18,6 +19,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.logging import LogLevel, LoggerType
 from imod.mf6 import LayeredWell, Well
 from imod.mf6.model import Modflow6Model
 from imod.mf6.multimodel.modelsplitter import PartitionInfo
@@ -87,7 +89,7 @@ def test_dump_version_number__version_written(twri_model, tmpdir_factory):
 
 
 @pytest.mark.usefixtures("twri_model")
-def test_dump_version_number__version_incompatible(twri_model, tmpdir_factory):
+def test_from_file_version_logged__version_in_dumped(twri_model, tmpdir_factory):
     """
     Tested if a warning is thrown when there is a mismatch between version
     numbers of saved model and current iMOD Python version.
@@ -104,12 +106,24 @@ def test_dump_version_number__version_incompatible(twri_model, tmpdir_factory):
     with open(toml_path_adapted, "wb") as f:
         tomli_w.dump(toml_content, f)
     # Act
-    with pytest.warns(UserWarning, match="0.0.0"):
+    logfile_path = tmp_path / "logfile.txt"
+    with open(logfile_path, "w") as sys.stdout:
+        imod.logging.configure(
+            LoggerType.PYTHON,
+            log_level=LogLevel.DEBUG,
+            add_default_file_handler=False,
+            add_default_stream_handler=True,
+        )
         imod.mf6.Modflow6Simulation.from_file(toml_path_adapted)
 
+    # Assert
+    with open(logfile_path, "r") as log_file:
+        log = log_file.read()
+        assert f"iMOD Python version in current environment: {imod.__version__}" in log
+        assert "iMOD Python version in dumped simulation: 0.0.0" in log
 
 @pytest.mark.usefixtures("twri_model")
-def test_dump_version_number__no_version(twri_model, tmpdir_factory):
+def test_from_file_version_logged__no_version_in_dumped(twri_model, tmpdir_factory):
     """
     Tested if a warning is thrown when there is a mismatch between version
     numbers of saved model and current iMOD Python version.
@@ -126,8 +140,21 @@ def test_dump_version_number__no_version(twri_model, tmpdir_factory):
     with open(toml_path_adapted, "wb") as f:
         tomli_w.dump(toml_content, f)
     # Act
-    with pytest.warns(UserWarning, match="No version information"):
+    logfile_path = tmp_path / "logfile.txt"
+    with open(logfile_path, "w") as sys.stdout:
+        imod.logging.configure(
+            LoggerType.PYTHON,
+            log_level=LogLevel.DEBUG,
+            add_default_file_handler=False,
+            add_default_stream_handler=True,
+        )
         imod.mf6.Modflow6Simulation.from_file(toml_path_adapted)
+
+    # Assert
+    with open(logfile_path, "r") as log_file:
+        log = log_file.read()
+        assert f"iMOD Python version in current environment: {imod.__version__}" in log
+        assert "No iMOD Python version information found in dumped simulation." in log
 
 
 @pytest.mark.usefixtures("twri_model")
