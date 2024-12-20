@@ -26,3 +26,28 @@ The TeamCity pipeline will:
 1. Create a release on GitHub
 2. Create the imod-python package and upload it to PyPi
 3. Build the documentation and deploy it
+
+The release is now available on PyPi but not yet on conda-forge. The conda-forge
+bot will automatically open a PR to update `the imod feedstock.
+<https://github.com/conda-forge/imod-feedstock>`_ It usually takes a few hours
+before the bot opens a PR. This PR will be reviewed by the imod-feedstock
+maintainers and merged if everything is in order. 
+
+Release a pre-release
+^^^^^^^^^^^^^^^^^^^^^
+
+To release a pre-release, follow the same steps as above, but add a ``rc`` to the
+version + a build number. For example: ``1.0.0rc0`` for the first release candidate.
+
+PyPI will automatically recognize this as a pre-release, thus will not show it
+as a stable build. To get the pre-release on conda-forge, you need to:
+
+1. Fork `the imod-feedstock <https://github.com/conda-forge/imod-feedstock>`_
+2. Checkout the ``rc`` branch of the imod-feedstock
+3. Update the version in the ``recipe/meta.yaml`` file to the pre-release version, e.g. ``1.0.0rc0``
+4. Update the sha256 checksum in the ``recipe/meta.yaml`` file, you can generate one by running:
+   ``curl -sL https://pypi.io/packages/source/i/imod/imod-{{version}}.tar.gz | openssl sha256`` 
+   (TIP: On Windows, you can install curl and openssl via pixi)
+5. Commit and push the changes to your fork
+6. Open a PR to the imod-feedstock and make sure it merges to the ``rc`` branch.
+7. This will trigger a few CI jobs. When these succeed, the branch can be merged.
