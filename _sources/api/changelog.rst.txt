@@ -6,8 +6,13 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[1.0.0rc1] - 2024-12-20
+-----------------------
+
+Small post-release fix for installation instructions in documentation.
+
 [1.0.0rc0] - 2024-12-20
-----------------------
+-----------------------
 
 Added
 ~~~~~

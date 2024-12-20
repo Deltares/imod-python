@@ -358,14 +358,14 @@ species.
  .. code-block:: none
 
 
-    [<matplotlib.lines.Line2D object at 0x00000265DD5B74D0>, <matplotlib.lines.Line2D object at 0x00000265DC39B450>, <matplotlib.lines.Line2D object at 0x00000265DD54EC10>, <matplotlib.lines.Line2D object at 0x00000265DD54E3D0>]
+    [<matplotlib.lines.Line2D object at 0x0000017F8917C790>, <matplotlib.lines.Line2D object at 0x0000017F89121250>, <matplotlib.lines.Line2D object at 0x0000017F8A1C8650>, <matplotlib.lines.Line2D object at 0x0000017F8A1C9CD0>]
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.077 seconds)
+   **Total running time of the script:** (0 minutes 3.142 seconds)
 
 
 .. _sphx_glr_download_examples_mf6_example_1d_transport.py:

@@ -171,7 +171,7 @@ that is: ``bnd[index] = -1```
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x00000265D66A3390>
+    <matplotlib.collections.QuadMesh object at 0x0000017F815940D0>
 
 
 
@@ -208,7 +208,7 @@ Define the recharge rates
  .. code-block:: none
 
 
-    [<matplotlib.lines.Line2D object at 0x00000265DB30FA90>]
+    [<matplotlib.lines.Line2D object at 0x0000017F8AB828D0>]
 
 
 
@@ -274,7 +274,7 @@ Defining the starting concentrations
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x00000265DB256410>
+    <matplotlib.collections.QuadMesh object at 0x0000017F8AA70E50>
 
 
 
