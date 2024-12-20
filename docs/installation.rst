@@ -28,11 +28,12 @@ Install beta release
 
 To install a beta release with pixi::
 
+  pixi config prepend default-channels "conda-forge/label/imod_rc"
   pixi add imod=1.0.0rc0
 
 Or with conda::
 
-  conda install imod=1.0.0rc0
+  conda install -c conda-forge/label/imod_rc -c conda-forge imod=1.0.0rc0
 
 Or with pip::
 
