@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>MODFLOW6 &#8212; iMOD Python 1.0.0b0 documentation</title>
+    <title>MODFLOW6 &#8212; iMOD Python 1.0.0rc0 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="../_static/documentation_options.js?v=ada814e5"></script>
+    <script src="../_static/documentation_options.js?v=d3b94175"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/mf6';</script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="imod.logging.pythonlogger.PythonLogger" href="generated/logging/imod.logging.pythonlogger.PythonLogger.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b0.dev" />
+  <meta name="docsearch:version" content="1.0.0rc0.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0b0 documentation - Home"/>
-    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0b0 documentation - Home"/>
+    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc0 documentation - Home"/>
+    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc0 documentation - Home"/>
   
   
 </a></div>
@@ -543,6 +543,7 @@
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.open_hds.html">imod.mf6.open_hds</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.open_cbc.html">imod.mf6.open_cbc</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.read_cbc_headers.html">imod.mf6.read_cbc_headers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.open_dvs.html">imod.mf6.open_dvs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.html">imod.mf6.Modflow6Simulation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.create_time_discretization.html">imod.mf6.Modflow6Simulation.create_time_discretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.write.html">imod.mf6.Modflow6Simulation.write</a></li>
@@ -627,6 +628,7 @@
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.NodePropertyFlow.clip_box.html">imod.mf6.NodePropertyFlow.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.html">imod.mf6.Recharge</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.from_imod5_data.html">imod.mf6.Recharge.from_imod5_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.from_imod5_cap_data.html">imod.mf6.Recharge.from_imod5_cap_data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.mask.html">imod.mf6.Recharge.mask</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.regrid_like.html">imod.mf6.Recharge.regrid_like</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.clip_box.html">imod.mf6.Recharge.clip_box</a></li>
@@ -846,6 +848,9 @@
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.read_cbc_headers.html#imod.mf6.read_cbc_headers" title="imod.mf6.read_cbc_headers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_cbc_headers</span></code></a>(cbc_path)</p></td>
 <td><p>Read all the header data from a cell-by-cell (.cbc) budget file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.open_dvs.html#imod.mf6.open_dvs" title="imod.mf6.open_dvs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">open_dvs</span></code></a>(dvs_path, grb_path, indices[, ...])</p></td>
+<td><p>Open modflow6 dependent variable output for complex packages (like the watercontent file for the UZF-package).</p></td>
 </tr>
 </tbody>
 </table>
@@ -1131,121 +1136,124 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.from_imod5_data.html#imod.mf6.Recharge.from_imod5_data" title="imod.mf6.Recharge.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Recharge.from_imod5_data</span></code></a>(imod5_data, target_dis)</p></td>
 <td><p>Construct an rch-package from iMOD5 data, loaded with the <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> function.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.mask.html#imod.mf6.Recharge.mask" title="imod.mf6.Recharge.mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Recharge.mask</span></code></a>(mask)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.from_imod5_cap_data.html#imod.mf6.Recharge.from_imod5_cap_data" title="imod.mf6.Recharge.from_imod5_cap_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Recharge.from_imod5_cap_data</span></code></a>(imod5_data, ...)</p></td>
+<td><p>Construct an rch-package from iMOD5 data in the CAP package, loaded with the <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.mask.html#imod.mf6.Recharge.mask" title="imod.mf6.Recharge.mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Recharge.mask</span></code></a>(mask)</p></td>
 <td><p>Mask values outside of domain.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.regrid_like.html#imod.mf6.Recharge.regrid_like" title="imod.mf6.Recharge.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Recharge.regrid_like</span></code></a>(target_grid, regrid_cache)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.regrid_like.html#imod.mf6.Recharge.regrid_like" title="imod.mf6.Recharge.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Recharge.regrid_like</span></code></a>(target_grid, regrid_cache)</p></td>
 <td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.clip_box.html#imod.mf6.Recharge.clip_box" title="imod.mf6.Recharge.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Recharge.clip_box</span></code></a>([time_min, time_max, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.clip_box.html#imod.mf6.Recharge.clip_box" title="imod.mf6.Recharge.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Recharge.clip_box</span></code></a>([time_min, time_max, ...])</p></td>
 <td><p>Clip a package by a bounding box (time, layer, y, x).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.River.html#imod.mf6.River" title="imod.mf6.River"><code class="xref py py-obj docutils literal notranslate"><span class="pre">River</span></code></a>(*_, **__)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.River.html#imod.mf6.River" title="imod.mf6.River"><code class="xref py py-obj docutils literal notranslate"><span class="pre">River</span></code></a>(*_, **__)</p></td>
 <td><p>River package.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.River.from_imod5_data.html#imod.mf6.River.from_imod5_data" title="imod.mf6.River.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">River.from_imod5_data</span></code></a>(key, imod5_data, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.River.from_imod5_data.html#imod.mf6.River.from_imod5_data" title="imod.mf6.River.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">River.from_imod5_data</span></code></a>(key, imod5_data, ...)</p></td>
 <td><p>Construct a river-package from iMOD5 data, loaded with the <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> function.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.River.mask.html#imod.mf6.River.mask" title="imod.mf6.River.mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">River.mask</span></code></a>(mask)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.River.mask.html#imod.mf6.River.mask" title="imod.mf6.River.mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">River.mask</span></code></a>(mask)</p></td>
 <td><p>Mask values outside of domain.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.River.regrid_like.html#imod.mf6.River.regrid_like" title="imod.mf6.River.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">River.regrid_like</span></code></a>(target_grid, regrid_cache)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.River.regrid_like.html#imod.mf6.River.regrid_like" title="imod.mf6.River.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">River.regrid_like</span></code></a>(target_grid, regrid_cache)</p></td>
 <td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.River.cleanup.html#imod.mf6.River.cleanup" title="imod.mf6.River.cleanup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">River.cleanup</span></code></a>(dis)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.River.cleanup.html#imod.mf6.River.cleanup" title="imod.mf6.River.cleanup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">River.cleanup</span></code></a>(dis)</p></td>
 <td><p>Clean up package inplace.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.River.clip_box.html#imod.mf6.River.clip_box" title="imod.mf6.River.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">River.clip_box</span></code></a>([time_min, time_max, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.River.clip_box.html#imod.mf6.River.clip_box" title="imod.mf6.River.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">River.clip_box</span></code></a>([time_min, time_max, ...])</p></td>
 <td><p>Clip a package by a bounding box (time, layer, y, x).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.River.split_conductance.html#imod.mf6.River.split_conductance" title="imod.mf6.River.split_conductance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">River.split_conductance</span></code></a>(conductance, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.River.split_conductance.html#imod.mf6.River.split_conductance" title="imod.mf6.River.split_conductance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">River.split_conductance</span></code></a>(conductance, ...)</p></td>
 <td><p>Seperates (exfiltration) conductance with an infiltration factor (iMODFLOW) into a drainage conductance and a river conductance following methods explained in Zaadnoordijk (2009).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.html#imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic" title="imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierHydraulicCharacteristic</span></code></a>(*_, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.html#imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic" title="imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierHydraulicCharacteristic</span></code></a>(*_, ...)</p></td>
 <td><p>Horizontal Flow Barrier (HFB) package</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg.html#imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg" title="imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg</span></code></a>(...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg.html#imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg" title="imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg</span></code></a>(...)</p></td>
 <td><p>Write package to Modflow 6 package.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.clip_box.html#imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.clip_box" title="imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.clip_box</span></code></a>([...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.clip_box.html#imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.clip_box" title="imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.clip_box</span></code></a>([...])</p></td>
 <td><p>Clip a package by a bounding box (time, layer, y, x).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.html#imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier" title="imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierMultiplier</span></code></a>(*_, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.html#imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier" title="imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierMultiplier</span></code></a>(*_, ...)</p></td>
 <td><p>Horizontal Flow Barrier (HFB) package</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg.html#imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg" title="imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg</span></code></a>(...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg.html#imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg" title="imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierMultiplier.to_mf6_pkg</span></code></a>(...)</p></td>
 <td><p>Write package to Modflow 6 package.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.clip_box.html#imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.clip_box" title="imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierMultiplier.clip_box</span></code></a>([...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.clip_box.html#imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.clip_box" title="imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierMultiplier.clip_box</span></code></a>([...])</p></td>
 <td><p>Clip a package by a bounding box (time, layer, y, x).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.html#imod.mf6.SingleLayerHorizontalFlowBarrierResistance" title="imod.mf6.SingleLayerHorizontalFlowBarrierResistance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierResistance</span></code></a>(*_, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.html#imod.mf6.SingleLayerHorizontalFlowBarrierResistance" title="imod.mf6.SingleLayerHorizontalFlowBarrierResistance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierResistance</span></code></a>(*_, ...)</p></td>
 <td><p>Horizontal Flow Barrier (HFB) package</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data.html#imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data" title="imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierResistance.from_imod5_data</span></code></a>(...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data.html#imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data" title="imod.mf6.SingleLayerHorizontalFlowBarrierResistance.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierResistance.from_imod5_data</span></code></a>(...)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg.html#imod.mf6.SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg" title="imod.mf6.SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg</span></code></a>(...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg.html#imod.mf6.SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg" title="imod.mf6.SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierResistance.to_mf6_pkg</span></code></a>(...)</p></td>
 <td><p>Write package to Modflow 6 package.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.clip_box.html#imod.mf6.SingleLayerHorizontalFlowBarrierResistance.clip_box" title="imod.mf6.SingleLayerHorizontalFlowBarrierResistance.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierResistance.clip_box</span></code></a>([...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SingleLayerHorizontalFlowBarrierResistance.clip_box.html#imod.mf6.SingleLayerHorizontalFlowBarrierResistance.clip_box" title="imod.mf6.SingleLayerHorizontalFlowBarrierResistance.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLayerHorizontalFlowBarrierResistance.clip_box</span></code></a>([...])</p></td>
 <td><p>Clip a package by a bounding box (time, layer, y, x).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SpecificStorage.html#imod.mf6.SpecificStorage" title="imod.mf6.SpecificStorage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SpecificStorage</span></code></a>(*_, **__)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SpecificStorage.html#imod.mf6.SpecificStorage" title="imod.mf6.SpecificStorage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SpecificStorage</span></code></a>(*_, **__)</p></td>
 <td><p>Storage Package with specific storage.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SpecificStorage.mask.html#imod.mf6.SpecificStorage.mask" title="imod.mf6.SpecificStorage.mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SpecificStorage.mask</span></code></a>(mask)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SpecificStorage.mask.html#imod.mf6.SpecificStorage.mask" title="imod.mf6.SpecificStorage.mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SpecificStorage.mask</span></code></a>(mask)</p></td>
 <td><p>Mask values outside of domain.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SpecificStorage.regrid_like.html#imod.mf6.SpecificStorage.regrid_like" title="imod.mf6.SpecificStorage.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SpecificStorage.regrid_like</span></code></a>(target_grid, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SpecificStorage.regrid_like.html#imod.mf6.SpecificStorage.regrid_like" title="imod.mf6.SpecificStorage.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SpecificStorage.regrid_like</span></code></a>(target_grid, ...)</p></td>
 <td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SpecificStorage.clip_box.html#imod.mf6.SpecificStorage.clip_box" title="imod.mf6.SpecificStorage.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SpecificStorage.clip_box</span></code></a>([time_min, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.SpecificStorage.clip_box.html#imod.mf6.SpecificStorage.clip_box" title="imod.mf6.SpecificStorage.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SpecificStorage.clip_box</span></code></a>([time_min, ...])</p></td>
 <td><p>Clip a package by a bounding box (time, layer, y, x).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.html#imod.mf6.StorageCoefficient" title="imod.mf6.StorageCoefficient"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StorageCoefficient</span></code></a>(*_, **__)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.html#imod.mf6.StorageCoefficient" title="imod.mf6.StorageCoefficient"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StorageCoefficient</span></code></a>(*_, **__)</p></td>
 <td><p>Storage Package with a storage coefficient.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.from_imod5_data.html#imod.mf6.StorageCoefficient.from_imod5_data" title="imod.mf6.StorageCoefficient.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StorageCoefficient.from_imod5_data</span></code></a>(...[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.from_imod5_data.html#imod.mf6.StorageCoefficient.from_imod5_data" title="imod.mf6.StorageCoefficient.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StorageCoefficient.from_imod5_data</span></code></a>(...[, ...])</p></td>
 <td><p>Construct a StorageCoefficient-package from iMOD5 data, loaded with the <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> function.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.mask.html#imod.mf6.StorageCoefficient.mask" title="imod.mf6.StorageCoefficient.mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StorageCoefficient.mask</span></code></a>(mask)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.mask.html#imod.mf6.StorageCoefficient.mask" title="imod.mf6.StorageCoefficient.mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StorageCoefficient.mask</span></code></a>(mask)</p></td>
 <td><p>Mask values outside of domain.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.regrid_like.html#imod.mf6.StorageCoefficient.regrid_like" title="imod.mf6.StorageCoefficient.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StorageCoefficient.regrid_like</span></code></a>(target_grid, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.regrid_like.html#imod.mf6.StorageCoefficient.regrid_like" title="imod.mf6.StorageCoefficient.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StorageCoefficient.regrid_like</span></code></a>(target_grid, ...)</p></td>
 <td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.clip_box.html#imod.mf6.StorageCoefficient.clip_box" title="imod.mf6.StorageCoefficient.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StorageCoefficient.clip_box</span></code></a>([time_min, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.StorageCoefficient.clip_box.html#imod.mf6.StorageCoefficient.clip_box" title="imod.mf6.StorageCoefficient.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StorageCoefficient.clip_box</span></code></a>([time_min, ...])</p></td>
 <td><p>Clip a package by a bounding box (time, layer, y, x).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.UnsaturatedZoneFlow.html#imod.mf6.UnsaturatedZoneFlow" title="imod.mf6.UnsaturatedZoneFlow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UnsaturatedZoneFlow</span></code></a>(*_, **__)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.UnsaturatedZoneFlow.html#imod.mf6.UnsaturatedZoneFlow" title="imod.mf6.UnsaturatedZoneFlow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UnsaturatedZoneFlow</span></code></a>(*_, **__)</p></td>
 <td><p>Unsaturated Zone Flow (UZF) package.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Well.html#imod.mf6.Well" title="imod.mf6.Well"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Well</span></code></a>(*_, **__)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Well.html#imod.mf6.Well" title="imod.mf6.Well"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Well</span></code></a>(*_, **__)</p></td>
 <td><p>Agnostic WEL package, which accepts x, y and a top and bottom of the well screens.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Well.cleanup.html#imod.mf6.Well.cleanup" title="imod.mf6.Well.cleanup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Well.cleanup</span></code></a>(dis)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Well.cleanup.html#imod.mf6.Well.cleanup" title="imod.mf6.Well.cleanup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Well.cleanup</span></code></a>(dis)</p></td>
 <td><p>Clean up package inplace.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Well.from_imod5_data.html#imod.mf6.Well.from_imod5_data" title="imod.mf6.Well.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Well.from_imod5_data</span></code></a>(key, imod5_data, times)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Well.from_imod5_data.html#imod.mf6.Well.from_imod5_data" title="imod.mf6.Well.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Well.from_imod5_data</span></code></a>(key, imod5_data, times)</p></td>
 <td><p>Convert wells to imod5 data, loaded with <a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a>, to a Well object.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Well.mask.html#imod.mf6.Well.mask" title="imod.mf6.Well.mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Well.mask</span></code></a>(domain)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Well.mask.html#imod.mf6.Well.mask" title="imod.mf6.Well.mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Well.mask</span></code></a>(domain)</p></td>
 <td><p>Mask wells based on two-dimensional domain.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Well.regrid_like.html#imod.mf6.Well.regrid_like" title="imod.mf6.Well.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Well.regrid_like</span></code></a>(target_grid, regrid_cache)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Well.regrid_like.html#imod.mf6.Well.regrid_like" title="imod.mf6.Well.regrid_like"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Well.regrid_like</span></code></a>(target_grid, regrid_cache)</p></td>
 <td><p>Creates a package of the same type as this package, based on another discretization.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Well.to_mf6_pkg.html#imod.mf6.Well.to_mf6_pkg" title="imod.mf6.Well.to_mf6_pkg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Well.to_mf6_pkg</span></code></a>(active, top, bottom, k[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Well.to_mf6_pkg.html#imod.mf6.Well.to_mf6_pkg" title="imod.mf6.Well.to_mf6_pkg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Well.to_mf6_pkg</span></code></a>(active, top, bottom, k[, ...])</p></td>
 <td><p>Write package to Modflow 6 package.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Well.clip_box.html#imod.mf6.Well.clip_box" title="imod.mf6.Well.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Well.clip_box</span></code></a>([time_min, time_max, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.Well.clip_box.html#imod.mf6.Well.clip_box" title="imod.mf6.Well.clip_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Well.clip_box</span></code></a>([time_min, time_max, ...])</p></td>
 <td><p>Clip a package by a bounding box (time, layer, y, x).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.WellDisStructured.html#imod.mf6.WellDisStructured" title="imod.mf6.WellDisStructured"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WellDisStructured</span></code></a>(*_, **__)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.WellDisStructured.html#imod.mf6.WellDisStructured" title="imod.mf6.WellDisStructured"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WellDisStructured</span></code></a>(*_, **__)</p></td>
 <td><p>WEL package for structured discretization (DIS) models .</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.WellDisVertices.html#imod.mf6.WellDisVertices" title="imod.mf6.WellDisVertices"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WellDisVertices</span></code></a>(*_, **__)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/mf6/imod.mf6.WellDisVertices.html#imod.mf6.WellDisVertices" title="imod.mf6.WellDisVertices"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WellDisVertices</span></code></a>(*_, **__)</p></td>
 <td><p>WEL package for discretization by vertices (DISV) models.</p></td>
 </tr>
 </tbody>

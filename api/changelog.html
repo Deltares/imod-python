@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Changelog &#8212; iMOD Python 1.0.0b0 documentation</title>
+    <title>Changelog &#8212; iMOD Python 1.0.0rc0 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="../_static/documentation_options.js?v=ada814e5"></script>
+    <script src="../_static/documentation_options.js?v=d3b94175"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/changelog';</script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="API Reference" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b0.dev" />
+  <meta name="docsearch:version" content="1.0.0rc0.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0b0 documentation - Home"/>
-    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0b0 documentation - Home"/>
+    <img src="../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc0 documentation - Home"/>
+    <img src="../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc0 documentation - Home"/>
   
   
 </a></div>
@@ -543,6 +543,7 @@
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.open_hds.html">imod.mf6.open_hds</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.open_cbc.html">imod.mf6.open_cbc</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.read_cbc_headers.html">imod.mf6.read_cbc_headers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.open_dvs.html">imod.mf6.open_dvs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.html">imod.mf6.Modflow6Simulation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.create_time_discretization.html">imod.mf6.Modflow6Simulation.create_time_discretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.write.html">imod.mf6.Modflow6Simulation.write</a></li>
@@ -627,6 +628,7 @@
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.NodePropertyFlow.clip_box.html">imod.mf6.NodePropertyFlow.clip_box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.html">imod.mf6.Recharge</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.from_imod5_data.html">imod.mf6.Recharge.from_imod5_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.from_imod5_cap_data.html">imod.mf6.Recharge.from_imod5_cap_data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.mask.html">imod.mf6.Recharge.mask</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.regrid_like.html">imod.mf6.Recharge.regrid_like</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.clip_box.html">imod.mf6.Recharge.clip_box</a></li>
@@ -837,8 +839,8 @@
 <p>All notable changes to this project will be documented in this file.</p>
 <p>The format is based on <a class="reference external" href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>, and this project adheres to
 <a class="reference external" href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
-<section id="b0-2024-12-20">
-<h2>[1.0.0b0] - 2024-12-20<a class="headerlink" href="#b0-2024-12-20" title="Link to this heading">#</a></h2>
+<section id="rc0-2024-12-20">
+<h2>[1.0.0rc0] - 2024-12-20<a class="headerlink" href="#rc0-2024-12-20" title="Link to this heading">#</a></h2>
 <section id="added">
 <h3>Added<a class="headerlink" href="#added" title="Link to this heading">#</a></h3>
 <ul class="simple">
@@ -849,7 +851,7 @@ ASCII grids in large existing meteo databases do not have to be read.</p></li>
 <li><p><a class="reference internal" href="generated/mf6/imod.mf6.LayeredWell.from_imod5_cap_data.html#imod.mf6.LayeredWell.from_imod5_cap_data" title="imod.mf6.LayeredWell.from_imod5_cap_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.LayeredWell.from_imod5_cap_data()</span></code></a> to construct a
 <a class="reference internal" href="generated/mf6/imod.mf6.LayeredWell.html#imod.mf6.LayeredWell" title="imod.mf6.LayeredWell"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.LayeredWell</span></code></a> package from iMOD5 data in the CAP package (for
 MetaSWAP). Currently only griddata (IDF) is supported.</p></li>
-<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Recharge.from_imod5_cap_data()</span></code> to construct a recharge package
+<li><p><a class="reference internal" href="generated/mf6/imod.mf6.Recharge.from_imod5_cap_data.html#imod.mf6.Recharge.from_imod5_cap_data" title="imod.mf6.Recharge.from_imod5_cap_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Recharge.from_imod5_cap_data()</span></code></a> to construct a recharge package
 for coupling a MODFLOW6 model to MetaSWAP.</p></li>
 <li><p><a class="reference internal" href="generated/msw/imod.msw.MetaSwapModel.from_imod5_data.html#imod.msw.MetaSwapModel.from_imod5_data" title="imod.msw.MetaSwapModel.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.msw.MetaSwapModel.from_imod5_data()</span></code></a> to construct a MetaSWAP model
 from data in an iMOD5 projectfile.</p></li>
@@ -865,26 +867,27 @@ tutorial.</p></li>
 <section id="fixed">
 <h3>Fixed<a class="headerlink" href="#fixed" title="Link to this heading">#</a></h3>
 <ul class="simple">
-<li><p>Fixed bug where <code class="xref py py-class docutils literal notranslate"><span class="pre">HorizontalFlowBarrierResistance</span></code>,
-<code class="xref py py-class docutils literal notranslate"><span class="pre">HorizontalFlowBarrierSingleLayerResistance</span></code> and other HFB packages
-could not be allocated to cell edges when idomain in layer 1 was largely
-inactive.</p></li>
+<li><p>Fixed bug where <a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierResistance.html#imod.mf6.HorizontalFlowBarrierResistance" title="imod.mf6.HorizontalFlowBarrierResistance"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.HorizontalFlowBarrierResistance</span></code></a>,
+<code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.HorizontalFlowBarrierSingleLayerResistance</span></code> and other HFB
+packages could not be allocated to cell edges when idomain in layer 1 was
+largely inactive.</p></li>
 <li><p>Fixed bug where <code class="xref py py-meth docutils literal notranslate"><span class="pre">HorizontalFlowBarrierResistance.clip_box()</span></code>,
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">HorizontalFlowBarrierSingleLayerResistance.clip_box()</span></code> methods only
 returned deepcopy instead of actually clipping the line geometries.</p></li>
-<li><p>Fixed bug where <code class="xref py py-class docutils literal notranslate"><span class="pre">HorizontalFlowBarrierResistance</span></code>,
-<code class="xref py py-class docutils literal notranslate"><span class="pre">HorizontalFlowBarrierSingleLayerResistance</span></code> and other HFB packages could not
-be clipped or copied with xarray &gt;= 2024.10.0.</p></li>
+<li><p>Fixed bug where <a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierResistance.html#imod.mf6.HorizontalFlowBarrierResistance" title="imod.mf6.HorizontalFlowBarrierResistance"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.HorizontalFlowBarrierResistance</span></code></a>,
+<code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.HorizontalFlowBarrierSingleLayerResistance</span></code> and other HFB
+packages could not be clipped or copied with xarray &gt;= 2024.10.0.</p></li>
 <li><p>Fixed crash upon calling <a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.dump.html#imod.mf6.GroundwaterFlowModel.dump" title="imod.mf6.GroundwaterFlowModel.dump"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.GroundwaterFlowModel.dump()</span></code></a>, when a
-<code class="xref py py-class docutils literal notranslate"><span class="pre">HorizontalFlowBarrierResistance</span></code>,
-<code class="xref py py-class docutils literal notranslate"><span class="pre">HorizontalFlowBarrierSingleLayerResistance</span></code> or other HFB package was
-assigned to the model.</p></li>
+<a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierResistance.html#imod.mf6.HorizontalFlowBarrierResistance" title="imod.mf6.HorizontalFlowBarrierResistance"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.HorizontalFlowBarrierResistance</span></code></a>,
+<code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.HorizontalFlowBarrierSingleLayerResistance</span></code> or other HFB
+package was assigned to the model.</p></li>
 <li><p><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.regrid_like.html#imod.mf6.Modflow6Simulation.regrid_like" title="imod.mf6.Modflow6Simulation.regrid_like"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.regrid_like()</span></code></a> can now regrid a structured
 model to an unstructured grid.</p></li>
 <li><p><a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.regrid_like.html#imod.mf6.Modflow6Simulation.regrid_like" title="imod.mf6.Modflow6Simulation.regrid_like"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.regrid_like()</span></code></a> throws a
 <code class="docutils literal notranslate"><span class="pre">NotImplementedError</span></code> when attempting to regrid an unstructured model to a
 structured grid.</p></li>
-<li><p><a class="reference internal" href="generated/msw/imod.msw.Sprinkling.html#imod.msw.Sprinkling" title="imod.msw.Sprinkling"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.msw.Sprinkling</span></code></a> now correctly writes source svats to scap_svat.inp file.</p></li>
+<li><p><a class="reference internal" href="generated/msw/imod.msw.Sprinkling.html#imod.msw.Sprinkling" title="imod.msw.Sprinkling"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.msw.Sprinkling</span></code></a> now correctly writes source svats to
+scap_svat.inp file.</p></li>
 <li><p><a class="reference internal" href="generated/evaluate/imod.evaluate.calculate_gxg.html#imod.evaluate.calculate_gxg" title="imod.evaluate.calculate_gxg"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.evaluate.calculate_gxg()</span></code></a>, upon providing a head dataarray chunked
 over time, will no longer error with <code class="docutils literal notranslate"><span class="pre">ValueError:</span> <span class="pre">Object</span> <span class="pre">has</span> <span class="pre">inconsistent</span>
 <span class="pre">chunks</span> <span class="pre">along</span> <span class="pre">dimension</span> <span class="pre">bimonth.</span> <span class="pre">This</span> <span class="pre">can</span> <span class="pre">be</span> <span class="pre">fixed</span> <span class="pre">by</span> <span class="pre">calling</span> <span class="pre">unify_chunks().</span></code></p></li>
@@ -901,8 +904,8 @@ in <a class="reference internal" href="generated/msw/imod.msw.Sprinkling.html#im
 <li><p>If <code class="docutils literal notranslate"><span class="pre">&quot;cap&quot;</span></code> package present in <code class="docutils literal notranslate"><span class="pre">imod5_data</span></code>,
 <a class="reference internal" href="generated/mf6/imod.mf6.GroundwaterFlowModel.from_imod5_data.html#imod.mf6.GroundwaterFlowModel.from_imod5_data" title="imod.mf6.GroundwaterFlowModel.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.GroundwaterFlowModel.from_imod5_data()</span></code></a> now automatically adds a
 well for metaswap sprinkling named <code class="docutils literal notranslate"><span class="pre">&quot;msw-sprinkling&quot;</span></code></p></li>
-<li><p>Less strict validation for <code class="xref py py-class docutils literal notranslate"><span class="pre">HorizontalFlowBarrierResistance</span></code>,
-<code class="xref py py-class docutils literal notranslate"><span class="pre">HorizontalFlowBarrierSingleLayerResistance</span></code> and other HFB packages for
+<li><p>Less strict validation for <a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierResistance.html#imod.mf6.HorizontalFlowBarrierResistance" title="imod.mf6.HorizontalFlowBarrierResistance"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.HorizontalFlowBarrierResistance</span></code></a>,
+<code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.HorizontalFlowBarrierSingleLayerResistance</span></code> and other HFB packages for
 simulations which are imported with
 <a class="reference internal" href="generated/mf6/imod.mf6.Modflow6Simulation.from_imod5_data.html#imod.mf6.Modflow6Simulation.from_imod5_data" title="imod.mf6.Modflow6Simulation.from_imod5_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">imod.mf6.Modflow6Simulation.from_imod5_data()</span></code></a></p></li>
 <li><p>DeprecationWarning thrown upon initializing <a class="reference internal" href="generated/prepare/imod.prepare.Regridder.html#imod.prepare.Regridder" title="imod.prepare.Regridder"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.prepare.Regridder</span></code></a>.
@@ -917,9 +920,9 @@ regrid entire MODFLOW6 packages or simulations, <a class="reference external" hr
 <section id="id2">
 <h3>Added<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
 <ul class="simple">
-<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.prepare.topsystem.SimulationAllocationOptions</span></code>,
-<code class="xref py py-class docutils literal notranslate"><span class="pre">imod.prepare.topsystem.SimulationDistributingOptions</span></code>, which are used
-to store default allocation and distributing options respectively.</p></li>
+<li><p><a class="reference internal" href="generated/prepare/imod.prepare.SimulationAllocationOptions.html#imod.prepare.SimulationAllocationOptions" title="imod.prepare.SimulationAllocationOptions"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.prepare.SimulationAllocationOptions</span></code></a>,
+<a class="reference internal" href="generated/prepare/imod.prepare.SimulationDistributingOptions.html#imod.prepare.SimulationDistributingOptions" title="imod.prepare.SimulationDistributingOptions"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.prepare.SimulationDistributingOptions</span></code></a>, which are used to store
+default allocation and distributing options respectively.</p></li>
 </ul>
 </section>
 <section id="id3">
@@ -965,7 +968,7 @@ DISV models if the model contained inactive cells.</p></li>
 <li><p><a class="reference internal" href="generated/prepare/imod.prepare.fill.html#imod.prepare.fill" title="imod.prepare.fill"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.prepare.fill()</span></code></a> previously assigned to the result of an xarray
 <code class="docutils literal notranslate"><span class="pre">.sel</span></code> operation. This might not work for dask backed data and has been
 addressed.</p></li>
-<li><p>Added <code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.open_dvs()</span></code> to read dependent variable output files like
+<li><p>Added <a class="reference internal" href="generated/mf6/imod.mf6.open_dvs.html#imod.mf6.open_dvs" title="imod.mf6.open_dvs"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.mf6.open_dvs()</span></code></a> to read dependent variable output files like
 the water content file of <a class="reference internal" href="generated/mf6/imod.mf6.UnsaturatedZoneFlow.html#imod.mf6.UnsaturatedZoneFlow" title="imod.mf6.UnsaturatedZoneFlow"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.UnsaturatedZoneFlow</span></code></a>.</p></li>
 <li><p><cite>imod.prj.open_projectfile_data</cite> is now able to also read IPF data for
 sprinkling wells in the CAP package.</p></li>
@@ -982,7 +985,8 @@ assigned to <a class="reference internal" href="generated/mf6/imod.mf6.Groundwat
 <ul class="simple">
 <li><p><a class="reference internal" href="generated/mf6/imod.mf6.Well.html#imod.mf6.Well" title="imod.mf6.Well"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.Well</span></code></a> now also validates that well filter top is above well
 filter bottom</p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">open_projectfile_data()</span></code> now also imports well filter top and bottom.</p></li>
+<li><p><a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> now also imports well filter
+top and bottom.</p></li>
 <li><p><a class="reference internal" href="generated/mf6/imod.mf6.Well.html#imod.mf6.Well" title="imod.mf6.Well"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.Well</span></code></a> now logs a warning if any wells are removed during writing.</p></li>
 <li><p><a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierResistance.html#imod.mf6.HorizontalFlowBarrierResistance" title="imod.mf6.HorizontalFlowBarrierResistance"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.HorizontalFlowBarrierResistance</span></code></a>,
 <a class="reference internal" href="generated/mf6/imod.mf6.HorizontalFlowBarrierMultiplier.html#imod.mf6.HorizontalFlowBarrierMultiplier" title="imod.mf6.HorizontalFlowBarrierMultiplier"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.HorizontalFlowBarrierMultiplier</span></code></a>,
@@ -992,8 +996,8 @@ vertical Polygons instead of Linestrings as geometry, and <code class="docutils 
 <a class="reference internal" href="generated/prepare/imod.prepare.linestring_to_square_zpolygons.html#imod.prepare.linestring_to_square_zpolygons" title="imod.prepare.linestring_to_square_zpolygons"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.prepare.linestring_to_square_zpolygons()</span></code></a> and
 <a class="reference internal" href="generated/prepare/imod.prepare.linestring_to_trapezoid_zpolygons.html#imod.prepare.linestring_to_trapezoid_zpolygons" title="imod.prepare.linestring_to_trapezoid_zpolygons"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.prepare.linestring_to_trapezoid_zpolygons()</span></code></a> to generate these
 polygons.</p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">open_projectfile_data()</span></code> now returns well data grouped by ipf name,
-instead of generic, separate number per entry.</p></li>
+<li><p><a class="reference internal" href="generated/io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> now returns well data grouped
+by ipf name, instead of generic, separate number per entry.</p></li>
 <li><p><a class="reference internal" href="generated/mf6/imod.mf6.Well.html#imod.mf6.Well" title="imod.mf6.Well"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.Well</span></code></a> now supports wells which have a filter with zero
 length, where <code class="docutils literal notranslate"><span class="pre">&quot;screen_top&quot;</span></code> equals <code class="docutils literal notranslate"><span class="pre">&quot;screen_bottom&quot;</span></code>.</p></li>
 <li><p><a class="reference internal" href="generated/mf6/imod.mf6.Well.html#imod.mf6.Well" title="imod.mf6.Well"><code class="xref py py-class docutils literal notranslate"><span class="pre">imod.mf6.Well</span></code></a> shares the same default <code class="docutils literal notranslate"><span class="pre">minimum_thickness</span></code> as
@@ -2325,7 +2329,7 @@ coordinates</p></li>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#b0-2024-12-20">[1.0.0b0] - 2024-12-20</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rc0-2024-12-20">[1.0.0rc0] - 2024-12-20</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#added">Added</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed">Fixed</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#changed">Changed</a></li>

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>imod.mf6.out &#8212; iMOD Python 1.0.0b0 documentation</title>
+    <title>imod.mf6.out &#8212; iMOD Python 1.0.0rc0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="../../../_static/documentation_options.js?v=ada814e5"></script>
+    <script src="../../../_static/documentation_options.js?v=d3b94175"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/imod/mf6/out';</script>
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b0.dev" />
+  <meta name="docsearch:version" content="1.0.0rc0.dev" />
   </head>
   
   
@@ -114,8 +114,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0b0 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0b0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc0 documentation - Home"/>
   
   
 </a></div>
@@ -584,6 +584,8 @@
 
 
 
+<div class="viewcode-block" id="open_dvs">
+<a class="viewcode-back" href="../../../api/generated/mf6/imod.mf6.open_dvs.html#imod.mf6.open_dvs">[docs]</a>
 <span class="k">def</span> <span class="nf">open_dvs</span><span class="p">(</span>
     <span class="n">dvs_path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">,</span>
     <span class="n">grb_path</span><span class="p">:</span> <span class="n">FilePath</span><span class="p">,</span>
@@ -630,7 +632,8 @@
     <span class="n">grb_content</span> <span class="o">=</span> <span class="n">read_grb</span><span class="p">(</span><span class="n">grb_path</span><span class="p">)</span>
     <span class="n">distype</span> <span class="o">=</span> <span class="n">grb_content</span><span class="p">[</span><span class="s2">&quot;distype&quot;</span><span class="p">]</span>
     <span class="n">_open</span> <span class="o">=</span> <span class="n">_get_function</span><span class="p">(</span><span class="n">_OPEN_DVS</span><span class="p">,</span> <span class="n">distype</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">_open</span><span class="p">(</span><span class="n">dvs_path</span><span class="p">,</span> <span class="n">grb_content</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">simulation_start_time</span><span class="p">,</span> <span class="n">time_unit</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_open</span><span class="p">(</span><span class="n">dvs_path</span><span class="p">,</span> <span class="n">grb_content</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">simulation_start_time</span><span class="p">,</span> <span class="n">time_unit</span><span class="p">)</span></div>
+
 
 
 <span class="k">def</span> <span class="nf">open_conc</span><span class="p">(</span>

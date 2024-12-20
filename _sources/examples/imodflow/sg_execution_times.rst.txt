@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.562** total execution time for 1 file **from examples\imodflow**:
+**00:00.719** total execution time for 1 file **from examples\imodflow**:
 
 .. container::
 
@@ -33,5 +33,5 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_examples_imodflow_ImodflowProjectfile.py` (``ImodflowProjectfile.py``)
-     - 00:00.562
+     - 00:00.719
      - 0.0

@@ -112,7 +112,7 @@ Rasterrize the shapes
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x000001D9A4739A10>
+    <matplotlib.image.AxesImage object at 0x00000265D6645450>
 
 
 
@@ -148,14 +148,14 @@ To rasterize on a different grid, create a dummy grid
  .. code-block:: none
 
 
-    <matplotlib.image.AxesImage object at 0x000001D99F0CF910>
+    <matplotlib.image.AxesImage object at 0x00000265DC3803D0>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.781 seconds)
+   **Total running time of the script:** (0 minutes 0.969 seconds)
 
 
 .. _sphx_glr_download_examples_prepare_rasterize_shp.py:

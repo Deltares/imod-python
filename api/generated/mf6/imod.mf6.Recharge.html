@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>imod.mf6.Recharge &#8212; iMOD Python 1.0.0b0 documentation</title>
+    <title>imod.mf6.Recharge &#8212; iMOD Python 1.0.0rc0 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="../../../_static/documentation_options.js?v=ada814e5"></script>
+    <script src="../../../_static/documentation_options.js?v=d3b94175"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/generated/mf6/imod.mf6.Recharge';</script>
@@ -53,7 +53,7 @@
     <link rel="prev" title="imod.mf6.NodePropertyFlow.clip_box" href="imod.mf6.NodePropertyFlow.clip_box.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b0.dev" />
+  <meta name="docsearch:version" content="1.0.0rc0.dev" />
   </head>
   
   
@@ -117,8 +117,8 @@
     
     
     
-    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0b0 documentation - Home"/>
-    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0b0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-light.svg" class="logo__image only-light" alt="iMOD Python 1.0.0rc0 documentation - Home"/>
+    <img src="../../../_static/imod-python-logo-dark.svg" class="logo__image only-dark pst-js-only" alt="iMOD Python 1.0.0rc0 documentation - Home"/>
   
   
 </a></div>
@@ -543,6 +543,7 @@
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.open_hds.html">imod.mf6.open_hds</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.open_cbc.html">imod.mf6.open_cbc</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.read_cbc_headers.html">imod.mf6.read_cbc_headers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.mf6.open_dvs.html">imod.mf6.open_dvs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.html">imod.mf6.Modflow6Simulation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.create_time_discretization.html">imod.mf6.Modflow6Simulation.create_time_discretization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Modflow6Simulation.write.html">imod.mf6.Modflow6Simulation.write</a></li>
@@ -627,6 +628,7 @@
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.NodePropertyFlow.clip_box.html">imod.mf6.NodePropertyFlow.clip_box</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">imod.mf6.Recharge</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Recharge.from_imod5_data.html">imod.mf6.Recharge.from_imod5_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="imod.mf6.Recharge.from_imod5_cap_data.html">imod.mf6.Recharge.from_imod5_cap_data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Recharge.mask.html">imod.mf6.Recharge.mask</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Recharge.regrid_like.html">imod.mf6.Recharge.regrid_like</a></li>
 <li class="toctree-l2"><a class="reference internal" href="imod.mf6.Recharge.clip_box.html">imod.mf6.Recharge.clip_box</a></li>
@@ -905,7 +907,7 @@ cell specified in the list if the specified cell is inactive.</p></li>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_file</span></code>(path, **kwargs)</p></td>
 <td><p>Loads an imod mf6 package from a file (currently only netcdf and zarr are supported).</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_imod5_cap_data</span></code>(imod5_data, target_dis)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="imod.mf6.Recharge.from_imod5_cap_data.html#imod.mf6.Recharge.from_imod5_cap_data" title="imod.mf6.Recharge.from_imod5_cap_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_imod5_cap_data</span></code></a>(imod5_data, target_dis)</p></td>
 <td><p>Construct an rch-package from iMOD5 data in the CAP package, loaded with the <a class="reference internal" href="../io/imod.formats.prj.open_projectfile_data.html#imod.formats.prj.open_projectfile_data" title="imod.formats.prj.open_projectfile_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">imod.formats.prj.open_projectfile_data()</span></code></a> function.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="imod.mf6.Recharge.from_imod5_data.html#imod.mf6.Recharge.from_imod5_data" title="imod.mf6.Recharge.from_imod5_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_imod5_data</span></code></a>(imod5_data, target_dis[, ...])</p></td>

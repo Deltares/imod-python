@@ -173,7 +173,7 @@ Set inactive cells by specifying ``bnd[index] = 0.0``
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x000001D9A0D27D90>
+    <matplotlib.collections.QuadMesh object at 0x00000265DB3052D0>
 
 
 
@@ -211,7 +211,7 @@ that is: ``bnd[index] = -1``
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x000001D9A5F48ED0>
+    <matplotlib.collections.QuadMesh object at 0x00000265DCB72AD0>
 
 
 
@@ -281,7 +281,7 @@ And, on both sides, the outer 15 cells of the top row are inactive in the transp
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x000001D9A0E46A90>
+    <matplotlib.collections.QuadMesh object at 0x00000265DB26E690>
 
 
 
@@ -329,7 +329,7 @@ Define the starting concentrations
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x000001D9A5E84950>
+    <matplotlib.collections.QuadMesh object at 0x00000265D7A6E2D0>
 
 
 
@@ -421,7 +421,7 @@ Define starting heads, these will be inserted in the Basic Flow (BAS) package
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x000001D99F093D50>
+    <matplotlib.collections.QuadMesh object at 0x00000265D6466590>
 
 
 
@@ -468,7 +468,7 @@ Define horizontal hydraulic conductivity
  .. code-block:: none
 
 
-    <matplotlib.collections.QuadMesh object at 0x000001D99FBA5D90>
+    <matplotlib.collections.QuadMesh object at 0x00000265DCE66790>
 
 
 
@@ -580,7 +580,7 @@ plot results as follows:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.375 seconds)
+   **Total running time of the script:** (0 minutes 3.969 seconds)
 
 
 .. _sphx_glr_download_examples_imod-wq_Hydrocoin.py:
