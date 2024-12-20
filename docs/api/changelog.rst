@@ -34,26 +34,27 @@ Added
 Fixed
 ~~~~~
 
-- Fixed bug where :class:`HorizontalFlowBarrierResistance`,
-  :class:`HorizontalFlowBarrierSingleLayerResistance` and other HFB packages
-  could not be allocated to cell edges when idomain in layer 1 was largely
-  inactive.
+- Fixed bug where :class:`imod.mf6.HorizontalFlowBarrierResistance`,
+  :class:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance` and other HFB
+  packages could not be allocated to cell edges when idomain in layer 1 was
+  largely inactive.
 - Fixed bug where :meth:`HorizontalFlowBarrierResistance.clip_box`,
   :meth:`HorizontalFlowBarrierSingleLayerResistance.clip_box` methods only
   returned deepcopy instead of actually clipping the line geometries.
-- Fixed bug where :class:`HorizontalFlowBarrierResistance`, 
-  :class:`HorizontalFlowBarrierSingleLayerResistance` and other HFB packages could not 
-  be clipped or copied with xarray >= 2024.10.0.
+- Fixed bug where :class:`imod.mf6.HorizontalFlowBarrierResistance`,
+  :class:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance` and other HFB
+  packages could not be clipped or copied with xarray >= 2024.10.0.
 - Fixed crash upon calling :meth:`imod.mf6.GroundwaterFlowModel.dump`, when a
-  :class:`HorizontalFlowBarrierResistance`,
-  :class:`HorizontalFlowBarrierSingleLayerResistance` or other HFB package was
-  assigned to the model.
+  :class:`imod.mf6.HorizontalFlowBarrierResistance`,
+  :class:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance` or other HFB
+  package was assigned to the model.
 - :meth:`imod.mf6.Modflow6Simulation.regrid_like` can now regrid a structured
   model to an unstructured grid.
 - :meth:`imod.mf6.Modflow6Simulation.regrid_like` throws a
   ``NotImplementedError`` when attempting to regrid an unstructured model to a
   structured grid.
-- :class:`imod.msw.Sprinkling` now correctly writes source svats to scap_svat.inp file.
+- :class:`imod.msw.Sprinkling` now correctly writes source svats to
+  scap_svat.inp file.
 - :func:`imod.evaluate.calculate_gxg`, upon providing a head dataarray chunked
   over time, will no longer error with ``ValueError: Object has inconsistent
   chunks along dimension bimonth. This can be fixed by calling unify_chunks().``
@@ -70,8 +71,8 @@ Changed
 - If ``"cap"`` package present in ``imod5_data``,
   :meth:`imod.mf6.GroundwaterFlowModel.from_imod5_data` now automatically adds a
   well for metaswap sprinkling named ``"msw-sprinkling"``
-- Less strict validation for :class:`HorizontalFlowBarrierResistance`,
-  :class:`HorizontalFlowBarrierSingleLayerResistance` and other HFB packages for
+- Less strict validation for :class:`imod.mf6.HorizontalFlowBarrierResistance`,
+  :class:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance` and other HFB packages for
   simulations which are imported with
   :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`
 - DeprecationWarning thrown upon initializing :class:`imod.prepare.Regridder`.
@@ -87,9 +88,9 @@ Changed
 Added
 ~~~~~
 
-- :class:`imod.prepare.topsystem.SimulationAllocationOptions`,
-  :class:`imod.prepare.topsystem.SimulationDistributingOptions`, which are used
-  to store default allocation and distributing options respectively.
+- :class:`imod.prepare.SimulationAllocationOptions`,
+  :class:`imod.prepare.SimulationDistributingOptions`, which are used to store
+  default allocation and distributing options respectively.
 
 Fixed
 ~~~~~
@@ -150,7 +151,8 @@ Changed
 
 - :class:`imod.mf6.Well` now also validates that well filter top is above well
   filter bottom
-- :func:`open_projectfile_data` now also imports well filter top and bottom.
+- :func:`imod.formats.prj.open_projectfile_data` now also imports well filter
+  top and bottom.
 - :class:`imod.mf6.Well` now logs a warning if any wells are removed during writing.
 - :class:`imod.mf6.HorizontalFlowBarrierResistance`,
   :class:`imod.mf6.HorizontalFlowBarrierMultiplier`,
@@ -160,8 +162,8 @@ Changed
   :func:`imod.prepare.linestring_to_square_zpolygons` and
   :func:`imod.prepare.linestring_to_trapezoid_zpolygons` to generate these
   polygons.
-- :func:`open_projectfile_data` now returns well data grouped by ipf name,
-  instead of generic, separate number per entry.
+- :func:`imod.formats.prj.open_projectfile_data` now returns well data grouped
+  by ipf name, instead of generic, separate number per entry.
 - :class:`imod.mf6.Well` now supports wells which have a filter with zero
   length, where ``"screen_top"`` equals ``"screen_bottom"``.
 - :class:`imod.mf6.Well` shares the same default ``minimum_thickness`` as
