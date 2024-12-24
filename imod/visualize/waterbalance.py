@@ -167,6 +167,6 @@ def waterbalance_barchart(
 
     # Set a unit on the y-axis
     if unit is not None:
-        ax.yaxis.set_label(unit)
+        ax.set_ylabel(unit)
 
     return ax
