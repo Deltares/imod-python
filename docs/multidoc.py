@@ -38,7 +38,7 @@ class MultiDoc:
             else self.current_dir / self.config["doc_folder"]
         )
 
-        # Setup url
+        # Switch between online or offline url
         self.baseurl = (
             "https://deltares.github.io/imod-python"
             if not self.config["local_build"]
@@ -143,7 +143,7 @@ class MultiDoc:
             # Apply patch to older version. Once it is known in which version(branch/tag) this file will be added
             # we can add a check to apply this patch only to older versions
             print("Applying patch")
-            _ = subprocess.run(
+            subprocess.run(
                 ["git", "apply", self.patch_file],
                 cwd=self.work_dir,
                 check=True,
@@ -154,14 +154,17 @@ class MultiDoc:
                 "Clearing pixi enviroment settings. This is needed for a clean build."
             )
             env = os.environ
+
+            ## Remove any path locations to dependencies inside the local .pixi folder
             path_items = os.environ["PATH"].split(os.pathsep)
             filtered_path = [
                 path
                 for path in path_items
-                if not os.path.abspath(path).startswith(str(self.root_dir))
+                if not os.path.abspath(path).startswith(str(self.root_dir / ".pixi"))
             ]
             env["Path"] = os.pathsep.join(filtered_path)
 
+            ## Remove environment variables added by pixi
             pixi_env_vars = [
                 "PIXI_PROJECT_ROOT",
                 "PIXI_PROJECT_NAME",
@@ -184,13 +187,13 @@ class MultiDoc:
 
             # Build the documentation of the branch
             print("Start sphinx-build.")
-            _ = subprocess.run(
+            subprocess.run(
                 ["pixi", "run", "--frozen", "install"],
                 cwd=self.work_dir,
                 env=env,
                 check=True,
             )
-            _ = subprocess.run(
+            subprocess.run(
                 [
                     "pixi",
                     "run",
@@ -241,6 +244,13 @@ class MultiDoc:
 
 
 class GitWorktreeManager:
+    """Context for working with git worktree
+
+    When combined with a `with` statement this class automatically
+    creates a worktree and removes it at exit
+
+    """
+
     def __init__(self, repo, work_dir, branch_or_tag):
         self.repo = repo
         self.work_dir = work_dir
@@ -261,6 +271,8 @@ class GitWorktreeManager:
 
 
 class SwitcherBuilder:
+    """Helper class for building the switcher.json file"""
+
     def __init__(self, versions, baseurl):
         self._versions = versions
         self._versions.sort(reverse=True)
