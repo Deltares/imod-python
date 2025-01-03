@@ -145,3 +145,4 @@ examples/data
 /imod/tests/mydask.png
 /imod/tests/*_report.xml
 docs/sg_execution_times.rst
+docs/workdir/
