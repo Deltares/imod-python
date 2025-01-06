@@ -33,7 +33,7 @@ def assert_simulation_can_run(simulation: imod.mf6.Modflow6Simulation, modeldir:
 
         # filter output on idomain
         idomain = simulation[flowmodel].domain
-        head = head.reindex_like(idomain, "nearest", 1e-5)
+        head = head.reindex_like(idomain, method="nearest", tolerance=1e-5)
         head = head.where(idomain == 1, other=0)
 
         # Test that heads are not nan
