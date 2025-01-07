@@ -230,14 +230,14 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         layered_data["head"] = planar_data["head"].where(ghb_allocation)
         layered_data["head"] = enforce_dim_order(layered_data["head"])
 
-        conductance = planar_data["conductance"]
-        if "layer" in conductance.coords:
-            conductance = conductance.isel({"layer": 0}, drop=True)
+        planar_conductance = planar_data["conductance"]
+        if "layer" in planar_conductance.coords:
+            planar_conductance = planar_conductance.isel({"layer": 0}, drop=True)
 
         layered_data["conductance"] = distribute_ghb_conductance(
             distributing_option,
             ghb_allocation,
-            conductance,
+            planar_conductance,
             top,
             bottom,
             npf.dataset["k"],
