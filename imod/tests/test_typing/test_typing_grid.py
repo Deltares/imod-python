@@ -89,12 +89,16 @@ def test_is_planar_grid(basic_dis, basic_unstructured_dis):
         bottom_layer = ibound.sel(layer=3)
         assert is_planar_grid(bottom_layer)
 
-        # set layer coordinates as  present and not  empty or 0
+        # set layer coordinates as present and not empty or 0
         bottom_layer = bottom_layer.expand_dims({"layer": [9]})
         assert not is_planar_grid(bottom_layer)
 
-        # set layer coordinates as  present and   0
+        # set layer coordinates as present and 0
         bottom_layer.coords["layer"].values[0] = 0
+        assert is_planar_grid(bottom_layer)
+
+        # set layer coordinates as present and -1
+        bottom_layer.coords["layer"].values[0] = -1
         assert is_planar_grid(bottom_layer)
 
 

@@ -430,7 +430,7 @@ def is_planar_grid(
         return True
     if grid["layer"].shape == ():
         return True
-    if grid["layer"][0] == 0 and len(grid["layer"]) == 1:
+    if grid["layer"][0] <= 0 and len(grid["layer"]) == 1:
         return True
     return False
 
