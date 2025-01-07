@@ -14,19 +14,19 @@ repository = "https://github.com/Deltares/imod-python.git"
 
 [tasks]
 # General tasks
-docs = { cmd = "make html", depends_on = ["install"], cwd = "docs" }
+docs = { cmd = "make html", depends-on = ["install"], cwd = "docs" }
 install = "python -m pip install --no-deps --editable ."
 pypi-publish = { cmd = "rm --recursive --force dist && python -m build && twine check dist/* && twine upload dist/*" }
 
 # Lint and format tasks
 format = "ruff check --fix .; ruff format ."
 lint = "ruff check . ; ruff format --check ."
-mypy_lint = { cmd ="mypy", depends_on = ["install"]}
-mypy_report = { cmd ="mypy | mypy2junit > mypy-report.xml", depends_on = ["install"]}
+mypy_lint = { cmd ="mypy", depends-on = ["install"]}
+mypy_report = { cmd ="mypy | mypy2junit > mypy-report.xml", depends-on = ["install"]}
 
 # Tests tasks
-tests = { depends_on = ["unittests", "examples"] }
-unittests = { depends_on = ["unittests_njit", "unittests_jit"] }
+tests = { depends-on = ["unittests", "examples"] }
+unittests = { depends-on = ["unittests_njit", "unittests_jit"] }
 unittests_njit = { cmd = [
     "NUMBA_DISABLE_JIT=1",
     "pytest",
@@ -39,7 +39,7 @@ unittests_njit = { cmd = [
     "--cov-report=term",
     "--cov-report=html:coverage",
     "--cov-config=.coveragerc"
-], depends_on = ["install"], cwd = "imod/tests" }
+], depends-on = ["install"], cwd = "imod/tests" }
 unittests_jit = { cmd = [
     "pytest",
     "-n", "auto",
@@ -47,7 +47,7 @@ unittests_jit = { cmd = [
     "--cache-clear",
     "--verbose",
     "--junitxml=unittest_jit_report.xml",
-], depends_on = ["install"], cwd = "imod/tests" }
+], depends-on = ["install"], cwd = "imod/tests" }
 # User acceptance tests, only works when paths to models are located on local
 # drive and are specified in a .env file.
 user_acceptance = { cmd = [
@@ -56,7 +56,7 @@ user_acceptance = { cmd = [
     "--cache-clear",
     "--verbose",
     "--junitxml=user_acceptance_report.xml",
-], depends_on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
+], depends-on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
 
 examples = { cmd = [
     "pytest",
@@ -65,7 +65,7 @@ examples = { cmd = [
     "--cache-clear",
     "--verbose",
     "--junitxml=examples_report.xml",
-], depends_on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
+], depends-on = ["install"], cwd = "imod/tests", env = { IMOD_DATA_DIR = ".imod_data" } }
 
 [dependencies]
 affine = "*"
@@ -161,7 +161,7 @@ test_import = { cmd = [
     "python",
     "-c",
     "import imod"
-], depends_on = ["install_with_deps"]}
+], depends-on = ["install_with_deps"]}
 install_with_deps = "python -m pip install --editable ."
 
 [environments]
