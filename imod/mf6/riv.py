@@ -202,6 +202,91 @@ class River(BoundaryCondition, IRegridPackage):
         super().__init__(cleaned_dict)
 
     @classmethod
+    def allocate_and_distribute_planar_data(
+        cls,
+        planar_data: dict[str, GridDataArray],
+        dis: StructuredDiscretization,
+        npf: NodePropertyFlow,
+        allocation_option: ALLOCATION_OPTION,
+        distributing_option: DISTRIBUTING_OPTION,
+    ) -> dict[str, GridDataArray]:
+        """
+        Allocate and distribute planar data for given discretization and npf
+        package.
+
+        Parameters
+        ----------
+        planar_data: dict[str, GridDataArray]
+            Dictionary with planar grid data.
+        dis: imod.mf6.StructuredDiscretization
+            Model discretization package.
+        npf: imod.mf6.NodePropertyFlow
+            Node property flow package.
+        allocation_option: ALLOCATION_OPTION
+            allocation option.
+        distributing_option: DISTRIBUTING_OPTION
+            distributing option.
+
+        Returns
+        -------
+        dict[str, GridDataArray]
+            Dictionary with layered grid data.
+        """
+        top = dis.dataset["top"]
+        bottom = dis.dataset["bottom"]
+        idomain = dis.dataset["idomain"]
+
+        riv_allocation, _ = allocate_riv_cells(
+            allocation_option,
+            idomain > 0,
+            top,
+            bottom,
+            planar_data["stage"],
+            planar_data["bottom_elevation"],
+        )
+
+        layered_data = {}
+        layered_data["conductance"] = distribute_riv_conductance(
+            distributing_option,
+            riv_allocation,
+            planar_data["conductance"],
+            top,
+            bottom,
+            npf.dataset["k"],
+            planar_data["stage"],
+            planar_data["bottom_elevation"],
+        )
+
+        # create layered arrays of stage and bottom elevation
+        layered_data["stage"] = planar_data["stage"].where(riv_allocation)
+        layered_data["stage"] = enforce_dim_order(layered_data["stage"])
+        layered_data["bottom_elevation"] = planar_data["bottom_elevation"].where(
+            riv_allocation
+        )
+        layered_data["bottom_elevation"] = enforce_dim_order(
+            layered_data["bottom_elevation"]
+        )
+
+        # due to regridding, the layered_bottom_elevation could be smaller than the
+        # bottom, so here we overwrite it with bottom if that's
+        # the case.
+        layer_bottom_above_bottom_elevation = bottom > layered_data["bottom_elevation"]
+
+        if layer_bottom_above_bottom_elevation.any():
+            logging.logger.log(
+                loglevel=LogLevel.WARNING,
+                message="Note: riv bottom was detected below model bottom. Updated the riv's bottom.",
+                additional_depth=0,
+            )
+            layered_data["bottom_elevation"] = xr.where(
+                layer_bottom_above_bottom_elevation,
+                bottom,
+                layered_data["bottom_elevation"],
+            )
+
+        return layered_data
+
+    @classmethod
     def from_imod5_data(
         cls,
         key: str,
@@ -244,7 +329,7 @@ class River(BoundaryCondition, IRegridPackage):
             End-time of the simulation. Used for expanding period data.
         allocation_option: ALLOCATION_OPTION
             allocation option.
-        distributing_option: dict[str, DISTRIBUTING_OPTION]
+        distributing_option: DISTRIBUTING_OPTION
             distributing option.
         regridder_types: RiverRegridMethod, optional
             Optional dataclass with regridder types for a specific variable.
@@ -261,12 +346,7 @@ class River(BoundaryCondition, IRegridPackage):
         this can happen if the infiltration factor is 0 or 1 everywhere.
         """
 
-        logger = logging.logger
-        # gather discretrizations
-        target_top = target_dis.dataset["top"]
-        target_bottom = target_dis.dataset["bottom"]
         target_idomain = target_dis.dataset["idomain"]
-        target_k = target_npf.dataset["k"]
 
         # gather input data
         data = {
@@ -277,7 +357,7 @@ class River(BoundaryCondition, IRegridPackage):
                 deep=True
             ),
         }
-        is_planar_conductance = is_planar_grid(data["conductance"])
+        is_planar = is_planar_grid(data["conductance"])
 
         # set up regridder methods
         if regridder_types is None:
@@ -287,57 +367,20 @@ class River(BoundaryCondition, IRegridPackage):
             data, target_idomain, regridder_types, regrid_cache, {}
         )
 
-        conductance = regridded_package_data["conductance"]
-        infiltration_factor = regridded_package_data["infiltration_factor"]
+        infiltration_factor = regridded_package_data.pop(
+            "infiltration_factor"
+        )
 
-        if is_planar_conductance:
-            riv_allocation = allocate_riv_cells(
+        if is_planar:
+            # allocate and distribute planar data
+            layered_data = cls.allocate_and_distribute_planar_data(
+                regridded_package_data,
+                target_dis,
+                target_npf,
                 allocation_option,
-                target_idomain == 1,
-                target_top,
-                target_bottom,
-                regridded_package_data["stage"],
-                regridded_package_data["bottom_elevation"],
-            )
-
-            regridded_package_data["conductance"] = distribute_riv_conductance(
                 distributing_option,
-                riv_allocation[0],
-                conductance,
-                target_top,
-                target_bottom,
-                target_k,
-                regridded_package_data["stage"],
-                regridded_package_data["bottom_elevation"],
             )
-
-            # create layered arrays of stage and bottom elevation
-            layered_stage = regridded_package_data["stage"].where(riv_allocation[0])
-            layered_stage = enforce_dim_order(layered_stage)
-            regridded_package_data["stage"] = layered_stage
-
-            layered_bottom_elevation = regridded_package_data["bottom_elevation"].where(
-                riv_allocation[0]
-            )
-            layered_bottom_elevation = enforce_dim_order(layered_bottom_elevation)
-
-            # due to regridding, the layered_bottom_elevation could be smaller than the
-            # bottom, so here we overwrite it with bottom if that's
-            # the case.
-
-            if np.any((target_bottom > layered_bottom_elevation).values[()]):
-                logger.log(
-                    loglevel=LogLevel.WARNING,
-                    message="Note: riv bottom was detected below model bottom. Updated the riv's bottom.",
-                    additional_depth=0,
-                )
-            layered_bottom_elevation = xr.where(
-                target_bottom > layered_bottom_elevation,
-                target_bottom,
-                layered_bottom_elevation,
-            )
-
-            regridded_package_data["bottom_elevation"] = layered_bottom_elevation
+            regridded_package_data.update(layered_data)
 
         # update the conductance of the river package to account for the infiltration
         # factor
@@ -345,7 +388,6 @@ class River(BoundaryCondition, IRegridPackage):
             regridded_package_data["conductance"], infiltration_factor
         )
         regridded_package_data["conductance"] = river_conductance
-        regridded_package_data.pop("infiltration_factor")
         regridded_package_data["bottom_elevation"] = enforce_dim_order(
             regridded_package_data["bottom_elevation"]
         )

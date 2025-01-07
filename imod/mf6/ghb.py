@@ -183,6 +183,68 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         super().__init__(cleaned_dict)
 
     @classmethod
+    def allocate_and_distribute_planar_data(
+        cls,
+        planar_data: dict[str, GridDataArray],
+        dis: StructuredDiscretization,
+        npf: NodePropertyFlow,
+        allocation_option: ALLOCATION_OPTION,
+        distributing_option: DISTRIBUTING_OPTION,
+    ) -> dict[str, GridDataArray]:
+        """
+        Allocate and distribute planar data for given discretization and npf
+        package.
+
+        Parameters
+        ----------
+        planar_data: dict[str, GridDataArray]
+            Dictionary with planar grid data.
+        dis: imod.mf6.StructuredDiscretization
+            Model discretization package.
+        npf: imod.mf6.NodePropertyFlow
+            Node property flow package.
+        allocation_option: ALLOCATION_OPTION
+            allocation option.
+        distributing_option: DISTRIBUTING_OPTION
+            distributing option.
+
+        Returns
+        -------
+        dict[str, GridDataArray]
+            Dictionary with layered grid data.
+        """
+
+        top = dis.dataset["top"]
+        bottom = dis.dataset["bottom"]
+        idomain = dis.dataset["idomain"]
+
+        ghb_allocation = allocate_ghb_cells(
+            allocation_option,
+            idomain > 0,
+            top,
+            bottom,
+            planar_data["head"],
+        )
+
+        layered_data = {}
+        layered_data["head"] = planar_data["head"].where(ghb_allocation)
+        layered_data["head"] = enforce_dim_order(layered_data["head"])
+
+        conductance = planar_data["conductance"]
+        if "layer" in conductance.coords:
+            conductance = conductance.isel({"layer": 0}, drop=True)
+
+        layered_data["conductance"] = distribute_ghb_conductance(
+            distributing_option,
+            ghb_allocation,
+            conductance,
+            top,
+            bottom,
+            npf.dataset["k"],
+        )
+        return layered_data
+
+    @classmethod
     def from_imod5_data(
         cls,
         key: str,
@@ -237,10 +299,6 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         -------
         A  Modflow 6 GeneralHeadBoundary packages.
         """
-        target_top = target_dis.dataset["top"]
-        target_bottom = target_dis.dataset["bottom"]
-        target_idomain = target_dis.dataset["idomain"]
-
         idomain = target_dis.dataset["idomain"]
         data = {
             "head": imod5_data[key]["head"],
@@ -255,35 +313,14 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
             data, idomain, regridder_types, regrid_cache, {}
         )
         if is_planar:
-            conductance = regridded_package_data["conductance"]
-
-            planar_head = regridded_package_data["head"]
-            k = target_npf.dataset["k"]
-
-            ghb_allocation = allocate_ghb_cells(
+            layered_data = cls.allocate_and_distribute_planar_data(
+                regridded_package_data,
+                target_dis,
+                target_npf,
                 allocation_option,
-                target_idomain == 1,
-                target_top,
-                target_bottom,
-                planar_head,
-            )
-
-            layered_head = planar_head.where(ghb_allocation)
-            layered_head = enforce_dim_order(layered_head)
-
-            regridded_package_data["head"] = layered_head
-
-            if "layer" in conductance.coords:
-                conductance = conductance.isel({"layer": 0}, drop=True)
-
-            regridded_package_data["conductance"] = distribute_ghb_conductance(
                 distributing_option,
-                ghb_allocation,
-                conductance,
-                target_top,
-                target_bottom,
-                k,
             )
+            regridded_package_data.update(layered_data)
 
         ghb = GeneralHeadBoundary(**regridded_package_data, validate=True)
         repeat = period_data.get(key)
