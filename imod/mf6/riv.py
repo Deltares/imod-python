@@ -367,9 +367,7 @@ class River(BoundaryCondition, IRegridPackage):
             data, target_idomain, regridder_types, regrid_cache, {}
         )
 
-        infiltration_factor = regridded_package_data.pop(
-            "infiltration_factor"
-        )
+        infiltration_factor = regridded_package_data.pop("infiltration_factor")
 
         if is_planar:
             # allocate and distribute planar data
