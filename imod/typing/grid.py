@@ -435,6 +435,20 @@ def is_planar_grid(
     return False
 
 
+def has_negative_layer(
+    grid: xr.DataArray | xr.Dataset | xu.UgridDataArray | xu.UgridDataset,
+) -> bool:
+    if not is_spatial_grid(grid):
+        return False
+    if "layer" not in grid.coords:
+        return False
+    if grid["layer"].shape == ():
+        return False
+    if grid["layer"][0] < 0:
+        return True
+    return False
+
+
 def is_transient_data_grid(
     grid: xr.DataArray | xr.Dataset | xu.UgridDataArray | xu.UgridDataset,
 ):

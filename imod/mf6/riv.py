@@ -38,7 +38,7 @@ from imod.schemata import (
     OtherCoordsSchema,
 )
 from imod.typing import GridDataArray
-from imod.typing.grid import enforce_dim_order, is_planar_grid
+from imod.typing.grid import enforce_dim_order, has_negative_layer, is_planar_grid
 from imod.util.expand_repetitions import expand_repetitions
 
 
@@ -235,6 +235,15 @@ class River(BoundaryCondition, IRegridPackage):
         top = dis.dataset["top"]
         bottom = dis.dataset["bottom"]
         idomain = dis.dataset["idomain"]
+
+        if has_negative_layer(planar_data["head"]):
+            allocation_option = ALLOCATION_OPTION.at_first_active
+
+        # Enforce planar data, remove all layer dimension information
+        planar_data = {
+            key: grid.isel({"layer": 0}, drop=True, missing_dims="ignore")
+            for key, grid in planar_data.items()
+        }
 
         riv_allocation, _ = allocate_riv_cells(
             allocation_option,

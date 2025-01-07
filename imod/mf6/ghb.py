@@ -34,7 +34,7 @@ from imod.schemata import (
     OtherCoordsSchema,
 )
 from imod.typing import GridDataArray
-from imod.typing.grid import enforce_dim_order, is_planar_grid
+from imod.typing.grid import enforce_dim_order, has_negative_layer, is_planar_grid
 from imod.util.expand_repetitions import expand_repetitions
 
 
@@ -218,6 +218,15 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         bottom = dis.dataset["bottom"]
         idomain = dis.dataset["idomain"]
 
+        if has_negative_layer(planar_data["head"]):
+            allocation_option = ALLOCATION_OPTION.at_first_active
+
+        # Enforce planar data, remove all layer dimension information
+        planar_data = {
+            key: grid.isel({"layer": 0}, drop=True, missing_dims="ignore")
+            for key, grid in planar_data.items()
+        }
+
         ghb_allocation = allocate_ghb_cells(
             allocation_option,
             idomain > 0,
@@ -230,14 +239,10 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         layered_data["head"] = planar_data["head"].where(ghb_allocation)
         layered_data["head"] = enforce_dim_order(layered_data["head"])
 
-        planar_conductance = planar_data["conductance"]
-        if "layer" in planar_conductance.coords:
-            planar_conductance = planar_conductance.isel({"layer": 0}, drop=True)
-
         layered_data["conductance"] = distribute_ghb_conductance(
             distributing_option,
             ghb_allocation,
-            planar_conductance,
+            planar_data["conductance"],
             top,
             bottom,
             npf.dataset["k"],
