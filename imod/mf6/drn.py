@@ -215,7 +215,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
         bottom = dis.dataset["bottom"]
         idomain = dis.dataset["idomain"]
 
-        if has_negative_layer(planar_data["head"]):
+        if has_negative_layer(planar_data["elevation"]):
             allocation_option = ALLOCATION_OPTION.at_first_active
 
         # Enforce planar data, remove all layer dimension information

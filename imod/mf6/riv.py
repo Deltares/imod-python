@@ -236,7 +236,7 @@ class River(BoundaryCondition, IRegridPackage):
         bottom = dis.dataset["bottom"]
         idomain = dis.dataset["idomain"]
 
-        if has_negative_layer(planar_data["head"]):
+        if has_negative_layer(planar_data["stage"]):
             allocation_option = ALLOCATION_OPTION.at_first_active
 
         # Enforce planar data, remove all layer dimension information
@@ -388,6 +388,9 @@ class River(BoundaryCondition, IRegridPackage):
                 distributing_option,
             )
             regridded_package_data.update(layered_data)
+            infiltration_factor = infiltration_factor.isel(
+                {"layer": 0}, drop=True, missing_dims="ignore"
+            )
 
         # update the conductance of the river package to account for the infiltration
         # factor
