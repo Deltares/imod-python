@@ -251,9 +251,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
 
         # if rate has only layer 0, then it is planar.
         if is_planar_grid(regridded_package_data["rate"]):
-            layered_data = cls.allocate_planar_data(
-                regridded_package_data, target_dis, ALLOCATION_OPTION.at_first_active
-            )
+            layered_data = cls.allocate_planar_data(regridded_package_data, target_dis)
             regridded_package_data.update(layered_data)
 
         return cls(**regridded_package_data, validate=True, fixed_cell=False)
