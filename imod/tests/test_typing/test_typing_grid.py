@@ -7,6 +7,7 @@ from imod.typing.grid import (
     GridCache,
     as_ugrid_dataarray,
     enforce_dim_order,
+    has_negative_layer,
     is_planar_grid,
     is_spatial_grid,
     is_transient_data_grid,
@@ -100,6 +101,27 @@ def test_is_planar_grid(basic_dis, basic_unstructured_dis):
         # set layer coordinates as present and -1
         bottom_layer.coords["layer"].values[0] = -1
         assert is_planar_grid(bottom_layer)
+
+
+def test_has_negative_layer(basic_dis, basic_unstructured_dis):
+    discretizations = [basic_dis, basic_unstructured_dis]
+    for discr in discretizations:
+        ibound, _, _ = discr
+
+        # layer coordinates is present
+        assert not has_negative_layer(ibound)
+
+        # set layer coordinates as present but empty
+        bottom_layer = ibound.sel(layer=3)
+        assert not has_negative_layer(bottom_layer)
+
+        # set layer coordinates as present and not empty or -1
+        bottom_layer = bottom_layer.expand_dims({"layer": [9]})
+        assert not has_negative_layer(bottom_layer)
+
+        # set layer coordinates as present and -1
+        bottom_layer.coords["layer"].values[0] = -1
+        assert has_negative_layer(bottom_layer)
 
 
 def test_is_spatial_grid__structured(basic_dis):
