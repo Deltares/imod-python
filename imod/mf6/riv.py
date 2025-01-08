@@ -212,7 +212,9 @@ class River(BoundaryCondition, IRegridPackage):
     ) -> dict[str, GridDataArray]:
         """
         Allocate and distribute planar data for given discretization and npf
-        package.
+        package. If layer number of ``planar_data`` is negative,
+        ``allocation_option`` is overrided and set to
+        ALLOCATION_OPTION.at_first_active.
 
         Parameters
         ----------
@@ -223,7 +225,9 @@ class River(BoundaryCondition, IRegridPackage):
         npf: imod.mf6.NodePropertyFlow
             Node property flow package.
         allocation_option: ALLOCATION_OPTION
-            allocation option.
+            allocation option. If planar data is assigned to a negative layer
+            number, this option is overridden and set to
+            ALLOCATION_OPTION.at_first_active.
         distributing_option: DISTRIBUTING_OPTION
             distributing option.
 
@@ -337,7 +341,9 @@ class River(BoundaryCondition, IRegridPackage):
         time_max: datetime
             End-time of the simulation. Used for expanding period data.
         allocation_option: ALLOCATION_OPTION
-            allocation option.
+            allocation option. If package data is assigned to a negative layer
+            number, this option is overridden and set to
+            ALLOCATION_OPTION.at_first_active.
         distributing_option: DISTRIBUTING_OPTION
             distributing option.
         regridder_types: RiverRegridMethod, optional

@@ -166,11 +166,11 @@ class Recharge(BoundaryCondition, IRegridPackage):
         cls,
         planar_data: dict[str, GridDataArray],
         dis: StructuredDiscretization,
-        allocation_option: ALLOCATION_OPTION,
     ) -> dict[str, GridDataArray]:
         """
         Allocate and distribute planar data for given discretization and npf
-        package.
+        package. To allocate cells, the allocation option
+        ALLOCATION_OPTION.at_first_active is set.
 
         Parameters
         ----------
@@ -180,10 +180,6 @@ class Recharge(BoundaryCondition, IRegridPackage):
             Model discretization package.
         npf: imod.mf6.NodePropertyFlow
             Node property flow package.
-        allocation_option: ALLOCATION_OPTION
-            allocation option.
-        distributing_option: DISTRIBUTING_OPTION
-            distributing option.
 
         Returns
         -------

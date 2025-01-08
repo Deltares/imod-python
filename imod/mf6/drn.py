@@ -190,7 +190,9 @@ class Drainage(BoundaryCondition, IRegridPackage):
     ) -> dict[str, GridDataArray]:
         """
         Allocate and distribute planar data for given discretization and npf
-        package.
+        package. If layer number of ``planar_data`` is negative,
+        ``allocation_option`` is overrided and set to
+        ALLOCATION_OPTION.at_first_active.
 
         Parameters
         ----------
@@ -201,7 +203,9 @@ class Drainage(BoundaryCondition, IRegridPackage):
         npf: imod.mf6.NodePropertyFlow
             Node property flow package.
         allocation_option: ALLOCATION_OPTION
-            allocation option.
+            allocation option. If planar data is assigned to a negative layer
+            number, this option is overridden and set to
+            ALLOCATION_OPTION.at_first_active.
         distributing_option: DISTRIBUTING_OPTION
             distributing option.
 
@@ -270,6 +274,8 @@ class Drainage(BoundaryCondition, IRegridPackage):
 
         Parameters
         ----------
+        key: str
+            Packagename of the iMOD5 data to use.
         imod5_data: dict
             Dictionary with iMOD5 data. This can be constructed from the
             :func:`imod.formats.prj.open_projectfile_data` method.
@@ -282,7 +288,9 @@ class Drainage(BoundaryCondition, IRegridPackage):
         target_npf: NodePropertyFlow package
             The conductivity information, used to compute drainage flux
         allocation_option: ALLOCATION_OPTION
-            allocation option.
+            allocation option. If package data is assigned to a negative layer
+            number, this option is overridden and set to
+            ALLOCATION_OPTION.at_first_active.
         distributing_option: dict[str, DISTRIBUTING_OPTION]
             distributing option.
         time_min: datetime
