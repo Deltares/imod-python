@@ -6,6 +6,25 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+[Unreleased]
+------------
+
+Added
+~~~~~
+
+- :meth:`imod.mf6.Recharge.from_imod5_data`,
+  :meth:`imod.mf6.River.from_imod5_data`,
+  :meth:`imod.mf6.Drainage.from_imod5_data`, and
+  :meth:`imod.mf6.GeneralHeadBoundary.from_imod5_data` now assign negative layer
+  numbers to the first active layer.
+
+Changed
+~~~~~~~
+
+- :func:`imod.formats.prj.open_projectfile_data` now also assigns negative and
+  zero layer numbers to grid coordinates.
+
+
 [1.0.0rc1] - 2024-12-20
 -----------------------
 
