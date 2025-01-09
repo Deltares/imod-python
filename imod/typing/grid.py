@@ -421,9 +421,11 @@ def is_empty(object: object) -> bool:  # noqa: F811
 def is_planar_grid(
     grid: xr.DataArray | xr.Dataset | xu.UgridDataArray | xu.UgridDataset,
 ) -> bool:
-    # Returns True if the grid is planar. It has then a layer coordinate with
-    # length 1 and value 0, or an empty layer coordinate axis, or no layer coordinate at all
-    # and it should have either x, y coordinates or cellface/edge coordinates.
+    # Returns True if the grid is planar.
+    # A grid is considered planar when:
+    # - it is a spatial grid (x, y coordinates or cellface/edge coordinates)
+    # - it has no layer coordinates, or, it has a single layer coordinate with
+    #   value less or equal to zero
     if not is_spatial_grid(grid):
         return False
     if "layer" not in grid.coords:

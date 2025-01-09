@@ -707,12 +707,7 @@ def _process_boundary_condition_entry(entry: Dict, periods: Dict[str, datetime])
         dims = ("time",)
         coords["time"] = time
 
-    # 0 signifies that the layer must be determined on the basis of
-    # bottom elevation and stage.
-    # -1 signifies that the layer must be determined on the basis of
-    # top active cells.
     layer = entry["layer"]
-
     coords["layer"] = layer
     dims = dims + ("layer",)
 
