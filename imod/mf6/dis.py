@@ -27,7 +27,6 @@ from imod.schemata import (
     DTypeSchema,
     IdentityNoDataSchema,
     IndexesSchema,
-    UniqueValuesSchema,
     ValidationError,
 )
 from imod.typing.grid import GridDataArray, is_unstructured
@@ -214,7 +213,6 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
 
         # Validate iMOD5 data
         if validate:
-            UniqueValuesSchema([-1, 0, 1]).validate(imod5_data["bnd"]["ibound"])
             if not np.all(
                 new_package_data["top"][1:].data == new_package_data["bottom"][:-1].data
             ):
