@@ -557,7 +557,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             - value name
         """
         top, bottom = broadcast_to_full_domain(idomain, top, bottom)
-        k = idomain * k
+        k = k.where(idomain > 0, 0.0)
         # Enforce unstructured
         unstructured_grid, top, bottom, k = (
             as_ugrid_dataarray(grid) for grid in [idomain, top, bottom, k]
