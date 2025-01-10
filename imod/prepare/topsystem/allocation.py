@@ -83,7 +83,7 @@ def allocate_riv_cells(
         enumerator.
     active: DataArray | UgridDatarray
         Boolean array containing active model cells. For Modflow 6, this is the
-        equivalent of ``idomain == 1``.
+        equivalent of ``idomain > 0``.
     top: DataArray | UgridDatarray
         Grid containing tops of model layers. If has no layer dimension, is
         assumed as top of upper layer and the other layers are padded with
@@ -156,7 +156,7 @@ def allocate_drn_cells(
         enumerator.
     active: DataArray | UgridDatarray
         Boolean array containing active model cells. For Modflow 6, this is the
-        equivalent of ``idomain == 1``.
+        equivalent of ``idomain > 0``.
     top: DataArray | UgridDatarray
         Grid containing tops of model layers. If has no layer dimension, is
         assumed as top of upper layer and the other layers are padded with
@@ -217,7 +217,7 @@ def allocate_ghb_cells(
         enumerator.
     active: DataArray | UgridDatarray
         Boolean array containing active model cells. For Modflow 6, this is the
-        equivalent of ``idomain == 1``.
+        equivalent of ``idomain > 0``.
     top: DataArray | UgridDatarray
         Grid containing tops of model layers. If has no layer dimension, is
         assumed as top of upper layer and the other layers are padded with
@@ -275,7 +275,7 @@ def allocate_rch_cells(
         enumerator.
     active: DataArray | UgridDataArray
         Boolean array containing active model cells. For Modflow 6, this is the
-        equivalent of ``idomain == 1``.
+        equivalent of ``idomain > 0``.
     rate: DataArray | UgridDataArray
         Array with recharge rates. This will only be used to infer where
         recharge cells are defined.

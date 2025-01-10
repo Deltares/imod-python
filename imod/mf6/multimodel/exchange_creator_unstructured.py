@@ -104,7 +104,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
             local_cell_indices = cls._get_local_cell_indices(submodel_partition_info)
 
             global_cell_indices_partition = global_cell_indices.where(
-                submodel_partition_info.active_domain == 1
+                submodel_partition_info.active_domain > 0
             )
             global_cell_indices_partition = global_cell_indices_partition.dropna(
                 "mesh2d_nFaces", how="all"

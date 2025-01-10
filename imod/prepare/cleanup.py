@@ -41,7 +41,7 @@ def _cleanup_robin_boundary(
     idomain: GridDataArray, grids: dict[str, GridDataArray]
 ) -> dict[str, GridDataArray]:
     """Cleanup robin boundary condition (i.e. bc with conductance)"""
-    active = idomain == 1
+    active = idomain > 0
     # Deactivate conductance cells outside active domain; this nodata
     # inconsistency will be aligned in the final call to align_nodata
     conductance = grids["conductance"].where(active)
