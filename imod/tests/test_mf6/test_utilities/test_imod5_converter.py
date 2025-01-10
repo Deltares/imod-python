@@ -62,6 +62,12 @@ class IboundCases:
         idomain = [1, -1, 1, 0, 0]
         return thickness, ibound, idomain
 
+    def case_mixed__idomain_2(self):
+        thickness = [1.0, 0.0, 1.0, 0.0, 1.0]
+        ibound = [2, -1, 2, 2, 0]
+        idomain = [2, -1, 2, 0, 0]
+        return thickness, ibound, idomain
+
 
 @parametrize_with_cases(argnames="thickness,ibound,expected", cases=IboundCases)
 def test_convert_ibound_to_idomain(template_grid, thickness, ibound, expected):
