@@ -27,8 +27,19 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
     Parameters
     ----------
     top: array of floats (xu.UgridDataArray)
+        is the top elevation for each cell in the top model layer.
     bottom: array of floats (xu.UgridDataArray)
+        is the bottom elevation for each cell.
     idomain: array of integers (xu.UgridDataArray)
+        Indicates the existence status of a cell. If the idomain value for a
+        cell is 0, the cell does not exist in the simulation. Input and output
+        values will be read and written for the cell, but internal to the
+        program, the cell is excluded from the solution. If the idomain value
+        for a cell is >0, the cell exists in the simulation. If the idomain
+        value for a cell is <0, the cell does not exist in the simulation.
+        Furthermore, the first existing cell above will be connected to the
+        first existing cell below. This type of cell is referred to as a
+        "vertical pass through" cell.
     validate: {True, False}
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
@@ -57,7 +68,7 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
     _write_schemata = {
         "idomain": (AnyValueSchema(">", 0),),
         "top": (
-            AllValueSchema(">", "bottom", ignore=("idomain", "==", -1)),
+            AllValueSchema(">", "bottom", ignore=("idomain", "<=", 0)),
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
             # No need to check coords: dataset ensures they align with idomain.
         ),
