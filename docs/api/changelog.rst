@@ -23,6 +23,10 @@ Changed
 
 - :func:`imod.formats.prj.open_projectfile_data` now also assigns negative and
   zero layer numbers to grid coordinates.
+- In :class:`imod.mf6.StructuredDiscretization`, IDOMAIN can now respectively be
+  > 0 to indicate an active cell and <0 to indicate a vertical passthrough cell,
+  consistent with MODFLOW6. Previously this could only be indicated with 1 and
+  -1.
 
 
 [1.0.0rc1] - 2024-12-20
