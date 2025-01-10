@@ -51,8 +51,8 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
         DataArray. If the idomain value for a cell is 0, the cell does not exist
         in the simulation. Input and output values will be read and written for
         the cell, but internal to the program, the cell is excluded from the
-        solution. If the idomain value for a cell is 1, the cell exists in the
-        simulation. if the idomain value for a cell is -1, the cell does not
+        solution. If the idomain value for a cell is >0, the cell exists in the
+        simulation. If the idomain value for a cell is <0, the cell does not
         exist in the simulation. Furthermore, the first existing cell above will
         be connected to the first existing cell below. This type of cell is
         referred to as a "vertical pass through" cell.
