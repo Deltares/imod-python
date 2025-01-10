@@ -540,3 +540,61 @@ def test_from_imod5(
     # write the packages for write validation
     write_context = WriteContext(simulation_directory=tmp_path, use_binary=False)
     drn_2._write("mydrn", [1], write_context)
+
+
+def test_from_imod5__negative_layer(imod5_dataset_periods, tmp_path):
+    period_data = imod5_dataset_periods[1]
+    imod5_dataset = imod5_dataset_periods[0]
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_dataset, validate=False)
+    target_npf = NodePropertyFlow.from_imod5_data(
+        imod5_dataset, target_dis.dataset["idomain"]
+    )
+
+    drn_reference = imod.mf6.Drainage.from_imod5_data(
+        "drn-2",
+        imod5_dataset,
+        period_data,
+        target_dis,
+        target_npf,
+        allocation_option=ALLOCATION_OPTION.at_first_active,
+        distributing_option=DISTRIBUTING_OPTION.by_crosscut_thickness,
+        time_min=datetime(2002, 2, 2),
+        time_max=datetime(2022, 2, 2),
+        regridder_types=None,
+    )
+
+    original_drn_2 = imod5_dataset["drn-2"].copy()
+    imod5_dataset["drn-2"] = {
+        key: da.assign_coords(layer=[-1]) for key, da in imod5_dataset["drn-2"].items()
+    }
+
+    drn_negative_layer = imod.mf6.Drainage.from_imod5_data(
+        "drn-2",
+        imod5_dataset,
+        period_data,
+        target_dis,
+        target_npf,
+        allocation_option=ALLOCATION_OPTION.at_elevation,
+        distributing_option=DISTRIBUTING_OPTION.by_crosscut_thickness,
+        time_min=datetime(2002, 2, 2),
+        time_max=datetime(2022, 2, 2),
+        regridder_types=None,
+    )
+
+    assert isinstance(drn_negative_layer, imod.mf6.Drainage)
+
+    pkg_errors = drn_negative_layer._validate(
+        schemata=drn_negative_layer._write_schemata,
+        idomain=target_dis["idomain"],
+        bottom=target_dis["bottom"],
+    )
+    assert len(pkg_errors) == 0
+
+    # write the packages for write validation
+    write_context = WriteContext(simulation_directory=tmp_path, use_binary=False)
+    drn_negative_layer._write("mydrn", [1], write_context)
+
+    assert drn_negative_layer.dataset.identical(drn_reference.dataset)
+
+    # Tear down
+    imod5_dataset["drn-2"] = original_drn_2

@@ -335,7 +335,7 @@ def test_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
     target_discretization = StructuredDiscretization.from_imod5_data(data)
 
     # create a planar grid with time-independent recharge
-    data["rch"]["rate"]["layer"].values[0] = 0
+    data["rch"]["rate"]["layer"].values[0] = -1
     assert not is_transient_data_grid(data["rch"]["rate"])
     assert is_planar_grid(data["rch"]["rate"])
 
@@ -364,8 +364,8 @@ def test_planar_rch_from_imod5_transient(imod5_dataset, tmp_path):
     input_recharge = data["rch"]["rate"].copy(deep=True)
     input_recharge = input_recharge.expand_dims({"time": [0, 1, 2]})
 
-    # make it planar by setting the layer coordinate to 0
-    input_recharge = input_recharge.assign_coords({"layer": [0]})
+    # make it planar by setting the layer coordinate to -1
+    input_recharge = input_recharge.assign_coords({"layer": [-1]})
 
     # update the data set
     data["rch"]["rate"] = input_recharge
@@ -397,7 +397,7 @@ def test_non_planar_rch_from_imod5_constant(imod5_dataset, tmp_path):
 
     # the input for recharge is on the second layer of the targetgrid
     original_rch = data["rch"]["rate"].copy(deep=True)
-    data["rch"]["rate"] = data["rch"]["rate"].assign_coords({"layer": [0]})
+    data["rch"]["rate"] = data["rch"]["rate"].assign_coords({"layer": [-1]})
     input_recharge = nan_like(data["khv"]["kh"])
     input_recharge.loc[{"layer": 2}] = data["rch"]["rate"].isel(layer=0)
 

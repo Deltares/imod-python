@@ -34,7 +34,7 @@ from imod.schemata import (
     OtherCoordsSchema,
 )
 from imod.typing import GridDataArray
-from imod.typing.grid import enforce_dim_order, is_planar_grid
+from imod.typing.grid import enforce_dim_order, has_negative_layer, is_planar_grid
 from imod.util.expand_repetitions import expand_repetitions
 
 
@@ -180,6 +180,76 @@ class Drainage(BoundaryCondition, IRegridPackage):
         super().__init__(cleaned_dict)
 
     @classmethod
+    def allocate_and_distribute_planar_data(
+        cls,
+        planar_data: dict[str, GridDataArray],
+        dis: StructuredDiscretization,
+        npf: NodePropertyFlow,
+        allocation_option: ALLOCATION_OPTION,
+        distributing_option: DISTRIBUTING_OPTION,
+    ) -> dict[str, GridDataArray]:
+        """
+        Allocate and distribute planar data for given discretization and npf
+        package. If layer number of ``planar_data`` is negative,
+        ``allocation_option`` is overrided and set to
+        ALLOCATION_OPTION.at_first_active.
+
+        Parameters
+        ----------
+        planar_data: dict[str, GridDataArray]
+            Dictionary with planar grid data.
+        dis: imod.mf6.StructuredDiscretization
+            Model discretization package.
+        npf: imod.mf6.NodePropertyFlow
+            Node property flow package.
+        allocation_option: ALLOCATION_OPTION
+            allocation option. If planar data is assigned to a negative layer
+            number, this option is overridden and set to
+            ALLOCATION_OPTION.at_first_active.
+        distributing_option: DISTRIBUTING_OPTION
+            distributing option.
+
+        Returns
+        -------
+        dict[str, GridDataArray]
+            Dictionary with layered grid data.
+        """
+
+        top = dis.dataset["top"]
+        bottom = dis.dataset["bottom"]
+        idomain = dis.dataset["idomain"]
+
+        if has_negative_layer(planar_data["elevation"]):
+            allocation_option = ALLOCATION_OPTION.at_first_active
+
+        # Enforce planar data, remove all layer dimension information
+        planar_data = {
+            key: grid.isel({"layer": 0}, drop=True, missing_dims="ignore")
+            for key, grid in planar_data.items()
+        }
+
+        drn_allocation = allocate_drn_cells(
+            allocation_option,
+            idomain > 0,
+            top,
+            bottom,
+            planar_data["elevation"],
+        )
+        layered_data = {}
+        layered_data["conductance"] = distribute_drn_conductance(
+            distributing_option,
+            drn_allocation,
+            planar_data["conductance"],
+            top,
+            bottom,
+            npf.dataset["k"],
+            planar_data["elevation"],
+        )
+        layered_data["elevation"] = planar_data["elevation"].where(drn_allocation)
+        layered_data["elevation"] = enforce_dim_order(layered_data["elevation"])
+        return layered_data
+
+    @classmethod
     def from_imod5_data(
         cls,
         key: str,
@@ -204,6 +274,8 @@ class Drainage(BoundaryCondition, IRegridPackage):
 
         Parameters
         ----------
+        key: str
+            Packagename of the iMOD5 data to use.
         imod5_data: dict
             Dictionary with iMOD5 data. This can be constructed from the
             :func:`imod.formats.prj.open_projectfile_data` method.
@@ -216,7 +288,9 @@ class Drainage(BoundaryCondition, IRegridPackage):
         target_npf: NodePropertyFlow package
             The conductivity information, used to compute drainage flux
         allocation_option: ALLOCATION_OPTION
-            allocation option.
+            allocation option. If package data is assigned to a negative layer
+            number, this option is overridden and set to
+            ALLOCATION_OPTION.at_first_active.
         distributing_option: dict[str, DISTRIBUTING_OPTION]
             distributing option.
         time_min: datetime
@@ -235,8 +309,6 @@ class Drainage(BoundaryCondition, IRegridPackage):
         A Modflow 6 Drainage package.
         """
 
-        target_top = target_dis.dataset["top"]
-        target_bottom = target_dis.dataset["bottom"]
         target_idomain = target_dis.dataset["idomain"]
 
         data = {
@@ -252,32 +324,15 @@ class Drainage(BoundaryCondition, IRegridPackage):
             data, target_idomain, regridder_types, regrid_cache, {}
         )
 
-        conductance = regridded_package_data["conductance"]
-
         if is_planar:
-            planar_elevation = regridded_package_data["elevation"]
-
-            drn_allocation = allocate_drn_cells(
+            layered_data = cls.allocate_and_distribute_planar_data(
+                regridded_package_data,
+                target_dis,
+                target_npf,
                 allocation_option,
-                target_idomain == 1,
-                target_top,
-                target_bottom,
-                planar_elevation,
-            )
-
-            layered_elevation = planar_elevation.where(drn_allocation)
-            layered_elevation = enforce_dim_order(layered_elevation)
-            regridded_package_data["elevation"] = layered_elevation
-
-            regridded_package_data["conductance"] = distribute_drn_conductance(
                 distributing_option,
-                drn_allocation,
-                conductance,
-                target_top,
-                target_bottom,
-                target_npf.dataset["k"],
-                planar_elevation,
             )
+            regridded_package_data.update(layered_data)
 
         drn = Drainage(**regridded_package_data, validate=True)
         repeat = period_data.get(key)

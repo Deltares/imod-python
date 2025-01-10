@@ -707,14 +707,9 @@ def _process_boundary_condition_entry(entry: Dict, periods: Dict[str, datetime])
         dims = ("time",)
         coords["time"] = time
 
-    # 0 signifies that the layer must be determined on the basis of
-    # bottom elevation and stage.
     layer = entry["layer"]
-    if layer <= 0:
-        layer is None
-    else:
-        coords["layer"] = layer
-        dims = dims + ("layer",)
+    coords["layer"] = layer
+    dims = dims + ("layer",)
 
     if "path" not in entry:
         path = None
@@ -727,8 +722,7 @@ def _process_boundary_condition_entry(entry: Dict, periods: Dict[str, datetime])
     header["addition"] = entry["addition"]
     header["factor"] = entry["factor"]
     header["dims"] = dims
-    if layer is not None:
-        header["layer"] = layer
+    header["layer"] = layer
     if time is not None:
         header["time"] = time
 

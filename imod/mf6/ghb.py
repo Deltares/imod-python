@@ -34,7 +34,7 @@ from imod.schemata import (
     OtherCoordsSchema,
 )
 from imod.typing import GridDataArray
-from imod.typing.grid import enforce_dim_order, is_planar_grid
+from imod.typing.grid import enforce_dim_order, has_negative_layer, is_planar_grid
 from imod.util.expand_repetitions import expand_repetitions
 
 
@@ -183,6 +183,77 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         super().__init__(cleaned_dict)
 
     @classmethod
+    def allocate_and_distribute_planar_data(
+        cls,
+        planar_data: dict[str, GridDataArray],
+        dis: StructuredDiscretization,
+        npf: NodePropertyFlow,
+        allocation_option: ALLOCATION_OPTION,
+        distributing_option: DISTRIBUTING_OPTION,
+    ) -> dict[str, GridDataArray]:
+        """
+        Allocate and distribute planar data for given discretization and npf
+        package. If layer number of ``planar_data`` is negative,
+        ``allocation_option`` is overrided and set to
+        ALLOCATION_OPTION.at_first_active.
+
+        Parameters
+        ----------
+        planar_data: dict[str, GridDataArray]
+            Dictionary with planar grid data.
+        dis: imod.mf6.StructuredDiscretization
+            Model discretization package.
+        npf: imod.mf6.NodePropertyFlow
+            Node property flow package.
+        allocation_option: ALLOCATION_OPTION
+            allocation option. If planar data is assigned to a negative layer
+            number, this option is overridden and set to
+            ALLOCATION_OPTION.at_first_active.
+        distributing_option: DISTRIBUTING_OPTION
+            distributing option.
+
+        Returns
+        -------
+        dict[str, GridDataArray]
+            Dictionary with layered grid data.
+        """
+
+        top = dis.dataset["top"]
+        bottom = dis.dataset["bottom"]
+        idomain = dis.dataset["idomain"]
+
+        if has_negative_layer(planar_data["head"]):
+            allocation_option = ALLOCATION_OPTION.at_first_active
+
+        # Enforce planar data, remove all layer dimension information
+        planar_data = {
+            key: grid.isel({"layer": 0}, drop=True, missing_dims="ignore")
+            for key, grid in planar_data.items()
+        }
+
+        ghb_allocation = allocate_ghb_cells(
+            allocation_option,
+            idomain > 0,
+            top,
+            bottom,
+            planar_data["head"],
+        )
+
+        layered_data = {}
+        layered_data["head"] = planar_data["head"].where(ghb_allocation)
+        layered_data["head"] = enforce_dim_order(layered_data["head"])
+
+        layered_data["conductance"] = distribute_ghb_conductance(
+            distributing_option,
+            ghb_allocation,
+            planar_data["conductance"],
+            top,
+            bottom,
+            npf.dataset["k"],
+        )
+        return layered_data
+
+    @classmethod
     def from_imod5_data(
         cls,
         key: str,
@@ -219,7 +290,9 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         target_npf: NodePropertyFlow package
             The conductivity information, used to compute GHB flux
         allocation_option: ALLOCATION_OPTION
-            allocation option.
+            allocation option. If package data is assigned to a negative layer
+            number, this option is overridden and set to
+            ALLOCATION_OPTION.at_first_active.
         time_min: datetime
             Begin-time of the simulation. Used for expanding period data.
         time_max: datetime
@@ -237,10 +310,6 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         -------
         A  Modflow 6 GeneralHeadBoundary packages.
         """
-        target_top = target_dis.dataset["top"]
-        target_bottom = target_dis.dataset["bottom"]
-        target_idomain = target_dis.dataset["idomain"]
-
         idomain = target_dis.dataset["idomain"]
         data = {
             "head": imod5_data[key]["head"],
@@ -255,35 +324,14 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
             data, idomain, regridder_types, regrid_cache, {}
         )
         if is_planar:
-            conductance = regridded_package_data["conductance"]
-
-            planar_head = regridded_package_data["head"]
-            k = target_npf.dataset["k"]
-
-            ghb_allocation = allocate_ghb_cells(
+            layered_data = cls.allocate_and_distribute_planar_data(
+                regridded_package_data,
+                target_dis,
+                target_npf,
                 allocation_option,
-                target_idomain == 1,
-                target_top,
-                target_bottom,
-                planar_head,
-            )
-
-            layered_head = planar_head.where(ghb_allocation)
-            layered_head = enforce_dim_order(layered_head)
-
-            regridded_package_data["head"] = layered_head
-
-            if "layer" in conductance.coords:
-                conductance = conductance.isel({"layer": 0}, drop=True)
-
-            regridded_package_data["conductance"] = distribute_ghb_conductance(
                 distributing_option,
-                ghb_allocation,
-                conductance,
-                target_top,
-                target_bottom,
-                k,
             )
+            regridded_package_data.update(layered_data)
 
         ghb = GeneralHeadBoundary(**regridded_package_data, validate=True)
         repeat = period_data.get(key)

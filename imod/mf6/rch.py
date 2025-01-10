@@ -162,6 +162,46 @@ class Recharge(BoundaryCondition, IRegridPackage):
         return errors
 
     @classmethod
+    def allocate_planar_data(
+        cls,
+        planar_data: dict[str, GridDataArray],
+        dis: StructuredDiscretization,
+    ) -> dict[str, GridDataArray]:
+        """
+        Allocate and distribute planar data for given discretization and npf
+        package. To allocate cells, the allocation option
+        ALLOCATION_OPTION.at_first_active is set.
+
+        Parameters
+        ----------
+        planar_data: dict[str, GridDataArray]
+            Dictionary with planar grid data.
+        dis: imod.mf6.StructuredDiscretization
+            Model discretization package.
+        npf: imod.mf6.NodePropertyFlow
+            Node property flow package.
+
+        Returns
+        -------
+        dict[str, GridDataArray]
+            Dictionary with layered grid data.
+        """
+        idomain = dis.dataset["idomain"]
+        if "layer" in planar_data["rate"].dims:
+            planar_data["rate"] = planar_data["rate"].isel(layer=0, drop=True)
+        # create an array indicating in which cells rch is active
+        is_rch_cell = allocate_rch_cells(
+            ALLOCATION_OPTION.at_first_active,
+            idomain > 0,
+            planar_data["rate"],
+        )
+        # remove rch from cells where it is not allocated and broadcast over layers.
+        layered_data = {}
+        layered_data["rate"] = planar_data["rate"].where(is_rch_cell)
+        layered_data["rate"] = enforce_dim_order(layered_data["rate"])
+        return layered_data
+
+    @classmethod
     def from_imod5_data(
         cls,
         imod5_data: dict[str, dict[str, GridDataArray]],
@@ -201,38 +241,20 @@ class Recharge(BoundaryCondition, IRegridPackage):
         data = {
             "rate": convert_unit_rch_rate(imod5_data["rch"]["rate"]),
         }
-        new_package_data = {}
-
         # first regrid the inputs to the target grid.
         if regridder_types is None:
             regridder_settings = Recharge.get_regrid_methods()
 
-        new_package_data = _regrid_package_data(
+        regridded_package_data = _regrid_package_data(
             data, new_idomain, regridder_settings, regrid_cache, {}
         )
 
         # if rate has only layer 0, then it is planar.
-        if is_planar_grid(new_package_data["rate"]):
-            if "layer" in new_package_data["rate"].dims:
-                planar_rate_regridded = new_package_data["rate"].isel(
-                    layer=0, drop=True
-                )
-            else:
-                planar_rate_regridded = new_package_data["rate"]
+        if is_planar_grid(regridded_package_data["rate"]):
+            layered_data = cls.allocate_planar_data(regridded_package_data, target_dis)
+            regridded_package_data.update(layered_data)
 
-            # create an array indicating in which cells rch is active
-            is_rch_cell = allocate_rch_cells(
-                ALLOCATION_OPTION.at_first_active,
-                new_idomain > 0,
-                planar_rate_regridded,
-            )
-
-            # remove rch from cells where it is not allocated and broadcast over layers.
-            rch_rate = planar_rate_regridded.where(is_rch_cell)
-            rch_rate = enforce_dim_order(rch_rate)
-            new_package_data["rate"] = rch_rate
-
-        return cls(**new_package_data, validate=True, fixed_cell=False)
+        return cls(**regridded_package_data, validate=True, fixed_cell=False)
 
     @classmethod
     def from_imod5_cap_data(

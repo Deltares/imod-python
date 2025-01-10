@@ -2,6 +2,7 @@ import pathlib
 import re
 import tempfile
 import textwrap
+from copy import deepcopy
 from datetime import datetime
 
 import numpy as np
@@ -18,7 +19,7 @@ from imod.mf6.write_context import WriteContext
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION
 from imod.prepare.topsystem.conductance import DISTRIBUTING_OPTION
 from imod.schemata import ValidationError
-from imod.typing.grid import ones_like, zeros_like
+from imod.typing.grid import has_negative_layer, is_planar_grid, ones_like, zeros_like
 
 TYPE_DIS_PKG = {
     xu.UgridDataArray: VerticesDiscretization,
@@ -495,7 +496,80 @@ def test_import_river_from_imod5(imod5_dataset, tmp_path):
 
 
 @pytest.mark.usefixtures("imod5_dataset")
-def test_import_river_from_imod5_infiltration_factors(imod5_dataset):
+def test_import_river_from_imod5__negative_layer(imod5_dataset, tmp_path):
+    # Arrange
+    imod5_data = imod5_dataset[0]
+    period_data = imod5_dataset[1]
+    globaltimes = [np.datetime64("2000-01-01")]
+    target_dis = StructuredDiscretization.from_imod5_data(imod5_data)
+    grid = target_dis.dataset["idomain"]
+    target_npf = NodePropertyFlow.from_imod5_data(imod5_data, grid)
+
+    # Gather reference packages (for negative layers, allocation option
+    # "at_first_active" should be taken)
+    (riv_reference, drn_reference) = imod.mf6.River.from_imod5_data(
+        "riv-1",
+        imod5_data,
+        period_data,
+        target_dis,
+        target_npf,
+        time_min=datetime(2000, 1, 1),
+        time_max=datetime(2002, 1, 1),
+        allocation_option=ALLOCATION_OPTION.at_first_active,
+        distributing_option=DISTRIBUTING_OPTION.by_crosscut_thickness,
+        regridder_types=None,
+    )
+
+    # Set layer to -1
+    original_riv_1 = deepcopy(imod5_data["riv-1"])
+    imod5_data["riv-1"] = {
+        key: da.assign_coords(layer=[-1]) for key, da in imod5_data["riv-1"].items()
+    }
+
+    (riv, drn) = imod.mf6.River.from_imod5_data(
+        "riv-1",
+        imod5_data,
+        period_data,
+        target_dis,
+        target_npf,
+        time_min=datetime(2000, 1, 1),
+        time_max=datetime(2002, 1, 1),
+        allocation_option=ALLOCATION_OPTION.at_elevation,
+        distributing_option=DISTRIBUTING_OPTION.by_crosscut_thickness,
+        regridder_types=None,
+    )
+
+    write_context = WriteContext(simulation_directory=tmp_path)
+    riv._write("riv", globaltimes, write_context)
+    drn._write("drn", globaltimes, write_context)
+
+    # Assert
+    # Test if arrangement is correctly set up
+    assert is_planar_grid(imod5_data["riv-1"]["conductance"])
+    assert has_negative_layer(imod5_data["riv-1"]["conductance"])
+
+    errors = riv._validate(
+        imod.mf6.River._write_schemata,
+        idomain=target_dis.dataset["idomain"],
+        bottom=target_dis.dataset["bottom"],
+    )
+    assert len(errors) == 0
+    errors = drn._validate(
+        imod.mf6.Drainage._write_schemata,
+        idomain=target_dis.dataset["idomain"],
+        bottom=target_dis.dataset["bottom"],
+    )
+    assert len(errors) == 0
+
+    assert riv.dataset.identical(riv_reference.dataset)
+    assert drn.dataset.identical(drn_reference.dataset)
+
+    # teardown
+    imod5_data["riv-1"] = original_riv_1
+
+
+@pytest.mark.usefixtures("imod5_dataset")
+def test_import_river_from_imod5__infiltration_factors(imod5_dataset):
     imod5_data = imod5_dataset[0]
     period_data = imod5_dataset[1]
     target_dis = StructuredDiscretization.from_imod5_data(imod5_data)
@@ -544,7 +618,7 @@ def test_import_river_from_imod5_infiltration_factors(imod5_dataset):
     imod5_data["riv-1"]["infiltration_factor"] = original_infiltration_factor
 
 
-def test_import_river_from_imod5_period_data(imod5_dataset_periods):
+def test_import_river_from_imod5__period_data(imod5_dataset_periods):
     imod5_data = imod5_dataset_periods[0]
     imod5_periods = imod5_dataset_periods[1]
     target_dis = StructuredDiscretization.from_imod5_data(imod5_data, validate=False)
