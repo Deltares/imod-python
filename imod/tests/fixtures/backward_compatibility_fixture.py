@@ -21,7 +21,7 @@ def imod5_dataset():
 
     # Fix data for ibound  as it contains floating values like 0.34, 0.25 etc.
     ibound = data["bnd"]["ibound"]
-    ibound = ibound.where(ibound <= 0, 1)
+    ibound = ibound.where(ibound <= 0, 2)
     data["bnd"]["ibound"] = ibound
     return data, pd
 
