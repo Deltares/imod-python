@@ -115,7 +115,7 @@ def _get_driver(path):
     except KeyError:
         raise ValueError(
             f'Unknown extension "{ext}", available extensions: '
-            f'{", ".join(EXTENSION_GDAL_DRIVER_CODE_MAP.keys())}'
+            f"{', '.join(EXTENSION_GDAL_DRIVER_CODE_MAP.keys())}"
         )
 
 
@@ -309,8 +309,8 @@ def write_aaigrid(path: pathlib.Path, a: np.ndarray, profile: Dict) -> None:
     ymin = ymax + profile["height"] * dy
 
     header = (
-        f'ncols        {profile["width"]}\n'
-        f'nrows        {profile["height"]}\n'
+        f"ncols        {profile['width']}\n"
+        f"nrows        {profile['height']}\n"
         f"xllcorner    {xmin:.12f}\n"
         f"yllcorner    {ymin:.12f}\n"
         f"cellsize     {dx:.12f}\n"

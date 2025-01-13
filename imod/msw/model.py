@@ -107,9 +107,7 @@ class MetaSwapModel(Model):
     _file_name = "para_sim.inp"
 
     _template = jinja2.Template(
-        "{%for setting, value in settings.items()%}"
-        "{{setting}} = {{value}}\n"
-        "{%endfor%}"
+        "{%for setting, value in settings.items()%}{{setting}} = {{value}}\n{%endfor%}"
     )
 
     def __init__(
