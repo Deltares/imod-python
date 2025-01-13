@@ -50,8 +50,8 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
 
         * If 0, the cell does not exist in the simulation. Input and output
           values will be read and written for the cell, but internal to the
-          program, the cell is excluded from the solution. 
-        * If >0, the cell exists in the simulation. 
+          program, the cell is excluded from the solution.
+        * If >0, the cell exists in the simulation.
         * If <0, the cell does not exist in the simulation. Furthermore, the
           first existing cell above will be connected to the first existing cell
           below. This type of cell is referred to as a "vertical pass through"
@@ -59,7 +59,7 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
 
         This DataArray needs contain a ``"layer"``, ``"y"`` and ``"x"``
         coordinate. Horizontal discretization information will be derived from
-        its x and y coordinates. 
+        its x and y coordinates.
     validate: {True, False}
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
