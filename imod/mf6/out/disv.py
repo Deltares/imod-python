@@ -436,8 +436,8 @@ def disv_indices(
 
     # Vertical flows
     # --------------
-    # Stored in an array of shape (nlayer, nface).
-    # For pass-through cells, set it from layers i to j using ragged_arange.
+    # Stored in an array of shape (nlayer, nface). For vertical passthrough
+    # cells, set it from layers i to j using ragged_arange.
     n_pass = diff[is_vertical] // ncells_per_layer
     ii = np.repeat(i[is_vertical], n_pass) + ragged_arange(n_pass) * ncells_per_layer
     lower.ravel()[ii] = np.repeat(index[is_vertical], n_pass)

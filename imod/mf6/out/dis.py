@@ -325,8 +325,8 @@ def dis_indices(
     * the right neighbor is +(1)
     * the front neighbor is +(number of cells in a column)
     * the lower neighbor is +(number of cells in a layer)
-    * lower "pass-through" cells (idomain <0) are multitude of (number of
-      cells in a layer)
+    * lower "vertical passthrough" cells (idomain <0) are multitude of (number
+      of cells in a layer)
 
     Parameters
     ----------

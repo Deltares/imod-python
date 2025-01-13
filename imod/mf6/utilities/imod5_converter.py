@@ -24,7 +24,7 @@ def convert_ibound_to_idomain(
     passthrough = (idomain_float.ffill("layer") > 0) & (
         idomain_float.bfill("layer") > 0
     )
-    # Then fill nans where passthrough with -1
+    # Then fill nans where vertical passthrough with -1
     idomain_float = idomain_float.combine_first(
         full_like(idomain_float, -1.0, dtype=float).where(passthrough)
     )
