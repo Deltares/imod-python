@@ -30,7 +30,7 @@ class IniFile(collections.UserDict, abc.ABC):
 
     # TODO: Create own key mapping to avoid keys like "edate"?
     _template = jinja2.Template(
-        "{%- for key, value in settings %}\n" "{{key}}={{value}}\n" "{%- endfor %}\n"
+        "{%- for key, value in settings %}\n{{key}}={{value}}\n{%- endfor %}\n"
     )
 
     def _format_datetimes(self):

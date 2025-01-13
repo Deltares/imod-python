@@ -36,9 +36,7 @@ def time_discretization_cftime(three_days):
 def test_create_time_discretization(time_discretization):
     rendered = time_discretization._render()
 
-    compare = (
-        "20180101000000,1,1,1.0\n" "20180102000000,1,1,1.0\n" "20180103000000,1,1,1.0\n"
-    )
+    compare = "20180101000000,1,1,1.0\n20180102000000,1,1,1.0\n20180103000000,1,1,1.0\n"
 
     assert rendered == compare
 
@@ -51,8 +49,6 @@ def test_create_time_discretization_cftime(time_discretization_cftime):
 
     rendered = time_discretization_cftime._render()
 
-    compare = (
-        "20180101000000,1,1,1.0\n" "20180102000000,1,1,1.0\n" "20180103000000,1,1,1.0\n"
-    )
+    compare = "20180101000000,1,1,1.0\n20180102000000,1,1,1.0\n20180103000000,1,1,1.0\n"
 
     assert rendered == compare
