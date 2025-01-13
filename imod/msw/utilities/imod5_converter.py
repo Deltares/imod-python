@@ -83,9 +83,7 @@ def is_msw_active_cell(
         Cells active per subunit
     """
     mf6_top_active = target_dis["idomain"].isel(layer=0, drop=True)
-    subunit_active = (
-        (imod5_cap["boundary"] == 1) & (msw_area > 0) & (mf6_top_active >= 1)
-    )
+    subunit_active = (imod5_cap["boundary"] > 0) & (msw_area > 0) & (mf6_top_active > 0)
     active = subunit_active.any(dim="subunit")
     return MetaSwapActive(active, subunit_active)
 

@@ -39,9 +39,10 @@ def broadcast_to_full_domain(
     """
     Broadcast the bottom and top array to have the same shape as the idomain
     """
-    bottom = idomain * bottom
+    active = idomain > 0
+    bottom = active * bottom
     top = (
-        idomain * top
+        active * top
         if hasattr(top, "coords") and "layer" in top.coords
         else create_layered_top(bottom, top)
     )

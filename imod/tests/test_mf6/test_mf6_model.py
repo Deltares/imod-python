@@ -432,4 +432,4 @@ def test_get_domain_geometry(structured_flow_model: GroundwaterFlowModel):
 
     assert np.all(np.isin(top.values, [10.0]))
     assert np.all(np.isin(bottom.values, [-1.0, -2.0, -3.0]))
-    assert np.all(np.isin(idomain.values, [1]))
+    assert np.all(np.isin(idomain.values, [2]))

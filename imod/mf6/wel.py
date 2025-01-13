@@ -73,7 +73,7 @@ def _assign_dims(arg: Any) -> Tuple | xr.DataArray:
 def mask_2D(package: GridAgnosticWell, domain_2d: GridDataArray) -> GridAgnosticWell:
     point_active = points_values(domain_2d, x=package.x, y=package.y)
 
-    is_inside_exterior = point_active == 1
+    is_inside_exterior = point_active > 0
     selection = package.dataset.loc[{"index": is_inside_exterior}]
 
     cls = type(package)

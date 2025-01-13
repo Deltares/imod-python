@@ -99,14 +99,15 @@ def _skip_variable(package: IMaskingSettings, var: str) -> bool:
 def _mask_spatial_var(self, var: str, mask: GridDataArray) -> GridDataArray:
     da = self.dataset[var]
     array_mask = _adjust_mask_for_unlayered_data(da, mask)
+    active = array_mask > 0
 
     if issubclass(da.dtype.type, numbers.Integral):
         if var == "idomain":
-            return da.where(array_mask > 0, other=array_mask)
+            return da.where(active, other=array_mask)
         else:
-            return da.where(array_mask > 0, other=0)
+            return da.where(active, other=0)
     elif issubclass(da.dtype.type, numbers.Real):
-        return da.where(array_mask > 0)
+        return da.where(active)
     else:
         raise TypeError(
             f"Expected dtype float or integer. Received instead: {da.dtype}"

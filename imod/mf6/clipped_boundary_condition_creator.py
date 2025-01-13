@@ -28,7 +28,7 @@ def create_clipped_boundary(
         covered by other ConstantHead packages
 
     """
-    active_grid_boundary = active_grid_boundary_xy(idomain == 1)
+    active_grid_boundary = active_grid_boundary_xy(idomain > 0)
     unassigned_grid_boundaries = _find_unassigned_grid_boundaries(
         active_grid_boundary, original_constant_head_boundaries
     )

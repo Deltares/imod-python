@@ -209,7 +209,9 @@ def test_from_imod5_data__idomain_values(imod5_dataset):
     # Test if idomain has appropriate count
     assert (dis["idomain"] == -1).sum() == 371824
     assert (dis["idomain"] == 0).sum() == 176912
-    assert (dis["idomain"] == 1).sum() == 703936
+    # IBOUND -1 was converted to 1, therefore not all active cells are 2
+    assert (dis["idomain"] == 1).sum() == 15607
+    assert (dis["idomain"] == 2).sum() == 688329
 
 
 @pytest.mark.usefixtures("imod5_dataset")
@@ -256,6 +258,8 @@ def test_from_imod5_data__validation_error(tmp_path):
     tmp_path = imod.util.temporary_directory()
     data = imod.data.imod5_projectfile_data(tmp_path)
     data = data[0]
+    # Set bottom above top, to create "gap" intebetween interfaces.
+    data["bot"]["bottom"][20, 6, 6] = data["top"]["top"][21, 6, 6] - 1.0
 
     _load_imod5_data_in_memory(data)
     with pytest.raises(ValidationError):

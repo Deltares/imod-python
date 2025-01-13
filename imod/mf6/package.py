@@ -565,8 +565,8 @@ class Package(PackageBase, IPackage, abc.ABC):
         Parameters
         ----------
         mask: xr.DataArray, xu.UgridDataArray of ints
-            idomain-like integer array. 1 sets cells to active, 0 sets cells to inactive,
-            -1 sets cells to vertical passthrough
+            idomain-like integer array. >0 sets cells to active, 0 sets cells to inactive,
+            <0 sets cells to vertical passthrough
 
         Returns
         -------
