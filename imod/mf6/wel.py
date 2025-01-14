@@ -47,7 +47,7 @@ from imod.schemata import (
 from imod.select.points import points_indices, points_values
 from imod.typing import GridDataArray, Imod5DataDict
 from imod.typing.grid import is_spatial_grid, ones_like
-from imod.util.expand_repetitions import resample_timeseries
+from imod.util.expand_repetitions import average_timeseries, resample_timeseries
 from imod.util.structured import values_within_range
 
 ABSTRACT_METH_ERROR_MSG = "Method in abstract base class called"
@@ -119,10 +119,17 @@ def _prepare_well_rates_from_groups(
     if has_associated:
         # Resample times per group
         unique_well_groups = [
-            resample_timeseries(df_group, start_times)
+            _process_timeseries(df_group, start_times)
             for df_group in unique_well_groups
         ]
     return _df_groups_to_da_rates(unique_well_groups)
+
+
+def _process_timeseries(df_group, start_times):
+    if len(start_times) > 1:
+        return resample_timeseries(df_group, start_times)
+    else:
+        return average_timeseries(df_group)
 
 
 def _prepare_df_ipf_associated(
