@@ -78,7 +78,7 @@ def resample_timeseries(
     # Catch case where multiple well rates precede first timestep on multiple
     # occasions, these have to be clipped to avoid including them in the
     # computation of weighted averages later in the function. We only want to
-    # include one well timestep before the first output timestep at maximum.
+    # include the last well timestep BEFORE the first output timestep.
     n_before_first_timestep = (intermediate_df["time"] < times[0]).cumsum()
     to_preserve = n_before_first_timestep == n_before_first_timestep.max()
     intermediate_df = intermediate_df[to_preserve]
