@@ -56,7 +56,7 @@ def resample_timeseries(
     Parameters
     ----------
     well_rate:  pd.DataFrame
-        input timeseries for well
+        input timeseries for a single well
     times: datetime
         list of times on which the output dataframe should have entries.
 
@@ -75,6 +75,13 @@ def resample_timeseries(
         on="time",
         validate="m:m",
     ).fillna(method="ffill")
+    # Catch case where multiple well rates precede first timestep on multiple
+    # occasions, these have to be clipped to avoid including them in the
+    # computation of weighted averages later in the function. We only want to
+    # include the last well timestep BEFORE the first output timestep.
+    n_before_first_timestep = (intermediate_df["time"] < times[0]).cumsum()
+    to_preserve = n_before_first_timestep == n_before_first_timestep.max()
+    intermediate_df = intermediate_df[to_preserve]
 
     # The entries before the start of the well timeseries do not have data yet,
     # so we fill them in here. Keep rate to zero and pad the location columns with

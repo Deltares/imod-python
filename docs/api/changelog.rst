@@ -28,6 +28,12 @@ Changed
   consistent with MODFLOW6. Previously this could only be indicated with 1 and
   -1.
 
+Fixed
+~~~~~
+
+- :meth:`imod.mf6.Well.from_imod5_data` and
+  :meth:`imod.mf6.LayeredWell.from_imod5_data` ignore well rates preceding first
+  element of ``times``.
 
 [1.0.0rc1] - 2024-12-20
 -----------------------
