@@ -101,6 +101,28 @@ def test_timeseries_resampling_4():
     )
 
 
+def test_timeseries_resampling_5():
+    # In this test, we resample a timeseries to a finer output discretization.
+    # The original times have several preceding timesteps, which need to be
+    # clipped off.
+    original_times = [datetime(1899, 1, 1), datetime(1909, 1, 1)] + [
+        datetime(1989, 1, i) for i in [1, 3, 5, 7, 9]
+    ]
+    original_rates = [0.0, 0.0, 200.0, 200.0, 300.0, 400.0, 500.0]
+    original_timeseries = initialize_timeseries(original_times, original_rates)
+
+    new_dates = [datetime(1989, 1, 2), datetime(1989, 1, 3), datetime(1989, 1, 4)]
+    new_timeseries = resample_timeseries(original_timeseries, new_dates)
+
+    expected_times = [datetime(1989, 1, 2), datetime(1989, 1, 3), datetime(1989, 1, 4)]
+    expected_rates = [200.0, 200.0, 200.0]
+    expected_timeseries = initialize_timeseries(expected_times, expected_rates)
+
+    pd.testing.assert_frame_equal(
+        new_timeseries, expected_timeseries, check_dtype=False
+    )
+
+
 def test_timeseries_resampling_coarsen_and_refine():
     # In this test, we resample a timeseries for a coarser output discretization.
     # Then we refine it again to the original discretization.
