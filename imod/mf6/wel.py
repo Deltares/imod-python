@@ -578,10 +578,13 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             * Multiplication and addition factors need to remain constant through time
             * Same associated well cannot be assigned to multiple layers
         - The dataframe of the first projectfile timestamp is selected
-        - Rate timeseries are resampled with a time weighted mean to the
-          simulation times.
-        - When simulation times fall outside well timeseries range, the last
-          rate is forward filled.
+        - Timeseries are processed as follows:
+            * If ``len(times) > 2``, rate timeseries are resampled with a time
+              weighted mean to the simulation times. When simulation times fall
+              outside well timeseries range, the last rate is forward filled.
+            * If ``len(times) == 2``, the simulation is assumed to be
+              "steady-state" and an average rate is computed from the
+              timeseries.
         - Projectfile timestamps are not used. Even if assigned to a
           "steady-state" timestamp, the resulting dataset still uses simulation
           times.
