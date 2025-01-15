@@ -271,8 +271,8 @@ class GroundwaterFlowModel(Modflow6Model):
         result["npf"] = npf_pkg
 
         # import sto
-        steady_state = "sto" in imod5_data.keys()
-        if steady_state:
+        transient = "sto" in imod5_data.keys()
+        if transient:
             result["sto"] = StorageCoefficient.from_imod5_data(
                 imod5_data,
                 grid,
@@ -309,10 +309,10 @@ class GroundwaterFlowModel(Modflow6Model):
         imod5_keys = list(imod5_data.keys())
 
         # import wells
-        if steady_state:
-            wel_times: StressPeriodTimesType = "steady-state"
+        if transient:
+            wel_times: StressPeriodTimesType = times
         else:
-            wel_times = times
+            wel_times = "steady-state"
         wel_keys = [key for key in imod5_keys if key[0:3] == "wel"]
         for wel_key in wel_keys:
             wel_key_truncated = wel_key[:16]

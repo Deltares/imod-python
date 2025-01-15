@@ -655,6 +655,38 @@ def test_import_from_imod5__correct_well_type(imod5_dataset):
 
 @pytest.mark.unittest_jit
 @pytest.mark.usefixtures("imod5_dataset")
+def test_import_from_imod5__well_steady_state(imod5_dataset):
+    # Unpack
+    imod5_data = imod5_dataset[0]
+    period_data = imod5_dataset[1]
+
+    sto = imod5_data.pop("sto")
+
+    # Other arrangement
+    default_simulation_allocation_options = SimulationAllocationOptions
+    default_simulation_distributing_options = SimulationDistributingOptions
+    datelist = pd.date_range(start="1/1/1989", end="1/1/2013", freq="W")
+
+    # Act
+    simulation = Modflow6Simulation.from_imod5_data(
+        imod5_data,
+        period_data,
+        datelist,
+        default_simulation_allocation_options,
+        default_simulation_distributing_options,
+    )
+    # Assert
+    gwf = simulation["imported_model"]
+    assert "time" not in gwf["wel-WELLS_L3"].dataset.coords
+    assert "time" not in gwf["wel-WELLS_L4"].dataset.coords
+    assert "time" not in gwf["wel-WELLS_L5"].dataset.coords
+    # Teardown
+    # Reassign storage package again
+    imod5_data["sto"] = sto
+
+
+@pytest.mark.unittest_jit
+@pytest.mark.usefixtures("imod5_dataset")
 def test_import_from_imod5__nonstandard_regridding(imod5_dataset, tmp_path):
     imod5_data = imod5_dataset[0]
     period_data = imod5_dataset[1]
