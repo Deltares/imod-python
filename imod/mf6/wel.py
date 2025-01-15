@@ -133,7 +133,7 @@ def _process_timeseries(df_group, start_times):
 
 
 def _prepare_df_ipf_associated(
-    pkg_data: dict, start_times: list[datetime], all_well_times: list[datetime]
+    pkg_data: dict, all_well_times: list[datetime]
 ) -> pd.DataFrame:
     """Prepare dataframe for an ipf with associated timeseries in a textfile."""
     # Validate if associated wells are assigned multiple layers, factors,
@@ -210,7 +210,7 @@ def _unpack_package_data(
     start_times = times[:-1]  # Starts stress periods.
     has_associated = pkg_data["has_associated"]
     if has_associated:
-        return _prepare_df_ipf_associated(pkg_data, start_times, all_well_times)
+        return _prepare_df_ipf_associated(pkg_data, all_well_times)
     else:
         return _prepare_df_ipf_unassociated(pkg_data, start_times)
 
