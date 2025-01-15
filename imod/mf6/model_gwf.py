@@ -40,7 +40,7 @@ from imod.prepare.topsystem.default_allocation_methods import (
     SimulationAllocationOptions,
     SimulationDistributingOptions,
 )
-from imod.typing import GridDataArray
+from imod.typing import GridDataArray, StressPeriodTimesType
 from imod.typing.grid import zeros_like
 
 
@@ -310,7 +310,7 @@ class GroundwaterFlowModel(Modflow6Model):
 
         # import wells
         if steady_state:
-            wel_times = "steady-state"
+            wel_times: StressPeriodTimesType = "steady-state"
         else:
             wel_times = times
         wel_keys = [key for key in imod5_keys if key[0:3] == "wel"]

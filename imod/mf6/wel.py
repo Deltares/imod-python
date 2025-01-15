@@ -5,7 +5,7 @@ import itertools
 import textwrap
 import warnings
 from datetime import datetime
-from typing import Any, Literal, Optional, Tuple, Union
+from typing import Any, Optional, Tuple, Union, cast
 
 import cftime
 import numpy as np
@@ -45,7 +45,7 @@ from imod.schemata import (
     ValidationError,
 )
 from imod.select.points import points_indices, points_values
-from imod.typing import GridDataArray, Imod5DataDict
+from imod.typing import GridDataArray, Imod5DataDict, StressPeriodTimesType
 from imod.typing.grid import is_spatial_grid, ones_like
 from imod.util.expand_repetitions import average_timeseries, resample_timeseries
 from imod.util.structured import values_within_range
@@ -108,7 +108,7 @@ def _df_groups_to_da_rates(
 def _prepare_well_rates_from_groups(
     pkg_data: dict,
     unique_well_groups: pd.api.typing.DataFrameGroupBy,
-    start_times: list[datetime],
+    start_times: StressPeriodTimesType,
 ) -> xr.DataArray:
     """
     Prepare well rates from dataframe groups, grouped by unique well locations.
@@ -124,7 +124,9 @@ def _prepare_well_rates_from_groups(
     return _df_groups_to_da_rates(unique_well_groups)
 
 
-def _process_timeseries(df_group, start_times):
+def _process_timeseries(
+    df_group: pd.api.typing.DataFrameGroupBy, start_times: StressPeriodTimesType
+):
     if _times_is_steady_state(start_times):
         return average_timeseries(df_group)
     else:
@@ -161,7 +163,7 @@ def _prepare_df_ipf_associated(
 
 
 def _prepare_df_ipf_unassociated(
-    pkg_data: dict, start_times: list[datetime] | Literal["steady-state"]
+    pkg_data: dict, start_times: StressPeriodTimesType
 ) -> pd.DataFrame:
     """Prepare dataframe for an ipf with no associated timeseries."""
     is_steady_state = any(t is None for t in pkg_data["time"])
@@ -207,7 +209,7 @@ def _prepare_df_ipf_unassociated(
 
 
 def _unpack_package_data(
-    pkg_data: dict, start_times: list[datetime], all_well_times: list[datetime]
+    pkg_data: dict, start_times: StressPeriodTimesType, all_well_times: list[datetime]
 ) -> pd.DataFrame:
     """Unpack package data to dataframe"""
     has_associated = pkg_data["has_associated"]
@@ -296,19 +298,19 @@ def derive_cellid_from_points(
     return cellid.astype(int)
 
 
-def _times_is_steady_state(times: list[datetime] | Literal["steady-state"]) -> bool:
+def _times_is_steady_state(times: StressPeriodTimesType) -> bool:
     return isinstance(times, str) and times == "steady-state"
 
 
 def _get_starttimes(
-    times: list[datetime] | Literal["steady-state"],
-) -> list[datetime] | Literal["steady-state"]:
+    times: StressPeriodTimesType,
+) -> StressPeriodTimesType:
     if _times_is_steady_state(times):
         return times
     elif hasattr(times, "__iter__") and isinstance(
         times[0], (datetime, np.datetime64, pd.Timestamp)
     ):
-        return times[:-1]
+        return cast(list[datetime], times[:-1])
     else:
         raise ValueError(
             "Only 'steady-state' or a list of datetimes are supported for ``times``."
@@ -567,7 +569,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         cls,
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        times: list[datetime] | Literal["steady-state"],
+        times: StressPeriodTimesType,
         minimum_k: float = 0.1,
         minimum_thickness: float = 0.05,
     ) -> "GridAgnosticWell":
