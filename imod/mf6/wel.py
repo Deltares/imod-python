@@ -108,14 +108,13 @@ def _df_groups_to_da_rates(
 def _prepare_well_rates_from_groups(
     pkg_data: dict,
     unique_well_groups: pd.api.typing.DataFrameGroupBy,
-    times: list[datetime],
+    start_times: list[datetime],
 ) -> xr.DataArray:
     """
     Prepare well rates from dataframe groups, grouped by unique well locations.
     Resample timeseries if ipf with associated text files.
     """
     has_associated = pkg_data["has_associated"]
-    start_times = times[:-1]  # Starts stress periods.
     if has_associated:
         # Resample times per group
         unique_well_groups = [
@@ -204,10 +203,9 @@ def _prepare_df_ipf_unassociated(
 
 
 def _unpack_package_data(
-    pkg_data: dict, times: list[datetime], all_well_times: list[datetime]
+    pkg_data: dict, start_times: list[datetime], all_well_times: list[datetime]
 ) -> pd.DataFrame:
     """Unpack package data to dataframe"""
-    start_times = times[:-1]  # Starts stress periods.
     has_associated = pkg_data["has_associated"]
     if has_associated:
         return _prepare_df_ipf_associated(pkg_data, all_well_times)
@@ -642,7 +640,8 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         pkg_data = imod5_data[key]
         all_well_times = get_all_imod5_prj_well_times(imod5_data)
 
-        df = _unpack_package_data(pkg_data, times, all_well_times)
+        start_times = times[:-1]  # Starts stress periods.
+        df = _unpack_package_data(pkg_data, start_times, all_well_times)
         cls._validate_imod5_depth_information(key, pkg_data, df)
 
         # Groupby unique wells, to get dataframes per time.
@@ -660,7 +659,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             for (var, dtype), value in zip(varnames, index_values)
         }
         cls_input["rate"] = _prepare_well_rates_from_groups(
-            pkg_data, unique_well_groups, times
+            pkg_data, unique_well_groups, start_times
         )
         cls_input["minimum_k"] = minimum_k
         cls_input["minimum_thickness"] = minimum_thickness
