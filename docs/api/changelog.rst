@@ -28,9 +28,9 @@ Changed
   consistent with MODFLOW6. Previously this could only be indicated with 1 and
   -1.
 - :meth:`imod.mf6.Well.from_imod5_data` and
-  :meth:`imod.mf6.LayeredWell.from_imod5_data` upon receiving ``len(times) <=
-  2``, the simulation is assumed to be "steady-state" and well timeseries are
-  averaged.
+  :meth:`imod.mf6.LayeredWell.from_imod5_data` now also accept the argument
+  ``times = "steady-state"``, for the simulation is assumed to be "steady-state"
+  and well timeseries are averaged.
 
 Fixed
 ~~~~~

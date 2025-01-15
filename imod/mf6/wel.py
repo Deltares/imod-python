@@ -5,7 +5,7 @@ import itertools
 import textwrap
 import warnings
 from datetime import datetime
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Literal, Optional, Tuple, Union
 
 import cftime
 import numpy as np
@@ -125,10 +125,10 @@ def _prepare_well_rates_from_groups(
 
 
 def _process_timeseries(df_group, start_times):
-    if len(start_times) > 1:
-        return resample_timeseries(df_group, start_times)
-    else:
+    if _times_is_steady_state(start_times):
         return average_timeseries(df_group)
+    else:
+        return resample_timeseries(df_group, start_times)
 
 
 def _prepare_df_ipf_associated(
@@ -161,7 +161,7 @@ def _prepare_df_ipf_associated(
 
 
 def _prepare_df_ipf_unassociated(
-    pkg_data: dict, start_times: list[datetime]
+    pkg_data: dict, start_times: list[datetime] | Literal["steady-state"]
 ) -> pd.DataFrame:
     """Prepare dataframe for an ipf with no associated timeseries."""
     is_steady_state = any(t is None for t in pkg_data["time"])
@@ -191,6 +191,10 @@ def _prepare_df_ipf_unassociated(
     da_multi = df_multi.to_xarray()
     indexers = {"ipf_row": ipf_row_index}
     if not is_steady_state:
+        if start_times == "steady-state":
+            raise ValueError(
+                "start_times cannot be 'steady-state' for transient wells without associated timeseries."
+            )
         indexers["time"] = start_times
     # Multi-dimensional reindex, forward fill well locations, fill well rates
     # with 0.0.
@@ -290,6 +294,21 @@ def derive_cellid_from_points(
     cellid = cellid.assign_coords(coords=xy_coords)
 
     return cellid.astype(int)
+
+
+def _times_is_steady_state(times: list[datetime] | Literal["steady-state"]) -> bool:
+    return isinstance(times, str) and times == "steady-state"
+
+
+def _get_starttimes(times: list[datetime] | Literal["steady-state"]) -> list[datetime] | Literal["steady-state"]:
+    if _times_is_steady_state(times):
+        return times
+    elif hasattr(times, '__iter__') and isinstance(times[0], (datetime, np.datetime64, pd.Timestamp)):
+        return times[:-1]
+    else:
+        raise ValueError(
+            "Only 'steady-state' or a list of datetimes are supported for ``times``."
+        )
 
 
 class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
@@ -544,7 +563,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         cls,
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        times: list[datetime],
+        times: list[datetime] | Literal["steady-state"],
         minimum_k: float = 0.1,
         minimum_thickness: float = 0.05,
     ) -> "GridAgnosticWell":
@@ -576,11 +595,13 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             * Multiplication and addition factors need to remain constant through time
             * Same associated well cannot be assigned to multiple layers
         - The dataframe of the first projectfile timestamp is selected
-        - Timeseries are processed as follows:
-            * If ``len(times) > 2``, rate timeseries are resampled with a time
-              weighted mean to the simulation times. When simulation times fall
-              outside well timeseries range, the last rate is forward filled.
-            * If ``len(times) == 2``, the simulation is assumed to be
+        - Timeseries are processed based on the ``times`` argument of this
+          method:
+            * If ``times`` is a list of datetimes, rate timeseries are resampled
+              with a time weighted mean to the simulation times. When simulation
+              times fall outside well timeseries range, the last rate is forward
+              filled.
+            * If ``times = "steady-state"``, the simulation is assumed to be
               "steady-state" and an average rate is computed from the
               timeseries.
         - Projectfile timestamps are not used. Even if assigned to a
@@ -626,8 +647,9 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         imod5_data: dict
             iMOD5 data loaded from a projectfile with
             :func:`imod.formats.prj.open_projectfile_data`
-        times: list
-            Simulation times
+        times: list[datetime] | Literal["steady-state"]
+            Simulation times, a list of datetimes for transient simulations. Or
+            the string ``"steady-state"`` for steady-state simulations.
         minimum_k: float, optional
             On creating point wells, no point wells will be placed in cells with
             a lower horizontal conductivity than this. Wells are placed when
@@ -637,10 +659,11 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             a lower thickness than this. Wells are placed when ``to_mf6_pkg`` is
             called.
         """
+
         pkg_data = imod5_data[key]
         all_well_times = get_all_imod5_prj_well_times(imod5_data)
 
-        start_times = times[:-1]  # Starts stress periods.
+        start_times = _get_starttimes(times) # Starts stress periods.
         df = _unpack_package_data(pkg_data, start_times, all_well_times)
         cls._validate_imod5_depth_information(key, pkg_data, df)
 

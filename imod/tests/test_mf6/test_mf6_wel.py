@@ -1019,6 +1019,19 @@ def test_import_and_convert_to_mf6(imod5_dataset, tmp_path, wel_class):
     mf6_well._write("wel", [], write_context)
 
 
+@parametrize("wel_class", [Well, LayeredWell])
+@pytest.mark.usefixtures("imod5_dataset")
+def test_import__as_steady_state(imod5_dataset, wel_class):
+    data = imod5_dataset[0]
+    times = "steady-state"
+    # Import grid-agnostic well from imod5 data (it contains 1 well)
+    wel = wel_class.from_imod5_data("wel-WELLS_L3", data, times)
+
+    assert "time" not in wel.dataset.coords
+    assert wel.dataset["rate"].shape == (1,)
+    np.testing.assert_almost_equal(wel.dataset["rate"].values, -323.89361702)
+
+
 @parametrize("wel_class", [Well])
 @pytest.mark.usefixtures("imod5_dataset")
 def test_import_and_cleanup(imod5_dataset, wel_class: Well):
