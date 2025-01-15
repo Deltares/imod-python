@@ -300,10 +300,14 @@ def _times_is_steady_state(times: list[datetime] | Literal["steady-state"]) -> b
     return isinstance(times, str) and times == "steady-state"
 
 
-def _get_starttimes(times: list[datetime] | Literal["steady-state"]) -> list[datetime] | Literal["steady-state"]:
+def _get_starttimes(
+    times: list[datetime] | Literal["steady-state"],
+) -> list[datetime] | Literal["steady-state"]:
     if _times_is_steady_state(times):
         return times
-    elif hasattr(times, '__iter__') and isinstance(times[0], (datetime, np.datetime64, pd.Timestamp)):
+    elif hasattr(times, "__iter__") and isinstance(
+        times[0], (datetime, np.datetime64, pd.Timestamp)
+    ):
         return times[:-1]
     else:
         raise ValueError(
@@ -663,7 +667,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         pkg_data = imod5_data[key]
         all_well_times = get_all_imod5_prj_well_times(imod5_data)
 
-        start_times = _get_starttimes(times) # Starts stress periods.
+        start_times = _get_starttimes(times)  # Starts stress periods.
         df = _unpack_package_data(pkg_data, start_times, all_well_times)
         cls._validate_imod5_depth_information(key, pkg_data, df)
 
