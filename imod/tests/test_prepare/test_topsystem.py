@@ -3,6 +3,7 @@ import xarray as xr
 from pytest_cases import parametrize_with_cases
 
 from imod.prepare.topsystem import (
+    ALLOCATION_OPTION,
     allocate_drn_cells,
     allocate_ghb_cells,
     allocate_rch_cells,
@@ -10,7 +11,6 @@ from imod.prepare.topsystem import (
     distribute_drn_conductance,
     distribute_ghb_conductance,
     distribute_riv_conductance,
-    ALLOCATION_OPTION
 )
 from imod.typing import GridDataArray
 from imod.typing.grid import is_unstructured, zeros_like
