@@ -167,6 +167,29 @@ def test_cleanup_riv__fix_bottom_elevation_to_stage(riv_data: dict, dis_data: di
 
 
 @parametrize_with_cases("riv_data, dis_data", cases=RivDisCases)
+def test_cleanup_riv__stage_equals_bottom_elevation(riv_data: dict, dis_data:dict):
+    """Assure no cleanup accidentily takes place when stage equals bottom_elevation"""
+    dis_dict = _prepare_dis_dict(dis_data, cleanup_riv)
+    # Arrange: Set bottom elevation equal to stage
+    riv_data["bottom_elevation"] = riv_data["stage"].copy()
+    # Assure conductance not modified by previous tests.
+    np.testing.assert_equal(_first(riv_data["conductance"]), 1.0)
+    # Act
+    riv_data_cleaned = cleanup_riv(**dis_dict, **riv_data)
+    # Assert
+    np.testing.assert_equal(
+        riv_data_cleaned["bottom_elevation"].values, riv_data_cleaned["stage"].values
+    )
+    np.testing.assert_equal(
+        riv_data["stage"].values, riv_data_cleaned["stage"].values
+    )
+    np.testing.assert_equal(
+        riv_data["bottom_elevation"].values, riv_data_cleaned["bottom_elevation"].values
+    )
+
+
+
+@parametrize_with_cases("riv_data, dis_data", cases=RivDisCases)
 def test_cleanup_riv__raise_error(riv_data: dict, dis_data: dict):
     """
     Test if error raised when stage below model layer bottom and see if user is
