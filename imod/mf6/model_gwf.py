@@ -271,8 +271,8 @@ class GroundwaterFlowModel(Modflow6Model):
         result["npf"] = npf_pkg
 
         # import sto
-        transient = "sto" in imod5_data.keys()
-        if transient:
+        is_transient = "sto" in imod5_data.keys()
+        if is_transient:
             result["sto"] = StorageCoefficient.from_imod5_data(
                 imod5_data,
                 grid,
@@ -309,10 +309,7 @@ class GroundwaterFlowModel(Modflow6Model):
         imod5_keys = list(imod5_data.keys())
 
         # import wells
-        if transient:
-            wel_times: StressPeriodTimesType = times
-        else:
-            wel_times = "steady-state"
+        wel_times: StressPeriodTimesType = times if is_transient else "steady-state"
         wel_keys = [key for key in imod5_keys if key[0:3] == "wel"]
         for wel_key in wel_keys:
             wel_key_truncated = wel_key[:16]
@@ -327,15 +324,15 @@ class GroundwaterFlowModel(Modflow6Model):
                     """
                 )
                 raise KeyError(msg)
-            layer = np.array(imod5_data[wel_key]["layer"])
-            if np.any(layer == 0):
-                result[wel_key_truncated] = Well.from_imod5_data(
-                    wel_key, imod5_data, wel_times
-                )
-            else:
-                result[wel_key_truncated] = LayeredWell.from_imod5_data(
-                    wel_key, imod5_data, wel_times
-                )
+
+            wel_layer = imod5_data[wel_key]["layer"].values
+            is_allocated = np.any(wel_layer == 0)
+            wel_args = (wel_key, imod5_data, wel_times)
+            result[wel_key_truncated] = (
+                Well.from_imod5_data(*wel_args)
+                if is_allocated
+                else LayeredWell.from_imod5_data(*wel_args)
+            )
 
         if "cap" in imod5_keys:
             result["msw-sprinkling"] = LayeredWell.from_imod5_cap_data(imod5_data)  # type: ignore

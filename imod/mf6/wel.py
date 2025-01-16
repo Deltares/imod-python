@@ -4,6 +4,7 @@ import abc
 import itertools
 import textwrap
 import warnings
+from collections.abc import Iterable
 from datetime import datetime
 from typing import Any, Optional, Tuple, Union, cast
 
@@ -127,7 +128,7 @@ def _prepare_well_rates_from_groups(
 def _process_timeseries(
     df_group: pd.api.typing.DataFrameGroupBy, start_times: StressPeriodTimesType
 ):
-    if _times_is_steady_state(start_times):
+    if _is_steady_state(start_times):
         return average_timeseries(df_group)
     else:
         return resample_timeseries(df_group, start_times)
@@ -195,7 +196,7 @@ def _prepare_df_ipf_unassociated(
     if not is_steady_state:
         if start_times == "steady-state":
             raise ValueError(
-                "start_times cannot be 'steady-state' for transient wells without associated timeseries."
+                "``start_times`` cannot be 'steady-state' for transient wells without associated timeseries."
             )
         indexers["time"] = start_times
     # Multi-dimensional reindex, forward fill well locations, fill well rates
@@ -298,18 +299,26 @@ def derive_cellid_from_points(
     return cellid.astype(int)
 
 
-def _times_is_steady_state(times: StressPeriodTimesType) -> bool:
+def _is_steady_state(times: StressPeriodTimesType) -> bool:
+    # Shortcut when not string, to avoid ambigious bitwise "and" operation when
+    # its not.
     return isinstance(times, str) and times == "steady-state"
+
+
+def _is_iterable_of_datetimes(times: StressPeriodTimesType) -> bool:
+    return (
+        isinstance(times, Iterable)
+        and (len(times) > 0)
+        and isinstance(times[0], (datetime, np.datetime64, pd.Timestamp))
+    )
 
 
 def _get_starttimes(
     times: StressPeriodTimesType,
 ) -> StressPeriodTimesType:
-    if _times_is_steady_state(times):
+    if _is_steady_state(times):
         return times
-    elif hasattr(times, "__iter__") and isinstance(
-        times[0], (datetime, np.datetime64, pd.Timestamp)
-    ):
+    elif _is_iterable_of_datetimes(times):
         return cast(list[datetime], times[:-1])
     else:
         raise ValueError(

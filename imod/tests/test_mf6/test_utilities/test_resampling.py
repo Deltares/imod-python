@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import numpy as np
 import pandas as pd
 
 from imod.util.expand_repetitions import average_timeseries, resample_timeseries
@@ -171,7 +172,7 @@ def test_mean_timeseries():
     mean_timeseries = average_timeseries(timeseries)
 
     dummy_times = [datetime(1989, 1, 1)]
-    expected_rates = [300.0]
+    expected_rates = np.mean(rates)
     expected_timeseries = initialize_timeseries(dummy_times, expected_rates)
     col_order = ["x", "y", "id", "filt_top", "filt_bot", "rate"]
     expected_timeseries = expected_timeseries[col_order]
