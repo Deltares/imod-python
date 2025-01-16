@@ -325,7 +325,7 @@ class GroundwaterFlowModel(Modflow6Model):
                 )
                 raise KeyError(msg)
 
-            wel_layer = imod5_data[wel_key]["layer"].values
+            wel_layer = np.array(imod5_data[wel_key]["layer"])
             is_allocated = np.any(wel_layer == 0)
             wel_args = (wel_key, imod5_data, wel_times)
             result[wel_key_truncated] = (
