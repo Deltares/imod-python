@@ -4,8 +4,9 @@ import abc
 import itertools
 import textwrap
 import warnings
+from collections.abc import Iterable
 from datetime import datetime
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Optional, Tuple, Union, cast
 
 import cftime
 import numpy as np
@@ -45,9 +46,9 @@ from imod.schemata import (
     ValidationError,
 )
 from imod.select.points import points_indices, points_values
-from imod.typing import GridDataArray, Imod5DataDict
+from imod.typing import GridDataArray, Imod5DataDict, StressPeriodTimesType
 from imod.typing.grid import is_spatial_grid, ones_like
-from imod.util.expand_repetitions import resample_timeseries
+from imod.util.expand_repetitions import average_timeseries, resample_timeseries
 from imod.util.structured import values_within_range
 
 ABSTRACT_METH_ERROR_MSG = "Method in abstract base class called"
@@ -108,25 +109,33 @@ def _df_groups_to_da_rates(
 def _prepare_well_rates_from_groups(
     pkg_data: dict,
     unique_well_groups: pd.api.typing.DataFrameGroupBy,
-    times: list[datetime],
+    start_times: StressPeriodTimesType,
 ) -> xr.DataArray:
     """
     Prepare well rates from dataframe groups, grouped by unique well locations.
     Resample timeseries if ipf with associated text files.
     """
     has_associated = pkg_data["has_associated"]
-    start_times = times[:-1]  # Starts stress periods.
     if has_associated:
         # Resample times per group
         unique_well_groups = [
-            resample_timeseries(df_group, start_times)
+            _process_timeseries(df_group, start_times)
             for df_group in unique_well_groups
         ]
     return _df_groups_to_da_rates(unique_well_groups)
 
 
+def _process_timeseries(
+    df_group: pd.api.typing.DataFrameGroupBy, start_times: StressPeriodTimesType
+):
+    if _is_steady_state(start_times):
+        return average_timeseries(df_group)
+    else:
+        return resample_timeseries(df_group, start_times)
+
+
 def _prepare_df_ipf_associated(
-    pkg_data: dict, start_times: list[datetime], all_well_times: list[datetime]
+    pkg_data: dict, all_well_times: list[datetime]
 ) -> pd.DataFrame:
     """Prepare dataframe for an ipf with associated timeseries in a textfile."""
     # Validate if associated wells are assigned multiple layers, factors,
@@ -155,7 +164,7 @@ def _prepare_df_ipf_associated(
 
 
 def _prepare_df_ipf_unassociated(
-    pkg_data: dict, start_times: list[datetime]
+    pkg_data: dict, start_times: StressPeriodTimesType
 ) -> pd.DataFrame:
     """Prepare dataframe for an ipf with no associated timeseries."""
     is_steady_state = any(t is None for t in pkg_data["time"])
@@ -185,6 +194,10 @@ def _prepare_df_ipf_unassociated(
     da_multi = df_multi.to_xarray()
     indexers = {"ipf_row": ipf_row_index}
     if not is_steady_state:
+        if start_times == "steady-state":
+            raise ValueError(
+                "``start_times`` cannot be 'steady-state' for transient wells without associated timeseries."
+            )
         indexers["time"] = start_times
     # Multi-dimensional reindex, forward fill well locations, fill well rates
     # with 0.0.
@@ -197,13 +210,12 @@ def _prepare_df_ipf_unassociated(
 
 
 def _unpack_package_data(
-    pkg_data: dict, times: list[datetime], all_well_times: list[datetime]
+    pkg_data: dict, start_times: StressPeriodTimesType, all_well_times: list[datetime]
 ) -> pd.DataFrame:
     """Unpack package data to dataframe"""
-    start_times = times[:-1]  # Starts stress periods.
     has_associated = pkg_data["has_associated"]
     if has_associated:
-        return _prepare_df_ipf_associated(pkg_data, start_times, all_well_times)
+        return _prepare_df_ipf_associated(pkg_data, all_well_times)
     else:
         return _prepare_df_ipf_unassociated(pkg_data, start_times)
 
@@ -285,6 +297,33 @@ def derive_cellid_from_points(
     cellid = cellid.assign_coords(coords=xy_coords)
 
     return cellid.astype(int)
+
+
+def _is_steady_state(times: StressPeriodTimesType) -> bool:
+    # Shortcut when not string, to avoid ambigious bitwise "and" operation when
+    # its not.
+    return isinstance(times, str) and times == "steady-state"
+
+
+def _is_iterable_of_datetimes(times: StressPeriodTimesType) -> bool:
+    return (
+        isinstance(times, Iterable)
+        and (len(times) > 0)
+        and isinstance(times[0], (datetime, np.datetime64, pd.Timestamp))
+    )
+
+
+def _get_starttimes(
+    times: StressPeriodTimesType,
+) -> StressPeriodTimesType:
+    if _is_steady_state(times):
+        return times
+    elif _is_iterable_of_datetimes(times):
+        return cast(list[datetime], times[:-1])
+    else:
+        raise ValueError(
+            "Only 'steady-state' or a list of datetimes are supported for ``times``."
+        )
 
 
 class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
@@ -539,7 +578,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         cls,
         key: str,
         imod5_data: dict[str, dict[str, GridDataArray]],
-        times: list[datetime],
+        times: StressPeriodTimesType,
         minimum_k: float = 0.1,
         minimum_thickness: float = 0.05,
     ) -> "GridAgnosticWell":
@@ -571,10 +610,15 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             * Multiplication and addition factors need to remain constant through time
             * Same associated well cannot be assigned to multiple layers
         - The dataframe of the first projectfile timestamp is selected
-        - Rate timeseries are resampled with a time weighted mean to the
-          simulation times.
-        - When simulation times fall outside well timeseries range, the last
-          rate is forward filled.
+        - Timeseries are processed based on the ``times`` argument of this
+          method:
+            * If ``times`` is a list of datetimes, rate timeseries are resampled
+              with a time weighted mean to the simulation times. When simulation
+              times fall outside well timeseries range, the last rate is forward
+              filled.
+            * If ``times = "steady-state"``, the simulation is assumed to be
+              "steady-state" and an average rate is computed from the
+              timeseries.
         - Projectfile timestamps are not used. Even if assigned to a
           "steady-state" timestamp, the resulting dataset still uses simulation
           times.
@@ -618,8 +662,9 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         imod5_data: dict
             iMOD5 data loaded from a projectfile with
             :func:`imod.formats.prj.open_projectfile_data`
-        times: list
-            Simulation times
+        times: list[datetime] | Literal["steady-state"]
+            Simulation times, a list of datetimes for transient simulations. Or
+            the string ``"steady-state"`` for steady-state simulations.
         minimum_k: float, optional
             On creating point wells, no point wells will be placed in cells with
             a lower horizontal conductivity than this. Wells are placed when
@@ -629,10 +674,12 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             a lower thickness than this. Wells are placed when ``to_mf6_pkg`` is
             called.
         """
+
         pkg_data = imod5_data[key]
         all_well_times = get_all_imod5_prj_well_times(imod5_data)
 
-        df = _unpack_package_data(pkg_data, times, all_well_times)
+        start_times = _get_starttimes(times)  # Starts stress periods.
+        df = _unpack_package_data(pkg_data, start_times, all_well_times)
         cls._validate_imod5_depth_information(key, pkg_data, df)
 
         # Groupby unique wells, to get dataframes per time.
@@ -650,7 +697,7 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             for (var, dtype), value in zip(varnames, index_values)
         }
         cls_input["rate"] = _prepare_well_rates_from_groups(
-            pkg_data, unique_well_groups, times
+            pkg_data, unique_well_groups, start_times
         )
         cls_input["minimum_k"] = minimum_k
         cls_input["minimum_thickness"] = minimum_thickness

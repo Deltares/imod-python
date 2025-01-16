@@ -1,8 +1,9 @@
 from datetime import datetime
 
+import numpy as np
 import pandas as pd
 
-from imod.util.expand_repetitions import resample_timeseries
+from imod.util.expand_repetitions import average_timeseries, resample_timeseries
 
 
 def initialize_timeseries(times: list[datetime], rates: list[float]) -> pd.DataFrame:
@@ -159,4 +160,23 @@ def test_timeseries_resampling_refine_and_coarsen():
 
     pd.testing.assert_frame_equal(
         original_timeseries, re_coarsened_timeseries, check_dtype=False
+    )
+
+
+def test_mean_timeseries():
+    # In this test, we compute the mean of a timeseries.
+    times = [datetime(1989, 1, i) for i in [1, 3, 4, 5, 6]]
+    rates = [i * 100 for i in range(1, 6)]
+    timeseries = initialize_timeseries(times, rates)
+
+    mean_timeseries = average_timeseries(timeseries)
+
+    dummy_times = [datetime(1989, 1, 1)]
+    expected_rates = np.mean(rates)
+    expected_timeseries = initialize_timeseries(dummy_times, expected_rates)
+    col_order = ["x", "y", "id", "filt_top", "filt_bot", "rate"]
+    expected_timeseries = expected_timeseries[col_order]
+
+    pd.testing.assert_frame_equal(
+        mean_timeseries, expected_timeseries, check_dtype=False
     )
