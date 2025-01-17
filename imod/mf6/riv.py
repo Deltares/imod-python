@@ -6,7 +6,6 @@ import numpy as np
 
 from imod import logging
 from imod.logging import init_log_decorator, standard_log_decorator
-from imod.logging.loglevel import LogLevel
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
@@ -474,9 +473,7 @@ class River(BoundaryCondition, IRegridPackage):
         """
         # gather input data
         varnames = ["conductance", "stage", "bottom_elevation", "infiltration_factor"]
-        data = {
-            varname: imod5_data[key][varname] for varname in varnames
-        }
+        data = {varname: imod5_data[key][varname] for varname in varnames}
         # Regrid the input data
         regridded_riv_pkg_data = regrid_imod5_pkg_data(
             River, data, target_dis, regridder_types, regrid_cache
