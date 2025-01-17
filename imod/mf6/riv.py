@@ -1,6 +1,6 @@
 from copy import deepcopy
 from datetime import datetime
-from typing import Optional, Tuple
+from typing import Optional, Tuple, cast
 
 import numpy as np
 
@@ -14,9 +14,9 @@ from imod.mf6.drn import Drainage
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.regrid.regrid_schemes import RiverRegridMethod
+from imod.mf6.utilities.imod5_converter import regrid_imod5_pkg_data
 from imod.mf6.utilities.regrid import (
     RegridderWeightsCache,
-    _regrid_package_data,
 )
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.prepare.cleanup import AlignLevelsMode, align_interface_levels, cleanup_riv
@@ -38,7 +38,7 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
-from imod.typing import GridDataDict
+from imod.typing import GridDataArray, GridDataDict
 from imod.typing.grid import (
     concat,
     enforce_dim_order,
@@ -46,6 +46,33 @@ from imod.typing.grid import (
     is_planar_grid,
 )
 from imod.util.expand_repetitions import expand_repetitions
+
+
+def maybe_set_repeat_stress(
+    repeat: Optional[list[datetime]],
+    time_min: datetime,
+    time_max: datetime,
+    optional_package: Optional[BoundaryCondition],
+) -> None:
+    """Set repeat stress for optional package if repeat is not None."""
+    if repeat is not None:
+        if optional_package is not None:
+            optional_package.set_repeat_stress(
+                expand_repetitions(repeat, time_min, time_max)
+            )
+
+
+def maybe_create_package(package: BoundaryCondition) -> Optional[BoundaryCondition]:
+    """ "
+    Create an optional package from a package if it has data. Return None if
+    package is inactive everywhere.
+    """
+    optional_package: Optional[BoundaryCondition] = None
+    # remove River package if its mask is False everywhere
+    mask = ~np.isnan(package["conductance"])
+    if np.any(mask):
+        optional_package = package.mask(mask)
+    return optional_package
 
 
 def maybe_rise_bottom_elevation(bottom_elevation, bottom):
@@ -66,6 +93,29 @@ def maybe_rise_bottom_elevation(bottom_elevation, bottom):
             bottom_elevation, bottom, AlignLevelsMode.BOTTOMUP
         )
     return bottom_elevation
+
+
+def _separate_infiltration_data(
+    riv_pkg_data: GridDataDict, infiltration_factor: GridDataArray
+) -> tuple[GridDataDict, GridDataDict]:
+    """
+    Account for the infiltration factor in the river package data. This function
+    updates the riv_pkg_data with an infiltration conductance. The extra
+    exfiltration conductance is separated into a data dict for drainage
+    """
+    # update the conductance of the river package to account for the
+    # infiltration factor
+    drain_conductance, river_conductance = split_conductance_with_infiltration_factor(
+        riv_pkg_data["conductance"], infiltration_factor
+    )
+    riv_pkg_data["conductance"] = river_conductance
+    # create a drainage package with the conductance we computed from the
+    # infiltration factor
+    drn_pkg_data = {
+        "elevation": riv_pkg_data["stage"],
+        "conductance": drain_conductance,
+    }
+    return riv_pkg_data, drn_pkg_data
 
 
 def create_drain_from_leftover_riv_imod5_data(
@@ -417,35 +467,27 @@ class River(BoundaryCondition, IRegridPackage):
 
         Returns
         -------
-        A MF6 river package, and a drainage package to account
-        for the infiltration factor which exists in IMOD5 but not in MF6.
-        Both the river package and the drainage package can be None,
+        A tuple containing a River package and a Drainage package. The Drainage
+        package accounts for the infiltration factor which exists in iMOD5 but
+        not in MF6. It furthermore potentially contains drainage cells above
+        river stage if ``ALLOCATION_OPTION.stage_to_riv_bot_drn_above`` is
+        chosen. Both the river package and the drainage package can be None,
         this can happen if the infiltration factor is 0 or 1 everywhere.
         """
-
-        target_idomain = target_dis.dataset["idomain"]
-
         # gather input data
+        varnames = ["conductance", "stage", "bottom_elevation", "infiltration_factor"]
         data = {
-            "conductance": imod5_data[key]["conductance"].copy(deep=True),
-            "stage": imod5_data[key]["stage"].copy(deep=True),
-            "bottom_elevation": imod5_data[key]["bottom_elevation"].copy(deep=True),
-            "infiltration_factor": imod5_data[key]["infiltration_factor"].copy(
-                deep=True
-            ),
+            varname: imod5_data[key][varname] for varname in varnames
         }
-        is_planar = is_planar_grid(data["conductance"])
-
-        # set up regridder methods
-        if regridder_types is None:
-            regridder_types = River.get_regrid_methods()
-        # regrid the input data
-        regridded_riv_pkg_data = _regrid_package_data(
-            data, target_idomain, regridder_types, regrid_cache, {}
+        # Regrid the input data
+        regridded_riv_pkg_data = regrid_imod5_pkg_data(
+            River, data, target_dis, regridder_types, regrid_cache
         )
-
+        # Pop infiltration_factor to avoid unnecessisarily allocating and
+        # distributing it.
         infiltration_factor = regridded_riv_pkg_data.pop("infiltration_factor")
-
+        # Allocate and distribute planar data if the grid is planar
+        is_planar = is_planar_grid(data["conductance"])
         allocation_drn_data: GridDataDict = {}
         if is_planar:
             # allocate and distribute planar data
@@ -462,52 +504,28 @@ class River(BoundaryCondition, IRegridPackage):
             infiltration_factor = infiltration_factor.isel(
                 {"layer": 0}, drop=True, missing_dims="ignore"
             )
-
-        # update the conductance of the river package to account for the
-        # infiltration factor
-        drain_conductance, river_conductance = (
-            split_conductance_with_infiltration_factor(
-                regridded_riv_pkg_data["conductance"], infiltration_factor
-            )
-        )
-        regridded_riv_pkg_data["conductance"] = river_conductance
         regridded_riv_pkg_data["bottom_elevation"] = enforce_dim_order(
             regridded_riv_pkg_data["bottom_elevation"]
         )
-
+        # Create packages
+        regridded_riv_pkg_data, infiltration_drn_data = _separate_infiltration_data(
+            regridded_riv_pkg_data, infiltration_factor
+        )
         river_package = River(**regridded_riv_pkg_data, validate=True)
-        # create a drainage package with the conductance we computed from the
-        # infiltration factor
-        infiltration_drn_data = {
-            "elevation": regridded_riv_pkg_data["stage"],
-            "conductance": drain_conductance,
-        }
         drainage_package = create_drain_from_leftover_riv_imod5_data(
             allocation_drn_data,
             infiltration_drn_data,
         )
-        optional_river_package: Optional[River] = None
-        optional_drainage_package: Optional[Drainage] = None
-        # remove River package if its mask is False everywhere
-        mask = ~np.isnan(river_package["conductance"])
-        if np.any(mask):
-            optional_river_package = river_package.mask(mask)
-
-        # remove Drainage package if its mask is False everywhere
-        mask = ~np.isnan(drainage_package["conductance"])
-        if np.any(mask):
-            optional_drainage_package = drainage_package.mask(mask)
-
+        optional_river_package = cast(
+            Optional[River], maybe_create_package(river_package)
+        )
+        optional_drainage_package = cast(
+            Optional[Drainage], maybe_create_package(drainage_package)
+        )
+        # Account for periods with repeat stresses.
         repeat = period_data.get(key)
-        if repeat is not None:
-            if optional_river_package is not None:
-                optional_river_package.set_repeat_stress(
-                    expand_repetitions(repeat, time_min, time_max)
-                )
-            if optional_drainage_package is not None:
-                optional_drainage_package.set_repeat_stress(
-                    expand_repetitions(repeat, time_min, time_max)
-                )
+        maybe_set_repeat_stress(repeat, time_min, time_max, optional_river_package)
+        maybe_set_repeat_stress(repeat, time_min, time_max, optional_drainage_package)
 
         return (optional_river_package, optional_drainage_package)
 

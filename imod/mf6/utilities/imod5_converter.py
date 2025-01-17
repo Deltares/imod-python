@@ -1,11 +1,14 @@
-from typing import Union, cast
+from typing import Optional, Union, cast
 
 import numpy as np
 import pandas as pd
 import xarray as xr
 
+from imod.mf6.package import Package
+from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
 from imod.typing import GridDataDict, Imod5DataDict, SelSettingsType
 from imod.typing.grid import full_like
+from imod.util.regrid_method_type import RegridMethodType
 
 
 def convert_ibound_to_idomain(
@@ -118,3 +121,26 @@ def well_from_imod5_cap_data(imod5_data: Imod5DataDict) -> dict[str, np.ndarray]
         return _well_from_imod5_cap_point_data(cap_data)
     else:
         return _well_from_imod5_cap_grid_data(cap_data)
+
+
+def regrid_imod5_pkg_data(
+    cls: type[Package],
+    imod5_pkg_data: GridDataDict,
+    target_dis: Package,
+    regridder_types: Optional[RegridMethodType],
+    regrid_cache: RegridderWeightsCache,
+) -> GridDataDict:
+    """
+    Regrid iMOD5 package data to target idomain. Optionally get regrid methods
+    from class if not provided.
+    """
+    target_idomain = target_dis.dataset["idomain"]
+
+    # set up regridder methods
+    if regridder_types is None:
+        regridder_types = cls.get_regrid_methods()
+    # regrid the input data
+    regridded_pkg_data = _regrid_package_data(
+        imod5_pkg_data, target_idomain, regridder_types, regrid_cache, {}
+    )
+    return regridded_pkg_data
