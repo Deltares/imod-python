@@ -25,6 +25,7 @@ from imod.prepare.topsystem.conductance import (
     DISTRIBUTING_OPTION,
     distribute_drn_conductance,
     distribute_riv_conductance,
+    split_conductance_with_infiltration_factor,
 )
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -439,44 +440,46 @@ class River(BoundaryCondition, IRegridPackage):
         if regridder_types is None:
             regridder_types = River.get_regrid_methods()
         # regrid the input data
-        regridded_package_data = _regrid_package_data(
+        regridded_riv_pkg_data = _regrid_package_data(
             data, target_idomain, regridder_types, regrid_cache, {}
         )
 
-        infiltration_factor = regridded_package_data.pop("infiltration_factor")
+        infiltration_factor = regridded_riv_pkg_data.pop("infiltration_factor")
 
         allocation_drn_data: GridDataDict = {}
         if is_planar:
             # allocate and distribute planar data
             allocation_riv_data, allocation_drn_data = (
                 cls.allocate_and_distribute_planar_data(
-                    regridded_package_data,
+                    regridded_riv_pkg_data,
                     target_dis,
                     target_npf,
                     allocation_option,
                     distributing_option,
                 )
             )
-            regridded_package_data.update(allocation_riv_data)
+            regridded_riv_pkg_data.update(allocation_riv_data)
             infiltration_factor = infiltration_factor.isel(
                 {"layer": 0}, drop=True, missing_dims="ignore"
             )
 
         # update the conductance of the river package to account for the
         # infiltration factor
-        drain_conductance, river_conductance = cls.split_conductance(
-            regridded_package_data["conductance"], infiltration_factor
+        drain_conductance, river_conductance = (
+            split_conductance_with_infiltration_factor(
+                regridded_riv_pkg_data["conductance"], infiltration_factor
+            )
         )
-        regridded_package_data["conductance"] = river_conductance
-        regridded_package_data["bottom_elevation"] = enforce_dim_order(
-            regridded_package_data["bottom_elevation"]
+        regridded_riv_pkg_data["conductance"] = river_conductance
+        regridded_riv_pkg_data["bottom_elevation"] = enforce_dim_order(
+            regridded_riv_pkg_data["bottom_elevation"]
         )
 
-        river_package = River(**regridded_package_data, validate=True)
+        river_package = River(**regridded_riv_pkg_data, validate=True)
         # create a drainage package with the conductance we computed from the
         # infiltration factor
         infiltration_drn_data = {
-            "elevation": regridded_package_data["stage"],
+            "elevation": regridded_riv_pkg_data["stage"],
             "conductance": drain_conductance,
         }
         drainage_package = create_drain_from_leftover_riv_imod5_data(
@@ -486,7 +489,7 @@ class River(BoundaryCondition, IRegridPackage):
         optional_river_package: Optional[River] = None
         optional_drainage_package: Optional[Drainage] = None
         # remove River package if its mask is False everywhere
-        mask = ~np.isnan(river_conductance)
+        mask = ~np.isnan(river_package["conductance"])
         if np.any(mask):
             optional_river_package = river_package.mask(mask)
 
@@ -507,66 +510,6 @@ class River(BoundaryCondition, IRegridPackage):
                 )
 
         return (optional_river_package, optional_drainage_package)
-
-    @classmethod
-    def split_conductance(cls, conductance, infiltration_factor):
-        """
-        Seperates (exfiltration) conductance with an infiltration factor (iMODFLOW) into
-        a drainage conductance and a river conductance following methods explained in Zaadnoordijk (2009).
-
-        Parameters
-        ----------
-        conductance : xr.DataArray or float
-            Exfiltration conductance. Is the default conductance provided to the iMODFLOW river package
-        infiltration_factor : xr.DataArray or float
-            Infiltration factor. The exfiltration conductance is multiplied with this factor to compute
-            the infiltration conductance. If 0, no infiltration takes place; if 1, infiltration is equal to    exfiltration
-
-        Returns
-        -------
-        drainage_conductance : xr.DataArray
-            conductance for the drainage package
-        river_conductance : xr.DataArray
-            conductance for the river package
-
-        Derivation
-        ----------
-        From Zaadnoordijk (2009):
-        [1] cond_RIV = A/ci
-        [2] cond_DRN = A * (ci-cd) / (ci*cd)
-        Where cond_RIV and cond_DRN repsectively are the River and Drainage conductance [L^2/T],
-        A is the cell area [L^2] and ci and cd respectively are the infiltration and exfiltration resistance [T]
-
-        Taking f as the infiltration factor and cond_d as the exfiltration conductance, we can write (iMOD manual):
-        [3] ci = cd * (1/f)
-        [4] cond_d = A/cd
-
-        We can then rewrite equations 1 and 2 to:
-        [5] cond_RIV = f * cond_d
-        [6] cond_DRN = (1-f) * cond_d
-
-        References
-        ----------
-        Zaadnoordijk, W. (2009).
-        Simulating Piecewise-Linear Surface Water and Ground Water Interactions with MODFLOW.
-        Ground Water.
-        https://ngwa.onlinelibrary.wiley.com/doi/10.1111/j.1745-6584.2009.00582.x
-
-        iMOD manual v5.2 (2020)
-        https://oss.deltares.nl/web/imod/
-
-        """
-        if np.any(infiltration_factor > 1):
-            raise ValueError("The infiltration factor should not exceed 1")
-
-        drainage_conductance = conductance * (1 - infiltration_factor)
-
-        river_conductance = conductance * infiltration_factor
-
-        # clean up the packages
-        drainage_conductance = drainage_conductance.where(drainage_conductance > 0)
-        river_conductance = river_conductance.where(river_conductance > 0)
-        return drainage_conductance, river_conductance
 
     @classmethod
     def get_regrid_methods(cls) -> RiverRegridMethod:

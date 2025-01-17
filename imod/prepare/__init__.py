@@ -54,6 +54,7 @@ from imod.prepare.topsystem import (
     distribute_drn_conductance,
     distribute_ghb_conductance,
     distribute_riv_conductance,
+    split_conductance_with_infiltration_factor,
 )
 from imod.prepare.voxelize import Voxelizer
 from imod.prepare.wells import assign_wells
