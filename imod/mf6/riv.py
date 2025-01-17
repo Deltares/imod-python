@@ -77,17 +77,15 @@ def maybe_create_package(package: BoundaryCondition) -> Optional[BoundaryConditi
 
 def maybe_rise_bottom_elevation(bottom_elevation, bottom):
     """
-    Due to regridding, the bottom_elevation could be smaller than the
+    Due to regridding, the bottom_elevation could be less than the
     layer bottom, so here we overwrite it with bottom if that's
     the case.
     """
-    layer_bottom_above_bottom_elevation = bottom > bottom_elevation
+    is_layer_bottom_above_bottom_elevation = (bottom > bottom_elevation).any()
 
-    if layer_bottom_above_bottom_elevation.any():
-        logging.logger.log(
-            loglevel=LogLevel.WARNING,
-            message="Note: riv bottom was detected below model bottom. Updated the riv's bottom.",
-            additional_depth=0,
+    if is_layer_bottom_above_bottom_elevation:
+        logging.logger.warning(
+            "Note: riv bottom was detected below model bottom. Updated the riv's bottom."
         )
         bottom_elevation, _ = align_interface_levels(
             bottom_elevation, bottom, AlignLevelsMode.BOTTOMUP
@@ -487,9 +485,9 @@ class River(BoundaryCondition, IRegridPackage):
         # distributing it.
         infiltration_factor = regridded_riv_pkg_data.pop("infiltration_factor")
         # Allocate and distribute planar data if the grid is planar
-        is_planar = is_planar_grid(data["conductance"])
+        is_planar_xy = is_planar_grid(data["conductance"])
         allocation_drn_data: GridDataDict = {}
-        if is_planar:
+        if is_planar_xy:
             # allocate and distribute planar data
             allocation_riv_data, allocation_drn_data = (
                 cls.allocate_and_distribute_planar_data(
