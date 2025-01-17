@@ -331,7 +331,7 @@ class River(BoundaryCondition, IRegridPackage):
             npf.dataset["k"],
         )
         riv_distribute_grids = (planar_data["stage"], planar_data["bottom_elevation"])
-        drn_distribute_grids = planar_data["bottom_elevation"]
+        drn_distribute_grids = (planar_data["bottom_elevation"],)
         bc_distribute_grids = (
             drn_distribute_grids
             if (drn_allocated is not None)
