@@ -44,6 +44,24 @@ def expand_repetitions(
     return expanded
 
 
+def average_timeseries(well_rate: pd.DataFrame) -> pd.DataFrame:
+    """
+    Compute the mean value of the timeseries for a single well. Time column is
+    dropped.
+
+    Parameters
+    ----------
+    well_rate:  pd.DataFrame
+        input timeseries for a single well
+    """
+    # Take first item
+    output_frame = well_rate.iloc[[0]].drop(columns=["time", "rate"])
+    # Compute mean
+    col_index = output_frame.shape[1]
+    output_frame.insert(col_index, "rate", well_rate["rate"].mean())
+    return output_frame
+
+
 def resample_timeseries(
     well_rate: pd.DataFrame, times: list[datetime] | pd.DatetimeIndex
 ) -> pd.DataFrame:
@@ -98,7 +116,8 @@ def resample_timeseries(
 
     # compute time difference from perious to current row
     time_diff_col = intermediate_df["time"].diff()
-    intermediate_df.insert(7, "time_to_next", time_diff_col.values)
+    col_index = intermediate_df.shape[1] - 1
+    intermediate_df.insert(col_index, "time_to_next", time_diff_col.values)
 
     # shift the new column 1 place down so that they become the time to the next row
     intermediate_df["time_to_next"] = intermediate_df["time_to_next"].shift(-1)
