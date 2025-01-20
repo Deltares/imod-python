@@ -46,6 +46,10 @@ Fixed
 - :meth:`imod.mf6.River.from_imod5_data` now preserves the drainage cells
   created with the ``stage_to_riv_bot_drn_above`` option of
   :func:`imod.prepare.ALLOCATION_OPTION`.
+- Bug in :func:`imod.prepare.distribute_riv_conductance` where conductances were
+  set to ``np.nan`` for cells where ``stage`` equals ``bottom_elevation`` when
+  :func:`imod.prepare.DISTRIBUTING_OPTION` was set to ``by_crosscut_thickness``,
+  ``by_crosscut_transmissivity``, ``by_corrected_transmissivity``.
 
 [1.0.0rc1] - 2024-12-20
 -----------------------
