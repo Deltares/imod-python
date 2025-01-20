@@ -1,13 +1,11 @@
 from copy import deepcopy
 from datetime import datetime
-from typing import Optional, Tuple
+from typing import Optional, Tuple, cast
 
 import numpy as np
-import xarray as xr
 
 from imod import logging
 from imod.logging import init_log_decorator, standard_log_decorator
-from imod.logging.loglevel import LogLevel
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
@@ -15,16 +13,18 @@ from imod.mf6.drn import Drainage
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.regrid.regrid_schemes import RiverRegridMethod
+from imod.mf6.utilities.imod5_converter import regrid_imod5_pkg_data
 from imod.mf6.utilities.regrid import (
     RegridderWeightsCache,
-    _regrid_package_data,
 )
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
-from imod.prepare.cleanup import cleanup_riv
+from imod.prepare.cleanup import AlignLevelsMode, align_interface_levels, cleanup_riv
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_riv_cells
 from imod.prepare.topsystem.conductance import (
     DISTRIBUTING_OPTION,
+    distribute_drn_conductance,
     distribute_riv_conductance,
+    split_conductance_with_infiltration_factor,
 )
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -37,9 +37,112 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
-from imod.typing import GridDataArray
-from imod.typing.grid import enforce_dim_order, has_negative_layer, is_planar_grid
+from imod.typing import GridDataArray, GridDataDict
+from imod.typing.grid import (
+    concat,
+    enforce_dim_order,
+    has_negative_layer,
+    is_planar_grid,
+)
 from imod.util.expand_repetitions import expand_repetitions
+
+
+def set_repeat_stress_if_available(
+    repeat: Optional[list[datetime]],
+    time_min: datetime,
+    time_max: datetime,
+    optional_package: Optional[BoundaryCondition],
+) -> None:
+    """Set repeat stress for optional package if repeat is not None."""
+    if repeat is not None:
+        if optional_package is not None:
+            optional_package.set_repeat_stress(
+                expand_repetitions(repeat, time_min, time_max)
+            )
+
+
+def mask_package__drop_if_empty(
+    package: BoundaryCondition,
+) -> Optional[BoundaryCondition]:
+    """ "
+    Create an optional package from a package if it has data. Return None if
+    package is inactive everywhere.
+    """
+    # remove River package if its mask is False everywhere
+    mask = ~np.isnan(package["conductance"])
+    return package.mask(mask) if np.any(mask) else None
+
+
+def rise_bottom_elevation_if_needed(
+    bottom_elevation: GridDataArray, bottom: GridDataArray
+) -> GridDataArray:
+    """
+    Due to regridding, the bottom_elevation could be less than the
+    layer bottom, so here we overwrite it with bottom if that's
+    the case.
+    """
+    is_layer_bottom_above_bottom_elevation = (bottom > bottom_elevation).any()
+
+    if is_layer_bottom_above_bottom_elevation:
+        logging.logger.warning(
+            "Note: riv bottom was detected below model bottom. Updated the riv's bottom."
+        )
+        bottom_elevation, _ = align_interface_levels(
+            bottom_elevation, bottom, AlignLevelsMode.BOTTOMUP
+        )
+    return bottom_elevation
+
+
+def _separate_infiltration_data(
+    riv_pkg_data: GridDataDict, infiltration_factor: GridDataArray
+) -> tuple[GridDataDict, GridDataDict]:
+    """
+    Account for the infiltration factor in the river package data. This function
+    updates the riv_pkg_data with an infiltration conductance. The extra
+    exfiltration conductance is separated into a data dict for drainage
+    """
+    # update the conductance of the river package to account for the
+    # infiltration factor
+    drain_conductance, river_conductance = split_conductance_with_infiltration_factor(
+        riv_pkg_data["conductance"], infiltration_factor
+    )
+    riv_pkg_data["conductance"] = river_conductance
+    # create a drainage package with the conductance we computed from the
+    # infiltration factor
+    drn_pkg_data = {
+        "elevation": riv_pkg_data["stage"],
+        "conductance": drain_conductance,
+    }
+    return riv_pkg_data, drn_pkg_data
+
+
+def _create_drain_from_leftover_riv_imod5_data(
+    allocation_drn_data: GridDataDict,
+    infiltration_drn_data: GridDataDict,
+) -> Drainage:
+    """
+    Create a drainage package from leftover imod5 river package data,
+    stemming from:
+
+        * If ``ALLOCATION_OPTION.stage_to_riv_bottom_drn_above`` is chosen,
+            drain cells are allocated from the first active cell to river
+            stage. In this case ``allocation_drn_data`` is not empty.
+        * Infiltration factor. This factor is optional in imod5, but it
+            does not exist in MF6, so we mimic its effect with a Drainage
+            boundary. This data is stored in ``infiltration_drn_data``.
+    """
+
+    if allocation_drn_data:
+        drain_leftover_data: GridDataDict = {}
+        for key, allocation_grid in allocation_drn_data.items():
+            concatenated = concat(
+                [allocation_grid, infiltration_drn_data[key]], dim="leftover"
+            )
+            drain_leftover_data[key] = concatenated.mean(dim="leftover")
+    else:
+        drain_leftover_data = infiltration_drn_data
+
+    return Drainage(**drain_leftover_data)  # type: ignore[arg-type]
 
 
 class River(BoundaryCondition, IRegridPackage):
@@ -204,12 +307,12 @@ class River(BoundaryCondition, IRegridPackage):
     @classmethod
     def allocate_and_distribute_planar_data(
         cls,
-        planar_data: dict[str, GridDataArray],
+        planar_data: GridDataDict,
         dis: StructuredDiscretization,
         npf: NodePropertyFlow,
         allocation_option: ALLOCATION_OPTION,
         distributing_option: DISTRIBUTING_OPTION,
-    ) -> dict[str, GridDataArray]:
+    ) -> tuple[GridDataDict, GridDataDict]:
         """
         Allocate and distribute planar data for given discretization and npf
         package. If layer number of ``planar_data`` is negative,
@@ -218,7 +321,7 @@ class River(BoundaryCondition, IRegridPackage):
 
         Parameters
         ----------
-        planar_data: dict[str, GridDataArray]
+        planar_data: GridDataDict
             Dictionary with planar grid data.
         dis: imod.mf6.StructuredDiscretization
             Model discretization package.
@@ -233,7 +336,7 @@ class River(BoundaryCondition, IRegridPackage):
 
         Returns
         -------
-        dict[str, GridDataArray]
+        GridDataDict
             Dictionary with layered grid data.
         """
         top = dis.dataset["top"]
@@ -248,8 +351,8 @@ class River(BoundaryCondition, IRegridPackage):
             key: grid.isel({"layer": 0}, drop=True, missing_dims="ignore")
             for key, grid in planar_data.items()
         }
-
-        riv_allocation, _ = allocate_riv_cells(
+        # Allocation of cells
+        riv_allocated, drn_allocated = allocate_riv_cells(
             allocation_option,
             idomain > 0,
             top,
@@ -257,53 +360,57 @@ class River(BoundaryCondition, IRegridPackage):
             planar_data["stage"],
             planar_data["bottom_elevation"],
         )
-
-        layered_data = {}
-        layered_data["conductance"] = distribute_riv_conductance(
+        drn_is_allocated = drn_allocated is not None
+        # Distribution of conductances
+        allocated_for_distribution = (
+            riv_allocated | drn_allocated if drn_is_allocated else riv_allocated  # type: ignore
+        )
+        distribute_func = (
+            distribute_drn_conductance
+            if drn_is_allocated
+            else distribute_riv_conductance
+        )
+        distribute_args = (
             distributing_option,
-            riv_allocation,
+            allocated_for_distribution,
             planar_data["conductance"],
             top,
             bottom,
             npf.dataset["k"],
-            planar_data["stage"],
-            planar_data["bottom_elevation"],
         )
-
+        riv_distribute_grids = (planar_data["stage"], planar_data["bottom_elevation"])
+        drn_distribute_grids = (planar_data["bottom_elevation"],)
+        bc_distribute_grids = (
+            drn_distribute_grids if drn_is_allocated else riv_distribute_grids
+        )
+        conductance = distribute_func(*distribute_args, *bc_distribute_grids)
+        # Create layered data dicts
+        layered_data_riv = {}
         # create layered arrays of stage and bottom elevation
-        layered_data["stage"] = planar_data["stage"].where(riv_allocation)
-        layered_data["stage"] = enforce_dim_order(layered_data["stage"])
-        layered_data["bottom_elevation"] = planar_data["bottom_elevation"].where(
-            riv_allocation
-        )
-        layered_data["bottom_elevation"] = enforce_dim_order(
-            layered_data["bottom_elevation"]
-        )
-
-        # due to regridding, the layered_bottom_elevation could be smaller than the
-        # bottom, so here we overwrite it with bottom if that's
-        # the case.
-        layer_bottom_above_bottom_elevation = bottom > layered_data["bottom_elevation"]
-
-        if layer_bottom_above_bottom_elevation.any():
-            logging.logger.log(
-                loglevel=LogLevel.WARNING,
-                message="Note: riv bottom was detected below model bottom. Updated the riv's bottom.",
-                additional_depth=0,
+        for key in ["stage", "bottom_elevation"]:
+            layered_data_riv[key] = enforce_dim_order(
+                planar_data[key].where(riv_allocated)
             )
-            layered_data["bottom_elevation"] = xr.where(
-                layer_bottom_above_bottom_elevation,
-                bottom,
-                layered_data["bottom_elevation"],
-            )
+        layered_data_riv["conductance"] = conductance.where(riv_allocated)
 
-        return layered_data
+        layered_data_drn = {}
+        if drn_allocated is not None:
+            layered_data_drn["elevation"] = enforce_dim_order(
+                planar_data["stage"].where(drn_allocated)
+            )
+            layered_data_drn["conductance"] = conductance.where(drn_allocated)
+
+        layered_data_riv["bottom_elevation"] = rise_bottom_elevation_if_needed(
+            layered_data_riv["bottom_elevation"], bottom
+        )
+
+        return layered_data_riv, layered_data_drn
 
     @classmethod
     def from_imod5_data(
         cls,
         key: str,
-        imod5_data: dict[str, dict[str, GridDataArray]],
+        imod5_data: dict[str, GridDataDict],
         period_data: dict[str, list[datetime]],
         target_dis: StructuredDiscretization,
         target_npf: NodePropertyFlow,
@@ -355,175 +462,69 @@ class River(BoundaryCondition, IRegridPackage):
 
         Returns
         -------
-        A MF6 river package, and a drainage package to account
-        for the infiltration factor which exists in IMOD5 but not in MF6.
-        Both the river package and the drainage package can be None,
+        A tuple containing a River package and a Drainage package. The Drainage
+        package accounts for the infiltration factor which exists in iMOD5 but
+        not in MF6. It furthermore potentially contains drainage cells above
+        river stage if ``ALLOCATION_OPTION.stage_to_riv_bot_drn_above`` is
+        chosen. Both the river package and the drainage package can be None,
         this can happen if the infiltration factor is 0 or 1 everywhere.
         """
-
-        target_idomain = target_dis.dataset["idomain"]
-
         # gather input data
-        data = {
-            "conductance": imod5_data[key]["conductance"].copy(deep=True),
-            "stage": imod5_data[key]["stage"].copy(deep=True),
-            "bottom_elevation": imod5_data[key]["bottom_elevation"].copy(deep=True),
-            "infiltration_factor": imod5_data[key]["infiltration_factor"].copy(
-                deep=True
-            ),
-        }
-        is_planar = is_planar_grid(data["conductance"])
-
-        # set up regridder methods
-        if regridder_types is None:
-            regridder_types = River.get_regrid_methods()
-        # regrid the input data
-        regridded_package_data = _regrid_package_data(
-            data, target_idomain, regridder_types, regrid_cache, {}
+        varnames = ["conductance", "stage", "bottom_elevation", "infiltration_factor"]
+        data = {varname: imod5_data[key][varname] for varname in varnames}
+        # Regrid the input data
+        regridded_riv_pkg_data = regrid_imod5_pkg_data(
+            River, data, target_dis, regridder_types, regrid_cache
         )
-
-        infiltration_factor = regridded_package_data.pop("infiltration_factor")
-
-        if is_planar:
+        # Pop infiltration_factor to avoid unnecessarily allocating and
+        # distributing it.
+        infiltration_factor = regridded_riv_pkg_data.pop("infiltration_factor")
+        # Allocate and distribute planar data if the grid is planar
+        is_planar_xy = is_planar_grid(data["conductance"])
+        allocation_drn_data: GridDataDict = {}
+        if is_planar_xy:
             # allocate and distribute planar data
-            layered_data = cls.allocate_and_distribute_planar_data(
-                regridded_package_data,
-                target_dis,
-                target_npf,
-                allocation_option,
-                distributing_option,
+            allocation_riv_data, allocation_drn_data = (
+                cls.allocate_and_distribute_planar_data(
+                    regridded_riv_pkg_data,
+                    target_dis,
+                    target_npf,
+                    allocation_option,
+                    distributing_option,
+                )
             )
-            regridded_package_data.update(layered_data)
+            regridded_riv_pkg_data.update(allocation_riv_data)
             infiltration_factor = infiltration_factor.isel(
                 {"layer": 0}, drop=True, missing_dims="ignore"
             )
-
-        # update the conductance of the river package to account for the infiltration
-        # factor
-        drain_conductance, river_conductance = cls.split_conductance(
-            regridded_package_data["conductance"], infiltration_factor
+        regridded_riv_pkg_data["bottom_elevation"] = enforce_dim_order(
+            regridded_riv_pkg_data["bottom_elevation"]
         )
-        regridded_package_data["conductance"] = river_conductance
-        regridded_package_data["bottom_elevation"] = enforce_dim_order(
-            regridded_package_data["bottom_elevation"]
+        # Create packages
+        regridded_riv_pkg_data, infiltration_drn_data = _separate_infiltration_data(
+            regridded_riv_pkg_data, infiltration_factor
         )
-
-        river_package = River(**regridded_package_data, validate=True)
-        optional_river_package: Optional[River] = None
-        optional_drainage_package: Optional[Drainage] = None
-        # create a drainage package with the conductance we computed from the infiltration factor
-        drainage_arrays = {
-            "stage": regridded_package_data["stage"],
-            "conductance": drain_conductance,
-        }
-
-        drainage_package = cls.create_infiltration_factor_drain(
-            drainage_arrays["stage"],
-            drainage_arrays["conductance"],
+        river_package = River(**regridded_riv_pkg_data, validate=True)
+        drainage_package = _create_drain_from_leftover_riv_imod5_data(
+            allocation_drn_data,
+            infiltration_drn_data,
         )
-        # remove River package if its mask is False everywhere
-        mask = ~np.isnan(river_conductance)
-        if np.any(mask):
-            optional_river_package = river_package.mask(mask)
-        else:
-            optional_river_package = None
-
-        # remove Drainage package if its mask is False everywhere
-        mask = ~np.isnan(drain_conductance)
-        if np.any(mask):
-            optional_drainage_package = drainage_package.mask(mask)
-        else:
-            optional_drainage_package = None
-
+        optional_river_package = cast(
+            Optional[River], mask_package__drop_if_empty(river_package)
+        )
+        optional_drainage_package = cast(
+            Optional[Drainage], mask_package__drop_if_empty(drainage_package)
+        )
+        # Account for periods with repeat stresses.
         repeat = period_data.get(key)
-        if repeat is not None:
-            if optional_river_package is not None:
-                optional_river_package.set_repeat_stress(
-                    expand_repetitions(repeat, time_min, time_max)
-                )
-            if optional_drainage_package is not None:
-                optional_drainage_package.set_repeat_stress(
-                    expand_repetitions(repeat, time_min, time_max)
-                )
+        set_repeat_stress_if_available(
+            repeat, time_min, time_max, optional_river_package
+        )
+        set_repeat_stress_if_available(
+            repeat, time_min, time_max, optional_drainage_package
+        )
 
         return (optional_river_package, optional_drainage_package)
-
-    @classmethod
-    def create_infiltration_factor_drain(
-        cls,
-        drain_elevation: GridDataArray,
-        drain_conductance: GridDataArray,
-    ):
-        """
-        Create a drainage package from the river package, to account for the infiltration factor.
-        This factor is optional in imod5, but it does not exist in MF6, so we mimic its effect
-        with a Drainage boundary.
-        """
-
-        mask = ~np.isnan(drain_conductance)
-        drainage = Drainage(drain_elevation, drain_conductance)
-        drainage.mask(mask)
-        return drainage
-
-    @classmethod
-    def split_conductance(cls, conductance, infiltration_factor):
-        """
-        Seperates (exfiltration) conductance with an infiltration factor (iMODFLOW) into
-        a drainage conductance and a river conductance following methods explained in Zaadnoordijk (2009).
-
-        Parameters
-        ----------
-        conductance : xr.DataArray or float
-            Exfiltration conductance. Is the default conductance provided to the iMODFLOW river package
-        infiltration_factor : xr.DataArray or float
-            Infiltration factor. The exfiltration conductance is multiplied with this factor to compute
-            the infiltration conductance. If 0, no infiltration takes place; if 1, infiltration is equal to    exfiltration
-
-        Returns
-        -------
-        drainage_conductance : xr.DataArray
-            conductance for the drainage package
-        river_conductance : xr.DataArray
-            conductance for the river package
-
-        Derivation
-        ----------
-        From Zaadnoordijk (2009):
-        [1] cond_RIV = A/ci
-        [2] cond_DRN = A * (ci-cd) / (ci*cd)
-        Where cond_RIV and cond_DRN repsectively are the River and Drainage conductance [L^2/T],
-        A is the cell area [L^2] and ci and cd respectively are the infiltration and exfiltration resistance [T]
-
-        Taking f as the infiltration factor and cond_d as the exfiltration conductance, we can write (iMOD manual):
-        [3] ci = cd * (1/f)
-        [4] cond_d = A/cd
-
-        We can then rewrite equations 1 and 2 to:
-        [5] cond_RIV = f * cond_d
-        [6] cond_DRN = (1-f) * cond_d
-
-        References
-        ----------
-        Zaadnoordijk, W. (2009).
-        Simulating Piecewise-Linear Surface Water and Ground Water Interactions with MODFLOW.
-        Ground Water.
-        https://ngwa.onlinelibrary.wiley.com/doi/10.1111/j.1745-6584.2009.00582.x
-
-        iMOD manual v5.2 (2020)
-        https://oss.deltares.nl/web/imod/
-
-        """
-        if np.any(infiltration_factor > 1):
-            raise ValueError("The infiltration factor should not exceed 1")
-
-        drainage_conductance = conductance * (1 - infiltration_factor)
-
-        river_conductance = conductance * infiltration_factor
-
-        # clean up the packages
-        drainage_conductance = drainage_conductance.where(drainage_conductance > 0)
-        river_conductance = river_conductance.where(river_conductance > 0)
-        return drainage_conductance, river_conductance
 
     @classmethod
     def get_regrid_methods(cls) -> RiverRegridMethod:

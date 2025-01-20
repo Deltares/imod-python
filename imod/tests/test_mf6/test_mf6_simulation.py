@@ -570,8 +570,6 @@ def compare_submodel_partition_info(first: PartitionInfo, second: PartitionInfo)
 def test_import_from_imod5(imod5_dataset, tmp_path):
     imod5_data = imod5_dataset[0]
     period_data = imod5_dataset[1]
-    default_simulation_allocation_options = SimulationAllocationOptions
-    default_simulation_distributing_options = SimulationDistributingOptions
 
     datelist = pd.date_range(start="1/1/1989", end="1/1/2013", freq="W")
 
@@ -579,8 +577,8 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
         imod5_data,
         period_data,
         datelist,
-        default_simulation_allocation_options,
-        default_simulation_distributing_options,
+        SimulationAllocationOptions,
+        SimulationDistributingOptions,
     )
     simulation["imported_model"]["oc"] = OutputControl(
         save_head="last", save_budget="last"
@@ -606,8 +604,6 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
 def test_from_imod5__strict_well_validation_set(imod5_dataset):
     imod5_data = imod5_dataset[0]
     period_data = imod5_dataset[1]
-    default_simulation_allocation_options = SimulationAllocationOptions
-    default_simulation_distributing_options = SimulationDistributingOptions
 
     datelist = pd.date_range(start="1/1/1989", end="1/1/1990", freq="W")
 
@@ -615,8 +611,8 @@ def test_from_imod5__strict_well_validation_set(imod5_dataset):
         imod5_data,
         period_data,
         datelist,
-        default_simulation_allocation_options,
-        default_simulation_distributing_options,
+        SimulationAllocationOptions,
+        SimulationDistributingOptions,
     )
     assert simulation._validation_context.strict_well_validation is False
     assert Modflow6Simulation("test")._validation_context.strict_well_validation is True
@@ -690,8 +686,6 @@ def test_import_from_imod5__well_steady_state(imod5_dataset):
 def test_import_from_imod5__nonstandard_regridding(imod5_dataset, tmp_path):
     imod5_data = imod5_dataset[0]
     period_data = imod5_dataset[1]
-    default_simulation_allocation_options = SimulationAllocationOptions
-    default_simulation_distributing_options = SimulationDistributingOptions
 
     regridding_option = {}
     regridding_option["npf"] = NodePropertyFlowRegridMethod()
@@ -703,8 +697,8 @@ def test_import_from_imod5__nonstandard_regridding(imod5_dataset, tmp_path):
         imod5_data,
         period_data,
         times,
-        default_simulation_allocation_options,
-        default_simulation_distributing_options,
+        SimulationAllocationOptions,
+        SimulationDistributingOptions,
         regridding_option,
     )
     simulation["imported_model"]["oc"] = OutputControl(
@@ -732,17 +726,14 @@ def test_import_from_imod5_no_storage_no_recharge(imod5_dataset, tmp_path):
     imod5_data.pop("rch")
     period_data = imod5_dataset[1]
 
-    default_simulation_allocation_options = SimulationAllocationOptions
-    default_simulation_distributing_options = SimulationDistributingOptions
-
     times = pd.date_range(start="1/1/2018", end="12/1/2018", freq="ME")
 
     simulation = Modflow6Simulation.from_imod5_data(
         imod5_data,
         period_data,
         times,
-        default_simulation_allocation_options,
-        default_simulation_distributing_options,
+        SimulationAllocationOptions,
+        SimulationDistributingOptions,
     )
     simulation["imported_model"]["oc"] = OutputControl(
         save_head="last", save_budget="last"

@@ -3,6 +3,7 @@ import xarray as xr
 from pytest_cases import parametrize_with_cases
 
 from imod.prepare.topsystem import (
+    ALLOCATION_OPTION,
     allocate_drn_cells,
     allocate_ghb_cells,
     allocate_rch_cells,
@@ -217,6 +218,47 @@ def test_riv_allocation__elevation_above_surface_level(
     expected_riv = [True, False, False, False]
     if expected_drn:
         expected_drn = [False, False, False, False]
+
+    actual_riv = take_nth_layer_column(actual_riv_da, 0)
+    empty_riv = take_nth_layer_column(actual_riv_da, 1)
+
+    if actual_drn_da is None:
+        actual_drn = None
+        empty_drn = None
+    else:
+        actual_drn = take_nth_layer_column(actual_drn_da, 0)
+        empty_drn = take_nth_layer_column(actual_drn_da, 1)
+
+    np.testing.assert_equal(actual_riv, expected_riv)
+    np.testing.assert_equal(actual_drn, expected_drn)
+    assert np.all(~empty_riv)
+    if empty_drn is not None:
+        assert np.all(~empty_drn)
+
+
+@parametrize_with_cases(
+    argnames="active,top,bottom,stage,bottom_elevation",
+    prefix="riv_",
+)
+@parametrize_with_cases(
+    argnames="option,expected_riv,expected_drn", prefix="allocation_", has_tag="riv"
+)
+def test_riv_allocation__stage_equals_bottom_elevation(
+    active, top, bottom, stage, bottom_elevation, option, expected_riv, expected_drn
+):
+    # Put elevations a lot above surface level. Need to be allocated to first
+    # layer.
+    actual_riv_da, actual_drn_da = allocate_riv_cells(
+        option, active, top, bottom, stage, stage
+    )
+
+    # Override expected values
+    if option is ALLOCATION_OPTION.first_active_to_elevation:
+        expected_riv = [True, True, False, False]
+    elif option is not ALLOCATION_OPTION.at_first_active:
+        expected_riv = [False, True, False, False]
+    if expected_drn:
+        expected_drn = [True, False, False, False]
 
     actual_riv = take_nth_layer_column(actual_riv_da, 0)
     empty_riv = take_nth_layer_column(actual_riv_da, 1)

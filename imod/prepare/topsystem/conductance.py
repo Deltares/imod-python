@@ -502,3 +502,65 @@ def _distribute_weights__by_conductivity(allocated: GridDataArray, k: GridDataAr
     k_allocated = allocated * k
 
     return k_allocated / k_allocated.sum(dim="layer")
+
+
+def split_conductance_with_infiltration_factor(
+    conductance: GridDataArray, infiltration_factor: GridDataArray
+) -> tuple[GridDataArray, GridDataArray]:
+    """
+    Seperates (exfiltration) conductance with an infiltration factor (iMODFLOW) into
+    a drainage conductance and a river conductance following methods explained in Zaadnoordijk (2009).
+
+    Parameters
+    ----------
+    conductance : xr.DataArray or float
+        Exfiltration conductance. Is the default conductance provided to the iMODFLOW river package
+    infiltration_factor : xr.DataArray or float
+        Infiltration factor. The exfiltration conductance is multiplied with this factor to compute
+        the infiltration conductance. If 0, no infiltration takes place; if 1, infiltration is equal to    exfiltration
+
+    Returns
+    -------
+    drainage_conductance : xr.DataArray
+        conductance for the drainage package
+    river_conductance : xr.DataArray
+        conductance for the river package
+
+    Derivation
+    ----------
+    From Zaadnoordijk (2009):
+    [1] cond_RIV = A/ci
+    [2] cond_DRN = A * (ci-cd) / (ci*cd)
+    Where cond_RIV and cond_DRN repsectively are the River and Drainage conductance [L^2/T],
+    A is the cell area [L^2] and ci and cd respectively are the infiltration and exfiltration resistance [T]
+
+    Taking f as the infiltration factor and cond_d as the exfiltration conductance, we can write (iMOD manual):
+    [3] ci = cd * (1/f)
+    [4] cond_d = A/cd
+
+    We can then rewrite equations 1 and 2 to:
+    [5] cond_RIV = f * cond_d
+    [6] cond_DRN = (1-f) * cond_d
+
+    References
+    ----------
+    Zaadnoordijk, W. (2009).
+    Simulating Piecewise-Linear Surface Water and Ground Water Interactions with MODFLOW.
+    Ground Water.
+    https://ngwa.onlinelibrary.wiley.com/doi/10.1111/j.1745-6584.2009.00582.x
+
+    iMOD manual v5.2 (2020)
+    https://oss.deltares.nl/web/imod/
+
+    """
+    if np.any(infiltration_factor > 1):
+        raise ValueError("The infiltration factor should not exceed 1")
+
+    drainage_conductance = conductance * (1 - infiltration_factor)
+
+    river_conductance = conductance * infiltration_factor
+
+    # clean up the packages
+    drainage_conductance = drainage_conductance.where(drainage_conductance > 0)
+    river_conductance = river_conductance.where(river_conductance > 0)
+    return drainage_conductance, river_conductance

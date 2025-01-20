@@ -18,6 +18,10 @@ from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.write_context import WriteContext
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION
 from imod.prepare.topsystem.conductance import DISTRIBUTING_OPTION
+from imod.prepare.topsystem.default_allocation_methods import (
+    SimulationAllocationOptions,
+    SimulationDistributingOptions,
+)
 from imod.schemata import ValidationError
 from imod.typing.grid import has_negative_layer, is_planar_grid, ones_like, zeros_like
 
@@ -471,8 +475,8 @@ def test_import_river_from_imod5(imod5_dataset, tmp_path):
         target_npf,
         time_min=datetime(2000, 1, 1),
         time_max=datetime(2002, 1, 1),
-        allocation_option=ALLOCATION_OPTION.at_elevation,
-        distributing_option=DISTRIBUTING_OPTION.by_crosscut_thickness,
+        allocation_option=SimulationAllocationOptions.riv,
+        distributing_option=SimulationDistributingOptions.riv,
         regridder_types=None,
     )
 
@@ -618,9 +622,11 @@ def test_import_river_from_imod5__infiltration_factors(imod5_dataset):
     imod5_data["riv-1"]["infiltration_factor"] = original_infiltration_factor
 
 
-def test_import_river_from_imod5__period_data(imod5_dataset_periods):
+@pytest.mark.usefixtures("imod5_dataset_periods")
+def test_import_river_from_imod5__period_data(imod5_dataset_periods, tmp_path):
     imod5_data = imod5_dataset_periods[0]
     imod5_periods = imod5_dataset_periods[1]
+    globaltimes = [np.datetime64("2000-01-01"), np.datetime64("2001-01-01")]
     target_dis = StructuredDiscretization.from_imod5_data(imod5_data, validate=False)
     grid = target_dis.dataset["idomain"]
     target_npf = NodePropertyFlow.from_imod5_data(imod5_data, grid)
@@ -636,34 +642,28 @@ def test_import_river_from_imod5__period_data(imod5_dataset_periods):
         target_npf,
         datetime(2002, 2, 2),
         datetime(2022, 2, 2),
-        ALLOCATION_OPTION.at_elevation,
-        DISTRIBUTING_OPTION.by_crosscut_thickness,
+        SimulationAllocationOptions.riv,
+        SimulationDistributingOptions.riv,
         regridder_types=None,
     )
 
     assert riv is not None
-    assert drn is None
-
-    imod5_data["riv-1"]["infiltration_factor"] = zeros_like(
-        original_infiltration_factor
-    )
-    (riv, drn) = imod.mf6.River.from_imod5_data(
-        "riv-1",
-        imod5_data,
-        imod5_periods,
-        target_dis,
-        target_npf,
-        datetime(2002, 2, 2),
-        datetime(2022, 2, 2),
-        ALLOCATION_OPTION.at_elevation,
-        DISTRIBUTING_OPTION.by_crosscut_thickness,
-        regridder_types=None,
-    )
-
-    assert riv is None
     assert drn is not None
 
-    # teardown
-    imod5_dataset_periods[0]["riv-1"]["infiltration_factor"] = (
-        original_infiltration_factor
+    write_context = WriteContext(simulation_directory=tmp_path)
+    riv._write("riv", globaltimes, write_context)
+    drn._write("drn", globaltimes, write_context)
+
+    errors = riv._validate(
+        imod.mf6.River._write_schemata,
+        idomain=target_dis.dataset["idomain"],
+        bottom=target_dis.dataset["bottom"],
     )
+    assert len(errors) == 0
+
+    errors = drn._validate(
+        imod.mf6.Drainage._write_schemata,
+        idomain=target_dis.dataset["idomain"],
+        bottom=target_dis.dataset["bottom"],
+    )
+    assert len(errors) == 0

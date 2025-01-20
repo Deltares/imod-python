@@ -18,7 +18,7 @@ class SimulationAllocationOptions:
         ``first_active_to_elevation``.
     riv: ALLOCATION_OPTION
         allocation option to be used for river packages, defaults to
-        ``stage_to_riv_bot``.
+        ``stage_to_riv_bot_drn_above``.
     ghb: ALLOCATION_OPTION
         allocation option to be used for general head boundary packages,
         defaults to ``at_elevation``.
@@ -38,7 +38,7 @@ class SimulationAllocationOptions:
     """
 
     drn: ALLOCATION_OPTION = ALLOCATION_OPTION.first_active_to_elevation
-    riv: ALLOCATION_OPTION = ALLOCATION_OPTION.stage_to_riv_bot
+    riv: ALLOCATION_OPTION = ALLOCATION_OPTION.stage_to_riv_bot_drn_above
     ghb: ALLOCATION_OPTION = ALLOCATION_OPTION.at_elevation
 
 
