@@ -347,7 +347,8 @@ def _compute_crosscut_thickness(
         raise ValueError("`bc_top` and `bc_bottom` cannot both be None.")
 
     top_layered = _enforce_layered_top(top, bottom)
-    thickness = _compute_layer_thickness(allocated, top, bottom)
+    layer_thickness = _compute_layer_thickness(allocated, top, bottom)
+    thickness = layer_thickness.copy()
     outside = zeros_like(allocated).astype(bool)
 
     if bc_top is not None:
@@ -368,6 +369,11 @@ def _compute_crosscut_thickness(
             top_layer_label
         ].where(is_below_surface, 1.0)
         thickness = thickness.where(~lower_layer_bc, corrected_thickness)
+
+    # Deal with case where bc_top and bc_bottom are equal.
+    if (bc_top is not None) and (bc_bottom is not None):
+        bc_top_equals_bc_bottom = bc_top == bc_bottom
+        thickness = thickness.where(~bc_top_equals_bc_bottom, layer_thickness)
 
     thickness = thickness.where(~outside, 0.0)
 
