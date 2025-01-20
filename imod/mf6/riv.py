@@ -47,7 +47,7 @@ from imod.typing.grid import (
 from imod.util.expand_repetitions import expand_repetitions
 
 
-def maybe_set_repeat_stress(
+def set_repeat_stress_if_available(
     repeat: Optional[list[datetime]],
     time_min: datetime,
     time_max: datetime,
@@ -61,20 +61,21 @@ def maybe_set_repeat_stress(
             )
 
 
-def maybe_create_package(package: BoundaryCondition) -> Optional[BoundaryCondition]:
+def mask_package__drop_if_empty(
+    package: BoundaryCondition,
+) -> Optional[BoundaryCondition]:
     """ "
     Create an optional package from a package if it has data. Return None if
     package is inactive everywhere.
     """
-    optional_package: Optional[BoundaryCondition] = None
     # remove River package if its mask is False everywhere
     mask = ~np.isnan(package["conductance"])
-    if np.any(mask):
-        optional_package = package.mask(mask)
-    return optional_package
+    return package.mask(mask) if np.any(mask) else None
 
 
-def maybe_rise_bottom_elevation(bottom_elevation, bottom):
+def rise_bottom_elevation_if_needed(
+    bottom_elevation: GridDataArray, bottom: GridDataArray
+) -> GridDataArray:
     """
     Due to regridding, the bottom_elevation could be less than the
     layer bottom, so here we overwrite it with bottom if that's
@@ -115,7 +116,7 @@ def _separate_infiltration_data(
     return riv_pkg_data, drn_pkg_data
 
 
-def create_drain_from_leftover_riv_imod5_data(
+def _create_drain_from_leftover_riv_imod5_data(
     allocation_drn_data: GridDataDict,
     infiltration_drn_data: GridDataDict,
 ) -> Drainage:
@@ -125,10 +126,10 @@ def create_drain_from_leftover_riv_imod5_data(
 
         * If ``ALLOCATION_OPTION.stage_to_riv_bottom_drn_above`` is chosen,
             drain cells are allocated from the first active cell to river
-            stage.
+            stage. In this case ``allocation_drn_data`` is not empty.
         * Infiltration factor. This factor is optional in imod5, but it
             does not exist in MF6, so we mimic its effect with a Drainage
-            boundary.
+            boundary. This data is stored in ``infiltration_drn_data``.
     """
 
     if allocation_drn_data:
@@ -359,15 +360,14 @@ class River(BoundaryCondition, IRegridPackage):
             planar_data["stage"],
             planar_data["bottom_elevation"],
         )
+        drn_is_allocated = drn_allocated is not None
         # Distribution of conductances
         allocated_for_distribution = (
-            riv_allocated | drn_allocated
-            if (drn_allocated is not None)
-            else riv_allocated
+            riv_allocated | drn_allocated if drn_is_allocated else riv_allocated  # type: ignore
         )
         distribute_func = (
             distribute_drn_conductance
-            if (drn_allocated is not None)
+            if drn_is_allocated
             else distribute_riv_conductance
         )
         distribute_args = (
@@ -381,9 +381,7 @@ class River(BoundaryCondition, IRegridPackage):
         riv_distribute_grids = (planar_data["stage"], planar_data["bottom_elevation"])
         drn_distribute_grids = (planar_data["bottom_elevation"],)
         bc_distribute_grids = (
-            drn_distribute_grids
-            if (drn_allocated is not None)
-            else riv_distribute_grids
+            drn_distribute_grids if drn_is_allocated else riv_distribute_grids
         )
         conductance = distribute_func(*distribute_args, *bc_distribute_grids)
         # Create layered data dicts
@@ -402,7 +400,7 @@ class River(BoundaryCondition, IRegridPackage):
             )
             layered_data_drn["conductance"] = conductance.where(drn_allocated)
 
-        layered_data_riv["bottom_elevation"] = maybe_rise_bottom_elevation(
+        layered_data_riv["bottom_elevation"] = rise_bottom_elevation_if_needed(
             layered_data_riv["bottom_elevation"], bottom
         )
 
@@ -478,7 +476,7 @@ class River(BoundaryCondition, IRegridPackage):
         regridded_riv_pkg_data = regrid_imod5_pkg_data(
             River, data, target_dis, regridder_types, regrid_cache
         )
-        # Pop infiltration_factor to avoid unnecessisarily allocating and
+        # Pop infiltration_factor to avoid unnecessarily allocating and
         # distributing it.
         infiltration_factor = regridded_riv_pkg_data.pop("infiltration_factor")
         # Allocate and distribute planar data if the grid is planar
@@ -507,20 +505,24 @@ class River(BoundaryCondition, IRegridPackage):
             regridded_riv_pkg_data, infiltration_factor
         )
         river_package = River(**regridded_riv_pkg_data, validate=True)
-        drainage_package = create_drain_from_leftover_riv_imod5_data(
+        drainage_package = _create_drain_from_leftover_riv_imod5_data(
             allocation_drn_data,
             infiltration_drn_data,
         )
         optional_river_package = cast(
-            Optional[River], maybe_create_package(river_package)
+            Optional[River], mask_package__drop_if_empty(river_package)
         )
         optional_drainage_package = cast(
-            Optional[Drainage], maybe_create_package(drainage_package)
+            Optional[Drainage], mask_package__drop_if_empty(drainage_package)
         )
         # Account for periods with repeat stresses.
         repeat = period_data.get(key)
-        maybe_set_repeat_stress(repeat, time_min, time_max, optional_river_package)
-        maybe_set_repeat_stress(repeat, time_min, time_max, optional_drainage_package)
+        set_repeat_stress_if_available(
+            repeat, time_min, time_max, optional_river_package
+        )
+        set_repeat_stress_if_available(
+            repeat, time_min, time_max, optional_drainage_package
+        )
 
         return (optional_river_package, optional_drainage_package)
 
