@@ -88,7 +88,7 @@ def _df_groups_to_da_rates(
     is_steady_state = "time" not in unique_well_groups[0].columns
     if is_steady_state:
         da_groups = [
-            xr.DataArray(df_group["rate"].iloc[0]) for df_group in unique_well_groups
+            xr.DataArray(df_group["rate"].sum()) for df_group in unique_well_groups
         ]
     else:
         da_groups = [
@@ -691,6 +691,8 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
 
         # Unpack wel indices by zipping
         varnames = [("x", float), ("y", float)] + cls._depth_colnames
+        # if pkg_data["has_associated"]:
+        #     varnames += [("id", str)]
         index_values = zip(*wel_index)
         cls_input: dict[str, Any] = {
             var: np.array(value, dtype=dtype)
