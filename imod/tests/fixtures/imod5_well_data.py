@@ -115,6 +115,7 @@ def ipf_simple_string():
     """
     )
 
+
 def ipf_simple_string_duplication():
     return textwrap.dedent(
         f"""\
