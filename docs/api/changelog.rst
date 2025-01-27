@@ -43,6 +43,10 @@ Fixed
 - :meth:`imod.mf6.Well.from_imod5_data` and
   :meth:`imod.mf6.LayeredWell.from_imod5_data` ignore well rates preceding first
   element of ``times``.
+- :meth:`imod.mf6.Well.from_imod5_data` and
+  :meth:`imod.mf6.LayeredWell.from_imod5_data` now sum rates of duplicated well
+  entries, so entries with duplicate x, y, and depth information instead of
+  taking the values of the first entry.
 - :meth:`imod.mf6.River.from_imod5_data` now preserves the drainage cells
   created with the ``stage_to_riv_bot_drn_above`` option of
   :func:`imod.prepare.ALLOCATION_OPTION`.
