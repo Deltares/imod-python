@@ -88,7 +88,7 @@ def _df_groups_to_da_rates(
     is_steady_state = "time" not in unique_well_groups[0].columns
     if is_steady_state:
         da_groups = [
-            xr.DataArray(df_group["rate"].iloc[0]) for df_group in unique_well_groups
+            xr.DataArray(df_group["rate"].sum()) for df_group in unique_well_groups
         ]
     else:
         da_groups = [
@@ -97,6 +97,9 @@ def _df_groups_to_da_rates(
             )
             for df_group in unique_well_groups
         ]
+        # Groupby time and sum to aggregate wells with the exact same x, y, and
+        # filter top/bottom.
+        da_groups = [da_group.groupby("time").sum() for da_group in da_groups]
     # Assign index coordinates
     da_groups = [
         da_group.expand_dims(dim="index").assign_coords(index=[i])

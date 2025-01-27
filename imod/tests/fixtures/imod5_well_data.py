@@ -49,11 +49,11 @@ ipf_simple_header = textwrap.dedent(
 )
 
 
-def projectfile_string(tmp_path):
+def projectfile_string(tmp_path, time_header="2000-01-01 00:00:00"):
     return textwrap.dedent(
         f"""\
     0001,(WEL),1, Wells,[WRA]
-    2000-01-01 00:00:00
+    {time_header}
     001,002
     1,2, 000,   1.000000    ,   0.000000    ,  -999.9900    ,'{tmp_path}\ipf1.ipf'
     1,2, 000,   1.000000    ,   0.000000    ,  -999.9900    ,'{tmp_path}\ipf2.ipf'
@@ -116,6 +116,27 @@ def ipf_simple_string():
     )
 
 
+def ipf_simple_string_duplication():
+    return textwrap.dedent(
+        f"""\
+    {ipf_simple_header}
+    276875.0,584375.0,-0.2,1.7,1.7,1107,162,1,4.0
+    276875.0,584375.0,-0.2,1.7,1.7,1107,162,1,4.0
+    276875.0,584375.0,-0.2,1.7,1.7,1107,162,1,4.0
+    276875.0,584375.0,-0.2,1.7,1.7,1107,162,1,4.0
+    276875.0,584375.0,-0.2,1.7,1.7,1107,162,1,4.0
+    276875.0,584375.0,-0.2,1.7,1.7,1107,162,1,4.0
+    276875.0,584375.0,-0.2,1.7,1.7,1107,162,1,4.0
+    277125.0,584375.0,-0.5,1.7,1.7,1107,162,1,4.0
+    277125.0,584375.0,-0.5,1.7,1.7,1107,162,1,4.0
+    277125.0,584375.0,-0.5,1.7,1.7,1107,162,1,4.0
+    277125.0,584375.0,-0.5,1.7,1.7,1107,162,1,4.0
+    277125.0,584375.0,-0.5,1.7,1.7,1107,162,1,4.0
+    277125.0,584375.0,-0.5,1.7,1.7,1107,162,1,4.0
+    """
+    )
+
+
 def timeseries_string():
     return textwrap.dedent(
         """\
@@ -167,12 +188,12 @@ def out_of_bounds_timeseries_string():
     )
 
 
-def write_ipf_assoc_files(
+def write_ipf_and_maybe_assoc_files(
+    tmp_path,
     projectfile_str,
     ipf1_str,
     ipf2_str,
-    timeseries_wel1_str,
-    tmp_path,
+    timeseries_wel1_str=None,
     other_timeseries_string=None,
 ):
     with open(Path(tmp_path) / "projectfile.prj", "w") as f:
@@ -184,8 +205,9 @@ def write_ipf_assoc_files(
     with open(Path(tmp_path) / "ipf2.ipf", "w") as f:
         f.write(ipf2_str)
 
-    with open(Path(tmp_path) / "timeseries_wel1.txt", "w") as f:
-        f.write(timeseries_wel1_str)
+    if timeseries_wel1_str is not None:
+        with open(Path(tmp_path) / "timeseries_wel1.txt", "w") as f:
+            f.write(timeseries_wel1_str)
 
     if other_timeseries_string is not None:
         with open(Path(tmp_path) / "other_timeseries_wel1.txt", "w") as f:
@@ -217,6 +239,34 @@ def write_ipf_mixed_files(
 
 
 @pytest.fixture(scope="session")
+def well_simple_import_prj__steady_state():
+    tmp_path = imod.util.temporary_directory()
+    os.makedirs(tmp_path)
+
+    projectfile_str = projectfile_string(tmp_path, time_header="STEADY-STATE")
+    ipf1_str = ipf_simple_string()
+    ipf2_str = ipf_simple_string_duplication()
+
+    return write_ipf_and_maybe_assoc_files(
+        tmp_path, projectfile_str, ipf1_str, ipf2_str
+    )
+
+
+@pytest.fixture(scope="session")
+def well_simple_import_prj__transient():
+    tmp_path = imod.util.temporary_directory()
+    os.makedirs(tmp_path)
+
+    projectfile_str = projectfile_string(tmp_path)
+    ipf1_str = ipf_simple_string()
+    ipf2_str = ipf_simple_string_duplication()
+
+    return write_ipf_and_maybe_assoc_files(
+        tmp_path, projectfile_str, ipf1_str, ipf2_str
+    )
+
+
+@pytest.fixture(scope="session")
 def well_regular_import_prj():
     tmp_path = imod.util.temporary_directory()
     os.makedirs(tmp_path)
@@ -226,8 +276,8 @@ def well_regular_import_prj():
     ipf2_str = ipf2_string()
     timeseries_well_str = timeseries_string()
 
-    return write_ipf_assoc_files(
-        projectfile_str, ipf1_str, ipf2_str, timeseries_well_str, tmp_path
+    return write_ipf_and_maybe_assoc_files(
+        tmp_path, projectfile_str, ipf1_str, ipf2_str, timeseries_well_str
     )
 
 
@@ -241,12 +291,12 @@ def well_duplication_import_prj():
     ipf2_str = ipf2_string()
     timeseries_well_str = timeseries_string()
     other_timeseries_well_str = other_timeseries_string()
-    return write_ipf_assoc_files(
+    return write_ipf_and_maybe_assoc_files(
+        tmp_path,
         projectfile_str,
         ipf1_str,
         ipf2_str,
         timeseries_well_str,
-        tmp_path,
         other_timeseries_well_str,
     )
 

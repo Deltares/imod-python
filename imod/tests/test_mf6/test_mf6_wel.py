@@ -1053,6 +1053,53 @@ def test_import_and_cleanup(imod5_dataset, wel_class: Well):
 
 
 @parametrize("wel_class", [Well, LayeredWell])
+@pytest.mark.usefixtures("well_simple_import_prj__steady_state")
+def test_import_simple_wells__steady_state(
+    well_simple_import_prj__steady_state, wel_class
+):
+    imod5dict, _ = open_projectfile_data(well_simple_import_prj__steady_state)
+    # Set layer to 1, to avoid validation error.
+    if wel_class is LayeredWell:
+        imod5dict["wel-ipf1"]["layer"] = [1]
+        imod5dict["wel-ipf2"]["layer"] = [1]
+
+    wel1 = wel_class.from_imod5_data("wel-ipf1", imod5dict, "steady-state")
+    wel2 = wel_class.from_imod5_data("wel-ipf2", imod5dict, "steady-state")
+
+    assert wel1.dataset["rate"].shape == (13,)
+    assert wel2.dataset["rate"].shape == (2,)
+
+    expected = np.array([(7 * -0.2), (6 * -0.5)])
+    np.testing.assert_allclose(wel2.dataset["rate"].values, expected)
+
+
+@parametrize("wel_class", [Well, LayeredWell])
+@pytest.mark.usefixtures("well_simple_import_prj__transient")
+def test_import_simple_wells__transient(well_simple_import_prj__transient, wel_class):
+    imod5dict, _ = open_projectfile_data(well_simple_import_prj__transient)
+    # Set layer to 1, to avoid validation error.
+    if wel_class is LayeredWell:
+        imod5dict["wel-ipf1"]["layer"] = [1]
+        imod5dict["wel-ipf2"]["layer"] = [1]
+
+    with pytest.raises(ValueError):
+        wel_class.from_imod5_data("wel-ipf1", imod5dict, "steady-state")
+
+    with pytest.raises(ValueError):
+        wel_class.from_imod5_data("wel-ipf2", imod5dict, "steady-state")
+
+    times = [imod5dict["wel-ipf2"]["time"][0], datetime(2001, 1, 1)]
+
+    wel1 = wel_class.from_imod5_data("wel-ipf1", imod5dict, times)
+    wel2 = wel_class.from_imod5_data("wel-ipf2", imod5dict, times)
+
+    assert wel1.dataset["rate"].shape == (1, 13)
+    assert wel2.dataset["rate"].shape == (1, 2)
+    expected = np.array([(7 * -0.2), (6 * -0.5)])
+    np.testing.assert_allclose(wel2.dataset["rate"].values[0], expected)
+
+
+@parametrize("wel_class", [Well, LayeredWell])
 @pytest.mark.usefixtures("well_regular_import_prj")
 def test_import_multiple_wells(well_regular_import_prj, wel_class):
     imod5dict, _ = open_projectfile_data(well_regular_import_prj)

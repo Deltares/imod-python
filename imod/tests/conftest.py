@@ -31,6 +31,8 @@ from .fixtures.imod5_well_data import (
     well_mixed_ipfs,
     well_out_of_bounds_ipfs,
     well_regular_import_prj,
+    well_simple_import_prj__steady_state,
+    well_simple_import_prj__transient,
 )
 from .fixtures.mf6_circle_fixture import (
     circle_model,
