@@ -694,8 +694,6 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
 
         # Unpack wel indices by zipping
         varnames = [("x", float), ("y", float)] + cls._depth_colnames
-        # if pkg_data["has_associated"]:
-        #     varnames += [("id", str)]
         index_values = zip(*wel_index)
         cls_input: dict[str, Any] = {
             var: np.array(value, dtype=dtype)
