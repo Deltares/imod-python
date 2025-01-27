@@ -97,6 +97,9 @@ def _df_groups_to_da_rates(
             )
             for df_group in unique_well_groups
         ]
+        # Groupby time and sum to aggregate wells with the exact same x, y, and
+        # filter top/bottom.
+        da_groups = [da_group.groupby("time").sum() for da_group in da_groups]
     # Assign index coordinates
     da_groups = [
         da_group.expand_dims(dim="index").assign_coords(index=[i])
