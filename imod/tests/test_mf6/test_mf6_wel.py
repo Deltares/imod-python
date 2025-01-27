@@ -1065,14 +1065,10 @@ def test_import_simple_wells__steady_state(well_simple_import_prj__steady_state,
     wel2 = wel_class.from_imod5_data("wel-ipf2", imod5dict, "steady-state")
 
     assert wel1.dataset["rate"].shape == (13,)
-    assert wel2.dataset["rate"].shape == (1,)
-    np.testing.assert_allclose(wel2.dataset["rate"].values, (13 * -0.2))
+    assert wel2.dataset["rate"].shape == (2,)
 
-    times = [
-        datetime(1981, 11, 30),
-        datetime(1981, 12, 31),
-        datetime(1982, 1, 31),]
-
+    expected = np.array([(7 * -0.2), (6 * -0.5)])
+    np.testing.assert_allclose(wel2.dataset["rate"].values, expected)
 
 
 @parametrize("wel_class", [Well, LayeredWell])
@@ -1090,21 +1086,19 @@ def test_import_simple_wells__transient(well_simple_import_prj__transient, wel_c
     with pytest.raises(ValueError):
         wel_class.from_imod5_data("wel-ipf2", imod5dict, "steady-state")
 
-    # TODO: Fix that this works with 1982 as well.
     times = [
-        datetime(2000, 11, 30),
-        datetime(2000, 12, 31),
-        datetime(2000, 1, 31),
-        datetime(2000, 2, 28),
-        datetime(2000, 3, 31),
-        datetime(2000, 4, 30),
+        imod5dict["wel-ipf2"]["time"][0],
+        datetime(2001, 1, 1)
     ]
 
     wel1 = wel_class.from_imod5_data("wel-ipf1", imod5dict, times)
     wel2 = wel_class.from_imod5_data("wel-ipf2", imod5dict, times)
 
-    assert wel1.dataset["rate"].shape == (5, 13)
-    assert wel2.dataset["rate"].shape == (5, 1)
+    assert wel1.dataset["rate"].shape == (1, 13)
+    assert wel2.dataset["rate"].shape == (1, 2)
+    expected = np.array([(7 * -0.2), (6 * -0.5)])
+    np.testing.assert_allclose(wel2.dataset["rate"].values[0], expected)
+
 
 @parametrize("wel_class", [Well, LayeredWell])
 @pytest.mark.usefixtures("well_regular_import_prj")
