@@ -31,10 +31,9 @@ Changed
   :meth:`imod.mf6.LayeredWell.from_imod5_data` now also accept the argument
   ``times = "steady-state"``, for the simulation is assumed to be "steady-state"
   and well timeseries are averaged.
-- The ``riv`` attribute of :class:`imod.prepare.SimulationAllocationOptions` has
-  the ``stage_to_riv_bot_drn_above`` of :func:`imod.prepare.ALLOCATION_OPTION`
-  now set as default. This means by default drainage cells are placed from the
-  first active cell to the river stage level when allocating rivers in
+- The ``drn`` attribute of :class:`imod.prepare.SimulationAllocationOptions` has
+  the ``at_elevation`` of :func:`imod.prepare.ALLOCATION_OPTION` option now set
+  as default. This means by default drainage cells are placed differently in
   :meth:`imod.mf6.Simulation.from_imod5_data`.
 
 Fixed

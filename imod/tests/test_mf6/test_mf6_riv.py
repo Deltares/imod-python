@@ -642,7 +642,7 @@ def test_import_river_from_imod5__period_data(imod5_dataset_periods, tmp_path):
         target_npf,
         datetime(2002, 2, 2),
         datetime(2022, 2, 2),
-        SimulationAllocationOptions.riv,
+        ALLOCATION_OPTION.stage_to_riv_bot_drn_above,
         SimulationDistributingOptions.riv,
         regridder_types=None,
     )
