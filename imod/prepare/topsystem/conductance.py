@@ -18,23 +18,31 @@ class DISTRIBUTING_OPTION(Enum):
     Enumerator containing settings to distribute 2D conductance grids over
     vertical layers for the RIV, DRN or GHB package.
 
-    * ``by_corrected_transmissivity``: RIV. Distribute the conductance by
-      corrected transmissivities. Crosscut thicknesses are used to compute
-      transmissivities. The crosscut thicknesses is computed based on the
+    * ``by_corrected_thickness``: RIV, DRN. Distribute the conductance by
+      corrected thicknesses. The crosscut thicknesses is computed based on the
       overlap of bottom_elevation over the bottom allocated layer. Same holds
       for the stage and top allocated layer. Furthermore the method corrects
       distribution weights for the mismatch between the midpoints of crosscut
       areas and model layer midpoints. This is the default method in iMOD 5.6,
       thus DISTRCOND = 0.
+    * ``by_corrected_transmissivity``: RIV, DRN. Distribute the conductance by
+      corrected transmissivities. Crosscut thicknesses are used to compute
+      transmissivities. The crosscut thicknesses is computed based on the
+      overlap of bottom_elevation over the bottom allocated layer. Same holds
+      for the stage and top allocated layer. Furthermore the method corrects
+      distribution weights for the mismatch between the midpoints of crosscut
+      areas and model layer midpoints. This matches iMOD 5.6 DISTRCOND = -1
+      option.
     * ``equally``: RIV, DRN, GHB. Distribute conductances equally over layers.
       This matches iMOD 5.6 DISTRCOND = 1 option.
-    * ``by_crosscut_thickness``: RIV. Distribute the conductance by crosscut
-      thicknesses. The crosscut thicknesses is computed based on the overlap of
-      bottom_elevation over the bottom allocated layer. Same holds for the stage
-      and top allocated layer. This matches iMOD 5.6 DISTRCOND = 2 option.
+    * ``by_crosscut_thickness``: RIV, DRN. Distribute the conductance by
+      crosscut thicknesses. The crosscut thicknesses is computed based on the
+      overlap of bottom_elevation over the bottom allocated layer. Same holds
+      for the stage and top allocated layer. This matches iMOD 5.6 DISTRCOND = 2
+      option.
     * ``by_layer_thickness``: RIV, DRN, GHB. Distribute the conductance by model
       layer thickness. This matches iMOD 5.6 DISTRCOND = 3 option.
-    * ``by_crosscut_transmissivity``: RIV. Distribute the conductance by
+    * ``by_crosscut_transmissivity``: RIV, DRN. Distribute the conductance by
       crosscut transmissivity. Crosscut thicknesses are used to compute
       transmissivities. The crosscut thicknesses is computed based on the
       overlap of bottom_elevation over the bottom allocated layer. Same holds
@@ -47,7 +55,8 @@ class DISTRIBUTING_OPTION(Enum):
       model layer transmissivity. This has no equivalent in iMOD 5.6.
     """
 
-    by_corrected_transmissivity = 0
+    by_corrected_transmissivity = -1
+    by_corrected_thickness = 0
     equally = 1
     by_crosscut_thickness = 2
     by_layer_thickness = 3
@@ -139,6 +148,10 @@ def distribute_riv_conductance(
             weights = _distribute_weights__by_crosscut_transmissivity(
                 allocated, top, bottom, k, stage, bottom_elevation
             )
+        case DISTRIBUTING_OPTION.by_corrected_thickness:
+            weights = _distribute_weights__by_corrected_thickness(
+                allocated, top, bottom, stage, bottom_elevation
+            )
         case DISTRIBUTING_OPTION.by_corrected_transmissivity:
             weights = _distribute_weights__by_corrected_transmissivity(
                 allocated, top, bottom, k, stage, bottom_elevation
@@ -151,7 +164,8 @@ def distribute_riv_conductance(
                 f"'{DISTRIBUTING_OPTION.by_layer_transmissivity.name}', "
                 f"'{DISTRIBUTING_OPTION.by_conductivity.name}', "
                 f"'{DISTRIBUTING_OPTION.by_crosscut_thickness.name}', "
-                f"'{DISTRIBUTING_OPTION.by_crosscut_transmissivity.name}', and "
+                f"'{DISTRIBUTING_OPTION.by_crosscut_transmissivity.name}', "
+                f"'{DISTRIBUTING_OPTION.by_corrected_thickness.name}', and "
                 f"'{DISTRIBUTING_OPTION.by_corrected_transmissivity.name}' supported. "
                 f"Got: '{distributing_option.name}'"
             )
@@ -228,6 +242,10 @@ def distribute_drn_conductance(
             weights = _distribute_weights__by_crosscut_transmissivity(
                 allocated, top, bottom, k, bc_bottom=elevation
             )
+        case DISTRIBUTING_OPTION.by_corrected_thickness:
+            weights = _distribute_weights__by_corrected_thickness(
+                allocated, top, bottom, bc_bottom=elevation
+            )
         case DISTRIBUTING_OPTION.by_corrected_transmissivity:
             weights = _distribute_weights__by_corrected_transmissivity(
                 allocated, top, bottom, k, bc_bottom=elevation
@@ -240,7 +258,8 @@ def distribute_drn_conductance(
                 f"'{DISTRIBUTING_OPTION.by_layer_transmissivity.name}', "
                 f"'{DISTRIBUTING_OPTION.by_conductivity.name}', "
                 f"'{DISTRIBUTING_OPTION.by_crosscut_thickness.name}', "
-                f"'{DISTRIBUTING_OPTION.by_crosscut_transmissivity.name}', and "
+                f"'{DISTRIBUTING_OPTION.by_crosscut_transmissivity.name}', "
+                f"'{DISTRIBUTING_OPTION.by_corrected_thickness.name}', and "
                 f"'{DISTRIBUTING_OPTION.by_corrected_transmissivity.name}' supported. "
                 f"Got: '{distributing_option.name}'"
             )
@@ -380,26 +399,20 @@ def _compute_crosscut_thickness(
     return thickness
 
 
-def _distribute_weights__by_corrected_transmissivity(
+def _compute_correction_factor(
     allocated: GridDataArray,
     top: GridDataArray,
     bottom: GridDataArray,
-    k: GridDataArray,
     bc_top: Optional[GridDataArray] = None,
     bc_bottom: Optional[GridDataArray] = None,
 ):
     """
-    Distribute conductances according to default method in iMOD 5.6, as
-    described page 690 of the iMOD 5.6 manual (but then to distribute WEL
-    rates). The method uses crosscut thicknesses to compute transmissivities.
-    Furthermore it corrects distribution weights for the mismatch between the
-    midpoints of crosscut areas and layer midpoints.
+    Compute correction factor to correct for a mismatch between the centre of
+    the partially penetrated model layer and the vertical midpoint of the
+    penetrating boundary condition. Correction is only applied to layers which
+    are only partially crosscut. Follows to what is described page 690 of the
+    iMOD 5.6 manual (but then to distribute WEL rates).
     """
-    crosscut_thickness = _compute_crosscut_thickness(
-        allocated, top, bottom, bc_top=bc_top, bc_bottom=bc_bottom
-    )
-    transmissivity = crosscut_thickness * k
-
     top_layered = _enforce_layered_top(top, bottom)
     layer_thickness = _compute_layer_thickness(allocated, top, bottom)
     midpoints = (top_layered + bottom) / 2
@@ -427,9 +440,53 @@ def _distribute_weights__by_corrected_transmissivity(
     top_layer_index = {"layer": min(top_layered.coords["layer"])}
     F_top_layer = F.loc[top_layer_index]
     F.loc[top_layer_index] = F_top_layer.where(F_top_layer > 0.0, 1.0)
+    return F
 
+
+def _distribute_weights__by_corrected_transmissivity(
+    allocated: GridDataArray,
+    top: GridDataArray,
+    bottom: GridDataArray,
+    k: GridDataArray,
+    bc_top: Optional[GridDataArray] = None,
+    bc_bottom: Optional[GridDataArray] = None,
+):
+    """
+    Distribute conductances according to default method in iMOD 5.6, as
+    described page 690 of the iMOD 5.6 manual (but then to distribute WEL
+    rates). The method uses crosscut thicknesses to compute transmissivities.
+    Furthermore it corrects distribution weights for the mismatch between the
+    midpoints of crosscut areas and layer midpoints.
+    """
+    crosscut_thickness = _compute_crosscut_thickness(
+        allocated, top, bottom, bc_top=bc_top, bc_bottom=bc_bottom
+    )
+    transmissivity = crosscut_thickness * k
+    F = _compute_correction_factor(allocated, top, bottom, bc_top, bc_bottom)
     transmissivity_corrected = transmissivity * F
     return transmissivity_corrected / transmissivity_corrected.sum(dim="layer")
+
+
+def _distribute_weights__by_corrected_thickness(
+    allocated: GridDataArray,
+    top: GridDataArray,
+    bottom: GridDataArray,
+    bc_top: Optional[GridDataArray] = None,
+    bc_bottom: Optional[GridDataArray] = None,
+):
+    """
+    Distribute conductances according to default method in iMOD 5.6, as
+    described page 690 of the iMOD 5.6 manual (but then to distribute WEL
+    rates). The method uses crosscut thicknesses to compute transmissivities.
+    Furthermore it corrects distribution weights for the mismatch between the
+    midpoints of crosscut areas and layer midpoints.
+    """
+    crosscut_thickness = _compute_crosscut_thickness(
+        allocated, top, bottom, bc_top=bc_top, bc_bottom=bc_bottom
+    )
+    F = _compute_correction_factor(allocated, top, bottom, bc_top, bc_bottom)
+    corrected_thickness = crosscut_thickness * F
+    return corrected_thickness / corrected_thickness.sum(dim="layer")
 
 
 def _distribute_weights__equally(allocated: GridDataArray):
