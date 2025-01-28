@@ -15,10 +15,10 @@ class SimulationAllocationOptions:
     ----------
     drn: ALLOCATION_OPTION
         allocation option to be used for drainage packages, defaults to
-        ``first_active_to_elevation``.
+        ``at_elevation``.
     riv: ALLOCATION_OPTION
         allocation option to be used for river packages, defaults to
-        ``stage_to_riv_bot_drn_above``.
+        ``stage_to_riv_bot``.
     ghb: ALLOCATION_OPTION
         allocation option to be used for general head boundary packages,
         defaults to ``at_elevation``.
@@ -37,8 +37,8 @@ class SimulationAllocationOptions:
 
     """
 
-    drn: ALLOCATION_OPTION = ALLOCATION_OPTION.first_active_to_elevation
-    riv: ALLOCATION_OPTION = ALLOCATION_OPTION.stage_to_riv_bot_drn_above
+    drn: ALLOCATION_OPTION = ALLOCATION_OPTION.at_elevation
+    riv: ALLOCATION_OPTION = ALLOCATION_OPTION.stage_to_riv_bot
     ghb: ALLOCATION_OPTION = ALLOCATION_OPTION.at_elevation
 
 
@@ -53,7 +53,7 @@ class SimulationDistributingOptions:
     ----------
     drn: DISTRIBUTING_OPTION
         distribution option to be used for drainage packages, defaults to
-        ``by_corrected_transmissivity``.
+        ``by_layer_transmissivity``.
     riv: DISTRIBUTING_OPTION
         distribution option to be used for river packages, defaults to
         ``by_corrected_transmissivity``.
@@ -75,6 +75,6 @@ class SimulationDistributingOptions:
 
     """
 
-    drn: DISTRIBUTING_OPTION = DISTRIBUTING_OPTION.by_corrected_transmissivity
+    drn: DISTRIBUTING_OPTION = DISTRIBUTING_OPTION.by_layer_transmissivity
     riv: DISTRIBUTING_OPTION = DISTRIBUTING_OPTION.by_corrected_transmissivity
     ghb: DISTRIBUTING_OPTION = DISTRIBUTING_OPTION.by_layer_transmissivity
