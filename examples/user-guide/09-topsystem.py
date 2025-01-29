@@ -319,7 +319,7 @@ imod.visualize.cross_section(
 # other plots show the effects of different settings. Again, distributing
 # options are described in more detail in :func:`imod.prepare.DISTRIBUTING_OPTION`
 
-fig, axes = plt.subplots(4, 2, figsize=[11, 15], sharex=True, sharey=True)
+fig, axes = plt.subplots(3, 3, figsize=[13, 11], sharex=True, sharey=True)
 axes = np.ravel(axes)
 
 k = distributing_data["k"].copy()
@@ -353,10 +353,10 @@ for i, option in enumerate(DISTRIBUTING_OPTION, start=1):
         riv_conductance, geometry
     )
 
-    if (i % 2) == 0:
-        kwargs_colorbar = {"plot_colorbar": False}
-    else:
+    if (i % 3) == 2:
         kwargs_colorbar = {"plot_colorbar": True}
+    else:
+        kwargs_colorbar = {"plot_colorbar": False}
 
     # Plot grey background of active cells
     is_active = ~np.isnan(xsection_distributed.coords["top"])
@@ -397,10 +397,11 @@ plt.tight_layout()
 # ``by_crosscut_transmissivity`` uses the crosscut thickness instead of the
 # layer thickness and therefore shows a lower conductance in the deeper layer
 # compared to ``by_layer_transmissivity``. Finally
-# ``by_corrected_transmissivity`` also corrects for the displacement of the
-# midpoint over the length where crosscut transmissivity is computed over
-# (``[layer top - river bottom]/2``) compared to the model cell centre. This
-# further reduces the conductance in the deeper layer.
+# ``by_corrected_transmissivity`` and ``by_corrected_thickness`` also correct
+# for the displacement of the midpoint over the length where crosscut
+# transmissivity is computed over (``[layer top - river bottom]/2``) compared to
+# the model cell centre. This further reduces the conductance in the deeper
+# layer.
 
 # %%
 # MODFLOW6 package
