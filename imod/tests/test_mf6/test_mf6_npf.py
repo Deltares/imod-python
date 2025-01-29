@@ -258,7 +258,7 @@ def test_npf_from_imod5_horizontal_anisotropy(imod5_dataset, tmp_path):
             assert np.all(ds_layer["angle1"].values == 315.0)
         else:
             assert np.all(ds_layer["k"].values == ds_layer["k22"].values)
-            assert np.all(ds_layer["angle1"].values == 0.0)
+            assert np.all(ds_layer["angle1"].values == 90.0)
 
     rendered_npf = npf.render(tmp_path, "npf", None, None)
     assert "k22" in rendered_npf

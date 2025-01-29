@@ -510,7 +510,7 @@ class NodePropertyFlow(Package, IRegridPackage):
                 angle1 = imod5_data["ani"]["angle"]
                 angle1 = 90.0 - angle1
                 angle1 = xr.where(angle1 < 0, 360.0 + angle1, angle1)
-                angle1 = fill_missing_layers(angle1, target_grid, 0)
+                angle1 = fill_missing_layers(angle1, target_grid, 90)
                 data["angle1"] = angle1
 
         icelltype = zeros_like(target_grid, dtype=int)
