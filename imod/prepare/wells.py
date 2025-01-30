@@ -172,8 +172,11 @@ def assign_wells(
     k: xarray.DataArray or xugrid.UgridDataArray, optional
         Horizontal conductivity of the model layers.
     minimum_thickness: float, optional, default: 0.01
+        Minimum thickness, cells with thicknesses smaller than this value will
+        be dropped.
     minimum_k: float, optional, default: 1.0
-        Minimum conductivity
+        Minimum horizontal conductivity, cells with horizontal conductivities
+        smaller than this value will be dropped.
     validate: bool
         raise an excpetion if one of the wells is not in the domain
     Returns
@@ -213,7 +216,7 @@ def assign_wells(
     #   -in very thin layers or when the wellbore penetrates the layer very little
     #   -in low conductivity layers
     df_factor = df_factor.loc[
-        (df_factor["overlap"] >= minimum_thickness) & (df_factor["k"] >= minimum_k)
+        (df_factor["overlap"] > minimum_thickness) & (df_factor["k"] > minimum_k)
     ]
     df_factor["rate"] = df_factor["transmissivity"] / df_factor.groupby("id")[
         "transmissivity"
