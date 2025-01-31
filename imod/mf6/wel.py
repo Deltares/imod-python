@@ -744,9 +744,12 @@ class Well(GridAgnosticWell):
         assign an identifier code to each well. if not provided, one will be generated
         Must be convertible to string, and unique entries.
     minimum_k: float, optional
-        on creating point wells, no point wells will be placed in cells with a lower horizontal conductivity than this
+        on allocating well filters to the model, no filter segments will be
+        placed in cells with a lower horizontal conductivity than this. Defaults
+        to 0.0.
     minimum_thickness: float, optional
-        on creating point wells, no point wells will be placed in cells with a lower thickness than this
+        on allocating well filters to the model, no filter segments will be
+        placed in cells with a lower thickness than this. Defaults to 0.0
     print_input: ({True, False}, optional)
         keyword to indicate that the list of well information will be written to
         the listing file immediately after it is read.
@@ -839,8 +842,8 @@ class Well(GridAgnosticWell):
         concentration: Optional[list[float] | xr.DataArray] = None,
         concentration_boundary_type="aux",
         id: Optional[list[Any]] = None,
-        minimum_k: float = 0.1,
-        minimum_thickness: float = 0.05,
+        minimum_k: float = 0.0,
+        minimum_thickness: float = 0.0,
         print_input: bool = False,
         print_flows: bool = False,
         save_flows: bool = False,
@@ -1132,9 +1135,11 @@ class LayeredWell(GridAgnosticWell):
         assign an identifier code to each well. if not provided, one will be generated
         Must be convertible to string, and unique entries.
     minimum_k: float, optional
-        on creating point wells, no point wells will be placed in cells with a lower horizontal conductivity than this
+        on allocating wells to model cells, no wells will be placed in cells
+        with a lower horizontal conductivity than this. Defaults to 0.0.
     minimum_thickness: float, optional
-        on creating point wells, no point wells will be placed in cells with a lower thickness than this
+        on allocating wells to model cells, no wells will be placed in cells
+        with a lower thickness than this. Defaults to 0.0.
     print_input: ({True, False}, optional)
         keyword to indicate that the list of well information will be written to
         the listing file immediately after it is read.
@@ -1215,8 +1220,8 @@ class LayeredWell(GridAgnosticWell):
         concentration: Optional[list[float] | xr.DataArray] = None,
         concentration_boundary_type="aux",
         id: Optional[list[Any]] = None,
-        minimum_k: float = 0.1,
-        minimum_thickness: float = 1.0,
+        minimum_k: float = 0.0,
+        minimum_thickness: float = 0.0,
         print_input: bool = False,
         print_flows: bool = False,
         save_flows: bool = False,
