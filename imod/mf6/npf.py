@@ -504,13 +504,13 @@ class NodePropertyFlow(Package, IRegridPackage):
         if has_horizontal_anisotropy:
             if not np.all(np.isnan(imod5_data["ani"]["factor"].values)):
                 factor = imod5_data["ani"]["factor"]
-                factor = fill_missing_layers(factor, target_grid, 1)
+                factor = fill_missing_layers(factor, target_grid, 1.0)
                 data["k22"] = data["k"] * factor
             if not np.all(np.isnan(imod5_data["ani"]["angle"].values)):
                 angle1 = imod5_data["ani"]["angle"]
                 angle1 = 90.0 - angle1
                 angle1 = xr.where(angle1 < 0, 360.0 + angle1, angle1)
-                angle1 = fill_missing_layers(angle1, target_grid, 90)
+                angle1 = fill_missing_layers(angle1, target_grid, 90.0)
                 data["angle1"] = angle1
 
         icelltype = zeros_like(target_grid, dtype=int)
