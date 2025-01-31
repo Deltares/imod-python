@@ -17,6 +17,8 @@ Added
   :meth:`imod.mf6.Drainage.from_imod5_data`, and
   :meth:`imod.mf6.GeneralHeadBoundary.from_imod5_data` now assign negative layer
   numbers to the first active layer.
+- :func:`imod.prepare.DISTRIBUTING_OPTION` got a new setting
+  ``by_corrected_thickness``. This matches DISTRCOND=-1 in iMOD5.
 
 Changed
 ~~~~~~~

@@ -251,6 +251,79 @@ def distribution_by_corrected_transmissivity__TFTF__drn():
 
 
 @case(tags=["riv"])
+def distribution_by_corrected_thickness():
+    option = DISTRIBUTING_OPTION.by_corrected_thickness
+    allocated_layer = xr.DataArray(
+        [False, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [np.nan, (2 / 3), (1 / 3), np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["riv"])
+def distribution_by_corrected_thickness__first_active():
+    """First active cell allocated, while stage in second layer"""
+    option = DISTRIBUTING_OPTION.by_corrected_thickness
+    allocated_layer = xr.DataArray(
+        [True, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [0.0, (2 / 3), (1 / 3), np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["riv", "drn"])
+def distribution_by_corrected_thickness__third_only():
+    """Third layer active only, while stage in second layer"""
+    option = DISTRIBUTING_OPTION.by_corrected_thickness
+    allocated_layer = xr.DataArray(
+        [False, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [np.nan, np.nan, 1.0, np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["riv"])
+def distribution_by_corrected_thickness__TFTF():
+    option = DISTRIBUTING_OPTION.by_corrected_thickness
+    allocated_layer = xr.DataArray(
+        [True, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [0.0, np.nan, 1.0, np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["drn"])
+def distribution_by_corrected_thickness__drn():
+    option = DISTRIBUTING_OPTION.by_corrected_thickness
+    allocated_layer = xr.DataArray(
+        [False, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [np.nan, (8 / 9), (1 / 9), np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["drn"])
+def distribution_by_corrected_thickness__first_active__drn():
+    """First active cell allocated, while drain in third layer"""
+    option = DISTRIBUTING_OPTION.by_corrected_thickness
+    allocated_layer = xr.DataArray(
+        [True, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [(4 / 13), (8 / 13), (1 / 13), np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["drn"])
+def distribution_by_corrected_thickness__TFTF__drn():
+    option = DISTRIBUTING_OPTION.by_corrected_thickness
+    allocated_layer = xr.DataArray(
+        [True, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [(4 / 5), np.nan, (1 / 5), np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["riv"])
 def distribution_by_crosscut_transmissivity():
     option = DISTRIBUTING_OPTION.by_crosscut_transmissivity
     allocated_layer = xr.DataArray(
