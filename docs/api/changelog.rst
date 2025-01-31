@@ -53,6 +53,8 @@ Fixed
   set to ``np.nan`` for cells where ``stage`` equals ``bottom_elevation`` when
   :func:`imod.prepare.DISTRIBUTING_OPTION` was set to ``by_crosscut_thickness``,
   ``by_crosscut_transmissivity``, ``by_corrected_transmissivity``.
+- :meth:`imod.mf6.NodePropertyFlow.from_imod5_data` now defaults to 90 degrees
+  for missing layers ``imod5_data`` instead of 0 degrees.
 
 [1.0.0rc1] - 2024-12-20
 -----------------------
