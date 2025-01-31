@@ -410,7 +410,7 @@ def _compute_correction_factor(
     Compute correction factor to correct for a mismatch between the centre of
     the partially penetrated model layer and the vertical midpoint of the
     penetrating boundary condition. Correction is only applied to layers which
-    are only partially crosscut. Follows to what is described page 690 of the
+    are only partially crosscut. Follows to what is described on page 690 of the
     iMOD 5.6 manual (but then to distribute WEL rates).
     """
     top_layered = _enforce_layered_top(top, bottom)
@@ -453,7 +453,7 @@ def _distribute_weights__by_corrected_transmissivity(
 ):
     """
     Distribute conductances according to default method in iMOD 5.6, as
-    described page 690 of the iMOD 5.6 manual (but then to distribute WEL
+    described on page 690 of the iMOD 5.6 manual (but then to distribute WEL
     rates). The method uses crosscut thicknesses to compute transmissivities.
     Furthermore it corrects distribution weights for the mismatch between the
     midpoints of crosscut areas and layer midpoints.
@@ -476,7 +476,7 @@ def _distribute_weights__by_corrected_thickness(
 ):
     """
     Distribute conductances according to default method in iMOD 5.6, as
-    described page 690 of the iMOD 5.6 manual (but then to distribute WEL
+    described on page 690 of the iMOD 5.6 manual (but then to distribute WEL
     rates). The method uses crosscut thicknesses to compute transmissivities.
     Furthermore it corrects distribution weights for the mismatch between the
     midpoints of crosscut areas and layer midpoints.
