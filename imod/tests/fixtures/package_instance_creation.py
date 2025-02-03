@@ -77,9 +77,9 @@ def get_grid_da(is_unstructured, dtype, value=1):
 def create_lake_package(is_unstructured):
     is_lake1 = get_grid_da(is_unstructured, bool, False)
     times_of_numeric_timeseries = [
-        np.datetime64("2000-01-01"),
-        np.datetime64("2000-03-01"),
-        np.datetime64("2000-05-01"),
+        np.datetime64("2000-01-01", "ns"),
+        np.datetime64("2000-03-01", "ns"),
+        np.datetime64("2000-05-01", "ns"),
     ]
     numeric = xr.DataArray(
         np.full((len(times_of_numeric_timeseries)), 5.0),
