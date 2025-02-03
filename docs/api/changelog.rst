@@ -41,6 +41,8 @@ Changed
 Fixed
 ~~~~~
 
+- :meth:`imod.mf6.Model.mask_all_packages` now preserves the ``dx`` and 
+    ``dy`` coordinates
 - :meth:`imod.mf6.Well.from_imod5_data` and
   :meth:`imod.mf6.LayeredWell.from_imod5_data` ignore well rates preceding first
   element of ``times``.

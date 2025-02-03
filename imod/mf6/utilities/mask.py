@@ -48,7 +48,8 @@ def _mask_all_packages(
     mask: GridDataArray,
 ):
     spatial_dimension_names = get_spatial_dimension_names(mask)
-    additional_dimension_names = ['dx', 'dy']
+    # Add any additional dimensions that are not part of the spatial dimensions. These are dimensions that are returned by xugrid
+    additional_dimension_names = ['dx', 'dy']   
     dimension_names = spatial_dimension_names + additional_dimension_names
     if any(coord not in dimension_names for coord in mask.coords):
         raise ValueError("unexpected coordinate dimension in masking domain")
