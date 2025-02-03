@@ -153,6 +153,10 @@ pip = "*"
 python = "3.12"
 pip = "*"
 
+[feature.py313.dependencies]
+python = "3.13"
+pip = "*"
+
 [feature.pixi-update.tasks]
 update = "pixi update --json | pixi-diff-to-markdown > diff.md"
 
@@ -170,4 +174,5 @@ interactive = { features = ["interactive"], solve-group = "conda-deps" }
 py310 = { features = ["py310", "py_common"], no-default-feature = true }
 py311 = { features = ["py311", "py_common"], no-default-feature = true }
 py312 = { features = ["py312", "py_common"], no-default-feature = true }
+py313 = { features = ["py313", "py_common"], no-default-feature = true }
 pixi-update = { features = ["pixi-update"], no-default-feature = true }
