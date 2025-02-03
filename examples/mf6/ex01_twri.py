@@ -151,7 +151,6 @@ gwf_model["wel"] = imod.mf6.Well(
     screen_top=screen_top,
     screen_bottom=screen_bottom,
     rate=rate_wel,
-    minimum_k=0.0001,
 )
 
 # Attach it to a simulation

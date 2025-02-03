@@ -37,6 +37,10 @@ Changed
   the ``at_elevation`` of :func:`imod.prepare.ALLOCATION_OPTION` option now set
   as default. This means by default drainage cells are placed differently in
   :meth:`imod.mf6.Simulation.from_imod5_data`.
+- :class:`imod.mf6.Well`, :class:`imod.mf6.LayeredWell`,
+  :func:`imod.prepare.wells.assign_wells`, :meth:`imod.mf6.Well.from_imod5_data`
+  and :meth:`imod.mf6.LayeredWell.from_imod5_data` now have default values for
+  ``minimum_thickness`` and ``minimum_k`` set to 0.0. 
 
 Fixed
 ~~~~~

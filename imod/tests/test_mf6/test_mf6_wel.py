@@ -377,7 +377,7 @@ def test_to_mf6_pkg__error_on_well_removal(
     Should throw error if error_on_well_removal = True"""
     idomain, top, bottom = basic_dis
 
-    wel = imod.mf6.Well(minimum_k=1.0, *well_high_lvl_test_data_transient)
+    wel = imod.mf6.Well(minimum_k=0.9, *well_high_lvl_test_data_transient)
     active = idomain == 1
     k = xr.ones_like(idomain)
     k.loc[{"x": 85.0}] = 1e-3

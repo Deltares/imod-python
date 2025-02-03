@@ -152,12 +152,15 @@ def test_write_all_wells_filtered_out(
 ):
     # for this test, we leave the low conductivity of the twri model as is, so
     # all wells get filtered out
+    # set minimum_k and minimum_thickness to force filtering
     twri_simulation["GWF_1"]["well"] = imod.mf6.Well(
         x=[1.0, 6002.0],
         y=[3.0, 5004.0],
         screen_top=[0.0, 0.0],
         screen_bottom=[-10.0, -10.0],
         rate=[1.0, 3.0],
+        minimum_k=0.1,
+        minimum_thickness=0.05,
         print_flows=True,
         validate=True,
     )
@@ -173,12 +176,15 @@ def test_write_one_well_filtered_out(
     # one of the wells violates the thickness constraint (the second one) and
     # gets filtered out alltogether
     twri_simulation["GWF_1"]["npf"]["k"] *= 20000
+    # set minimum_k and minimum_thickness to force filtering
     twri_simulation["GWF_1"]["well"] = imod.mf6.Well(
         x=[1.0, 6002.0],
         y=[3.0, 5004.0],
         screen_top=[0.0, 0.0],
         screen_bottom=[-10.0, -0.01],
         rate=[1.0, 3.0],
+        minimum_k=0.1,
+        minimum_thickness=0.05,
         print_flows=True,
         validate=True,
     )
@@ -197,12 +203,15 @@ def test_write_one_layer_filtered_out(
     k.loc[{"layer": 3}] = 10.0
 
     # define 2 wells penetrating all layers
+    # set minimum_k and minimum_thickness to force filtering
     twri_simulation["GWF_1"]["well"] = imod.mf6.Well(
         x=[1.0, 6002.0],
         y=[3.0, 5004.0],
         screen_top=[0.0, 0.0],
         screen_bottom=[-400.0, -400],
         rate=[1.0, 3.0],
+        minimum_k=0.1,
+        minimum_thickness=0.05,
         print_flows=True,
         validate=True,
     )
