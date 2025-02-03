@@ -18,6 +18,12 @@ Known issues
 - MetaSWAP's "flexible drainage" ("Peilgestuurde drainage" in Dutch) is not
   supported.
 - IPEST is not supported.
+- *Edge case*: When a well is located on the x-boundary of a cell in the model
+  grid, the well is placed by iMOD5 in the western cell, whereas iMOD Python
+  places the well in the eastern cell. This is because iMOD Python conforms to
+  GDAL in how it looks up points in a grid. The workaround is to move the well
+  slightly away from the boundary, by subtracting a small value from the
+  x-coordinate of the well (e.g. 0.1 mm).
 
 Notes
 -----
