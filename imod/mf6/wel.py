@@ -744,12 +744,11 @@ class Well(GridAgnosticWell):
         assign an identifier code to each well. if not provided, one will be generated
         Must be convertible to string, and unique entries.
     minimum_k: float, optional
-        on allocating well filters to the model, no filter segments will be
-        placed in cells with a lower horizontal conductivity than this. Defaults
-        to 0.0.
+        on allocating wells to the model, no filter segments will be placed in
+        cells with a smaller horizontal conductivity than this. Defaults to 0.0.
     minimum_thickness: float, optional
-        on allocating well filters to the model, no filter segments will be
-        placed in cells with a lower thickness than this. Defaults to 0.0
+        on allocating wells to the model, no filter segments will be placed in
+        cells with a smaller thickness than this. Defaults to 0.0
     print_input: ({True, False}, optional)
         keyword to indicate that the list of well information will be written to
         the listing file immediately after it is read.
