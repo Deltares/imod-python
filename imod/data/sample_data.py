@@ -36,7 +36,7 @@ def create_pooch_registry() -> pooch.core.Pooch:
 
 
 def load_pooch_registry(registry: pooch.core.Pooch) -> pooch.core.Pooch:
-    with importlib.resources.files("imod.data") as pkg_dir:
+    with importlib.resources.as_file(importlib.resources.files("imod.data")) as pkg_dir:
         registry.load_registry(pkg_dir / "registry.txt")
     return registry
 
