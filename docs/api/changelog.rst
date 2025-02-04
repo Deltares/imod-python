@@ -12,6 +12,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Added
 ~~~~~
 
+- Support for Python 3.13.
 - :meth:`imod.mf6.Recharge.from_imod5_data`,
   :meth:`imod.mf6.River.from_imod5_data`,
   :meth:`imod.mf6.Drainage.from_imod5_data`, and
