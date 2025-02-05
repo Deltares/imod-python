@@ -24,6 +24,20 @@ Known issues
   GDAL in how it looks up points in a grid. The workaround is to move the well
   slightly away from the boundary, by subtracting a small value from the
   x-coordinate of the well (e.g. 0.1 mm).
+- There is a bug in iMOD5 in how the HFB's hydraulic characteristic is computed.
+  iMDO5 adds the background resistance of the aquifer to the HFB resistance when
+  writing the MODFLOW6 input files. The background resistance is already
+  accounted for by MODFLOW6 internally, so in practice this means the background
+  resistance is added twice. This is especially noticeable when a HFB intersects
+  a low permeable layer. The workaround in iMOD5 is to specify a negative HFB
+  factor in the projectfile, which makes iMOD5 to skip adding the background
+  resistance.
+- By specifying a negative HFB factor in the projectfile, the iMOD5
+  documentation mentions this will turn on the option to override a resistance
+  in between cells with the HFB resistance. This is NOT supported by MODFLOW6,
+  as MODFLOW6 always adds the background resistance to the HFB resistance to
+  compute the resistance inbetween cells.
+
 
 Notes
 -----
