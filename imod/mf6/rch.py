@@ -18,6 +18,7 @@ from imod.msw.utilities.imod5_converter import (
 )
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_rch_cells
 from imod.schemata import (
+    AllCoordsValueSchema,
     AllInsideNoDataSchema,
     AllNoDataSchema,
     AllValueSchema,
@@ -98,6 +99,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
             IndexesSchema(),
             CoordsSchema(("layer",)),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "concentration": [
             DTypeSchema(np.floating),
@@ -109,6 +111,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
                 )
             ),
             CONC_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
         "save_flows": [DTypeSchema(np.bool_), DimsSchema()],

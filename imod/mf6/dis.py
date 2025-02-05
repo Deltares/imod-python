@@ -21,6 +21,7 @@ from imod.mf6.utilities.regrid import (
 from imod.mf6.validation import DisBottomSchema
 from imod.schemata import (
     ActiveCellsConnectedSchema,
+    AllCoordsValueSchema,
     AllValueSchema,
     AnyValueSchema,
     DimsSchema,
@@ -77,11 +78,13 @@ class StructuredDiscretization(Package, IRegridPackage, IMaskingSettings):
             DTypeSchema(np.floating),
             DimsSchema("layer", "y", "x") | DimsSchema("layer"),
             IndexesSchema(),
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "idomain": [
             DTypeSchema(np.integer),
             DimsSchema("layer", "y", "x"),
             IndexesSchema(),
+            AllCoordsValueSchema("layer", ">", 0),
         ],
     }
     _write_schemata = {

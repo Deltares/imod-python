@@ -23,6 +23,7 @@ from imod.prepare.topsystem.conductance import (
     distribute_drn_conductance,
 )
 from imod.schemata import (
+    AllCoordsValueSchema,
     AllInsideNoDataSchema,
     AllNoDataSchema,
     AllValueSchema,
@@ -93,12 +94,14 @@ class Drainage(BoundaryCondition, IRegridPackage):
             IndexesSchema(),
             CoordsSchema(("layer",)),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "conductance": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             CoordsSchema(("layer",)),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "concentration": [
             DTypeSchema(np.floating),
@@ -110,6 +113,7 @@ class Drainage(BoundaryCondition, IRegridPackage):
                 )
             ),
             CONC_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
         "save_flows": [DTypeSchema(np.bool_), DimsSchema()],

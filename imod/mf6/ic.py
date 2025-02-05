@@ -12,7 +12,12 @@ from imod.mf6.regrid.regrid_schemes import (
 )
 from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
 from imod.mf6.validation import PKG_DIMS_SCHEMA
-from imod.schemata import DTypeSchema, IdentityNoDataSchema, IndexesSchema
+from imod.schemata import (
+    AllCoordsValueSchema,
+    DTypeSchema,
+    IdentityNoDataSchema,
+    IndexesSchema,
+)
 from imod.typing import GridDataArray
 
 
@@ -55,6 +60,7 @@ class InitialConditions(Package, IRegridPackage):
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
     }
     _write_schemata = {

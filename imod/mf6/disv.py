@@ -11,6 +11,7 @@ from imod.mf6.regrid.regrid_schemes import DiscretizationRegridMethod
 from imod.mf6.validation import DisBottomSchema
 from imod.mf6.write_context import WriteContext
 from imod.schemata import (
+    AllCoordsValueSchema,
     AllValueSchema,
     AnyValueSchema,
     DimsSchema,
@@ -63,11 +64,13 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
             DTypeSchema(np.floating),
             DimsSchema("layer", "{face_dim}") | DimsSchema("layer"),
             IndexesSchema(),
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "idomain": [
             DTypeSchema(np.integer),
             DimsSchema("layer", "{face_dim}"),
             IndexesSchema(),
+            AllCoordsValueSchema("layer", ">", 0),
         ],
     }
     _write_schemata = {

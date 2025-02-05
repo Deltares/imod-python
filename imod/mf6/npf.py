@@ -18,6 +18,7 @@ from imod.mf6.utilities.regrid import (
 )
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
+    AllCoordsValueSchema,
     AllValueSchema,
     CompatibleSettingsSchema,
     DimsSchema,
@@ -248,41 +249,49 @@ class NodePropertyFlow(Package, IRegridPackage):
             DTypeSchema(np.integer),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "k": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "rewet_layer": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "k22": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "k33": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "angle1": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "angle2": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "angle3": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "alternative_cell_averaging": [
             DTypeSchema(str),

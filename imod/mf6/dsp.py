@@ -6,6 +6,7 @@ from imod.mf6.package import Package
 from imod.mf6.regrid.regrid_schemes import DispersionRegridMethod
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
+    AllCoordsValueSchema,
     CompatibleSettingsSchema,
     DimsSchema,
     DTypeSchema,
@@ -91,31 +92,37 @@ class Dispersion(Package, IRegridPackage):
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "longitudinal_horizontal": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "transversal_horizontal1": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "longitudinal_vertical": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "transversal_horizontal2": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "transversal_vertical": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "xt3d_off": [DTypeSchema(np.bool_), DimsSchema()],
         "xt3d_rhs": [

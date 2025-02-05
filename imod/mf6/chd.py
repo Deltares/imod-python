@@ -12,6 +12,7 @@ from imod.mf6.regrid.regrid_schemes import ConstantHeadRegridMethod
 from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
+    AllCoordsValueSchema,
     AllInsideNoDataSchema,
     AllNoDataSchema,
     AllValueSchema,
@@ -93,12 +94,14 @@ class ConstantHead(BoundaryCondition, IRegridPackage):
             IndexesSchema(),
             CoordsSchema(("layer",)),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "concentration": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             CoordsSchema(("layer",)),
             CONC_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
     }
     _write_schemata = {

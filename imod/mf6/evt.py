@@ -8,6 +8,7 @@ from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.regrid.regrid_schemes import EvapotranspirationRegridMethod
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
+    AllCoordsValueSchema,
     AllInsideNoDataSchema,
     AllNoDataSchema,
     AllValueSchema,
@@ -105,30 +106,35 @@ class Evapotranspiration(BoundaryCondition, IRegridPackage):
             IndexesSchema(),
             CoordsSchema(("layer",)),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "rate": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             CoordsSchema(("layer",)),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "depth": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             CoordsSchema(("layer",)),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "proportion_rate": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             CoordsSchema(("layer",)),
             SEGMENT_BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "proportion_depth": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             CoordsSchema(("layer",)),
             SEGMENT_BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "concentration": [
             DTypeSchema(np.floating),
