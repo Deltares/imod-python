@@ -132,6 +132,14 @@ def test_wrong_dtype(drainage):
         imod.mf6.Drainage(**drainage)
 
 
+def test_wrong_layer_coord(drainage):
+    ds = xr.merge([drainage], join="exact")
+    ds = ds.assign_coords(layer=[0, 1, 2])
+
+    with pytest.raises(ValidationError):
+        imod.mf6.Drainage(**ds)
+
+
 def test_validate_false(drainage):
     drainage["elevation"] = drainage["elevation"].astype(np.int32)
 
