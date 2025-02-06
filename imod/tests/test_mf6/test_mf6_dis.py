@@ -85,6 +85,17 @@ def test_wrong_dtype(idomain_and_bottom):
         )
 
 
+def test_wrong_layer_coord_value(idomain_and_bottom):
+    idomain, bottom = idomain_and_bottom
+
+    with pytest.raises(ValidationError):
+        imod.mf6.StructuredDiscretization(
+            top=200.0,
+            bottom=bottom.assign_coords(layer=[0, 1, 2]),
+            idomain=idomain.assign_coords(layer=[0, 1, 2]),
+        )
+
+
 def test_bottom_exceeding_itself(idomain_and_bottom):
     idomain, bottom = idomain_and_bottom
 

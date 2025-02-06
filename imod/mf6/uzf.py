@@ -7,6 +7,7 @@ from imod.mf6.boundary_condition import AdvancedBoundaryCondition, BoundaryCondi
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.prepare.layer import get_upper_active_grid_cells
 from imod.schemata import (
+    AllCoordsValueSchema,
     AllInsideNoDataSchema,
     AllNoDataSchema,
     AllValueSchema,
@@ -22,8 +23,6 @@ from imod.schemata import (
 class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
     """
     Unsaturated Zone Flow (UZF) package.
-
-    TODO: Support timeseries file? Observations? Water Mover?
 
     Parameters
     ----------
@@ -129,52 +128,64 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         "surface_depression_depth": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "kv_sat": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             CoordsSchema(("layer",)),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "theta_res": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "theta_sat": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "theta_init": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "epsilon": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "infiltration_rate": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "et_pot": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA | DimsSchema(),  # optional var
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "extinction_depth": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA | DimsSchema(),  # optional var
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "extinction_theta": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA | DimsSchema(),  # optional var
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "root_potential": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA | DimsSchema(),  # optional var
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "root_activity": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA | DimsSchema(),  # optional var
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
         "save_flows": [DTypeSchema(np.bool_), DimsSchema()],

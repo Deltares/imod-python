@@ -14,6 +14,7 @@ from imod.mf6.regrid.regrid_schemes import (
 from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
+    AllCoordsValueSchema,
     AllValueSchema,
     DimsSchema,
     DTypeSchema,
@@ -134,11 +135,13 @@ class SpecificStorage(StorageBase):
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ),
         "specific_yield": (
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ),
         "transient": (
             DTypeSchema(np.bool_),
@@ -149,6 +152,7 @@ class SpecificStorage(StorageBase):
             DTypeSchema(np.integer),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ),
         "save_flows": (DTypeSchema(np.bool_), DimsSchema()),
     }
@@ -268,11 +272,13 @@ class StorageCoefficient(StorageBase):
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ),
         "specific_yield": (
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ),
         "transient": (
             DTypeSchema(np.bool_),
@@ -283,6 +289,7 @@ class StorageCoefficient(StorageBase):
             DTypeSchema(np.integer),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ),
         "save_flows": (DTypeSchema(np.bool_), DimsSchema()),
     }

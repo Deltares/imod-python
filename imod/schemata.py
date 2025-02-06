@@ -115,7 +115,6 @@ class BaseSchema(abc.ABC):
         return SchemaUnion(self, other)
 
 
-# SchemaType = TypeVar("SchemaType", bound=BaseSchema)
 SchemaType: TypeAlias = BaseSchema
 
 
@@ -405,6 +404,42 @@ class OtherCoordsSchema(BaseSchema):
             self.require_all_keys,
             self.allow_extra_keys,
         ).validate(obj)
+
+
+class AllCoordsValueSchema(BaseSchema):
+    """
+    Validate presence of coords.
+
+    Parameters
+    ----------
+    coord : str
+        name of coordinate
+    """
+
+    def __init__(
+        self,
+        coordname: str,
+        operator: str,
+        other: Any,
+    ) -> None:
+        self.coordname = coordname
+        self.operator = OPERATORS[operator]
+        self.operator_str = operator
+        self.other = other
+
+    def validate(self, obj: GridDataArray, **kwargs) -> None:
+        obj_coords = list(obj.coords.keys())
+        # Shortcut if coord is not in obj, use Coordinate schema to throw error if
+        # coord is missing.
+        if scalar_None(obj) or (self.coordname not in obj_coords):
+            return
+
+        obj_coord = obj.coords[self.coordname]
+        condition = self.operator(obj_coord, self.other)
+        if not condition.all():
+            raise ValidationError(
+                f"Not all values of coordinate {self.coordname} comply with criterion: {self.operator_str} {self.other}"
+            )
 
 
 class ValueSchema(BaseSchema, abc.ABC):

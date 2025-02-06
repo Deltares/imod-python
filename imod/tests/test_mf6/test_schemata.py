@@ -28,3 +28,17 @@ def test_option_schema():
         ValidationError, match="Invalid option: c. Valid options are: a, b"
     ):
         schema.validate(xr.DataArray("c"))
+
+
+def test_AllCoordValues_schema():
+    schema = sch.AllCoordsValueSchema("layer", ">", 0)
+
+    da = xr.DataArray([1, 1, 1], coords={"layer": [1, 2, 3]}, dims=("layer",))
+    assert schema.validate(da) is None
+    assert schema.validate(da.rename(layer="ignore")) is None
+
+    with pytest.raises(
+        ValidationError,
+        match="Not all values of coordinate layer comply with criterion: > 0",
+    ):
+        assert schema.validate(da.assign_coords(layer=[0, 1, 2]))

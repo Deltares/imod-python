@@ -27,6 +27,7 @@ from imod.prepare.topsystem.conductance import (
     split_conductance_with_infiltration_factor,
 )
 from imod.schemata import (
+    AllCoordsValueSchema,
     AllInsideNoDataSchema,
     AllNoDataSchema,
     AllValueSchema,
@@ -204,18 +205,21 @@ class River(BoundaryCondition, IRegridPackage):
             IndexesSchema(),
             CoordsSchema(("layer",)),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "conductance": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             CoordsSchema(("layer",)),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "bottom_elevation": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             CoordsSchema(("layer",)),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "concentration": [
             DTypeSchema(np.floating),
@@ -227,6 +231,7 @@ class River(BoundaryCondition, IRegridPackage):
                 )
             ),
             CONC_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "print_input": [DTypeSchema(np.bool_), DimsSchema()],
         "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
