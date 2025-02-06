@@ -42,7 +42,7 @@ Changed
   :func:`imod.prepare.wells.assign_wells`, :meth:`imod.mf6.Well.from_imod5_data`
   and :meth:`imod.mf6.LayeredWell.from_imod5_data` now have default values for
   ``minimum_thickness`` and ``minimum_k`` set to 0.0. 
-- When trying to initiate a MODFLOW6 package with a ``layer`` coordinate with
+- When intitating a MODFLOW6 package with a ``layer`` coordinate with 
   values <= 0, iMOD Python will throw an error.
 
 Fixed
