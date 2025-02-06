@@ -601,6 +601,37 @@ def test_import_from_imod5(imod5_dataset, tmp_path):
 
 @pytest.mark.unittest_jit
 @pytest.mark.usefixtures("imod5_dataset")
+def test_from_imod5__has_cap_data(imod5_dataset):
+    imod5_data = deepcopy(imod5_dataset[0])
+    period_data = imod5_dataset[1]
+
+    imod5_data["cap"] = {}
+    msw_bound = imod5_data["bnd"]["ibound"].isel(layer=0, drop=True)
+    imod5_data["cap"]["boundary"] = msw_bound
+    imod5_data["cap"]["wetted_area"] = xr.ones_like(msw_bound) * 100
+    imod5_data["cap"]["urban_area"] = xr.ones_like(msw_bound) * 200
+    imod5_data["cap"]["artificial_recharge"] = msw_bound
+    imod5_data["cap"]["artificial_recharge_layer"] = xr.ones_like(msw_bound) + 1
+    imod5_data["cap"]["artificial_recharge_capacity"] = xr.DataArray(25.0)
+
+    datelist = pd.date_range(start="1/1/1989", end="1/1/2013", freq="W")
+
+    simulation = Modflow6Simulation.from_imod5_data(
+        imod5_data,
+        period_data,
+        datelist,
+        SimulationAllocationOptions,
+        SimulationDistributingOptions,
+    )
+
+    gwf_model = simulation["imported_model"]
+
+    assert "msw-rch" in gwf_model.keys()
+    assert "msw-sprinkling" in gwf_model.keys()
+
+
+@pytest.mark.unittest_jit
+@pytest.mark.usefixtures("imod5_dataset")
 def test_from_imod5__strict_well_validation_set(imod5_dataset):
     imod5_data = imod5_dataset[0]
     period_data = imod5_dataset[1]
