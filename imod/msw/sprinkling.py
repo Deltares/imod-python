@@ -11,7 +11,10 @@ from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.regrid.regrid_schemes import SprinklingRegridMethod
 from imod.msw.utilities.common import concat_imod5
-from imod.typing import GridDataDict, Imod5DataDict, IntArray, SelSettingsType
+from imod.msw.utilities.imod5_converter import (
+    get_cell_area_from_imod5_data,
+)
+from imod.typing import GridDataDict, Imod5DataDict, IntArray
 from imod.typing.grid import zeros_like
 
 
@@ -29,9 +32,12 @@ def _sprinkling_data_from_imod5_ipf(cap_data: GridDataDict) -> GridDataDict:
 
 
 def _sprinkling_data_from_imod5_grid(cap_data: GridDataDict) -> GridDataDict:
-    artificial_rch_type = cap_data["artificial_recharge"]
-    capacity = cap_data["artificial_recharge_capacity"]
+    # Convert units from mm/d to m3/d
+    msw_area = get_cell_area_from_imod5_data(cap_data)
+    capacity_mmd = cap_data["artificial_recharge_capacity"]
+    capacity_m3d = capacity_mmd * 1e-3 * msw_area.sel(subunit=0, drop=True)
 
+    artificial_rch_type = cap_data["artificial_recharge"]
     from_groundwater = artificial_rch_type == 1
     from_surfacewater = artificial_rch_type == 2
     is_active = artificial_rch_type != 0
@@ -40,10 +46,10 @@ def _sprinkling_data_from_imod5_grid(cap_data: GridDataDict) -> GridDataDict:
 
     # Add zero where active, to have active cells set to 0.0.
     max_abstraction_groundwater_rural = zero_where_active.where(
-        ~from_groundwater, capacity
+        ~from_groundwater, capacity_m3d
     )
     max_abstraction_surfacewater_rural = zero_where_active.where(
-        ~from_surfacewater, capacity
+        ~from_surfacewater, capacity_m3d
     )
 
     # No sprinkling for urban environments

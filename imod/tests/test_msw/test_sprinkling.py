@@ -279,16 +279,17 @@ def test_sprinkling_from_imod5_data__points(cap_data_sprinkling_points):
 
 def test_sprinkling_from_imod5_data__grid(cap_data_sprinkling_grid):
     # Arrange
+    rate = 25.0 * 0.25 * 1.0e-3
     # fmt: off
     expected_gw_abstraction = np.array(
-    [[nan, 25., 0.],
-     [nan, 25., 0.],
-     [nan, 25., 0.]]
+    [[nan, rate, 0.],
+     [nan, rate, 0.],
+     [nan, rate, 0.]]
     )
     expected_sw_abstraction = np.array(
-    [[nan, 0., 25.],
-     [nan, 0., 25.],
-     [nan, 0., 25.]]
+    [[nan, 0., rate],
+     [nan, 0., rate],
+     [nan, 0., rate]]
     )
     # fmt: on
 
