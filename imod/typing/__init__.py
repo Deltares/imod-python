@@ -27,6 +27,11 @@ class SelSettingsType(TypedDict, total=False):
     missing_dims: Literal["raise", "warn", "ignore"]
 
 
+class DropVarsType(TypedDict, total=False):
+    names: str
+    errors: Literal["raise", "ignore"]
+
+
 class Imod5DataDict(TypedDict, total=False):
     cap: GridDataDict
     extra: dict[str, list[str]]

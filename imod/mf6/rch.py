@@ -16,6 +16,7 @@ from imod.msw.utilities.imod5_converter import (
     get_cell_area_from_imod5_data,
     is_msw_active_cell,
 )
+from imod.msw.utilities.select import drop_layer_dim_cap_data
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_rch_cells
 from imod.schemata import (
     AllCoordsValueSchema,
@@ -271,7 +272,7 @@ class Recharge(BoundaryCondition, IRegridPackage):
         used to couple MODFLOW6 to MetaSWAP models. Active cells will have a
         recharge rate of 0.0.
         """
-        cap_data = cast(GridDataDict, imod5_data["cap"])
+        cap_data = cast(GridDataDict, drop_layer_dim_cap_data(imod5_data)["cap"])
 
         msw_area = get_cell_area_from_imod5_data(cap_data)
         msw_active = is_msw_active_cell(target_dis, cap_data, msw_area)
