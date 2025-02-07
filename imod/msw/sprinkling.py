@@ -29,19 +29,14 @@ def _sprinkling_data_from_imod5_ipf(cap_data: GridDataDict) -> GridDataDict:
 
 
 def _sprinkling_data_from_imod5_grid(cap_data: GridDataDict) -> GridDataDict:
-    drop_layer_kwargs: SelSettingsType = {
-        "layer": 0,
-        "drop": True,
-        "missing_dims": "ignore",
-    }
-    type = cap_data["artificial_recharge"].isel(**drop_layer_kwargs)
-    capacity = cap_data["artificial_recharge_capacity"].isel(**drop_layer_kwargs)
+    artificial_rch_type = cap_data["artificial_recharge"]
+    capacity = cap_data["artificial_recharge_capacity"]
 
-    from_groundwater = type == 1
-    from_surfacewater = type == 2
-    is_active = type != 0
+    from_groundwater = artificial_rch_type == 1
+    from_surfacewater = artificial_rch_type == 2
+    is_active = artificial_rch_type != 0
 
-    zero_where_active = zeros_like(type).where(is_active)
+    zero_where_active = zeros_like(artificial_rch_type).where(is_active)
 
     # Add zero where active, to have active cells set to 0.0.
     max_abstraction_groundwater_rural = zero_where_active.where(
