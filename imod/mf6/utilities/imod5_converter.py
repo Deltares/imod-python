@@ -63,11 +63,11 @@ def _well_from_imod5_cap_point_data(cap_data: GridDataDict) -> dict[str, np.ndar
 
 
 def _well_from_imod5_cap_grid_data(cap_data: GridDataDict) -> dict[str, np.ndarray]:
-    type = cap_data["artificial_recharge"]
+    artificial_rch_type = cap_data["artificial_recharge"]
     layer = cap_data["artificial_recharge_layer"].astype(int)
 
-    from_groundwater = (type != 0).to_numpy()
-    coords = type.coords
+    from_groundwater = (artificial_rch_type != 0).to_numpy()
+    coords = artificial_rch_type.coords
     x_grid, y_grid = np.meshgrid(coords["x"].to_numpy(), coords["y"].to_numpy())
 
     data = {}
