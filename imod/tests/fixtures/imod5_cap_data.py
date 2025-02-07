@@ -37,6 +37,23 @@ def cap_data_sprinkling_grid() -> Imod5DataDict:
 
 
 @pytest.fixture(scope="function")
+def cap_data_sprinkling_grid_with_layer() -> Imod5DataDict:
+    type = zeros_grid()
+    type[:, 1] = 1
+    type[:, 2] = 2
+    layer = xr.ones_like(type)
+    layer[:, 1] = 2
+
+    cap_data = {
+        "artificial_recharge": type.expand_dims("layer"),
+        "artificial_recharge_layer": layer.expand_dims("layer"),
+        "artificial_recharge_capacity": xr.DataArray(25.0),
+    }
+
+    return {"cap": cap_data}
+
+
+@pytest.fixture(scope="function")
 def cap_data_sprinkling_points() -> Imod5DataDict:
     type = zeros_grid()
     type[:, 1] = 3000
