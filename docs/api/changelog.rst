@@ -64,6 +64,8 @@ Fixed
   ``by_crosscut_transmissivity``, ``by_corrected_transmissivity``.
 - :meth:`imod.mf6.NodePropertyFlow.from_imod5_data` now defaults to 90 degrees
   for missing layers ``imod5_data`` instead of 0 degrees.
+- Bug in :meth:`imod.mf6.Modflow6Simulation.from_imod5_data` where an error was
+  raised in case the ``"CAP"`` package was present in the ``imod5_data``.
 
 [1.0.0rc1] - 2024-12-20
 -----------------------
