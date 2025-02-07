@@ -67,7 +67,10 @@ Fixed
 - :meth:`imod.mf6.NodePropertyFlow.from_imod5_data` now defaults to 90 degrees
   for missing layers ``imod5_data`` instead of 0 degrees.
 - Bug in :meth:`imod.mf6.Modflow6Simulation.from_imod5_data` where an error was
-  raised in case the ``"CAP"`` package was present in the ``imod5_data``.
+  raised in case the ``"cap"`` package was present in the ``imod5_data``.
+- Bug where :meth:`imod.mf6.LayeredWell.from_imod5_cap_data` and
+  :meth:`imod.mf6.Recharge.from_imod5_cap_data` threw an error if the ``"cap"``
+  in the ``imod5_data`` had a ``"layer"`` dimension and coordinate. 
 
 [1.0.0rc1] - 2024-12-20
 -----------------------
