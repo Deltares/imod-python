@@ -16,7 +16,6 @@ from imod.msw.utilities.imod5_converter import (
     get_cell_area_from_imod5_data,
     is_msw_active_cell,
 )
-from imod.msw.utilities.select import drop_layer_dim_cap_data
 from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_rch_cells
 from imod.schemata import (
     AllCoordsValueSchema,
@@ -35,6 +34,7 @@ from imod.typing.grid import (
     enforce_dim_order,
     is_planar_grid,
 )
+from imod.util.dims import drop_layer_dim_cap_data
 
 
 class Recharge(BoundaryCondition, IRegridPackage):
