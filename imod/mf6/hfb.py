@@ -31,7 +31,14 @@ from imod.mf6.utilities.hfb import (
     _prepare_index_names,
 )
 from imod.mf6.validation_context import ValidationContext
-from imod.schemata import EmptyIndexesSchema, MaxNUniqueValuesSchema, ValidationError
+from imod.schemata import (
+    DimsSchema,
+    DTypeSchema,
+    EmptyIndexesSchema,
+    GeometryTypeSchema,
+    MaxNUniqueValuesSchema,
+    ValidationError,
+)
 from imod.typing import GeoDataFrameType, GridDataArray, LineStringType
 from imod.typing.grid import as_ugrid_dataarray, ones_like
 from imod.util.imports import MissingOptionalModule
@@ -47,11 +54,19 @@ else:
 
 if TYPE_CHECKING:
     import shapely
+
+    _POLYGON = shapely.geometry.Polygon
+    _LINESTRING = shapely.geometry.LineString
 else:
     try:
         import shapely
+
+        _POLYGON = shapely.geometry.Polygon
+        _LINESTRING = shapely.geometry.LineString
     except ImportError:
         shapely = MissingOptionalModule("shapely")
+        _POLYGON = ""
+        _LINESTRING = ""
 
 NO_BARRIER_MSG = textwrap.dedent(
     """
@@ -247,7 +262,7 @@ def _select_dataframe_with_snapped_line_index(
 def _extract_mean_hfb_bounds_from_dataframe(
     dataframe: GeoDataFrameType,
 ) -> Tuple[pd.Series, pd.Series]:
-    """
+    r"""
     Extract hfb bounds from dataframe. Requires dataframe geometry to be of type
     shapely "Z Polygon".
 
@@ -976,6 +991,17 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
 
     """
 
+    _init_schemata = {
+        "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
+    }
+
+    _write_schemata = {
+        "geometry": [
+            EmptyIndexesSchema(),
+            GeometryTypeSchema(_POLYGON),
+        ],
+    }
+
     @init_log_decorator()
     def __init__(
         self,
@@ -1041,8 +1067,15 @@ class SingleLayerHorizontalFlowBarrierHydraulicCharacteristic(
 
     """
 
+    _init_schemata = {
+        "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
+    }
+
     _write_schemata = {
-        "geometry": [EmptyIndexesSchema()],
+        "geometry": [
+            EmptyIndexesSchema(),
+            GeometryTypeSchema(_LINESTRING),
+        ],
         "layer": [MaxNUniqueValuesSchema(1)],
     }
 
@@ -1111,6 +1144,14 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     >>> hfb = imod.mf6.HorizontalFlowBarrierMultiplier(barrier_gdf)
 
     """
+
+    _init_schemata = {
+        "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
+    }
+
+    _write_schemata = {
+        "geometry": [EmptyIndexesSchema(), GeometryTypeSchema(_POLYGON)],
+    }
 
     @init_log_decorator()
     def __init__(
@@ -1182,8 +1223,12 @@ class SingleLayerHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
 
     """
 
+    _init_schemata = {
+        "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
+    }
+
     _write_schemata = {
-        "geometry": [EmptyIndexesSchema()],
+        "geometry": [EmptyIndexesSchema(), GeometryTypeSchema(_LINESTRING)],
         "layer": [MaxNUniqueValuesSchema(1)],
     }
 
@@ -1273,6 +1318,14 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
 
     """
 
+    _init_schemata = {
+        "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
+    }
+
+    _write_schemata = {
+        "geometry": [EmptyIndexesSchema(), GeometryTypeSchema(_POLYGON)],
+    }
+
     @init_log_decorator()
     def __init__(
         self,
@@ -1336,8 +1389,12 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
 
     """
 
+    _init_schemata = {
+        "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
+    }
+
     _write_schemata = {
-        "geometry": [EmptyIndexesSchema()],
+        "geometry": [EmptyIndexesSchema(), GeometryTypeSchema(_LINESTRING)],
         "layer": [MaxNUniqueValuesSchema(1)],
     }
 
