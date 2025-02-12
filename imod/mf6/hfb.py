@@ -260,7 +260,7 @@ def _select_dataframe_with_snapped_line_index(
 def _extract_mean_hfb_bounds_from_dataframe(
     dataframe: GeoDataFrameType,
 ) -> Tuple[pd.Series, pd.Series]:
-    """
+    r"""
     Extract hfb bounds from dataframe. Requires dataframe geometry to be of type
     shapely "Z Polygon".
 
