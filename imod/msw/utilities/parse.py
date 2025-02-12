@@ -23,12 +23,15 @@ def _try_parsing_string_to_number(s: str) -> ScalarType:
     return s
 
 
-def correct_unsa_svat_path(unsa_path: Path | str) -> str:
+def correct_unsa_svat_path(unsa_path: ScalarType) -> str:
     """
     Correct the path to the UNSA SVAT executable in the parameter file. Drop any
     quotes and trailing backslashes, and replace any dollar signs. These could
     have been added by ``MetaSwapModel._render_unsaturated_database_path``.
     """
+    if not isinstance(unsa_path, str):
+        raise TypeError(f"Unexcepted type for unsa_path, expected str, got {unsa_path}")
+
     unsa_path = unsa_path.replace('"', "")
 
     if unsa_path.endswith("\\"):

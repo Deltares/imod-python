@@ -59,7 +59,7 @@ INITIAL_CONDITIONS_PACKAGES = (
     InitialConditionsSavedState,
 )
 
-DEFAULT_SETTINGS = {
+DEFAULT_SETTINGS: dict[str, Any] = {
     "vegetation_mdl": 1,
     "evapotranspiration_mdl": 1,
     "saltstress_mdl": 0,
@@ -222,7 +222,7 @@ class MetaSwapModel(Model):
         if not optional_package:
             raise KeyError(f"Could not find package of type: {pkg_type}")
 
-    def _write_simulation_settings(self, directory: Union[str, Path]):
+    def _write_simulation_settings(self, directory: Path) -> None:
         """
         Write simulation settings to para_sim.inp.
 

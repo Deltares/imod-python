@@ -1,3 +1,4 @@
+import pytest
 from pytest_cases import parametrize_with_cases
 
 from imod.msw.utilities.parse import (
@@ -54,3 +55,11 @@ def test_correct_unsa_svat_path(path, path_expected):
     path_corrected = correct_unsa_svat_path(path)
     # Assert
     assert path_corrected == path_expected
+
+
+def test_correct_unsa_svat_path__wrong_type():
+    with pytest.raises(TypeError):
+        correct_unsa_svat_path(1.0)
+
+    with pytest.raises(TypeError):
+        correct_unsa_svat_path(1)
