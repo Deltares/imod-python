@@ -49,6 +49,8 @@ Changed
   validate whether proper type of geometry is provided, respectively Polygon for
   :class:`imod.mf6.HorizontalFlowBarrierResistance`, and LineString for
   :class:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance`.
+- Relaxed validation for :class:`imod.msw.MetaSwapModel` if ``FileCopier``
+  package is present.
 
 Fixed
 ~~~~~
@@ -79,6 +81,8 @@ Fixed
 - :meth:`imod.mf6.LayeredWell.from_imod5_cap_data` will convert the
   ``max_abstraction_groundwater`` and ``max_abstraction_surfacewater`` capacity
   from mm/d to m3/d.
+- Models imported with :meth:`imod.msw.MetaSwapModel.from_imod5_data` can be
+  written with ``validate`` set to True.
 
 
 [1.0.0rc1] - 2024-12-20
