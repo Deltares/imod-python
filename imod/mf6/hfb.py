@@ -31,7 +31,14 @@ from imod.mf6.utilities.hfb import (
     _prepare_index_names,
 )
 from imod.mf6.validation_context import ValidationContext
-from imod.schemata import EmptyIndexesSchema, MaxNUniqueValuesSchema, ValidationError
+from imod.schemata import (
+    DimsSchema,
+    DTypeSchema,
+    EmptyIndexesSchema,
+    GeometryTypeSchema,
+    MaxNUniqueValuesSchema,
+    ValidationError,
+)
 from imod.typing import GeoDataFrameType, GridDataArray, LineStringType
 from imod.typing.grid import as_ugrid_dataarray, ones_like
 from imod.util.imports import MissingOptionalModule
@@ -976,6 +983,17 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
 
     """
 
+    _init_schemata = {
+        "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
+    }
+
+    _write_schemata = {
+        "geometry": [
+            EmptyIndexesSchema(),
+            GeometryTypeSchema(shapely.Polygon),
+        ],
+    }
+
     @init_log_decorator()
     def __init__(
         self,
@@ -1041,8 +1059,15 @@ class SingleLayerHorizontalFlowBarrierHydraulicCharacteristic(
 
     """
 
+    _init_schemata = {
+        "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
+    }
+
     _write_schemata = {
-        "geometry": [EmptyIndexesSchema()],
+        "geometry": [
+            EmptyIndexesSchema(),
+            GeometryTypeSchema(shapely.LineString),
+        ],
         "layer": [MaxNUniqueValuesSchema(1)],
     }
 
@@ -1111,6 +1136,14 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     >>> hfb = imod.mf6.HorizontalFlowBarrierMultiplier(barrier_gdf)
 
     """
+
+    _init_schemata = {
+        "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
+    }
+
+    _write_schemata = {
+        "geometry": [EmptyIndexesSchema(), GeometryTypeSchema(shapely.Polygon)],
+    }
 
     @init_log_decorator()
     def __init__(
@@ -1182,8 +1215,12 @@ class SingleLayerHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
 
     """
 
+    _init_schemata = {
+        "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
+    }
+
     _write_schemata = {
-        "geometry": [EmptyIndexesSchema()],
+        "geometry": [EmptyIndexesSchema(), GeometryTypeSchema(shapely.LineString)],
         "layer": [MaxNUniqueValuesSchema(1)],
     }
 
@@ -1273,6 +1310,14 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
 
     """
 
+    _init_schemata = {
+        "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
+    }
+
+    _write_schemata = {
+        "geometry": [EmptyIndexesSchema(), GeometryTypeSchema(shapely.Polygon)],
+    }
+
     @init_log_decorator()
     def __init__(
         self,
@@ -1336,8 +1381,12 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
 
     """
 
+    _init_schemata = {
+        "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
+    }
+
     _write_schemata = {
-        "geometry": [EmptyIndexesSchema()],
+        "geometry": [EmptyIndexesSchema(), GeometryTypeSchema(shapely.LineString)],
         "layer": [MaxNUniqueValuesSchema(1)],
     }
 

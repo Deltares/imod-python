@@ -34,7 +34,17 @@ validation xarray library becomes.
 import abc
 import operator
 from functools import partial
-from typing import Any, Callable, Dict, Optional, Sequence, Tuple, TypeAlias, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Optional,
+    Sequence,
+    Tuple,
+    TypeAlias,
+    Union,
+)
 
 import numpy as np
 import scipy
@@ -43,6 +53,15 @@ import xugrid as xu
 from numpy.typing import DTypeLike  # noqa: F401
 
 from imod.typing import GridDataArray, ScalarAsDataArray
+from imod.util.imports import MissingOptionalModule
+
+if TYPE_CHECKING:
+    import geopandas as gpd
+else:
+    try:
+        import geopandas as gpd
+    except ImportError:
+        gpd = MissingOptionalModule("geopandas")
 
 DimsT = Union[str, None]
 ShapeT = Tuple[Union[int, None]]
@@ -173,6 +192,14 @@ class OptionSchema(BaseSchema):
 
 class DTypeSchema(BaseSchema):
     def __init__(self, dtype: DTypeLike) -> None:
+        """
+        Validate dtype
+
+        Parameters
+        ----------
+        dtype : Any
+            Dtype of the DataArray.
+        """
         if dtype in [
             np.floating,
             np.integer,
@@ -185,19 +212,35 @@ class DTypeSchema(BaseSchema):
             self.dtype = np.dtype(dtype)
 
     def validate(self, obj: GridDataArray, **kwargs) -> None:
+        if scalar_None(obj):
+            return
+
+        if not np.issubdtype(obj.dtype, self.dtype):
+            raise ValidationError(f"dtype {obj.dtype} != {self.dtype}")
+
+
+class GeometryTypeSchema(BaseSchema):
+    def __init__(self, dtype: DTypeLike) -> None:
         """
-        Validate dtype
+        Validate geometry types
 
         Parameters
         ----------
         dtype : Any
             Dtype of the DataArray.
         """
-        if scalar_None(obj):
-            return
+        self.dtype = dtype
 
-        if not np.issubdtype(obj.dtype, self.dtype):
-            raise ValidationError(f"dtype {obj.dtype} != {self.dtype}")
+    def validate(self, obj: GridDataArray, **kwargs) -> None:
+        is_geometry_type = [isinstance(i, self.dtype) for i in obj.data.ravel()]
+        if not all(is_geometry_type):
+            is_wrong_type = ~np.array(is_geometry_type)
+            wrong_type_index = np.argwhere(is_wrong_type).ravel()
+            wrong_types = [o.type for o in obj.data.ravel()[is_wrong_type]]
+            raise ValidationError(
+                f"Geometry not of expected type '{self.dtype}'. "
+                f"Got wrong types for geometry number {wrong_type_index}, namely {wrong_types}"
+            )
 
 
 class DimsSchema(BaseSchema):

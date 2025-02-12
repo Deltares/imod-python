@@ -473,7 +473,7 @@ def test_to_mf6_layered_hfb(mf6_flow_barrier_mock, basic_dis, layer, expected_va
     assert_array_equal(barrier_layer, expected_layer)
 
 
-def test_to_mf6_layered_hfb__error():
+def test_to_mf6_layered_hfb__error_non_unique_layer():
     """Throws error because multiple layers attached to one object."""
     # Arrange.
     print_input = False
@@ -488,6 +488,34 @@ def test_to_mf6_layered_hfb__error():
         data={
             "resistance": [1e3, 1e3],
             "layer": [1, 2],
+        },
+    )
+
+    hfb = SingleLayerHorizontalFlowBarrierResistance(geometry, print_input)
+    errors = hfb._validate(hfb._write_schemata)
+
+    assert len(errors) > 0
+
+
+def test_to_mf6_layered_hfb__error_geometry_type():
+    """Throws error because wrong geometry type in object."""
+    # Arrange.
+    print_input = False
+
+    barrier_ztop = [0.0, 0.0]
+    barrier_zbottom = [-100.0, -100.0]
+    barrier_y = [5.5, 5.5, 5.5]
+    barrier_x = [82.0, 40.0, 0.0]
+
+    polygons = linestring_to_square_zpolygons(
+        barrier_x, barrier_y, barrier_ztop, barrier_zbottom
+    )
+
+    geometry = gpd.GeoDataFrame(
+        geometry=polygons,
+        data={
+            "resistance": [1e3, 1e3],
+            "layer": [1, 1],
         },
     )
 
