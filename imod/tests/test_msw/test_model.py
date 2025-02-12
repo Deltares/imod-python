@@ -9,6 +9,7 @@ from pytest_cases import parametrize_with_cases
 from imod import mf6, msw
 from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.msw.model import DEFAULT_SETTINGS
+from imod.msw.utilities.parse import read_para_sim
 from imod.typing import GridDataArray, Imod5DataDict
 
 
@@ -20,6 +21,33 @@ def test_msw_model_write(msw_model, coupled_mf6_model, coupled_mf6wel, tmp_path)
 
     assert len(list(output_dir.rglob(r"*.inp"))) == 16
     assert len(list(output_dir.rglob(r"*.asc"))) == 4
+
+
+def test_msw_model_write_settings_roundtrip(msw_model, tmp_path):
+    # Arrange
+    output_dir = tmp_path / "metaswap"
+    output_dir.mkdir()
+    keys_to_drop = [
+        "iybg",
+        "tdbg",
+        "simgro_opt",
+        "idf_per",
+        "idf_dx",
+        "idf_dy",
+        "idf_ncol",
+        "idf_nrow",
+        "idf_xmin",
+        "idf_ymin",
+        "idf_nodata",
+    ]
+    # Act
+    msw_model._write_simulation_settings(output_dir)
+    # Assert
+    parasim_settings = read_para_sim(output_dir / "para_sim.inp")
+    for key in keys_to_drop:
+        parasim_settings.pop(key)
+
+    assert msw_model.simulation_settings == parasim_settings
 
 
 def test_get_starttime(msw_model):
