@@ -21,6 +21,10 @@ def zeros_grid():
 
 @pytest.fixture(scope="function")
 def cap_data_sprinkling_grid() -> Imod5DataDict:
+    boundary = zeros_grid() + 1
+    wetted_area = zeros_grid() + 0.5
+    urban_area = zeros_grid() + 0.25
+
     artificial_rch_type = zeros_grid()
     artificial_rch_type[:, 1] = 1
     artificial_rch_type[:, 2] = 2
@@ -28,6 +32,9 @@ def cap_data_sprinkling_grid() -> Imod5DataDict:
     layer[:, 1] = 2
 
     cap_data = {
+        "boundary": boundary,
+        "wetted_area": wetted_area,
+        "urban_area": urban_area,
         "artificial_recharge": artificial_rch_type,
         "artificial_recharge_layer": layer,
         "artificial_recharge_capacity": xr.DataArray(25.0),
@@ -38,6 +45,10 @@ def cap_data_sprinkling_grid() -> Imod5DataDict:
 
 @pytest.fixture(scope="function")
 def cap_data_sprinkling_grid_with_layer() -> Imod5DataDict:
+    boundary = zeros_grid() + 1
+    wetted_area = zeros_grid() + 0.5
+    urban_area = zeros_grid() + 0.25
+
     artificial_rch_type = zeros_grid()
     artificial_rch_type[:, 1] = 1
     artificial_rch_type[:, 2] = 2
@@ -45,6 +56,9 @@ def cap_data_sprinkling_grid_with_layer() -> Imod5DataDict:
     layer[:, 1] = 2
 
     cap_data = {
+        "boundary": boundary.expand_dims("layer"),
+        "wetted_area": wetted_area.expand_dims("layer"),
+        "urban_area": urban_area.expand_dims("layer"),
         "artificial_recharge": artificial_rch_type.expand_dims("layer"),
         "artificial_recharge_layer": layer.expand_dims("layer"),
         "artificial_recharge_capacity": xr.DataArray(25.0),
@@ -55,6 +69,10 @@ def cap_data_sprinkling_grid_with_layer() -> Imod5DataDict:
 
 @pytest.fixture(scope="function")
 def cap_data_sprinkling_points() -> Imod5DataDict:
+    boundary = zeros_grid() + 1
+    wetted_area = zeros_grid() + 0.5
+    urban_area = zeros_grid() + 0.25
+
     artificial_rch_type = zeros_grid()
     artificial_rch_type[:, 1] = 3000
     artificial_rch_type[:, 2] = 4000
@@ -69,6 +87,9 @@ def cap_data_sprinkling_points() -> Imod5DataDict:
 
     layer = pd.DataFrame(data=data)
     cap_data = {
+        "boundary": boundary,
+        "wetted_area": wetted_area,
+        "urban_area": urban_area,
         "artificial_recharge": artificial_rch_type,
         "artificial_recharge_layer": layer,
         "artificial_recharge_capacity": xr.DataArray(25.0),
