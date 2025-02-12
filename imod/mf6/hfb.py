@@ -54,11 +54,17 @@ else:
 
 if TYPE_CHECKING:
     import shapely
+    _POLYGON = shapely.geometry.Polygon
+    _LINESTRING = shapely.geometry.LineString
 else:
     try:
         import shapely
+        _POLYGON = shapely.geometry.Polygon
+        _LINESTRING = shapely.geometry.LineString
     except ImportError:
         shapely = MissingOptionalModule("shapely")
+        _POLYGON = ""
+        _LINESTRING = ""
 
 NO_BARRIER_MSG = textwrap.dedent(
     """
@@ -990,7 +996,7 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
     _write_schemata = {
         "geometry": [
             EmptyIndexesSchema(),
-            GeometryTypeSchema(shapely.Polygon),
+            GeometryTypeSchema(_POLYGON),
         ],
     }
 
@@ -1066,7 +1072,7 @@ class SingleLayerHorizontalFlowBarrierHydraulicCharacteristic(
     _write_schemata = {
         "geometry": [
             EmptyIndexesSchema(),
-            GeometryTypeSchema(shapely.LineString),
+            GeometryTypeSchema(_LINESTRING),
         ],
         "layer": [MaxNUniqueValuesSchema(1)],
     }
@@ -1142,7 +1148,7 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     }
 
     _write_schemata = {
-        "geometry": [EmptyIndexesSchema(), GeometryTypeSchema(shapely.Polygon)],
+        "geometry": [EmptyIndexesSchema(), GeometryTypeSchema(_POLYGON)],
     }
 
     @init_log_decorator()
@@ -1220,7 +1226,7 @@ class SingleLayerHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     }
 
     _write_schemata = {
-        "geometry": [EmptyIndexesSchema(), GeometryTypeSchema(shapely.LineString)],
+        "geometry": [EmptyIndexesSchema(), GeometryTypeSchema(_LINESTRING)],
         "layer": [MaxNUniqueValuesSchema(1)],
     }
 
@@ -1315,7 +1321,7 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     }
 
     _write_schemata = {
-        "geometry": [EmptyIndexesSchema(), GeometryTypeSchema(shapely.Polygon)],
+        "geometry": [EmptyIndexesSchema(), GeometryTypeSchema(_POLYGON)],
     }
 
     @init_log_decorator()
@@ -1386,7 +1392,7 @@ class SingleLayerHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     }
 
     _write_schemata = {
-        "geometry": [EmptyIndexesSchema(), GeometryTypeSchema(shapely.LineString)],
+        "geometry": [EmptyIndexesSchema(), GeometryTypeSchema(_LINESTRING)],
         "layer": [MaxNUniqueValuesSchema(1)],
     }
 
