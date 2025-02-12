@@ -137,7 +137,7 @@ class MetaSwapModel(Model):
             # TODO: Test if this is how MetaSWAP accepts relative paths
             return f'"${unsaturated_database}\\"'
 
-    def _check_required_packages(self):
+    def _check_required_packages(self) -> None:
         pkg_types_included = {type(pkg) for pkg in self.values()}
         missing_packages = set(REQUIRED_PACKAGES) - pkg_types_included
         if len(missing_packages) > 0:
@@ -193,6 +193,10 @@ class MetaSwapModel(Model):
                 f"which were not in AnnualCropGrowth: {missing_indices}"
             )
 
+    def has_file_copier(self) -> bool:
+        pkg_types_included = {type(pkg) for pkg in self.values()}
+        return FileCopier in pkg_types_included
+
     def _get_starttime(self):
         """
         Loop over all packages to get the minimum time.
@@ -224,6 +228,12 @@ class MetaSwapModel(Model):
         if not optional_package:
             raise KeyError(f"Could not find package of type: {pkg_type}")
 
+    def _model_checks(self, validate: bool):
+        if validate and not self.has_file_copier():
+            self._check_required_packages()
+            self._check_vegetation_indices_in_annual_crop_factors()
+            self._check_landuse_indices_in_lookup_options()
+
     def write(
         self,
         directory: Union[str, Path],
@@ -241,10 +251,7 @@ class MetaSwapModel(Model):
         """
 
         # Model checks
-        if validate:
-            self._check_required_packages()
-            self._check_vegetation_indices_in_annual_crop_factors()
-            self._check_landuse_indices_in_lookup_options()
+        self._model_checks(validate)
 
         # Force to Path
         directory = Path(directory)
