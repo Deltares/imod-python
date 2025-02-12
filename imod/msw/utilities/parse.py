@@ -23,6 +23,23 @@ def _try_parsing_string_to_number(s: str) -> ScalarType:
     return s
 
 
+def correct_unsa_svat_path(unsa_path: Path | str) -> str:
+    """
+    Correct the path to the UNSA SVAT executable in the parameter file. Drop any
+    quotes and trailing backslashes, and replace any dollar signs. These could
+    have been added by ``MetaSwapModel._render_unsaturated_database_path``.
+    """
+    unsa_path = unsa_path.replace('"', "")
+
+    if unsa_path.endswith("\\"):
+        unsa_path = unsa_path[:-1]
+
+    if unsa_path.startswith("$"):
+        unsa_path = unsa_path.replace("$", "./")
+
+    return unsa_path
+
+
 def read_para_sim(file: Path | str) -> dict[str, ScalarType]:
     with open(file, "r") as f:
         lines = f.readlines()
@@ -35,4 +52,7 @@ def read_para_sim(file: Path | str) -> dict[str, ScalarType]:
                 key = key_values[0].strip()
                 value = _try_parsing_string_to_number(key_values[1].strip())
                 out[key] = value
+
+    out["unsa_svat_path"] = correct_unsa_svat_path(out["unsa_svat_path"])
+
     return out
