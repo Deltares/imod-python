@@ -139,7 +139,8 @@ class MetaSwapModel(Model):
 
     def _check_required_packages(self) -> None:
         pkg_types_included = {type(pkg) for pkg in self.values()}
-        missing_packages = set(REQUIRED_PACKAGES) - pkg_types_included
+        required_packages_set = cast(set[type[Any]], set(REQUIRED_PACKAGES))
+        missing_packages = required_packages_set - pkg_types_included
         if len(missing_packages) > 0:
             raise ValueError(
                 f"Missing the following required packages: {missing_packages}"
