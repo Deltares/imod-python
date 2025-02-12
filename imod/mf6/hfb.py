@@ -54,11 +54,13 @@ else:
 
 if TYPE_CHECKING:
     import shapely
+
     _POLYGON = shapely.geometry.Polygon
     _LINESTRING = shapely.geometry.LineString
 else:
     try:
         import shapely
+
         _POLYGON = shapely.geometry.Polygon
         _LINESTRING = shapely.geometry.LineString
     except ImportError:
