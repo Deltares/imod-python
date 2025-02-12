@@ -44,6 +44,11 @@ Changed
   ``minimum_thickness`` and ``minimum_k`` set to 0.0. 
 - When intitating a MODFLOW6 package with a ``layer`` coordinate with 
   values <= 0, iMOD Python will throw an error.
+- :class:`imod.mf6.HorizontalFlowBarrierResistance`,
+  :class:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance` and other HFB now
+  validate whether proper type of geometry is provided, respectively Polygon for
+  :class:`imod.mf6.HorizontalFlowBarrierResistance`, and LineString for
+  :class:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance`.
 
 Fixed
 ~~~~~
