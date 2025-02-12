@@ -34,9 +34,9 @@ from imod.msw.utilities.common import find_in_file_list
 from imod.msw.utilities.imod5_converter import has_active_scaling_factor
 from imod.msw.utilities.mask import MaskValues, mask_and_broadcast_cap_data
 from imod.msw.utilities.parse import read_para_sim
-from imod.msw.utilities.select import drop_layer_dim_cap_data
 from imod.msw.vegetation import AnnualCropFactors
 from imod.typing import Imod5DataDict
+from imod.util.dims import drop_layer_dim_cap_data
 from imod.util.regrid_method_type import RegridderType
 
 REQUIRED_PACKAGES = (

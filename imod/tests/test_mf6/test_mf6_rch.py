@@ -463,7 +463,7 @@ def test_from_imod5_cap_data(imod5_dataset):
     data = deepcopy(imod5_dataset[0])
     target_discretization = StructuredDiscretization.from_imod5_data(data)
     data["cap"] = {}
-    msw_bound = data["bnd"]["ibound"].isel(layer=0, drop=True)
+    msw_bound = data["bnd"]["ibound"].isel(layer=0, drop=False)
     data["cap"]["boundary"] = msw_bound
     data["cap"]["wetted_area"] = xr.ones_like(msw_bound) * 100
     data["cap"]["urban_area"] = xr.ones_like(msw_bound) * 200

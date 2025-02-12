@@ -6,8 +6,9 @@ import xarray as xr
 
 from imod.mf6.package import Package
 from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
-from imod.typing import GridDataDict, Imod5DataDict, SelSettingsType
+from imod.typing import GridDataDict, Imod5DataDict
 from imod.typing.grid import full_like
+from imod.util.dims import drop_layer_dim_cap_data
 from imod.util.regrid_method_type import RegridMethodType
 
 
@@ -62,21 +63,11 @@ def _well_from_imod5_cap_point_data(cap_data: GridDataDict) -> dict[str, np.ndar
 
 
 def _well_from_imod5_cap_grid_data(cap_data: GridDataDict) -> dict[str, np.ndarray]:
-    drop_layer_kwargs: SelSettingsType = {
-        "layer": 0,
-        "drop": True,
-        "missing_dims": "ignore",
-    }
-    type = cap_data["artificial_recharge"].isel(**drop_layer_kwargs).compute()
-    layer = (
-        cap_data["artificial_recharge_layer"]
-        .isel(**drop_layer_kwargs)
-        .astype(int)
-        .compute()
-    )
+    artificial_rch_type = cap_data["artificial_recharge"]
+    layer = cap_data["artificial_recharge_layer"].astype(int)
 
-    from_groundwater = (type != 0).to_numpy()
-    coords = type.coords
+    from_groundwater = (artificial_rch_type != 0).to_numpy()
+    coords = artificial_rch_type.coords
     x_grid, y_grid = np.meshgrid(coords["x"].to_numpy(), coords["y"].to_numpy())
 
     data = {}
@@ -115,7 +106,7 @@ def well_from_imod5_cap_data(imod5_data: Imod5DataDict) -> dict[str, np.ndarray]
         capacity is already defined in the point data. This is an ``n:1``
         mapping: multiple grid cells can map to one well.
     """
-    cap_data = cast(GridDataDict, imod5_data["cap"])
+    cap_data = cast(GridDataDict, drop_layer_dim_cap_data(imod5_data)["cap"])
 
     if isinstance(cap_data["artificial_recharge_layer"], pd.DataFrame):
         return _well_from_imod5_cap_point_data(cap_data)
