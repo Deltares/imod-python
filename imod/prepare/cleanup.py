@@ -339,7 +339,9 @@ def cleanup_wel(
     return cleaned_wells
 
 
-def cleanup_hfb(barrier: GeoDataFrameType, idomain_2d: GridDataArray) -> GeoDataFrameType:
+def cleanup_hfb(
+    barrier: GeoDataFrameType, idomain_2d: GridDataArray
+) -> GeoDataFrameType:
     """
     Clean up HFB data, fixes some common mistakes causing ValidationErrors by
     doing the following:
@@ -359,7 +361,9 @@ def cleanup_hfb(barrier: GeoDataFrameType, idomain_2d: GridDataArray) -> GeoData
         Cleaned up GeoDataFrame with HFB data.
     """
     if idomain_2d.dims != ("y", "x"):
-        raise ValueError(f'Dimensions must be ("y", "x"), instead got {idomain_2d.dims}')
+        raise ValueError(
+            f'Dimensions must be ("y", "x"), instead got {idomain_2d.dims}'
+        )
 
     active = idomain_2d > 0
     # Drop HFB cells outside active domain

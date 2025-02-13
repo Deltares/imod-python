@@ -1,14 +1,20 @@
 from typing import Callable
 
 import geopandas as gpd
-from shapely import linestrings
 import numpy as np
 import pandas as pd
 import pytest
 import xugrid as xu
 from pytest_cases import parametrize, parametrize_with_cases
+from shapely import linestrings
 
-from imod.prepare.cleanup import cleanup_drn, cleanup_ghb, cleanup_riv, cleanup_wel, cleanup_hfb
+from imod.prepare.cleanup import (
+    cleanup_drn,
+    cleanup_ghb,
+    cleanup_hfb,
+    cleanup_riv,
+    cleanup_wel,
+)
 from imod.tests.test_mf6.test_mf6_riv import DisCases, RivDisCases
 from imod.typing import GridDataArray
 
@@ -290,9 +296,8 @@ def test_cleanup_hfb(dis_data: dict):
     # Act
     with pytest.raises(ValueError):
         cleanup_hfb(geometry, idomain)
-    
+
     clipped_geometry = cleanup_hfb(geometry, idomain.isel(layer=0))
 
     # Assert
     np.testing.assert_allclose(clipped_geometry.bounds.maxy, y_max)
-

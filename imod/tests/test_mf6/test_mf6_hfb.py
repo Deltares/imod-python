@@ -1075,7 +1075,7 @@ def test_cleanup(structured_flow_model, hfb_case, expected_y):
     y = dis["idomain"].coords["y"]
     layer = dis["idomain"].coords["layer"]
     set_to_zero = (y <= y_max) & (layer == 1)
-    dis["idomain"] = dis["idomain"].where(set_to_zero, 0) 
+    dis["idomain"] = dis["idomain"].where(set_to_zero, 0)
 
     # Act
     hfb.cleanup(dis)
