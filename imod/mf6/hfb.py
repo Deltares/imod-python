@@ -16,6 +16,8 @@ from fastcore.dispatch import typedispatch
 
 from imod.logging import LogLevel, init_log_decorator, logger
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
@@ -23,6 +25,7 @@ from imod.mf6.utilities.clip import (
     bounding_polygon_from_line_data_and_clip_box,
     clip_line_gdf_by_bounding_polygon,
     clip_line_gdf_by_grid,
+    clip_by_grid,
 )
 from imod.mf6.utilities.grid import broadcast_to_full_domain
 from imod.mf6.utilities.hfb import (
@@ -866,12 +869,37 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             )
         return new
 
-    def mask(self, _) -> Package:
+    def cleanup(self, dis: StructuredDiscretization | VerticesDiscretization) -> None:
         """
-        The mask method is irrelevant for this package as it is
-        grid-agnostic, instead this method retuns a copy of itself.
+        Cleanup the package inplace by removing barriers that fall outside of
+        the active model domain.
+
+        Parameters
+        ----------
+        dis: StructuredDiscretization | VerticesDiscretication
+            Model discretization package.
+
         """
-        return deepcopy(self)
+        active = dis["idomain"] > 0
+        clipped_line_data = clip_line_gdf_by_grid(self.line_data, active)
+        self.line_data = clipped_line_data
+
+    def mask(self, mask) -> Package:
+        """
+        Remove line segments outside of active domain.
+
+        Parameters
+        ----------
+        mask: xr.DataArray, xu.UgridDataArray of ints
+            idomain-like integer array. >0 sets cells to active, 0 sets cells to inactive,
+            <0 sets cells to vertical passthrough
+
+        Returns
+        -------
+        masked: Package
+            The package with part masked.
+        """
+        return clip_by_grid(self, mask)
 
     def _snap_to_grid(
         self, idomain: GridDataArray
