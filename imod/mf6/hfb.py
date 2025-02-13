@@ -23,14 +23,8 @@ from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
 from imod.mf6.utilities.clip import (
     bounding_polygon_from_line_data_and_clip_box,
-    clip_by_grid,
 )
 from imod.mf6.utilities.grid import broadcast_to_full_domain
-from imod.util.hfb import (
-    _create_zlinestring_from_bound_df,
-    _extract_hfb_bounds_from_zpolygons,
-    _prepare_index_names,
-)
 from imod.mf6.validation_context import ValidationContext
 from imod.prepare.cleanup import cleanup_hfb
 from imod.prepare.hfb import clip_line_gdf_by_bounding_polygon, clip_line_gdf_by_grid
@@ -44,6 +38,11 @@ from imod.schemata import (
 )
 from imod.typing import GeoDataFrameType, GridDataArray, LineStringType
 from imod.typing.grid import as_ugrid_dataarray, ones_like
+from imod.util.hfb import (
+    _create_zlinestring_from_bound_df,
+    _extract_hfb_bounds_from_zpolygons,
+    _prepare_index_names,
+)
 from imod.util.imports import MissingOptionalModule
 
 if TYPE_CHECKING:

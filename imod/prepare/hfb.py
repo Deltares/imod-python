@@ -1,12 +1,12 @@
 from itertools import pairwise
 from typing import TYPE_CHECKING, List, Tuple
 
+from imod.typing import GeoDataFrameType, GridDataArray, PolygonType
+from imod.typing.grid import bounding_polygon
 from imod.util.hfb import (
     clipped_hfb_zlinestrings_to_zpolygons,
     hfb_zpolygons_to_zlinestrings,
 )
-from imod.typing import GeoDataFrameType, GridDataArray, PolygonType
-from imod.typing.grid import bounding_polygon
 from imod.util.imports import MissingOptionalModule
 
 if TYPE_CHECKING:
