@@ -1,7 +1,12 @@
 from itertools import pairwise
 from typing import TYPE_CHECKING, List, Tuple
 
-from imod.typing import PolygonType
+from imod.mf6.utilities.hfb import (
+    clipped_hfb_zlinestrings_to_zpolygons,
+    hfb_zpolygons_to_zlinestrings,
+)
+from imod.typing import GeoDataFrameType, GridDataArray, PolygonType
+from imod.typing.grid import bounding_polygon
 from imod.util.imports import MissingOptionalModule
 
 if TYPE_CHECKING:
@@ -217,3 +222,55 @@ def linestring_to_trapezoid_zpolygons(
         _line_to_trapezoid_zpolygon(x, y, zt, zb)
         for x, y, zt, zb in zip(x_pairs, y_pairs, zt_pairs, zb_pairs)
     ]
+
+
+def _clip_linestring(
+    gdf_linestrings: GeoDataFrameType, bounding_gdf: GeoDataFrameType
+) -> GeoDataFrameType:
+    clipped_line_data = gdf_linestrings.clip(bounding_gdf)
+
+    # Catch edge case: when line crosses only vertex of polygon, a point
+    # or multipoint is returned. Drop these.
+    type_ids = shapely.get_type_id(clipped_line_data.geometry)
+    is_points = (type_ids == shapely.GeometryType.POINT) | (
+        type_ids == shapely.GeometryType.MULTIPOINT
+    )
+    clipped_line_data = clipped_line_data[~is_points]
+
+    if clipped_line_data.index.shape[0] == 0:
+        # Shortcut if GeoDataFrame is empty
+        return clipped_line_data
+
+    # Convert MultiLineStrings to LineStrings, index parts of MultiLineStrings
+    clipped_line_data = clipped_line_data.explode(
+        "geometry", ignore_index=False, index_parts=True
+    )
+    if clipped_line_data.index.nlevels == 3:
+        index_names = ["bound", "index", "parts"]
+    else:
+        index_names = ["index", "parts"]
+    clipped_line_data.index = clipped_line_data.index.set_names(index_names)
+    return clipped_line_data
+
+
+def clip_line_gdf_by_bounding_polygon(
+    gdf: GeoDataFrameType, bounding_gdf: GeoDataFrameType
+) -> GeoDataFrameType:
+    if (shapely.get_type_id(gdf.geometry) == shapely.GeometryType.POLYGON).any():
+        # Shapely returns z linestrings when clipping our vertical z polygons.
+        # To work around this convert polygons to zlinestrings to clip.
+        # Consequently construct polygons from these clipped linestrings.
+        gdf_linestrings = hfb_zpolygons_to_zlinestrings(gdf)
+        clipped_linestrings = _clip_linestring(gdf_linestrings, bounding_gdf)
+        return clipped_hfb_zlinestrings_to_zpolygons(clipped_linestrings)
+    else:
+        return _clip_linestring(gdf, bounding_gdf)
+
+
+def clip_line_gdf_by_grid(
+    gdf: GeoDataFrameType, active: GridDataArray
+) -> GeoDataFrameType:
+    """Clip GeoDataFrame by bounding polygon of grid"""
+    # Clip line with polygon
+    bounding_gdf = bounding_polygon(active)
+    return clip_line_gdf_by_bounding_polygon(gdf, bounding_gdf)

@@ -24,8 +24,6 @@ from imod.mf6.package import Package
 from imod.mf6.utilities.clip import (
     bounding_polygon_from_line_data_and_clip_box,
     clip_by_grid,
-    clip_line_gdf_by_bounding_polygon,
-    clip_line_gdf_by_grid,
 )
 from imod.mf6.utilities.grid import broadcast_to_full_domain
 from imod.mf6.utilities.hfb import (
@@ -35,6 +33,7 @@ from imod.mf6.utilities.hfb import (
 )
 from imod.mf6.validation_context import ValidationContext
 from imod.prepare.cleanup import cleanup_hfb
+from imod.prepare.hfb import clip_line_gdf_by_bounding_polygon, clip_line_gdf_by_grid
 from imod.schemata import (
     DimsSchema,
     DTypeSchema,

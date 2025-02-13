@@ -13,12 +13,9 @@ from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.interfaces.ipackagebase import IPackageBase
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.utilities.grid import get_active_domain_slice
-from imod.mf6.utilities.hfb import (
-    clipped_hfb_zlinestrings_to_zpolygons,
-    hfb_zpolygons_to_zlinestrings,
-)
+from imod.prepare.hfb import clip_line_gdf_by_grid
 from imod.typing import GeoDataFrameType, GridDataArray
-from imod.typing.grid import bounding_polygon, is_spatial_grid
+from imod.typing.grid import is_spatial_grid
 from imod.util.imports import MissingOptionalModule
 
 if TYPE_CHECKING:
@@ -113,58 +110,6 @@ def clip_by_grid(package: ILineDataPackage, active: GridDataArray) -> ILineDataP
     clipped_package = deepcopy(package)
     clipped_package.line_data = clipped_line_data
     return clipped_package
-
-
-def _clip_linestring(
-    gdf_linestrings: GeoDataFrameType, bounding_gdf: GeoDataFrameType
-) -> GeoDataFrameType:
-    clipped_line_data = gdf_linestrings.clip(bounding_gdf)
-
-    # Catch edge case: when line crosses only vertex of polygon, a point
-    # or multipoint is returned. Drop these.
-    type_ids = shapely.get_type_id(clipped_line_data.geometry)
-    is_points = (type_ids == shapely.GeometryType.POINT) | (
-        type_ids == shapely.GeometryType.MULTIPOINT
-    )
-    clipped_line_data = clipped_line_data[~is_points]
-
-    if clipped_line_data.index.shape[0] == 0:
-        # Shortcut if GeoDataFrame is empty
-        return clipped_line_data
-
-    # Convert MultiLineStrings to LineStrings, index parts of MultiLineStrings
-    clipped_line_data = clipped_line_data.explode(
-        "geometry", ignore_index=False, index_parts=True
-    )
-    if clipped_line_data.index.nlevels == 3:
-        index_names = ["bound", "index", "parts"]
-    else:
-        index_names = ["index", "parts"]
-    clipped_line_data.index = clipped_line_data.index.set_names(index_names)
-    return clipped_line_data
-
-
-def clip_line_gdf_by_bounding_polygon(
-    gdf: GeoDataFrameType, bounding_gdf: GeoDataFrameType
-) -> GeoDataFrameType:
-    if (shapely.get_type_id(gdf.geometry) == shapely.GeometryType.POLYGON).any():
-        # Shapely returns z linestrings when clipping our vertical z polygons.
-        # To work around this convert polygons to zlinestrings to clip.
-        # Consequently construct polygons from these clipped linestrings.
-        gdf_linestrings = hfb_zpolygons_to_zlinestrings(gdf)
-        clipped_linestrings = _clip_linestring(gdf_linestrings, bounding_gdf)
-        return clipped_hfb_zlinestrings_to_zpolygons(clipped_linestrings)
-    else:
-        return _clip_linestring(gdf, bounding_gdf)
-
-
-def clip_line_gdf_by_grid(
-    gdf: GeoDataFrameType, active: GridDataArray
-) -> GeoDataFrameType:
-    """Clip GeoDataFrame by bounding polygon of grid"""
-    # Clip line with polygon
-    bounding_gdf = bounding_polygon(active)
-    return clip_line_gdf_by_bounding_polygon(gdf, bounding_gdf)
 
 
 def bounding_polygon_from_line_data_and_clip_box(
