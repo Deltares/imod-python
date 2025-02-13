@@ -1,7 +1,7 @@
 """Cleanup utilities"""
 
 from enum import Enum
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 import pandas as pd
 import xarray as xr
@@ -10,16 +10,7 @@ from imod.mf6.utilities.mask import mask_arrays
 from imod.prepare.hfb import clip_line_gdf_by_grid
 from imod.prepare.wells import locate_wells, validate_well_columnnames
 from imod.schemata import scalar_None
-from imod.typing import GridDataArray
-from imod.util.imports import MissingOptionalModule
-
-if TYPE_CHECKING:
-    import geopandas as gpd
-else:
-    try:
-        import geopandas as gpd
-    except ImportError:
-        gpd = MissingOptionalModule("geopandas")
+from imod.typing import GeoDataFrameType, GridDataArray
 
 
 class AlignLevelsMode(Enum):
@@ -348,7 +339,7 @@ def cleanup_wel(
     return cleaned_wells
 
 
-def cleanup_hfb(barrier: gpd.GeoDataFrame, idomain: GridDataArray) -> gpd.GeoDataFrame:
+def cleanup_hfb(barrier: GeoDataFrameType, idomain: GridDataArray) -> GeoDataFrameType:
     """
     Clean up HFB data, fixes some common mistakes causing ValidationErrors by
     doing the following:
