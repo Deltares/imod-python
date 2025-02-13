@@ -879,7 +879,18 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             Model discretization package.
 
         """
-        clipped_line_data = cleanup_hfb(barrier=self.line_data, idomain=dis["idomain"])
+        idomain = dis["idomain"]
+
+        is_layered_hfb = "layer" in self._get_vertical_variables()
+        if is_layered_hfb:
+            # Assume all barriers in same layer, is a requirement of SingleLayer
+            # classes which is validated.
+            layer_nr = self.dataset["layer"].data.ravel()[0]
+            idomain_2d = idomain.sel(layer=layer_nr, drop=True)
+        else:
+            idomain_2d = idomain.max(dim="layer")
+
+        clipped_line_data = cleanup_hfb(barrier=self.line_data, idomain_2d=idomain_2d)
         self.line_data = clipped_line_data
 
     def mask(self, _) -> Package:

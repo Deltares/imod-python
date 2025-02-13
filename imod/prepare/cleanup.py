@@ -339,7 +339,7 @@ def cleanup_wel(
     return cleaned_wells
 
 
-def cleanup_hfb(barrier: GeoDataFrameType, idomain: GridDataArray) -> GeoDataFrameType:
+def cleanup_hfb(barrier: GeoDataFrameType, idomain_2d: GridDataArray) -> GeoDataFrameType:
     """
     Clean up HFB data, fixes some common mistakes causing ValidationErrors by
     doing the following:
@@ -350,15 +350,18 @@ def cleanup_hfb(barrier: GeoDataFrameType, idomain: GridDataArray) -> GeoDataFra
     ----------
     barrier: geopandas.GeoDataFrame
         GeoDataFrame with HFB data
-    idomain: xarray.DataArray | xugrid.UgridDataArray
-        MODFLOW 6 model domain. idomain==1 is considered active domain.
+    idomain_2d: xarray.DataArray | xugrid.UgridDataArray
+        MODFLOW 6 model domain of a single layer. idomain==1 is considered active domain.
 
     Returns
     -------
     geopandas.GeoDataFrame
         Cleaned up GeoDataFrame with HFB data.
     """
-    active = idomain > 0
+    if idomain_2d.dims != ("y", "x"):
+        raise ValueError(f'Dimensions must be ("y", "x"), instead got {idomain_2d.dims}')
+
+    active = idomain_2d > 0
     # Drop HFB cells outside active domain
     clipped_barrier = clip_line_gdf_by_grid(barrier, active)
     return clipped_barrier
