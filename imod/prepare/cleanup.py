@@ -1,15 +1,25 @@
 """Cleanup utilities"""
 
 from enum import Enum
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 import pandas as pd
 import xarray as xr
 
+from imod.mf6.utilities.clip import clip_line_gdf_by_grid
 from imod.mf6.utilities.mask import mask_arrays
 from imod.prepare.wells import locate_wells, validate_well_columnnames
 from imod.schemata import scalar_None
 from imod.typing import GridDataArray
+from imod.util.imports import MissingOptionalModule
+
+if TYPE_CHECKING:
+    import geopandas as gpd
+else:
+    try:
+        import geopandas as gpd
+    except ImportError:
+        gpd = MissingOptionalModule("geopandas")
 
 
 class AlignLevelsMode(Enum):
@@ -336,3 +346,28 @@ def cleanup_wel(
         cleaned_wells, minimum_thickness
     )
     return cleaned_wells
+
+
+def cleanup_hfb(barrier: gpd.GeoDataFrame, idomain: GridDataArray) -> gpd.GeoDataFrame:
+    """
+    Clean up HFB data, fixes some common mistakes causing ValidationErrors by
+    doing the following:
+
+    - Drop HFB segments outside active domain (idomain==1)
+
+    Parameters
+    ----------
+    barrier: geopandas.GeoDataFrame
+        GeoDataFrame with HFB data
+    idomain: xarray.DataArray | xugrid.UgridDataArray
+        MODFLOW 6 model domain. idomain==1 is considered active domain.
+
+    Returns
+    -------
+    geopandas.GeoDataFrame
+        Cleaned up GeoDataFrame with HFB data.
+    """
+    active = idomain > 0
+    # Drop HFB cells outside active domain
+    clipped_barrier = clip_line_gdf_by_grid(barrier, active)
+    return clipped_barrier

@@ -23,9 +23,9 @@ from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
 from imod.mf6.utilities.clip import (
     bounding_polygon_from_line_data_and_clip_box,
+    clip_by_grid,
     clip_line_gdf_by_bounding_polygon,
     clip_line_gdf_by_grid,
-    clip_by_grid,
 )
 from imod.mf6.utilities.grid import broadcast_to_full_domain
 from imod.mf6.utilities.hfb import (
@@ -34,6 +34,7 @@ from imod.mf6.utilities.hfb import (
     _prepare_index_names,
 )
 from imod.mf6.validation_context import ValidationContext
+from imod.prepare.cleanup import cleanup_hfb
 from imod.schemata import (
     DimsSchema,
     DTypeSchema,
@@ -880,8 +881,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             Model discretization package.
 
         """
-        active = dis["idomain"] > 0
-        clipped_line_data = clip_line_gdf_by_grid(self.line_data, active)
+        clipped_line_data = cleanup_hfb(barrier=self.line_data, idomain=dis["idomain"])
         self.line_data = clipped_line_data
 
     def mask(self, mask) -> Package:
