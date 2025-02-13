@@ -1,7 +1,7 @@
 from itertools import pairwise
 from typing import TYPE_CHECKING, List, Tuple
 
-from imod.mf6.utilities.hfb import (
+from imod.util.hfb import (
     clipped_hfb_zlinestrings_to_zpolygons,
     hfb_zpolygons_to_zlinestrings,
 )

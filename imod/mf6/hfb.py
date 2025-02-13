@@ -26,7 +26,7 @@ from imod.mf6.utilities.clip import (
     clip_by_grid,
 )
 from imod.mf6.utilities.grid import broadcast_to_full_domain
-from imod.mf6.utilities.hfb import (
+from imod.util.hfb import (
     _create_zlinestring_from_bound_df,
     _extract_hfb_bounds_from_zpolygons,
     _prepare_index_names,
@@ -883,22 +883,12 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         clipped_line_data = cleanup_hfb(barrier=self.line_data, idomain=dis["idomain"])
         self.line_data = clipped_line_data
 
-    def mask(self, mask) -> Package:
+    def mask(self, _) -> Package:
         """
-        Remove line segments outside of active domain.
-
-        Parameters
-        ----------
-        mask: xr.DataArray, xu.UgridDataArray of ints
-            idomain-like integer array. >0 sets cells to active, 0 sets cells to inactive,
-            <0 sets cells to vertical passthrough
-
-        Returns
-        -------
-        masked: Package
-            The package with part masked.
+        The mask method is irrelevant for this package as it is
+        grid-agnostic, instead this method retuns a copy of itself.
         """
-        return clip_by_grid(self, mask)
+        return deepcopy(self)
 
     def _snap_to_grid(
         self, idomain: GridDataArray
