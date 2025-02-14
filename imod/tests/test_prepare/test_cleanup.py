@@ -1,12 +1,20 @@
 from typing import Callable
 
+import geopandas as gpd
 import numpy as np
 import pandas as pd
 import pytest
 import xugrid as xu
 from pytest_cases import parametrize, parametrize_with_cases
+from shapely import linestrings
 
-from imod.prepare.cleanup import cleanup_drn, cleanup_ghb, cleanup_riv, cleanup_wel
+from imod.prepare.cleanup import (
+    cleanup_drn,
+    cleanup_ghb,
+    cleanup_hfb,
+    cleanup_riv,
+    cleanup_wel,
+)
 from imod.tests.test_mf6.test_mf6_riv import DisCases, RivDisCases
 from imod.typing import GridDataArray
 
@@ -266,3 +274,66 @@ def test_cleanup_wel(dis_data: dict):
     well_cleaned = cleanup_wel(well_df, **dis_dict)
     # Assert
     pd.testing.assert_frame_equal(well_cleaned, well_expected_df)
+
+
+@parametrize_with_cases("dis_data", cases=DisCases)
+def test_cleanup_hfb__ymax_clipped(dis_data: dict):
+    # Arrange
+    barrier_y = [25.0, 15.0, -1.0]
+    barrier_x = [16.0, 16.0, 16.0]
+
+    geometry = gpd.GeoDataFrame(
+        geometry=[linestrings(barrier_x, barrier_y)],
+        data={
+            "resistance": [1200.0],
+            "layer": [1],
+        },
+    )
+    y_max = 20.0
+    idomain = dis_data["idomain"]
+    if isinstance(idomain, xu.UgridDataArray):
+        above_y_max = idomain.ugrid.grid.face_y > y_max
+        idomain.loc[:, above_y_max] = 0
+    else:
+        above_y_max = idomain.coords["y"] > y_max
+        idomain.loc[:, above_y_max, :] = 0
+
+    # Act
+    with pytest.raises(ValueError):
+        cleanup_hfb(geometry, idomain)
+
+    clipped_geometry = cleanup_hfb(geometry, idomain.isel(layer=0))
+
+    # Assert
+    np.testing.assert_allclose(clipped_geometry.bounds.maxy, y_max)
+
+
+@parametrize_with_cases("dis_data", cases=DisCases)
+def test_cleanup_hfb__split_in_two(dis_data: dict):
+    """Deactivate middle cell, barrier should be split in two."""
+    # Arrange
+    barrier_y = [25.0, 15.0, -1.0]
+    barrier_x = [16.0, 16.0, 16.0]
+
+    geometry = gpd.GeoDataFrame(
+        geometry=[linestrings(barrier_x, barrier_y)],
+        data={
+            "resistance": [1200.0],
+            "layer": [1],
+        },
+    )
+    idomain = dis_data["idomain"]
+    if isinstance(idomain, xu.UgridDataArray):
+        idomain.loc[:, 4] = 0
+    else:
+        idomain.loc[:, 15.0, :] = 0
+
+    # Act
+    with pytest.raises(ValueError):
+        cleanup_hfb(geometry, idomain)
+
+    clipped_geometry = cleanup_hfb(geometry, idomain.isel(layer=0))
+    bounds = clipped_geometry.geometry.bounds
+    assert len(clipped_geometry) == 2
+    np.testing.assert_allclose(bounds.miny.values, np.array([20.0, 0.0]))
+    np.testing.assert_allclose(bounds.maxy.values, np.array([25.0, 10.0]))

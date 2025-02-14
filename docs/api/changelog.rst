@@ -49,6 +49,10 @@ Changed
   validate whether proper type of geometry is provided, respectively Polygon for
   :class:`imod.mf6.HorizontalFlowBarrierResistance`, and LineString for
   :class:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance`.
+- :func:`imod.prepare.cleanup.cleanup_hfb` to clean up HFB geometries.
+- :meth:`imod.mf6.HorizontalFlowBarrierResistance.cleanup`,
+  :meth:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance.cleanup`,
+  to clean up HFB geometries crossing inactive model cells.
 
 Fixed
 ~~~~~

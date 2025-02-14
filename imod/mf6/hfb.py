@@ -16,21 +16,18 @@ from fastcore.dispatch import typedispatch
 
 from imod.logging import LogLevel, init_log_decorator, logger
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.package import Package
 from imod.mf6.utilities.clip import (
     bounding_polygon_from_line_data_and_clip_box,
-    clip_line_gdf_by_bounding_polygon,
-    clip_line_gdf_by_grid,
 )
 from imod.mf6.utilities.grid import broadcast_to_full_domain
-from imod.mf6.utilities.hfb import (
-    _create_zlinestring_from_bound_df,
-    _extract_hfb_bounds_from_zpolygons,
-    _prepare_index_names,
-)
 from imod.mf6.validation_context import ValidationContext
+from imod.prepare.cleanup import cleanup_hfb
+from imod.prepare.hfb import clip_line_gdf_by_bounding_polygon, clip_line_gdf_by_grid
 from imod.schemata import (
     DimsSchema,
     DTypeSchema,
@@ -41,6 +38,11 @@ from imod.schemata import (
 )
 from imod.typing import GeoDataFrameType, GridDataArray, LineStringType
 from imod.typing.grid import as_ugrid_dataarray, ones_like
+from imod.util.hfb import (
+    _create_zlinestring_from_bound_df,
+    _extract_hfb_bounds_from_zpolygons,
+    _prepare_index_names,
+)
 from imod.util.imports import MissingOptionalModule
 
 if TYPE_CHECKING:
@@ -865,6 +867,31 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
                 self.line_data, bounding_gdf
             )
         return new
+
+    def cleanup(self, dis: StructuredDiscretization | VerticesDiscretization) -> None:
+        """
+        Cleanup the package inplace by removing barriers that fall outside of
+        the active model domain.
+
+        Parameters
+        ----------
+        dis: StructuredDiscretization | VerticesDiscretication
+            Model discretization package.
+
+        """
+        idomain = dis["idomain"]
+
+        is_layered_hfb = "layer" in self._get_vertical_variables()
+        if is_layered_hfb:
+            # Assume all barriers in same layer, is a requirement of SingleLayer
+            # classes which is validated.
+            layer_nr = self.dataset["layer"].data.ravel()[0]
+            idomain_2d = idomain.sel(layer=layer_nr, drop=True)
+        else:
+            idomain_2d = idomain.max(dim="layer")
+
+        clipped_line_data = cleanup_hfb(barrier=self.line_data, idomain_2d=idomain_2d)
+        self.line_data = clipped_line_data
 
     def mask(self, _) -> Package:
         """

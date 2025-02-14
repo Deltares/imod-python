@@ -1056,3 +1056,49 @@ def test_clipbox_and_to_mf6_pkg(structured_flow_model, hfb_case, expected_y):
 
     assert np.all(actual_y <= y_max)
     np.testing.assert_equal(expected_y, actual_y)
+
+
+@parametrize_with_cases("hfb_case, expected_y", cases=HfbCases)
+def test_cleanup__ymax_clipped(structured_flow_model, hfb_case, expected_y):
+    # Arrange
+    dis = structured_flow_model["dis"]
+    top, bottom, idomain = (
+        dis["top"],
+        dis["bottom"],
+        dis["idomain"],
+    )
+    k = xr.ones_like(idomain)
+
+    hfb = SingleLayerHorizontalFlowBarrierResistance(hfb_case)
+
+    y_max = 7.0
+    y = dis["idomain"].coords["y"]
+    layer = dis["idomain"].coords["layer"]
+    set_to_zero = (y <= y_max) & (layer == 1)
+    dis["idomain"] = dis["idomain"].where(set_to_zero, 0)
+
+    # Act
+    hfb.cleanup(dis)
+    mf6_hfb = hfb.to_mf6_pkg(idomain, top, bottom, k)
+
+    # Assert
+    actual_y = idomain.coords["y"].values[mf6_hfb["cell_id1"][0] - 1]
+
+    assert np.all(actual_y <= y_max)
+    np.testing.assert_equal(expected_y, actual_y)
+
+
+@parametrize_with_cases("hfb_case, _", cases=HfbCases)
+def test_cleanup__split_in_two(structured_flow_model, hfb_case, _):
+    """Deactivate central cell, should split the barrier in two."""
+    # Arrange
+    dis = structured_flow_model["dis"]
+
+    idomain = dis["idomain"]
+    idomain.loc[:, 6.0, :] = 0
+
+    hfb = SingleLayerHorizontalFlowBarrierResistance(hfb_case)
+    # Act
+    hfb.cleanup(dis)
+    # Assert
+    assert len(hfb.line_data) == 2
