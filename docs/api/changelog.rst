@@ -81,6 +81,8 @@ Fixed
 - :meth:`imod.mf6.LayeredWell.from_imod5_cap_data` will convert the
   ``max_abstraction_groundwater`` and ``max_abstraction_surfacewater`` capacity
   from mm/d to m3/d.
+- :class:`imod.msw.TimeOutputControl` now starts counting at 0.0 instead of 1.0,
+  like MetaSWAP expects.
 - Models imported with :meth:`imod.msw.MetaSwapModel.from_imod5_data` can be
   written with ``validate`` set to True.
 
