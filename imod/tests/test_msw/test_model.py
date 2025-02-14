@@ -8,6 +8,7 @@ from pytest_cases import parametrize_with_cases
 
 from imod import mf6, msw
 from imod.mf6.utilities.regrid import RegridderWeightsCache
+from imod.msw.copy_files import FileCopier
 from imod.msw.model import DEFAULT_SETTINGS
 from imod.msw.utilities.parse import read_para_sim
 from imod.typing import GridDataArray, Imod5DataDict
@@ -96,6 +97,22 @@ def test_check_landuse_indices_in_lookup_options(msw_model):
 
     with pytest.raises(ValueError):
         msw_model._check_landuse_indices_in_lookup_options()
+
+
+def test_check_model(msw_model):
+    """
+    Test _model_checks method. Should raise error if validate = True and
+    FileCopier not present, else not.
+    """
+    msw_model.pop("grid")
+
+    msw_model._model_checks(validate=False)
+
+    with pytest.raises(ValueError):
+        msw_model._model_checks(validate=True)
+
+    msw_model["copy_files"] = FileCopier(["./test.txt"])
+    msw_model._model_checks(validate=True)
 
 
 def test_render_unsat_database_path(msw_model, tmp_path):
@@ -316,7 +333,7 @@ def test_import_from_imod5_and_write(
     mf6_wel_pkg = well_pkg.to_mf6_pkg(
         active, dis_pkg["top"], dis_pkg["bottom"], npf_pkg["k"]
     )
-    model.write(modeldir, dis_pkg, mf6_wel_pkg, validate=False)
+    model.write(modeldir, dis_pkg, mf6_wel_pkg)
 
     # Assert
     expected_n_files = 13
