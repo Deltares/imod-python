@@ -49,6 +49,8 @@ Changed
   validate whether proper type of geometry is provided, respectively Polygon for
   :class:`imod.mf6.HorizontalFlowBarrierResistance`, and LineString for
   :class:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance`.
+- Relaxed validation for :class:`imod.msw.MetaSwapModel` if ``FileCopier``
+  package is present.
 
 Fixed
 ~~~~~
@@ -81,6 +83,8 @@ Fixed
   from mm/d to m3/d.
 - :class:`imod.msw.TimeOutputControl` now starts counting at 0.0 instead of 1.0,
   like MetaSWAP expects.
+- Models imported with :meth:`imod.msw.MetaSwapModel.from_imod5_data` can be
+  written with ``validate`` set to True.
 
 
 [1.0.0rc1] - 2024-12-20

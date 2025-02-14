@@ -1,5 +1,5 @@
 import collections
-from copy import copy
+from copy import copy, deepcopy
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional, Tuple, Union, cast
@@ -59,7 +59,7 @@ INITIAL_CONDITIONS_PACKAGES = (
     InitialConditionsSavedState,
 )
 
-DEFAULT_SETTINGS = {
+DEFAULT_SETTINGS: dict[str, Any] = {
     "vegetation_mdl": 1,
     "evapotranspiration_mdl": 1,
     "saltstress_mdl": 0,
@@ -122,9 +122,7 @@ class MetaSwapModel(Model):
         else:
             self.simulation_settings = settings
 
-        self.simulation_settings["unsa_svat_path"] = (
-            self._render_unsaturated_database_path(unsaturated_database)
-        )
+        self.simulation_settings["unsa_svat_path"] = unsaturated_database
 
     def _render_unsaturated_database_path(self, unsaturated_database: Union[str, Path]):
         # Force to Path object
@@ -137,9 +135,10 @@ class MetaSwapModel(Model):
             # TODO: Test if this is how MetaSWAP accepts relative paths
             return f'"${unsaturated_database}\\"'
 
-    def _check_required_packages(self):
+    def _check_required_packages(self) -> None:
         pkg_types_included = {type(pkg) for pkg in self.values()}
-        missing_packages = set(REQUIRED_PACKAGES) - pkg_types_included
+        required_packages_set = cast(set[type[Any]], set(REQUIRED_PACKAGES))
+        missing_packages = required_packages_set - pkg_types_included
         if len(missing_packages) > 0:
             raise ValueError(
                 f"Missing the following required packages: {missing_packages}"
@@ -193,6 +192,10 @@ class MetaSwapModel(Model):
                 f"which were not in AnnualCropGrowth: {missing_indices}"
             )
 
+    def has_file_copier(self) -> bool:
+        pkg_types_included = {type(pkg) for pkg in self.values()}
+        return FileCopier in pkg_types_included
+
     def _get_starttime(self):
         """
         Loop over all packages to get the minimum time.
@@ -224,6 +227,42 @@ class MetaSwapModel(Model):
         if not optional_package:
             raise KeyError(f"Could not find package of type: {pkg_type}")
 
+    def _model_checks(self, validate: bool):
+        if validate and not self.has_file_copier():
+            self._check_required_packages()
+            self._check_vegetation_indices_in_annual_crop_factors()
+            self._check_landuse_indices_in_lookup_options()
+
+    def _write_simulation_settings(self, directory: Path) -> None:
+        """
+        Write simulation settings to para_sim.inp.
+
+        Parameters
+        ----------
+        directory: Path or str
+            directory to write model in.
+        """
+        simulation_settings = deepcopy(self.simulation_settings)
+
+        # Add time settings
+        year, time_since_start_year = self._get_starttime()
+
+        simulation_settings["iybg"] = year
+        simulation_settings["tdbg"] = time_since_start_year
+
+        # Add IdfMapping settings
+        idf_key = self._get_pkg_key(IdfMapping)
+        simulation_settings.update(self[idf_key].get_output_settings())
+
+        simulation_settings["unsa_svat_path"] = self._render_unsaturated_database_path(
+            simulation_settings["unsa_svat_path"]
+        )
+
+        filename = directory / self._file_name
+        with open(filename, "w") as f:
+            rendered = self._template.render(settings=simulation_settings)
+            f.write(rendered)
+
     def write(
         self,
         directory: Union[str, Path],
@@ -241,29 +280,14 @@ class MetaSwapModel(Model):
         """
 
         # Model checks
-        if validate:
-            self._check_required_packages()
-            self._check_vegetation_indices_in_annual_crop_factors()
-            self._check_landuse_indices_in_lookup_options()
+        self._model_checks(validate)
 
         # Force to Path
         directory = Path(directory)
         directory.mkdir(exist_ok=True, parents=True)
 
-        # Add time settings
-        year, time_since_start_year = self._get_starttime()
-
-        self.simulation_settings["iybg"] = year
-        self.simulation_settings["tdbg"] = time_since_start_year
-
-        # Add IdfMapping settings
-        idf_key = self._get_pkg_key(IdfMapping)
-        self.simulation_settings.update(self[idf_key].get_output_settings())
-
-        filename = directory / self._file_name
-        with open(filename, "w") as f:
-            rendered = self._template.render(settings=self.simulation_settings)
-            f.write(rendered)
+        # Write simulation settings
+        self._write_simulation_settings(directory)
 
         # Get index and svat
         grid_key = self._get_pkg_key(GridData)
