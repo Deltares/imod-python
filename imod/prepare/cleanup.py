@@ -360,10 +360,6 @@ def cleanup_hfb(
     geopandas.GeoDataFrame
         Cleaned up GeoDataFrame with HFB data.
     """
-    if idomain_2d.dims != ("y", "x"):
-        raise ValueError(
-            f'Dimensions must be ("y", "x"), instead got {idomain_2d.dims}'
-        )
 
     active = idomain_2d > 0
     # Drop HFB cells outside active domain
