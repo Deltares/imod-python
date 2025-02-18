@@ -3,7 +3,6 @@ import struct
 from typing import Any, BinaryIO, Dict, List, Optional, Tuple, cast
 
 import dask
-import numba
 import numpy as np
 import scipy.sparse
 import xarray as xr
@@ -18,7 +17,12 @@ from .common import (
     IntArray,
     _to_nan,
     get_first_header_advanced_package,
+    read_name_dvs,
+    read_times_dvs,
 )
+
+XUGRID_FILL_VALUE = -1
+IDOMAIN_ACTIVE = 1
 
 
 def _ugrid_iavert_javert(
@@ -147,6 +151,20 @@ def read_hds_timestep(
     return _to_nan(a2d, dry_nan)
 
 
+def read_dvs_timestep(
+    path: FilePath, nlayer: int, ncells_per_layer: int, pos: int, indices: np.ndarray
+) -> FloatArray:
+    """
+    Reads all values of one timestep.
+    """
+    with open(path, "rb") as f:
+        f.seek(pos)
+        a1d = np.full(nlayer * ncells_per_layer, dtype=np.float64, fill_value=np.nan)
+        f.seek(52, 1)  # skip kstp, kper, pertime
+        a1d[indices] = np.fromfile(f, np.float64, indices.size)
+    return a1d.reshape((nlayer, ncells_per_layer))
+
+
 def open_hds(
     path: FilePath,
     grid_info: Dict[str, Any],
@@ -180,6 +198,45 @@ def open_hds(
         daskarr, coords, ("time", "layer", grid.face_dimension), name=grid_info["name"]
     )
 
+    if simulation_start_time is not None:
+        da = assign_datetime_coords(da, simulation_start_time, time_unit)
+    return xu.UgridDataArray(da, grid)
+
+
+def open_dvs(
+    path: FilePath,
+    grid_info: Dict[str, Any],
+    indices: np.ndarray,
+    simulation_start_time: Optional[np.datetime64] = None,
+    time_unit: Optional[str] = "d",
+) -> xu.UgridDataArray:
+    grid = grid_info["grid"]
+    nlayer, ncells_per_layer = grid_info["nlayer"], grid_info["ncells_per_layer"]
+    filesize = os.path.getsize(path)
+    ntime = filesize // (52 + (indices.size * 8))
+    times = read_times_dvs(path, ntime, indices)
+    dv_name = read_name_dvs(path)
+
+    coords = grid_info["coords"]
+    coords["time"] = times
+
+    dask_list = []
+    # loop over times and add delayed arrays
+    for i in range(ntime):
+        # TODO verify dimension order
+        pos = i * (52 + indices.size * 8)
+        a = dask.delayed(read_dvs_timestep)(
+            path, nlayer, ncells_per_layer, pos, indices
+        )
+        x = dask.array.from_delayed(
+            a, shape=(nlayer, ncells_per_layer), dtype=np.float64
+        )
+        dask_list.append(x)
+
+    daskarr = dask.array.stack(dask_list, axis=0)
+    da = xr.DataArray(
+        daskarr, coords, ("time", "layer", grid.face_dimension), name=dv_name
+    )
     if simulation_start_time is not None:
         da = assign_datetime_coords(da, simulation_start_time, time_unit)
     return xu.UgridDataArray(da, grid)
@@ -291,70 +348,14 @@ def open_imeth6_budgets(
     return xu.UgridDataArray(da, grid)
 
 
-@numba.njit  # type: ignore[misc]
-def disv_lower_index(
-    ia: IntArray,
-    ja: IntArray,
-    ncells: int,
-    nlayer: int,
-    ncells_per_layer: int,
-) -> IntArray:
-    lower = np.full(ncells, -1, np.int64)
-    for i in range(ncells):
-        for nzi in range(ia[i], ia[i + 1]):
-            nzi -= 1  # python is 0-based, modflow6 is 1-based
-            j = ja[nzi] - 1  # python is 0-based, modflow6 is 1-based
-            d = j - i
-            if d < ncells_per_layer:  # upper, diagonal, horizontal
-                continue
-            elif d == ncells_per_layer:  # lower neighbor
-                lower[i] = nzi
-            else:  # skips one: must be pass through
-                npassed = int(d / ncells_per_layer)
-                for ipass in range(0, npassed):
-                    lower[i + ipass * ncells_per_layer] = nzi
-
-    return lower.reshape(nlayer, ncells_per_layer)
-
-
-def expand_indptr(ia: IntArray):
-    n = np.diff(ia)
-    return np.repeat(np.arange(ia.size - 1), n)
-
-
-def disv_horizontal_index(
-    ia: IntArray,
-    ja: IntArray,
-    nlayer: int,
-    ncells_per_layer: int,
-    edge_face_connectivity: IntArray,
-    fill_value: int,
-    face_coordinates: FloatArray,
-):
-    # Allocate output array
-    nedge = len(edge_face_connectivity)
-    horizontal = np.full((nlayer, nedge), -1)
-
-    # Grab the index values to the horizontal connections
-    i = expand_indptr(ia)
-    j = ja - 1
-    d = j - i
-    is_horizontal = (0 < d) & (d < ncells_per_layer)
-    index = np.arange(j.size)[is_horizontal].reshape((nlayer, -1))
-
-    # i -> j is pre-sorted (required by CSR structure); the edge_faces are repeated
-    # per layer. Because i -> j is sorted in terms of face numbering, we need
-    # only to figure out which order the edge_face_connectivity has.
-    is_connection = edge_face_connectivity[:, 1] != fill_value
-    edge_faces = edge_face_connectivity[is_connection]
-    order = np.argsort(np.lexsort(edge_faces.T[::-1]))
-    # Reshuffle for every layer
-    index = index[:, order]
-
-    # Now set the values in the output array
-    horizontal[:, is_connection] = index
-
+def compute_flow_orientation(
+    edge_face_connectivity: IntArray, face_coordinates: FloatArray
+) -> Tuple[FloatArray, FloatArray]:
     # Compute unit components (x: u, y: v)
+    nedge = len(edge_face_connectivity)
+    is_connection = edge_face_connectivity[:, 1] != XUGRID_FILL_VALUE
+    edge_faces = edge_face_connectivity[is_connection]
+    # Ensure direction matches flow from low cell index to high cell index.
     edge_faces.sort(axis=1)
     u = np.full(nedge, np.nan)
     v = np.full(nedge, np.nan)
@@ -364,32 +365,124 @@ def disv_horizontal_index(
     t = np.sqrt(dx**2 + dy**2)
     u[is_connection] = dx / t
     v[is_connection] = dy / t
-    return horizontal, u, v
+    return u, v
+
+
+def mf6_csr_to_coo(ia: IntArray, ja: IntArray) -> Tuple[IntArray, IntArray]:
+    """
+    Convert MODFLOW 6 Compressed Sparse Row (CSR) matrix 1-based arrays into
+    0-based COO(rdinate) arrays.
+    """
+    n = np.diff(ia)
+    i = np.repeat(np.arange(ia.size - 1), n)
+    j = ja - 1
+    return i, j
+
+
+def alt_cumsum(a):
+    """Alternative cumsum, start 0 and omit the last value."""
+    out = np.empty(a.size, a.dtype)
+    out[0] = 0
+    np.cumsum(a[:-1], out=out[1:])
+    return out
+
+
+def ragged_arange(n: IntArray) -> IntArray:
+    """Equal to: np.concatenate([np.arange(e) for e in n])"""
+    return alt_cumsum(np.ones(int(n.sum()), dtype=int)) - np.repeat(alt_cumsum(n), n)
+
+
+def disv_indices(
+    ia: IntArray,
+    ja: IntArray,
+    idomain: IntArray,
+    edge_face_connectivity: IntArray,
+):
+    """
+    Parameters
+    ----------
+    ia: IntArray of shape (ncell+1,)
+        MODFLOW 6 indptr of CSR connectivity matrix. 1-based.
+    ja: IntArray of shape (nconnections + ncell,)
+        MODFLOW 6 indices of CSR connectivity matrix. 1-based.
+    idomain: IntArray of shape (nlayer, nface)
+        Active cells are marked by a value of 1 (IDOMAIN_ACTIVE).
+    edge_face_connectivity: IntArray of shape (nface, 2)
+        External boundaries are marked by a second face value of -1
+        (XUGRID_FILL_VALUE).
+
+    Returns
+    -------
+    lower: IntArray of shape (nlayer, nface)
+        Contains the indices into the flow data for the lower face for each
+        cell. Lower faces without flow are marked by a value of -1.
+    horizontal: IntArray of shape (nlayer, nedge)
+        Contains the indices into the flow data for the each edge. Edges
+        without flow are marked by a value of -1.
+    """
+    nlayer, ncells_per_layer = idomain.shape
+    # Allocate output arrays.
+    nedge = len(edge_face_connectivity)
+    horizontal = np.full((nlayer, nedge), -1)
+    lower = np.full((nlayer, ncells_per_layer), -1)
+
+    i, j = mf6_csr_to_coo(ia, ja)
+    diff = j - i
+    is_vertical = diff >= ncells_per_layer
+    # Remove diagonals as well (i == j)
+    is_horizontal = (diff > 0) & (~is_vertical)
+    # Generate a linear index into the cells.
+    index = np.arange(j.size)
+
+    # Vertical flows
+    # --------------
+    # Stored in an array of shape (nlayer, nface). For vertical passthrough
+    # cells, set it from layers i to j using ragged_arange.
+    n_pass = diff[is_vertical] // ncells_per_layer
+    ii = np.repeat(i[is_vertical], n_pass) + ragged_arange(n_pass) * ncells_per_layer
+    lower.ravel()[ii] = np.repeat(index[is_vertical], n_pass)
+
+    # Horizontal flows
+    # ----------------
+    # Will be stored in an array of shape (nlayer, nedge).
+    # i -> j is pre-sorted (required by CSR structure). Because i -> j is
+    # sorted in terms of face numbering, we need only to figure out which order
+    # the edge_face_connectivity has. A lexsort of (i_face, j_face) results in
+    # the same ordering as the CSR structure: sorted first by i, then by j.
+
+    # Create edge face connectivity for each layer, shape: (nlayer, nface, 2).
+    # NOTE: the addition obliterates any -1 FILL value. Hence we check the original
+    # edge_face_connectivity afterwards for the outer boundaries.
+    layered_edge_faces = np.add.outer(
+        np.arange(nlayer) * ncells_per_layer,
+        edge_face_connectivity,
+    )
+
+    # Identify inactive faces and outer boundaries (second face == FILL).
+    is_active = idomain.ravel()[layered_edge_faces] == IDOMAIN_ACTIVE
+    is_inner_edge = edge_face_connectivity[:, 1] != XUGRID_FILL_VALUE
+    is_connection = (is_active.all(axis=2) & is_inner_edge[np.newaxis, :]).ravel()
+
+    # Create face i to face j connections; find the ordering.
+    i_to_j = layered_edge_faces.reshape((-1, 2))[is_connection]
+    order = np.argsort(np.lexsort(i_to_j.T[::-1]))
+
+    # Now set the values in the output array.
+    horizontal.ravel()[is_connection] = index[is_horizontal][order]
+    return lower, horizontal
 
 
 def disv_to_horizontal_lower_indices(
     grb_content: dict,
 ) -> Tuple[xr.DataArray, xr.DataArray, xr.DataArray, xr.DataArray]:
     grid = grb_content["grid"]
-    horizontal, u, v = disv_horizontal_index(
+    lower, horizontal = disv_indices(
         ia=grb_content["ia"],
         ja=grb_content["ja"],
-        nlayer=grb_content["nlayer"],
-        ncells_per_layer=grb_content["ncells_per_layer"],
+        idomain=grb_content["idomain"].to_numpy(),
         edge_face_connectivity=grid.edge_face_connectivity,
-        fill_value=grid.fill_value,
-        face_coordinates=grid.face_coordinates,
     )
-    lower = disv_lower_index(
-        ia=grb_content["ia"],
-        ja=grb_content["ja"],
-        ncells=grb_content["ncells"],
-        nlayer=grb_content["nlayer"],
-        ncells_per_layer=grb_content["ncells_per_layer"],
-    )
-
-    # Compute unit_vector
-
+    u, v = compute_flow_orientation(grid.edge_face_connectivity, grid.face_coordinates)
     return (
         xr.DataArray(
             horizontal, grb_content["coords"], dims=["layer", grid.edge_dimension]

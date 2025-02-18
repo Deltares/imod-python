@@ -1,4 +1,5 @@
 import csv
+import filecmp
 import os
 import tempfile
 from pathlib import Path
@@ -6,47 +7,21 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
-import xarray as xr
-from numpy import nan
 from numpy.testing import assert_equal
 
-from imod.msw import MeteoGrid
+from imod.mf6.utilities.regrid import RegridderWeightsCache
+from imod.msw import MeteoGrid, MeteoGridCopy
 
 
-def test_meteo_grid():
-    x = [1.0, 2.0, 3.0]
-    y = [1.0, 2.0, 3.0]
-    time = pd.date_range(start="2000-01-01", end="2000-01-02", freq="D")
+def test_meteo_grid_init(meteo_grids):
+    meteo_grids = MeteoGrid(*meteo_grids)
 
-    dx = 1.0
-    dy = -1.0
-    # fmt: off
-    precipitation = xr.DataArray(
-        np.array(
-            [
-                [[1.0, 1.0, 1.0],
-                 [nan, nan, nan],
-                 [1.0, 1.0, 1.0]],
+    assert meteo_grids.dataset["precipitation"].dims == ("time", "y", "x")
+    assert meteo_grids.dataset["evapotranspiration"].dims == ("time",)
 
-                [[2.0, 2.0, 1.0],
-                 [nan, nan, nan],
-                 [1.0, 2.0, 1.0]],
-            ]
-        ),
-        dims=("time", "y", "x"),
-        coords={"time": time, "y": y, "x": x, "dx": dx, "dy": dy}
-    )
 
-    evapotranspiration = xr.DataArray(
-        np.array(
-            [1.0, 3.0]
-        ),
-        dims=("time",),
-        coords={"time": time}
-    )
-    # fmt: on
-
-    meteo_grid = MeteoGrid(precipitation, evapotranspiration)
+def test_meteo_grid_write(meteo_grids):
+    meteo_grid = MeteoGrid(*meteo_grids)
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
@@ -75,32 +50,62 @@ def test_meteo_grid():
     assert gridnames == expected_filenames
 
 
-def test_meteo_no_time_grid():
-    x = [1.0, 2.0, 3.0]
-    y = [1.0, 2.0, 3.0]
-    time = pd.date_range(start="2000-01-01", end="2000-01-02", freq="D")
-
-    dx = 1.0
-    dy = -1.0
-    # fmt: off
-    precipitation = xr.DataArray(
-        np.array(
-            [
-                [[1.0, 1.0, 1.0],
-                 [nan, nan, nan],
-                 [1.0, 1.0, 1.0]],
-
-                [[2.0, 2.0, 1.0],
-                 [nan, nan, nan],
-                 [1.0, 2.0, 1.0]],
-            ]
-        ),
-        dims=("time", "y", "x"),
-        coords={"time": time, "y": y, "x": x, "dx": dx, "dy": dy}
-    )
+def test_meteo_no_time_grid(meteo_grids):
+    precipitation, _ = meteo_grids
 
     evapotranspiration = 3.0
     # fmt: on
 
     with pytest.raises(ValueError):
         MeteoGrid(precipitation, evapotranspiration)
+
+
+def test_regrid_meteo(meteo_grids, simple_2d_grid_with_subunits):
+    meteo = MeteoGrid(*meteo_grids)
+    new_grid = simple_2d_grid_with_subunits
+
+    regrid_context = RegridderWeightsCache()
+
+    regridded_ponding = meteo.regrid_like(new_grid, regrid_context)
+
+    assert np.all(regridded_ponding.dataset["x"].values == new_grid["x"].values)
+    assert np.all(regridded_ponding.dataset["y"].values == new_grid["y"].values)
+
+
+def setup_written_meteo_grids(meteo_grids, tmp_path) -> Path:
+    meteo_grid = MeteoGrid(*meteo_grids)
+    grid_dir = tmp_path / "grid"
+    grid_dir.mkdir(exist_ok=True, parents=True)
+    meteo_grid.write(grid_dir)
+    return grid_dir
+
+
+def test_meteogridcopy_write(meteo_grids, tmp_path):
+    # Arrange
+    grid_dir = setup_written_meteo_grids(meteo_grids, tmp_path)
+    meteo_grid_copy = MeteoGridCopy(grid_dir / "mete_grid.inp")
+    copy_dir = tmp_path / "copied"
+    copy_dir.mkdir(exist_ok=True, parents=True)
+    # Act
+    meteo_grid_copy.write(copy_dir)
+    # Assert
+    assert filecmp.cmp(grid_dir / "mete_grid.inp", copy_dir / "mete_grid.inp")
+
+
+def test_meteogridcopy_from_imod5(meteo_grids, tmp_path):
+    # Arrange
+    grid_dir = setup_written_meteo_grids(meteo_grids, tmp_path)
+    imod5_data = {}
+    imod5_data["extra"] = {}
+    imod5_data["extra"]["paths"] = [
+        ["foo"],
+        [(grid_dir / "mete_grid.inp").resolve()],
+        ["bar"],
+    ]
+    meteo_grid_copy = MeteoGridCopy.from_imod5_data(imod5_data)
+    copy_dir = tmp_path / "copied"
+    copy_dir.mkdir(exist_ok=True, parents=True)
+    # Act
+    meteo_grid_copy.write(copy_dir)
+    # Assert
+    assert filecmp.cmp(grid_dir / "mete_grid.inp", copy_dir / "mete_grid.inp")

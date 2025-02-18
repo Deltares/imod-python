@@ -1,11 +1,15 @@
+from typing import Any, TextIO
+
 import numpy as np
 import xarray as xr
 
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
+from imod.util.regrid_method_type import EmptyRegridMethod, RegridMethodType
 
 
-class AnnualCropFactors(MetaSwapPackage):
+class AnnualCropFactors(MetaSwapPackage, IRegridPackage):
     """
     For each vegetation type specify a yearly trend in vegetation factors and
     interception characteristics. These are used if WOFOST is not used.
@@ -52,6 +56,8 @@ class AnnualCropFactors(MetaSwapPackage):
         "ponding_factor": VariableMetaData(8, 0.01, 10.0, float),
     }
 
+    _regrid_method: RegridMethodType = EmptyRegridMethod()
+
     def __init__(
         self,
         soil_cover: xr.DataArray,
@@ -73,7 +79,7 @@ class AnnualCropFactors(MetaSwapPackage):
 
         self._pkgcheck()
 
-    def _render(self, file, *args):
+    def _render(self, file: TextIO, *args: Any):
         dataframe = self.dataset.to_dataframe(
             dim_order=("vegetation_index", "day_of_year")
         ).reset_index()

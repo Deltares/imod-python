@@ -13,9 +13,11 @@ from xugrid.core.wrap import UgridDataArray
 
 import imod
 from imod.mf6 import ConstantHead
+from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.model import Modflow6Model
 from imod.mf6.model_gwf import GroundwaterFlowModel
 from imod.mf6.package import Package
+from imod.mf6.validation_context import ValidationContext
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 
@@ -105,6 +107,7 @@ class TestModel:
         model_name = "Test model"
         model = Modflow6Model()
         # create write context
+        validation_context = ValidationContext()
         write_context = WriteContext(tmp_path)
 
         discretization_mock = MagicMock(spec_set=Package)
@@ -119,7 +122,9 @@ class TestModel:
         global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
 
         # Act.
-        status = model.write(model_name, global_times_mock, True, write_context)
+        status = model._write(
+            model_name, global_times_mock, write_context, validation_context
+        )
 
         # Assert.
         assert not status.has_errors()
@@ -130,6 +135,7 @@ class TestModel:
         model_name = "Test model"
         model = Modflow6Model()
         # create write context
+        validation_context = ValidationContext()
         write_context = WriteContext(tmp_path)
 
         template_mock = MagicMock(spec_set=Template)
@@ -139,7 +145,9 @@ class TestModel:
         global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
 
         # Act.
-        status = model.write(model_name, global_times_mock, True, write_context)
+        status = model._write(
+            model_name, global_times_mock, write_context, validation_context
+        )
 
         # Assert.
         assert status.has_errors()
@@ -150,6 +158,7 @@ class TestModel:
         model_name = "Test model"
         model = Modflow6Model()
         # create write context
+        validation_context = ValidationContext()
         write_context = WriteContext(tmp_path)
 
         discretization_mock = MagicMock(spec_set=Package)
@@ -167,8 +176,8 @@ class TestModel:
         global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
 
         # Act.
-        status = model.write(
-            model_name, global_times_mock, True, write_context=write_context
+        status = model._write(
+            model_name, global_times_mock, write_context, validation_context
         )
 
         # Assert.
@@ -178,6 +187,7 @@ class TestModel:
         # Arrange.
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
+        validation_context = ValidationContext()
         write_context = WriteContext(simulation_directory=tmp_path)
 
         model = Modflow6Model()
@@ -205,7 +215,9 @@ class TestModel:
 
         # Act.
         write_context = WriteContext(tmp_path)
-        status = model.write(model_name, global_times_mock, True, write_context)
+        status = model._write(
+            model_name, global_times_mock, write_context, validation_context
+        )
 
         # Assert.
         assert len(status.errors) == 2
@@ -359,3 +371,65 @@ def test_deepcopy(
 ):
     # test  making a deepcopy will not crash
     _ = deepcopy(unstructured_flow_model)
+
+
+def test_prepare_wel_to_mf6(
+    structured_flow_model: GroundwaterFlowModel,
+):
+    # Arrange
+    # add a well to the model
+    well = imod.mf6.Well(
+        x=[3.0],
+        y=[3.0],
+        screen_top=[0.0],
+        screen_bottom=[-3.0],
+        rate=[1.0],
+        print_flows=True,
+        validate=True,
+    )
+    structured_flow_model["well"] = well
+    # Act
+    mf6_well = structured_flow_model.prepare_wel_for_mf6("well", True, True)
+    # Assert
+    assert isinstance(mf6_well, Mf6Wel)
+
+
+def test_prepare_wel_to_mf6__error(
+    structured_flow_model: GroundwaterFlowModel,
+):
+    # Act
+    with pytest.raises(TypeError):
+        structured_flow_model.prepare_wel_for_mf6("dis", True, True)
+
+
+def test_get_k(structured_flow_model: GroundwaterFlowModel):
+    # Act
+    k = structured_flow_model._get_k()
+    # Assert
+    assert isinstance(k, xr.DataArray)
+    np.testing.assert_allclose(k.values, 1.23)
+    # Arrange
+    npf = structured_flow_model.pop("npf")
+    structured_flow_model["npf_other_name"] = npf
+    # Act
+    k = structured_flow_model._get_k()
+    # Assert
+    assert isinstance(k, xr.DataArray)
+    np.testing.assert_allclose(k.values, 1.23)
+
+
+def test_get_domain_geometry(structured_flow_model: GroundwaterFlowModel):
+    # Act
+    top, bottom, idomain = structured_flow_model._get_domain_geometry()
+    # Assert
+    assert isinstance(top, xr.DataArray)
+    assert isinstance(bottom, xr.DataArray)
+    assert isinstance(idomain, xr.DataArray)
+
+    assert top.dtype == np.float64
+    assert bottom.dtype == np.float64
+    assert idomain.dtype == np.int32
+
+    assert np.all(np.isin(top.values, [10.0]))
+    assert np.all(np.isin(bottom.values, [-1.0, -2.0, -3.0]))
+    assert np.all(np.isin(idomain.values, [2]))

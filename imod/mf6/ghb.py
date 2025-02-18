@@ -1,11 +1,29 @@
+from copy import deepcopy
+from datetime import datetime
+from typing import Optional
+
 import numpy as np
 
-from imod.logging import init_log_decorator
+from imod.logging import init_log_decorator, standard_log_decorator
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
-from imod.mf6.regrid.regrid_schemes import GeneralHeadBoundaryRegridMethod
+from imod.mf6.npf import NodePropertyFlow
+from imod.mf6.regrid.regrid_schemes import (
+    GeneralHeadBoundaryRegridMethod,
+    RegridMethodType,
+)
+from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
+from imod.prepare.cleanup import cleanup_ghb
+from imod.prepare.topsystem.allocation import ALLOCATION_OPTION, allocate_ghb_cells
+from imod.prepare.topsystem.conductance import (
+    DISTRIBUTING_OPTION,
+    distribute_ghb_conductance,
+)
 from imod.schemata import (
+    AllCoordsValueSchema,
     AllInsideNoDataSchema,
     AllNoDataSchema,
     AllValueSchema,
@@ -16,6 +34,9 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
+from imod.typing import GridDataArray
+from imod.typing.grid import enforce_dim_order, has_negative_layer, is_planar_grid
+from imod.util.expand_repetitions import expand_repetitions
 
 
 class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
@@ -77,12 +98,14 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
             IndexesSchema(),
             CoordsSchema(("layer",)),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "conductance": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             CoordsSchema(("layer",)),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "concentration": [
             DTypeSchema(np.floating),
@@ -94,6 +117,7 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
                 )
             ),
             CONC_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
         "save_flows": [DTypeSchema(np.bool_), DimsSchema()],
@@ -147,3 +171,178 @@ class GeneralHeadBoundary(BoundaryCondition, IRegridPackage):
         errors = super()._validate(schemata, **kwargs)
 
         return errors
+
+    @standard_log_decorator()
+    def cleanup(self, dis: StructuredDiscretization | VerticesDiscretization) -> None:
+        """
+        Clean up package inplace. This method calls
+        :func:`imod.prepare.cleanup_ghb`, see documentation of that
+        function for details on cleanup.
+
+        dis: imod.mf6.StructuredDiscretization | imod.mf6.VerticesDiscretization
+            Model discretization package.
+        """
+        dis_dict = {"idomain": dis.dataset["idomain"]}
+        cleaned_dict = self._call_func_on_grids(cleanup_ghb, dis_dict)
+        super().__init__(cleaned_dict)
+
+    @classmethod
+    def allocate_and_distribute_planar_data(
+        cls,
+        planar_data: dict[str, GridDataArray],
+        dis: StructuredDiscretization,
+        npf: NodePropertyFlow,
+        allocation_option: ALLOCATION_OPTION,
+        distributing_option: DISTRIBUTING_OPTION,
+    ) -> dict[str, GridDataArray]:
+        """
+        Allocate and distribute planar data for given discretization and npf
+        package. If layer number of ``planar_data`` is negative,
+        ``allocation_option`` is overrided and set to
+        ALLOCATION_OPTION.at_first_active.
+
+        Parameters
+        ----------
+        planar_data: dict[str, GridDataArray]
+            Dictionary with planar grid data.
+        dis: imod.mf6.StructuredDiscretization
+            Model discretization package.
+        npf: imod.mf6.NodePropertyFlow
+            Node property flow package.
+        allocation_option: ALLOCATION_OPTION
+            allocation option. If planar data is assigned to a negative layer
+            number, this option is overridden and set to
+            ALLOCATION_OPTION.at_first_active.
+        distributing_option: DISTRIBUTING_OPTION
+            distributing option.
+
+        Returns
+        -------
+        dict[str, GridDataArray]
+            Dictionary with layered grid data.
+        """
+
+        top = dis.dataset["top"]
+        bottom = dis.dataset["bottom"]
+        idomain = dis.dataset["idomain"]
+
+        if has_negative_layer(planar_data["head"]):
+            allocation_option = ALLOCATION_OPTION.at_first_active
+
+        # Enforce planar data, remove all layer dimension information
+        planar_data = {
+            key: grid.isel({"layer": 0}, drop=True, missing_dims="ignore")
+            for key, grid in planar_data.items()
+        }
+
+        ghb_allocation = allocate_ghb_cells(
+            allocation_option,
+            idomain > 0,
+            top,
+            bottom,
+            planar_data["head"],
+        )
+
+        layered_data = {}
+        layered_data["head"] = planar_data["head"].where(ghb_allocation)
+        layered_data["head"] = enforce_dim_order(layered_data["head"])
+
+        layered_data["conductance"] = distribute_ghb_conductance(
+            distributing_option,
+            ghb_allocation,
+            planar_data["conductance"],
+            top,
+            bottom,
+            npf.dataset["k"],
+        )
+        return layered_data
+
+    @classmethod
+    def from_imod5_data(
+        cls,
+        key: str,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        period_data: dict[str, list[datetime]],
+        target_dis: StructuredDiscretization,
+        target_npf: NodePropertyFlow,
+        time_min: datetime,
+        time_max: datetime,
+        allocation_option: ALLOCATION_OPTION,
+        distributing_option: DISTRIBUTING_OPTION,
+        regridder_types: Optional[RegridMethodType] = None,
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
+    ) -> "GeneralHeadBoundary":
+        """
+        Construct a GeneralHeadBoundary-package from iMOD5 data, loaded with the
+        :func:`imod.formats.prj.open_projectfile_data` function.
+
+        .. note::
+
+            The method expects the iMOD5 model to be fully 3D, not quasi-3D.
+
+        Parameters
+        ----------
+        imod5_data: dict
+            Dictionary with iMOD5 data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
+        period_data: dict
+            Dictionary with iMOD5 period data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
+        target_dis:  StructuredDiscretization package
+            The grid that should be used for the new package. Does not
+            need to be identical to one of the input grids.
+        target_npf: NodePropertyFlow package
+            The conductivity information, used to compute GHB flux
+        allocation_option: ALLOCATION_OPTION
+            allocation option. If package data is assigned to a negative layer
+            number, this option is overridden and set to
+            ALLOCATION_OPTION.at_first_active.
+        time_min: datetime
+            Begin-time of the simulation. Used for expanding period data.
+        time_max: datetime
+            End-time of the simulation. Used for expanding period data.
+        distributing_option: dict[str, DISTRIBUTING_OPTION]
+            distributing option.
+        regrid_cache: RegridderWeightsCache, optional
+            stores regridder weights for different regridders. Can be used to speed up regridding,
+            if the same regridders are used several times for regridding different arrays.
+        regridder_types: RegridMethodType, optional
+            Optional dataclass with regridder types for a specific variable.
+            Use this to override default regridding methods.
+
+        Returns
+        -------
+        A  Modflow 6 GeneralHeadBoundary packages.
+        """
+        idomain = target_dis.dataset["idomain"]
+        data = {
+            "head": imod5_data[key]["head"],
+            "conductance": imod5_data[key]["conductance"],
+        }
+        is_planar = is_planar_grid(data["conductance"])
+
+        if regridder_types is None:
+            regridder_types = GeneralHeadBoundaryRegridMethod()
+
+        regridded_package_data = _regrid_package_data(
+            data, idomain, regridder_types, regrid_cache, {}
+        )
+        if is_planar:
+            layered_data = cls.allocate_and_distribute_planar_data(
+                regridded_package_data,
+                target_dis,
+                target_npf,
+                allocation_option,
+                distributing_option,
+            )
+            regridded_package_data.update(layered_data)
+
+        ghb = GeneralHeadBoundary(**regridded_package_data, validate=True)
+        repeat = period_data.get(key)
+        if repeat is not None:
+            ghb.set_repeat_stress(expand_repetitions(repeat, time_min, time_max))
+        return ghb
+
+    @classmethod
+    def get_regrid_methods(cls) -> GeneralHeadBoundaryRegridMethod:
+        return deepcopy(cls._regrid_method)

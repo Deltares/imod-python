@@ -36,3 +36,14 @@ def test_zero_thickness_validation(idomain_and_bottom):
     error = errors["bottom"][0]
     assert isinstance(error, ValidationError)
     assert error.args[0] == "found thickness <= 0.0"
+
+
+def test_wrong_layer_coord(idomain_and_bottom):
+    idomain, bottom = idomain_and_bottom
+
+    with pytest.raises(ValidationError):
+        imod.mf6.VerticesDiscretization(
+            top=0.0,
+            bottom=bottom.assign_coords(layer=[0, 1, 2]),
+            idomain=idomain.assign_coords(layer=[0, 1, 2]),
+        )

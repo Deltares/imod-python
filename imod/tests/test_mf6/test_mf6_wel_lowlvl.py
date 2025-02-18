@@ -94,7 +94,7 @@ def test_mf6wel_write__stationary(
     write_context = WriteContext(directory, use_binary=True)
 
     # Act
-    mf6wel.write(pkgname, globaltimes, write_context)
+    mf6wel._write(pkgname, globaltimes, write_context)
 
     # Assert
     assert len(list(directory.glob("**/*"))) == 3
@@ -116,7 +116,7 @@ def test_mf6wel_write__transient(
     directory.mkdir(exist_ok=True)
     write_context = WriteContext(directory, use_binary=True)
     # Act
-    mf6wel.write(pkgname, globaltimes, write_context)
+    mf6wel._write(pkgname, globaltimes, write_context)
 
     # Assert
     assert len(list(directory.glob("**/*"))) == 7
@@ -185,7 +185,7 @@ def test_remove_inactive__stationary(basic_dis, mf6wel_test_data_stationary):
     ds_removed = imod.mf6.utilities.dataset.remove_inactive(ds, active)
 
     # Assert
-    assert dict(ds_removed.dims) == {"ncellid": 6, "nmax_cellid": 3}
+    assert dict(ds_removed.dims) == {"ncellid": 6, "dim_cellid": 3}
 
 
 def test_remove_inactive__transient(basic_dis, mf6wel_test_data_transient):
@@ -203,4 +203,4 @@ def test_remove_inactive__transient(basic_dis, mf6wel_test_data_transient):
     ds_removed = imod.mf6.utilities.dataset.remove_inactive(ds, active)
 
     # Assert
-    assert dict(ds_removed.dims) == {"ncellid": 6, "time": 5, "nmax_cellid": 3}
+    assert dict(ds_removed.dims) == {"ncellid": 6, "time": 5, "dim_cellid": 3}

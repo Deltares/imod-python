@@ -4,14 +4,15 @@ import numpy as np
 import pytest
 
 import imod
+from imod.mf6 import VerticesDiscretization
 from imod.mf6.regrid.regrid_schemes import ConstantHeadRegridMethod
 from imod.mf6.utilities.regrid import RegridderWeightsCache
-from imod.mf6.utilities.regridding_types import RegridderType
 from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
 from imod.tests.fixtures.mf6_small_models_fixture import (
     grid_data_structured,
     grid_data_unstructured,
 )
+from imod.util.regrid_method_type import RegridderType
 
 
 def test_regrid_structured_simulation_to_structured_simulation(
@@ -24,7 +25,7 @@ def test_regrid_structured_simulation_to_structured_simulation(
         "regridded_simulation", finer_idomain
     )
 
-    assert_simulation_can_run(new_simulation, "dis", tmp_path)
+    assert_simulation_can_run(new_simulation, tmp_path)
 
 
 def test_regrid_unstructured_simulation_to_unstructured_simulation(
@@ -38,7 +39,31 @@ def test_regrid_unstructured_simulation_to_unstructured_simulation(
     )
 
     # Test that the newly regridded simulation can run
-    assert_simulation_can_run(new_simulation, "disv", tmp_path)
+    assert_simulation_can_run(new_simulation, tmp_path)
+
+
+def test_regrid_structured_simulation_to_unstructured_simulation(
+    tmp_path: Path,
+    structured_flow_simulation: imod.mf6.Modflow6Simulation,
+):
+    finer_idomain = grid_data_unstructured(np.int32, 1, 0.4)
+
+    new_simulation = structured_flow_simulation.regrid_like(
+        "regridded_simulation", finer_idomain
+    )
+    assert isinstance(new_simulation["flow"]["dis"], VerticesDiscretization)
+
+    # Test that the newly regridded simulation can run
+    assert_simulation_can_run(new_simulation, tmp_path)
+
+
+def test_regrid_unstructured_simulation_to_structured_simulation(
+    unstructured_flow_simulation: imod.mf6.Modflow6Simulation,
+):
+    finer_idomain = grid_data_structured(np.int32, 1, 0.4)
+
+    with pytest.raises(NotImplementedError):
+        unstructured_flow_simulation.regrid_like("regridded_simulation", finer_idomain)
 
 
 def test_regridded_simulation_has_required_packages(
@@ -67,7 +92,7 @@ def test_regrid_with_custom_method(circle_model):
     regrid_method = ConstantHeadRegridMethod(
         head=(RegridderType.BARYCENTRIC,), concentration=(RegridderType.BARYCENTRIC,)
     )
-    regrid_context = RegridderWeightsCache()
+    regrid_cache = RegridderWeightsCache()
     simulation_regridded["GWF_1"]["chd"] = chd_pkg.regrid_like(
-        idomain, regrid_context=regrid_context, regridder_types=regrid_method
+        idomain, regrid_cache=regrid_cache, regridder_types=regrid_method
     )

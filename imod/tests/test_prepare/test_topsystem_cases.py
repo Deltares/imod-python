@@ -23,7 +23,7 @@ def time_da():
 
 def riv_structured_transient(basic_dis__topsystem):
     ibound, top, bottom = basic_dis__topsystem
-    top = top.sel(layer=1)
+    top = top.sel(layer=1, drop=True)
     elevation = zeros_like(ibound.sel(layer=1), dtype=np.float64)
     # Deactivate second cell
     elevation[1, 1] = np.nan
@@ -36,6 +36,7 @@ def riv_structured_transient(basic_dis__topsystem):
 
 def riv_unstructured_transient(basic_disv__topsystem):
     ibound, top, bottom = basic_disv__topsystem
+    top = top.sel(layer=1, drop=True)
     elevation = zeros_like(ibound.sel(layer=1), dtype=np.float64)
     # Deactivate second cell
     elevation[1] = np.nan
@@ -49,7 +50,7 @@ def riv_unstructured_transient(basic_disv__topsystem):
 
 def riv_structured(basic_dis__topsystem):
     ibound, top, bottom = basic_dis__topsystem
-    top = top.sel(layer=1)
+    top = top.sel(layer=1, drop=True)
     elevation = zeros_like(ibound.sel(layer=1), dtype=np.float64)
     # Deactivate second cell
     elevation[1, 1] = np.nan
@@ -61,6 +62,7 @@ def riv_structured(basic_dis__topsystem):
 
 def riv_unstructured(basic_disv__topsystem):
     ibound, top, bottom = basic_disv__topsystem
+    top = top.sel(layer=1, drop=True)
     elevation = zeros_like(ibound.sel(layer=1), dtype=np.float64)
     # Deactivate second cell
     elevation[1] = np.nan
@@ -72,7 +74,7 @@ def riv_unstructured(basic_disv__topsystem):
 
 def drn_structured(basic_dis__topsystem):
     ibound, top, bottom = basic_dis__topsystem
-    top = top.sel(layer=1)
+    top = top.sel(layer=1, drop=True)
     elevation = zeros_like(ibound.sel(layer=1), dtype=np.float64)
     # Deactivate second cell
     elevation[1, 1] = np.nan
@@ -83,6 +85,7 @@ def drn_structured(basic_dis__topsystem):
 
 def drn_unstructured(basic_disv__topsystem):
     ibound, top, bottom = basic_disv__topsystem
+    top = top.sel(layer=1, drop=True)
     elevation = zeros_like(ibound.sel(layer=1), dtype=np.float64)
     # Deactivate second cell
     elevation[1] = np.nan
@@ -93,7 +96,7 @@ def drn_unstructured(basic_disv__topsystem):
 
 def ghb_structured(basic_dis__topsystem):
     ibound, top, bottom = basic_dis__topsystem
-    top = top.sel(layer=1)
+    top = top.sel(layer=1, drop=True)
     elevation = zeros_like(ibound.sel(layer=1), dtype=np.float64)
     # Deactivate second cell
     elevation[1, 1] = np.nan
@@ -104,6 +107,7 @@ def ghb_structured(basic_dis__topsystem):
 
 def ghb_unstructured(basic_disv__topsystem):
     ibound, top, bottom = basic_disv__topsystem
+    top = top.sel(layer=1, drop=True)
     elevation = zeros_like(ibound.sel(layer=1), dtype=np.float64)
     # Deactivate second cell
     elevation[1] = np.nan
@@ -243,6 +247,79 @@ def distribution_by_corrected_transmissivity__TFTF__drn():
         [True, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
     )
     expected = [(8 / 9), np.nan, (1 / 9), np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["riv"])
+def distribution_by_corrected_thickness():
+    option = DISTRIBUTING_OPTION.by_corrected_thickness
+    allocated_layer = xr.DataArray(
+        [False, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [np.nan, (2 / 3), (1 / 3), np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["riv"])
+def distribution_by_corrected_thickness__first_active():
+    """First active cell allocated, while stage in second layer"""
+    option = DISTRIBUTING_OPTION.by_corrected_thickness
+    allocated_layer = xr.DataArray(
+        [True, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [0.0, (2 / 3), (1 / 3), np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["riv", "drn"])
+def distribution_by_corrected_thickness__third_only():
+    """Third layer active only, while stage in second layer"""
+    option = DISTRIBUTING_OPTION.by_corrected_thickness
+    allocated_layer = xr.DataArray(
+        [False, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [np.nan, np.nan, 1.0, np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["riv"])
+def distribution_by_corrected_thickness__TFTF():
+    option = DISTRIBUTING_OPTION.by_corrected_thickness
+    allocated_layer = xr.DataArray(
+        [True, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [0.0, np.nan, 1.0, np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["drn"])
+def distribution_by_corrected_thickness__drn():
+    option = DISTRIBUTING_OPTION.by_corrected_thickness
+    allocated_layer = xr.DataArray(
+        [False, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [np.nan, (8 / 9), (1 / 9), np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["drn"])
+def distribution_by_corrected_thickness__first_active__drn():
+    """First active cell allocated, while drain in third layer"""
+    option = DISTRIBUTING_OPTION.by_corrected_thickness
+    allocated_layer = xr.DataArray(
+        [True, True, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [(4 / 13), (8 / 13), (1 / 13), np.nan]
+    return option, allocated_layer, expected
+
+
+@case(tags=["drn"])
+def distribution_by_corrected_thickness__TFTF__drn():
+    option = DISTRIBUTING_OPTION.by_corrected_thickness
+    allocated_layer = xr.DataArray(
+        [True, False, True, False], coords={"layer": [1, 2, 3, 4]}, dims=("layer",)
+    )
+    expected = [(4 / 5), np.nan, (1 / 5), np.nan]
     return option, allocated_layer, expected
 
 

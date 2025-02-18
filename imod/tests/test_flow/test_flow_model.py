@@ -240,9 +240,7 @@ def test_compose_periods(model_periodic_stress):
 def test_render_periods(model_periodic_stress):
     periods_composed = model_periodic_stress._compose_periods()
 
-    compare = (
-        "Periods\n" "summer\n" "01-01-2000 00:00:00\n" "winter\n" "02-01-2000 00:00:00"
-    )
+    compare = "Periods\nsummer\n01-01-2000 00:00:00\nwinter\n02-01-2000 00:00:00"
 
     rendered = model_periodic_stress._render_periods(periods_composed)
 

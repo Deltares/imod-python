@@ -206,8 +206,7 @@ def plot_map(
     # Catch case first where no figure provided, but ax was provided
     if fig is None and ax is not None:
         raise ValueError(
-            "Axes provided, yet no figure is provided. "
-            "Please provide a figure as well."
+            "Axes provided, yet no figure is provided. Please provide a figure as well."
         )
     if fig is None:
         fig = plt.figure(figsize=figsize)

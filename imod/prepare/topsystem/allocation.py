@@ -83,7 +83,7 @@ def allocate_riv_cells(
         enumerator.
     active: DataArray | UgridDatarray
         Boolean array containing active model cells. For Modflow 6, this is the
-        equivalent of ``idomain == 1``.
+        equivalent of ``idomain > 0``.
     top: DataArray | UgridDatarray
         Grid containing tops of model layers. If has no layer dimension, is
         assumed as top of upper layer and the other layers are padded with
@@ -156,7 +156,7 @@ def allocate_drn_cells(
         enumerator.
     active: DataArray | UgridDatarray
         Boolean array containing active model cells. For Modflow 6, this is the
-        equivalent of ``idomain == 1``.
+        equivalent of ``idomain > 0``.
     top: DataArray | UgridDatarray
         Grid containing tops of model layers. If has no layer dimension, is
         assumed as top of upper layer and the other layers are padded with
@@ -217,7 +217,7 @@ def allocate_ghb_cells(
         enumerator.
     active: DataArray | UgridDatarray
         Boolean array containing active model cells. For Modflow 6, this is the
-        equivalent of ``idomain == 1``.
+        equivalent of ``idomain > 0``.
     top: DataArray | UgridDatarray
         Grid containing tops of model layers. If has no layer dimension, is
         assumed as top of upper layer and the other layers are padded with
@@ -275,7 +275,7 @@ def allocate_rch_cells(
         enumerator.
     active: DataArray | UgridDataArray
         Boolean array containing active model cells. For Modflow 6, this is the
-        equivalent of ``idomain == 1``.
+        equivalent of ``idomain > 0``.
     rate: DataArray | UgridDataArray
         Array with recharge rates. This will only be used to infer where
         recharge cells are defined.
@@ -312,6 +312,20 @@ def _enforce_layered_top(top: GridDataArray, bottom: GridDataArray):
         return top
     else:
         return create_layered_top(bottom, top)
+
+
+def get_above_lower_bound(bottom_elevation: GridDataArray, top_layered: GridDataArray):
+    """
+    Returns boolean array that indicates cells are above the lower vertical
+    limit of the topsystem. These are the cells located above the
+    bottom_elevation grid or in the first layer.
+    """
+    top_layer_label = {"layer": min(top_layered.coords["layer"])}
+    is_above_lower_bound = bottom_elevation <= top_layered
+    # Bottom elevation above top surface is allowed, so these are set to True
+    # regardless.
+    is_above_lower_bound.loc[top_layer_label] = ~bottom_elevation.isnull()
+    return is_above_lower_bound
 
 
 @enforced_dim_order
@@ -351,7 +365,9 @@ def _allocate_cells__stage_to_riv_bot(
 
     top_layered = _enforce_layered_top(top, bottom)
 
-    riv_cells = (stage > bottom) & (bottom_elevation < top_layered)
+    is_above_lower_bound = get_above_lower_bound(bottom_elevation, top_layered)
+    is_below_upper_bound = stage > bottom
+    riv_cells = is_below_upper_bound & is_above_lower_bound
 
     return riv_cells, None
 
@@ -394,7 +410,9 @@ def _allocate_cells__first_active_to_elevation(
 
     top_layered = _enforce_layered_top(top, bottom)
 
-    riv_cells = (upper_active_layer <= layer) & (bottom_elevation < top_layered)
+    is_above_lower_bound = get_above_lower_bound(bottom_elevation, top_layered)
+    is_below_upper_bound = upper_active_layer <= layer
+    riv_cells = is_below_upper_bound & is_above_lower_bound & active
 
     return riv_cells, None
 
@@ -442,13 +460,13 @@ def _allocate_cells__stage_to_riv_bot_drn_above(
     PLANAR_GRID.validate(bottom_elevation)
 
     top_layered = _enforce_layered_top(top, bottom)
-
+    is_above_lower_bound = get_above_lower_bound(bottom_elevation, top_layered)
     upper_active_layer = get_upper_active_layer_number(active)
     layer = active.coords["layer"]
-    drn_cells = (upper_active_layer <= layer) & (bottom >= stage)
-    riv_cells = (
-        (upper_active_layer <= layer) & (bottom_elevation < top_layered)
-    ) != drn_cells
+    is_below_upper_bound = upper_active_layer <= layer
+    is_below_upper_bound_and_active = is_below_upper_bound & active
+    drn_cells = is_below_upper_bound_and_active & (bottom >= stage)
+    riv_cells = (is_below_upper_bound_and_active & is_above_lower_bound) != drn_cells
 
     return riv_cells, drn_cells
 
@@ -482,8 +500,9 @@ def _allocate_cells__at_elevation(
     PLANAR_GRID.validate(elevation)
 
     top_layered = _enforce_layered_top(top, bottom)
-
-    riv_cells = (elevation < top_layered) & (elevation >= bottom)
+    is_above_lower_bound = get_above_lower_bound(elevation, top_layered)
+    is_below_upper_bound = elevation >= bottom
+    riv_cells = is_below_upper_bound & is_above_lower_bound
 
     return riv_cells, None
 

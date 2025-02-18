@@ -9,6 +9,8 @@ from numpy.testing import assert_almost_equal, assert_equal
 
 from imod.msw import IdfMapping, TimeOutputControl, VariableOutputControl
 
+DUMMY_ARGS = None, None, None, None
+
 
 def grid():
     x = [1.0, 2.0, 3.0, 4.0]
@@ -54,12 +56,11 @@ def grid():
 
 
 def test_var_oc(fixed_format_parser):
-    dummy = None, None
     var_output_control = VariableOutputControl()
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        var_output_control.write(output_dir, *dummy)
+        var_output_control.write(output_dir, *DUMMY_ARGS)
 
         results = fixed_format_parser(
             output_dir / VariableOutputControl._file_name,
@@ -74,7 +75,6 @@ def test_var_oc(fixed_format_parser):
 
 
 def test_time_oc(fixed_format_parser):
-    dummy = None, None
     freq = "D"
     times = pd.date_range(start="1/1/1971", end="1/3/1971", freq=freq)
 
@@ -82,13 +82,13 @@ def test_time_oc(fixed_format_parser):
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        time_output_control.write(output_dir, *dummy)
+        time_output_control.write(output_dir, *DUMMY_ARGS)
 
         results = fixed_format_parser(
             output_dir / TimeOutputControl._file_name, TimeOutputControl._metadata_dict
         )
 
-    assert_almost_equal(results["time_since_start_year"], np.array([1.0, 2.0, 3.0]))
+    assert_almost_equal(results["time_since_start_year"], np.array([0.0, 1.0, 2.0]))
     assert_equal(results["year"], [1971, 1971, 1971])
     assert_equal(results["option"], [7, 7, 7])
 
@@ -101,7 +101,7 @@ def test_idf_oc_write_simple_model(fixed_format_parser):
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        idf_output_control.write(output_dir, index, svat)
+        idf_output_control.write(output_dir, index, svat, None, None)
 
         results = fixed_format_parser(
             output_dir / IdfMapping._file_name, IdfMapping._metadata_dict

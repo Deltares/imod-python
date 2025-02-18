@@ -1,11 +1,13 @@
 import numpy as np
 import xarray as xr
+import xugrid as xu
 
 from imod.logging import init_log_decorator
 from imod.mf6.boundary_condition import AdvancedBoundaryCondition, BoundaryCondition
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.prepare.layer import get_upper_active_grid_cells
 from imod.schemata import (
+    AllCoordsValueSchema,
     AllInsideNoDataSchema,
     AllNoDataSchema,
     AllValueSchema,
@@ -21,8 +23,6 @@ from imod.schemata import (
 class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
     """
     Unsaturated Zone Flow (UZF) package.
-
-    TODO: Support timeseries file? Observations? Water Mover?
 
     Parameters
     ----------
@@ -97,6 +97,8 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         path to output cbc-file for UZF budgets
     budgetcsv_fileout: ({"str"}, optional)
         path to output csv-file for summed budgets
+    water_content_file: ({"str"}, optional)
+        path to output file for unsaturated zone water content
     observations: [Not yet supported.]
         Default is None.
     water_mover: [Not yet supported.]
@@ -126,52 +128,64 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         "surface_depression_depth": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "kv_sat": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             CoordsSchema(("layer",)),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "theta_res": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "theta_sat": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "theta_init": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "epsilon": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "infiltration_rate": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "et_pot": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA | DimsSchema(),  # optional var
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "extinction_depth": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA | DimsSchema(),  # optional var
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "extinction_theta": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA | DimsSchema(),  # optional var
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "root_potential": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA | DimsSchema(),  # optional var
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "root_activity": [
             DTypeSchema(np.floating),
             BOUNDARY_DIMS_SCHEMA | DimsSchema(),  # optional var
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
         "save_flows": [DTypeSchema(np.bool_), DimsSchema()],
@@ -233,6 +247,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         save_flows=False,
         budget_fileout=None,
         budgetcsv_fileout=None,
+        water_content_file=None,
         observations=None,
         water_mover=None,
         timeseries=None,
@@ -271,6 +286,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
             "save_flows": save_flows,
             "budget_fileout": budget_fileout,
             "budgetcsv_fileout": budgetcsv_fileout,
+            "water_content_file": water_content_file,
             "observations": observations,
             "water_mover": water_mover,
             "timeseries": timeseries,
@@ -301,7 +317,10 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         for var in self._period_data:
             if self.dataset[var].size == 1:  # Prevent loading large arrays in memory
                 if self.dataset[var].values[()] is None:
-                    self.dataset[var] = xr.full_like(self["infiltration_rate"], 0.0)
+                    if isinstance(self["infiltration_rate"], xu.UgridDataArray):
+                        self.dataset[var] = xu.full_like(self["infiltration_rate"], 0)
+                    else:
+                        self.dataset[var] = xr.full_like(self["infiltration_rate"], 0.0)
                 else:
                     raise ValueError("{} cannot be a scalar".format(var))
 
@@ -379,9 +398,12 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
 
         field_spec = self._get_field_spec_from_dtype(recarr)
         field_names = [i[0] for i in field_spec]
-        index_spec = [("iuzno", np.int32)] + field_spec[:3]
+        n = 3
+        if isinstance(self.dataset, xu.UgridDataset):
+            n = 2
+        index_spec = [("iuzno", np.int32)] + field_spec[:n]
         field_spec = (
-            [("landflag", np.int32)] + [("ivertcon", np.int32)] + field_spec[3:]
+            [("landflag", np.int32)] + [("ivertcon", np.int32)] + field_spec[n:]
         )
         sparse_dtype = np.dtype(index_spec + field_spec)
 

@@ -11,6 +11,7 @@ from imod.mf6.regrid.regrid_schemes import DiscretizationRegridMethod
 from imod.mf6.validation import DisBottomSchema
 from imod.mf6.write_context import WriteContext
 from imod.schemata import (
+    AllCoordsValueSchema,
     AllValueSchema,
     AnyValueSchema,
     DimsSchema,
@@ -27,8 +28,24 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
     Parameters
     ----------
     top: array of floats (xu.UgridDataArray)
+        is the top elevation for each cell in the top model layer.
     bottom: array of floats (xu.UgridDataArray)
+        is the bottom elevation for each cell.
     idomain: array of integers (xu.UgridDataArray)
+        Indicates the existence status of a cell.
+
+        * If 0, the cell does not exist in the simulation. Input and output
+          values will be read and written for the cell, but internal to the
+          program, the cell is excluded from the solution.
+        * If >0, the cell exists in the simulation.
+        * If <0, the cell does not exist in the simulation. Furthermore, the
+          first existing cell above will be connected to the first existing cell
+          below. This type of cell is referred to as a "vertical pass through"
+          cell.
+
+        This UgridDataArray needs to contain a ``"layer"`` coordinate and a face
+        dimension. Horizontal discretization information will be derived from
+        its face dimension.
     validate: {True, False}
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
@@ -47,17 +64,19 @@ class VerticesDiscretization(Package, IRegridPackage, IMaskingSettings):
             DTypeSchema(np.floating),
             DimsSchema("layer", "{face_dim}") | DimsSchema("layer"),
             IndexesSchema(),
+            AllCoordsValueSchema("layer", ">", 0),
         ],
         "idomain": [
             DTypeSchema(np.integer),
             DimsSchema("layer", "{face_dim}"),
             IndexesSchema(),
+            AllCoordsValueSchema("layer", ">", 0),
         ],
     }
     _write_schemata = {
         "idomain": (AnyValueSchema(">", 0),),
         "top": (
-            AllValueSchema(">", "bottom", ignore=("idomain", "==", -1)),
+            AllValueSchema(">", "bottom", ignore=("idomain", "<=", 0)),
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
             # No need to check coords: dataset ensures they align with idomain.
         ),

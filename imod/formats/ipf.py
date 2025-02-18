@@ -17,6 +17,7 @@ import numpy as np
 import pandas as pd
 
 import imod
+from imod.util.time import to_pandas_datetime_series
 
 
 def _infer_delimwhitespace(line, ncol):
@@ -230,15 +231,7 @@ def read_associated(path, kwargs={}):
 
     if nrow > 0 and itype == 1:
         time_column = colnames[0]
-        len_date = len(df[time_column].iloc[0])
-        if len_date == 14:
-            df[time_column] = pd.to_datetime(df[time_column], format="%Y%m%d%H%M%S")
-        elif len_date == 8:
-            df[time_column] = pd.to_datetime(df[time_column], format="%Y%m%d")
-        else:
-            raise ValueError(
-                f"{path.name}: datetime format must be yyyymmddhhmmss or yyyymmdd"
-            )
+        df[time_column] = to_pandas_datetime_series(df[time_column])
     return df
 
 

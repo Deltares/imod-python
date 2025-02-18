@@ -10,15 +10,31 @@ from unittest import mock
 from unittest.mock import MagicMock
 
 import numpy as np
+import pandas as pd
 import pytest
 import rasterio
+import tomli
+import tomli_w
 import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.logging import LoggerType, LogLevel
+from imod.mf6 import LayeredWell, Well
 from imod.mf6.model import Modflow6Model
 from imod.mf6.multimodel.modelsplitter import PartitionInfo
+from imod.mf6.oc import OutputControl
+from imod.mf6.regrid.regrid_schemes import (
+    DiscretizationRegridMethod,
+    NodePropertyFlowRegridMethod,
+    StorageCoefficientRegridMethod,
+)
+from imod.mf6.simulation import Modflow6Simulation
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo
+from imod.prepare.topsystem.default_allocation_methods import (
+    SimulationAllocationOptions,
+    SimulationDistributingOptions,
+)
 from imod.schemata import ValidationError
 from imod.tests.fixtures.mf6_small_models_fixture import (
     grid_data_structured,
@@ -39,6 +55,11 @@ def test_twri_roundtrip(twri_model, tmpdir_factory):
     roundtrip(twri_model, tmpdir_factory, "twri")
 
 
+@pytest.mark.usefixtures("twri_model_hfb")
+def test_twri_hfb_roundtrip(twri_model_hfb, tmpdir_factory):
+    roundtrip(twri_model_hfb, tmpdir_factory, "twri")
+
+
 @pytest.mark.usefixtures("transient_twri_model")
 def test_twri_transient_roundtrip(transient_twri_model, tmpdir_factory):
     roundtrip(transient_twri_model, tmpdir_factory, "twri_transient")
@@ -52,6 +73,89 @@ def test_twri_disv_roundtrip(twri_disv_model, tmpdir_factory):
 @pytest.mark.usefixtures("circle_model")
 def test_circle_roundtrip(circle_model, tmpdir_factory):
     roundtrip(circle_model, tmpdir_factory, "circle")
+
+
+@pytest.mark.usefixtures("twri_model")
+def test_dump_version_number__version_written(twri_model, tmpdir_factory):
+    # Arrange
+    tmp_path = tmpdir_factory.mktemp("twri")
+    # Act
+    twri_model.dump(tmp_path)
+    # Assert
+    toml_path = tmp_path / f"{twri_model.name}.toml"
+    with open(toml_path, "rb") as f:
+        toml_content = tomli.load(f)
+    assert toml_content["version"]["imod-python"] == imod.__version__
+
+
+@pytest.mark.usefixtures("twri_model")
+def test_from_file_version_logged__version_in_dumped(twri_model, tmpdir_factory):
+    """
+    Tested if a warning is thrown when there is a mismatch between version
+    numbers of saved model and current iMOD Python version.
+    """
+    # Arrange
+    tmp_path = tmpdir_factory.mktemp("twri")
+    twri_model.dump(tmp_path)
+    toml_path = tmp_path / f"{twri_model.name}.toml"
+    with open(toml_path, "rb") as f:
+        toml_content = tomli.load(f)
+    toml_content["version"]["imod-python"] = "0.0.0"
+
+    toml_path_adapted = tmp_path / f"{twri_model.name}_adapted.toml"
+    with open(toml_path_adapted, "wb") as f:
+        tomli_w.dump(toml_content, f)
+    # Act
+    logfile_path = tmp_path / "logfile.txt"
+    with open(logfile_path, "w") as sys.stdout:
+        imod.logging.configure(
+            LoggerType.PYTHON,
+            log_level=LogLevel.DEBUG,
+            add_default_file_handler=False,
+            add_default_stream_handler=True,
+        )
+        imod.mf6.Modflow6Simulation.from_file(toml_path_adapted)
+
+    # Assert
+    with open(logfile_path, "r") as log_file:
+        log = log_file.read()
+        assert f"iMOD Python version in current environment: {imod.__version__}" in log
+        assert "iMOD Python version in dumped simulation: 0.0.0" in log
+
+
+@pytest.mark.usefixtures("twri_model")
+def test_from_file_version_logged__no_version_in_dumped(twri_model, tmpdir_factory):
+    """
+    Tested if a warning is thrown when there is a mismatch between version
+    numbers of saved model and current iMOD Python version.
+    """
+    # Arrange
+    tmp_path = tmpdir_factory.mktemp("twri")
+    twri_model.dump(tmp_path)
+    toml_path = tmp_path / f"{twri_model.name}.toml"
+    with open(toml_path, "rb") as f:
+        toml_content = tomli.load(f)
+    toml_content.pop("version")
+
+    toml_path_adapted = tmp_path / f"{twri_model.name}_adapted.toml"
+    with open(toml_path_adapted, "wb") as f:
+        tomli_w.dump(toml_content, f)
+    # Act
+    logfile_path = tmp_path / "logfile.txt"
+    with open(logfile_path, "w") as sys.stdout:
+        imod.logging.configure(
+            LoggerType.PYTHON,
+            log_level=LogLevel.DEBUG,
+            add_default_file_handler=False,
+            add_default_stream_handler=True,
+        )
+        imod.mf6.Modflow6Simulation.from_file(toml_path_adapted)
+
+    # Assert
+    with open(logfile_path, "r") as log_file:
+        log = log_file.read()
+        assert f"iMOD Python version in current environment: {imod.__version__}" in log
+        assert "No iMOD Python version information found in dumped simulation." in log
 
 
 @pytest.mark.usefixtures("twri_model")
@@ -89,7 +193,6 @@ def test_twri_disv_mdal_compliant_semi_roundtrip(twri_disv_model, tmpdir_factory
 
 
 @pytest.mark.usefixtures("circle_model")
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_open_head(circle_model, tmp_path):
     simulation = circle_model
 
@@ -118,7 +221,6 @@ def test_simulation_open_head(circle_model, tmp_path):
 
 
 @pytest.mark.usefixtures("circle_model")
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_open_head_relative_path(circle_model, tmp_path):
     simulation = circle_model
 
@@ -139,7 +241,6 @@ def test_simulation_open_head_relative_path(circle_model, tmp_path):
 
 
 @pytest.mark.usefixtures("circle_model")
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_open_flow_budget(circle_model, tmp_path):
     simulation = circle_model
 
@@ -179,7 +280,6 @@ def test_write_circle_model_twice(circle_model, tmp_path):
 
 
 @pytest.mark.usefixtures("circle_model")
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_open_concentration_fail(circle_model, tmp_path):
     """No transport model is assigned, so should throw error when opening concentrations"""
     simulation = circle_model
@@ -303,7 +403,7 @@ class TestModflow6Simulation:
 
         model_mock = MagicMock(spec_set=Modflow6Model)
         model_mock._model_id = "test_model_id"
-        model_mock.write.return_value = model_status_info
+        model_mock._write.return_value = model_status_info
 
         simulation["test_model"] = model_mock
 
@@ -463,3 +563,225 @@ def compare_submodel_partition_info(first: PartitionInfo, second: PartitionInfo)
     return (first.id == second.id) and np.array_equal(
         first.active_domain, second.active_domain
     )
+
+
+@pytest.mark.unittest_jit
+@pytest.mark.usefixtures("imod5_dataset")
+def test_import_from_imod5(imod5_dataset, tmp_path):
+    imod5_data = imod5_dataset[0]
+    period_data = imod5_dataset[1]
+
+    datelist = pd.date_range(start="1/1/1989", end="1/1/2013", freq="W")
+
+    simulation = Modflow6Simulation.from_imod5_data(
+        imod5_data,
+        period_data,
+        datelist,
+        SimulationAllocationOptions,
+        SimulationDistributingOptions,
+    )
+    simulation["imported_model"]["oc"] = OutputControl(
+        save_head="last", save_budget="last"
+    )
+    simulation.create_time_discretization(["01-01-2003", "02-01-2003"])
+    # Cleanup
+    # Remove HFB packages outside domain
+    # TODO: Build in support for hfb packages outside domain
+    for hfb_outside in ["hfb-24", "hfb-26"]:
+        simulation["imported_model"].pop(hfb_outside)
+    # Align NoData to domain
+    idomain = simulation["imported_model"].domain
+    simulation.mask_all_models(idomain)
+    # write and validate the simulation.
+    simulation.write(tmp_path, binary=False, validate=True)
+
+    # Test if simulation attribute appropiately set
+    assert simulation._validation_context.strict_well_validation is False
+
+
+@pytest.mark.unittest_jit
+@pytest.mark.usefixtures("imod5_dataset")
+def test_from_imod5__has_cap_data(imod5_dataset):
+    imod5_data = deepcopy(imod5_dataset[0])
+    period_data = imod5_dataset[1]
+
+    imod5_data["cap"] = {}
+    msw_bound = imod5_data["bnd"]["ibound"].isel(layer=0, drop=True)
+    imod5_data["cap"]["boundary"] = msw_bound
+    imod5_data["cap"]["wetted_area"] = xr.ones_like(msw_bound) * 100
+    imod5_data["cap"]["urban_area"] = xr.ones_like(msw_bound) * 200
+    imod5_data["cap"]["artificial_recharge"] = msw_bound
+    imod5_data["cap"]["artificial_recharge_layer"] = xr.ones_like(msw_bound) + 1
+    imod5_data["cap"]["artificial_recharge_capacity"] = xr.DataArray(25.0)
+
+    datelist = pd.date_range(start="1/1/1989", end="1/1/2013", freq="W")
+
+    simulation = Modflow6Simulation.from_imod5_data(
+        imod5_data,
+        period_data,
+        datelist,
+        SimulationAllocationOptions,
+        SimulationDistributingOptions,
+    )
+
+    gwf_model = simulation["imported_model"]
+
+    assert "msw-rch" in gwf_model.keys()
+    assert "msw-sprinkling" in gwf_model.keys()
+
+
+@pytest.mark.unittest_jit
+@pytest.mark.usefixtures("imod5_dataset")
+def test_from_imod5__strict_well_validation_set(imod5_dataset):
+    imod5_data = imod5_dataset[0]
+    period_data = imod5_dataset[1]
+
+    datelist = pd.date_range(start="1/1/1989", end="1/1/1990", freq="W")
+
+    simulation = Modflow6Simulation.from_imod5_data(
+        imod5_data,
+        period_data,
+        datelist,
+        SimulationAllocationOptions,
+        SimulationDistributingOptions,
+    )
+    assert simulation._validation_context.strict_well_validation is False
+    assert Modflow6Simulation("test")._validation_context.strict_well_validation is True
+
+
+@pytest.mark.unittest_jit
+@pytest.mark.usefixtures("imod5_dataset")
+def test_import_from_imod5__correct_well_type(imod5_dataset):
+    # Unpack
+    imod5_data = imod5_dataset[0]
+    period_data = imod5_dataset[1]
+    # Temporarily change layer number to 0, to force Well object instead of
+    # LayeredWell
+    original_wel_layer = imod5_data["wel-WELLS_L3"]["layer"]
+    imod5_data["wel-WELLS_L3"]["layer"] = [0] * len(original_wel_layer)
+    # Other arrangement
+    default_simulation_allocation_options = SimulationAllocationOptions
+    default_simulation_distributing_options = SimulationDistributingOptions
+    datelist = pd.date_range(start="1/1/1989", end="1/1/2013", freq="W")
+
+    # Act
+    simulation = Modflow6Simulation.from_imod5_data(
+        imod5_data,
+        period_data,
+        datelist,
+        default_simulation_allocation_options,
+        default_simulation_distributing_options,
+    )
+    # Set layer back to right value (before AssertionError might be thrown)
+    imod5_data["wel-WELLS_L3"]["layer"] = original_wel_layer
+    # Assert
+    assert isinstance(simulation["imported_model"]["wel-WELLS_L3"], Well)
+    assert isinstance(simulation["imported_model"]["wel-WELLS_L4"], LayeredWell)
+    assert isinstance(simulation["imported_model"]["wel-WELLS_L5"], LayeredWell)
+
+
+@pytest.mark.unittest_jit
+@pytest.mark.usefixtures("imod5_dataset")
+def test_import_from_imod5__well_steady_state(imod5_dataset):
+    # Unpack
+    imod5_data = imod5_dataset[0]
+    period_data = imod5_dataset[1]
+
+    sto = imod5_data.pop("sto")
+
+    # Other arrangement
+    default_simulation_allocation_options = SimulationAllocationOptions
+    default_simulation_distributing_options = SimulationDistributingOptions
+    datelist = pd.date_range(start="1/1/1989", end="1/1/2013", freq="W")
+
+    # Act
+    simulation = Modflow6Simulation.from_imod5_data(
+        imod5_data,
+        period_data,
+        datelist,
+        default_simulation_allocation_options,
+        default_simulation_distributing_options,
+    )
+    # Assert
+    gwf = simulation["imported_model"]
+    assert "time" not in gwf["wel-WELLS_L3"].dataset.coords
+    assert "time" not in gwf["wel-WELLS_L4"].dataset.coords
+    assert "time" not in gwf["wel-WELLS_L5"].dataset.coords
+    # Teardown
+    # Reassign storage package again
+    imod5_data["sto"] = sto
+
+
+@pytest.mark.unittest_jit
+@pytest.mark.usefixtures("imod5_dataset")
+def test_import_from_imod5__nonstandard_regridding(imod5_dataset, tmp_path):
+    imod5_data = imod5_dataset[0]
+    period_data = imod5_dataset[1]
+
+    regridding_option = {}
+    regridding_option["npf"] = NodePropertyFlowRegridMethod()
+    regridding_option["dis"] = DiscretizationRegridMethod()
+    regridding_option["sto"] = StorageCoefficientRegridMethod()
+    times = pd.date_range(start="1/1/2018", end="12/1/2018", freq="ME")
+
+    simulation = Modflow6Simulation.from_imod5_data(
+        imod5_data,
+        period_data,
+        times,
+        SimulationAllocationOptions,
+        SimulationDistributingOptions,
+        regridding_option,
+    )
+    simulation["imported_model"]["oc"] = OutputControl(
+        save_head="last", save_budget="last"
+    )
+    simulation.create_time_discretization(["01-01-2003", "02-01-2003"])
+    # Cleanup
+    # Remove HFB packages outside domain
+    # TODO: Build in support for hfb packages outside domain
+    for hfb_outside in ["hfb-24", "hfb-26"]:
+        simulation["imported_model"].pop(hfb_outside)
+    # Align NoData to domain
+    idomain = simulation["imported_model"].domain
+    simulation.mask_all_models(idomain)
+    # write and validate the simulation.
+    simulation.write(tmp_path, binary=False, validate=True)
+
+
+@pytest.mark.unittest_jit
+@pytest.mark.usefixtures("imod5_dataset")
+def test_import_from_imod5_no_storage_no_recharge(imod5_dataset, tmp_path):
+    # this test imports an imod5 simulation, but it has no recharge and no storage package.
+    imod5_data = imod5_dataset[0]
+    imod5_data.pop("sto")
+    imod5_data.pop("rch")
+    period_data = imod5_dataset[1]
+
+    times = pd.date_range(start="1/1/2018", end="12/1/2018", freq="ME")
+
+    simulation = Modflow6Simulation.from_imod5_data(
+        imod5_data,
+        period_data,
+        times,
+        SimulationAllocationOptions,
+        SimulationDistributingOptions,
+    )
+    simulation["imported_model"]["oc"] = OutputControl(
+        save_head="last", save_budget="last"
+    )
+    simulation.create_time_discretization(["01-01-2003", "02-01-2003"])
+    # Cleanup
+    # Remove HFB packages outside domain
+    # TODO: Build in support for hfb packages outside domain
+    for hfb_outside in ["hfb-24", "hfb-26"]:
+        simulation["imported_model"].pop(hfb_outside)
+    # check storage is present and rch is absent
+    assert not simulation["imported_model"]["sto"].dataset["transient"].values[()]
+    package_keys = simulation["imported_model"].keys()
+    for key in package_keys:
+        assert key[0:3] != "rch"
+    # Align NoData to domain
+    idomain = simulation["imported_model"].domain
+    simulation.mask_all_models(idomain)
+    # write and validate the simulation.
+    simulation.write(tmp_path, binary=False, validate=True)

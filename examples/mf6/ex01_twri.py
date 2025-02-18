@@ -151,7 +151,6 @@ gwf_model["wel"] = imod.mf6.Well(
     screen_top=screen_top,
     screen_bottom=screen_bottom,
     rate=rate_wel,
-    minimum_k=0.0001,
 )
 
 # Attach it to a simulation
@@ -216,7 +215,7 @@ head.isel(layer=0, time=0).plot.contourf()
 # %%
 # .. _MODFLOW6 example problems: https://github.com/MODFLOW-USGS/modflow6-examples
 # .. _description: https://modflow6-examples.readthedocs.io/en/master/_examples/ex-gwf-twri.html
-# .. _notebook: https://github.com/MODFLOW-USGS/modflow6-examples/tree/master/notebooks/ex-gwf-twri.ipynb
+# .. _notebook: https://github.com/MODFLOW-USGS/modflow6-examples/blob/develop/scripts/ex-gwf-twri.py
 # .. _Techniques of Water-Resources Investigation: https://pubs.usgs.gov/twri/twri7-c1/
 # .. _McDonald & Harbaugh, 1988: https://pubs.er.usgs.gov/publication/twri06A1
 # .. _Harbaugh & McDonald, 1996: https://pubs.er.usgs.gov/publication/ofr96485

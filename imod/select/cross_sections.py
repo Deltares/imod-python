@@ -349,7 +349,7 @@ def cross_section_line(data, start, end):
     `xarray.DataArray` so that we can utilize its coordinate data.
 
     Adapted from Metpy:
-    https://github.com/Unidata/MetPy/blob/master/metpy/interpolate/slices.py
+    https://github.com/Unidata/MetPy/blob/main/src/metpy/interpolate/slices.py
 
     Parameters
     ----------
@@ -391,7 +391,7 @@ def cross_section_linestring(data, linestring):
     we can utilize its coordinate data.
 
     Adapted from Metpy:
-    https://github.com/Unidata/MetPy/blob/master/metpy/interpolate/slices.py
+    https://github.com/Unidata/MetPy/blob/main/src/metpy/interpolate/slices.py
 
     Parameters
     ----------

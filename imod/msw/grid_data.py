@@ -1,12 +1,23 @@
 import numpy as np
 import xarray as xr
 
+from imod.mf6 import StructuredDiscretization
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
-from imod.util.spatial import spatial_reference
+from imod.msw.regrid.regrid_schemes import GridDataRegridMethod
+from imod.msw.utilities.imod5_converter import (
+    get_cell_area_from_imod5_data,
+    get_landuse_from_imod5_data,
+    get_rootzone_depth_from_imod5_data,
+    is_msw_active_cell,
+)
+from imod.msw.utilities.mask import MetaSwapActive, mask_and_broadcast_pkg_data
+from imod.typing import Imod5DataDict
+from imod.util.spatial import get_cell_area, spatial_reference
 
 
-class GridData(MetaSwapPackage):
+class GridData(MetaSwapPackage, IRegridPackage):
     """
     This contains the grid data of MetaSWAP.
 
@@ -50,6 +61,8 @@ class GridData(MetaSwapPackage):
     _without_subunit = ("surface_elevation", "soil_physical_unit")
     _to_fill = ("soil_physical_unit_string", "temp")
 
+    _regrid_method = GridDataRegridMethod()
+
     def __init__(
         self,
         area: xr.DataArray,
@@ -60,6 +73,7 @@ class GridData(MetaSwapPackage):
         active: xr.DataArray,
     ):
         super().__init__()
+
         self.dataset["area"] = area
         self.dataset["landuse"] = landuse
         self.dataset["rootzone_depth"] = rootzone_depth
@@ -95,7 +109,7 @@ class GridData(MetaSwapPackage):
 
         active = self.dataset["active"]
 
-        cell_area = active.astype(float) * dx * abs(dy)
+        cell_area = get_cell_area(active)
         total_area = self.dataset["area"].sum(dim="subunit")
 
         # Apparently all regional models intentionally provided area grids
@@ -106,3 +120,52 @@ class GridData(MetaSwapPackage):
             raise ValueError(
                 "Provided area grid with total areas larger than cell area"
             )
+
+    @classmethod
+    def from_imod5_data(
+        cls,
+        imod5_data: Imod5DataDict,
+        target_dis: StructuredDiscretization,
+    ) -> tuple["GridData", MetaSwapActive]:
+        """
+        Construct a MetaSWAP GridData package from iMOD5 data in the CAP
+        package, loaded with the :func:`imod.formats.prj.open_projectfile_data`
+        function.
+
+        Method does the following things:
+
+        - Computes rural area from the wetted area and urban area grids.
+        - Sets a second subunit for urban landuse (== 18).
+        - Rootzone depth is converted from cm's to m's.
+        - Determines where MetaSWAP should be active based on area grids,
+          boundary grid, and MODFLOW6 idomain.
+
+        Parameters
+        ----------
+        imod5_data: Imod5DataDict
+            iMOD5 data as returned by
+            :func:`imod.formats.prj.open_projectfile_data`
+        target_dis: imod.mf6.StructuredDiscretization
+            MODFLOW6 discretization to couple the MetaSWAP model to.
+
+        Returns
+        -------
+        imod.msw.GridData
+            GridData package
+        MetaSwapActive
+            Dataclass containing where MetaSwAP is active, per subunit, as well
+            as aggregated over subunits.
+        """
+        imod5_cap = imod5_data["cap"]
+
+        data = {}
+        data["area"] = get_cell_area_from_imod5_data(imod5_cap)
+        data["landuse"] = get_landuse_from_imod5_data(imod5_cap)
+        data["rootzone_depth"] = get_rootzone_depth_from_imod5_data(imod5_cap)
+        data["surface_elevation"] = imod5_cap["surface_elevation"]
+        data["soil_physical_unit"] = imod5_cap["soil_physical_unit"].astype(int)
+
+        msw_active = is_msw_active_cell(target_dis, imod5_cap, data["area"])
+        data_active = mask_and_broadcast_pkg_data(cls, data, msw_active)
+        data_active["active"] = msw_active.all
+        return cls(**data_active), msw_active

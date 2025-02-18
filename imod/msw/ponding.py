@@ -1,10 +1,17 @@
+from typing import Any, TextIO
+
 import pandas as pd
+import xarray as xr
 
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.msw.fixed_format import VariableMetaData
-from imod.msw.pkgbase import MetaSwapPackage
+from imod.msw.pkgbase import DataDictType, MetaSwapPackage
+from imod.msw.regrid.regrid_schemes import PondingRegridMethod
+from imod.msw.utilities.common import concat_imod5
+from imod.typing import Imod5DataDict, IntArray
 
 
-class Ponding(MetaSwapPackage):
+class Ponding(MetaSwapPackage, IRegridPackage):
     """
     Set ponding related parameters for MetaSWAP. This class is responsible for
     the svat2swnr_roff.inp file. Currently, we do not support ponds coupled to
@@ -39,6 +46,8 @@ class Ponding(MetaSwapPackage):
     _without_subunit = ()
     _to_fill = ()
 
+    _regrid_method = PondingRegridMethod()
+
     def __init__(self, ponding_depth, runon_resistance, runoff_resistance) -> None:
         super().__init__()
         self.dataset["ponding_depth"] = ponding_depth
@@ -47,8 +56,8 @@ class Ponding(MetaSwapPackage):
 
         self._pkgcheck()
 
-    def _render(self, file, index, svat):
-        data_dict = {"svat": svat.values.ravel()[index]}
+    def _render(self, file: TextIO, index: IntArray, svat: xr.DataArray, *args: Any):
+        data_dict: DataDictType = {"svat": svat.values.ravel()[index]}
 
         for var in self._with_subunit:
             data_dict[var] = self._index_da(self.dataset[var], index)
@@ -62,3 +71,32 @@ class Ponding(MetaSwapPackage):
         self._check_range(dataframe)
 
         return self.write_dataframe_fixed_width(file, dataframe)
+
+    @classmethod
+    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "Ponding":
+        """
+        Construct a MetaSWAP Ponding package from iMOD5 data in the CAP
+        package, loaded with the :func:`imod.formats.prj.open_projectfile_data`
+        function.
+
+        Method concatenates ponding depths, runon resistance, and runoff
+        resistance along two subunits. Subunit 0 for rural, and 1 for urban
+        landuse.
+
+        Parameters
+        ----------
+        imod5_data: Imod5DataDict
+            iMOD5 data as returned by
+            :func:`imod.formats.prj.open_projectfile_data`
+
+        Returns
+        -------
+        imod.msw.Ponding
+        """
+        cap_data = imod5_data["cap"]
+        data = {}
+        for key in cls._with_subunit:
+            data_ls = [cap_data[f"{landuse}_{key}"] for landuse in ["rural", "urban"]]
+            data[key] = concat_imod5(*data_ls)
+
+        return cls(**data)

@@ -6,8 +6,8 @@ build-backend = "hatchling.build"
 name = "imod"
 dynamic = ["version"]
 requires-python = ">=3.10"
-authors = [{ name = "Deltares", email = "huite.bootsma@deltares.nl" }, ]
-maintainers = [{ name = "Deltares", email = "huite.bootsma@deltares.nl" }]
+authors = [{ name = "Deltares", email = "imod.info@deltares.nl" }, ]
+maintainers = [{ name = "Deltares", email = "imod.info@deltares.nl" }]
 description = "Make massive MODFLOW models!"
 readme = "README.rst"
 license = { file = "LICENSE" }
@@ -158,6 +158,8 @@ ignore_missing_imports = true
 [tool.pytest.ini_options]
 markers = [
     "example: marks test as example (deselect with '-m \"not example\"')",
+    "user_acceptance: marks user acceptance tests (deselect with '-m \"not user_acceptance\"')",
+    "unittest_jit: marks unit tests that should be jitted (deselect with '-m \"not unittest_jit\"')"
 ]
 
 [tool.hatch.version]

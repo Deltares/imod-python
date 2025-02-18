@@ -45,7 +45,8 @@ object PipPythonTemplate : Template({
                 "python_env", listOf(
                     value("py310", label = "python 3.10"),
                     value("py311", label = "python 3.11"),
-                    value("py312", label = "python 3.12")
+                    value("py312", label = "python 3.12"),
+                    value("py313", label = "python 3.13")
                 )
             )
         }

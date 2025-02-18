@@ -1,6 +1,7 @@
 import numbers
 
 import numpy as np
+import xarray as xr
 from fastcore.dispatch import typedispatch
 from xarray.core.utils import is_scalar
 
@@ -47,7 +48,10 @@ def _mask_all_packages(
     mask: GridDataArray,
 ):
     spatial_dimension_names = get_spatial_dimension_names(mask)
-    if any(coord not in spatial_dimension_names for coord in mask.coords):
+    # Add any additional dimensions that are not part of the spatial dimensions. These are dimensions that are returned by xugrid
+    additional_dimension_names = ["dx", "dy"]
+    dimension_names = spatial_dimension_names + additional_dimension_names
+    if any(coord not in dimension_names for coord in mask.coords):
         raise ValueError("unexpected coordinate dimension in masking domain")
 
     for pkgname, pkg in model.items():
@@ -98,14 +102,15 @@ def _skip_variable(package: IMaskingSettings, var: str) -> bool:
 def _mask_spatial_var(self, var: str, mask: GridDataArray) -> GridDataArray:
     da = self.dataset[var]
     array_mask = _adjust_mask_for_unlayered_data(da, mask)
+    active = array_mask > 0
 
     if issubclass(da.dtype.type, numbers.Integral):
         if var == "idomain":
-            return da.where(array_mask > 0, other=array_mask)
+            return da.where(active, other=array_mask)
         else:
-            return da.where(array_mask > 0, other=0)
+            return da.where(active, other=0)
     elif issubclass(da.dtype.type, numbers.Real):
-        return da.where(array_mask > 0)
+        return da.where(active)
     else:
         raise TypeError(
             f"Expected dtype float or integer. Received instead: {da.dtype}"
@@ -129,3 +134,17 @@ def _adjust_mask_for_unlayered_data(
         array_mask = mask.isel(layer=0)
 
     return array_mask
+
+
+def mask_arrays(arrays: dict[str, xr.DataArray]) -> dict[str, xr.DataArray]:
+    """
+    This function takes a dictionary of xr.DataArrays. The arrays are assumed to have the same
+    coordinates. When a np.nan value is found in any array, the other arrays are also
+    set to np.nan at the same coordinates.
+    """
+    masks = [xr.DataArray(~np.isnan(array)) for array in arrays.values()]
+    # Get total mask across all arrays
+    total_mask = xr.concat(masks[:], dim="arrays").all("arrays")
+    # Mask arrays with total mask
+    arrays_masked = {key: array.where(total_mask) for key, array in arrays.items()}
+    return arrays_masked

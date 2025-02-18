@@ -3,7 +3,6 @@ from imod.mf6.regrid.regrid_schemes import (
     DiscretizationRegridMethod,
     DispersionRegridMethod,
     DrainageRegridMethod,
-    EmptyRegridMethod,
     EvapotranspirationRegridMethod,
     GeneralHeadBoundaryRegridMethod,
     InitialConditionsRegridMethod,
@@ -14,3 +13,4 @@ from imod.mf6.regrid.regrid_schemes import (
     SpecificStorageRegridMethod,
     StorageCoefficientRegridMethod,
 )
+from imod.util.regrid_method_type import EmptyRegridMethod

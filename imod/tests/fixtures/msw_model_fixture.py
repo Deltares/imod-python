@@ -5,6 +5,8 @@ import xarray as xr
 from numpy import nan
 
 from imod import mf6, msw
+from imod.mf6.mf6_wel_adapter import Mf6Wel
+from imod.mf6.wel import derive_cellid_from_points
 
 
 def make_coupled_mf6_model():
@@ -73,16 +75,13 @@ def make_coupled_mf6_model():
     gwf_model["oc"] = mf6.OutputControl(save_head="last", save_budget="last")
 
     # Create wells
-    wel_layer = 3
+    layer = 3
+    well_x = np.tile(x, nrow)
+    well_y = np.repeat(y, ncol)
+    well_rate = np.zeros(well_x.shape)
+    well_layer = np.full_like(well_x, layer, dtype=int)
 
-    ix = np.tile(np.arange(ncol) + 1, nrow)
-    iy = np.repeat(np.arange(nrow) + 1, ncol)
-    rate = np.zeros(ix.shape)
-    layer = np.full_like(ix, wel_layer)
-
-    gwf_model["wells_msw"] = mf6.WellDisStructured(
-        layer=layer, row=iy, column=ix, rate=rate
-    )
+    gwf_model["well_msw"] = mf6.LayeredWell(well_x, well_y, well_layer, well_rate)
 
     # Attach it to a simulation
     simulation = mf6.Modflow6Simulation("test")
@@ -117,9 +116,6 @@ def make_msw_model():
     dx = 1.0
     dy = -1.0
 
-    nrow = len(y)
-    ncol = len(x)
-
     freq = "D"
     times = pd.date_range(start="1/1/1971", end="1/3/1971", freq=freq)
 
@@ -146,7 +142,7 @@ def make_msw_model():
              [False, True, False],
              [False, True, False]]),
         dims=("y", "x"),
-        coords={"y": y, "x": x}
+        coords={"y": y, "x": x, "dx": dx, "dy": dy}
     )
     # fmt: on
     msw_grid = xr.ones_like(active, dtype=float)
@@ -188,29 +184,6 @@ def make_msw_model():
     )
     lu = xr.ones_like(vegetation_index_da, dtype=float)
 
-    # %% Well
-
-    wel_layer = 3
-
-    ix = np.tile(np.arange(ncol) + 1, nrow)
-    iy = np.repeat(np.arange(nrow) + 1, ncol)
-    rate = np.zeros(ix.shape)
-    layer = np.full_like(ix, wel_layer)
-
-    well = mf6.WellDisStructured(layer=layer, row=iy, column=ix, rate=rate)
-
-    # %% Modflow 6
-    dz = np.array([1, 10, 100])
-    layer = [1, 2, 3]
-
-    top = 0.0
-    bottom = top - xr.DataArray(
-        np.cumsum(layer * dz), coords={"layer": layer}, dims="layer"
-    )
-
-    idomain = xr.full_like(msw_grid, 1, dtype=int).expand_dims(layer=layer)
-    dis = mf6.StructuredDiscretization(top=top, bottom=bottom, idomain=idomain)
-
     # %% Initiate model
     msw_model = msw.MetaSwapModel(unsaturated_database=unsaturated_database)
     msw_model["grid"] = msw.GridData(
@@ -231,9 +204,8 @@ def make_msw_model():
 
     # %% Sprinkling
     msw_model["sprinkling"] = msw.Sprinkling(
-        max_abstraction_groundwater=xr.full_like(msw_grid, 100.0),
-        max_abstraction_surfacewater=xr.full_like(msw_grid, 100.0),
-        well=well,
+        max_abstraction_groundwater=xr.full_like(area, 100.0),
+        max_abstraction_surfacewater=xr.full_like(area, 100.0),
     )
 
     # %% Ponding
@@ -254,8 +226,8 @@ def make_msw_model():
     # %% Infiltration
     msw_model["infiltration"] = msw.Infiltration(
         infiltration_capacity=xr.full_like(area, 1.0),
-        downward_resistance=xr.full_like(msw_grid, -9999.0),
-        upward_resistance=xr.full_like(msw_grid, -9999.0),
+        downward_resistance=xr.full_like(area, -9999.0),
+        upward_resistance=xr.full_like(area, -9999.0),
         bottom_resistance=xr.full_like(msw_grid, -9999.0),
         extra_storage_coefficient=xr.full_like(msw_grid, 0.1),
     )
@@ -297,7 +269,7 @@ def make_msw_model():
     )
 
     # %% Metaswap Mappings
-    msw_model["mod2svat"] = msw.CouplerMapping(modflow_dis=dis, well=well)
+    msw_model["mod2svat"] = msw.CouplerMapping()
 
     # %% Output Control
     msw_model["oc_idf"] = msw.IdfMapping(area, -9999.0)
@@ -305,6 +277,36 @@ def make_msw_model():
     msw_model["oc_time"] = msw.TimeOutputControl(time=times)
 
     return msw_model
+
+
+@pytest.fixture(scope="function")
+def coupled_mf6wel():
+    x = [1.0, 2.0, 3.0]
+    y = [3.0, 2.0, 1.0]
+    layer = [1, 2, 3]
+    dx = 1.0
+    dy = -1.0
+
+    nlay = len(layer)
+    nrow = len(y)
+    ncol = len(x)
+
+    like = xr.DataArray(
+        data=np.ones((nlay, nrow, ncol)),
+        dims=("layer", "y", "x"),
+        coords={"layer": layer, "y": y, "x": x, "dx": dx, "dy": dy},
+    )
+    idomain = like.astype(np.int32)
+
+    layer = 3
+    well_x = np.tile(x, nrow)
+    well_y = np.repeat(y, ncol)
+    well_rate = np.zeros(well_x.shape)
+    well_layer = np.full_like(well_x, layer, dtype=int)
+
+    cellids = derive_cellid_from_points(idomain, well_x, well_y, well_layer)
+    well_msw = Mf6Wel(cellids, well_rate)
+    return well_msw
 
 
 @pytest.fixture(scope="function")

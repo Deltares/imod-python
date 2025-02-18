@@ -1,8 +1,13 @@
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
+from imod.msw.regrid.regrid_schemes import ScalingRegridMethod
+from imod.msw.utilities.common import concat_imod5
+from imod.typing import Imod5DataDict
+from imod.typing.grid import ones_like
 
 
-class ScalingFactors(MetaSwapPackage):
+class ScalingFactors(MetaSwapPackage, IRegridPackage):
     """
     This package allows you to do three things:
         1. Set scaling factors for some inputs in the soil physical database,
@@ -58,6 +63,8 @@ class ScalingFactors(MetaSwapPackage):
     _without_subunit = ("depth_perched_water_table",)
     _to_fill = ()
 
+    _regrid_method = ScalingRegridMethod()
+
     def __init__(
         self,
         scale_soil_moisture,
@@ -72,3 +79,39 @@ class ScalingFactors(MetaSwapPackage):
         self.dataset["depth_perched_water_table"] = depth_perched_water_table
 
         self._pkgcheck()
+
+    @classmethod
+    def from_imod5_data(cls, imod5_data: Imod5DataDict) -> "ScalingFactors":
+        """
+        Construct a MetaSWAP Ponding package from iMOD5 data in the CAP
+        package, loaded with the :func:`imod.formats.prj.open_projectfile_data`
+        function.
+
+        Pressure head factor is set to one for all subunits. All urban areas
+        (subunit=1) are also set to one for all variables, except the perced
+        water table level.
+
+        Parameters
+        ----------
+        imod5_data: Imod5DataDict
+            iMOD5 data as returned by
+            :func:`imod.formats.prj.open_projectfile_data`
+
+        Returns
+        -------
+        imod.msw.ScalingFactors
+        """
+        cap_data = imod5_data["cap"]
+        grid_ones = ones_like(cap_data["boundary"])
+
+        data = {}
+        data["scale_soil_moisture"] = concat_imod5(
+            cap_data["soil_moisture_fraction"], grid_ones
+        )
+        data["scale_hydraulic_conductivity"] = concat_imod5(
+            cap_data["conductivitiy_factor"], grid_ones
+        )
+        data["scale_pressure_head"] = concat_imod5(grid_ones, grid_ones)
+        data["depth_perched_water_table"] = cap_data["perched_water_table_level"]
+
+        return cls(**data)

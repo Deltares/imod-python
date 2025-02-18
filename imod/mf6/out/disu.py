@@ -77,6 +77,16 @@ def open_hds(
     raise NotImplementedError
 
 
+def open_dvs(
+    path: FilePath,
+    grid_info: Dict[str, Any],
+    indices: np.ndarray,
+    simulation_start_time: Optional[np.datetime64] = None,
+    time_unit: Optional[str] = "d",
+) -> xr.DataArray:
+    raise NotImplementedError
+
+
 def open_imeth1_budgets(
     cbc_path: FilePath, grb_content: dict, header_list: List[cbc.Imeth1Header]
 ) -> xr.DataArray:

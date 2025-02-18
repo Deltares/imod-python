@@ -1,15 +1,22 @@
+from copy import deepcopy
+from typing import Any, Optional, TextIO
+
 import pandas as pd
 
+from imod.mf6.interfaces.iregridpackage import IRegridPackage
+from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.timeutil import to_metaswap_timeformat
+from imod.typing import GridDataArray
+from imod.util.regrid_method_type import RegridMethodType
 
 
 # I did not use long variable names here (e.g. "precipitation"), as MetaSWAP
 # uses these 2 to 4 character names to print its output to. This also has the
 # benefit that the user is able to set additional variable names via kwargs
 # (there are more than 130 possible variable names to choose from in MetaSWAP)
-class VariableOutputControl(MetaSwapPackage):
+class VariableOutputControl(MetaSwapPackage, IRegridPackage):
     """
     Control which variables will be created as output. The variable names used
     in this class provide a condensed water balance. You can use additional
@@ -80,7 +87,7 @@ class VariableOutputControl(MetaSwapPackage):
         for key, value in kwargs.items():
             self.dataset[key] = int(value)
 
-    def _render(self, file, *args):
+    def _render(self, file: TextIO, *args: Any):
         variable, option = zip(
             *[(var, self.dataset[var].values) for var in self.dataset.data_vars]
         )
@@ -92,7 +99,7 @@ class VariableOutputControl(MetaSwapPackage):
         return self.write_dataframe_fixed_width(file, dataframe)
 
 
-class TimeOutputControl(MetaSwapPackage):
+class TimeOutputControl(MetaSwapPackage, IRegridPackage):
     """
     Specify the accumulation periods which will be used to write output. For
     example, say the model computes on a daily timestep, but timesteps two days
@@ -118,16 +125,23 @@ class TimeOutputControl(MetaSwapPackage):
 
         self.dataset["times"] = time
 
-    def _render(self, file, *args):
+    def _render(self, file: TextIO, *args: Any):
         year, time_since_start_year = to_metaswap_timeformat(self.dataset["times"])
 
         dataframe = pd.DataFrame(
             data={"time_since_start_year": time_since_start_year, "year": year}
         )
 
-        dataframe["time_since_start_year"] += 1
         dataframe["option"] = 7
 
         self._check_range(dataframe)
 
         return self.write_dataframe_fixed_width(file, dataframe)
+
+    def regrid_like(
+        self,
+        target_grid: GridDataArray,
+        regrid_context: RegridderWeightsCache,
+        regridder_types: Optional[RegridMethodType] = None,
+    ) -> "MetaSwapPackage":
+        return deepcopy(self)

@@ -9,6 +9,8 @@ iMOD Python: make massive MODFLOW models
    :target: https://choosealicense.com/licenses/mit/
 .. image:: https://img.shields.io/conda/vn/conda-forge/imod.svg
    :target: https://github.com/conda-forge/imod-feedstock
+.. image:: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/prefix-dev/pixi/main/assets/badge/v0.json
+   :target: https://pixi.sh
 
 The ``imod`` Python package is an open source project to make working with
 MODFLOW groundwater models in Python easier. It builds on top of popular
@@ -67,7 +69,7 @@ Issues: https://github.com/Deltares/imod-python/issues
    examples/index
    api/index
    faq/index
-   developing
+   developing/index
 
 .. _Deltares: https://www.deltares.nl
 .. _dask: https://dask.org/

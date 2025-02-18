@@ -3,6 +3,7 @@ import pandas as pd
 import pytest
 import xarray as xr
 import xugrid as xu
+from filelock import FileLock
 
 import imod
 
@@ -43,9 +44,12 @@ def test_uda(test_da):
     return xu.UgridDataArray(da, grid)
 
 
-@pytest.fixture(scope="module")
-def test_uda_elevation():
-    elevation = xu.data.elevation_nl()
+@pytest.fixture(scope="function")
+def uda_elevation():
+    from xugrid.data.sample_data import REGISTRY
+
+    with FileLock(REGISTRY.path / "xugrid_elevation_nl.nc.lock"):
+        elevation = xu.data.elevation_nl()
     return xu.concat(
         [elevation, elevation - 10.0, elevation - 20.0], dim="z"
     ).assign_coords(z=[0.0, -10.0, -20.0])
@@ -169,7 +173,7 @@ def test_get_values__unstructured(test_uda):
     assert expected == actual
 
 
-def test_get_indices__uda_elevation(test_uda_elevation):
+def test_get_indices__uda_elevation(uda_elevation):
     """
     Test for layered unstructured grid, x and y need to be looked up on
     Ugrid2d, whereas z should be looked in the regular coordinates.
@@ -181,7 +185,7 @@ def test_get_indices__uda_elevation(test_uda_elevation):
     z = np.array([-1.0, -2.0, -15.0, 1.0, -23.0])
 
     points_indices = imod.select.points_indices(
-        test_uda_elevation, x=x, y=y, z=z, out_of_bounds="ignore"
+        uda_elevation, x=x, y=y, z=z, out_of_bounds="ignore"
     )
 
     data_expected = {}
@@ -195,13 +199,13 @@ def test_get_indices__uda_elevation(test_uda_elevation):
         np.testing.assert_equal(points_indices[key], data_expected[key])
 
 
-def test_get_values__uda_elevation(test_uda_elevation):
+def test_get_values__uda_elevation(uda_elevation):
     x = np.array([30_000.0, 31_000.0, 30_000.0, 1.0, 31_000.0])
     y = np.array([400_000.0, 390_000.0, 400_000.0, 1.0, 390_000.0])
     z = np.array([-1.0, -2.0, -15.0, 1.0, -23.0])
 
     points_values = imod.select.points_values(
-        test_uda_elevation, x=x, y=y, z=z, out_of_bounds="ignore"
+        uda_elevation, x=x, y=y, z=z, out_of_bounds="ignore"
     )
     data_expected = np.array([3.04, -0.74, -6.96, -20.74])
 

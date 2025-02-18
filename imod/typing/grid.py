@@ -8,7 +8,7 @@ import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
 
-from imod.typing import GridDataArray, GridDataset, structured
+from imod.typing import GeoDataFrameType, GridDataArray, GridDataset, structured
 from imod.util.spatial import _polygonize
 
 T = TypeVar("T")
@@ -43,6 +43,16 @@ def nan_like(grid: xr.DataArray, dtype=np.float32, *args, **kwargs):
 @typedispatch  # type: ignore[no-redef]
 def nan_like(grid: xu.UgridDataArray, dtype=np.float32, *args, **kwargs):  # noqa: F811
     return xu.full_like(grid, fill_value=np.nan, dtype=dtype, *args, **kwargs)
+
+
+@typedispatch
+def full_like(grid: xr.DataArray, fill_value, *args, **kwargs):
+    return xr.full_like(grid, fill_value, *args, **kwargs)
+
+
+@typedispatch  # type: ignore [no-redef]
+def full_like(grid: xu.UgridDataArray, fill_value, *args, **kwargs):  # noqa: F811
+    return xu.full_like(grid, fill_value, *args, **kwargs)
 
 
 @typedispatch
@@ -227,17 +237,17 @@ def merge_with_dictionary(
 
 
 @typedispatch
-def bounding_polygon(active: xr.DataArray):
+def bounding_polygon(active: xr.DataArray) -> GeoDataFrameType:
     """Return bounding polygon of active cells"""
     to_polygonize = active.where(active, other=np.nan)
     polygons_gdf = _polygonize(to_polygonize)
     # Filter polygons with inactive values (NaN)
-    is_active_polygon = polygons_gdf["value"] == 1.0
+    is_active_polygon = polygons_gdf["value"] > 0
     return polygons_gdf.loc[is_active_polygon]
 
 
 @typedispatch  # type: ignore[no-redef]
-def bounding_polygon(active: xu.UgridDataArray):  # noqa: F811
+def bounding_polygon(active: xu.UgridDataArray) -> GeoDataFrameType:  # noqa: F811
     """Return bounding polygon of active cells"""
     active_indices = np.where(active > 0)[0]
     domain_slice = {f"{active.ugrid.grid.face_dimension}": active_indices}
@@ -355,9 +365,11 @@ def enforce_dim_order(grid: xu.UgridDataArray) -> xu.UgridDataArray:  # noqa: F8
     )
 
 
-def _enforce_unstructured(obj: GridDataArray, ugrid2d=xu.Ugrid2d) -> xu.UgridDataArray:
-    """Force obj to unstructured"""
-    return xu.UgridDataArray(xr.DataArray(obj), ugrid2d)
+def _as_ugrid_dataarray_with_topology(
+    obj: GridDataArray, topology: xu.Ugrid2d
+) -> xu.UgridDataArray:
+    """Force obj and topology to ugrid dataarray"""
+    return xu.UgridDataArray(xr.DataArray(obj), topology)
 
 
 def preserve_gridtype(func: Callable[P, T]) -> Callable[P, T]:
@@ -389,8 +401,126 @@ def preserve_gridtype(func: Callable[P, T]) -> Callable[P, T]:
         if unstructured:
             # Multiple grids returned
             if isinstance(x, tuple):
-                return tuple(_enforce_unstructured(i, grid) for i in x)
-            return _enforce_unstructured(x, grid)
+                return tuple(_as_ugrid_dataarray_with_topology(i, grid) for i in x)
+            return _as_ugrid_dataarray_with_topology(x, grid)
         return x
 
     return decorator
+
+
+@typedispatch
+def is_empty(object: xr.Dataset) -> bool:
+    return len(object.keys()) == 0
+
+
+@typedispatch  # type: ignore[no-redef]
+def is_empty(object: object) -> bool:  # noqa: F811
+    return False
+
+
+def is_planar_grid(
+    grid: xr.DataArray | xr.Dataset | xu.UgridDataArray | xu.UgridDataset,
+) -> bool:
+    # Returns True if the grid is planar.
+    # A grid is considered planar when:
+    # - it is a spatial grid (x, y coordinates or cellface/edge coordinates)
+    # - it has no layer coordinates, or, it has a single layer coordinate with
+    #   value less or equal to zero
+    if not is_spatial_grid(grid):
+        return False
+    if "layer" not in grid.coords:
+        return True
+    if grid["layer"].shape == ():
+        return True
+    if grid["layer"][0] <= 0 and len(grid["layer"]) == 1:
+        return True
+    return False
+
+
+def has_negative_layer(
+    grid: xr.DataArray | xr.Dataset | xu.UgridDataArray | xu.UgridDataset,
+) -> bool:
+    if not is_spatial_grid(grid):
+        return False
+    if "layer" not in grid.coords:
+        return False
+    if grid["layer"].shape == ():
+        return False
+    if grid["layer"][0] < 0:
+        return True
+    return False
+
+
+def is_transient_data_grid(
+    grid: xr.DataArray | xr.Dataset | xu.UgridDataArray | xu.UgridDataset,
+):
+    # Returns True if there is a time coordinate on the object with more than one value.
+    if "time" in grid.coords:
+        if len(grid["time"]) > 1:
+            return True
+    return False
+
+
+class GridCache:
+    """
+    Cache grids in this object for a specific function, lookup grids based on
+    unique geometry hash.
+    """
+
+    def __init__(self, func: Callable, max_cache_size=5):
+        self.max_cache_size = max_cache_size
+        self.grid_cache: dict[int, GridDataArray] = {}
+        self.func = func
+
+    def get_grid(self, grid: GridDataArray):
+        geom_hash = get_grid_geometry_hash(grid)
+        if geom_hash not in self.grid_cache.keys():
+            if len(self.grid_cache.keys()) >= self.max_cache_size:
+                self.remove_first()
+            self.grid_cache[geom_hash] = self.func(grid)
+        return self.grid_cache[geom_hash]
+
+    def remove_first(self):
+        keys = list(self.grid_cache.keys())
+        self.grid_cache.pop(keys[0])
+
+    def clear(self):
+        self.grid_cache = {}
+
+
+UGRID2D_FROM_STRUCTURED_CACHE = GridCache(xu.Ugrid2d.from_structured)
+
+
+@typedispatch
+def as_ugrid_dataarray(grid: xr.DataArray) -> xu.UgridDataArray:
+    """
+    Enforce GridDataArray to UgridDataArray, calls
+    xu.UgridDataArray.from_structured, which is a costly operation. Therefore
+    cache results.
+    """
+
+    topology = UGRID2D_FROM_STRUCTURED_CACHE.get_grid(grid)
+
+    # Copied from:
+    # https://github.com/Deltares/xugrid/blob/3dee693763da1c4c0859a4f53ac38d4b99613a33/xugrid/core/wrap.py#L236
+    # Note that "da" is renamed to "grid" and "grid" to "topology"
+    dims = grid.dims[:-2]
+    coords = {k: grid.coords[k] for k in dims}
+    face_da = xr.DataArray(
+        grid.data.reshape(*grid.shape[:-2], -1),
+        coords=coords,
+        dims=[*dims, topology.face_dimension],
+        name=grid.name,
+    )
+    return xu.UgridDataArray(face_da, topology)
+
+
+@typedispatch  # type: ignore[no-redef]
+def as_ugrid_dataarray(grid: xu.UgridDataArray) -> xu.UgridDataArray:  # noqa: F811
+    """Enforce GridDataArray to UgridDataArray"""
+    return grid
+
+
+@typedispatch  # type: ignore[no-redef]
+def as_ugrid_dataarray(grid: object) -> xu.UgridDataArray:  # noqa: F811
+    raise TypeError(f"Function doesn't support type {type(grid)}")

@@ -556,3 +556,8 @@ def test_no_overlap():
     out = imod.prepare.Regridder(method=weightedmean).regrid(source, like)
     assert out.shape == (2,)
     assert out.isnull().all()
+
+
+def test_deprecation_warn_upon_init():
+    with pytest.warns(DeprecationWarning):
+        _ = imod.prepare.Regridder(method="mean")

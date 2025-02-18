@@ -25,7 +25,7 @@ def grid_data_structured(
     dims = ("layer", "y", "x")
     layer = np.arange(1, nlayer + 1)
 
-    coords = {"layer": layer, "y": y, "x": x, "dx": cellsize, "dy": cellsize}
+    coords = {"layer": layer, "y": y, "x": x, "dx": cellsize, "dy": -cellsize}
 
     structured_grid_data = xr.DataArray(
         np.ones(shape, dtype=dtype) * value, coords=coords, dims=dims
@@ -123,7 +123,7 @@ def structured_flow_model() -> imod.mf6.GroundwaterFlowModel:
     gwf_model = _make_model(grid_data_structured, cellsize)
 
     bottom = grid_data_structured_layered(np.float64, -1.0, cellsize)
-    idomain = grid_data_structured(np.int32, 1, cellsize)
+    idomain = grid_data_structured(np.int32, 2, cellsize)
 
     # Unassign the constant-head package from some cells to have a more meaningful simulation
     constant_head = gwf_model["chd"].dataset["head"]
@@ -152,7 +152,7 @@ def unstructured_flow_model() -> imod.mf6.GroundwaterFlowModel:
     constant_head.loc[{"mesh2d_nFaces": 13, "layer": 2}] = np.nan
 
     bottom = grid_data_unstructured_layered(np.float64, -1.0, cellsize)
-    idomain = grid_data_unstructured(np.int32, 1, cellsize)
+    idomain = grid_data_unstructured(np.int32, 2, cellsize)
     gwf_model["disv"] = imod.mf6.VerticesDiscretization(
         top=10.0, bottom=bottom, idomain=idomain
     )

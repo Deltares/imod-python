@@ -5,6 +5,7 @@ import pathlib
 import subprocess
 import warnings
 from copy import deepcopy
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, DefaultDict, Iterable, Optional, Union, cast
 
@@ -20,11 +21,11 @@ import xugrid as xu
 import imod
 import imod.logging
 import imod.mf6.exchangebase
-from imod.logging import standard_log_decorator
+from imod.logging import LogLevel, logger, standard_log_decorator
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.gwfgwt import GWFGWT
 from imod.mf6.gwtgwt import GWTGWT
-from imod.mf6.ims import Solution
+from imod.mf6.ims import Solution, SolutionPresetModerate
 from imod.mf6.interfaces.imodel import IModel
 from imod.mf6.interfaces.isimulation import ISimulation
 from imod.mf6.model import Modflow6Model
@@ -37,11 +38,17 @@ from imod.mf6.multimodel.exchange_creator_unstructured import (
 from imod.mf6.multimodel.modelsplitter import create_partition_info, slice_model
 from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
+from imod.mf6.regrid.regrid_schemes import RegridMethodType
 from imod.mf6.ssm import SourceSinkMixing
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.utilities.mask import _mask_all_models
 from imod.mf6.utilities.regrid import _regrid_like
+from imod.mf6.validation_context import ValidationContext
 from imod.mf6.write_context import WriteContext
+from imod.prepare.topsystem.default_allocation_methods import (
+    SimulationAllocationOptions,
+    SimulationDistributingOptions,
+)
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
 from imod.typing.grid import (
@@ -80,6 +87,22 @@ def get_packages(simulation: Modflow6Simulation) -> dict[str, Package]:
     }
 
 
+def log_versions(version_saved: Optional[dict[str, str]]) -> None:
+    logger.log(
+        LogLevel.INFO, f"iMOD Python version in current environment: {imod.__version__}"
+    )
+    if version_saved:
+        version_msg = (
+            f"iMOD Python version in dumped simulation: {version_saved['imod-python']}"
+        )
+    else:
+        version_msg = "No iMOD Python version information found in dumped simulation."
+    logger.log(
+        LogLevel.INFO,
+        version_msg,
+    )
+
+
 class Modflow6Simulation(collections.UserDict, ISimulation):
     def _initialize_template(self):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
@@ -91,6 +114,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         self.name = name
         self.directory = None
         self._initialize_template()
+        self._validation_context = ValidationContext()
 
     def __setitem__(self, key, value):
         super().__setitem__(key, value)
@@ -235,20 +259,21 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         ----------
         directory: str, pathlib.Path
             Directory to write Modflow 6 simulation to.
-        binary: ({True, False}, optional)
+        use_binary: ({True, False}, optional)
             Whether to write time-dependent input for stress packages as binary
             files, which are smaller in size, or more human-readable text files.
         validate: ({True, False}, optional)
             Whether to validate the Modflow6 simulation, including models, at
             write. If True, erronous model input will throw a
             ``ValidationError``.
-        absolute_paths: ({True, False}, optional)
+        use_absolute_paths: ({True, False}, optional)
             True if all paths written to the mf6 inputfiles should be absolute.
         """
         # create write context
         write_context = WriteContext(directory, binary, use_absolute_paths)
+        self._validation_context.validate = validate
         if self.is_split():
-            write_context.is_partitioned = True
+            self._validation_context.strict_well_validation = False
 
         # Check models for required content
         for key, model in self.items():
@@ -271,7 +296,7 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
 
         # Write time discretization file
         globaltimes = self["time_discretization"]["time"].values
-        self["time_discretization"].write(
+        self["time_discretization"]._write(
             pkgname="time_discretization",
             globaltimes=globaltimes,
             write_context=write_context,
@@ -287,11 +312,11 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
             # skip timedis, exchanges
             if isinstance(value, Modflow6Model):
                 status_info.add(
-                    value.write(
+                    value._write(
                         modelname=key,
                         globaltimes=globaltimes,
-                        validate=validate,
                         write_context=model_write_context,
+                        validate_context=self._validation_context,
                     )
                 )
             elif isinstance(value, Package):
@@ -299,11 +324,11 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
                     ims_write_context = write_context.copy_with_new_write_directory(
                         write_context.simulation_directory
                     )
-                    value.write(key, globaltimes, ims_write_context)
+                    value._write(key, globaltimes, ims_write_context)
             elif isinstance(value, list):
                 for exchange in value:
                     if isinstance(exchange, imod.mf6.exchangebase.ExchangeBase):
-                        exchange.write(
+                        exchange._write(
                             exchange.package_name(), globaltimes, write_context
                         )
 
@@ -862,6 +887,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         directory.mkdir(parents=True, exist_ok=True)
 
         toml_content: DefaultDict[str, dict] = collections.defaultdict(dict)
+        # Dump version number
+        toml_content["version"] = {"imod-python": imod.__version__}
+        # Dump models and exchanges
         for key, value in self.items():
             cls_name = type(value).__name__
             if isinstance(value, Modflow6Model):
@@ -908,6 +936,9 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         toml_path = pathlib.Path(toml_path)
         with open(toml_path, "rb") as f:
             toml_content = tomli.load(f)
+
+        version_saved = toml_content.pop("version", None)
+        log_versions(version_saved)
 
         simulation = Modflow6Simulation(name=toml_path.stem)
         for key, entry in toml_content.items():
@@ -1304,15 +1335,131 @@ class Modflow6Simulation(collections.UserDict, ISimulation):
         """
         This function applies a mask to all models in a simulation, provided they use
         the same discretization. The  method parameter "mask" is an idomain-like array.
-        Masking will overwrite idomain with the mask where the mask is 0 or -1.
-        Where the mask is 1, the original value of idomain will be kept.
+        Masking will overwrite idomain with the mask where the mask is <0.
+        Where the mask is >0, the original value of idomain will be kept.
         Masking will update the packages accordingly, blanking their input where needed,
         and is therefore not a reversible operation.
 
         Parameters
         ----------
         mask: xr.DataArray, xu.UgridDataArray of ints
-            idomain-like integer array. 1 sets cells to active, 0 sets cells to inactive,
-            -1 sets cells to vertical passthrough
+            idomain-like integer array. >0 sets cells to active, 0 sets cells to inactive,
+            <0 sets cells to vertical passthrough
         """
         _mask_all_models(self, mask)
+
+    @classmethod
+    @standard_log_decorator()
+    def from_imod5_data(
+        cls,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        period_data: dict[str, list[datetime]],
+        times: list[datetime],
+        allocation_options: Optional[SimulationAllocationOptions] = None,
+        distributing_options: Optional[SimulationDistributingOptions] = None,
+        regridder_types: Optional[dict[str, RegridMethodType]] = None,
+    ) -> "Modflow6Simulation":
+        """
+        Imports a GroundwaterFlowModel (GWF) from the data in an iMOD5 project
+        file and puts it in a simulation. Quasi-3D iMOD5 models, i.e. models
+        where there is only horizontal flow in aquifers and vertical flow in
+        aquitards, are not supported.
+
+        This method adds all static and boundary condition packages from the
+        projectfile to the simulation. Output Control (OC) must be added
+        manually after importing. The
+        :func:`imod.mf6.ims.SolutionPresetModerate` solver settings are added
+        automatically under the "ims" key, but these can be overrided by the
+        user after importing.
+
+        Parameters
+        ----------
+        imod5_data: dict[str, dict[str, GridDataArray]]
+            dictionary containing the arrays mentioned in the project file as xarray datasets,
+            under the key of the package type to which it belongs.
+        period_data: dict[str, list[datetime]]
+            dictionary containing the package names mapped to a list of repeated
+            stress periods. These are set as ``repeat_stress``.
+        times:  list[datetime]
+            time discretization of the model to be imported. This is used for
+            the following:
+
+                * Times of wells with associated timeseries are resampled to these times
+                * Start and end times in the list are used to repeat the stresses
+                  of periodic data (e.g. river stages in iMOD5 for "summer", "winter")
+                * The simulation is discretized to these times, using
+                  :meth:`imod.mf6.Modflow6Simulation.create_time_discretization`
+
+        allocation_options: SimulationAllocationOptions, optional
+            object containing the allocation options per package type. If you
+            want a specific package to have a different allocation option, then
+            it should be imported separately.
+        distributing_options: SimulationDistributingOptions, optional
+            object containing the conductivity distribution options per package
+            type. If you want a package to have a different allocation option,
+            then it should be imported separately.
+        regridder_types: dict[str, RegridMethodType]
+            the key is the package name. The value is the RegridMethodType
+            object containing the settings for regridding the package with the
+            specified key.
+
+        Returns
+        -------
+        Modflow6Simulation
+            Simulation prepared for MODFLOW6
+
+        Examples
+        --------
+        Open projectfile data first:
+
+        >>> from imod.formats.prj import open_projectfile_data
+        >>> imod5_data, period_data = open_projectfile_data("path/to/projectfile")
+
+        You can then import the simulation as follows:
+
+        >>> times = [np.datetime("2001-01-01"), np.datetime("2002-01-01"), np.datetime("2003-01-01")]
+        >>> mf6_sim = imod.mf6.Modflow6Simulation.from_imod5_data(imod5_data, period_data, times)
+
+        Allocate rivers differently:
+
+        >>> from imod.prepare.topsystem import SimulationAllocationOptions, ALLOCATION_OPTION
+        >>> allocation_options = SimulationAllocationOptions()
+        >>> allocation_options.riv = ALLOCATION_OPTION.at_elevation
+        >>> mf6_sim = imod.mf6.Modflow6Simulation.from_imod5_data(imod5_data, period_data, times, allocation_options)
+
+        You can override solver settings if needed after importing:
+
+        >>> mf6_sim["imported_model"]["ims"] = SolutionPresetComplex()
+
+        """
+        if allocation_options is None:
+            allocation_options = SimulationAllocationOptions()
+        if distributing_options is None:
+            distributing_options = SimulationDistributingOptions()
+        if regridder_types is None:
+            regridder_types = {}
+
+        simulation = Modflow6Simulation("imported_simulation")
+        simulation._validation_context.strict_well_validation = False
+        simulation._validation_context.strict_hfb_validation = False
+
+        # import GWF model,
+        groundwaterFlowModel = GroundwaterFlowModel.from_imod5_data(
+            imod5_data,
+            period_data,
+            times,
+            allocation_options,
+            distributing_options,
+            regridder_types,
+        )
+        simulation["imported_model"] = groundwaterFlowModel
+
+        # generate ims package
+        solution = SolutionPresetModerate(
+            ["imported_model"],
+            print_option="all",
+        )
+        simulation["ims"] = solution
+
+        simulation.create_time_discretization(additional_times=times)
+        return simulation

@@ -142,3 +142,6 @@ examples/data
 # pixi environments
 .pixi
 
+/imod/tests/mydask.png
+/imod/tests/*_report.xml
+docs/sg_execution_times.rst

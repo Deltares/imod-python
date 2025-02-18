@@ -6,8 +6,323 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
-0.17.2
-------
+[Unreleased]
+------------
+
+Added
+~~~~~
+
+- Support for Python 3.13.
+- :meth:`imod.mf6.Recharge.from_imod5_data`,
+  :meth:`imod.mf6.River.from_imod5_data`,
+  :meth:`imod.mf6.Drainage.from_imod5_data`, and
+  :meth:`imod.mf6.GeneralHeadBoundary.from_imod5_data` now assign negative layer
+  numbers to the first active layer.
+- :func:`imod.prepare.DISTRIBUTING_OPTION` got a new setting
+  ``by_corrected_thickness``. This matches DISTRCOND=-1 in iMOD5.
+
+Changed
+~~~~~~~
+
+- :func:`imod.formats.prj.open_projectfile_data` now also assigns negative and
+  zero layer numbers to grid coordinates.
+- In :class:`imod.mf6.StructuredDiscretization`, IDOMAIN can now respectively be
+  > 0 to indicate an active cell and <0 to indicate a vertical passthrough cell,
+  consistent with MODFLOW6. Previously this could only be indicated with 1 and
+  -1.
+- :meth:`imod.mf6.Well.from_imod5_data` and
+  :meth:`imod.mf6.LayeredWell.from_imod5_data` now also accept the argument
+  ``times = "steady-state"``, for the simulation is assumed to be "steady-state"
+  and well timeseries are averaged.
+- The ``drn`` attribute of :class:`imod.prepare.SimulationAllocationOptions` has
+  the ``at_elevation`` of :func:`imod.prepare.ALLOCATION_OPTION` option now set
+  as default. This means by default drainage cells are placed differently in
+  :meth:`imod.mf6.Simulation.from_imod5_data`.
+- :class:`imod.mf6.Well`, :class:`imod.mf6.LayeredWell`,
+  :func:`imod.prepare.wells.assign_wells`, :meth:`imod.mf6.Well.from_imod5_data`
+  and :meth:`imod.mf6.LayeredWell.from_imod5_data` now have default values for
+  ``minimum_thickness`` and ``minimum_k`` set to 0.0. 
+- When intitating a MODFLOW6 package with a ``layer`` coordinate with 
+  values <= 0, iMOD Python will throw an error.
+- :class:`imod.mf6.HorizontalFlowBarrierResistance`,
+  :class:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance` and other HFB now
+  validate whether proper type of geometry is provided, respectively Polygon for
+  :class:`imod.mf6.HorizontalFlowBarrierResistance`, and LineString for
+  :class:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance`.
+- Relaxed validation for :class:`imod.msw.MetaSwapModel` if ``FileCopier``
+  package is present.
+
+Fixed
+~~~~~
+
+- :meth:`imod.mf6.Model.mask_all_packages` now preserves the ``dx`` and 
+    ``dy`` coordinates
+- :meth:`imod.mf6.Well.from_imod5_data` and
+  :meth:`imod.mf6.LayeredWell.from_imod5_data` ignore well rates preceding first
+  element of ``times``.
+- :meth:`imod.mf6.Well.from_imod5_data` and
+  :meth:`imod.mf6.LayeredWell.from_imod5_data` now sum the rates of well entries
+  that are on the exact same location (same x, y, and depth) instead of taking
+  the values of the first entry.
+- :meth:`imod.mf6.River.from_imod5_data` now preserves the drainage cells
+  created with the ``stage_to_riv_bot_drn_above`` option of
+  :func:`imod.prepare.ALLOCATION_OPTION`.
+- Bug in :func:`imod.prepare.distribute_riv_conductance` where conductances were
+  set to ``np.nan`` for cells where ``stage`` equals ``bottom_elevation`` when
+  :func:`imod.prepare.DISTRIBUTING_OPTION` was set to ``by_crosscut_thickness``,
+  ``by_crosscut_transmissivity``, ``by_corrected_transmissivity``.
+- :meth:`imod.mf6.NodePropertyFlow.from_imod5_data` now defaults to 90 degrees
+  for missing layers ``imod5_data`` instead of 0 degrees.
+- Bug in :meth:`imod.mf6.Modflow6Simulation.from_imod5_data` where an error was
+  raised in case the ``"cap"`` package was present in the ``imod5_data``.
+- Bug where :meth:`imod.mf6.LayeredWell.from_imod5_cap_data` and
+  :meth:`imod.mf6.Recharge.from_imod5_cap_data` threw an error if the ``"cap"``
+  in the ``imod5_data`` had a ``"layer"`` dimension and coordinate. 
+- :meth:`imod.mf6.LayeredWell.from_imod5_cap_data` will convert the
+  ``max_abstraction_groundwater`` and ``max_abstraction_surfacewater`` capacity
+  from mm/d to m3/d.
+- :class:`imod.msw.TimeOutputControl` now starts counting at 0.0 instead of 1.0,
+  like MetaSWAP expects.
+- Models imported with :meth:`imod.msw.MetaSwapModel.from_imod5_data` can be
+  written with ``validate`` set to True.
+
+
+[1.0.0rc1] - 2024-12-20
+-----------------------
+
+Small post-release fix for installation instructions in documentation.
+
+[1.0.0rc0] - 2024-12-20
+-----------------------
+
+Added
+~~~~~
+
+- :class:`imod.msw.MeteoGridCopy` to copy existing `mete_grid.inp` files, so
+  ASCII grids in large existing meteo databases do not have to be read.
+- :class:`imod.msw.CopyFiles` to copy settings and lookup tables in existing
+  ``.inp`` files.
+- :meth:`imod.mf6.LayeredWell.from_imod5_cap_data` to construct a
+  :class:`imod.mf6.LayeredWell` package from iMOD5 data in the CAP package (for
+  MetaSWAP). Currently only griddata (IDF) is supported.
+- :meth:`imod.mf6.Recharge.from_imod5_cap_data` to construct a recharge package
+  for coupling a MODFLOW6 model to MetaSWAP.
+- :meth:`imod.msw.MetaSwapModel.from_imod5_data` to construct a MetaSWAP model
+  from data in an iMOD5 projectfile.
+- :meth:`imod.msw.MetaSwapModel.write` has a ``validate`` argument, which can be
+  used to turn off validation upon writing, use at your own risk!
+- :class:`imod.msw.MetaSwapModel` got ``settings`` argument to set simulation
+  settings.
+- :func:`imod.data.tutorial_03` to load data for the iMOD Documentation
+  tutorial.
+- :meth:`imod.mf6.Modflow6Simulation.dump` now saves iMOD Python version number.
+
+Fixed
+~~~~~
+
+- Fixed bug where :class:`imod.mf6.HorizontalFlowBarrierResistance`,
+  :class:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance` and other HFB
+  packages could not be allocated to cell edges when idomain in layer 1 was
+  largely inactive.
+- Fixed bug where :meth:`HorizontalFlowBarrierResistance.clip_box`,
+  :meth:`HorizontalFlowBarrierSingleLayerResistance.clip_box` methods only
+  returned deepcopy instead of actually clipping the line geometries.
+- Fixed bug where :class:`imod.mf6.HorizontalFlowBarrierResistance`,
+  :class:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance` and other HFB
+  packages could not be clipped or copied with xarray >= 2024.10.0.
+- Fixed crash upon calling :meth:`imod.mf6.GroundwaterFlowModel.dump`, when a
+  :class:`imod.mf6.HorizontalFlowBarrierResistance`,
+  :class:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance` or other HFB
+  package was assigned to the model.
+- :meth:`imod.mf6.Modflow6Simulation.regrid_like` can now regrid a structured
+  model to an unstructured grid.
+- :meth:`imod.mf6.Modflow6Simulation.regrid_like` throws a
+  ``NotImplementedError`` when attempting to regrid an unstructured model to a
+  structured grid.
+- :class:`imod.msw.Sprinkling` now correctly writes source svats to
+  scap_svat.inp file.
+- :func:`imod.evaluate.calculate_gxg`, upon providing a head dataarray chunked
+  over time, will no longer error with ``ValueError: Object has inconsistent
+  chunks along dimension bimonth. This can be fixed by calling unify_chunks().``
+- Improved performance of regridding package data.
+
+
+Changed
+~~~~~~~
+
+- :class:`imod.msw.Infiltration`'s variables ``upward_resistance`` and
+  ``downward_resistance`` now require a ``subunit`` coordinate.
+- Variables ``max_abstraction_groundwater`` and ``max_abstraction_surfacewater``
+  in :class:`imod.msw.Sprinkling` now needs to have a subunit coordinate.
+- If ``"cap"`` package present in ``imod5_data``,
+  :meth:`imod.mf6.GroundwaterFlowModel.from_imod5_data` now automatically adds a
+  well for metaswap sprinkling named ``"msw-sprinkling"``
+- Less strict validation for :class:`imod.mf6.HorizontalFlowBarrierResistance`,
+  :class:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance` and other HFB packages for
+  simulations which are imported with
+  :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`
+- DeprecationWarning thrown upon initializing :class:`imod.prepare.Regridder`.
+  We plan to remove this object in the final 1.0 release. `Use the xugrid
+  regridder to regrid individual grids instead.
+  <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_ To
+  regrid entire MODFLOW6 packages or simulations, `see the user guide here.
+  <https://deltares.github.io/imod-python/user-guide/08-regridding.html>`_.
+
+[0.18.1] - 2024-11-20
+---------------------
+
+Added
+~~~~~
+
+- :class:`imod.prepare.SimulationAllocationOptions`,
+  :class:`imod.prepare.SimulationDistributingOptions`, which are used to store
+  default allocation and distributing options respectively.
+
+Fixed
+~~~~~
+
+- Relaxed validation for `imod.mf6.StructuredDiscretization` to also support
+  cells with zero thickness where IDOMAIN = 0. Before, only cells with a zero
+  thickness and IDOMAIN = -1 were supported, else the software threw a ``not all
+  values comply with criterion: > bottom``.
+- Fix bug where no ``ValidationError`` was thrown if there is an active RCH, DRN,
+  GHB, or RIV cell where idomain = -1.
+
+Changed
+~~~~~~~
+
+- In :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`, and
+  :meth:`imod.mf6.GroundwaterFlowModel.from_imod5_data` the arguments
+  ``allocation_options``, ``distributing_options`` are now optional.
+- The order of arguments of :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`, 
+  and :meth:`imod.mf6.GroundwaterFlowModel.from_imod5_data`. It now is 
+  ``imod5_data, period_data, times, allocation_options, distributing_options, regridder_types``
+  instead of:
+  ``imod5_data, period_data, allocation_options, distributing_options, times, regridder_types``
+
+
+[0.18.0] - 2024-11-11
+---------------------
+
+Fixed
+~~~~~
+
+- Multiple ``HorizontalFlowBarrier`` objects attached to
+  :class:`imod.mf6.GroundwaterFlowModel` are merged into a single horizontal
+  flow barrier for MODFLOW 6.
+- Bug where error would be thrown when barriers in a ``HorizontalFlowBarrier``
+  would be snapped to the same cell edge. These are now summed.
+- Improve performance validation upon Package initialization
+- Improve performance writing ``HorizontalFlowBarrier`` objects
+- `imod.mf6.open_cbc` failing with ``flowja=False`` on budget output for
+  DISV models if the model contained inactive cells.
+- `imod.mf6.open_cbc` now works for 2D and 1D models. 
+- :func:`imod.prepare.fill` previously assigned to the result of an xarray
+  ``.sel`` operation. This might not work for dask backed data and has been
+  addressed.
+- Added :func:`imod.mf6.open_dvs` to read dependent variable output files like
+  the water content file of :class:`imod.mf6.UnsaturatedZoneFlow`.
+- `imod.prj.open_projectfile_data` is now able to also read IPF data for
+  sprinkling wells in the CAP package.
+- Fix that caused iMOD Python to break upon import with numpy >=1.23, <2.0 .
+- ValidationError message now contains a suggestion to use the cleanup method,
+  if available in the erroneous package.
+- Bug where error was thrown when :class:`imod.mf6.NodePropertyFlow` was
+  assigned to :class:`imod.mf6.GroundwaterFlowModel` with key different from
+  ``"npf"`` upon writing, along with well or horizontal flow barrier packages.
+
+
+Changed
+~~~~~~~
+
+- :class:`imod.mf6.Well` now also validates that well filter top is above well
+  filter bottom
+- :func:`imod.formats.prj.open_projectfile_data` now also imports well filter
+  top and bottom.
+- :class:`imod.mf6.Well` now logs a warning if any wells are removed during writing.
+- :class:`imod.mf6.HorizontalFlowBarrierResistance`,
+  :class:`imod.mf6.HorizontalFlowBarrierMultiplier`,
+  :class:`imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic` now uses
+  vertical Polygons instead of Linestrings as geometry, and ``"ztop"`` and
+  ``"zbottom"`` variables are not used anymore. See
+  :func:`imod.prepare.linestring_to_square_zpolygons` and
+  :func:`imod.prepare.linestring_to_trapezoid_zpolygons` to generate these
+  polygons.
+- :func:`imod.formats.prj.open_projectfile_data` now returns well data grouped
+  by ipf name, instead of generic, separate number per entry.
+- :class:`imod.mf6.Well` now supports wells which have a filter with zero
+  length, where ``"screen_top"`` equals ``"screen_bottom"``.
+- :class:`imod.mf6.Well` shares the same default ``minimum_thickness`` as
+  :func:`imod.prepare.assign_wells`, which is 0.05, before this was 1.0.
+- :func:`imod.prepare.allocate_drn_cells`,
+  :func:`imod.prepare.allocate_ghb_cells`,
+  :func:`imod.prepare.allocate_riv_cells`, now allocate to the first model layer
+  when elevations are above or equal to model top for all methods in
+  :func:`imod.prepare.ALLOCATION_OPTION`.
+- :meth:`imod.mf6.Well.to_mf6_pkg` got a new argument:
+  ``strict_well_validation``, which controls the behavior for when wells are
+  removed entirely during their assignment to layers. This replaces the
+  ``is_partitioned`` argument.
+- :func:`imod.prepare.fill` now takes a ``dims`` argument instead of ``by``,
+  and will fill over N dimensions. Secondly, the function no longer takes
+  an ``invalid`` argument, but instead always treats NaNs as missing.
+- Reverted the need for providing WriteContext objects to MODFLOW6 Model and
+  Package objects' ``write`` method. These now use similar arguments to the
+  :meth:`imod.mf6.Modflow6Simulation.write` method.
+- :class:`imod.msw.CouplingMapping`, :class:`imod.msw.Sprinkling`,
+  `imod.msw.Sprinkling.MetaSwapModel`, now take the
+  :class:`imod.mf6.mf6_wel_adapter.Mf6Wel` and the
+  :class:`imod.mf6.StructuredDiscretization` packages as arguments at their
+  respective ``write`` method, instead of upon initializing these MetaSWAP
+  objects.
+- :class:`imod.msw.CouplingMapping` and :class:`imod.msw.Sprinkling` now take
+  the :class:`imod.mf6.mf6_wel_adapter.Mf6Wel` as well argument instead of the
+  deprecated :class:`imod.mf6.WellDisStructured`.
+
+
+Added
+~~~~~
+
+- :meth:`imod.mf6.Modflow6Simulation.from_imod5_data` to import imod5 data
+  loaded with :func:`imod.formats.prj.open_projectfile_data` as a MODFLOW 6
+  simulation.
+- :func:`imod.prepare.linestring_to_square_zpolygons` and
+  :func:`imod.prepare.linestring_to_trapezoid_zpolygons` to generate vertical
+  polygons that can be used to specify horizontal flow barriers, specifically:
+  :class:`imod.mf6.HorizontalFlowBarrierResistance`,
+  :class:`imod.mf6.HorizontalFlowBarrierMultiplier`,
+  :class:`imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic`.
+- :class:`imod.mf6.LayeredWell` to specify wells directly to layers instead
+  assigning them with filter depths.
+- :func:`imod.prepare.cleanup_drn`, :func:`imod.prepare.cleanup_ghb`,
+  :func:`imod.prepare.cleanup_riv`, :func:`imod.prepare.cleanup_wel`. These are
+  utility functions to clean up drainage, general head boundaries, and rivers,
+  respectively.
+- :meth:`imod.mf6.Drainage.cleanup`,
+  :meth:`imod.mf6.GeneralHeadboundary.cleanup`, :meth:`imod.mf6.River.cleanup`,
+  :meth:`imod.mf6.Well.cleanup` convenience methods to call the corresponding
+  cleanup utility functions with the appropriate arguments.
+- :meth:`imod.msw.MetaSwapModel.regrid_like` to regrid MetaSWAP models. This is
+  still experimental functionality, regridding the :class:`imod.msw.Sprinkling`
+  is not yet supported.
+- The context :func:`imod.util.context.print_if_error` to print an error instead
+  of raising it in a ``with`` statement. This is useful for code snippets which
+  definitely will fail.
+- :meth:`imod.msw.MetaSwapModel.regrid_like` to regrid MetaSWAP models.
+- :meth:`imod.mf6.GroundwaterFlowModel.prepare_wel_for_mf6` to prepare wells for
+  MODFLOW6, for debugging purposes.
+
+Removed
+~~~~~~~
+
+- :func:`imod.formats.prj.convert_to_disv` has been removed. This functionality
+  has been replaced by :meth:`imod.mf6.Modflow6Simulation.from_imod5_data`. To
+  convert a structured simulation to an unstructured simulation, call:
+  :meth:`imod.mf6.Modflow6Simulation.regrid_like`
+
+
+[0.17.2] - 2024-09-17
+---------------------
 
 Fixed
 ~~~~~
@@ -51,6 +366,16 @@ Changed
   :class:`imod.mf6.regrid.RiverRegridMethod`,
   :class:`imod.mf6.regrid.SpecificStorageRegridMethod`,
   :class:`imod.mf6.regrid.StorageCoefficientRegridMethod`.
+- Renamed ``imod.mf6.LayeredHorizontalFlowBarrier`` classes to
+  :class:`imod.mf6.SingleLayerHorizontalFlowBarrierResistance`,
+  :class:`imod.mf6.SingleLayerHorizontalFlowBarrierHydraulicCharacteristic`,
+  :class:`imod.mf6.SingleLayerHorizontalFlowBarrierMultiplier`,
+
+Fixed
+~~~~~
+- :func:`imod.formats.prj.open_projectfile_data` now reports the path to a
+  faulty IPF or IDF file in the error message.
+
 
 
 
@@ -292,9 +617,12 @@ Added
 - Added Python 3.11 support.
 - The GWF-GWF exchange options are derived from user created packages (NPF, OC) and
   set automatically.
-- Added the ``simulation_start_time`` and ``time_unit`` arguments. To the ``Modflow6Simulation.open_`` methods, and ``imod.mf6.out.open_`` functions. This converts the ``"time"`` coordinate to datetimes.
-- added :meth:`imod.mf6.Modflow6Simulation.mask_all_models`  to apply a mask to all models under a simulation,
-  provided the simulation is not split and the models use the same discretization. 
+- Added the ``simulation_start_time`` and ``time_unit`` arguments. To the
+  ``Modflow6Simulation.open_`` methods, and ``imod.mf6.out.open_`` functions.
+  This converts the ``"time"`` coordinate to datetimes.
+- added :meth:`imod.mf6.Modflow6Simulation.mask_all_models` to apply a mask to
+  all models under a simulation, provided the simulation is not split and the
+  models use the same discretization. 
 
 
 Changed

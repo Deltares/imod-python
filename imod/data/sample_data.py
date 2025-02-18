@@ -36,7 +36,7 @@ def create_pooch_registry() -> pooch.core.Pooch:
 
 
 def load_pooch_registry(registry: pooch.core.Pooch) -> pooch.core.Pooch:
-    with importlib.resources.files("imod.data") as pkg_dir:
+    with importlib.resources.as_file(importlib.resources.files("imod.data")) as pkg_dir:
         registry.load_registry(pkg_dir / "registry.txt")
     return registry
 
@@ -46,6 +46,8 @@ REGISTRY = load_pooch_registry(REGISTRY)
 
 
 def twri_output(path: Union[str, Path]) -> None:
+    # Unzips TWRI output to ``path``. Has a race condition when executed
+    # multiple times with the same path.
     lock = FileLock(REGISTRY.path / "ex01-twri-output.zip.lock")
     with lock:
         _ = REGISTRY.fetch("ex01-twri-output.zip", processor=Unzip(extract_dir=path))
@@ -63,8 +65,9 @@ def hondsrug_layermodel() -> xr.Dataset:
     lock = FileLock(REGISTRY.path / "hondsrug-layermodel.nc.lock")
     with lock:
         fname = REGISTRY.fetch("hondsrug-layermodel.nc")
+        hondsrug_layermodel = xr.open_dataset(fname)
 
-    return xr.open_dataset(fname)
+    return hondsrug_layermodel
 
 
 def hondsrug_meteorology() -> xr.Dataset:
@@ -248,3 +251,45 @@ def hondsrug_planar_river() -> xr.Dataset:
     planar_river["stage"] = (top - planar_river["stage"]) / 2 + planar_river["stage"]
 
     return planar_river
+
+
+def colleagues_river_data(path: Union[str, Path]):
+    """
+    River data with some mistakes introduced to showcase cleanup
+    utilities.
+    """
+    gwf_model = hondsrug_simulation(path)["GWF"]
+    dis_ds = gwf_model["dis"].dataset
+    riv_ds_old = gwf_model["riv"].dataset
+    # Existing RIV package has only layer coord with [1, 3, 5, 6]. This causes
+    # problems with some methods, at least with cleanup. Therefore align data
+    # here for the cleanup example. River packages with limited layer coords are
+    # currently not fully supported.
+    riv_ds, _ = xr.align(riv_ds_old, dis_ds, join="outer")
+    x = riv_ds.coords["x"]
+    y = riv_ds.coords["y"]
+    riv_bot_da = riv_ds["bottom_elevation"]
+    riv_ds["stage"] += 0.05
+    riv_ds["stage"] = riv_ds["stage"].where(x > 239500)
+    riv_ds["conductance"] = riv_ds["conductance"].fillna(0.0)
+    x_preserve = (x < 244200) | (x > 246000)
+    y_preserve = (y < 560000) | (y > 561000)
+    riv_ds["bottom_elevation"] = riv_bot_da.where(
+        x_preserve | y_preserve, riv_bot_da + 0.15
+    )
+    return riv_ds
+
+
+def tutorial_03(path: Path | str) -> None:
+    """
+    Starting dataset for tutorial 3 in the iMOD Documentation.
+    """
+    # Unzips tutorial content to ``path``. Has a race condition when executed
+    # multiple times with the same path.
+    path = Path(path)
+    filename = "iMOD-Documentation-tutorial_03.zip"
+    lock = FileLock(REGISTRY.path / f"{filename}.lock")
+    with lock:
+        _ = REGISTRY.fetch(filename, processor=Unzip(extract_dir=path))
+
+    return path / "tutorial_03" / "GWF_model_Hondsrug.prj"

@@ -1,14 +1,24 @@
 import warnings
-from typing import Any
+from copy import deepcopy
+from typing import Any, Optional
 
 import numpy as np
 
 from imod.logging import init_log_decorator
 from imod.mf6.interfaces.iregridpackage import IRegridPackage
 from imod.mf6.package import Package
-from imod.mf6.regrid.regrid_schemes import InitialConditionsRegridMethod
+from imod.mf6.regrid.regrid_schemes import (
+    InitialConditionsRegridMethod,
+)
+from imod.mf6.utilities.regrid import RegridderWeightsCache, _regrid_package_data
 from imod.mf6.validation import PKG_DIMS_SCHEMA
-from imod.schemata import DTypeSchema, IdentityNoDataSchema, IndexesSchema
+from imod.schemata import (
+    AllCoordsValueSchema,
+    DTypeSchema,
+    IdentityNoDataSchema,
+    IndexesSchema,
+)
+from imod.typing import GridDataArray
 
 
 class InitialConditions(Package, IRegridPackage):
@@ -50,6 +60,7 @@ class InitialConditions(Package, IRegridPackage):
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
+            AllCoordsValueSchema("layer", ">", 0),
         ],
     }
     _write_schemata = {
@@ -89,3 +100,55 @@ class InitialConditions(Package, IRegridPackage):
             self["start"], icdirectory, "strt", binary=binary
         )
         return self._template.render(d)
+
+    @classmethod
+    def from_imod5_data(
+        cls,
+        imod5_data: dict[str, dict[str, GridDataArray]],
+        target_grid: GridDataArray,
+        regridder_types: Optional[InitialConditionsRegridMethod] = None,
+        regrid_cache: RegridderWeightsCache = RegridderWeightsCache(),
+    ) -> "InitialConditions":
+        """
+        Construct an InitialConditions-package from iMOD5 data, loaded with the
+        :func:`imod.formats.prj.open_projectfile_data` function.
+
+        .. note::
+
+            The method expects the iMOD5 model to be fully 3D, not quasi-3D.
+
+        Parameters
+        ----------
+        imod5_data: dict
+            Dictionary with iMOD5 data. This can be constructed from the
+            :func:`imod.formats.prj.open_projectfile_data` method.
+        target_grid: GridDataArray
+            The grid that should be used for the new package. Does not
+            need to be identical to one of the input grids.
+        regridder_types: InitialConditionsRegridMethod, optional
+            Optional dataclass with regridder types for a specific variable.
+            Use this to override default regridding methods.
+        regrid_cache: RegridderWeightsCache, optional
+            stores regridder weights for different regridders. Can be used to speed up regridding,
+            if the same regridders are used several times for regridding different arrays.
+
+        Returns
+        -------
+        Modflow 6 InitialConditions package.
+        """
+
+        data = {
+            "start": imod5_data["shd"]["head"],
+        }
+
+        if regridder_types is None:
+            regridder_types = InitialConditions.get_regrid_methods()
+
+        new_package_data = _regrid_package_data(
+            data, target_grid, regridder_types, regrid_cache, {}
+        )
+        return cls(**new_package_data, validate=True)
+
+    @classmethod
+    def get_regrid_methods(cls) -> InitialConditionsRegridMethod:
+        return deepcopy(cls._regrid_method)

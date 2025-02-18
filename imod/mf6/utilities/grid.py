@@ -39,9 +39,10 @@ def broadcast_to_full_domain(
     """
     Broadcast the bottom and top array to have the same shape as the idomain
     """
-    bottom = idomain * bottom
+    active = idomain > 0
+    bottom = active * bottom
     top = (
-        idomain * top
+        active * top
         if hasattr(top, "coords") and "layer" in top.coords
         else create_layered_top(bottom, top)
     )
@@ -80,3 +81,22 @@ def create_geometric_grid_info(active: xr.DataArray) -> pd.DataFrame:
             "dy": dy.flatten(),
         }
     )
+
+
+def create_smallest_target_grid(*grids: xr.DataArray) -> xr.DataArray:
+    """
+    Create smallest target grid from multiple structured grids. This is the grid
+    with smallest extent and finest resolution amongst all provided grids.
+    """
+    dx_ls, xmin_ls, xmax_ls, dy_ls, ymin_ls, ymax_ls = zip(
+        *[imod.util.spatial.spatial_reference(grid) for grid in grids]
+    )
+
+    dx = min(dx_ls)
+    xmin = max(xmin_ls)
+    xmax = min(xmax_ls)
+    dy = max(dy_ls)
+    ymax = min(ymax_ls)
+    ymin = max(ymin_ls)
+
+    return imod.util.spatial.empty_2d(dx, xmin, xmax, dy, ymin, ymax)
