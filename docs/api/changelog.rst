@@ -51,6 +51,8 @@ Changed
   :class:`imod.mf6.HorizontalFlowBarrierSingleLayerResistance`.
 - Relaxed validation for :class:`imod.msw.MetaSwapModel` if ``FileCopier``
   package is present.
+- Change aterisk to dash and tabs to four spaces in ``ValidationError`` messages.
+
 
 Fixed
 ~~~~~
