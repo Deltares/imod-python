@@ -37,7 +37,8 @@ class Buoyancy(Package):
         fluid reference density used in the equation of state.
     density_concentration_slope: sequence of floats
         Slope of the (linear) density concentration line used in the density
-        equation of state.
+        equation of state. A value of 0.7143 is often used for TDS g/l. A value
+        of 1.316 is common for CL g/l.
     reference_concentration: sequence of floats
         Reference concentration used in the density equation of state.
     modelname: sequence of strings,
