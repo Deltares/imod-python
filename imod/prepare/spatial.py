@@ -1,5 +1,5 @@
 import pathlib
-from typing import TYPE_CHECKING, Callable, Iterable, Optional, Union
+from typing import TYPE_CHECKING, Callable, Iterable, Optional, Union, cast
 
 import dask
 import numba
@@ -27,7 +27,9 @@ if TYPE_CHECKING:
     import geopandas as gpd
 
 
-def round_extent(extent, cellsize):
+def round_extent(
+    extent: tuple[float, float, float, float], cellsize: float
+) -> tuple[float, float, float, float]:
     """Increases the extent until all sides lie on a coordinate
     divisible by cellsize."""
     xmin, ymin, xmax, ymax = extent
@@ -38,7 +40,7 @@ def round_extent(extent, cellsize):
     return xmin, ymin, xmax, ymax
 
 
-def round_z(z_extent, dz):
+def round_z(z_extent: tuple[float, float], dz: float):
     """Increases the extent until all sides lie on a coordinate
     divisible by dz."""
     zmin, zmax = z_extent
@@ -47,7 +49,7 @@ def round_z(z_extent, dz):
     return zmin, zmax
 
 
-def _fill_np(data):
+def _fill_np(data: np.ndarray) -> np.ndarray:
     nodata = np.isnan(data)
     if not nodata.any():
         return data.copy()
@@ -60,7 +62,7 @@ def _fill_np(data):
     return data[tuple(indices)]
 
 
-def fill(da, dims=None):
+def fill(da: xr.DataArray, dims: Optional[tuple[str, ...]] = None) -> xr.DataArray:
     """
     Fill in NaNs using basic nearest neighbour interpolation.
 
@@ -117,14 +119,14 @@ def fill(da, dims=None):
 
 
 def laplace_interpolate(
-    source,
-    dims=("y", "x"),
-    direct=False,
-    delta=0.0,
-    relax=0.97,
-    atol=0.0,
-    rtol=1.0e-5,
-    maxiter=500,
+    source: xr.DataArray,
+    dims: tuple[str, ...] = ("y", "x"),
+    direct: bool = False,
+    delta: float = 0.0,
+    relax: float = 0.97,
+    atol: float = 0.0,
+    rtol: float = 1.0e-5,
+    maxiter: int = 500,
 ):
     """
     Fills gaps in ``source`` (NaN values) by interpolating from existing values
@@ -159,11 +161,11 @@ def laplace_interpolate(
     interpolated : xr.DataArray
         source, with interpolated values.
     """
-    missing_dims = set(dims) - set(source.dims)
+    missing_dims = set(dims) - set(cast(tuple[str, ...], source.dims))
     if missing_dims:
         raise ValueError(f"Dimensions not in source: {missing_dims}")
     # Ensure order matches the order in source.
-    dims = [dim for dim in source.dims if dim in dims]
+    dims = tuple(cast(str, dim) for dim in source.dims if dim in dims)
     shape = tuple(source.sizes[d] for d in dims)
     connectivity = laplace._build_connectivity(shape)
     arr = xr.apply_ufunc(
