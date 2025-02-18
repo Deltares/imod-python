@@ -81,21 +81,7 @@ def test_laplace_interpolate():
     da = xr.DataArray(data, **kwargs)
     # remove some values
     da.values[:, 1] = np.nan
-    actual = imod.prepare.laplace_interpolate(da, mxiter=5, iter1=30)
-    assert np.allclose(actual.values, 1.0)
-
-    ibound = xr.full_like(da, True)
-    ibound.values[1, 1] = False
-    actual = imod.prepare.laplace_interpolate(da, ibound=ibound, mxiter=5, iter1=30)
-    assert np.isnan(actual.values[1, 1])
-    actual.values[1, 1] = 1.0
-    assert np.allclose(actual.values, 1.0)
-
-    da.values[:] = 1.0
-    da.values[1, :] = np.nan
-    actual = imod.prepare.laplace_interpolate(da, ibound=ibound, mxiter=5, iter1=30)
-    assert np.isnan(actual.values[1, 1])
-    actual.values[1, 1] = 1.0
+    actual = imod.prepare.laplace_interpolate(da, maxiter=50)
     assert np.allclose(actual.values, 1.0)
 
 
