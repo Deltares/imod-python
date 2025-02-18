@@ -166,7 +166,7 @@ Changed
   regridder to regrid individual grids instead.
   <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_ To
   regrid entire MODFLOW6 packages or simulations, `see the user guide here.
-  <https://deltares.github.io/imod-python/user_guide/regridding.html>`_.
+  <https://deltares.github.io/imod-python/user-guide/08-regridding.html>`_.
 
 [0.18.1] - 2024-11-20
 ---------------------
