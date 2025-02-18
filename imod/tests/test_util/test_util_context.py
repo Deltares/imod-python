@@ -2,7 +2,6 @@ import pytest
 
 from imod.util.context import print_if_error
 
-# Comment added to test if sonarcloud ignores this file.
 
 def test_print_if_error():
     with print_if_error(TypeError):
