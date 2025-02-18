@@ -51,7 +51,7 @@ class StatusInfo(StatusInfoBase):
 
     def to_string(self) -> str:
         header = self.title + ":" + "\n"
-        bullet = "\t* "
+        bullet = "    - "
         indented_errors = f"{bullet}" + f"\n{bullet}".join(self.errors)
         return header + indented_errors
 
@@ -89,10 +89,10 @@ class NestedStatusInfo(StatusInfoBase):
     def to_string(self) -> str:
         string = ""
         for child in self.__children:
-            string += "\n* " + child.to_string()
+            string += "\n- " + child.to_string()
 
         string += self.__footer_text
 
-        string = string.replace("\n", "\n\t")
+        string = string.replace("\n", "\n    ")
 
         return self.title + ":" + string
