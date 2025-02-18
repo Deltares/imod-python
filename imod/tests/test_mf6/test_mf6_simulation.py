@@ -390,9 +390,9 @@ class TestModflow6Simulation:
         expected_text = textwrap.dedent(
             """
             Simulation validation status:
-            \t* Model 1:
-            \t\t* Package 1:
-            \t\t\t* Some error"""
+                - Model 1:
+                    - Package 1:
+                        - Some error"""
         )
 
         pkg_status_info = StatusInfo("Package 1")

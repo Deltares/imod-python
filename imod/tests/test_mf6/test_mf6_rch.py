@@ -244,8 +244,8 @@ def test_render_concentration(concentration_fc, rate_fc):
 def test_no_layer_coord(rch_dict):
     message = textwrap.dedent(
         """
-        * rate
-        \t- coords has missing keys: {'layer'}"""
+        - rate
+            - coords has missing keys: {'layer'}"""
     )
 
     rch_dict["rate"] = rch_dict["rate"].sel(layer=1, drop=True)
@@ -259,17 +259,17 @@ def test_no_layer_coord(rch_dict):
 def test_scalar():
     message = textwrap.dedent(
         """
-        * rate
-        \t- coords has missing keys: {'layer'}
-        \t- No option succeeded:
-        \tdim mismatch: expected ('time', 'layer', 'y', 'x'), got ()
-        \tdim mismatch: expected ('layer', 'y', 'x'), got ()
-        \tdim mismatch: expected ('time', 'layer', '{face_dim}'), got ()
-        \tdim mismatch: expected ('layer', '{face_dim}'), got ()
-        \tdim mismatch: expected ('time', 'y', 'x'), got ()
-        \tdim mismatch: expected ('y', 'x'), got ()
-        \tdim mismatch: expected ('time', '{face_dim}'), got ()
-        \tdim mismatch: expected ('{face_dim}',), got ()"""
+        - rate
+            - coords has missing keys: {'layer'}
+            - No option succeeded:
+            dim mismatch: expected ('time', 'layer', 'y', 'x'), got ()
+            dim mismatch: expected ('layer', 'y', 'x'), got ()
+            dim mismatch: expected ('time', 'layer', '{face_dim}'), got ()
+            dim mismatch: expected ('layer', '{face_dim}'), got ()
+            dim mismatch: expected ('time', 'y', 'x'), got ()
+            dim mismatch: expected ('y', 'x'), got ()
+            dim mismatch: expected ('time', '{face_dim}'), got ()
+            dim mismatch: expected ('{face_dim}',), got ()"""
     )
     with pytest.raises(ValidationError, match=re.escape(message)):
         imod.mf6.Recharge(rate=0.001)
