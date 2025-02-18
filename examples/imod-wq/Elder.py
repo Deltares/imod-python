@@ -15,7 +15,7 @@ Simpson, J., & Clement, P. (2003).
 Theoretical analysis of the worthiness of Henry and Elder
 problems as benchmark of density-dependent groundwater flow models.
 `Advances in Water Resources, 1708` (02).
-Retrieved from http://www.eng.auburn.edu/~clemept/publsihed_pdf/awrmat.pdf
+Retrieved from https://www.sciencedirect.com/science/article/abs/pii/S0309170802000854
 """
 
 # %%

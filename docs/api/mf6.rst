@@ -135,7 +135,6 @@ Flow Packages
     River.regrid_like
     River.cleanup
     River.clip_box
-    River.split_conductance
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.to_mf6_pkg
     SingleLayerHorizontalFlowBarrierHydraulicCharacteristic.clip_box
