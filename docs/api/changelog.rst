@@ -52,6 +52,10 @@ Changed
 - Relaxed validation for :class:`imod.msw.MetaSwapModel` if ``FileCopier``
   package is present.
 - Change aterisk to dash and tabs to four spaces in ``ValidationError`` messages.
+- :func:`imod.prepare.laplace_interpolate` has been simplified, using
+  ``scipy.sparse.linalg.cg`` as the backend. We've remove the support for the
+  ``ibound`` argument, the ``iter1`` argument has been dropped, ``mxiter`` has
+  been renamed to ``maxiter``, ``close`` has been renamed to ``rtol``.
 
 
 Fixed
