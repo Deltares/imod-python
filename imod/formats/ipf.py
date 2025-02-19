@@ -394,7 +394,7 @@ def write_assoc(path, df, itype=1, nodata=1.0e20, assoc_columns=None):
         IPF type.
         Possible values, either integer or string:
 
-        * ``1`` : ``"timeseries"``, a column named ``"time"`` is required.        
+        * ``1`` : ``"timeseries"``, a column named ``"time"`` is required.
         * ``2`` : ``"borehole1d"``, a column named ``"top"`` is required.
         * ``3`` : ``"cpt"``, a column named ``"top"`` is required.
         * ``4`` : ``"borehole3d"``, columns named ``"x_offset"``,

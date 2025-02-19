@@ -592,7 +592,7 @@ def split_conductance_with_infiltration_factor(
     Note
     ----
     Derivation of the formulas from Zaadnoordijk (2009):
-    
+
     * [1] cond_RIV = A/ci
     * [2] cond_DRN = A * (ci-cd) / (ci*cd)
 
