@@ -158,8 +158,9 @@ class SchemaUnion:
             except ValidationError as e:
                 errors.append(e)
 
+        ws = "\n    "
         if len(errors) == len(self.schemata):  # All schemata failed
-            message = "\n\t" + "\n\t".join(str(error) for error in errors)
+            message = f"{ws}" + f"{ws}".join(str(error) for error in errors)
             raise ValidationError(f"No option succeeded:{message}")
 
     def __or__(self, other):

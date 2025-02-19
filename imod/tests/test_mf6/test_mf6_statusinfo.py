@@ -53,13 +53,13 @@ def nested_status_info():
 
 EXPECTED_TEXT_TEMPLATE = """\
 root:
-\t* child1:
-\t\t* grandchild1:
-\t\t* grandchild2:
-\t\t\t* test error2
-\t\t\t* test error3
-\t* child2:
-\t\t* test error1"""
+    - child1:
+        - grandchild1:
+        - grandchild2:
+            - test error2
+            - test error3
+    - child2:
+        - test error1"""
 
 
 class TestNestedStatusInfo:
@@ -89,7 +89,7 @@ class TestNestedStatusInfo:
     def test_to_string_with_footer(self, nested_status_info):
         # Arrange
         footer_text = "footer"
-        expected_text = EXPECTED_TEXT_TEMPLATE + "\n\t" + footer_text
+        expected_text = EXPECTED_TEXT_TEMPLATE + "\n    " + footer_text
         # Act
         nested_status_info.set_footer_text(footer_text)
         actual = nested_status_info.to_string()

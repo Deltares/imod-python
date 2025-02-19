@@ -74,8 +74,8 @@ class DisBottomSchema(NoDataComparisonSchema):
 def validation_pkg_error_message(pkg_errors):
     messages = []
     for var, var_errors in pkg_errors.items():
-        messages.append(f"* {var}")
-        messages.extend(f"\t- {error}" for error in var_errors)
+        messages.append(f"- {var}")
+        messages.extend(f"    - {error}" for error in var_errors)
     return "\n" + "\n".join(messages)
 
 

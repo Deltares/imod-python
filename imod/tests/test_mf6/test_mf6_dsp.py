@@ -93,8 +93,8 @@ def test_dispersion_options():
 def test_dispersion_erronous_options():
     message = textwrap.dedent(
         """
-        * xt3d_rhs
-        \t- Incompatible setting: xt3d_off should be False"""
+        - xt3d_rhs
+            - Incompatible setting: xt3d_off should be False"""
     )
 
     with pytest.raises(ValidationError, match=re.escape(message)):

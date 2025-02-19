@@ -72,9 +72,9 @@ NO_BARRIER_MSG = textwrap.dedent(
     """
     No barriers could be assigned to cell edges,
     this is caused by either one of the following:
-    \t- Barriers fall completely outside the model grid
-    \t- Barriers were assigned to the edge of the model domain
-    \t- Barriers were assigned to edges of inactive cells
+        - Barriers fall completely outside the model grid
+        - Barriers were assigned to the edge of the model domain
+        - Barriers were assigned to edges of inactive cells
     """
 )
 
