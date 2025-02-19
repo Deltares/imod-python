@@ -589,9 +589,9 @@ def split_conductance_with_infiltration_factor(
     river_conductance : xr.DataArray
         conductance for the river package
 
-    Derivation
-    ----------
-    From Zaadnoordijk (2009):
+    Note
+    ----
+    Derivation of the formulas from Zaadnoordijk (2009):
     [1] cond_RIV = A/ci
     [2] cond_DRN = A * (ci-cd) / (ci*cd)
     Where cond_RIV and cond_DRN repsectively are the River and Drainage conductance [L^2/T],

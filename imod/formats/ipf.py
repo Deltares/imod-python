@@ -394,10 +394,11 @@ def write_assoc(path, df, itype=1, nodata=1.0e20, assoc_columns=None):
         IPF type.
         Possible values, either integer or string:
 
-        1 : "timeseries"
-        2 : "borehole1d"
-        3 : "cpt"
-        4 : "borehole3d"
+        * ``1`` : ``"timeseries"``, a column named ``"time"`` is required.        
+        * ``2`` : ``"borehole1d"``, a column named ``"top"`` is required.
+        * ``3`` : ``"cpt"``, a column named ``"top"`` is required.
+        * ``4`` : ``"borehole3d"``, columns named ``"x_offset"``,
+          ``"y_offset"``, and ``"top"`` are required.
     nodata : float
         The value given to nodata values. These are generally NaN (Not-a-Number)
         in pandas, but this leads to errors in iMOD(FLOW) for IDFs.
@@ -622,10 +623,11 @@ def save(path, df, itype=None, assoc_ext="txt", nodata=1.0e20, assoc_columns=Non
         IPF type. Defaults to ``None``, in which case no associated files are
         created. Possible other values, either integer or string:
 
-        * ``1`` or ``"timeseries"``
-        * ``2`` or ``"borehole1d"``
-        * ``3`` or ``"cpt"``
-        * ``4`` or ``"borehole3d"``
+        * ``1`` or ``"timeseries"``, a column named ``"time"`` is required.
+        * ``2`` or ``"borehole1d"``, a column named ``"top"`` is required.
+        * ``3`` or ``"cpt"``, a column named ``"top"`` is required.
+        * ``4`` or ``"borehole3d"``, columns named ``"x_offset"``,
+          ``"y_offset"``, and ``"top"`` are required.
     assoc_ext : str
         Extension of the associated files. Defaults to "txt".
     nodata : float

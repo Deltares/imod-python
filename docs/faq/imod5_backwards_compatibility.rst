@@ -130,7 +130,7 @@ Here an overview of iMOD5 MODFLOW6 features:
     DRN,Align iMOD5 input grids ,:meth:`imod.mf6.Drainage.from_imod5_data`
     DRN,Regrid,:meth:`imod.mf6.Drainage.regrid_like`
     DRN,Clip,:meth:`imod.mf6.Drainage.clip_box`
-    RIV,Infiltration factors (IFF),":meth:`imod.mf6.River.from_imod5_data`, :meth:`imod.mf6.River.split_conductance`"
+    RIV,Infiltration factors (IFF),":meth:`imod.mf6.River.from_imod5_data`, :meth:`imod.prepare.split_conductance_with_infiltration_factor`"
     RIV,Auto placement (IDEFLAYER),":meth:`imod.mf6.River.from_imod5_data`, :func:`imod.prepare.allocate_riv_cells`"
     RIV,Distribute conductances (DISTRCOND),":meth:`imod.mf6.River.from_imod5_data`, :func:`imod.prepare.distribute_riv_conductance`"
     RIV,Cleanup,":meth:`imod.mf6.River.cleanup`, :func:`imod.prepare.cleanup_riv`"
