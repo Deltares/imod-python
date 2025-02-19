@@ -605,21 +605,20 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
         *Associated wells*
 
         Wells with timeseries in an associated textfile are processed as
-        follows:
+        follows.
 
-        - Wells are validated if the following requirements are met
-            * Associated well entries in projectfile are defined on either all
+        - Wells are validated if the following requirements are met:
+            - Associated well entries in projectfile are defined on either all
               timestamps or just the first
-            * Multiplication and addition factors need to remain constant through time
-            * Same associated well cannot be assigned to multiple layers
+            - Multiplication and addition factors need to remain constant through time
+            - Same associated well cannot be assigned to multiple layers
         - The dataframe of the first projectfile timestamp is selected
-        - Timeseries are processed based on the ``times`` argument of this
-          method:
-            * If ``times`` is a list of datetimes, rate timeseries are resampled
+        - Timeseries are processed based on the ``times`` argument of this method:
+            - If ``times`` is a list of datetimes, rate timeseries are resampled
               with a time weighted mean to the simulation times. When simulation
               times fall outside well timeseries range, the last rate is forward
               filled.
-            * If ``times = "steady-state"``, the simulation is assumed to be
+            - If ``times = "steady-state"``, the simulation is assumed to be
               "steady-state" and an average rate is computed from the
               timeseries.
         - Projectfile timestamps are not used. Even if assigned to a
