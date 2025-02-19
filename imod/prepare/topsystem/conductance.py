@@ -592,18 +592,22 @@ def split_conductance_with_infiltration_factor(
     Note
     ----
     Derivation of the formulas from Zaadnoordijk (2009):
-    [1] cond_RIV = A/ci
-    [2] cond_DRN = A * (ci-cd) / (ci*cd)
+    
+    * [1] cond_RIV = A/ci
+    * [2] cond_DRN = A * (ci-cd) / (ci*cd)
+
     Where cond_RIV and cond_DRN repsectively are the River and Drainage conductance [L^2/T],
     A is the cell area [L^2] and ci and cd respectively are the infiltration and exfiltration resistance [T]
 
     Taking f as the infiltration factor and cond_d as the exfiltration conductance, we can write (iMOD manual):
-    [3] ci = cd * (1/f)
-    [4] cond_d = A/cd
+
+    * [3] ci = cd * (1/f)
+    * [4] cond_d = A/cd
 
     We can then rewrite equations 1 and 2 to:
-    [5] cond_RIV = f * cond_d
-    [6] cond_DRN = (1-f) * cond_d
+
+    * [5] cond_RIV = f * cond_d
+    * [6] cond_DRN = (1-f) * cond_d
 
     References
     ----------
