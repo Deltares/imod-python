@@ -296,7 +296,7 @@ class MetaSwap(Package):
         # Frozen(SortedKeysDict).keys() does not preserve ordering in keys
         # Therefore convert to set and check for symmetric difference,
         # to see if any dimensions are missing or unexpected dimensions are included.
-        dims = set(self.dataset.dims.keys())
+        dims = set(self.dataset.sizes.keys())
 
         if len(dims.symmetric_difference(("y", "x"))) > 0:
             raise ValueError(f'Dataset dims not ("y", "x"), instead got {dims}')

@@ -227,7 +227,7 @@ class Evapotranspiration(BoundaryCondition, IRegridPackage):
         options = super()._get_options(predefined_options, not_options=not_options)
         # Add amount of segments
         if "segment" in self.dataset.dims:
-            options["nseg"] = self.dataset.dims["segment"] + 1
+            options["nseg"] = self.dataset.sizes["segment"] + 1
         else:
             options["nseg"] = 1
         return options

@@ -305,9 +305,9 @@ def test_import_from_imod5(
     assert not missing_keys
     for pkgname in grid_packages:
         # Test if all grid packages broadcasted to grid.
-        missing_dims = {"y", "x"} - set(model[pkgname].dataset.dims.keys())
+        missing_dims = {"y", "x"} - set(model[pkgname].dataset.sizes.keys())
         assert not missing_dims
-    assert "time" in model["time_oc"].dataset.dims.keys()
+    assert "time" in model["time_oc"].dataset.sizes.keys()
     assert len(model["meteo_grid"].dataset.dims) == 0
     assert ("scaling_factor" in model.keys()) == has_scaling_factor
 
