@@ -54,9 +54,10 @@ def _read_ipf(path, kwargs=None) -> Tuple[pd.DataFrame, int, str]:
         line = f.readline()
         delim_whitespace = _infer_delimwhitespace(line, ncol)
         f.seek(position)
+        sep='\s+' if delim_whitespace else ','
 
         ipf_kwargs = {
-            "delim_whitespace": delim_whitespace,
+            "sep": sep,
             "header": None,
             "names": colnames,
             "nrows": nrow,
@@ -78,10 +79,10 @@ def _read(path, kwargs=None, assoc_kwargs=None):
         globpath for IPF files to read.
     kwargs : dict
         Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
-        IPF files (e.g. `{"delim_whitespace": True}`)
+        IPF files (e.g. `{"sep": "\s+"}`)
     assoc_kwargs: dict
         Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
-        associated (TXT) files (e.g. `{"delim_whitespace": True}`)
+        associated (TXT) files (e.g. `{"sep": "\s+"}`)
 
     Returns
     -------
@@ -131,7 +132,7 @@ def read_associated(path, kwargs={}):
         Path to associated file.
     kwargs : dict
         Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
-        associated (TXT) file (e.g. `{"delim_whitespace": True}`).
+        associated (TXT) file (e.g. `{"sep": "\s+"}`).
 
     Returns
     -------
@@ -263,10 +264,10 @@ def read(path, kwargs={}, assoc_kwargs={}):
         be combined in a single pd.DataFrame.
     kwargs : dict
         Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
-        IPF files (e.g. `{"delim_whitespace": True}`)
+        IPF files (e.g. `{"sep": "\s+"}`)
     assoc_kwargs: dict
         Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
-        associated (TXT) files (e.g. `{"delim_whitespace": True}`)
+        associated (TXT) files (e.g. `{"sep": "\s+"}`)
 
     Returns
     -------
