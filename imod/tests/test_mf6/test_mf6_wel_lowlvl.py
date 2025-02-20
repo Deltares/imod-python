@@ -185,7 +185,7 @@ def test_remove_inactive__stationary(basic_dis, mf6wel_test_data_stationary):
     ds_removed = imod.mf6.utilities.dataset.remove_inactive(ds, active)
 
     # Assert
-    assert dict(ds_removed.dims) == {"ncellid": 6, "dim_cellid": 3}
+    assert dict(ds_removed.sizes) == {"ncellid": 6, "dim_cellid": 3}
 
 
 def test_remove_inactive__transient(basic_dis, mf6wel_test_data_transient):
@@ -203,4 +203,4 @@ def test_remove_inactive__transient(basic_dis, mf6wel_test_data_transient):
     ds_removed = imod.mf6.utilities.dataset.remove_inactive(ds, active)
 
     # Assert
-    assert dict(ds_removed.dims) == {"ncellid": 6, "time": 5, "dim_cellid": 3}
+    assert dict(ds_removed.sizes) == {"ncellid": 6, "time": 5, "dim_cellid": 3}
