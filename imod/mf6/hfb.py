@@ -951,8 +951,8 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         ]
 
         return values.where(
-            (connected_cells_left.drop(face_dimension) > 0)
-            & (connected_cells_right.drop(face_dimension) > 0)
+            (connected_cells_left.drop_vars(face_dimension) > 0)
+            & (connected_cells_right.drop_vars(face_dimension) > 0)
         )
 
 
