@@ -200,15 +200,16 @@ def read_associated(path, kwargs={}):
         line = f.readline()
         f.seek(position)
         delim_whitespace = _infer_delimwhitespace(line, ncol)
+        sep = "\s+" if delim_whitespace else ","
 
         itype_kwargs = {
-            "delim_whitespace": delim_whitespace,
             "header": None,
             "names": colnames,
             "usecols": usecols,
             "nrows": nrow,
             "na_values": na_values,
             "skipinitialspace": True,
+            "sep": sep,
         }
         if itype == 1:  # Timevariant information: timeseries
             # check if first column is time in [yyyymmdd] or [yyyymmddhhmmss]
