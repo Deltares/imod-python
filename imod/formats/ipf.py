@@ -54,7 +54,7 @@ def _read_ipf(path, kwargs=None) -> Tuple[pd.DataFrame, int, str]:
         line = f.readline()
         delim_whitespace = _infer_delimwhitespace(line, ncol)
         f.seek(position)
-        sep='\s+' if delim_whitespace else ','
+        sep = "\s+" if delim_whitespace else ","
 
         ipf_kwargs = {
             "sep": sep,
