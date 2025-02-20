@@ -54,7 +54,7 @@ def _read_ipf(path, kwargs=None) -> Tuple[pd.DataFrame, int, str]:
         line = f.readline()
         delim_whitespace = _infer_delimwhitespace(line, ncol)
         f.seek(position)
-        sep = "\s+" if delim_whitespace else ","
+        sep = r"\s+" if delim_whitespace else ","
 
         ipf_kwargs = {
             "sep": sep,
@@ -164,6 +164,7 @@ def read_associated(path, kwargs={}):
         # https://github.com/pandas-dev/pandas/issues/19827#issuecomment-398649163
         lines = [f.readline() for _ in range(ncol)]
         delim_whitespace = _infer_delimwhitespace(lines[0], 2)
+        sep = r"\s+" if delim_whitespace else ","
         # Normally, this ought to work:
         # metadata = pd.read_csv(f, header=None, nrows=ncol).values
         # TODO: replace when bugfix is released
@@ -175,7 +176,7 @@ def read_associated(path, kwargs={}):
         # the challenge lies in replacing the pd.notnull for nodata values.
         # is otherwise quite a bit faster for such a header block.
         metadata_kwargs = {
-            "delim_whitespace": delim_whitespace,
+            "sep": sep,
             "header": None,
             "nrows": ncol,
             "skipinitialspace": True,
@@ -201,7 +202,7 @@ def read_associated(path, kwargs={}):
         line = f.readline()
         f.seek(position)
         delim_whitespace = _infer_delimwhitespace(line, ncol)
-        sep = "\s+" if delim_whitespace else ","
+        sep = r"\s+" if delim_whitespace else ","
 
         itype_kwargs = {
             "header": None,

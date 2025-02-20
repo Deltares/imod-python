@@ -45,7 +45,7 @@ def read_imod_legend(path):
     try:
         legend = _read(sep=",")
     except ValueError:
-        legend = _read(sep="\s+")
+        legend = _read(sep=r"\s+")
 
     # The colors in iMOD are formatted in RGB. Format to hexadecimal.
     red = legend["red"]
