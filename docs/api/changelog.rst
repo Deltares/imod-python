@@ -91,7 +91,7 @@ Fixed
   like MetaSWAP expects.
 - Models imported with :meth:`imod.msw.MetaSwapModel.from_imod5_data` can be
   written with ``validate`` set to True.
-- Fixed part of the code that made Pandas, Geopands, and xarray throw a lot of
+- Fixed part of the code that made Pandas, Geopandas, and xarray throw a lot of
   ``FutureWarning``s and ``DeprecationWarning``s.
 
 
