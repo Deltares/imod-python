@@ -536,8 +536,8 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
             filtered_ids = well_data_filtered["id"].to_dataframe()["id"]
         else:
             filtered_ids = well_data_filtered["id"]
-        is_missing_id = ~filtered_ids.isin(well_data["id"])
-        return filtered_ids[is_missing_id]
+        is_missing_id = ~well_data["id"].isin(filtered_ids.unique())
+        return well_data["id"].loc[is_missing_id].unique()
 
     def to_mf6_package_information(
         self, filtered_wells: list[str], reason_text: str
