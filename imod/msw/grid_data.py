@@ -91,11 +91,14 @@ class GridData(MetaSwapPackage, IRegridPackage):
         active = self.dataset["active"]
 
         isactive = area.where(active).notnull()
-
-        index = isactive.values.ravel()
-
         svat = xr.full_like(area, fill_value=0, dtype=np.int64).rename("svat")
-        svat.values[isactive.values] = np.arange(1, index.sum() + 1)
+        # Load into memory to avoid dask issue
+        # https://github.com/dask/dask/issues/11753
+        isactive.load()
+        svat.load()
+        
+        index = isactive.values.ravel()
+        svat.data[isactive.data] = np.arange(1, index.sum() + 1)
 
         return index, svat
 

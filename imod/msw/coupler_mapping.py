@@ -115,6 +115,9 @@ class CouplerMapping(MetaSwapPackage):
         well_row = well_cellid.sel(dim_cellid="row").data - 1
         well_column = well_cellid.sel(dim_cellid="column").data - 1
 
+        # Load into memory to avoid dask issue
+        # https://github.com/dask/dask/issues/11753
+        idomain_active.load()
         n_mod = idomain_active.sum()
         mod_id = xr.full_like(idomain_active, 0, dtype=np.int64)
         mod_id.data[idomain_active.data] = np.arange(1, n_mod + 1)
