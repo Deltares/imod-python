@@ -531,12 +531,13 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
     def gather_filtered_well_ids(
         self, well_data_filtered: pd.DataFrame | xr.Dataset, well_data: pd.DataFrame
     ) -> list[str]:
-        filtered_well_ids = [
-            id
-            for id in well_data["id"].unique()
-            if id not in well_data_filtered["id"].values
-        ]
-        return filtered_well_ids
+        # Work around performance issue with xarray isin for large datasets.
+        if isinstance(well_data_filtered, xr.Dataset):
+            filtered_ids = well_data_filtered["id"].to_dataframe()["id"]
+        else:
+            filtered_ids = well_data_filtered["id"]
+        is_missing_id = ~filtered_ids.isin(well_data["id"])
+        return filtered_ids[is_missing_id]
 
     def to_mf6_package_information(
         self, filtered_wells: list[str], reason_text: str
