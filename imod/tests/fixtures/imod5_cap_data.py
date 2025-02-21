@@ -49,7 +49,7 @@ def cap_data_sprinkling_grid() -> Imod5DataDict:
 
 @pytest.fixture(scope="function")
 def cap_data_sprinkling_grid__big() -> Imod5DataDict:
-    n = 300
+    n = 1000
     boundary = zeros_dask_grid(n) + 1
     wetted_area = zeros_dask_grid(n) + 0.5
     urban_area = zeros_dask_grid(n) + 0.25
