@@ -91,6 +91,9 @@ Fixed
   like MetaSWAP expects.
 - Models imported with :meth:`imod.msw.MetaSwapModel.from_imod5_data` can be
   written with ``validate`` set to True.
+- :meth:`imod.mf6.Recharge.from_imod5_cap_data` now returns a 2D array with a
+  ``"layer"`` coordinate of ``1`` as otherwise ``primod`` throws an error when
+  trying to derive recharge-svat mappings.
 
 
 [1.0.0rc1] - 2024-12-20
