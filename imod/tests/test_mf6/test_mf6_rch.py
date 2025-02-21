@@ -477,8 +477,8 @@ def test_from_imod5_cap_data(imod5_dataset):
     # Assert
     np.testing.assert_array_equal(np.unique(rate), np.array([0.0, np.nan]))
     # Boundaries inactive in MetaSWAP
-    assert np.isnan(rate[0, :, 0]).all()
-    assert np.isnan(rate[0, :, -1]).all()
-    assert np.isnan(rate[0, 0, :]).all()
-    assert np.isnan(rate[0, -1, :]).all()
-    assert np.isnan(rate[:, 100, 100]).all()
+    assert np.isnan(rate[:, 0]).all()
+    assert np.isnan(rate[:, -1]).all()
+    assert np.isnan(rate[0, :]).all()
+    assert np.isnan(rate[-1, :]).all()
+    assert np.isnan(rate[100, 100]).all()

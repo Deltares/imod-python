@@ -279,11 +279,8 @@ class Recharge(BoundaryCondition, IRegridPackage):
         active = msw_active.all
 
         data = {}
-        layer_da = xr.full_like(
-            target_dis.dataset.coords["layer"], np.nan, dtype=np.float64
-        )
-        layer_da.loc[{"layer": 1}] = 0.0
-        data["rate"] = layer_da.where(active)
+        zero_scalar = xr.DataArray(0.0, coords={"layer": 1})
+        data["rate"] = zero_scalar.where(active)
 
         return cls(**data, validate=True, fixed_cell=False)
 
