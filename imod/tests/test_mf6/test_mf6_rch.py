@@ -10,10 +10,11 @@ import xarray as xr
 
 import imod
 from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing.grid import is_planar_grid, is_transient_data_grid, nan_like
-from imod.mf6.utilities.regrid import RegridderWeightsCache
+
 
 @pytest.fixture(scope="function")
 def rch_dict():
@@ -502,7 +503,7 @@ def test_from_imod5_cap_data__regrid(imod5_dataset):
     like = imod.util.empty_2d(*expected_spatial_ref)
     # Act
     rch = imod.mf6.Recharge.from_imod5_cap_data(data, target_discretization)
-    rch_coarse = rch.regrid_like(like, regrid_cache = RegridderWeightsCache())
+    rch_coarse = rch.regrid_like(like, regrid_cache=RegridderWeightsCache())
     # Assert
     actual_spatial_ref = imod.util.spatial_reference(rch_coarse.dataset["rate"])
     assert actual_spatial_ref == expected_spatial_ref
@@ -521,11 +522,10 @@ def test_from_imod5_cap_data__clip_box(imod5_dataset):
     # Setup template grid
     dx, xmin, xmax, dy, ymin, ymax = imod.util.spatial_reference(msw_bound)
     xmin_to_clip = xmin + 10 * dx
-    expected_spatial_ref = dx, xmin_to_clip, xmax, dy, ymin, ymax 
+    expected_spatial_ref = dx, xmin_to_clip, xmax, dy, ymin, ymax
     # Act
     rch = imod.mf6.Recharge.from_imod5_cap_data(data, target_discretization)
-    rch_clipped = rch.clip_box(x_min = xmin_to_clip)
+    rch_clipped = rch.clip_box(x_min=xmin_to_clip)
     # Assert
     actual_spatial_ref = imod.util.spatial_reference(rch_clipped.dataset["rate"])
     assert actual_spatial_ref == expected_spatial_ref
-
