@@ -128,6 +128,7 @@ vtk = { version = ">=9.0", build = "*qt*" }
 xarray = ">=2023.08.0"
 xugrid = ">=0.11.0"
 zarr = "*"
+pytest-timeout = ">=2.3.1,<3"
 
 [pypi-dependencies]
 mypy2junit = "*"
