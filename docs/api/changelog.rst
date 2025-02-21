@@ -91,6 +91,8 @@ Fixed
   like MetaSWAP expects.
 - Models imported with :meth:`imod.msw.MetaSwapModel.from_imod5_data` can be
   written with ``validate`` set to True.
+- Fixed part of the code that made Pandas, Geopandas, and xarray throw a lot of
+  ``FutureWarning``s and ``DeprecationWarning``s.
 - Fixed performance issue when coverting very large wells (>10k) with
   :meth:`imod.mf6.Well.to_mf6_pkg` and :meth:`imod.mf6.LayeredWell.to_mf6_pkg`,
   such as those created with :meth:`imod.mf6.LayeredWell.from_imod5_cap_data`

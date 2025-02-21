@@ -603,7 +603,7 @@ def test_clip_box__well_stationary(
         ds = wel.clip_box(**clip_box_args).dataset
 
         # Assert
-        assert dict(ds.dims) == expected_dims
+        assert dict(ds.sizes) == expected_dims
 
 
 @pytest.mark.parametrize(
@@ -637,7 +637,7 @@ def test_clip_box__layered_well_stationary(
         ds = wel.clip_box(**clip_box_args).dataset
 
         # Assert
-        assert dict(ds.dims) == expected_dims
+        assert dict(ds.sizes) == expected_dims
 
 
 @pytest.mark.parametrize(
@@ -655,28 +655,28 @@ def test_clip_box__high_lvl_transient(
     # Act & Assert
     # Test clipping x & y without specified time
     ds = wel.clip_box(x_min=52.0, x_max=76.0, y_max=67.0).dataset
-    assert dict(ds.dims) == {"index": 3, "time": 5, "species": 2}
+    assert dict(ds.sizes) == {"index": 3, "time": 5, "species": 2}
 
     # Test clipping with z
     ds = wel.clip_box(layer_max=2, top=top, bottom=bottom).dataset
-    assert dict(ds.dims) == {"index": 4, "time": 5, "species": 2}
+    assert dict(ds.sizes) == {"index": 4, "time": 5, "species": 2}
     ds = wel.clip_box(layer_min=5, top=top, bottom=bottom).dataset
-    assert dict(ds.dims) == {"index": 4, "time": 5, "species": 2}
+    assert dict(ds.sizes) == {"index": 4, "time": 5, "species": 2}
 
     # Test clipping with specified time
     timestr = "2000-01-03"
     ds = wel.clip_box(time_min=timestr).dataset
-    assert dict(ds.dims) == {"index": 8, "time": 3, "species": 2}
+    assert dict(ds.sizes) == {"index": 8, "time": 3, "species": 2}
 
     # Test clipping with specified time and spatial dimensions
     timestr = "2000-01-03"
     ds = wel.clip_box(x_min=52.0, x_max=76.0, y_max=67.0, time_min=timestr).dataset
-    assert dict(ds.dims) == {"index": 3, "time": 3, "species": 2}
+    assert dict(ds.sizes) == {"index": 3, "time": 3, "species": 2}
 
     # Test clipping with specified time inbetween timesteps
     timestr = "2000-01-03 18:00:00"
     ds = wel.clip_box(x_min=52.0, x_max=76.0, y_max=67.0, time_min=timestr).dataset
-    assert dict(ds.dims) == {"index": 3, "time": 3, "species": 2}
+    assert dict(ds.sizes) == {"index": 3, "time": 3, "species": 2}
     ds_first_time = ds.isel(time=0)
     assert ds_first_time.coords["time"] == np.datetime64(timestr)
     np.testing.assert_allclose(ds_first_time["rate"].values, np.array([3.0, 3.0, 3.0]))

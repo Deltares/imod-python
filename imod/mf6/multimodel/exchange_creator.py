@@ -293,8 +293,7 @@ class ExchangeCreator(abc.ABC):
         colnames = ["cell_idx1", "cell_idx2", "cell_label1", "cell_label2"]
         colnames_reversed = ["cell_idx2", "cell_idx1", "cell_label2", "cell_label1"]
 
-        decreasing_connections = df.loc[label_decreasing, colnames].values.astype(int)
-
+        decreasing_connections = df.loc[label_decreasing, colnames].values
         df.loc[label_decreasing, colnames_reversed] = decreasing_connections
 
         self._connected_cells = df

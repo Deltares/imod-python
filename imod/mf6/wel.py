@@ -876,7 +876,7 @@ class Well(GridAgnosticWell):
         }
         super().__init__(dict_dataset)
         # Set index as coordinate
-        index_coord = np.arange(self.dataset.dims["index"])
+        index_coord = np.arange(self.dataset.sizes["index"])
         self.dataset = self.dataset.assign_coords(index=index_coord)
         self._validate_init_schemata(validate)
 
@@ -953,7 +953,7 @@ class Well(GridAgnosticWell):
 
         # Initiate array of True with right shape to deal with case no spatial
         # selection needs to be done.
-        in_bounds = np.full(ds.dims["index"], True)
+        in_bounds = np.full(ds.sizes["index"], True)
         # Select all variables along "index" dimension
         in_bounds &= values_within_range(ds["x"], x_min, x_max)
         in_bounds &= values_within_range(ds["y"], y_min, y_max)
@@ -1253,7 +1253,7 @@ class LayeredWell(GridAgnosticWell):
         }
         super().__init__(dict_dataset)
         # Set index as coordinate
-        index_coord = np.arange(self.dataset.dims["index"])
+        index_coord = np.arange(self.dataset.sizes["index"])
         self.dataset = self.dataset.assign_coords(index=index_coord)
         self._validate_init_schemata(validate)
 
@@ -1306,7 +1306,7 @@ class LayeredWell(GridAgnosticWell):
 
         # Initiate array of True with right shape to deal with case no spatial
         # selection needs to be done.
-        in_bounds = np.full(ds.dims["index"], True)
+        in_bounds = np.full(ds.sizes["index"], True)
         # Select all variables along "index" dimension
         in_bounds &= values_within_range(ds["x"], x_min, x_max)
         in_bounds &= values_within_range(ds["y"], y_min, y_max)

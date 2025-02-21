@@ -54,9 +54,10 @@ def _read_ipf(path, kwargs=None) -> Tuple[pd.DataFrame, int, str]:
         line = f.readline()
         delim_whitespace = _infer_delimwhitespace(line, ncol)
         f.seek(position)
+        sep = r"\s+" if delim_whitespace else ","
 
         ipf_kwargs = {
-            "delim_whitespace": delim_whitespace,
+            "sep": sep,
             "header": None,
             "names": colnames,
             "nrows": nrow,
@@ -78,10 +79,10 @@ def _read(path, kwargs=None, assoc_kwargs=None):
         globpath for IPF files to read.
     kwargs : dict
         Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
-        IPF files (e.g. `{"delim_whitespace": True}`)
+        IPF files (e.g. `{"sep": "\s+"}`)
     assoc_kwargs: dict
         Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
-        associated (TXT) files (e.g. `{"delim_whitespace": True}`)
+        associated (TXT) files (e.g. `{"sep": "\s+"}`)
 
     Returns
     -------
@@ -131,7 +132,7 @@ def read_associated(path, kwargs={}):
         Path to associated file.
     kwargs : dict
         Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
-        associated (TXT) file (e.g. `{"delim_whitespace": True}`).
+        associated (TXT) file (e.g. `{"sep": "\s+"}`).
 
     Returns
     -------
@@ -163,6 +164,7 @@ def read_associated(path, kwargs={}):
         # https://github.com/pandas-dev/pandas/issues/19827#issuecomment-398649163
         lines = [f.readline() for _ in range(ncol)]
         delim_whitespace = _infer_delimwhitespace(lines[0], 2)
+        sep = r"\s+" if delim_whitespace else ","
         # Normally, this ought to work:
         # metadata = pd.read_csv(f, header=None, nrows=ncol).values
         # TODO: replace when bugfix is released
@@ -174,7 +176,7 @@ def read_associated(path, kwargs={}):
         # the challenge lies in replacing the pd.notnull for nodata values.
         # is otherwise quite a bit faster for such a header block.
         metadata_kwargs = {
-            "delim_whitespace": delim_whitespace,
+            "sep": sep,
             "header": None,
             "nrows": ncol,
             "skipinitialspace": True,
@@ -200,15 +202,16 @@ def read_associated(path, kwargs={}):
         line = f.readline()
         f.seek(position)
         delim_whitespace = _infer_delimwhitespace(line, ncol)
+        sep = r"\s+" if delim_whitespace else ","
 
         itype_kwargs = {
-            "delim_whitespace": delim_whitespace,
             "header": None,
             "names": colnames,
             "usecols": usecols,
             "nrows": nrow,
             "na_values": na_values,
             "skipinitialspace": True,
+            "sep": sep,
         }
         if itype == 1:  # Timevariant information: timeseries
             # check if first column is time in [yyyymmdd] or [yyyymmddhhmmss]
@@ -262,10 +265,10 @@ def read(path, kwargs={}, assoc_kwargs={}):
         be combined in a single pd.DataFrame.
     kwargs : dict
         Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
-        IPF files (e.g. `{"delim_whitespace": True}`)
+        IPF files (e.g. `{"sep": "\s+"}`)
     assoc_kwargs: dict
         Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
-        associated (TXT) files (e.g. `{"delim_whitespace": True}`)
+        associated (TXT) files (e.g. `{"sep": "\s+"}`)
 
     Returns
     -------
