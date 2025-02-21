@@ -18,9 +18,11 @@ def zeros_grid(n):
 
     return xr.DataArray(data, coords=coords, dims=("y", "x"))
 
+
 def zeros_dask_grid(n):
     da = zeros_grid(n)
     return da.chunk({"x": n, "y": n})
+
 
 @pytest.fixture(scope="function")
 def cap_data_sprinkling_grid() -> Imod5DataDict:
