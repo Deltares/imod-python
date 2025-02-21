@@ -1,11 +1,10 @@
 import tempfile
 from pathlib import Path
-import pytest
-from pytest_cases import parametrize_with_cases
 
 import numpy as np
 import xarray as xr
 from numpy.testing import assert_equal
+from pytest_cases import parametrize_with_cases
 
 from imod import mf6, msw
 from imod.mf6.mf6_wel_adapter import Mf6Wel
@@ -37,6 +36,7 @@ def case_svat_data():
     # fmt: on
     return svat
 
+
 def case_svat_data__dask():
     return case_svat_data().chunk({"x": 3, "y": 3, "subunit": 1})
 
@@ -51,14 +51,15 @@ def get_mf6_wel(svat_data):
 
 
 def get_mf6_dis(svat_data):
-    like = xr.full_like(svat_data.isel(subunit=0, drop=True), 1.0, dtype=float).expand_dims(
-        layer=[1, 2, 3]
-    )
+    like = xr.full_like(
+        svat_data.isel(subunit=0, drop=True), 1.0, dtype=float
+    ).expand_dims(layer=[1, 2, 3])
     return mf6.StructuredDiscretization(
         top=1.0,
         bottom=xr.full_like(like, 0.0),
         idomain=xr.full_like(like, 1, dtype=np.int32),
     )
+
 
 def get_index(svat_data):
     return (svat_data != 0).data.ravel()
@@ -92,7 +93,7 @@ def test_simple_model_with_sprinkling_1_subunit(fixed_format_parser, svat_data):
     index = get_index(svat_data)
     mf6_dis = get_mf6_dis(svat_data)
     mf6_wel = get_mf6_wel(svat_data)
-    #mf6_wel.dataset = mf6_wel.dataset.sel()
+    # mf6_wel.dataset = mf6_wel.dataset.sel()
 
     coupler_mapping = msw.CouplerMapping()
 

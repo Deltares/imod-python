@@ -281,6 +281,7 @@ def case_grid_data_two_subunits(
     # fmt: on
     return data
 
+
 @case(tags="two_subunit")
 def case_grid_data_two_subunits__dask(
     coords_two_subunit: dict, coords_planar: dict

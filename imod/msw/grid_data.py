@@ -96,7 +96,7 @@ class GridData(MetaSwapPackage, IRegridPackage):
         # https://github.com/dask/dask/issues/11753
         isactive.load()
         svat.load()
-        
+
         index = isactive.values.ravel()
         svat.data[isactive.data] = np.arange(1, index.sum() + 1)
 
