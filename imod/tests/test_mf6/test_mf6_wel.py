@@ -1254,6 +1254,18 @@ def test_from_imod5_cap_data__grid(cap_data_sprinkling_grid):
     np.testing.assert_array_equal(ds["x"].to_numpy(), expected_x)
     np.testing.assert_array_equal(ds["y"].to_numpy(), expected_y)
 
+def test_from_imod5_cap_data__big_grid(cap_data_sprinkling_grid__big):
+    # Arrange
+    bnd_2d = cap_data_sprinkling_grid__big["cap"]["boundary"]
+    layer = xr.DataArray([1, 1], coords={"layer": [1, 2]}, dims=["layer"])
+    bnd = layer * bnd_2d
+    # Act
+    well = LayeredWell.from_imod5_cap_data(cap_data_sprinkling_grid__big)
+    mf6_wel = well.to_mf6_pkg(bnd.astype(bool), bnd, bnd, bnd)
+    # Assert
+    pass
+
+
 
 def test_from_imod5_cap_data__points(cap_data_sprinkling_points):
     with pytest.raises(NotImplementedError):

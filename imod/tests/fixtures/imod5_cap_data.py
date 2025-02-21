@@ -6,9 +6,9 @@ import xarray as xr
 from imod.typing import Imod5DataDict
 
 
-def zeros_grid():
-    x = [1.0, 2.0, 3.0]
-    y = [3.0, 2.0, 1.0]
+def zeros_grid(n):
+    x = np.arange(n, dtype=float) + 1.0
+    y = np.arange(n, dtype=float)[::-1] + 1.0
     dx = 1.0
     dy = -1.0
 
@@ -18,14 +18,18 @@ def zeros_grid():
 
     return xr.DataArray(data, coords=coords, dims=("y", "x"))
 
+def zeros_dask_grid(n):
+    da = zeros_grid(n)
+    return da.chunk({"x": n, "y": n})
 
 @pytest.fixture(scope="function")
 def cap_data_sprinkling_grid() -> Imod5DataDict:
-    boundary = zeros_grid() + 1
-    wetted_area = zeros_grid() + 0.5
-    urban_area = zeros_grid() + 0.25
+    n = 3
+    boundary = zeros_grid(n) + 1
+    wetted_area = zeros_grid(n) + 0.5
+    urban_area = zeros_grid(n) + 0.25
 
-    artificial_rch_type = zeros_grid()
+    artificial_rch_type = zeros_grid(n)
     artificial_rch_type[:, 1] = 1
     artificial_rch_type[:, 2] = 2
     layer = xr.ones_like(artificial_rch_type)
@@ -44,12 +48,36 @@ def cap_data_sprinkling_grid() -> Imod5DataDict:
 
 
 @pytest.fixture(scope="function")
-def cap_data_sprinkling_grid_with_layer() -> Imod5DataDict:
-    boundary = zeros_grid() + 1
-    wetted_area = zeros_grid() + 0.5
-    urban_area = zeros_grid() + 0.25
+def cap_data_sprinkling_grid__big() -> Imod5DataDict:
+    n = 300
+    boundary = zeros_dask_grid(n) + 1
+    wetted_area = zeros_dask_grid(n) + 0.5
+    urban_area = zeros_dask_grid(n) + 0.25
 
-    artificial_rch_type = zeros_grid()
+    artificial_rch_type = zeros_dask_grid(n) + 2.0
+    layer = xr.ones_like(artificial_rch_type)
+    layer[:, 1] = 2
+
+    cap_data = {
+        "boundary": boundary,
+        "wetted_area": wetted_area,
+        "urban_area": urban_area,
+        "artificial_recharge": artificial_rch_type,
+        "artificial_recharge_layer": layer,
+        "artificial_recharge_capacity": xr.DataArray(25.0),
+    }
+
+    return {"cap": cap_data}
+
+
+@pytest.fixture(scope="function")
+def cap_data_sprinkling_grid_with_layer() -> Imod5DataDict:
+    n = 3
+    boundary = zeros_grid(n) + 1
+    wetted_area = zeros_grid(n) + 0.5
+    urban_area = zeros_grid(n) + 0.25
+
+    artificial_rch_type = zeros_grid(n)
     artificial_rch_type[:, 1] = 1
     artificial_rch_type[:, 2] = 2
     layer = xr.ones_like(artificial_rch_type)
@@ -69,11 +97,12 @@ def cap_data_sprinkling_grid_with_layer() -> Imod5DataDict:
 
 @pytest.fixture(scope="function")
 def cap_data_sprinkling_points() -> Imod5DataDict:
-    boundary = zeros_grid() + 1
-    wetted_area = zeros_grid() + 0.5
-    urban_area = zeros_grid() + 0.25
+    n = 3
+    boundary = zeros_grid(n) + 1
+    wetted_area = zeros_grid(n) + 0.5
+    urban_area = zeros_grid(n) + 0.25
 
-    artificial_rch_type = zeros_grid()
+    artificial_rch_type = zeros_grid(n)
     artificial_rch_type[:, 1] = 3000
     artificial_rch_type[:, 2] = 4000
 
