@@ -92,7 +92,7 @@ def resample_timeseries(
         how="outer",
         on="time",
         validate="m:m",
-    ).fillna(method="ffill")
+    ).ffill()
     # Catch case where multiple well rates precede first timestep on multiple
     # occasions, these have to be clipped to avoid including them in the
     # computation of weighted averages later in the function. We only want to

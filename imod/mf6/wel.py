@@ -531,12 +531,13 @@ class GridAgnosticWell(BoundaryCondition, IPointDataPackage, abc.ABC):
     def gather_filtered_well_ids(
         self, well_data_filtered: pd.DataFrame | xr.Dataset, well_data: pd.DataFrame
     ) -> list[str]:
-        filtered_well_ids = [
-            id
-            for id in well_data["id"].unique()
-            if id not in well_data_filtered["id"].values
-        ]
-        return filtered_well_ids
+        # Work around performance issue with xarray isin for large datasets.
+        if isinstance(well_data_filtered, xr.Dataset):
+            filtered_ids = well_data_filtered["id"].to_dataframe()["id"]
+        else:
+            filtered_ids = well_data_filtered["id"]
+        is_missing_id = ~well_data["id"].isin(filtered_ids.unique())
+        return well_data["id"].loc[is_missing_id].unique()
 
     def to_mf6_package_information(
         self, filtered_wells: list[str], reason_text: str
@@ -875,7 +876,7 @@ class Well(GridAgnosticWell):
         }
         super().__init__(dict_dataset)
         # Set index as coordinate
-        index_coord = np.arange(self.dataset.dims["index"])
+        index_coord = np.arange(self.dataset.sizes["index"])
         self.dataset = self.dataset.assign_coords(index=index_coord)
         self._validate_init_schemata(validate)
 
@@ -952,7 +953,7 @@ class Well(GridAgnosticWell):
 
         # Initiate array of True with right shape to deal with case no spatial
         # selection needs to be done.
-        in_bounds = np.full(ds.dims["index"], True)
+        in_bounds = np.full(ds.sizes["index"], True)
         # Select all variables along "index" dimension
         in_bounds &= values_within_range(ds["x"], x_min, x_max)
         in_bounds &= values_within_range(ds["y"], y_min, y_max)
@@ -1252,7 +1253,7 @@ class LayeredWell(GridAgnosticWell):
         }
         super().__init__(dict_dataset)
         # Set index as coordinate
-        index_coord = np.arange(self.dataset.dims["index"])
+        index_coord = np.arange(self.dataset.sizes["index"])
         self.dataset = self.dataset.assign_coords(index=index_coord)
         self._validate_init_schemata(validate)
 
@@ -1305,7 +1306,7 @@ class LayeredWell(GridAgnosticWell):
 
         # Initiate array of True with right shape to deal with case no spatial
         # selection needs to be done.
-        in_bounds = np.full(ds.dims["index"], True)
+        in_bounds = np.full(ds.sizes["index"], True)
         # Select all variables along "index" dimension
         in_bounds &= values_within_range(ds["x"], x_min, x_max)
         in_bounds &= values_within_range(ds["y"], y_min, y_max)

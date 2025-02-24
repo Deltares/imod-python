@@ -31,11 +31,11 @@ def read_imod_legend(path):
     """
 
     # Read file. Do not rely the headers in the leg file.
-    def _read(delim_whitespace):
+    def _read(sep):
         return pd.read_csv(
             path,
             header=1,
-            delim_whitespace=delim_whitespace,
+            sep=sep,
             index_col=False,
             usecols=[0, 1, 2, 3, 4],
             names=["upper", "lower", "red", "green", "blue"],
@@ -43,9 +43,9 @@ def read_imod_legend(path):
 
     # Try both comma and whitespace separated
     try:
-        legend = _read(delim_whitespace=False)
+        legend = _read(sep=",")
     except ValueError:
-        legend = _read(delim_whitespace=True)
+        legend = _read(sep=r"\s+")
 
     # The colors in iMOD are formatted in RGB. Format to hexadecimal.
     red = legend["red"]

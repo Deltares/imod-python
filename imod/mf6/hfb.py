@@ -400,7 +400,7 @@ def _prepare_barrier_dataset_for_mf6_adapter(dataset: xr.Dataset) -> xr.Dataset:
     # removes the layer as well.
     layer = dataset.coords["layer"].values
     # Drop leftover coordinate and reset cell_id.
-    dataset = dataset.drop_vars("edge_index").reset_coords()
+    dataset = dataset.drop_vars(("edge_index", "layer", "cell_id")).reset_coords()
     # Attach layer again
     dataset["layer"] = ("cell_id", layer)
     return dataset
@@ -951,8 +951,8 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         ]
 
         return values.where(
-            (connected_cells_left.drop(face_dimension) > 0)
-            & (connected_cells_right.drop(face_dimension) > 0)
+            (connected_cells_left.drop_vars(face_dimension) > 0)
+            & (connected_cells_right.drop_vars(face_dimension) > 0)
         )
 
 
