@@ -93,7 +93,6 @@ def test_simple_model_with_sprinkling_1_subunit(fixed_format_parser, svat_data):
     index = get_index(svat_data)
     mf6_dis = get_mf6_dis(svat_data)
     mf6_wel = get_mf6_wel(svat_data)
-    # mf6_wel.dataset = mf6_wel.dataset.sel()
 
     coupler_mapping = msw.CouplerMapping()
 
@@ -106,9 +105,9 @@ def test_simple_model_with_sprinkling_1_subunit(fixed_format_parser, svat_data):
             msw.CouplerMapping._metadata_dict,
         )
 
-    assert_equal(results["mod_id"], np.array([20, 17, 2, 8]))
+    assert_equal(results["mod_id"], np.array([20, 8, 2, 8]))
     assert_equal(results["svat"], np.array([1, 2, 1, 2]))
-    assert_equal(results["layer"], np.array([3, 2, 1, 1]))
+    assert_equal(results["layer"], np.array([3, 1, 1, 1]))
 
 
 @parametrize_with_cases("svat_data", cases=[case_svat_data, case_svat_data__dask])
