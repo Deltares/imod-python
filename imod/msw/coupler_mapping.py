@@ -70,6 +70,12 @@ class CouplerMapping(MetaSwapPackage):
         # assign to self.dataset, as grid extent might differ from svat when
         # MetaSWAP only covers part of the Modflow grid domain.
         idomain_active = mf6_dis["idomain"] >= 1
+        # Load into memory to avoid dask issue
+        # https://github.com/dask/dask/issues/11753
+        # Otherwise fancy indexing in ``_create_mod_id_rch`` and
+        # ``_create_well_id`` will fail.
+        idomain_active.load()
+        svat.load()
         idomain_top_active = idomain_active.sel(layer=1, drop=True)
         mod_id = self._create_mod_id_rch(svat, idomain_top_active)
 
@@ -115,9 +121,6 @@ class CouplerMapping(MetaSwapPackage):
         well_row = well_cellid.sel(dim_cellid="row").data - 1
         well_column = well_cellid.sel(dim_cellid="column").data - 1
 
-        # Load into memory to avoid dask issue
-        # https://github.com/dask/dask/issues/11753
-        idomain_active.load()
         n_mod = idomain_active.sum()
         mod_id = xr.full_like(idomain_active, 0, dtype=np.int64)
         mod_id.data[idomain_active.data] = np.arange(1, n_mod + 1)
