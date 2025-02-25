@@ -10,6 +10,7 @@ import xarray as xr
 
 import imod
 from imod.mf6.dis import StructuredDiscretization
+from imod.mf6.utilities.regrid import RegridderWeightsCache
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing.grid import is_planar_grid, is_transient_data_grid, nan_like
@@ -467,18 +468,72 @@ def test_from_imod5_cap_data(imod5_dataset):
     data["cap"]["boundary"] = msw_bound
     data["cap"]["wetted_area"] = xr.ones_like(msw_bound) * 100
     data["cap"]["urban_area"] = xr.ones_like(msw_bound) * 200
+    # Compute midpoint of grid and set areas such, that cells need to be
+    # deactivated.
+    midpoint = tuple((int(x / 2) for x in msw_bound.shape))
     # Set to total cellsize, cell needs to be deactivated.
-    data["cap"]["wetted_area"][100, 100] = 625.0
+    data["cap"]["wetted_area"][midpoint] = 625.0
     # Set to zero, cell needs to be deactivated.
-    data["cap"]["urban_area"][100, 100] = 0.0
+    data["cap"]["urban_area"][midpoint] = 0.0
     # Act
     rch = imod.mf6.Recharge.from_imod5_cap_data(data, target_discretization)
     rate = rch.dataset["rate"]
     # Assert
+    # Shape
+    assert rate.dims == ("y", "x")
+    assert "layer" in rate.coords
+    assert rate.coords["layer"] == 1
+    # Values
     np.testing.assert_array_equal(np.unique(rate), np.array([0.0, np.nan]))
     # Boundaries inactive in MetaSWAP
-    assert np.isnan(rate[0, :, 0]).all()
-    assert np.isnan(rate[0, :, -1]).all()
-    assert np.isnan(rate[0, 0, :]).all()
-    assert np.isnan(rate[0, -1, :]).all()
-    assert np.isnan(rate[:, 100, 100]).all()
+    assert np.isnan(rate[:, 0]).all()
+    assert np.isnan(rate[:, -1]).all()
+    assert np.isnan(rate[0, :]).all()
+    assert np.isnan(rate[-1, :]).all()
+    assert np.isnan(rate[midpoint]).all()
+
+
+@pytest.mark.unittest_jit
+def test_from_imod5_cap_data__regrid(imod5_dataset):
+    # Arrange
+    data = deepcopy(imod5_dataset[0])
+    target_discretization = StructuredDiscretization.from_imod5_data(data)
+    data["cap"] = {}
+    msw_bound = data["bnd"]["ibound"].isel(layer=0, drop=False)
+    data["cap"]["boundary"] = msw_bound
+    data["cap"]["wetted_area"] = xr.ones_like(msw_bound) * 100
+    data["cap"]["urban_area"] = xr.ones_like(msw_bound) * 200
+    # Setup template grid
+    dx_small, xmin, xmax, dy_small, ymin, ymax = imod.util.spatial_reference(msw_bound)
+    dx = dx_small * 2
+    dy = dy_small * 2
+    expected_spatial_ref = dx, xmin, xmax, dy, ymin, ymax
+    like = imod.util.empty_2d(*expected_spatial_ref)
+    # Act
+    rch = imod.mf6.Recharge.from_imod5_cap_data(data, target_discretization)
+    rch_coarse = rch.regrid_like(like, regrid_cache=RegridderWeightsCache())
+    # Assert
+    actual_spatial_ref = imod.util.spatial_reference(rch_coarse.dataset["rate"])
+    assert actual_spatial_ref == expected_spatial_ref
+
+
+@pytest.mark.unittest_jit
+def test_from_imod5_cap_data__clip_box(imod5_dataset):
+    # Arrange
+    data = deepcopy(imod5_dataset[0])
+    target_discretization = StructuredDiscretization.from_imod5_data(data)
+    data["cap"] = {}
+    msw_bound = data["bnd"]["ibound"].isel(layer=0, drop=False)
+    data["cap"]["boundary"] = msw_bound
+    data["cap"]["wetted_area"] = xr.ones_like(msw_bound) * 100
+    data["cap"]["urban_area"] = xr.ones_like(msw_bound) * 200
+    # Setup template grid
+    dx, xmin, xmax, dy, ymin, ymax = imod.util.spatial_reference(msw_bound)
+    xmin_to_clip = xmin + 10 * dx
+    expected_spatial_ref = dx, xmin_to_clip, xmax, dy, ymin, ymax
+    # Act
+    rch = imod.mf6.Recharge.from_imod5_cap_data(data, target_discretization)
+    rch_clipped = rch.clip_box(x_min=xmin_to_clip)
+    # Assert
+    actual_spatial_ref = imod.util.spatial_reference(rch_clipped.dataset["rate"])
+    assert actual_spatial_ref == expected_spatial_ref

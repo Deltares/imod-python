@@ -91,6 +91,9 @@ Fixed
   like MetaSWAP expects.
 - Models imported with :meth:`imod.msw.MetaSwapModel.from_imod5_data` can be
   written with ``validate`` set to True.
+- :meth:`imod.mf6.Recharge.from_imod5_cap_data` now returns a 2D array with a
+  ``"layer"`` coordinate of ``1`` as otherwise ``primod`` throws an error when
+  trying to derive recharge-svat mappings.
 - Fixed part of the code that made Pandas, Geopandas, and xarray throw a lot of
   ``FutureWarning``s and ``DeprecationWarning``s.
 - Fixed performance issue when coverting very large wells (>10k) with
