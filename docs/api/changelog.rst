@@ -9,6 +9,11 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Removed
+~~~~~~~
+- ``imod.flow`` module has been removed for generating iMODFLOW models. Use
+  ``imod.mf6`` instead to generate MODFLOW6 models.
+
 Added
 ~~~~~
 
