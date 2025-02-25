@@ -19,6 +19,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.common.statusinfo import NestedStatusInfo, StatusInfo
 from imod.logging import LoggerType, LogLevel
 from imod.mf6 import LayeredWell, Well
 from imod.mf6.model import Modflow6Model
@@ -30,7 +31,6 @@ from imod.mf6.regrid.regrid_schemes import (
     StorageCoefficientRegridMethod,
 )
 from imod.mf6.simulation import Modflow6Simulation
-from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo
 from imod.prepare.topsystem.default_allocation_methods import (
     SimulationAllocationOptions,
     SimulationDistributingOptions,

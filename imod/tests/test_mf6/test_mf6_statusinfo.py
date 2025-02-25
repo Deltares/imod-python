@@ -1,6 +1,6 @@
 from pytest import fixture
 
-from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo
+from imod.common.statusinfo import NestedStatusInfo, StatusInfo
 
 
 class TestStatusInfo:

@@ -6,7 +6,7 @@ from typing import Optional, cast
 
 import numpy as np
 
-from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
+from imod.common.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.schemata import DimsSchema, NoDataComparisonSchema, ValidationError
 from imod.typing import GridDataArray
 
