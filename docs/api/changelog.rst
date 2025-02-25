@@ -67,7 +67,7 @@ Fixed
 ~~~~~
 
 - :meth:`imod.mf6.Model.mask_all_packages` now preserves the ``dx`` and 
-    ``dy`` coordinates
+  ``dy`` coordinates
 - :meth:`imod.mf6.Well.from_imod5_data` and
   :meth:`imod.mf6.LayeredWell.from_imod5_data` ignore well rates preceding first
   element of ``times``.
@@ -100,7 +100,7 @@ Fixed
   ``"layer"`` coordinate of ``1`` as otherwise ``primod`` throws an error when
   trying to derive recharge-svat mappings.
 - Fixed part of the code that made Pandas, Geopandas, and xarray throw a lot of
-  ``FutureWarning``s and ``DeprecationWarning``s.
+  ``FutureWarning`` and ``DeprecationWarning``.
 - Fixed performance issue when converting very large wells (>10k) with
   :meth:`imod.mf6.Well.to_mf6_pkg` and :meth:`imod.mf6.LayeredWell.to_mf6_pkg`,
   such as those created with :meth:`imod.mf6.LayeredWell.from_imod5_cap_data`
