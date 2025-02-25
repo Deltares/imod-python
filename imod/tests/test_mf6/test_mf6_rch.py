@@ -468,21 +468,29 @@ def test_from_imod5_cap_data(imod5_dataset):
     data["cap"]["boundary"] = msw_bound
     data["cap"]["wetted_area"] = xr.ones_like(msw_bound) * 100
     data["cap"]["urban_area"] = xr.ones_like(msw_bound) * 200
+    # Compute midpoint of grid and set areas such, that cells need to be
+    # deactivated.
+    midpoint = tuple((int(x / 2) for x in msw_bound.shape))
     # Set to total cellsize, cell needs to be deactivated.
-    data["cap"]["wetted_area"][100, 100] = 625.0
+    data["cap"]["wetted_area"][midpoint] = 625.0
     # Set to zero, cell needs to be deactivated.
-    data["cap"]["urban_area"][100, 100] = 0.0
+    data["cap"]["urban_area"][midpoint] = 0.0
     # Act
     rch = imod.mf6.Recharge.from_imod5_cap_data(data, target_discretization)
     rate = rch.dataset["rate"]
     # Assert
+    # Shape
+    assert rate.dims == ("y", "x")
+    assert "layer" in rate.coords
+    assert rate.coords["layer"] == 1
+    # Values
     np.testing.assert_array_equal(np.unique(rate), np.array([0.0, np.nan]))
     # Boundaries inactive in MetaSWAP
     assert np.isnan(rate[:, 0]).all()
     assert np.isnan(rate[:, -1]).all()
     assert np.isnan(rate[0, :]).all()
     assert np.isnan(rate[-1, :]).all()
-    assert np.isnan(rate[100, 100]).all()
+    assert np.isnan(rate[midpoint]).all()
 
 
 @pytest.mark.unittest_jit
