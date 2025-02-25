@@ -304,5 +304,8 @@ def read_imeth6_budgets_dense(
     table = read_imeth6_budgets(cbc_path, count, dtype, pos)
     if indices is None:
         indices = table["id1"] - 1  # Convert to 0 based index
-    out[indices] = table[return_variable]
+    # Zero the relevant values, overwrite the NaN value.
+    out[indices] = 0
+    # Sum all the budget terms.
+    np.add.at(out, indices, table[return_variable])
     return out.reshape(shape)

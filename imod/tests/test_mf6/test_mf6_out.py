@@ -377,6 +377,35 @@ def test_open_cbc__dis(twri_result):
             array.load()
 
 
+def test_open_cbc__dis_multi_drn_1_cell(twri_result_9_drn_in_1_cell):
+    """
+    Test if the cbc file is read correctly when there are multiple drain cells
+    in one cell. Values should be summed.
+    """
+    modeldir = twri_result_9_drn_in_1_cell
+    with imod.util.cd(modeldir):
+        cbc = imod.mf6.open_cbc("GWF_1/GWF_1.cbc", "GWF_1/dis.dis.grb")
+        assert isinstance(cbc, dict)
+        assert sorted(cbc.keys()) == [
+            "chd_chd",
+            "drn_drn",
+            "flow-front-face",
+            "flow-lower-face",
+            "flow-right-face",
+            "wel_wel",
+        ]
+        drn = cbc["drn_drn"]
+        assert drn.shape == (1, 3, 15, 15)
+        assert isinstance(drn, xr.DataArray)
+        assert isinstance(drn.data, dask.array.Array)
+
+        # Test if no errors are thrown if the array is loaded into memory
+        drn.load()
+
+        actual_value = drn.sel(time=1.0, layer=1)[6, 9]
+        np.testing.assert_approx_equal(actual_value, -24.7, significant=1)
+
+
 @pytest.mark.usefixtures("transient_twri_result")
 def test_open_cbc__dis_transient(transient_twri_result):
     modeldir = transient_twri_result

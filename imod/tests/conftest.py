@@ -86,6 +86,7 @@ from .fixtures.mf6_twri_fixture import (
     twri_model,
     twri_model_hfb,
     twri_result,
+    twri_result_9_drn_in_1_cell,
 )
 from .fixtures.mf6_welltest_fixture import (
     mf6wel_test_data_stationary,
