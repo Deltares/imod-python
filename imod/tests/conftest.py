@@ -20,7 +20,6 @@ from .fixtures.flow_basic_unstructured_fixture import (
     basic_unstructured_dis,
     circle_dis,
 )
-from .fixtures.flow_example_fixture import imodflow_model
 from .fixtures.flow_transport_simulation_fixture import flow_transport_simulation
 from .fixtures.imod5_cap_data import (
     cap_data_sprinkling_grid,
