@@ -282,6 +282,16 @@ def case_grid_data_two_subunits(
     return data
 
 
+@case(tags="two_subunit")
+def case_grid_data_two_subunits__dask(
+    coords_two_subunit: dict, coords_planar: dict
+) -> dict[str, xr.DataArray]:
+    data = case_grid_data_two_subunits(coords_two_subunit, coords_planar)
+    for key, values in data.items():
+        data[key] = values.chunk({"x": 3, "y": 1})
+    return data
+
+
 @parametrize_with_cases("grid_data_dict", cases=".", has_tag="two_subunit")
 def test_generate_index_array(
     grid_data_dict: dict[str, xr.DataArray], coords_two_subunit: dict
