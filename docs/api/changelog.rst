@@ -96,10 +96,13 @@ Fixed
   trying to derive recharge-svat mappings.
 - Fixed part of the code that made Pandas, Geopandas, and xarray throw a lot of
   ``FutureWarning``s and ``DeprecationWarning``s.
-- Fixed performance issue when coverting very large wells (>10k) with
+- Fixed performance issue when converting very large wells (>10k) with
   :meth:`imod.mf6.Well.to_mf6_pkg` and :meth:`imod.mf6.LayeredWell.to_mf6_pkg`,
   such as those created with :meth:`imod.mf6.LayeredWell.from_imod5_cap_data`
   for a large grid.
+- Fixed issue where an error was thrown when deriving couplings for
+  :class:`imod.msw.CouplerMapping` and computing svats in
+  :class:`imod.msw.GridData` with ``dask>=2025.2.0``.
 
 
 [1.0.0rc1] - 2024-12-20
