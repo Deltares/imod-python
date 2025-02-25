@@ -938,7 +938,7 @@ Fixed
 
 - :meth:`imod.mf6.Modflow6Simulation.write` with ``binary=False`` no longer
   results in invalid MODFLOW6 input for 2D grid data, such as DIS top.
-- :meth:`imod.flow.ImodflowModel.write` no longer writes incorrect project
+- ``imod.flow.ImodflowModel.write`` no longer writes incorrect project
   files for non-grid values with a time and layer dimension.
 - :func:`imod.evaluate.interpolate_value_boundaries`: Fix edge case when
   successive values in z direction are exactly equal to the boundary value.
@@ -954,7 +954,7 @@ Changed
 Added
 ~~~~~
 
-- :meth:`imod.flow.ImodflowModel.write` now supports writing a
+- ``imod.flow.ImodflowModel.write`` now supports writing a
   ``config_run.ini`` to convert the projectfile to a runfile or modflow 6
   namfile with iMOD5.
 - Added validation of Modflow6 Flow and Transport models. Incorrect model input
@@ -974,10 +974,10 @@ Fixed
 - Hotfixes for :meth:`imod.wq.model.SeawatModel.clip`, until `this merge request
   <https://gitlab.com/deltares/imod/imod-python/-/merge_requests/111>`_ is
   fulfilled. 
-- :meth:`imod.flow.ImodflowModel.write` will set the timestring in the
+- ``imod.flow.ImodflowModel.write`` will set the timestring in the
   projectfile to ``steady-state`` for ``BoundaryConditions`` without a time
   dimension.
-- Added :class:`imod.flow.OutputControl` as this was still missing.
+- Added ``imod.flow.OutputControl`` as this was still missing.
 - :func:`imod.ipf.read` will no longer error when an associated files with 0
   rows is read.
 - :func:`imod.evaluate.calculate_gxg` now correctly uses (March 14, March
@@ -1000,11 +1000,11 @@ Changed
   accordingly. Previously, if IDs were shared between different layers, the
   associated files would be overwritten as the IDs would result in the same
   file name being used over and over.
-- :meth:`imod.flow.ImodflowModel.time_discretization`,
+- ``imod.flow.ImodflowModel.time_discretization``,
   :meth:`imod.wq.SeawatModel.time_discretization`,
   :meth:`imod.mf6.Modflow6Simulation.time_discretization`,
   are renamed to:
-  :meth:`imod.flow.ImodflowModel.create_time_discretization`,
+  ``imod.flow.ImodflowModel.create_time_discretization``,
   :meth:`imod.wq.SeawatModel.create_time_discretization`,
   :meth:`imod.mf6.Modflow6Simulation.create_time_discretization`,
 - Moved tests inside `imod` directory, added an entry point for pytest fixtures.
@@ -1035,7 +1035,7 @@ Added
   in the GxG calculation as separate variables in the output dataset.
 - :func:`imod.visualize.spatial.plot_map` now accepts a `fix` and `ax` argument,
   to enable adding maps to existing axes.
-- :meth:`imod.flow.ImodflowModel.create_time_discretization`,
+- ``imod.flow.ImodflowModel.create_time_discretization``,
   :meth:`imod.wq.SeawatModel.create_time_discretization`,
   :meth:`imod.mf6.Modflow6Simulation.create_time_discretization`, now have a
   documentation section.
@@ -1112,7 +1112,7 @@ Added
    :py:func:`imod.prepare.zonal_aggregate_polygons` to efficiently compute zonal
    aggregates for many polygons (e.g. the properties every individual ditch in
    the Netherlands).
--  Added :py:class:`imod.flow.ImodflowModel` to write to model iMODFLOW project
+-  Added ``imod.flow.ImodflowModel`` to write to model iMODFLOW project
    file.
 -  :meth:`imod.mf6.Modflow6Simulation.write` now has a ``binary`` keyword. When set
    to ``False``, all MODFLOW6 input is written to text rather than binary files.
